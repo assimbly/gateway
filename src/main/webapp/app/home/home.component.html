@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-md-3">
+        <span class="hipster img-fluid rounded"></span>
+    </div>
+    <div class="col-md-9">
+        <div [ngSwitch]="isAuthenticated()">
+            <div  *ngSwitchCase="true">
+	               <jhi-camel-route>Loading routes...</jhi-camel-route>
+	        </div>
+			<div *ngSwitchCase="false">
+				<div class="card">
+					<div class="card-header">Welcome to Assimbly</div>
+					<div class="card-block pt-4">
+						<blockquote class="card-blockquote">							
+							<p>A messaging gateway with web configuration based on Apache Camel.</p>
+							<br/>
+							<p>Go to account to register or sign in.</p>														
+						</blockquote>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
