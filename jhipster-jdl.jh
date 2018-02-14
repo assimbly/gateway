@@ -1,0 +1,111 @@
+entity Gateway {
+	name String,
+    type GatewayType,
+	environmentName String,
+	stage EnvironmentType
+	defaultFromEndpointType String,
+	defaultToEndpointType String,
+	defaultErrorEndpointType String
+}
+
+entity EnvironmentVariables {
+	key String,
+	value String
+}
+
+entity CamelRoute {
+	name String	
+}
+
+entity FromEndpoint {
+	type EndpointType,
+    uri String,
+    options String
+}
+
+entity ToEndpoint {
+	type EndpointType,
+    uri String,
+    options String
+}
+
+entity ErrorEndpoint {
+	type EndpointType,
+    uri String,
+    options String
+}
+
+entity Service {
+	name String,
+	type String,
+	url String,
+	username String,
+	password String,
+	driver String,
+	configuration String
+}
+
+entity Header {
+	name String
+}
+
+entity HeaderKeys {
+	key String,
+	value String,
+	type String	
+}
+
+
+enum GatewayType {
+    FILE, BROKER
+}
+
+enum EnvironmentType {
+    DEVELOPMENT, TEST, ACCEPTANCE, PRODUCTION
+}
+
+
+enum EndpointType {
+   SONICMQ, ACTIVEMQ, KAFKA, SJMS, SQL, HTTP4, SFTP, STREAM, WASTEBIN, FILE
+}
+
+relationship OneToMany {
+	Gateway{camelRoute} to CamelRoute
+}
+
+relationship OneToMany {
+	Gateway{environmentVariables} to EnvironmentVariables
+}
+
+relationship OneToOne {
+	CamelRoute{fromEndpoint} to FromEndpoint
+}
+
+relationship OneToOne {
+	CamelRoute{errorEndpoint} to ErrorEndpoint
+}
+
+relationship OneToMany {
+	CamelRoute{toEndpoint} to ToEndpoint
+}
+
+relationship OneToOne {
+	FromEndpoint{service} to Service,
+    ToEndpoint{service} to Service,
+    ErrorEndpoint{service} to Service
+}
+
+relationship OneToOne {
+	FromEndpoint{header} to Header,
+    ToEndpoint{header} to Header,
+    ErrorEndpoint{header} to Header
+}
+
+relationship OneToMany {
+	Header{headerKeys} to HeaderKeys
+}
+
+// Set pagination options
+paginate CamelRoute with infinite-scroll
+
+dto * with mapstruct

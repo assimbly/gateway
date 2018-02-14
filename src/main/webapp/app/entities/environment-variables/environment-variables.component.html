@@ -1,0 +1,66 @@
+<div>
+    <h2>
+        <span>Environment Variables</span>
+        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Environment Variables
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="environmentVariables">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th id="environmentVariablesTitleID" [hidden]="!environmentVariablesTitleID"><span>ID</span></th>
+            <th><span>Key</span></th>
+            <th><span>Value</span></th>
+            <th id="environmentVariablesTitleGatewayID" [hidden]="!environmentVariablesTitleGatewayID"><span>Gateway</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let environmentVariables of environmentVariables ;trackBy: trackId">
+                <td  id="environmentVariablesRowID" [hidden]="!environmentVariablesRowID"><a [routerLink]="['../environment-variables', environmentVariables.id ]">{{environmentVariables.id}}</a></td>
+                <td>{{environmentVariables.key}}</td>
+                <td>{{environmentVariables.value}}</td>
+                <td  id="environmentVariablesRowGatewayID" [hidden]="!environmentVariablesRowGatewayID">
+                    <div *ngIf="environmentVariables.gatewayId">
+                        <a [routerLink]="['../gateway', environmentVariables.gatewayId  ]" >{{environmentVariables.gatewayId}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../environment-variables', environmentVariables.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

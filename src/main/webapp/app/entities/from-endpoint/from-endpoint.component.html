@@ -1,0 +1,74 @@
+<div>
+    <h2>
+        <span>From Endpoints</span>
+        <button class="btn btn-primary float-right jh-create-entity create-from-endpoint" [routerLink]="['/', { outlets: { popup: ['from-endpoint-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new From Endpoint
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="fromEndpoints">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span>ID</span></th>
+            <th><span>Type</span></th>
+            <th><span>Uri</span></th>
+            <th><span>Options</span></th>
+            <th><span>Service</span></th>
+            <th><span>Header</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let fromEndpoint of fromEndpoints ;trackBy: trackId">
+                <td><a [routerLink]="['../from-endpoint', fromEndpoint.id ]">{{fromEndpoint.id}}</a></td>
+                <td>{{fromEndpoint.type}}</td>
+                <td>{{fromEndpoint.uri}}</td>
+                <td>{{fromEndpoint.options}}</td>
+                <td>
+                    <div *ngIf="fromEndpoint.serviceId">
+                        <a [routerLink]="['../service', fromEndpoint.serviceId  ]" >{{fromEndpoint.serviceId}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="fromEndpoint.headerId">
+                        <a [routerLink]="['../header', fromEndpoint.headerId  ]" >{{fromEndpoint.headerId}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../from-endpoint', fromEndpoint.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'from-endpoint/'+ fromEndpoint.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'from-endpoint/'+ fromEndpoint.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
