@@ -1,0 +1,97 @@
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myGatewayLabel">Create or edit a Gateway</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!gateway.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                   [(ngModel)]="gateway.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                [(ngModel)]="gateway.name" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_type">Type</label>
+            <select class="form-control" name="type" [(ngModel)]="gateway.type" id="field_type" >
+                <option value="FILE">FILE</option>
+                <option value="BROKER">BROKER</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_environmentName">Environment Name</label>
+            <input type="text" class="form-control" name="environmentName" id="field_environmentName"
+                [(ngModel)]="gateway.environmentName" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_stage">Stage</label>
+            <select class="form-control" name="stage" [(ngModel)]="gateway.stage" id="field_stage" >
+                <option value="DEVELOPMENT">DEVELOPMENT</option>
+                <option value="TEST">TEST</option>
+                <option value="ACCEPTANCE">ACCEPTANCE</option>
+                <option value="PRODUCTION">PRODUCTION</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_defaultFromEndpointType">Default From Endpoint</label>
+            <select class="form-control" name="type"  name="defaultFromEndpointType" id="field_defaultFromEndpointType" [(ngModel)]="gateway.defaultFromEndpointType">
+                <option value="SONICMQ">SONICMQ</option>
+                <option value="ACTIVEMQ">ACTIVEMQ</option>
+                <option value="KAFKA">KAFKA</option>               
+                <option value="SJMS">SJMS</option>
+                <option value="SQL">SQL</option>
+                <option value="HTTP4">HTTP4</option>
+                <option value="SFTP">SFTP</option>
+                <option value="STREAM">STREAM</option>
+                <option value="WASTEBIN">WASTEBIN</option>
+                <option value="FILE">FILE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_defaultToEndpointType">Default To Endpoint</label>
+           <select class="form-control" name="type"  name="defaultToEndpointType" id="field_defaultToEndpointType" [(ngModel)]="gateway.defaultToEndpointType">
+                <option value="SONICMQ">SONICMQ</option>
+                <option value="ACTIVEMQ">ACTIVEMQ</option>
+                <option value="KAFKA">KAFKA</option>               
+                <option value="SJMS">SJMS</option>
+                <option value="SQL">SQL</option>
+                <option value="HTTP4">HTTP4</option>
+                <option value="SFTP">SFTP</option>
+                <option value="STREAM">STREAM</option>
+                <option value="WASTEBIN">WASTEBIN</option>
+                <option value="FILE">FILE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_defaultErrorEndpointType">Default Error Endpoint</label>
+           <select class="form-control" name="type" name="defaultErrorEndpointType" id="field_defaultErrorEndpointType" [(ngModel)]="gateway.defaultErrorEndpointType" >
+                <option value="SONICMQ">SONICMQ</option>
+                <option value="ACTIVEMQ">ACTIVEMQ</option>
+                <option value="KAFKA">KAFKA</option>               
+                <option value="SJMS">SJMS</option>
+                <option value="SQL">SQL</option>
+                <option value="HTTP4">HTTP4</option>
+                <option value="SFTP">SFTP</option>
+                <option value="STREAM">STREAM</option>
+                <option value="WASTEBIN">WASTEBIN</option>
+                <option value="FILE">FILE</option>
+            </select>
+            
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

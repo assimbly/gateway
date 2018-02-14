@@ -1,0 +1,63 @@
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myFromEndpointLabel">Create or edit a From Endpoint</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!fromEndpoint.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                   [(ngModel)]="fromEndpoint.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_type">Type</label>
+            <select class="form-control" name="type" [(ngModel)]="fromEndpoint.type" id="field_type" >
+                <option value="SONICMQ">SONICMQ</option>
+                <option value="ACTIVEMQ">ACTIVEMQ</option>
+                <option value="SJMS">SJMS</option>
+                <option value="SQL">SQL</option>
+                <option value="HTTP4">HTTP4</option>
+                <option value="SFTP">SFTP</option>
+                <option value="STREAM">STREAM</option>
+                <option value="WASTEBIN">WASTEBIN</option>
+                <option value="FILE">FILE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_uri">Uri</label>
+            <input type="text" class="form-control" name="uri" id="field_uri"
+                [(ngModel)]="fromEndpoint.uri" />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_options">Options</label>
+            <input type="text" class="form-control" name="options" id="field_options"
+                [(ngModel)]="fromEndpoint.options" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label" for="field_service">Service</label>
+            <select class="form-control" id="field_service" name="service" [(ngModel)]="fromEndpoint.serviceId">
+                <option [ngValue]="null"></option>
+                <option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_header">Header</label>
+            <select class="form-control" id="field_header" name="header" [(ngModel)]="fromEndpoint.headerId">
+                <option [ngValue]="null"></option>
+                <option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

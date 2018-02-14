@@ -1,0 +1,37 @@
+<div *ngIf="gateway">
+    <h2><span>Gateway</span> {{gateway.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd>
+            <span>{{gateway.name}}</span>
+        </dd>
+        <dt><span>Type</span></dt>
+        <dd>
+            <span>{{gateway.type}}</span>
+        </dd>
+        <dt><span>Environment Name</span></dt>
+        <dd>
+            <span>{{gateway.environmentName}}</span>
+        </dd>
+        <dt><span>Stage</span></dt>
+        <dd>
+            <span>{{gateway.stage}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>
