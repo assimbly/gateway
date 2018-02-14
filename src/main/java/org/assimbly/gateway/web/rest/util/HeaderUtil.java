@@ -28,11 +28,31 @@ public final class HeaderUtil {
     public static HttpHeaders createEntityUpdateAlert(String entityName, String param) {
         return createAlert("A " + entityName + " is updated with identifier " + param, param);
     }
-
+    
     public static HttpHeaders createEntityDeletionAlert(String entityName, String param) {
         return createAlert("A " + entityName + " is deleted with identifier " + param, param);
     }
 
+    public static HttpHeaders createStartAlert(String param) {
+        return createAlert("Started route " + param, param);
+    }
+    
+    public static HttpHeaders createRestartAlert(String param) {
+        return createAlert("Restarted " + param, param);
+    }
+
+    public static HttpHeaders createStopAlert(String param) {
+        return createAlert("Stopped route " + param, param);
+    }
+
+    public static HttpHeaders camelFailureAlert(String routeName, String errorKey, String defaultMessage) {
+        log.error("Entity processing failed, {}", defaultMessage);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-gatewayApp-error", defaultMessage);
+        headers.add("X-gatewayApp-params", routeName);
+        return headers;
+    }
+    
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
