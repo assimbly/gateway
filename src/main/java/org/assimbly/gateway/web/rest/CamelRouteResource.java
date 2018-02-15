@@ -238,7 +238,7 @@ public class CamelRouteResource {
 	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
 		}    
      }
-    
+   
     @GetMapping("/camel-routes/status/{id}")
     @Timed
     public String statusCamelRoute(@PathVariable Long id) throws URISyntaxException {

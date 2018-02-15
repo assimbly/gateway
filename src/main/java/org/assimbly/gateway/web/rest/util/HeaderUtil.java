@@ -48,7 +48,8 @@ public final class HeaderUtil {
 	public static HttpHeaders createPauseAlert(String param) {
 		return createAlert("Paused route " + param, param);
 	}
-    public static HttpHeaders camelFailureAlert(String routeName, String errorKey, String defaultMessage) {
+
+	public static HttpHeaders camelFailureAlert(String routeName, String errorKey, String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-gatewayApp-error", defaultMessage);
