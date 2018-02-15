@@ -220,6 +220,25 @@ public class CamelRouteResource {
 		}
     }    
 
+    @GetMapping("/camel-routes/pause/{id}")
+    @Timed
+    public ResponseEntity<Void>  pauseCamelRoute(@PathVariable Long id) throws URISyntaxException {
+
+       	String routeID = id.toString();
+    	String routeName = camelRouteRepository.findOne(id).getName();
+
+       	log.info("REST request to pause route " + routeName);
+    	
+        try {
+			connector.stopRoute(routeID);
+	       	log.info("Paused route " + routeName);
+   	        return ResponseEntity.ok().headers(HeaderUtil.createPauseAlert(routeName)).build();
+		} catch (Exception e) {
+			log.debug("Can't pause route" + e);
+	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
+		}    
+     }
+    
     @GetMapping("/camel-routes/status/{id}")
     @Timed
     public String statusCamelRoute(@PathVariable Long id) throws URISyntaxException {
