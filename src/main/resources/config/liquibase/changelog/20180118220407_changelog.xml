@@ -1,0 +1,91 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="user (generated)" id="1516309456519-1">
+        <addColumn tableName="camel_route">
+            <column name="error_endpoint_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-2">
+        <addColumn tableName="camel_route">
+            <column name="from_endpoint_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-3">
+        <addUniqueConstraint columnNames="error_endpoint_id" constraintName="UC_CAMEL_ROUTEERROR_ENDPOINT_ID_COL" tableName="camel_route"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-4">
+        <addUniqueConstraint columnNames="from_endpoint_id" constraintName="UC_CAMEL_ROUTEFROM_ENDPOINT_ID_COL" tableName="camel_route"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-5">
+        <addForeignKeyConstraint baseColumnNames="error_endpoint_id" baseTableName="camel_route" constraintName="FK1wap6lu05flpkv96rksobi9kr" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="error_endpoint"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-6">
+        <addForeignKeyConstraint baseColumnNames="from_endpoint_id" baseTableName="camel_route" constraintName="FKkqmk8nlpb8nv0xjra5h65yyxl" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="from_endpoint"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-7">
+        <dropForeignKeyConstraint baseTableName="CAMEL_ROUTE" constraintName="FK_CAMEL_ROUTE_ENDPOINT_ERROR_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-8">
+        <dropForeignKeyConstraint baseTableName="CAMEL_ROUTE" constraintName="FK_CAMEL_ROUTE_ENDPOINT_FROM_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-9">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_ERROR" constraintName="FK_ENDPOINT_ERROR_HEADER_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-10">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_ERROR" constraintName="FK_ENDPOINT_ERROR_SERVICE_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-11">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_FROM" constraintName="FK_ENDPOINT_FROM_HEADER_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-12">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_FROM" constraintName="FK_ENDPOINT_FROM_SERVICE_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-13">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_CAMEL_ROUTE_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-14">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_HEADER_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-15">
+        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_SERVICE_ID"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-16">
+        <dropUniqueConstraint constraintName="CONSTRAINT_3" tableName="ENDPOINT_TO"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-17">
+        <dropUniqueConstraint constraintName="CONSTRAINT_3C" tableName="ENDPOINT_TO"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-18">
+        <dropUniqueConstraint constraintName="CONSTRAINT_7" tableName="ENDPOINT_ERROR"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-19">
+        <dropUniqueConstraint constraintName="CONSTRAINT_71" tableName="ENDPOINT_ERROR"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-20">
+        <dropUniqueConstraint constraintName="CONSTRAINT_9" tableName="ENDPOINT_FROM"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-21">
+        <dropUniqueConstraint constraintName="CONSTRAINT_98" tableName="ENDPOINT_FROM"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-22">
+        <dropUniqueConstraint constraintName="CONSTRAINT_F1" tableName="CAMEL_ROUTE"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-23">
+        <dropUniqueConstraint constraintName="CONSTRAINT_F1E" tableName="CAMEL_ROUTE"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-24">
+        <dropTable tableName="ENDPOINT_ERROR"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-25">
+        <dropTable tableName="ENDPOINT_FROM"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-26">
+        <dropTable tableName="ENDPOINT_TO"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-27">
+        <dropColumn columnName="ENDPOINT_ERROR_ID" tableName="CAMEL_ROUTE"/>
+    </changeSet>
+    <changeSet author="user (generated)" id="1516309456519-28">
+        <dropColumn columnName="ENDPOINT_FROM_ID" tableName="CAMEL_ROUTE"/>
+    </changeSet>
+</databaseChangeLog>

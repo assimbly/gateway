@@ -1,0 +1,44 @@
+
+<div *ngIf="camelRoute">
+    <h2><span>Camel Route</span> {{camelRoute.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd>
+            <span>{{camelRoute.name}}</span>
+        </dd>
+        <dt><span>Gateway</span></dt>
+        <dd>
+            <div *ngIf="camelRoute.gatewayId">
+                <a [routerLink]="['/gateway', camelRoute.gatewayId]">{{camelRoute.gatewayId}}</a>
+            </div>
+        </dd>
+        <dt><span>From Endpoint</span></dt>
+        <dd>
+            <div *ngIf="camelRoute.fromEndpointId">
+                <a [routerLink]="['/from-endpoint', camelRoute.fromEndpointId]">{{camelRoute.fromEndpointId}}</a>
+            </div>
+        </dd>
+        <dt><span>Error Endpoint</span></dt>
+        <dd>
+            <div *ngIf="camelRoute.errorEndpointId">
+                <a [routerLink]="['/error-endpoint', camelRoute.errorEndpointId]">{{camelRoute.errorEndpointId}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'camel-route/'+ camelRoute.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

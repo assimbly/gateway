@@ -1,0 +1,48 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "camelRoute",
+            "otherEntityName": "camelRoute",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "service",
+            "otherEntityName": "service",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "toEndpoint"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "toEndpoint"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "type",
+            "fieldType": "EndpointType",
+            "fieldValues": "SONICMQ,ACTIVEMQ,SJMS,SQL,HTTP4,SFTP,STREAM,WASTEBIN,FILE"
+        },
+        {
+            "fieldName": "uri",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "options",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180114201816",
+    "entityTableName": "to_endpoint",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

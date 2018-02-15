@@ -1,0 +1,46 @@
+
+<div *ngIf="errorEndpoint">
+    <h2><span>Error Endpoint</span> {{errorEndpoint.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Type</span></dt>
+        <dd>
+            <span>{{errorEndpoint.type}}</span>
+        </dd>
+        <dt><span>Uri</span></dt>
+        <dd>
+            <span>{{errorEndpoint.uri}}</span>
+        </dd>
+        <dt><span>Options</span></dt>
+        <dd>
+            <span>{{errorEndpoint.options}}</span>
+        </dd>
+        <dt><span>Service</span></dt>
+        <dd>
+            <div *ngIf="errorEndpoint.serviceId">
+                <a [routerLink]="['/service', errorEndpoint.serviceId]">{{errorEndpoint.serviceId}}</a>
+            </div>
+        </dd>
+        <dt><span>Header</span></dt>
+        <dd>
+            <div *ngIf="errorEndpoint.headerId">
+                <a [routerLink]="['/header', errorEndpoint.headerId]">{{errorEndpoint.headerId}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'error-endpoint/'+ errorEndpoint.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

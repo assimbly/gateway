@@ -1,0 +1,64 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { JhiEventManager } from 'ng-jhipster';
+
+import { Header } from './header.model';
+import { HeaderPopupService } from './header-popup.service';
+import { HeaderService } from './header.service';
+
+@Component({
+    selector: 'jhi-header-delete-dialog',
+    templateUrl: './header-delete-dialog.component.html'
+})
+export class HeaderDeleteDialogComponent {
+
+    header: Header;
+
+    constructor(
+        private headerService: HeaderService,
+        public activeModal: NgbActiveModal,
+        private eventManager: JhiEventManager
+    ) {
+    }
+
+    clear() {
+        this.activeModal.dismiss('cancel');
+    }
+
+    confirmDelete(id: number) {
+        this.headerService.delete(id).subscribe((response) => {
+            this.eventManager.broadcast({
+                name: 'headerListModification',
+                content: 'Deleted an header'
+            });
+            this.activeModal.dismiss(true);
+        });
+    }
+}
+
+@Component({
+    selector: 'jhi-header-delete-popup',
+    template: ''
+})
+export class HeaderDeletePopupComponent implements OnInit, OnDestroy {
+
+    routeSub: any;
+
+    constructor(
+        private route: ActivatedRoute,
+        private headerPopupService: HeaderPopupService
+    ) {}
+
+    ngOnInit() {
+        this.routeSub = this.route.params.subscribe((params) => {
+            this.headerPopupService
+                .open(HeaderDeleteDialogComponent as Component, params['id']);
+        });
+    }
+
+    ngOnDestroy() {
+        this.routeSub.unsubscribe();
+    }
+}
