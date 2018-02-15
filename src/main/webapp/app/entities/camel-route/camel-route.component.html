@@ -1,0 +1,98 @@
+<div>
+    <h2>
+        <span>Camel Routes</span>
+        <button class="btn btn-primary float-right" type="submit" [routerLink]="['../camel-route', 'edit-all' ]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Camel Route
+            </span>
+        </button>        
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="camelRoutes">
+        <table class="table table-striped">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+            <th jhiSortBy="id" id="camelRouteTitleID" [hidden]="!camelRouteTitleID"><span>ID</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="name"><span>Name</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="gatewayId" id="camelRouteTitleGatewayID" [hidden]="!camelRouteTitleGatewayID"><span>Gateway</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="fromEndpointId"><span>From Endpoint</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="toEndpointId"><span>To Endpoints</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="errorEndpointId" id="camelRouteTitleErrorEndpointID" [hidden]="!camelRouteTitleErrorEndpointID"><span>Endpoint Error</span> <span class="fa fa-sort"></span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+            <tr *ngFor="let camelRoute of camelRoutes ;trackBy: trackId">
+                <td id="camelRouteRowID" [hidden]="!camelRouteRowID"><a [routerLink]="['../camel-route', camelRoute.id ]">{{camelRoute.id}}</a></td>
+                <td>{{camelRoute.name}}</td>
+                <td id="camelRouteGatewayID" [hidden]="!camelRouteRowGatewayID">
+                    <div *ngIf="camelRoute.gatewayId">
+                        <a [routerLink]="['../gateway', camelRoute.gatewayId  ]" >{{camelRoute.gatewayId}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="camelRoute.fromEndpointId">
+                        <a [routerLink]="['../from-endpoint', camelRoute.fromEndpointId  ]" >{{camelRoute.fromEndpointId}}</a>
+                    </div>
+                </td>
+                <td>
+                <div *ngIf="camelRoute.toEndpointId">
+                        <a [routerLink]="['../to-endpoint', camelRoute.toEndpointId  ]" >{{camelRoute.toEndpointId}}</a>
+                    </div>
+                </td>                
+                <td  id="camelRouteErrorEndpointID" [hidden]="!camelRouteRowErrorEndpointID">
+                    <div *ngIf="camelRoute.errorEndpointId">
+                        <a [routerLink]="['../error-endpoint', camelRoute.errorEndpointId  ]" >{{camelRoute.errorEndpointId}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../camel-route', camelRoute.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'camel-route/'+ camelRoute.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'camel-route/'+ camelRoute.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                    	<button type="button" (click)="start(camelRoute.id);" class="btn btn-info btn-sm">
+                            <span class="fa fa-play"></span>
+                            <span class="d-none d-md-inline">Start</span>
+                        </button>
+                    	<button type="button" (click)="restart(camelRoute.id);" class="btn btn-primary btn-sm">
+                            <span class="fa fa-refresh"></span>
+                            <span class="d-none d-md-inline">Restart</span>
+                        </button>
+                    	<button type="button" (click)="stop(camelRoute.id);" class="btn btn-danger btn-sm">
+                            <span class="fa fa-stop"></span>
+                            <span class="d-none d-md-inline">Stop</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

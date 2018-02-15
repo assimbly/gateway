@@ -1,0 +1,73 @@
+import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { SERVER_API_URL } from '../../app.constants';
+
+import { HeaderKeys } from './header-keys.model';
+import { ResponseWrapper, createRequestOption } from '../../shared';
+
+@Injectable()
+export class HeaderKeysService {
+
+    private resourceUrl =  SERVER_API_URL + 'api/header-keys';
+
+    constructor(private http: Http) { }
+
+    create(headerKeys: HeaderKeys): Observable<HeaderKeys> {
+        const copy = this.convert(headerKeys);
+        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
+    update(headerKeys: HeaderKeys): Observable<HeaderKeys> {
+        const copy = this.convert(headerKeys);
+        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
+    find(id: number): Observable<HeaderKeys> {
+        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
+    query(req?: any): Observable<ResponseWrapper> {
+        const options = createRequestOption(req);
+        return this.http.get(this.resourceUrl, options)
+            .map((res: Response) => this.convertResponse(res));
+    }
+
+    delete(id: number): Observable<Response> {
+        return this.http.delete(`${this.resourceUrl}/${id}`);
+    }
+
+    private convertResponse(res: Response): ResponseWrapper {
+        const jsonResponse = res.json();
+        const result = [];
+        for (let i = 0; i < jsonResponse.length; i++) {
+            result.push(this.convertItemFromServer(jsonResponse[i]));
+        }
+        return new ResponseWrapper(res.headers, result, res.status);
+    }
+
+    /**
+     * Convert a returned JSON object to HeaderKeys.
+     */
+    private convertItemFromServer(json: any): HeaderKeys {
+        const entity: HeaderKeys = Object.assign(new HeaderKeys(), json);
+        return entity;
+    }
+
+    /**
+     * Convert a HeaderKeys to a JSON which can be sent to the server.
+     */
+    private convert(headerKeys: HeaderKeys): HeaderKeys {
+        const copy: HeaderKeys = Object.assign({}, headerKeys);
+        return copy;
+    }
+}

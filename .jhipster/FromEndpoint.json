@@ -1,0 +1,42 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "service",
+            "otherEntityName": "service",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "fromEndpoint"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "fromEndpoint"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "type",
+            "fieldType": "EndpointType",
+            "fieldValues": "SONICMQ,ACTIVEMQ,SJMS,SQL,HTTP4,SFTP,STREAM,WASTEBIN,FILE"
+        },
+        {
+            "fieldName": "uri",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "options",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180114201815",
+    "entityTableName": "from_endpoint",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

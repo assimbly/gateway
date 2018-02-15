@@ -6,6 +6,9 @@ buildscript {
         jcenter()
         maven { url "http://repo.spring.io/plugins-release" }
         maven { url "https://plugins.gradle.org/m2/" }
+        flatDir {
+       		dirs 'libs'
+   		}
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
@@ -13,6 +16,8 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
+    
+    
 }
 
 plugins {
@@ -132,6 +137,7 @@ configurations {
     compile.exclude module: "spring-boot-starter-tomcat"
 }
 
+
 repositories {
     mavenLocal()
     jcenter()
@@ -193,6 +199,7 @@ dependencies {
     compile "io.springfox:springfox-bean-validators"
     compile "mysql:mysql-connector-java"
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+    compile "org.assimbly:camelconnector:1.0.0"  
     testCompile "com.jayway.jsonpath:json-path"
     testCompile ("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
