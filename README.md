@@ -1,7 +1,27 @@
-# gateway
-This application was generated using JHipster 4.13.3, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.13.3](http://www.jhipster.tech/documentation-archive/v4.13.3).
+# Introduction
+
+Assimbly is a messaging gateway. Basicly it sends data between two endpoints. The purpose of Assimbly is to connect these
+endpoints with the help of a webgui. The webgui helps to configure these endpoints and manages the lifecycle of the connections.
+
+On the background [Apache Camel!](https://github.com/apache/camel) does the actual works. Assimbly only implements point-to-point(s) intergration pattern of Camel.
+So if data only needs to transfered it can connect any supported endpoint by the [Assimbly Connector!](https://github.com/assimbly/connector).
+
+The idea however is to get messages from and to a messaging broker like ActiveMQ and Kafka. With help of ingesting tooling (Elastic etc) or other integration software (ESB, Apache ServicesMix, Apache NiFi etc)
+the message can be routed and processed. Another Assimbly node can also act as a gateway for the consuming application. 
+
+
+## Design
+
+The main goals are:
+
+* Separate-of-concerns: Seperate gateway (interoperability) from message broker and message bus
+* Ease of use: Configure and manage connections with ease
+* Web based: Access from any browser
+
 
 ## Development
+
+Assimbly gateway was generated using JHipster 4.13.3, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.13.3](http://www.jhipster.tech/documentation-archive/v4.13.3).
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
@@ -30,24 +50,6 @@ Add the `help` flag on any command to see how you can use it. For example, `yarn
 
 The `yarn run` command will list all of the scripts available to run for this project.
 
-### Service workers
-
-Service workers are commented by default, to enable them please uncomment the following code.
-
-* The service worker registering script in index.html
-
-```html
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-        .register('./sw.js')
-        .then(function() { console.log('Service Worker Registered'); });
-    }
-</script>
-```
-
-Note: workbox creates the respective service worker and dynamically generate the `sw.js`
-
 ### Managing dependencies
 
 For example, to add [Leaflet][] library as a runtime dependency of your application, you would run following command:
@@ -71,21 +73,6 @@ Edit [src/main/webapp/content/css/vendor.css](src/main/webapp/content/css/vendor
 Note: there are still few other things remaining to do for Leaflet that we won't detail here.
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
-
-### Using angular-cli
-
-You can also use [Angular CLI][] to generate some custom client code.
-
-For example, the following command:
-
-    ng generate component my-component
-
-will generate few files:
-
-    create src/main/webapp/app/my-component/my-component.component.html
-    create src/main/webapp/app/my-component/my-component.component.ts
-    update src/main/webapp/app/app.module.ts
-
 
 ## Building for production
 
@@ -113,8 +100,6 @@ To launch your application's tests, run:
 Unit tests are run by [Karma][] and written with [Jasmine][]. They're located in [src/test/javascript/](src/test/javascript/) and can be run with:
 
     yarn test
-
-
 
 For more information, refer to the [Running tests page][].
 
