@@ -199,7 +199,7 @@ dependencies {
     compile "io.springfox:springfox-bean-validators"
     compile "mysql:mysql-connector-java"
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
-    compile "org.assimbly:camelconnector:1.0.0"  
+    compile "org.assimbly:connector:1.0.0"  
     testCompile "com.jayway.jsonpath:json-path"
     testCompile ("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'

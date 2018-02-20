@@ -36,6 +36,13 @@ export class ToEndpointService {
         });
     }
 
+    findByRouteId(id: number): Observable<ToEndpoint> {
+        return this.http.get(`${this.resourceUrl}/byrouteid/${id}`).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
     query(req?: any): Observable<ResponseWrapper> {
         const options = createRequestOption(req);
         return this.http.get(this.resourceUrl, options)
@@ -56,16 +63,16 @@ export class ToEndpointService {
     }
 
     /**
-     * Convert a returned JSON object to ToEndpoint.
-     */
+	 * Convert a returned JSON object to ToEndpoint.
+	 */
     private convertItemFromServer(json: any): ToEndpoint {
         const entity: ToEndpoint = Object.assign(new ToEndpoint(), json);
         return entity;
     }
 
     /**
-     * Convert a ToEndpoint to a JSON which can be sent to the server.
-     */
+	 * Convert a ToEndpoint to a JSON which can be sent to the server.
+	 */
     private convert(toEndpoint: ToEndpoint): ToEndpoint {
         const copy: ToEndpoint = Object.assign({}, toEndpoint);
         return copy;

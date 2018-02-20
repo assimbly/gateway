@@ -32,8 +32,8 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
         GatewayGatewayModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
-        GatewayServiceModule,
         GatewayToEndpointModule,
+        GatewayServiceModule,
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     declarations: [],

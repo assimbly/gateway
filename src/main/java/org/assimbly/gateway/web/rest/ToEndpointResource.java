@@ -105,9 +105,24 @@ public class ToEndpointResource {
      * @param id the id of the toEndpointDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
      */
+    @GetMapping("/to-endpoints/byrouteid/{id}")
+    @Timed
+    public ResponseEntity<ToEndpointDTO> getToEndpointByRouteID(@PathVariable Long id) {
+        log.debug("REST request to get ToEndpoints by routeid");
+        List<ToEndpoint> toEndpoints = toEndpointRepository.findByCamelRouteId(id);
+        ToEndpoint toEndpoint = toEndpoints.get(0);
+        ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(toEndpointDTO));
+    }    
+    /**
+     * GET  /to-endpoints/:id : get the "id" toEndpoint.
+     *
+     * @param id the id of the toEndpointDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
+     */
     @GetMapping("/to-endpoints/{id}")
     @Timed
-    public ResponseEntity<ToEndpointDTO> getToEndpoint(@PathVariable Long id) {
+    public ResponseEntity<ToEndpointDTO> getToEndpointID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoint : {}", id);
         ToEndpoint toEndpoint = toEndpointRepository.findOne(id);
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);

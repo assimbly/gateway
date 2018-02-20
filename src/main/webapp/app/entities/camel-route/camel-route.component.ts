@@ -4,15 +4,22 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 
 import { CamelRoute } from './camel-route.model';
 import { CamelRouteService } from './camel-route.service';
+import { FromEndpoint } from '../from-endpoint/from-endpoint.model';
+import { FromEndpointService } from '../from-endpoint/from-endpoint.service';
+import { ToEndpoint } from '../to-endpoint/to-endpoint.model';
+import { ToEndpointService } from '../to-endpoint/to-endpoint.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-camel-route',
     templateUrl: './camel-route.component.html'
 })
+
 export class CamelRouteComponent implements OnInit, OnDestroy {
 
     camelRoutes: CamelRoute[];
+    fromEndpoints: FromEndpoint[];
+    toEndpoints: ToEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -25,12 +32,16 @@ export class CamelRouteComponent implements OnInit, OnDestroy {
 
     constructor(
         private camelRouteService: CamelRouteService,
+        private fromEndpointService: FromEndpointService,
+        private toEndpointService: ToEndpointService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
         private principal: Principal
     ) {
         this.camelRoutes = [];
+        this.fromEndpoints = [];
+        this.toEndpoints = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
         this.page = 0;
         this.links = {
@@ -48,12 +59,28 @@ export class CamelRouteComponent implements OnInit, OnDestroy {
         }).subscribe(
             (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
             (res: ResponseWrapper) => this.onError(res.json)
+            );
+
+        this.fromEndpointService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.fromEndpoints = res.json;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+
+        this.toEndpointService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.toEndpoints = res.json;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
         );
     }
 
     reset() {
         this.page = 0;
         this.camelRoutes = [];
+        this.fromEndpoints = [];
+        this.toEndpoints = [];
         this.loadAll();
     }
 
@@ -82,6 +109,16 @@ export class CamelRouteComponent implements OnInit, OnDestroy {
                 content: 'Stop an camelRoute'
             });
         });
+    }
+
+    getFromEndpointType(id: number) {
+        const fromEndpoint = this.fromEndpoints.find(function(obj) { return obj.id === id; });
+        if (fromEndpoint !== undefined) { return fromEndpoint.type; };
+    }
+
+    getToEndpointType(id: number) {
+        const toEndpoint = this.toEndpoints.find(function(obj) { return obj.camelRouteId === id; });
+        if (toEndpoint !== undefined) { return toEndpoint.type; };
     }
 
     loadPage(page) {

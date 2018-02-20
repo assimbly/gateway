@@ -2,8 +2,8 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import org.assimbly.camelconnector.connect.Connector;
-import org.assimbly.camelconnector.connect.impl.CamelConnector;
+import org.assimbly.connector.connect.Connector;
+import org.assimbly.connector.connect.impl.CamelConnector;
 import org.assimbly.gateway.config.camelroutes.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.CamelRoute;
 import org.assimbly.gateway.repository.CamelRouteRepository;
@@ -189,7 +189,7 @@ public class CamelRouteResource {
    	        return ResponseEntity.ok().headers(HeaderUtil.createStopAlert(routeName)).build();
 		} catch (Exception e) {
 			log.debug("Can't stop route" + e);
-	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
+	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't stop",e.getMessage())).build();
 		}    
      }
 
@@ -212,11 +212,11 @@ public class CamelRouteResource {
         	}
             	
    			connector.restartRoute(routeID);
-   	       	log.info("Started route " + routeName);
+   	       	log.info("Restarted route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createRestartAlert(routeName)).build();
     	} catch (Exception e) {
-			log.debug("Can't start route" + e);
-	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
+			log.debug("Can't restart route" + e);
+	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't restart",e.getMessage())).build();
 		}
     }    
 
@@ -230,15 +230,34 @@ public class CamelRouteResource {
        	log.info("REST request to pause route " + routeName);
     	
         try {
-			connector.stopRoute(routeID);
+			connector.pauseRoute(routeID);
 	       	log.info("Paused route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createPauseAlert(routeName)).build();
 		} catch (Exception e) {
 			log.debug("Can't pause route" + e);
-	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
+	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't pause",e.getMessage())).build();
 		}    
      }
-   
+
+    @GetMapping("/camel-routes/resume/{id}")
+    @Timed
+    public ResponseEntity<Void>  resumeCamelRoute(@PathVariable Long id) throws URISyntaxException {
+
+       	String routeID = id.toString();
+    	String routeName = camelRouteRepository.findOne(id).getName();
+
+       	log.info("REST request to pause route " + routeName);
+    	
+        try {
+			connector.resumeRoute(routeID);
+	       	log.info("Resumed route " + routeName);
+   	        return ResponseEntity.ok().headers(HeaderUtil.createResumeAlert(routeName)).build();
+		} catch (Exception e) {
+			log.debug("Can't resume route" + e);
+	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't resume",e.getMessage())).build();
+		}    
+     }    
+    
     @GetMapping("/camel-routes/status/{id}")
     @Timed
     public String statusCamelRoute(@PathVariable Long id) throws URISyntaxException {
