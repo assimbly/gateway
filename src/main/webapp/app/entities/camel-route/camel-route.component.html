@@ -1,10 +1,10 @@
 <div>
     <h2>
-        <span>Camel Routes</span>
+        <span>Routes</span>
         <button class="btn btn-primary float-right" type="submit" [routerLink]="['../camel-route', 'edit-all' ]">
             <span class="fa fa-plus"></span>
             <span >
-            Create new Camel Route
+            Create new route
             </span>
         </button>        
     </h2>
@@ -19,8 +19,8 @@
             <th jhiSortBy="id" id="camelRouteTitleID" [hidden]="!camelRouteTitleID"><span>ID</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="name"><span>Name</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="gatewayId" id="camelRouteTitleGatewayID" [hidden]="!camelRouteTitleGatewayID"><span>Gateway</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="fromEndpointId"><span>From Endpoint</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="toEndpointId"><span>To Endpoints</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="fromEndpointId"><span>From</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="toEndpointId"><span>To</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="errorEndpointId" id="camelRouteTitleErrorEndpointID" [hidden]="!camelRouteTitleErrorEndpointID"><span>Endpoint Error</span> <span class="fa fa-sort"></span></th>
             <th></th>
             </tr>
@@ -36,13 +36,13 @@
                 </td>
                 <td>
                     <div *ngIf="camelRoute.fromEndpointId">
-                        <a [routerLink]="['../from-endpoint', camelRoute.fromEndpointId  ]" >{{camelRoute.fromEndpointId}}</a>
+                        <a [routerLink]="['../from-endpoint', camelRoute.fromEndpointId  ]" >{{getFromEndpointType(camelRoute.fromEndpointId)}}</a>
                     </div>
                 </td>
                 <td>
-                <div *ngIf="camelRoute.toEndpointId">
-                        <a [routerLink]="['../to-endpoint', camelRoute.toEndpointId  ]" >{{camelRoute.toEndpointId}}</a>
-                    </div>
+                <div>
+                   <a>{{getToEndpointType(camelRoute.id)}}</a>
+                 </div>
                 </td>                
                 <td  id="camelRouteErrorEndpointID" [hidden]="!camelRouteRowErrorEndpointID">
                     <div *ngIf="camelRoute.errorEndpointId">
@@ -58,9 +58,7 @@
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'camel-route/'+ camelRoute.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                        		[routerLink]="['../camel-route/edit-all', camelRoute.id ]"
                                 class="btn btn-primary btn-sm">
                             <span class="fa fa-pencil"></span>
                             <span class="d-none d-md-inline">Edit</span>

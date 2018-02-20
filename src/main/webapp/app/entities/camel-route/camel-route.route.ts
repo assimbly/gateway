@@ -26,6 +26,14 @@ export const camelRouteRoute: Routes = [
         },
         canActivate: [UserRouteAccessService]
     }, {
+        path: 'camel-route/edit-all/:id',
+        component: CamelRouteEditAllComponent,
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'CamelRoutes'
+        },
+        canActivate: [UserRouteAccessService]
+    }, {
         path: 'camel-route/configuration',
         component: CamelRouteConfigurationComponent,
         data: {
