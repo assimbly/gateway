@@ -2,8 +2,11 @@
 	#editForm="ngForm" *ngIf="finished">
 
 	<div>
-		<h2>
-			<span>Create or edit a Camel Route</span>
+		<h2 *ngIf="camelRoute.id">
+			<span>Edit Camel Route</span>
+		</h2>
+		<h2 *ngIf="!camelRoute.id">
+			<span>Create Camel Route</span>
 		</h2>
 	</div>
 
@@ -39,7 +42,7 @@
 		</div>
 	</div>
 
-	<ngb-tabset> <ngb-tab title="From"> <ng-template
+	<ngb-tabset> <ngb-tab title="From" id="fromTab"> <ng-template
 		ngbTabContent> <jhi-alert-error></jhi-alert-error>
 	<div class="form-group" id="fromEndpointID" [hidden]="!fromEndpointID">
 		<label for="id">ID</label> <input type="text" class="form-control"
@@ -90,7 +93,9 @@
 				*ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
 		</select>
 	</div>
-	</ng-template> </ngb-tab> <ngb-tab title="To"> <ng-template ngbTabContent>
+	</ng-template> </ngb-tab> 
+	
+	<ngb-tab title="To" id="toTab"> <ng-template ngbTabContent>
 	<jhi-alert-error></jhi-alert-error>
 	<div class="form-group" id="toEndpointID" [hidden]="!toEndpointID">
 		<label for="id">ID</label> <input type="text" class="form-control"
@@ -122,7 +127,7 @@
 			id="field_options" [(ngModel)]="toEndpoint.options" />
 	</div>
 
-	<div class="form-group">
+	<div class="form-group" id="camelRouteID2" [hidden]="!camelRouteID2">
 		<label class="form-control-label">Camel Route</label>
 		<input type="text" class="form-control" id="field_camelRoute" name="camelRoute" [(ngModel)]="toEndpoint.camelRouteId" />
 	</div>
@@ -145,17 +150,9 @@
 		</select>
 	</div>
 	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal"
-			(click)="clear()">
-			<span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
-		</button>
-		<button type="submit" [disabled]="editForm.form.invalid || isSaving"
-			class="btn btn-primary">
-			<span class="fa fa-save"></span>&nbsp;<span>Save</span>
-		</button>
-	</div>
-	</ng-template> </ngb-tab> <ngb-tab title="Error"> <ng-template ngbTabContent>
+	</ng-template> </ngb-tab>
+	
+	 <ngb-tab title="Error" id="errorTab"> <ng-template ngbTabContent>
 	<div class="form-group" id="errorEndpointID" [hidden]="!errorEndpointID">
 		<label for="id">ID</label> <input type="text" class="form-control"
 			id="id" name="id" [(ngModel)]="errorEndpoint.id" readonly />

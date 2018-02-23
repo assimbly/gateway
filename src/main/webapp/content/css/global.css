@@ -208,4 +208,23 @@ ui bootstrap tweaks
     white-space: nowrap;
  }
 
+/* ==========================================================================
+custom assimbly css
+========================================================================== */
+#fromTab.active,
+#toTab.active,
+#errorTab.active {
+  background-color: red;
+  border-color: white;
+  color: white;
+}
+
+#fromTab,
+#toTab,
+#errorTab {
+  background-color: grey;
+  border-color: white;
+  color: white;
+}
+
 /* jhipster-needle-css-add-main JHipster will add new css style */
