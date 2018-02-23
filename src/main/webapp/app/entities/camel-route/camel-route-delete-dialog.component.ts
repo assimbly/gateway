@@ -36,6 +36,16 @@ export class CamelRouteDeleteDialogComponent {
             this.activeModal.dismiss(true);
         });
     }
+
+    confirmDeleteAll(id: number) {
+        this.camelRouteService.deleteAll(id).subscribe((response) => {
+            this.eventManager.broadcast({
+                name: 'camelRouteListModification',
+                content: 'Deleted an camelRoute'
+            });
+            this.activeModal.dismiss(true);
+        });
+    }
 }
 
 @Component({
@@ -49,7 +59,7 @@ export class CamelRouteDeletePopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private camelRoutePopupService: CamelRoutePopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {

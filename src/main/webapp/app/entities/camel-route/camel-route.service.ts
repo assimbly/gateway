@@ -46,6 +46,10 @@ export class CamelRouteService {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
+    deleteAll(id: number): Observable<Response> {
+        return this.http.delete(`${this.resourceUrl}/delete-all/${id}`);
+    }
+
     start(id: number): Observable<Response> {
         return this.http.get(`${this.resourceUrl}/start/${id}`);
     }

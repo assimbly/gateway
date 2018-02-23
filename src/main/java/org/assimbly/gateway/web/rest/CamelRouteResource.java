@@ -6,7 +6,13 @@ import org.assimbly.connector.connect.Connector;
 import org.assimbly.connector.connect.impl.CamelConnector;
 import org.assimbly.gateway.config.camelroutes.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.CamelRoute;
+import org.assimbly.gateway.domain.ErrorEndpoint;
+import org.assimbly.gateway.domain.FromEndpoint;
+import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.CamelRouteRepository;
+import org.assimbly.gateway.repository.ErrorEndpointRepository;
+import org.assimbly.gateway.repository.FromEndpointRepository;
+import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
@@ -28,6 +34,7 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -42,7 +49,10 @@ public class CamelRouteResource {
     private static final String ENTITY_NAME = "camelRoute";
 
     private final CamelRouteRepository camelRouteRepository;
-
+    private final FromEndpointRepository fromEndpointRepository;
+    private final ErrorEndpointRepository errorEndpointRepository;
+    private final ToEndpointRepository toEndpointRepository;
+    
     private final CamelRouteMapper camelRouteMapper;
 
 	@Autowired
@@ -50,8 +60,12 @@ public class CamelRouteResource {
 
 	private Connector connector = new CamelConnector();
    
-    public CamelRouteResource(CamelRouteRepository camelRouteRepository, CamelRouteMapper camelRouteMapper) {
+    public CamelRouteResource(CamelRouteRepository camelRouteRepository, FromEndpointRepository fromEndpointRepository, ErrorEndpointRepository errorEndpointRepository, ToEndpointRepository toEndpointRepository, CamelRouteMapper camelRouteMapper) {
         this.camelRouteRepository = camelRouteRepository;
+        this.fromEndpointRepository = fromEndpointRepository;
+        this.errorEndpointRepository = errorEndpointRepository;
+        this.toEndpointRepository = toEndpointRepository;
+
         this.camelRouteMapper = camelRouteMapper;
     }
 
@@ -144,6 +158,23 @@ public class CamelRouteResource {
         camelRouteRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    /**
+     * DELETE  /camel-routes/:id : delete the "id" camelRoute.
+     *
+     * @param id the id of the camelRouteDTO to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping("/camel-routes/delete-all/{id}")
+    @Timed
+    public ResponseEntity<Void> deleteAllCamelRoute(@PathVariable Long id) {
+        log.debug("REST request to delete complete CamelRoute : {}", id);
+        camelRouteRepository.delete(id);
+        
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }    
+    
+    //Lifecycle
     
     @GetMapping("/camel-routes/start/{id}")
     @Timed

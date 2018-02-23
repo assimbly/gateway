@@ -31,15 +31,15 @@ public class CamelRoute implements Serializable {
     @ManyToOne
     private Gateway gateway;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "camelRoute")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "camelRoute",cascade = CascadeType.REMOVE)
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
