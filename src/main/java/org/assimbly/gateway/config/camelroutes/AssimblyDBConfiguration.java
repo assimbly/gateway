@@ -1,5 +1,7 @@
 package org.assimbly.gateway.config.camelroutes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AssimblyDBConfiguration {
 
+	private List<TreeMap<String,String>> configuration  = new ArrayList<>();;
 	private TreeMap<String, String> properties;
 
 	private String options;
@@ -36,61 +39,95 @@ public class AssimblyDBConfiguration {
 
 	private Header header;
 
-	public TreeMap<String, String> set(long connectorID) throws Exception {
+	public TreeMap<String, String> convertDBToRouteConfiguration(Long id) throws Exception {
 	
 	   properties = new TreeMap<String, String>();
 
-	   setGeneralPropertiesFromAssimblyDB(connectorID);
-
+       CamelRoute camelRoute = camelRouteRepository.findOne(id);
+    
+	   getGeneralPropertiesFromDB(camelRoute);
+	      
 		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
 			 throw new Exception("Set of configuration failed. Endpoint cannot be null");
+		}else {
+			getEndpointPropertiesFromDB(camelRoute);	
 		}
-
-	   
-	   //set from properties
-	   setURIfromAssimblyDB("from");
-	   setServiceFromAssimblyDB("from");
-	   setHeaderFromAssimblyDB("from");
-	   
-	   //set to properties
-	   setURIfromAssimblyDB("to");		   
-	   setServiceFromAssimblyDB("to");
-	   setHeaderFromAssimblyDB("to");
-
-	   //set error properties
-	   setURIfromAssimblyDB("error");
-	   setServiceFromAssimblyDB("error");
-	   setHeaderFromAssimblyDB("error");
-
-	   //set up defaults settings if null -->
-	    properties.put("id",Long.toString(connectorID));	
-	   
-	   	if(properties.get("from.uri") != null){
-			properties.put("route","default");
-		}else{
-			properties.put("route", "none");
-		}
-
-		if(properties.get("to.uri") == null){
-			properties.put("to.uri","mock:wastebin");		
-		}
-	   	   
-		properties.put("header.contenttype", "text/xml;charset=UTF-8");
 	   
 	   return properties;
 
 	}
 
-	private void setGeneralPropertiesFromAssimblyDB(long connectorID) throws Exception{
+	public TreeMap<String, String> convertDBToRouteConfiguration(CamelRoute camelRoute) throws Exception {
 		
-        CamelRoute camelRoute = camelRouteRepository.findOne(connectorID);
+		   properties = new TreeMap<String, String>();
+
+		   getGeneralPropertiesFromDB(camelRoute);
+		      
+			if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
+				 throw new Exception("Set of configuration failed. Endpoint cannot be null");
+			}else {
+				getEndpointPropertiesFromDB(camelRoute);	
+			}
+		   
+		   return properties;
+
+		}
+	
+	public void importConfiguration(String xmlConfiguration) {
+		//todo
+	}
+	
+	public String exportConfiguration() {
+		//todo
+		return "xmlconfiguration";
+	}	
+
+	
+	//private methods
+	
+	private void getGeneralPropertiesFromDB(CamelRoute camelRoute) throws Exception{
+
         fromEndpoint = camelRoute.getFromEndpoint();
         errorEndpoint = camelRoute.getErrorEndpoint();
         toEndpoints = camelRoute.getToEndpoints();
         
 	}
 
-	private void setURIfromAssimblyDB(String type) {
+	private void getEndpointPropertiesFromDB(CamelRoute camelRoute) throws Exception{
+		   
+		   //set from properties
+		   getURIfromAssimblyDB("from");
+		   getServiceFromAssimblyDB("from");
+		   getHeaderFromAssimblyDB("from");
+		   
+		   //set to properties
+		   getURIfromAssimblyDB("to");		   
+		   getServiceFromAssimblyDB("to");
+		   getHeaderFromAssimblyDB("to");
+
+		   //set error properties
+		   getURIfromAssimblyDB("error");
+		   getServiceFromAssimblyDB("error");
+		   getHeaderFromAssimblyDB("error");
+
+		   //set up defaults settings if null -->
+		    properties.put("id",Long.toString(camelRoute.getId()));	
+		   
+		   	if(properties.get("from.uri") != null){
+				properties.put("route","default");
+			}else{
+				properties.put("route", "none");
+			}
+
+			if(properties.get("to.uri") == null){
+				properties.put("to.uri","mock:wastebin");		
+			}
+		   	   
+			properties.put("header.contenttype", "text/xml;charset=UTF-8");
+        
+	}
+	
+	private void getURIfromAssimblyDB(String type) {
 		
 		options = "";
 
@@ -101,7 +138,7 @@ public class AssimblyDBConfiguration {
 				uri = fromEndpoint.getUri();
 				options = fromEndpoint.getOptions();
 
-				setURIProperties(type, componentType, uri, options);
+				getURIProperties(type, componentType, uri, options);
 		
 				break;
 		case "to":
@@ -112,7 +149,7 @@ public class AssimblyDBConfiguration {
 					uri = toEndpoint.getUri();
 					options = toEndpoint.getOptions();
 
-					setURIProperties(type, componentType, uri, options);
+					getURIProperties(type, componentType, uri, options);
 				}
 			
 				break;
@@ -122,13 +159,13 @@ public class AssimblyDBConfiguration {
 				uri = errorEndpoint.getUri();
 				options = errorEndpoint.getOptions();
 
-				setURIProperties(type, componentType, uri, options);
+				getURIProperties(type, componentType, uri, options);
 
 				break;
 		}
 	}	
 	
-	private void setURIProperties(String type, String componentType, String uri, String options) {
+	private void getURIProperties(String type, String componentType, String uri, String options) {
 		
 		componentType = componentType.toLowerCase();
 		
@@ -149,7 +186,7 @@ public class AssimblyDBConfiguration {
 		properties.put(type + ".uri", uri);
 	}
 
-	private void setServiceFromAssimblyDB(String type) {
+	private void getServiceFromAssimblyDB(String type) {
 
 		switch (type) {
 	        case "from":
@@ -172,12 +209,12 @@ public class AssimblyDBConfiguration {
 		}
 
 	    if(service != null){
-	    	setServiceProperties(type,service);	
+	    	getServiceProperties(type,service);	
 	    }
 		
 	}
 
-	private void setServiceProperties(String type, org.assimbly.gateway.domain.Service service) {
+	private void getServiceProperties(String type, org.assimbly.gateway.domain.Service service) {
 		properties.put(type + ".connection_id", service.getId().toString());
 		properties.put(type + ".username", service.getUsername());
 		properties.put(type + ".password", service.getPassword());
@@ -186,7 +223,7 @@ public class AssimblyDBConfiguration {
 		properties.put(type + ".configuration", service.getConfiguration());
 	}	
 	
-	private void setHeaderFromAssimblyDB(String type) {
+	private void getHeaderFromAssimblyDB(String type) {
 
 		switch (type) {
         case "from":
@@ -217,4 +254,21 @@ public class AssimblyDBConfiguration {
 	    	}	    	
 	    }
 	}
+	
+	public List<TreeMap<String,String>> convertDBtoConfiguration(Long gatewayid) throws Exception {
+
+		List<CamelRoute> camelRoutes = camelRouteRepository.findAllByGatewayId(gatewayid);
+		
+		for(CamelRoute camelRoute : camelRoutes){
+			if(camelRoute!=null) {
+				TreeMap<String, String> routeConfiguration = convertDBToRouteConfiguration(camelRoute);
+				if(routeConfiguration!=null) {
+					this.configuration.add(routeConfiguration);
+				}
+			}
+		}
+		
+		return configuration;
+	}
+	
 }

@@ -1,6 +1,8 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+
+import org.assimbly.gateway.config.camelroutes.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
 
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -11,6 +13,7 @@ import org.assimbly.gateway.service.mapper.GatewayMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +37,9 @@ public class GatewayResource {
     private final GatewayRepository gatewayRepository;
 
     private final GatewayMapper gatewayMapper;
+
+	@Autowired
+	private AssimblyDBConfiguration assimblyDBConfiguration;
 
     public GatewayResource(GatewayRepository gatewayRepository, GatewayMapper gatewayMapper) {
         this.gatewayRepository = gatewayRepository;
@@ -127,4 +133,24 @@ public class GatewayResource {
         gatewayRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+    
+    /**
+     * POST  /camel-routes/import : import configuration from XML.
+     *
+     * @param xml configuration
+     * @return the ResponseEntity with status 201 (Created) and with body the new camelRouteDTO, or with status 400 (Bad Request) if the camelRoute has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/camel-routes/import", consumes = "application/xml", produces = "text/plain")
+    @Timed
+    public String importConfiguration(@RequestBody String xmlConfiguration) throws URISyntaxException {
+        
+    	log.debug("REST request to import configuration : {}" + xmlConfiguration);
+    	
+    	assimblyDBConfiguration.importConfiguration(xmlConfiguration);
+    	
+    	return "imported";
+
+    }    
+    
 }

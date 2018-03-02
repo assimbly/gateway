@@ -34,7 +34,6 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -59,7 +58,12 @@ public class CamelRouteResource {
 	private AssimblyDBConfiguration assimblyDBConfiguration;
 
 	private Connector connector = new CamelConnector();
-   
+
+	String routeID;
+	String routeName;
+
+	private String configurationType;
+	
     public CamelRouteResource(CamelRouteRepository camelRouteRepository, FromEndpointRepository fromEndpointRepository, ErrorEndpointRepository errorEndpointRepository, ToEndpointRepository toEndpointRepository, CamelRouteMapper camelRouteMapper) {
         this.camelRouteRepository = camelRouteRepository;
         this.fromEndpointRepository = fromEndpointRepository;
@@ -154,68 +158,82 @@ public class CamelRouteResource {
     @DeleteMapping("/camel-routes/{id}")
     @Timed
     public ResponseEntity<Void> deleteCamelRoute(@PathVariable Long id) {
-        log.debug("REST request to delete CamelRoute : {}", id);
+        log.debug("REST request to delete complete CamelRoute : {}", id);
         camelRouteRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
     /**
-     * DELETE  /camel-routes/:id : delete the "id" camelRoute.
+     * POST  /camel-routes/setconfiguration : live configuration from XML.
      *
-     * @param id the id of the camelRouteDTO to delete
-     * @return the ResponseEntity with status 200 (OK)
+     * @param id the id of the camelRouteDTO
+     * @return the ResponseEntity with status 201 (Created) and with body the new camelRouteDTO, or with status 400 (Bad Request) if the camelRoute has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @DeleteMapping("/camel-routes/delete-all/{id}")
+    @PostMapping(path = "/camel-routes/setconfiguration/{id}", produces = "text/plain")
     @Timed
-    public ResponseEntity<Void> deleteAllCamelRoute(@PathVariable Long id) {
-        log.debug("REST request to delete complete CamelRoute : {}", id);
-        camelRouteRepository.delete(id);
+    public String setConfiguration(@PathVariable Long id) throws URISyntaxException {
         
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    	log.debug("REST request to set configuration : " + id.toString());
+    	
+    	try {
+    		configureRoute("db",id,null);
+    		return "succesful";
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return "failed";
+		}
     }    
     
-    //Lifecycle
+    
+    /**
+     * POST  /camel-routes/setliveconfiguration : live configuration from XML.
+     *
+     * @param id the id of the camelRouteDTO
+     * @param xml configuration
+     * @return the ResponseEntity with status 201 (Created) and with body the new camelRouteDTO, or with status 400 (Bad Request) if the camelRoute has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/camel-routes/setliveconfiguration/{id}", consumes = "application/xml", produces = "text/plain")
+    @Timed
+    public String setLiveConfiguration(@PathVariable Long id,@RequestBody String xmlConfiguration) throws URISyntaxException {
+        
+    	log.debug("REST request to set live ((xml) configuration : " + xmlConfiguration);
+    	
+    	try {
+    		configureRoute("xml",id,xmlConfiguration);
+    		return "succesful";
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return "failed";
+		}
+    }        
+    
+    
+	//Lifecycle management
     
     @GetMapping("/camel-routes/start/{id}")
     @Timed
     public ResponseEntity<Void> startCamelRoute(@PathVariable Long id) throws URISyntaxException {
-
-    	String routeID = id.toString();
-    	String routeName = camelRouteRepository.findOne(id).getName();
-
-       	log.info("REST request to start route " + routeName);
 		
     	try {
-            if(!connector.isStarted()){
-            	connector.start();
-            }	
-            
-        	if(!connector.hasRoute(routeID)) {
-    			TreeMap<String, String> properties = assimblyDBConfiguration.set(id);
-    			connector.addConfiguration(properties);
-        	}
-            	
-   			connector.startRoute(routeID);
+        	initRoute("start",id);
+    		connector.startRoute(routeID);
    	       	log.info("Started route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createStartAlert(routeName)).build();
-   			//return true;
     	} catch (Exception e) {
 			log.debug("Can't start route" + e);
 	        return ResponseEntity.ok().headers(HeaderUtil.camelFailureAlert(routeName,"Can't start",e.getMessage())).build();
 		}
     }
 
-    @GetMapping("/camel-routes/stop/{id}")
+	@GetMapping("/camel-routes/stop/{id}")
     @Timed
     public ResponseEntity<Void>  stopCamelRoute(@PathVariable Long id) throws URISyntaxException {
-
-       	String routeID = id.toString();
-    	String routeName = camelRouteRepository.findOne(id).getName();
-
-       	log.info("REST request to stop route " + routeName);
     	
         try {
-			connector.stopRoute(routeID);
+        	initRoute("stop",id);
+        	connector.stopRoute(routeID);
 	       	log.info("Stopped route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createStopAlert(routeName)).build();
 		} catch (Exception e) {
@@ -227,21 +245,10 @@ public class CamelRouteResource {
     @GetMapping("/camel-routes/restart/{id}")
     @Timed
     public ResponseEntity<Void>  restartCamelRoute(@PathVariable Long id) throws URISyntaxException {
-    	String routeID = id.toString();
-    	String routeName = camelRouteRepository.findOne(id).getName();
-
-       	log.info("REST request to restart route " + routeName);
+  	
 		
     	try {
-            if(!connector.isStarted()){
-            	connector.start();        
-            }	
-            
-        	if(!connector.hasRoute(routeID)) {
-    			TreeMap<String, String> properties = assimblyDBConfiguration.set(id);
-    			connector.addConfiguration(properties);
-        	}
-            	
+        	initRoute("restart",id);
    			connector.restartRoute(routeID);
    	       	log.info("Restarted route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createRestartAlert(routeName)).build();
@@ -255,13 +262,10 @@ public class CamelRouteResource {
     @Timed
     public ResponseEntity<Void>  pauseCamelRoute(@PathVariable Long id) throws URISyntaxException {
 
-       	String routeID = id.toString();
-    	String routeName = camelRouteRepository.findOne(id).getName();
-
-       	log.info("REST request to pause route " + routeName);
     	
         try {
-			connector.pauseRoute(routeID);
+        	initRoute("pause",id);
+        	connector.pauseRoute(routeID);
 	       	log.info("Paused route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createPauseAlert(routeName)).build();
 		} catch (Exception e) {
@@ -274,12 +278,8 @@ public class CamelRouteResource {
     @Timed
     public ResponseEntity<Void>  resumeCamelRoute(@PathVariable Long id) throws URISyntaxException {
 
-       	String routeID = id.toString();
-    	String routeName = camelRouteRepository.findOne(id).getName();
-
-       	log.info("REST request to pause route " + routeName);
-    	
         try {
+        	initRoute("resume",id);
 			connector.resumeRoute(routeID);
 	       	log.info("Resumed route " + routeName);
    	        return ResponseEntity.ok().headers(HeaderUtil.createResumeAlert(routeName)).build();
@@ -292,13 +292,56 @@ public class CamelRouteResource {
     @GetMapping("/camel-routes/status/{id}")
     @Timed
     public String statusCamelRoute(@PathVariable Long id) throws URISyntaxException {
-    	String routeID = id.toString();
 
     	try {    		
-			return connector.getRouteStatus(routeID);
+        	initRoute("status",id);
+    		return connector.getRouteStatus(routeID);
 		} catch (Exception e) {
 			log.debug("Can't retrieve status." + e);
-			return "unknown";
+			return "unknown status";
 		}   
     }
+
+    
+    //private methods    
+    private void initRoute(String action, Long id) throws Exception {
+    
+    	routeID = id.toString();
+    	CamelRoute route = camelRouteRepository.findOne(id);
+
+    	if(route==null) {
+    		routeName = routeID;
+       		configurationType = "xml";
+    	}else {
+    		routeName = route.getName();
+    		configurationType = "db";
+    	}
+
+       	log.info("REST request to " + action + " route " + routeName);
+		
+       	if(!connector.isStarted()){
+        	try {
+				connector.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+
+       	if(configurationType.equals("db") && (action.equals("start")||action.equals("restart"))) {
+       		configureRoute(configurationType,id,null);
+       	}       	
+	}
+    
+    private void configureRoute(String configurationType, Long id, String configuration) throws Exception {
+    
+		TreeMap<String, String> properties;
+		
+		if(configurationType.equals("db")) {
+			properties = assimblyDBConfiguration.convertDBToRouteConfiguration(id);
+			connector.setRouteConfiguration(properties);
+		}else if(configurationType.equals("xml")) {
+			properties = connector.convertXMLToRouteConfiguration(id.toString(), configuration);
+			connector.setRouteConfiguration(properties);
+		}			
+    }    
 }
