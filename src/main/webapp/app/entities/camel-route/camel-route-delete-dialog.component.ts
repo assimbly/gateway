@@ -36,16 +36,6 @@ export class CamelRouteDeleteDialogComponent {
             this.activeModal.dismiss(true);
         });
     }
-
-    confirmDeleteAll(id: number) {
-        this.camelRouteService.deleteAll(id).subscribe((response) => {
-            this.eventManager.broadcast({
-                name: 'camelRouteListModification',
-                content: 'Deleted an camelRoute'
-            });
-            this.activeModal.dismiss(true);
-        });
-    }
 }
 
 @Component({

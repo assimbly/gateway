@@ -82,15 +82,5 @@ export const camelRoutePopupRoute: Routes = [
         },
         canActivate: [UserRouteAccessService],
         outlet: 'popup'
-    },
-    {
-        path: 'camel-route/delete-all/:id',
-        component: CamelRouteDeletePopupComponent,
-        data: {
-            authorities: ['ROLE_USER'],
-            pageTitle: 'CamelRoutes'
-        },
-        canActivate: [UserRouteAccessService],
-        outlet: 'popup'
     }
 ];
