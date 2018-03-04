@@ -24,3 +24,5 @@ only screen and (                min-resolution: 2dppx) {
     }
 }
 
+.tab { display:inline-block; 
+       margin-left: 40px; }

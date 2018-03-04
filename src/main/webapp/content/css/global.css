@@ -214,7 +214,7 @@ custom assimbly css
 #fromTab.active,
 #toTab.active,
 #errorTab.active {
-  background-color: red;
+  background-color: crimson;
   border-color: white;
   color: white;
 }
@@ -225,6 +225,14 @@ custom assimbly css
   background-color: grey;
   border-color: white;
   color: white;
+}
+
+#tabBackground {
+  background-color: whitesmoke;
+  border-color: black;
+  margin-top: 10px;  
+  margin-bottom: 10px;
+  border-bottom: 3px solid whitesmoke;
 }
 
 /* jhipster-needle-css-add-main JHipster will add new css style */
