@@ -2,8 +2,8 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import org.assimbly.connector.connect.Connector;
-import org.assimbly.connector.connect.impl.CamelConnector;
+import org.assimbly.connector.Connector;
+import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.camelroutes.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.CamelRoute;
 import org.assimbly.gateway.domain.ErrorEndpoint;
@@ -291,7 +291,7 @@ public class CamelRouteResource {
     
     @GetMapping("/camel-routes/status/{id}")
     @Timed
-    public String statusCamelRoute(@PathVariable Long id) throws URISyntaxException {
+    public String statusCamelRoute(@PathVariable Long id) throws Exception {
 
     	try {    		
         	initRoute("status",id);
@@ -299,7 +299,8 @@ public class CamelRouteResource {
 		} catch (Exception e) {
 			log.debug("Can't retrieve status." + e);
 			return "unknown status";
-		}   
+		}  
+    	
     }
 
     
