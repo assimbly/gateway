@@ -8,15 +8,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity ToEndpoint and its DTO ToEndpointDTO.
  */
-@Mapper(componentModel = "spring", uses = {CamelRouteMapper.class, ServiceMapper.class, HeaderMapper.class})
+@Mapper(componentModel = "spring", uses = {FlowMapper.class, ServiceMapper.class, HeaderMapper.class})
 public interface ToEndpointMapper extends EntityMapper<ToEndpointDTO, ToEndpoint> {
 
-    @Mapping(source = "camelRoute.id", target = "camelRouteId")
+    @Mapping(source = "flow.id", target = "flowId")
     @Mapping(source = "service.id", target = "serviceId")
     @Mapping(source = "header.id", target = "headerId")
     ToEndpointDTO toDto(ToEndpoint toEndpoint);
 
-    @Mapping(source = "camelRouteId", target = "camelRoute")
+    @Mapping(source = "flowId", target = "flow")
     @Mapping(source = "serviceId", target = "service")
     @Mapping(source = "headerId", target = "header")
     ToEndpoint toEntity(ToEndpointDTO toEndpointDTO);

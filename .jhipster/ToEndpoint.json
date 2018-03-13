@@ -2,8 +2,8 @@
     "fluentMethods": true,
     "relationships": [
         {
-            "relationshipName": "camelRoute",
-            "otherEntityName": "camelRoute",
+            "relationshipName": "flow",
+            "otherEntityName": "flow",
             "relationshipType": "many-to-one",
             "otherEntityField": "id"
         },

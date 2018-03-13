@@ -35,7 +35,7 @@ public class ToEndpoint implements Serializable {
     private String options;
 
     @ManyToOne
-    private CamelRoute camelRoute;
+    private Flow flow;
 
     @OneToOne
     @JoinColumn(unique = true)
@@ -93,17 +93,17 @@ public class ToEndpoint implements Serializable {
         this.options = options;
     }
 
-    public CamelRoute getCamelRoute() {
-        return camelRoute;
+    public Flow getFlow() {
+        return flow;
     }
 
-    public ToEndpoint camelRoute(CamelRoute camelRoute) {
-        this.camelRoute = camelRoute;
+    public ToEndpoint flow(Flow flow) {
+        this.flow = flow;
         return this;
     }
 
-    public void setCamelRoute(CamelRoute camelRoute) {
-        this.camelRoute = camelRoute;
+    public void setFlow(Flow flow) {
+        this.flow = flow;
     }
 
     public Service getService() {

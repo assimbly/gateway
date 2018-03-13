@@ -55,7 +55,7 @@ public class Gateway implements Serializable {
     @OneToMany(mappedBy = "gateway")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Set<CamelRoute> camelRoutes = new HashSet<>();
+    private Set<Flow> flows = new HashSet<>();
 
     @OneToMany(mappedBy = "gateway")
     @JsonIgnore
@@ -162,29 +162,29 @@ public class Gateway implements Serializable {
         this.defaultErrorEndpointType = defaultErrorEndpointType;
     }
 
-    public Set<CamelRoute> getCamelRoutes() {
-        return camelRoutes;
+    public Set<Flow> getFlows() {
+        return flows;
     }
 
-    public Gateway camelRoutes(Set<CamelRoute> camelRoutes) {
-        this.camelRoutes = camelRoutes;
+    public Gateway flows(Set<Flow> flows) {
+        this.flows = flows;
         return this;
     }
 
-    public Gateway addCamelRoute(CamelRoute camelRoute) {
-        this.camelRoutes.add(camelRoute);
-        camelRoute.setGateway(this);
+    public Gateway addFlow(Flow flow) {
+        this.flows.add(flow);
+        flow.setGateway(this);
         return this;
     }
 
-    public Gateway removeCamelRoute(CamelRoute camelRoute) {
-        this.camelRoutes.remove(camelRoute);
-        camelRoute.setGateway(null);
+    public Gateway removeFlow(Flow flow) {
+        this.flows.remove(flow);
+        flow.setGateway(null);
         return this;
     }
 
-    public void setCamelRoutes(Set<CamelRoute> camelRoutes) {
-        this.camelRoutes = camelRoutes;
+    public void setFlows(Set<Flow> flows) {
+        this.flows = flows;
     }
 
     public Set<EnvironmentVariables> getEnvironmentVariables() {

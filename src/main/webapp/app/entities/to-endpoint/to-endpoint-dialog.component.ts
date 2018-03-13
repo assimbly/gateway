@@ -9,7 +9,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { ToEndpoint } from './to-endpoint.model';
 import { ToEndpointPopupService } from './to-endpoint-popup.service';
 import { ToEndpointService } from './to-endpoint.service';
-import { CamelRoute, CamelRouteService } from '../camel-route';
+import { Flow, FlowService } from '../flow';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { ResponseWrapper } from '../../shared';
@@ -23,7 +23,7 @@ export class ToEndpointDialogComponent implements OnInit {
     toEndpoint: ToEndpoint;
     isSaving: boolean;
 
-    camelroutes: CamelRoute[];
+    flows: Flow[];
 
     services: Service[];
 
@@ -33,7 +33,7 @@ export class ToEndpointDialogComponent implements OnInit {
         public activeModal: NgbActiveModal,
         private jhiAlertService: JhiAlertService,
         private toEndpointService: ToEndpointService,
-        private camelRouteService: CamelRouteService,
+        private flowService: FlowService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
         private eventManager: JhiEventManager
@@ -42,8 +42,8 @@ export class ToEndpointDialogComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
-        this.camelRouteService.query()
-            .subscribe((res: ResponseWrapper) => { this.camelroutes = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+        this.flowService.query()
+            .subscribe((res: ResponseWrapper) => { this.flows = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
         this.serviceService
             .query({filter: 'toendpoint-is-null'})
             .subscribe((res: ResponseWrapper) => {
@@ -106,7 +106,7 @@ export class ToEndpointDialogComponent implements OnInit {
         this.jhiAlertService.error(error.message, null, null);
     }
 
-    trackCamelRouteById(index: number, item: CamelRoute) {
+    trackFlowById(index: number, item: Flow) {
         return item.id;
     }
 

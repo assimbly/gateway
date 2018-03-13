@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { GatewayGatewayModule } from './gateway/gateway.module';
 import { GatewayEnvironmentVariablesModule } from './environment-variables/environment-variables.module';
-import { GatewayCamelRouteModule } from './camel-route/camel-route.module';
+import { GatewayFlowModule } from './flow/flow.module';
 import { GatewayServiceModule } from './service/service.module';
 import { GatewayHeaderModule } from './header/header.module';
 import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
@@ -15,7 +15,7 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
     imports: [
         GatewayGatewayModule,
         GatewayEnvironmentVariablesModule,
-        GatewayCamelRouteModule,
+        GatewayFlowModule,
         GatewayServiceModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
@@ -25,7 +25,7 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     exports: [
-        GatewayCamelRouteModule,
+        GatewayFlowModule,
         GatewayEnvironmentVariablesModule,
         GatewayErrorEndpointModule,
         GatewayFromEndpointModule,

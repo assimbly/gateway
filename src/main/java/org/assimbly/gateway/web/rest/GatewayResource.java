@@ -2,7 +2,7 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import org.assimbly.gateway.config.camelroutes.AssimblyDBConfiguration;
+import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
 
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -135,13 +135,13 @@ public class GatewayResource {
     }
     
     /**
-     * POST  /camel-routes/import : import configuration from XML.
+     * POST  /flows/import : import configuration from XML.
      *
      * @param xml configuration
-     * @return the ResponseEntity with status 201 (Created) and with body the new camelRouteDTO, or with status 400 (Bad Request) if the camelRoute has already an ID
+     * @return the ResponseEntity with status 201 (Created) and with body the new flowDTO, or with status 400 (Bad Request) if the flow has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping(path = "/camel-routes/import", consumes = "application/xml", produces = "text/plain")
+    @PostMapping(path = "/flows/import", consumes = "application/xml", produces = "text/plain")
     @Timed
     public String importConfiguration(@RequestBody String xmlConfiguration) throws URISyntaxException {
         

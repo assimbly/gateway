@@ -3,8 +3,8 @@
     "relationships": [
         {
             "relationshipType": "one-to-many",
-            "relationshipName": "camelRoute",
-            "otherEntityName": "camelRoute",
+            "relationshipName": "flowRoute",
+            "otherEntityName": "flowRoute",
             "otherEntityRelationshipName": "gateway"
         },
         {

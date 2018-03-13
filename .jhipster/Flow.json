@@ -1,0 +1,45 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "gateway",
+            "otherEntityName": "gateway",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "fromEndpoint",
+            "otherEntityName": "fromEndpoint",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "flowRoute"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "errorEndpoint",
+            "otherEntityName": "errorEndpoint",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "flowRoute"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "toEndpoint",
+            "otherEntityName": "toEndpoint",
+            "otherEntityRelationshipName": "flowRoute"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180114132915",
+    "entityTableName": "flow_route",
+    "dto": "mapstruct",
+    "pagination": "infinite-scroll",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

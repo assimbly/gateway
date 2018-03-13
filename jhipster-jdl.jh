@@ -13,7 +13,7 @@ entity EnvironmentVariables {
 	value String
 }
 
-entity CamelRoute {
+entity Flow {
 	name String	
 }
 
@@ -70,7 +70,7 @@ enum EndpointType {
 }
 
 relationship OneToMany {
-	Gateway{camelRoute} to CamelRoute
+	Gateway{flowRoute} to Flow
 }
 
 relationship OneToMany {
@@ -78,15 +78,15 @@ relationship OneToMany {
 }
 
 relationship OneToOne {
-	CamelRoute{fromEndpoint} to FromEndpoint
+	Flow{fromEndpoint} to FromEndpoint
 }
 
 relationship OneToOne {
-	CamelRoute{errorEndpoint} to ErrorEndpoint
+	Flow{errorEndpoint} to ErrorEndpoint
 }
 
 relationship OneToMany {
-	CamelRoute{toEndpoint} to ToEndpoint
+	Flow{toEndpoint} to ToEndpoint
 }
 
 relationship OneToOne {
@@ -106,6 +106,6 @@ relationship OneToMany {
 }
 
 // Set pagination options
-paginate CamelRoute with infinite-scroll
+paginate Flow with infinite-scroll
 
 dto * with mapstruct
