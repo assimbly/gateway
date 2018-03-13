@@ -34,7 +34,7 @@ public final class HeaderUtil {
     }
 
     public static HttpHeaders createStartAlert(String param) {
-        return createAlert("Started route " + param, param);
+        return createAlert("Started flow " + param, param);
     }
     
     public static HttpHeaders createRestartAlert(String param) {
@@ -42,22 +42,22 @@ public final class HeaderUtil {
     }
 
     public static HttpHeaders createStopAlert(String param) {
-        return createAlert("Stopped route " + param, param);
+        return createAlert("Stopped flow " + param, param);
     }
 
 	public static HttpHeaders createPauseAlert(String param) {
-		return createAlert("Paused route " + param, param);
+		return createAlert("Paused flow " + param, param);
 	}
 
 	public static HttpHeaders createResumeAlert(String param) {
 		return createAlert("Route " + param + " resumes", param);
 	}
 
-	public static HttpHeaders camelFailureAlert(String routeName, String errorKey, String defaultMessage) {
+	public static HttpHeaders flowFailureAlert(String flowName, String errorKey, String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-gatewayApp-error", defaultMessage);
-        headers.add("X-gatewayApp-params", routeName);
+        headers.add("X-gatewayApp-params", flowName);
         return headers;
     }
     

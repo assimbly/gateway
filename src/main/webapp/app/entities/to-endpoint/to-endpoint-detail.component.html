@@ -16,10 +16,10 @@
         <dd>
             <span>{{toEndpoint.options}}</span>
         </dd>
-        <dt><span>Camel Route</span></dt>
+        <dt><span>Flow</span></dt>
         <dd>
-            <div *ngIf="toEndpoint.camelRouteId">
-                <a [routerLink]="['/camel-route', toEndpoint.camelRouteId]">{{toEndpoint.camelRouteId}}</a>
+            <div *ngIf="toEndpoint.flowId">
+                <a [routerLink]="['/flow', toEndpoint.flowId]">{{toEndpoint.flowId}}</a>
             </div>
         </dd>
         <dt><span>Service</span></dt>

@@ -12,7 +12,7 @@ import org.mapstruct.*;
 public interface GatewayMapper extends EntityMapper<GatewayDTO, Gateway> {
 
 
-    @Mapping(target = "camelRoutes", ignore = true)
+    @Mapping(target = "flows", ignore = true)
     @Mapping(target = "environmentVariables", ignore = true)
     Gateway toEntity(GatewayDTO gatewayDTO);
 

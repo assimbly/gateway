@@ -109,7 +109,7 @@ public class ToEndpointResource {
     @Timed
     public ResponseEntity<ToEndpointDTO> getToEndpointByRouteID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoints by routeid");
-        List<ToEndpoint> toEndpoints = toEndpointRepository.findByCamelRouteId(id);
+        List<ToEndpoint> toEndpoints = toEndpointRepository.findByFlowId(id);
         ToEndpoint toEndpoint = toEndpoints.get(0);
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(toEndpointDTO));

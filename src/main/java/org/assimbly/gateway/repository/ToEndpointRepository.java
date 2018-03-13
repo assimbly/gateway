@@ -15,6 +15,6 @@ import org.springframework.data.jpa.repository.*;
 @Repository
 public interface ToEndpointRepository extends JpaRepository<ToEndpoint, Long> {
 
-	List<ToEndpoint> findByCamelRouteId(Long id);
+	List<ToEndpoint> findByFlowId(Long id);
 
 }

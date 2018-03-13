@@ -22,7 +22,7 @@ export class Gateway implements BaseEntity {
         public defaultFromEndpointType?: string,
         public defaultToEndpointType?: string,
         public defaultErrorEndpointType?: string,
-        public camelRoutes?: BaseEntity[],
+        public flows?: BaseEntity[],
         public environmentVariables?: BaseEntity[],
     ) {
     }

@@ -20,7 +20,7 @@ public class EndpointToDTO implements Serializable {
 
     private String options;
 
-    private Long camelRouteId;
+    private Long flowId;
 
     private Long serviceId;
 
@@ -58,12 +58,12 @@ public class EndpointToDTO implements Serializable {
         this.options = options;
     }
 
-    public Long getCamelRouteId() {
-        return camelRouteId;
+    public Long getFlowId() {
+        return flowId;
     }
 
-    public void setCamelRouteId(Long camelRouteId) {
-        this.camelRouteId = camelRouteId;
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
     }
 
     public Long getServiceId() {

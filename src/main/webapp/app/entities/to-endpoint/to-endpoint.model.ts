@@ -18,7 +18,7 @@ export class ToEndpoint implements BaseEntity {
         public type?: EndpointType,
         public uri?: string,
         public options?: string,
-        public camelRouteId?: number,
+        public flowId?: number,
         public serviceId?: number,
         public headerId?: number,
     ) {

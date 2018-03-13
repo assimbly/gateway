@@ -38,10 +38,10 @@
         </div>
 
         <div class="form-group">
-            <label class="form-control-label" for="field_camelRoute">Camel Route</label>
-            <select class="form-control" id="field_camelRoute" name="camelRoute" [(ngModel)]="toEndpoint.camelRouteId" >
+            <label class="form-control-label" for="field_flow">Flow</label>
+            <select class="form-control" id="field_flow" name="flow" [(ngModel)]="toEndpoint.flowId" >
                 <option [ngValue]="null"></option>
-                <option [ngValue]="camelRouteOption.id" *ngFor="let camelRouteOption of camelroutes; trackBy: trackCamelRouteById">{{camelRouteOption.id}}</option>
+                <option [ngValue]="flowOption.id" *ngFor="let flowOption of flows trackBy: trackFlowById">{{flowOption.id}}</option>
             </select>
         </div>
         <div class="form-group">
