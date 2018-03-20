@@ -1,6 +1,6 @@
 # Introduction
 
-Assimbly is a messaging gateway. Basicly it sends data between two endpoints. The purpose of Assimbly is to connect these
+Assimbly is a messaging gateway. Basicly it sends data between two endpoints (a flow). The purpose of Assimbly is to connect these
 endpoints with the help of a webgui. There you can configure these endpoints and manage the lifecycle of a flow.
 
 On the background [Apache Camel](https://github.com/apache/camel) does the actual works. Assimbly only implements the point-to-point(s) intergration pattern of Camel.
