@@ -26,6 +26,11 @@
 						*ngIf="flow" [(ngModel)]="flow.name" />
 				</div>
 				<div class="form-group">
+					<label class="form-control-label" for="field_name">Autostart</label> <input
+						type="text" class="form-control" name="autoStart" id="field_name"
+						*ngIf="flow" [(ngModel)]="flow.autoStart" />
+				</div>				
+				<div class="form-group">
 					<label class="form-control-label" for="field_gateway">Gateway</label>
 					<input type="text" class="form-control" name="gateway"
 						id="field_name" *ngIf="flow"

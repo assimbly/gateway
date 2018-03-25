@@ -4,25 +4,25 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <!--
-        Added the constraints for entity CamelRoute.
+        Added the constraints for entity Flow.
     -->
     <changeSet id="20180114132915-2" author="jhipster">
         
         <addForeignKeyConstraint baseColumnNames="gateway_id"
-                                 baseTableName="camel_route"
-                                 constraintName="fk_camel_route_gateway_id"
+                                 baseTableName="flow_route"
+                                 constraintName="fk_flow_gateway_id"
                                  referencedColumnNames="id"
                                  referencedTableName="gateway"/>
 
         <addForeignKeyConstraint baseColumnNames="from_endpoint_id"
-                                 baseTableName="camel_route"
-                                 constraintName="fk_camel_route_from_endpoint_id"
+                                 baseTableName="flow_route"
+                                 constraintName="fk_flow_from_endpoint_id"
                                  referencedColumnNames="id"
                                  referencedTableName="from_endpoint"/>
 
         <addForeignKeyConstraint baseColumnNames="error_endpoint_id"
-                                 baseTableName="camel_route"
-                                 constraintName="fk_camel_route_error_endpoint_id"
+                                 baseTableName="flow_route"
+                                 constraintName="fk_flow_error_endpoint_id"
                                  referencedColumnNames="id"
                                  referencedTableName="error_endpoint"/>
 

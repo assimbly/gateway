@@ -14,7 +14,8 @@ entity EnvironmentVariables {
 }
 
 entity Flow {
-	name String	
+	name String,
+	autoStart Boolean	
 }
 
 entity FromEndpoint {

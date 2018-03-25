@@ -8,7 +8,7 @@ import { GatewayTestModule } from '../../../test.module';
 import { ToEndpointDialogComponent } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint-dialog.component';
 import { ToEndpointService } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint.service';
 import { ToEndpoint } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint.model';
-import { CamelRouteService } from '../../../../../../main/webapp/app/entities/camel-route';
+import { FlowService } from '../../../../../../main/webapp/app/entities/flow';
 import { ServiceService } from '../../../../../../main/webapp/app/entities/service';
 import { HeaderService } from '../../../../../../main/webapp/app/entities/header';
 
@@ -26,7 +26,7 @@ describe('Component Tests', () => {
                 imports: [GatewayTestModule],
                 declarations: [ToEndpointDialogComponent],
                 providers: [
-                    CamelRouteService,
+                    FlowService,
                     ServiceService,
                     HeaderService,
                     ToEndpointService

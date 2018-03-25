@@ -8,11 +8,11 @@
     -->
     <changeSet id="20180114201816-2" author="jhipster">
         
-        <addForeignKeyConstraint baseColumnNames="camel_route_id"
+        <addForeignKeyConstraint baseColumnNames="flow_id"
                                  baseTableName="to_endpoint"
-                                 constraintName="fk_to_endpoint_camel_route_id"
+                                 constraintName="fk_to_endpoint_flow_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="camel_route"/>
+                                 referencedTableName="flow"/>
 
         <addForeignKeyConstraint baseColumnNames="service_id"
                                  baseTableName="to_endpoint"

@@ -15,6 +15,8 @@ public class FlowDTO implements Serializable {
 
     private String name;
 
+    private Boolean autoStart;
+
     private Long gatewayId;
 
     private Long fromEndpointId;
@@ -35,6 +37,14 @@ public class FlowDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean isAutoStart() {
+        return autoStart;
+    }
+
+    public void setAutoStart(Boolean autoStart) {
+        this.autoStart = autoStart;
     }
 
     public Long getGatewayId() {
@@ -87,6 +97,7 @@ public class FlowDTO implements Serializable {
         return "FlowDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", autoStart='" + isAutoStart() + "'" +
             "}";
     }
 }

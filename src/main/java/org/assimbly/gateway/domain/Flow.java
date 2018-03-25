@@ -28,18 +28,21 @@ public class Flow implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "auto_start")
+    private Boolean autoStart;
+
     @ManyToOne
     private Gateway gateway;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "flow")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
@@ -64,6 +67,19 @@ public class Flow implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean isAutoStart() {
+        return autoStart;
+    }
+
+    public Flow autoStart(Boolean autoStart) {
+        this.autoStart = autoStart;
+        return this;
+    }
+
+    public void setAutoStart(Boolean autoStart) {
+        this.autoStart = autoStart;
     }
 
     public Gateway getGateway() {
@@ -156,6 +172,7 @@ public class Flow implements Serializable {
         return "Flow{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", autoStart='" + isAutoStart() + "'" +
             "}";
     }
 }

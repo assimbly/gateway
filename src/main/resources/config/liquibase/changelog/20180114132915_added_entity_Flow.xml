@@ -15,14 +15,18 @@
     <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
 
     <!--
-        Added the entity CamelRoute.
+        Added the entity Flow.
     -->
     <changeSet id="20180114132915-1" author="jhipster">
-        <createTable tableName="camel_route">
+        <createTable tableName="flow_route">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="auto_start" type="bit">
                 <constraints nullable="true" />
             </column>
 

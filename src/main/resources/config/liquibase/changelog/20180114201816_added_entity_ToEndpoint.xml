@@ -34,7 +34,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="camel_route_id" type="bigint">
+            <column name="flow_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <column name="service_id" type="bigint">
