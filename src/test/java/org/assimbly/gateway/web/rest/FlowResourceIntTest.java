@@ -43,6 +43,9 @@ public class FlowResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
+    private static final Boolean DEFAULT_AUTO_START = false;
+    private static final Boolean UPDATED_AUTO_START = true;
+
     @Autowired
     private FlowRepository flowRepository;
 
@@ -68,7 +71,7 @@ public class FlowResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final FlowResource flowResource = new FlowResource(flowRepository, null, null, null, flowMapper);
+        final FlowResource flowResource = new FlowResource(flowRepository, flowMapper);
         this.restFlowMockMvc = MockMvcBuilders.standaloneSetup(flowResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -84,7 +87,8 @@ public class FlowResourceIntTest {
      */
     public static Flow createEntity(EntityManager em) {
         Flow flow = new Flow()
-            .name(DEFAULT_NAME);
+            .name(DEFAULT_NAME)
+            .autoStart(DEFAULT_AUTO_START);
         return flow;
     }
 
@@ -110,6 +114,7 @@ public class FlowResourceIntTest {
         assertThat(flowList).hasSize(databaseSizeBeforeCreate + 1);
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
     }
 
     @Test
@@ -143,7 +148,8 @@ public class FlowResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())));
     }
 
     @Test
@@ -157,7 +163,8 @@ public class FlowResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+            .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()));
     }
 
     @Test
@@ -180,7 +187,8 @@ public class FlowResourceIntTest {
         // Disconnect from session so that the updates on updatedFlow are not directly saved in db
         em.detach(updatedFlow);
         updatedFlow
-            .name(UPDATED_NAME);
+            .name(UPDATED_NAME)
+            .autoStart(UPDATED_AUTO_START);
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
@@ -193,6 +201,7 @@ public class FlowResourceIntTest {
         assertThat(flowList).hasSize(databaseSizeBeforeUpdate);
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
     }
 
     @Test

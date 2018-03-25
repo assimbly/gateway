@@ -34,12 +34,16 @@
         {
             "fieldName": "name",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "autoStart",
+            "fieldType": "Boolean"
         }
     ],
     "changelogDate": "20180114132915",
-    "entityTableName": "flow_route",
     "dto": "mapstruct",
-    "pagination": "infinite-scroll",
     "service": "no",
-    "jpaMetamodelFiltering": false
+    "entityTableName": "flow_route",
+    "jpaMetamodelFiltering": false,
+    "pagination": "infinite-scroll"
 }

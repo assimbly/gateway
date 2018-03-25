@@ -7,7 +7,7 @@
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132913_added_entity_Gateway.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132914_added_entity_EnvironmentVariables.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20180114132915_added_entity_CamelRoute.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180114132915_added_entity_Flow.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132919_added_entity_Service.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132920_added_entity_Header.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132921_added_entity_HeaderKeys.xml" relativeToChangelogFile="false"/>
@@ -16,7 +16,7 @@
     <include file="config/liquibase/changelog/20180114201817_added_entity_ErrorEndpoint.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20180114132914_added_entity_constraints_EnvironmentVariables.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20180114132915_added_entity_constraints_CamelRoute.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180114132915_added_entity_constraints_Flow.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132921_added_entity_constraints_HeaderKeys.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114201815_added_entity_constraints_FromEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114201816_added_entity_constraints_ToEndpoint.xml" relativeToChangelogFile="false"/>
