@@ -18,7 +18,7 @@
         Added the entity Flow.
     -->
     <changeSet id="20180114132915-1" author="jhipster">
-        <createTable tableName="flow_route">
+        <createTable tableName="flow">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

@@ -168,7 +168,7 @@ public class AssimblyDBConfiguration {
 	private void getURIProperties(String type, String componentType, String uri, String options) {
 		
 		componentType = componentType.toLowerCase();
-		
+	
 		if(componentType.equals("file")||componentType.equals("sftp")) {
 			componentType = componentType + "://";
 		}else if(componentType.equals("http")) {
@@ -176,7 +176,7 @@ public class AssimblyDBConfiguration {
 		}else {
 			componentType = componentType + ":";
 		}			
-			
+
 		if (options == null) {
 			uri = componentType.toLowerCase() + uri;
 		} else {

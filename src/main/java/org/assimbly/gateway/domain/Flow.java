@@ -42,7 +42,7 @@ public class Flow implements Serializable {
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    @OneToMany(mappedBy = "flow")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.REMOVE)
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
