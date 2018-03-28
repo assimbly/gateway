@@ -6,13 +6,7 @@ import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.domain.FromEndpoint;
-import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.repository.ErrorEndpointRepository;
-import org.assimbly.gateway.repository.FromEndpointRepository;
-import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
@@ -48,9 +42,6 @@ public class FlowResource {
     private static final String ENTITY_NAME = "flow";
 
     private final FlowRepository flowRepository;
-    private final FromEndpointRepository fromEndpointRepository;
-    private final ErrorEndpointRepository errorEndpointRepository;
-    private final ToEndpointRepository toEndpointRepository;
     
     private final FlowMapper flowMapper;
 
@@ -63,7 +54,13 @@ public class FlowResource {
 	String flowName;
 
 	private String configurationType;
+
+    public FlowResource(FlowRepository flowRepository, FlowMapper flowMapper) {
+        this.flowRepository = flowRepository;
+        this.flowMapper = flowMapper;
+    }
 	
+    /*
     public FlowResource(FlowRepository flowRepository, FromEndpointRepository fromEndpointRepository, ErrorEndpointRepository errorEndpointRepository, ToEndpointRepository toEndpointRepository, FlowMapper flowMapper) {
         this.flowRepository = flowRepository;
         this.fromEndpointRepository = fromEndpointRepository;
@@ -71,8 +68,8 @@ public class FlowResource {
         this.toEndpointRepository = toEndpointRepository;
 
         this.flowMapper = flowMapper;
-    }
-
+    }*/
+    
     /**
      * POST  /flows : Create a new flow.
      *
@@ -211,7 +208,7 @@ public class FlowResource {
     	
     	/*
     	try {
-    		configureRoute("xml",id,xmlConfiguration);
+    		configureFlow("xml",id,xmlConfiguration);
     		return "succesful";
 		} catch (Exception e) {
 			log.error(e.getMessage());
