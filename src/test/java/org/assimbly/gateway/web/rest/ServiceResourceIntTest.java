@@ -46,21 +46,6 @@ public class ServiceResourceIntTest {
     private static final String DEFAULT_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_TYPE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_URL = "AAAAAAAAAA";
-    private static final String UPDATED_URL = "BBBBBBBBBB";
-
-    private static final String DEFAULT_USERNAME = "AAAAAAAAAA";
-    private static final String UPDATED_USERNAME = "BBBBBBBBBB";
-
-    private static final String DEFAULT_PASSWORD = "AAAAAAAAAA";
-    private static final String UPDATED_PASSWORD = "BBBBBBBBBB";
-
-    private static final String DEFAULT_DRIVER = "AAAAAAAAAA";
-    private static final String UPDATED_DRIVER = "BBBBBBBBBB";
-
-    private static final String DEFAULT_CONFIGURATION = "AAAAAAAAAA";
-    private static final String UPDATED_CONFIGURATION = "BBBBBBBBBB";
-
     @Autowired
     private ServiceRepository serviceRepository;
 
@@ -103,12 +88,7 @@ public class ServiceResourceIntTest {
     public static Service createEntity(EntityManager em) {
         Service service = new Service()
             .name(DEFAULT_NAME)
-            .type(DEFAULT_TYPE)
-            .url(DEFAULT_URL)
-            .username(DEFAULT_USERNAME)
-            .password(DEFAULT_PASSWORD)
-            .driver(DEFAULT_DRIVER)
-            .configuration(DEFAULT_CONFIGURATION);
+            .type(DEFAULT_TYPE);
         return service;
     }
 
@@ -135,11 +115,6 @@ public class ServiceResourceIntTest {
         Service testService = serviceList.get(serviceList.size() - 1);
         assertThat(testService.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testService.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testService.getUrl()).isEqualTo(DEFAULT_URL);
-        assertThat(testService.getUsername()).isEqualTo(DEFAULT_USERNAME);
-        assertThat(testService.getPassword()).isEqualTo(DEFAULT_PASSWORD);
-        assertThat(testService.getDriver()).isEqualTo(DEFAULT_DRIVER);
-        assertThat(testService.getConfiguration()).isEqualTo(DEFAULT_CONFIGURATION);
     }
 
     @Test
@@ -174,12 +149,7 @@ public class ServiceResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(service.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
-            .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME.toString())))
-            .andExpect(jsonPath("$.[*].password").value(hasItem(DEFAULT_PASSWORD.toString())))
-            .andExpect(jsonPath("$.[*].driver").value(hasItem(DEFAULT_DRIVER.toString())))
-            .andExpect(jsonPath("$.[*].configuration").value(hasItem(DEFAULT_CONFIGURATION.toString())));
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
     }
 
     @Test
@@ -194,12 +164,7 @@ public class ServiceResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(service.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL.toString()))
-            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
-            .andExpect(jsonPath("$.password").value(DEFAULT_PASSWORD.toString()))
-            .andExpect(jsonPath("$.driver").value(DEFAULT_DRIVER.toString()))
-            .andExpect(jsonPath("$.configuration").value(DEFAULT_CONFIGURATION.toString()));
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()));
     }
 
     @Test
@@ -223,15 +188,10 @@ public class ServiceResourceIntTest {
         em.detach(updatedService);
         updatedService
             .name(UPDATED_NAME)
-            .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
-            .username(UPDATED_USERNAME)
-            .password(UPDATED_PASSWORD)
-            .driver(UPDATED_DRIVER)
-            .configuration(UPDATED_CONFIGURATION);
-        ServiceDTO serviceDTO = serviceMapper.toDto(updatedService);
+            .type(UPDATED_TYPE);
+        ServiceDTO serviceDTO = serviceMapper.toDto(service);
 
-        restServiceMockMvc.perform(put("/api/services")
+		restServiceMockMvc.perform(put("/api/services")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceDTO)))
             .andExpect(status().isOk());
@@ -242,11 +202,6 @@ public class ServiceResourceIntTest {
         Service testService = serviceList.get(serviceList.size() - 1);
         assertThat(testService.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testService.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testService.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testService.getUsername()).isEqualTo(UPDATED_USERNAME);
-        assertThat(testService.getPassword()).isEqualTo(UPDATED_PASSWORD);
-        assertThat(testService.getDriver()).isEqualTo(UPDATED_DRIVER);
-        assertThat(testService.getConfiguration()).isEqualTo(UPDATED_CONFIGURATION);
     }
 
     @Test

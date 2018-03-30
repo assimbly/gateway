@@ -45,7 +45,7 @@ public class GatewayResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final GatewayType DEFAULT_TYPE = GatewayType.FILE;
+    private static final GatewayType DEFAULT_TYPE = GatewayType.ADAPTER;
     private static final GatewayType UPDATED_TYPE = GatewayType.BROKER;
 
     private static final String DEFAULT_ENVIRONMENT_NAME = "AAAAAAAAAA";

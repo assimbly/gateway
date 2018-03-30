@@ -38,12 +38,13 @@ entity ErrorEndpoint {
 
 entity Service {
 	name String,
-	type String,
-	url String,
-	username String,
-	password String,
-	driver String,
-	configuration String
+	type String	
+}
+
+entity ServiceKeys {
+	key String,
+	value String,
+	type String	
 }
 
 entity Header {
@@ -100,6 +101,10 @@ relationship OneToOne {
 	FromEndpoint{header} to Header,
     ToEndpoint{header} to Header,
     ErrorEndpoint{header} to Header
+}
+
+relationship OneToMany {
+	Service{serviceKeys} to ServiceKeys
 }
 
 relationship OneToMany {

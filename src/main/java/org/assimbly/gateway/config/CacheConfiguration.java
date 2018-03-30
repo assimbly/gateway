@@ -58,6 +58,7 @@ public class CacheConfiguration {
             cm.createCache(org.assimbly.gateway.domain.FromEndpoint.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.ToEndpoint.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.ErrorEndpoint.class.getName(), jcacheConfiguration);
+            cm.createCache(org.assimbly.gateway.domain.ServiceKeys.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }

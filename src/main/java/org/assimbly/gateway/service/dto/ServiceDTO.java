@@ -15,16 +15,6 @@ public class ServiceDTO implements Serializable {
 
     private String type;
 
-    private String url;
-
-    private String username;
-
-    private String password;
-
-    private String driver;
-
-    private String configuration;
-
     public Long getId() {
         return id;
     }
@@ -47,46 +37,6 @@ public class ServiceDTO implements Serializable {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public String getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(String configuration) {
-        this.configuration = configuration;
     }
 
     @Override
@@ -116,11 +66,6 @@ public class ServiceDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
-            ", url='" + getUrl() + "'" +
-            ", username='" + getUsername() + "'" +
-            ", password='" + getPassword() + "'" +
-            ", driver='" + getDriver() + "'" +
-            ", configuration='" + getConfiguration() + "'" +
             "}";
     }
 }

@@ -1,0 +1,27 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "serviceKeys",
+            "otherEntityName": "service",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "key",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "value",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180330121320",
+    "dto": "mapstruct",
+    "service": "serviceImpl",
+    "entityTableName": "service_keys",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
