@@ -216,11 +216,6 @@ public class AssimblyDBConfiguration {
 
 	private void getServiceProperties(String type, org.assimbly.gateway.domain.Service service) {
 		properties.put(type + ".service.id", service.getId().toString());
-		properties.put(type + ".service.username", service.getUsername());
-		properties.put(type + ".service.password", service.getPassword());
-		properties.put(type + ".service.url", service.getUrl());
-		properties.put(type + ".service.driver", service.getDriver());
-		properties.put(type + ".service.configuration", service.getConfiguration());
 	}	
 	
 	private void getHeaderFromAssimblyDB(String type) {

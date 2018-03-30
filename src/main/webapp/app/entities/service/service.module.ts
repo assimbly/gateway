@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
 import { GatewaySharedModule } from '../../shared';
 import {
     ServiceService,
@@ -23,6 +24,7 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         GatewaySharedModule,
+        GatewayServiceKeysModule,
         RouterModule.forChild(ENTITY_STATES)
     ],
     declarations: [
@@ -46,4 +48,4 @@ const ENTITY_STATES = [
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayServiceModule {}
+export class GatewayServiceModule { }

@@ -15,18 +15,26 @@
     <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
 
     <!--
-        Added the entity Service.
+        Added the entity ServiceKeys.
     -->
-    <changeSet id="20180114132919-1" author="jhipster">
-        <createTable tableName="service">
+    <changeSet id="20180330121320-1" author="jhipster">
+        <createTable tableName="service_keys">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
+            <column name="jhi_key" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="jhi_value" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
 
             <column name="jhi_type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="service_id" type="bigint">
                 <constraints nullable="true" />
             </column>
 

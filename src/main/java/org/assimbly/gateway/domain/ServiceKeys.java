@@ -9,12 +9,12 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A Service.
+ * A ServiceKeys.
  */
 @Entity
-@Table(name = "service")
+@Table(name = "service_keys")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Service implements Serializable {
+public class ServiceKeys implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,11 +22,17 @@ public class Service implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "jhi_key")
+    private String key;
+
+    @Column(name = "jhi_value")
+    private String value;
 
     @Column(name = "jhi_type")
     private String type;
+
+    @ManyToOne
+    private Service service;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -37,24 +43,37 @@ public class Service implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public Service name(String name) {
-        this.name = name;
+    public ServiceKeys key(String key) {
+        this.key = key;
         return this;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public ServiceKeys value(String value) {
+        this.value = value;
+        return this;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getType() {
         return type;
     }
 
-    public Service type(String type) {
+    public ServiceKeys type(String type) {
         this.type = type;
         return this;
     }
@@ -63,6 +82,18 @@ public class Service implements Serializable {
         this.type = type;
     }
 
+    public Service getService() {
+        return service;
+    }
+
+    public ServiceKeys service(Service service) {
+        this.service = service;
+        return this;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -73,11 +104,11 @@ public class Service implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Service service = (Service) o;
-        if (service.getId() == null || getId() == null) {
+        ServiceKeys serviceKeys = (ServiceKeys) o;
+        if (serviceKeys.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), service.getId());
+        return Objects.equals(getId(), serviceKeys.getId());
     }
 
     @Override
@@ -87,9 +118,10 @@ public class Service implements Serializable {
 
     @Override
     public String toString() {
-        return "Service{" +
+        return "ServiceKeys{" +
             "id=" + getId() +
-            ", name='" + getName() + "'" +
+            ", key='" + getKey() + "'" +
+            ", value='" + getValue() + "'" +
             ", type='" + getType() + "'" +
             "}";
     }
