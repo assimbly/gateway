@@ -10,6 +10,7 @@ import { ResponseWrapper, createRequestOption } from '../../shared';
 export class FlowService {
 
     private resourceUrl =  SERVER_API_URL + 'api/flows';
+    private connectorUrl =  SERVER_API_URL + 'api/connector';
 
     constructor(private http: Http) { }
 
@@ -47,15 +48,15 @@ export class FlowService {
     }
 
     start(id: number): Observable<Response> {
-        return this.http.get(`${this.resourceUrl}/start/${id}`);
+        return this.http.get(`${this.connectorUrl}/start/${id}`);
     }
 
     restart(id: number): Observable<Response> {
-        return this.http.get(`${this.resourceUrl}/restart/${id}`);
+        return this.http.get(`${this.connectorUrl}/restart/${id}`);
     }
 
     stop(id: number): Observable<Response> {
-        return this.http.get(`${this.resourceUrl}/stop/${id}`);
+        return this.http.get(`${this.connectorUrl}/stop/${id}`);
     }
 
     private convertResponse(res: Response): ResponseWrapper {
