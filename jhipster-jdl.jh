@@ -1,8 +1,9 @@
-entity Gateway {
+entity MessageGateway {
 	name String,
     type GatewayType,
 	environmentName String,
-	stage EnvironmentType
+	stage EnvironmentType,
+	connectorType ConnectorType,
 	defaultFromEndpointType String,
 	defaultToEndpointType String,
 	defaultErrorEndpointType String
@@ -59,24 +60,27 @@ entity HeaderKeys {
 
 
 enum GatewayType {
-    FILE, BROKER
+    ADAPTER, BROKER, API, SOAP
 }
 
 enum EnvironmentType {
     DEVELOPMENT, TEST, ACCEPTANCE, PRODUCTION
 }
 
+enum ConnectorType {
+    CAMEL,SPRINGINTEGRATION,CURL
+}
 
 enum EndpointType {
-   SONICMQ, ACTIVEMQ, KAFKA, SJMS, SQL, HTTP4, SFTP, STREAM, WASTEBIN, FILE
+   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, WASTEBIN 
 }
 
 relationship OneToMany {
-	Gateway{flowRoute} to Flow
+	MessageGateway{flowRoute} to Flow
 }
 
 relationship OneToMany {
-	Gateway{environmentVariables} to EnvironmentVariables
+	MessageGateway{environmentVariables} to EnvironmentVariables
 }
 
 relationship OneToOne {

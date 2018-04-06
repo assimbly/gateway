@@ -29,7 +29,7 @@
             <tr *ngFor="let flow of flows ;trackBy: trackId">
                 <td id="flowRowID" [hidden]="!flowRowID"><a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a></td>
                 <td>{{flow.name}}</td>
-                <td id="flowGatewayID" [hidden]="!flowRowGatewayID">
+                <td id="flowRowID" [hidden]="!flowRowID">
                     <div *ngIf="flow.gatewayId">
                         <a [routerLink]="['../gateway', flow.gatewayId  ]" >{{flow.gatewayId}}</a>
                     </div>
