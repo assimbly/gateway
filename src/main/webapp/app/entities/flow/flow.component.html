@@ -64,7 +64,7 @@
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'flow/delete-all/' + flow.id} }]"
+                        		[routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]"
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">

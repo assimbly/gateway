@@ -134,23 +134,4 @@ public class GatewayResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     
-    /**
-     * POST  /flows/import : import configuration from XML.
-     *
-     * @param xml configuration
-     * @return the ResponseEntity with status 201 (Created) and with body the new flowDTO, or with status 400 (Bad Request) if the flow has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @PostMapping(path = "/flows/import", consumes = "application/xml", produces = "text/plain")
-    @Timed
-    public String importConfiguration(@RequestBody String xmlConfiguration) throws URISyntaxException {
-        
-    	log.debug("REST request to import configuration : {}" + xmlConfiguration);
-    	
-    	assimblyDBConfiguration.importConfiguration(xmlConfiguration);
-    	
-    	return "imported";
-
-    }    
-    
 }

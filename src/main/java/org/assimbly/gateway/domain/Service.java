@@ -1,11 +1,14 @@
 package org.assimbly.gateway.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -27,6 +30,11 @@ public class Service implements Serializable {
 
     @Column(name = "jhi_type")
     private String type;
+    
+    @OneToMany(mappedBy = "service")
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set<ServiceKeys> serviceKeys = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -61,8 +69,32 @@ public class Service implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }    
+    
+    public Set<ServiceKeys> getServiceKeys() {
+        return serviceKeys;
     }
 
+    public Service serviceKeys(Set<ServiceKeys> serviceKeys) {
+        this.serviceKeys = serviceKeys;
+        return this;
+    }
+
+    public Service addServiceKeys(ServiceKeys serviceKeys) {
+        this.serviceKeys.add(serviceKeys);
+        serviceKeys.setService(this);
+        return this;
+    }
+
+    public Service removeServiceKeys(ServiceKeys serviceKeys) {
+        this.serviceKeys.remove(serviceKeys);
+        serviceKeys.setService(null);
+        return this;
+    }
+
+    public void setServiceKeys(Set<ServiceKeys> serviceKeys) {
+        this.serviceKeys = serviceKeys;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -90,7 +122,6 @@ public class Service implements Serializable {
         return "Service{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", type='" + getType() + "'" +
             "}";
     }
 }

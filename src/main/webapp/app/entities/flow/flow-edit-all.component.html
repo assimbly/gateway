@@ -15,7 +15,7 @@
 
 			<div>
 				<jhi-alert-error></jhi-alert-error>
-				<div class="form-group" id="flowID" [hidden]="!flowID">
+				<div class="form-group" id="flowId" [hidden]="!flowId">
 					<label for="id">ID</label> <input type="text" class="form-control"
 						id="id" name="id" *ngIf="flow" [(ngModel)]="flow.id"
 						readonly />
@@ -26,28 +26,31 @@
 						*ngIf="flow" [(ngModel)]="flow.name" />
 				</div>
 				<div class="form-group">
-					<label class="form-control-label" for="field_name">Autostart</label> <input
-						type="text" class="form-control" name="autoStart" id="field_name"
-						*ngIf="flow" [(ngModel)]="flow.autoStart" />
+					<label class="form-control-label" for="field_name">Autostart</label>
+					            <select type="text" class="form-control" name="autoStart" id="field_autostart"
+						*ngIf="flow" [(ngModel)]="flow.autoStart" >
+		                <option value="true">true</option>
+		                <option value="false">false</option>
+            		</select> 
 				</div>				
 				<div class="form-group">
 					<label class="form-control-label" for="field_gateway">Gateway</label>
 					<input type="text" class="form-control" name="gateway"
-						id="field_name" *ngIf="flow"
+						id="field_gateway" *ngIf="flow"
 						[(ngModel)]="flow.gatewayId" />
 				</div>
 				<div class="form-group" id="flowFromEndpoint"
 					[hidden]="!flowFromEndpoint">
 					<label class="form-control-label" for="field_fromEndpoint">From
 						Endpoint</label> <input type="text" class="form-control"
-						name="fromEndpoint" id="field_name" *ngIf="flow"
+						name="fromEndpoint" id="field_fromEndpoint" *ngIf="flow"
 						[(ngModel)]="flow.fromEndpointId" />
 				</div>
 				<div class="form-group" id="flowErrorEndpoint"
 					[hidden]="!flowErrorEndpoint">
 					<label class="form-control-label" for="field_errorEndpoint">Error
 						Endpoint</label> <input type="text" class="form-control"
-						name="errorEndpoint" id="field_name" *ngIf="flow"
+						name="errorEndpoint" id="field_errorEndpoint" *ngIf="flow"
 						[(ngModel)]="flow.errorEndpointId" />
 				</div>
 
@@ -60,8 +63,8 @@
 				<div row id="tabBackground">
 					<div class="col-11">
 
-						<div class="form-group" id="fromEndpointID"
-							[hidden]="!fromEndpointID">
+						<div class="form-group" id="fromEndpointId"
+							[hidden]="!fromEndpointId">
 							<label for="id">ID</label> <input type="text"
 								class="form-control" id="id" name="id"
 								[(ngModel)]="fromEndpoint.id" readonly />
@@ -119,7 +122,7 @@
 				<div row id="tabBackground">
 					<div class="col-11">
 
-						<div class="form-group" id="toEndpointID" [hidden]="!toEndpointID">
+						<div class="form-group" id="toEndpointId" [hidden]="!toEndpointId">
 							<label for="id">ID</label> <input type="text"
 								class="form-control" id="id" name="id"
 								[(ngModel)]="toEndpoint.id" readonly />
@@ -184,8 +187,8 @@
 				<div row id="tabBackground">
 					<div class="col-11">
 
-						<div class="form-group" id="errorEndpointID"
-							[hidden]="!errorEndpointID">
+						<div class="form-group" id="errorEndpointId"
+							[hidden]="!errorEndpointId">
 							<label for="id">ID</label> <input type="text"
 								class="form-control" id="id" name="id"
 								[(ngModel)]="errorEndpoint.id" readonly />

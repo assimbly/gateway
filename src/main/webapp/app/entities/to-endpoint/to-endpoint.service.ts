@@ -36,8 +36,8 @@ export class ToEndpointService {
         });
     }
 
-    findByRouteId(id: number): Observable<ToEndpoint> {
-        return this.http.get(`${this.resourceUrl}/byrouteid/${id}`).map((res: Response) => {
+    findByFlowId(id: number): Observable<ToEndpoint> {
+        return this.http.get(`${this.resourceUrl}/byflowid/${id}`).map((res: Response) => {
             const jsonResponse = res.json();
             return this.convertItemFromServer(jsonResponse);
         });

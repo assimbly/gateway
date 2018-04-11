@@ -1,7 +1,7 @@
 import { BaseEntity } from './../../shared';
 
 export const enum GatewayType {
-    'FILE',
+    'ADAPTER',
     'BROKER'
 }
 
@@ -23,7 +23,7 @@ export class Gateway implements BaseEntity {
         public defaultToEndpointType?: string,
         public defaultErrorEndpointType?: string,
         public flows?: BaseEntity[],
-        public environmentVariables?: BaseEntity[],
+        public environmentVariables?: BaseEntity[]
     ) {
     }
 }

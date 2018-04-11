@@ -105,9 +105,9 @@ public class ToEndpointResource {
      * @param id the id of the toEndpointDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/to-endpoints/byrouteid/{id}")
+    @GetMapping("/to-endpoints/byflowid/{id}")
     @Timed
-    public ResponseEntity<ToEndpointDTO> getToEndpointByRouteID(@PathVariable Long id) {
+    public ResponseEntity<ToEndpointDTO> getToEndpointByFlowID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoints by routeid");
         List<ToEndpoint> toEndpoints = toEndpointRepository.findByFlowId(id);
         ToEndpoint toEndpoint = toEndpoints.get(0);

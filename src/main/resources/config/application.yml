@@ -45,7 +45,7 @@ spring:
         basename: i18n/messages
     mvc:
         favicon:
-            enabled: false
+            enabled: true
     thymeleaf:
         mode: XHTML
 security:
@@ -86,7 +86,7 @@ jhipster:
         default-include-pattern: /api/.*
         title: gateway API
         description: gateway API documentation
-        version: 0.0.1
+        version: 0.2.0
         terms-of-service-url:
         contact-name:
         contact-url:

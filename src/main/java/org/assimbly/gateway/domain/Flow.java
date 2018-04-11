@@ -34,11 +34,11 @@ public class Flow implements Serializable {
     @ManyToOne
     private Gateway gateway;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
