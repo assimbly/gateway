@@ -11,8 +11,9 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface ServiceMapper extends EntityMapper<ServiceDTO, Service> {
 
-
-
+    @Mapping(target = "serviceKeys", ignore = true)
+    Service toEntity(ServiceDTO serviceDTO);
+    
     default Service fromId(Long id) {
         if (id == null) {
             return null;

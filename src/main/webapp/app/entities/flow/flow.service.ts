@@ -9,8 +9,9 @@ import { ResponseWrapper, createRequestOption } from '../../shared';
 @Injectable()
 export class FlowService {
 
-    private resourceUrl =  SERVER_API_URL + 'api/flows';
-    private connectorUrl =  SERVER_API_URL + 'api/connector';
+    private resourceUrl = SERVER_API_URL + 'api/flows';
+    private connectorUrl = SERVER_API_URL + 'api/connector';
+    private configurationUrl = SERVER_API_URL + 'api/configuration';
 
     constructor(private http: Http) { }
 
@@ -47,16 +48,29 @@ export class FlowService {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
+    getConfiguration(id: number): Observable<Response>  {
+        const gatewayid = 1;
+        return this.http.get(`${this.configurationUrl}/${gatewayid}/getflowconfiguration/${id}`);
+    }
+
+    setConfiguration(id: number, xmlconfiguration: string): Observable<Response> {
+        const gatewayid = 1;
+        return this.http.post(`${this.connectorUrl}/${gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+    }
+
     start(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/start/${id}`);
+        const gatewayid = 1;
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/start/${id}`);
     }
 
     restart(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/restart/${id}`);
+        const gatewayid = 1;
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/restart/${id}`);
     }
 
     stop(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/stop/${id}`);
+        const gatewayid = 1;
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stop/${id}`);
     }
 
     private convertResponse(res: Response): ResponseWrapper {

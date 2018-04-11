@@ -1,7 +1,7 @@
 {
   "name": "gateway",
-  "version": "0.0.0",
-  "description": "Description for gateway",
+  "version": "0.2.0",
+  "description": "Messaging Gateway",
   "private": true,
   "license": "UNLICENSED",
   "cacheDirectories": [

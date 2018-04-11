@@ -18,7 +18,6 @@ logging:
         ROOT: DEBUG
         org.assimbly.gateway: DEBUG
         io.github.jhipster: DEBUG
-        io.hawt: INFO
 
 spring:
     profiles:
@@ -103,7 +102,7 @@ jhipster:
         exposed-headers: "Link,X-Total-Count"
         allow-credentials: true
         max-age: 1800
-    security:    
+    security:
         remember-me:
             # security key (this key should be unique for your application, and kept secret)
             key: 3ff0a5bceb965db5bcb77fecccd1ce908c269e49
@@ -139,9 +138,5 @@ jhipster:
 # More documentation is available at:
 # http://www.jhipster.tech/common-application-properties/
 # ===================================================================
-hawtio:
-     authenticationEnabled: false
-     hawtio: true
-     proxyWhitelist: localhost, 127.0.0.1
-     
+
 application:

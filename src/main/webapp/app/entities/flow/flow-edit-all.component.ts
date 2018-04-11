@@ -84,7 +84,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
                 }
 
-                this.toEndpointService.findByRouteId(id).subscribe((toEndpoint) => {
+                this.toEndpointService.findByFlowId(id).subscribe((toEndpoint) => {
                     this.toEndpoint = toEndpoint;
                 });
 
@@ -134,15 +134,19 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     save() {
         this.isSaving = true;
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
-            this.subscribeToSaveResponse(
-                this.errorEndpointService.update(this.errorEndpoint)
-            );
+
             this.subscribeToSaveResponse(
                 this.fromEndpointService.update(this.fromEndpoint)
             );
+
+            this.subscribeToSaveResponse(
+                this.errorEndpointService.update(this.errorEndpoint)
+            );
+
             this.subscribeToSaveResponse(
                 this.flowService.update(this.flow)
             );
+
             this.subscribeToSaveResponse(
                 this.toEndpointService.update(this.toEndpoint)
             );

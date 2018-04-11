@@ -85,21 +85,42 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     start(id: number) {
-        this.flowService.start(id).subscribe((response) => {
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Start an flow'
+
+        this.flowService.getConfiguration(id)
+            .map((response) => response.text())
+            .subscribe((data) => {
+                this.flowService.setConfiguration(id, data)
+                    .map((response) => response.text())
+                    .subscribe((data2) => {
+                        console.log('data' + data2);
+                        this.flowService.start(id).subscribe((response) => {
+                            this.eventManager.broadcast({
+                                name: 'flowListModification',
+                                content: 'Start an flow'
+                            });
+                        });
+                    });
             });
-        });
     }
 
     restart(id: number) {
-        this.flowService.restart(id).subscribe((response) => {
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Restart an flow'
+
+        this.flowService.getConfiguration(id)
+            .map((response) => response.text())
+            .subscribe((data) => {
+                this.flowService.setConfiguration(id, data)
+                    .map((response) => response.text())
+                    .subscribe((data2) => {
+                        console.log('data' + data2);
+                        this.flowService.restart(id).subscribe((response) => {
+                            this.eventManager.broadcast({
+                                name: 'flowListModification',
+                                content: 'Restart an flow'
+                            });
+                        });
+                    });
             });
-        });
+
     }
 
     stop(id: number) {
@@ -117,7 +138,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     getToEndpointType(id: number) {
-        const toEndpoint = this.toEndpoints.find(function(obj) { return obj.flowId === id; });
+        const toEndpoint = this.toEndpoints.find(function(obj) { return obj.id === id; });
         if (toEndpoint !== undefined) { return toEndpoint.type; };
     }
 
