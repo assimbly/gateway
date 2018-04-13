@@ -45,6 +45,10 @@ public class ConnectorResource {
 	@Autowired
 	private AssimblyDBConfiguration assimblyDBConfiguration;
 
+	private String jsonconfiguration;
+
+	private boolean plainResponse;
+
     public ConnectorResource(Environment env, JHipsterProperties jHipsterProperties) {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
@@ -55,7 +59,7 @@ public class ConnectorResource {
     /**
      * POST  /connector/{connectorid}/setconfiguration : Set configuration from XML.
      *
-     * @param connectorId (by gatewayId)
+     * @param connectorId (gatewayId)
      * @param configuration as xml
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
@@ -75,29 +79,45 @@ public class ConnectorResource {
     }    
     
     /**
-     * Get  /getconfiguration : get XML configuration for gateway.
+     * Get  /connector/{connectorId}/getconfiguration : get XML configuration for gateway.
      *
-     * @param connectorId (by connectorId)
+     * @param connectorid (gatewayId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/connector/{connectorId}/getconfiguration", consumes = "application/xml", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/connector/{connectorId}/getconfiguration", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
 
-       	try {
+    	plainResponse = true;
+    	
+    	try {
 			configuration = connector.getConfiguration();
-			xmlconfiguration = connector.convertConfigurationToXML(connectorId.toString(), configuration);
-   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration);
+			
+			if(mediaType.equals("application/xml")) {
+				xmlconfiguration = connector.convertConfigurationToXML(connectorId.toString(), configuration);
+				if(xmlconfiguration.startsWith("Error")||xmlconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration,plainResponse);				
+			}else if(mediaType.equals("application/json")){
+				jsonconfiguration = connector.convertConfigurationToJSON(connectorId.toString(), configuration);
+				if(jsonconfiguration.startsWith("Error")||jsonconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",jsonconfiguration,plainResponse);				
+			}else {
+				//return json until ini is supported
+				jsonconfiguration = connector.convertConfigurationToJSON(connectorId.toString(), configuration);
+				if(jsonconfiguration.startsWith("Error")||jsonconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration,plainResponse);
+			}
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration,e);
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration","failed",e);
    		}
 
     }    
 
     /**
-     * POST  /setflowconfiguration : Set configuration from XML.
+     * POST  /connector/{connectorId}/setflowconfiguration/{id} : Set configuration from XML.
      *
+     * @param connectorid (gatewayId)
      * @param id (FlowId)
      * @param configuration as XML / if empty get from db (for the time being)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
@@ -107,7 +127,7 @@ public class ConnectorResource {
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String xmlConfiguration) throws Exception {
 
-    	mediaType = "text/json";
+    	mediaType = "application/json";
     	
        	try {
 			if(xmlConfiguration.isEmpty() || xmlConfiguration.equals("database")){
@@ -127,26 +147,40 @@ public class ConnectorResource {
     }    
 
     /**
-     * Get  /getconfiguration : get XML configuration for gateway.
+     * Get  /connector/{connectorId}/getflowconfiguration/{id} : get XML configuration for gateway.
      *
+     * @param connectorid (gatewayId)
      * @param id (flowId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/connector/{connectorId}/getflowconfiguration/{id}", consumes = "application/xml", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/connector/{connectorId}/getflowconfiguration/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
+    	plainResponse = true;
+    	
     	try {
 			flowconfiguration = connector.getFlowConfiguration(id.toString());
-			xmlconfiguration = connector.convertFlowConfigurationToXML(flowconfiguration);
-   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowConfiguration",xmlconfiguration);
+			
+			if(mediaType.equals("application/xml")) {
+				xmlconfiguration = connector.convertFlowConfigurationToXML(flowconfiguration);
+				if(xmlconfiguration.startsWith("Error")||xmlconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowConfiguration",xmlconfiguration,plainResponse);				
+			}else if(mediaType.equals("application/json")){
+				jsonconfiguration = connector.convertFlowConfigurationToJSON(flowconfiguration);
+				if(jsonconfiguration.startsWith("Error")||jsonconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowConfiguration",jsonconfiguration,plainResponse);				
+			}else {
+				//return json until ini is supported
+				jsonconfiguration = connector.convertFlowConfigurationToJSON(flowconfiguration);
+				if(jsonconfiguration.startsWith("Error")||jsonconfiguration.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowConfiguration",xmlconfiguration,plainResponse);
+			}
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowConfiguration",xmlconfiguration,e);
    		}
     }    
-    
-    
 
     
 	//manage connector

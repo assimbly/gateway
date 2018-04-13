@@ -2,11 +2,6 @@ package org.assimbly.gateway.web.rest.util;
 
 import org.json.JSONObject;
 import org.json.XML;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * Utility class for HTTP body creation.
