@@ -1,14 +1,8 @@
 package org.assimbly.gateway.web.rest.util;
 
-import org.assimbly.gateway.web.rest.ConnectorResource;
-import org.json.JSONObject;
-import org.json.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * Utility class for HTTP body creation.
@@ -46,6 +40,35 @@ public final class ResponseUtil {
    		return response;    	
     }
 
+    public static ResponseEntity<String> createSuccessResponse(long connectorId, String mediaType, String action, String message, boolean plainResponse) throws Exception{
+
+    	log.debug("REST request with action " + action + " for gateway with id " + connectorId);
+    
+    	if(plainResponse) {
+        	response = ResponseEntity.ok()
+	        		.body(message);
+    	}else {
+
+        	switch (mediaType.toLowerCase()) {    	
+		        case "application/json":
+		        	response = ResponseEntity.ok()
+		        		.body(BodyUtil.createSuccessJSONResponse(connectorId, action, message));
+		            break;
+		        case "application/xml":
+		        	response = ResponseEntity.ok()
+		        		.body(BodyUtil.createSuccessXMLResponse(connectorId, action, message));
+		            break;
+		        default: 
+		        	response = ResponseEntity.ok()
+		        		.body(BodyUtil.createSuccessTEXTResponse(message));
+		            break;
+        	}
+    	}
+    	
+    	return response;	
+   	}
+    
+    
     public static ResponseEntity<String> createSuccessResponseWithHeaders(long connectorId, String mediaType, String action, String message, String headerMessage, String headerParam) throws Exception{
 
     	log.debug("REST request with action " + action + " for gateway with id " + connectorId);
@@ -115,6 +138,6 @@ public final class ResponseUtil {
     	}
 		
 		return response;
-	}	
+	}
     
 }
