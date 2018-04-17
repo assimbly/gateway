@@ -235,4 +235,12 @@ custom assimbly css
   border-bottom: 3px solid whitesmoke;
 }
 
+.detailsTable {
+    width: 50%;
+}
+
+.lastItemBorder{
+    border-bottom: 1px solid #e9ecef;
+}
+
 /* jhipster-needle-css-add-main JHipster will add new css style */
