@@ -1,0 +1,49 @@
+<td id="flowRowID" [hidden]="!flowRowID">
+    <a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
+</td>
+<td>{{flow.name}}</td>
+<td id="flowRowID" [hidden]="!flowRowID">
+    <a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
+</td>
+<td>
+    <a *ngIf="flow.fromEndpointId" [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
+</td>
+<td>
+    <a [routerLink]="['../to-endpoint', flow.id]" data-toggle="tooltip" title="{{toEndpointTooltip}}">{{toEndpoint.type}}</a>
+</td>
+<td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
+    <a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
+</td>
+<td class="text-right">
+    <div class="btn-group flex-btn-group-container">
+        <button type="submit" [routerLink]="['../flow', flow.id ]" class="btn btn-info btn-sm">
+            <span class="fa fa-eye"></span>
+            <span class="d-none d-md-inline">View</span>
+        </button>
+        <button type="submit" [routerLink]="['../flow/edit-all', flow.id ]" class="btn btn-primary btn-sm">
+            <span class="fa fa-pencil"></span>
+            <span class="d-none d-md-inline">Edit</span>
+        </button>
+        <button type="submit" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+            class="btn btn-danger btn-sm">
+            <span class="fa fa-remove"></span>
+            <span class="d-none d-md-inline">Delete</span>
+        </button>
+    </div>
+</td>
+<td class="text-right">
+    <div class="btn-group flex-btn-group-container">
+        <button type="button" (click)="start(flow.id);" class="btn btn-info btn-sm">
+            <span class="fa fa-play"></span>
+            <span class="d-none d-md-inline">Start</span>
+        </button>
+        <button type="button" (click)="restart(flow.id);" class="btn btn-primary btn-sm">
+            <span class="fa fa-refresh"></span>
+            <span class="d-none d-md-inline">Restart</span>
+        </button>
+        <button type="button" (click)="stop(flow.id);" class="btn btn-danger btn-sm">
+            <span class="fa fa-stop"></span>
+            <span class="d-none d-md-inline">Stop</span>
+        </button>
+    </div>
+</td>

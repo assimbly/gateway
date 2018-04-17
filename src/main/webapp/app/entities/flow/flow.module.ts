@@ -21,6 +21,7 @@ import {
     flowRoute,
     flowPopupRoute,
 } from './';
+import { FlowRowComponent } from './flow-row.component';
 
 const ENTITY_STATES = [
     ...flowRoute,
@@ -48,6 +49,7 @@ const ENTITY_STATES = [
         FlowDeleteDialogComponent,
         FlowPopupComponent,
         FlowDeletePopupComponent,
+        FlowRowComponent
     ],
     entryComponents: [
         FlowComponent,
