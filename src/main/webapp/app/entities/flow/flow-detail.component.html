@@ -1,47 +1,166 @@
-
-<div *ngIf="flow">
-    <h2><span>Flow Route</span> {{flow.id}}</h2>
-    <hr>
+<div class="container" *ngIf="!!flow">
+    <h2><span>Flow {{flow.name}}</span></h2>
     <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Name</span></dt>
-        <dd>
-            <span>{{flow.name}}</span>
-        </dd>
-        <dd>
-            <span>{{flow.autoStart}}</span>
-        </dd>        
-        <dt><span>Gateway</span></dt>
-        <dd>
-            <div *ngIf="flow.gatewayId">
-                <a [routerLink]="['/gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
-            </div>
-        </dd>
-        <dt><span>From Endpoint</span></dt>
-        <dd>
-            <div *ngIf="flow.fromEndpointId">
-                <a [routerLink]="['/from-endpoint', flow.fromEndpointId]">{{flow.fromEndpointId}}</a>
-            </div>
-        </dd>
-        <dt><span>Error Endpoint</span></dt>
-        <dd>
-            <div *ngIf="flow.errorEndpointId">
-                <a [routerLink]="['/error-endpoint', flow.errorEndpointId]">{{flow.errorEndpointId}}</a>
-            </div>
-        </dd>
-    </dl>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <tbody>
+                <tr>
+                    <th class="detailsTable">ID</th>
+                    <td class="detailsTable">{{flow.id}}</td>
+                </tr>
+                <tr>
+                    <th>Autostart</th>
+                    <td>{{flow.autoStart}}</td>
+                </tr>
+                <tr>
+                    <th class="lastItemBorder">Gateway name</th>
+                    <td class="lastItemBorder"><a [routerLink]="['/gateway', flow.gatewayId]" *ngIf="!!gateway">{{gateway.name}}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ngb-tabset>
+
+        <ngb-tab title="From" id="fromTab">
+            <ng-template ngbTabContent>
+                <div row id="tabBackground">
+                    <table class="table table-sm">
+                        <tbody *ngIf="!!fromEndpoint">
+                            <tr>
+                                <th class="detailsTable">ID</th>
+                                <td class="detailsTable">
+                                    <a [routerLink]="['/from-endpoint', fromEndpoint.id]">{{fromEndpoint.id}}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td>{{fromEndpoint.type}}</td>
+                            </tr>
+                            <tr>
+                                <th>Uri</th>
+                                <td>{{fromEndpoint.uri}}</td>
+                            </tr>
+                            <tr>
+                                <th>Options</th>
+                                <td>{{fromEndpoint.options}}</td>
+                            </tr>
+                            <tr>
+                                <th>Service</th>
+                                <td>{{fromEndpoint.serviceId}}</td>
+                            </tr>
+                            <tr>
+                                <th class="lastItemBorder">Header</th>
+                                <td class="lastItemBorder">{{fromEndpoint.headerId}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </ng-template>
+        </ngb-tab>
+
+        <ngb-tab title="To" id="toTab">
+            <ng-template ngbTabContent>
+                <jhi-alert-error></jhi-alert-error>
+                <div row id="tabBackground">
+                    <table class="table table-sm" *ngFor="let toEndpoint of toEndpoints">
+                        <tbody *ngIf="!!toEndpoint">
+                            <tr>
+                                <th class="detailsTable">ID</th>
+                                <td class="detailsTable">
+                                    <a [routerLink]="['/to-endpoint', toEndpoint.id]">{{fromEndpoint.id}}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td>{{toEndpoint.type}}</td>
+                            </tr>
+                            <tr>
+                                <th>Uri</th>
+                                <td>{{toEndpoint.uri}}</td>
+                            </tr>
+                            <tr>
+                                <th>Options</th>
+                                <td>{{toEndpoint.options}}</td>
+                            </tr>
+                            <tr>
+                                <th>Flow</th>
+                                <td>{{toEndpoint.flowId}}</td>
+                            </tr>
+                            <tr>
+                                <th>Service</th>
+                                <td>{{toEndpoint.serviceId}}</td>
+                            </tr>
+                            <tr>
+                                <th class="lastItemBorder">Header</th>
+                                <td class="lastItemBorder">{{toEndpoint.headerId}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </ng-template>
+        </ngb-tab>
+
+        <ngb-tab title="Error" id="errorTab">
+            <ng-template ngbTabContent>
+                <div row id="tabBackground">
+                    <table class="table table-sm">
+                        <tbody *ngIf="!!errorEndpoint">
+                            <tr>
+                                <th class="detailsTable">ID</th>
+                                <td class="detailsTable">
+                                    <a [routerLink]="['/error-endpoint', errorEndpoint.id]">{{errorEndpoint.id}}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td>{{errorEndpoint.type}}</td>
+                            </tr>
+                            <tr>
+                                <th>Uri</th>
+                                <td>{{errorEndpoint.uri}}</td>
+                            </tr>
+                            <tr>
+                                <th>Options</th>
+                                <td>{{errorEndpoint.options}}</td>
+                            </tr>
+                            <tr>
+                                <th>Service</th>
+                                <td>{{errorEndpoint.serviceId}}</td>
+                            </tr>
+                            <tr>
+                                <th class="lastItemBorder">Header</th>
+                                <td class="lastItemBorder">{{errorEndpoint.headerId}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </ng-template>
+        </ngb-tab>
+    </ngb-tabset>
+
+    <div class="float-right">
+            <button type="submit" (click)="previousState()" class="btn btn-info">
+                    <span class="fa fa-arrow-left"></span>&nbsp;
+                    <span> Back</span>
+                </button>
+            
+                <button type="button" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+                    class="btn btn-primary">
+                    <span class="fa fa-pencil"></span>&nbsp;
+                    <span> Edit</span>
+                </button>
+            
+    </div>
+    <!--<button type="submit" (click)="previousState()" class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;
+        <span> Back</span>
     </button>
 
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+        class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;
+        <span> Edit</span>
+    </button>-->
 </div>
