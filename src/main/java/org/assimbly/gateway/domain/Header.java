@@ -28,7 +28,7 @@ public class Header implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "header")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "header",cascade = CascadeType.REMOVE)
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<HeaderKeys> headerKeys = new HashSet<>();
