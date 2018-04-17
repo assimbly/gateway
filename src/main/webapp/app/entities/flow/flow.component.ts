@@ -9,6 +9,7 @@ import { FromEndpointService } from '../from-endpoint/from-endpoint.service';
 import { ToEndpoint } from '../to-endpoint/to-endpoint.model';
 import { ToEndpointService } from '../to-endpoint/to-endpoint.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
+import { EndpointType } from '../from-endpoint';
 
 @Component({
     selector: 'jhi-flow',
@@ -29,6 +30,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
+    fromEndpointTooltip: string;
+    toEndpointTooltip: string;
+    errorEndpointTooltip: string;
 
     constructor(
         private flowService: FlowService,
@@ -120,7 +124,6 @@ export class FlowComponent implements OnInit, OnDestroy {
                         });
                     });
             });
-
     }
 
     stop(id: number) {
@@ -134,12 +137,22 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     getFromEndpointType(id: number) {
         const fromEndpoint = this.fromEndpoints.find(function(obj) { return obj.id === id; });
-        if (fromEndpoint !== undefined) { return fromEndpoint.type; };
+        if (fromEndpoint !== undefined) {
+            // this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
+            return fromEndpoint.type;
+        };
     }
 
     getToEndpointType(id: number) {
         const toEndpoint = this.toEndpoints.find(function(obj) { return obj.id === id; });
-        if (toEndpoint !== undefined) { return toEndpoint.type; };
+        if (toEndpoint !== undefined) {
+            // this.toEndpointTooltip = this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options)
+            return toEndpoint.type;
+        };
+    }
+
+    endpointTooltip(type, uri, options): string {
+        return `${type.toLowerCase()}://${uri}?${options}`;
     }
 
     loadPage(page) {
