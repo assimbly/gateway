@@ -22,7 +22,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
     flow: Flow;
     gateway: Gateway;
     fromEndpoint: FromEndpoint;
-    toEndpoints: ToEndpoint[];
+    toEndpoint: ToEndpoint;
     errorEndpoint: ErrorEndpoint;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -52,7 +52,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
             this.flow = flow;
             this.getGateway(flow.gatewayId);
             this.getFromEndpoint(flow.fromEndpointId);
-            this.getToEndpoint(flow.toEndpoints);
+            this.getToEndpoint(flow.id);
             this.getErrorEndpoint(flow.errorEndpointId);
         });
     }
@@ -61,30 +61,28 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
         if (!id) { return; }
 
         this.gatewayService.find(id)
-            .subscribe((gateway) => {this.gateway = gateway; console.log(gateway)});
+            .subscribe((gateway) => this.gateway = gateway);
     }
 
     getFromEndpoint(id) {
         if (!id) { return; }
 
         this.fromEndpointService.find(id)
-            .subscribe((fromEndpoint) => {this.fromEndpoint = fromEndpoint; console.log(fromEndpoint)});
+            .subscribe((fromEndpoint) => this.fromEndpoint = fromEndpoint);
     }
 
-    getToEndpoint(toEndpoints: BaseEntity[]) {
-        if (!toEndpoints) { return; }
+    getToEndpoint(id) {
+        if (!id) { return; }
 
-        toEndpoints.forEach((toEndpoint) => {
-            this.toEndpointService.find(toEndpoint.id)
-            .subscribe((endpoint) => {this.toEndpoints.push(endpoint); console.log(this.toEndpoints)});
-        });
+        this.toEndpointService.find(id)
+            .subscribe((toEndpoint) => this.toEndpoint = toEndpoint);
     }
 
     getErrorEndpoint(id) {
         if (!id) { return; }
 
         this.errorEndpointService.find(id)
-            .subscribe((errorEndpoint) => {this.errorEndpoint = errorEndpoint; console.log(errorEndpoint)});
+            .subscribe((errorEndpoint) => this.errorEndpoint = errorEndpoint);
     }
 
     previousState() {
