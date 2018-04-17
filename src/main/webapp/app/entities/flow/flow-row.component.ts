@@ -4,17 +4,19 @@ import { FlowService } from './flow.service';
 import { JhiEventManager } from 'ng-jhipster';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
+import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
 
 @Component({
-    selector: 'jhi-flow-row',
+    selector: '[jhi-flow-row]',
     templateUrl: './flow-row.component.html'
 })
 
 export class FlowRowComponent implements OnInit {
 
     @Input() flow: Flow;
-    fromEndpoint: FromEndpoint;
-    toEndpoint: ToEndpoint;
+    fromEndpoint: FromEndpoint = new FromEndpoint();
+    toEndpoint: ToEndpoint = new ToEndpoint();
+    errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
@@ -24,6 +26,7 @@ export class FlowRowComponent implements OnInit {
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
+        private errorEndpointService: ErrorEndpointService,
         private eventManager: JhiEventManager
     ) {
     }
@@ -31,6 +34,8 @@ export class FlowRowComponent implements OnInit {
     ngOnInit() {
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.getToEndpoint(this.flow.id);
+        this.getErrorEndpoint(this.flow.errorEndpointId);
+        console.log(this.flow.errorEndpointId);
     }
 
     getFromEndpoint(id: number) {
@@ -49,7 +54,16 @@ export class FlowRowComponent implements OnInit {
             });
     }
 
+    getErrorEndpoint(id: number) {
+        this.errorEndpointService.find(id)
+            .subscribe((errorEndpoint) => {
+                this.errorEndpoint = errorEndpoint;
+                this.errorEndpointTooltip = this.endpointTooltip(errorEndpoint.type, errorEndpoint.uri, errorEndpoint.options);
+            });
+    }
+
     endpointTooltip(type, uri, options): string {
+        if (type === null) {return};
         return `${type.toLowerCase()}://${uri}?${options}`;
     }
 

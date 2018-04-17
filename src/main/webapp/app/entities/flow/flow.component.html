@@ -32,7 +32,7 @@
                         <span>From</span>
                         <span class="fa fa-sort"></span>
                     </th>
-                    <th jhiSortBy="toEndpointId">
+                    <th jhiSortBy="id">
                         <span>To</span>
                         <span class="fa fa-sort"></span>
                     </th>
@@ -44,65 +44,7 @@
                 </tr>
             </thead>
             <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                <tr *ngFor="let flow of flows ;trackBy: trackId" jhi-flow-row [flow]="flow">
-                    <!--<td id="flowRowID" [hidden]="!flowRowID">
-                        <a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
-                    </td>
-                    <td>{{flow.name}}</td>
-                    <td id="flowRowID" [hidden]="!flowRowID">
-                        <div *ngIf="flow.gatewayId">
-                            <a [routerLink]="['../gateway', flow.gatewayId  ]">{{flow.gatewayId}}</a>
-                        </div>
-                    </td>
-                    <td>
-                        <div *ngIf="flow.fromEndpointId">
-                            <a [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{getFromEndpointType(flow.fromEndpointId)}}</a>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <a [routerLink]="['../to-endpoint', flow.toEndpointId]" data-toggle="tooltip" title="{{toEndpointTooltip}}">{{getToEndpointType(flow.id)}}</a>
-                        </div>
-                    </td>
-                    <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
-                        <div *ngIf="flow.errorEndpointId">
-                            <a [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" data-placement="top" title="Tooltip on top">{{flow.errorEndpointId}}</a>
-                        </div>
-                    </td>
-                    <td class="text-right">
-                        <div class="btn-group flex-btn-group-container">
-                            <button type="submit" [routerLink]="['../flow', flow.id ]" class="btn btn-info btn-sm">
-                                <span class="fa fa-eye"></span>
-                                <span class="d-none d-md-inline">View</span>
-                            </button>
-                            <button type="submit" [routerLink]="['../flow/edit-all', flow.id ]" class="btn btn-primary btn-sm">
-                                <span class="fa fa-pencil"></span>
-                                <span class="d-none d-md-inline">Edit</span>
-                            </button>
-                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                                <span class="fa fa-remove"></span>
-                                <span class="d-none d-md-inline">Delete</span>
-                            </button>
-                        </div>
-                    </td>
-                    <td class="text-right">
-                        <div class="btn-group flex-btn-group-container">
-                            <button type="button" (click)="start(flow.id);" class="btn btn-info btn-sm">
-                                <span class="fa fa-play"></span>
-                                <span class="d-none d-md-inline">Start</span>
-                            </button>
-                            <button type="button" (click)="restart(flow.id);" class="btn btn-primary btn-sm">
-                                <span class="fa fa-refresh"></span>
-                                <span class="d-none d-md-inline">Restart</span>
-                            </button>
-                            <button type="button" (click)="stop(flow.id);" class="btn btn-danger btn-sm">
-                                <span class="fa fa-stop"></span>
-                                <span class="d-none d-md-inline">Stop</span>
-                            </button>
-                        </div>
-                    </td>-->
-                </tr>
+                <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>
             </tbody>
         </table>
     </div>

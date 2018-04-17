@@ -3,24 +3,16 @@
 </td>
 <td>{{flow.name}}</td>
 <td id="flowRowID" [hidden]="!flowRowID">
-    <div *ngIf="flow.gatewayId">
-        <a [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
-    </div>
+    <a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
 </td>
 <td>
-    <div *ngIf="flow.fromEndpointId">
-        <a [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
-    </div>
+    <a *ngIf="flow.fromEndpointId" [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
 </td>
 <td>
-    <div>
-        <a [routerLink]="['../to-endpoint', flow.toEndpointId]" data-toggle="tooltip" title="{{toEndpointTooltip}}">{{toEndpoint.type}}</a>
-    </div>
+    <a [routerLink]="['../to-endpoint', flow.id]" data-toggle="tooltip" title="{{toEndpointTooltip}}">{{toEndpoint.type}}</a>
 </td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
-    <div *ngIf="flow.errorEndpointId">
-        <a [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" data-placement="top" title="Tooltip on top">{{flow.errorEndpointId}}</a>
-    </div>
+    <a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
 </td>
 <td class="text-right">
     <div class="btn-group flex-btn-group-container">

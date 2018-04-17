@@ -4,10 +4,6 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
-import { FromEndpoint } from '../from-endpoint/from-endpoint.model';
-import { FromEndpointService } from '../from-endpoint/from-endpoint.service';
-import { ToEndpoint } from '../to-endpoint/to-endpoint.model';
-import { ToEndpointService } from '../to-endpoint/to-endpoint.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { EndpointType } from '../from-endpoint';
 
@@ -19,8 +15,6 @@ import { EndpointType } from '../from-endpoint';
 export class FlowComponent implements OnInit, OnDestroy {
 
     flows: Flow[];
-    fromEndpoints: FromEndpoint[];
-    toEndpoints: ToEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -30,22 +24,15 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
-    fromEndpointTooltip: string;
-    toEndpointTooltip: string;
-    errorEndpointTooltip: string;
 
     constructor(
         private flowService: FlowService,
-        private fromEndpointService: FromEndpointService,
-        private toEndpointService: ToEndpointService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
         private principal: Principal
     ) {
         this.flows = [];
-        this.fromEndpoints = [];
-        this.toEndpoints = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
         this.page = 0;
         this.links = {
@@ -64,95 +51,12 @@ export class FlowComponent implements OnInit, OnDestroy {
             (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
             (res: ResponseWrapper) => this.onError(res.json)
             );
-
-        this.fromEndpointService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.fromEndpoints = res.json;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-
-        this.toEndpointService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.toEndpoints = res.json;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
     }
 
     reset() {
         this.page = 0;
         this.flows = [];
-        this.fromEndpoints = [];
-        this.toEndpoints = [];
         this.loadAll();
-    }
-
-    start(id: number) {
-
-        this.flowService.getConfiguration(id)
-            .map((response) => response.text())
-            .subscribe((data) => {
-                this.flowService.setConfiguration(id, data)
-                    .map((response) => response.text())
-                    .subscribe((data2) => {
-                        console.log('data' + data2);
-                        this.flowService.start(id).subscribe((response) => {
-                            this.eventManager.broadcast({
-                                name: 'flowListModification',
-                                content: 'Start an flow'
-                            });
-                        });
-                    });
-            });
-    }
-
-    restart(id: number) {
-
-        this.flowService.getConfiguration(id)
-            .map((response) => response.text())
-            .subscribe((data) => {
-                this.flowService.setConfiguration(id, data)
-                    .map((response) => response.text())
-                    .subscribe((data2) => {
-                        console.log('data' + data2);
-                        this.flowService.restart(id).subscribe((response) => {
-                            this.eventManager.broadcast({
-                                name: 'flowListModification',
-                                content: 'Restart an flow'
-                            });
-                        });
-                    });
-            });
-    }
-
-    stop(id: number) {
-        this.flowService.stop(id).subscribe((response) => {
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Stop an flow'
-            });
-        });
-    }
-
-    getFromEndpointType(id: number) {
-        const fromEndpoint = this.fromEndpoints.find(function(obj) { return obj.id === id; });
-        if (fromEndpoint !== undefined) {
-            // this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
-            return fromEndpoint.type;
-        };
-    }
-
-    getToEndpointType(id: number) {
-        const toEndpoint = this.toEndpoints.find(function(obj) { return obj.id === id; });
-        if (toEndpoint !== undefined) {
-            // this.toEndpointTooltip = this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options)
-            return toEndpoint.type;
-        };
-    }
-
-    endpointTooltip(type, uri, options): string {
-        return `${type.toLowerCase()}://${uri}?${options}`;
     }
 
     loadPage(page) {
