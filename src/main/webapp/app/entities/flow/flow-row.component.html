@@ -37,6 +37,10 @@
             <span class="fa fa-play"></span>
             <span class="d-none d-md-inline">Start</span>
         </button>
+        <button type="button" (click)="pause(flow.id);" class="btn btn-warning btn-sm">
+            <span class="fa fa-pause"></span>
+            <span class="d-none d-md-inline">Pause</span>
+        </button>
         <button type="button" (click)="restart(flow.id);" class="btn btn-primary btn-sm">
             <span class="fa fa-refresh"></span>
             <span class="d-none d-md-inline">Restart</span>
