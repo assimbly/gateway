@@ -29,6 +29,8 @@ public class ConfigurationResource {
 
 	@Autowired
 	private AssimblyDBConfiguration assimblyDBConfiguration;
+
+	private String jsonconfiguration;
 	
     public ConfigurationResource(Environment env, JHipsterProperties jHipsterProperties) {
         this.env = env;
@@ -45,7 +47,7 @@ public class ConfigurationResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping(path = "/configuration/{connectorId}/setconfiguration", consumes = "application/xml", produces = {"text/plain","application/xml","application/json"})
+    @PostMapping(path = "/configuration/{connectorId}/setconfiguration", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String xmlConfiguration) throws Exception {
 
@@ -65,16 +67,23 @@ public class ConfigurationResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/configuration/{connectorId}/getconfiguration", consumes = "application/xml", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/configuration/{connectorId}/getconfiguration", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
 
-    	mediaType="text/plain";
-    	
        	try {
-			xmlconfiguration = assimblyDBConfiguration.convertDBToXMLConfiguration(connectorId);
-			
-       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration);
+			if(mediaType.equals("application/xml")) {
+				xmlconfiguration = assimblyDBConfiguration.convertDBToXMLConfiguration(connectorId);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",xmlconfiguration,true);
+			}else if(mediaType.equals("application/json")){
+				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONConfiguration(connectorId);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
+			}else {
+				//return json until ini is supported
+				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONConfiguration(connectorId);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
+			}
+       		
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration,e);
    		}
@@ -94,8 +103,6 @@ public class ConfigurationResource {
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String xmlConfiguration) throws Exception {
 
        	try {
-       		mediaType = "application/json";
-			
 			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set (not supported yet)");
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
@@ -113,14 +120,21 @@ public class ConfigurationResource {
     @Timed
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
-    	mediaType="text/plain";
-    	
        	try {
-			xmlconfiguration = assimblyDBConfiguration.convertDBToXMLFlowConfiguration(id);
+			if(mediaType.equals("application/xml")) {
+				xmlconfiguration = assimblyDBConfiguration.convertDBToXMLFlowConfiguration(id);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",xmlconfiguration,true);
+			}else if(mediaType.equals("application/json")){
+				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONFlowConfiguration(id);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
+			}else {
+				//return json until ini is supported
+				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONFlowConfiguration(id);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
+			}
 			
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",xmlconfiguration);
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration get",e);
    		}
     }    
 }
