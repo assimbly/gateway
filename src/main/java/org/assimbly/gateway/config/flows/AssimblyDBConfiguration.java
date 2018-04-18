@@ -14,6 +14,8 @@ import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ import org.w3c.dom.Element;
 
 @Service
 public class AssimblyDBConfiguration {
+
+    public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
 	private List<TreeMap<String,String>> configuration  = new ArrayList<>();;
 	private TreeMap<String, String> properties;
@@ -59,6 +63,7 @@ public class AssimblyDBConfiguration {
 	private Element headers;
 	private Element flow;
 	private String connectorId;
+	private String jsonConfiguration;
 
 
 	
@@ -83,7 +88,11 @@ public class AssimblyDBConfiguration {
 	   properties = new TreeMap<String, String>();
 
        Flow flow = flowRepository.findOne(id);
-    
+
+		if (flow == null) {
+			 throw new Exception("Flow ID does not exists");
+		}
+		
 	   getGeneralFlowPropertiesFromDB(flow);
 	      
 		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
@@ -133,6 +142,28 @@ public class AssimblyDBConfiguration {
 		   return xmlConfiguration;
 
 		}
+
+	public String convertDBToJSONConfiguration(Long gatewayId) throws Exception {
+		
+		xmlConfiguration = convertDBToXMLConfiguration(gatewayId);
+		
+        JSONObject xmlJSONObj = XML.toJSONObject(xmlConfiguration);
+        jsonConfiguration = xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
+		
+		return jsonConfiguration;
+
+	}
+	
+	public String convertDBToJSONFlowConfiguration(Long id) throws Exception {
+		
+		xmlConfiguration = convertDBToXMLFlowConfiguration(id);
+		
+        JSONObject xmlJSONObj = XML.toJSONObject(xmlConfiguration);
+        jsonConfiguration = xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
+		
+		return jsonConfiguration;
+
+	}
 	
 	//private methods
 	private String convertDBToXMLFlowConfiguration(Flow flow) throws Exception {
@@ -404,40 +435,55 @@ public class AssimblyDBConfiguration {
 			endpoint.appendChild(uri);
 				
 			if(confOptions!=null) {
+				
 			    Element options = doc.createElement("options");
 			    endpoint.appendChild(options);
 			    
 			    String[] confOptionsSplitted = confOptions.split(",");
 			    
-			    for(String confOption : confOptionsSplitted) {
-			    	String[] confOptionSplitted = confOption.split("=");
-
-			    	if(confOptionSplitted.length>1){
+			    if(confOptionsSplitted.length>0) {
+			    
+				    for(String confOption : confOptionsSplitted) {
+				    	String[] confOptionSplitted = confOption.split("=");
+	
+				    	if(confOptionSplitted.length>0){
+				    		Element option = doc.createElement(confOptionSplitted[0]);
+						    option.setTextContent(confOptionSplitted[1]);	
+				    		options.appendChild(option);
+				    	}
+				    }
+			    }else {
+			    	
+			    	String[] confOptionSplitted = confOptions.split("=");
+			    	
+			    	if(confOptionSplitted.length>0){
 			    		Element option = doc.createElement(confOptionSplitted[0]);
 					    option.setTextContent(confOptionSplitted[1]);	
 			    		options.appendChild(option);
 			    	}
+		    	
 			    }
-			    
-			    if(confService!=null) {
-			    	String confServiceId = confService.getId().toString();
-				    Element serviceId = doc.createElement("service_id");
-				    
-				    serviceId.setTextContent(confServiceId);
-			    	endpoint.appendChild(serviceId);
-				    setServiceFromDB(confServiceId, "from", fromEndpointDB.getService());
-				}
-
-			    if(confHeader!=null) {
-			    	String confHeaderId = confService.getId().toString();
-				    Element headerId = doc.createElement("service_id");
-			    	
-				    endpoint.appendChild(headerId);
-				    headerId.setTextContent(confHeaderId);
-				    setHeaderFromDB(confHeaderId, "from", fromEndpointDB.getHeader());
-				}
-			
 			}
+			
+		    if(confService!=null) {
+		    	String confServiceId = confService.getId().toString();
+			    Element serviceId = doc.createElement("service_id");
+			    
+			    serviceId.setTextContent(confServiceId);
+		    	endpoint.appendChild(serviceId);
+			    setServiceFromDB(confServiceId, "from", fromEndpointDB.getService());
+			}
+
+		    if(confHeader!=null) {
+		    	String confHeaderId = confService.getId().toString();
+			    Element headerId = doc.createElement("service_id");
+		    	
+			    endpoint.appendChild(headerId);
+			    headerId.setTextContent(confHeaderId);
+			    setHeaderFromDB(confHeaderId, "from", fromEndpointDB.getHeader());
+			}
+
+			
 		}
 	}
 
@@ -640,4 +686,5 @@ public class AssimblyDBConfiguration {
 	        throw new RuntimeException("Error converting to String", ex);
 	    }
 	}
+
 }
