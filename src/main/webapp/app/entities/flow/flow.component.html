@@ -3,10 +3,10 @@
         <span>Flows</span>
         <button class="btn btn-primary float-right" type="submit" [routerLink]="['../flow', 'edit-all' ]">
             <span class="fa fa-plus"></span>
-            <span >
-            Create new flow
+            <span>
+                Create new flow
             </span>
-        </button>        
+        </button>
     </h2>
     <jhi-alert></jhi-alert>
     <div class="row">
@@ -15,81 +15,36 @@
     <div class="table-responsive" *ngIf="flows">
         <table class="table table-striped">
             <thead>
-            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-            <th jhiSortBy="id" id="flowTitleID" [hidden]="!flowTitleID"><span>ID</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="name"><span>Name</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="gatewayId" id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID"><span>Gateway</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="fromEndpointId"><span>From</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="toEndpointId"><span>To</span> <span class="fa fa-sort"></span></th>
-            <th jhiSortBy="errorEndpointId" id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID"><span>Endpoint Error</span> <span class="fa fa-sort"></span></th>
-            <th></th>
-            </tr>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+                    <th jhiSortBy="id" id="flowTitleID" [hidden]="!flowTitleID">
+                        <span>ID</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="name">
+                        <span>Name</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="gatewayId" id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID">
+                        <span>Gateway</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="fromEndpointId">
+                        <span>From</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="id">
+                        <span>To</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="errorEndpointId" id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID">
+                        <span>Endpoint Error</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-            <tr *ngFor="let flow of flows ;trackBy: trackId">
-                <td id="flowRowID" [hidden]="!flowRowID"><a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a></td>
-                <td>{{flow.name}}</td>
-                <td id="flowRowID" [hidden]="!flowRowID">
-                    <div *ngIf="flow.gatewayId">
-                        <a [routerLink]="['../gateway', flow.gatewayId  ]" >{{flow.gatewayId}}</a>
-                    </div>
-                </td>
-                <td>
-                    <div *ngIf="flow.fromEndpointId">
-                        <a [routerLink]="['../from-endpoint', flow.fromEndpointId  ]" >{{getFromEndpointType(flow.fromEndpointId)}}</a>
-                    </div>
-                </td>
-                <td>
-                <div>
-                   <a>{{getToEndpointType(flow.id)}}</a>
-                 </div>
-                </td>                
-                <td  id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
-                    <div *ngIf="flow.errorEndpointId">
-                        <a [routerLink]="['../error-endpoint', flow.errorEndpointId  ]" >{{flow.errorEndpointId}}</a>
-                    </div>
-                </td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../flow', flow.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                        		[routerLink]="['../flow/edit-all', flow.id ]"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                        		[routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                    	<button type="button" (click)="start(flow.id);" class="btn btn-info btn-sm">
-                            <span class="fa fa-play"></span>
-                            <span class="d-none d-md-inline">Start</span>
-                        </button>
-                    	<button type="button" (click)="restart(flow.id);" class="btn btn-primary btn-sm">
-                            <span class="fa fa-refresh"></span>
-                            <span class="d-none d-md-inline">Restart</span>
-                        </button>
-                    	<button type="button" (click)="stop(flow.id);" class="btn btn-danger btn-sm">
-                            <span class="fa fa-stop"></span>
-                            <span class="d-none d-md-inline">Stop</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>
             </tbody>
         </table>
     </div>
