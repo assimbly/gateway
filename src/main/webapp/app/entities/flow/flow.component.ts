@@ -6,6 +6,7 @@ import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { EndpointType } from '../from-endpoint';
+import { GatewayService } from '../gateway';
 
 @Component({
     selector: 'jhi-flow',
@@ -24,8 +25,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
+    gatewayExists: boolean = false;
 
     constructor(
+        private gatewayService: GatewayService,
         private flowService: FlowService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
@@ -50,7 +53,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         }).subscribe(
             (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
             (res: ResponseWrapper) => this.onError(res.json)
-            );
+        );
     }
 
     reset() {
@@ -64,6 +67,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.loadAll();
     }
     ngOnInit() {
+        this.isGatewayCreated();
         this.loadAll();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
@@ -73,6 +77,13 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+    }
+
+    isGatewayCreated(): void {
+        this.gatewayService.query()
+            .subscribe((gateways) => {
+                this.gatewayExists = gateways.json.length === 0
+            });
     }
 
     trackId(index: number, item: Flow) {
