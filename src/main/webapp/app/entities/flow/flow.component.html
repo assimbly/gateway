@@ -8,9 +8,22 @@
             </span>
         </button>
     </h2>
-    <jhi-alert></jhi-alert>
-    <div class="row">
+    <div class="mt-3" *ngIf="gatewayExists; else gatewayNotExists">
+        <p class="d-inline-block my-2">No gateway have been configured for this node. Please create one first.</p>
+        <button class="btn btn-primary float-right" type="submit" [routerLink]="['/gateway']">
+            <span class="fa fa-plus"></span>
+            <span>Create gateway</span>
+        </button>
     </div>
+    <ng-template #gatewayNotExists>
+        <div class="my-3 float-right d-inline-block">
+            <button class="btn btn-primary" type="submit" [routerLink]="['../flow', 'edit-all' ]">
+                <span class="fa fa-plus"></span>
+                <span>Create new flow</span>
+            </button>
+        </div>
+    </ng-template>
+    <jhi-alert></jhi-alert>
     <br/>
     <div class="table-responsive" *ngIf="flows">
         <table class="table table-striped">
