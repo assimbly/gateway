@@ -1,6 +1,12 @@
 <div>
     <h2>
         <span>Flows</span>
+        <button class="btn btn-primary float-right" type="submit" [routerLink]="['../flow', 'edit-all' ]">
+            <span class="fa fa-plus"></span>
+            <span>
+                Create new flow
+            </span>
+        </button>
     </h2>
     <div class="mt-3" *ngIf="gatewayExists; else gatewayNotExists">
         <p class="d-inline-block my-2">No gateway have been configured for this node. Please create one first.</p>
