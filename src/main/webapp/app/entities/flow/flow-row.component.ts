@@ -94,6 +94,24 @@ export class FlowRowComponent implements OnInit {
         });
     }
 
+    resume(id: number) {
+        this.flowService.getConfiguration(id)
+            .map((response) => response.text())
+            .subscribe((data) => {
+                this.flowService.setConfiguration(id, data)
+                    .map((response) => response.text())
+                    .subscribe((data2) => {
+                        console.log('data' + data2);
+                        this.flowService.resume(id).subscribe((response) => {
+                            this.eventManager.broadcast({
+                                name: 'flowListModification',
+                                content: 'Resume an flow'
+                            });
+                        });
+                    });
+            });
+    }
+
     restart(id: number) {
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
