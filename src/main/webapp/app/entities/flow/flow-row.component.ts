@@ -91,6 +91,10 @@ export class FlowRowComponent implements OnInit {
         this.flowService.pause(id).subscribe((response) => {
             this.isFlowPaused = this.isFlowStarted = response.status === 200;
             this.isFlowResumed = this.isFlowStoped = !this.isFlowPaused;
+            this.eventManager.broadcast({
+                name: 'flowListModification',
+                content: 'Pause an flow'
+            });
         });
     }
 
@@ -105,6 +109,10 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.resume(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
                             this.isFlowPaused = this.isFlowStoped = !this.isFlowResumed;
+                            this.eventManager.broadcast({
+                                name: 'flowListModification',
+                                content: 'Resume an flow'
+                            });
                         });
                     });
             });
