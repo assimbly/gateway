@@ -63,6 +63,11 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/start/${id}`);
     }
 
+    pause(id: number): Observable<Response> {
+        const gatewayid = 1;
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/pause/${id}`);
+    }
+
     restart(id: number): Observable<Response> {
         const gatewayid = 1;
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/restart/${id}`);

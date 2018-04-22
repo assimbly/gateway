@@ -53,7 +53,6 @@ export class FlowComponent implements OnInit, OnDestroy {
         }).subscribe(
             (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
             (res: ResponseWrapper) => this.onError(res.json)
-
         );
     }
 

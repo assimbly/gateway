@@ -68,7 +68,6 @@ export class FlowRowComponent implements OnInit {
     }
 
     start(id: number) {
-
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
             .subscribe((data) => {
@@ -86,8 +85,16 @@ export class FlowRowComponent implements OnInit {
             });
     }
 
-    restart(id: number) {
+    pause(id: number) {
+        this.flowService.pause(id).subscribe((response) => {
+            this.eventManager.broadcast({
+                name: 'flowListModification',
+                content: 'Pause an flow'
+            });
+        });
+    }
 
+    restart(id: number) {
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
             .subscribe((data) => {
