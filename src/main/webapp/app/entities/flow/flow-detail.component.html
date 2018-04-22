@@ -64,7 +64,7 @@
             <ng-template ngbTabContent>
                 <jhi-alert-error></jhi-alert-error>
                 <div row id="tabBackground">
-                    <table class="table table-sm" *ngFor="let toEndpoint of toEndpoints">
+                    <table class="table table-sm">
                         <tbody *ngIf="!!toEndpoint">
                             <tr>
                                 <th class="detailsTable">ID</th>
@@ -141,26 +141,13 @@
     </ngb-tabset>
 
     <div class="float-right">
-            <button type="submit" (click)="previousState()" class="btn btn-info">
-                    <span class="fa fa-arrow-left"></span>&nbsp;
-                    <span> Back</span>
-                </button>
-            
-                <button type="button" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
-                    class="btn btn-primary">
-                    <span class="fa fa-pencil"></span>&nbsp;
-                    <span> Edit</span>
-                </button>
-            
+        <button type="submit" (click)="previousState()" class="btn btn-info">
+            <span class="fa fa-arrow-left"></span>&nbsp;
+            <span> Back</span>
+        </button>
+        <button type="submit" [routerLink]="['../../flow/edit-all', flow.id ]" class="btn btn-primary">
+            <span class="fa fa-pencil"></span>&nbsp;
+            <span> Edit</span>
+        </button>  
     </div>
-    <!--<button type="submit" (click)="previousState()" class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;
-        <span> Back</span>
-    </button>
-
-    <button type="button" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
-        class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;
-        <span> Edit</span>
-    </button>-->
 </div>

@@ -13,6 +13,8 @@ export class FlowService {
     private connectorUrl = SERVER_API_URL + 'api/connector';
     private configurationUrl = SERVER_API_URL + 'api/configuration';
 
+    private gatewayid = 1;
+
     constructor(private http: Http) { }
 
     create(flow: Flow): Observable<Flow> {
@@ -49,28 +51,35 @@ export class FlowService {
     }
 
     getConfiguration(id: number): Observable<Response>  {
-        const gatewayid = 1;
-        return this.http.get(`${this.configurationUrl}/${gatewayid}/getflowconfiguration/${id}`);
+        return this.http.get(`${this.configurationUrl}/${this.gatewayid}/getflowconfiguration/${id}`);
     }
 
     setConfiguration(id: number, xmlconfiguration: string): Observable<Response> {
-        const gatewayid = 1;
-        return this.http.post(`${this.connectorUrl}/${gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
     }
 
     start(id: number): Observable<Response> {
-        const gatewayid = 1;
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/start/${id}`);
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
+    }
+
+    pause(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`);
+    }
+
+    resume(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`);
     }
 
     restart(id: number): Observable<Response> {
-        const gatewayid = 1;
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/restart/${id}`);
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`);
     }
 
     stop(id: number): Observable<Response> {
-        const gatewayid = 1;
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stop/${id}`);
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`);
+    }
+
+    getFlowStatus(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
     }
 
     private convertResponse(res: Response): ResponseWrapper {
