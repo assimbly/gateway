@@ -64,7 +64,8 @@ export class FlowRowComponent implements OnInit {
 
     endpointTooltip(type, uri, options): string {
         if (type === null) {return};
-        return `${type.toLowerCase()}://${uri}?${options}`;
+        const opt = options === null ? '' : `?${options}`;
+        return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
     start(id: number) {
