@@ -7,7 +7,7 @@ import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
 
 @Component({
-    selector: 'jhi-flow-row',
+    selector: '[jhi-flow-row]',
     templateUrl: './flow-row.component.html'
 })
 
