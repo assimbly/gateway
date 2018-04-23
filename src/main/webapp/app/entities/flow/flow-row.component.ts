@@ -5,6 +5,7 @@ import { JhiEventManager } from 'ng-jhipster';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
+import * as moment from 'moment';
 
 @Component({
     selector: '[jhi-flow-row]',
@@ -24,6 +25,10 @@ export class FlowRowComponent implements OnInit {
     public isFlowStoped = true;
     public isFlowRestarted = true;
 
+    public flowStatus: string;
+    public flowStatusError: string;
+    public isFlowStatusOK: boolean;
+
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
     errorEndpointTooltip: string;
@@ -38,6 +43,8 @@ export class FlowRowComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.isFlowStatusOK = true;
+        this.flowStatus = 'Stoped';
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.getToEndpoint(this.flow.id);
         this.getErrorEndpoint(this.flow.errorEndpointId);
@@ -73,7 +80,13 @@ export class FlowRowComponent implements OnInit {
         return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
+    curentDateTime(): string {
+        return moment().format('YYYY-MM-DD HH:mm:ss');
+    }
+
     start(id: number) {
+        this.flowStatus = 'Starting';
+        this.isFlowStatusOK = true;
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
             .subscribe((data) => {
@@ -84,19 +97,31 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.start(id).subscribe((response) => {
                             this.isFlowStarted = this.isFlowResumed = response.status === 200;
                             this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowStarted;
+                            this.flowStatus = 'Started at ' + this.curentDateTime();
+                        }, (err) => {
+                            this.isFlowStatusOK = false;
+                            this.flowStatusError = err;
                         });
                     });
             });
     }
 
     pause(id: number) {
+        this.flowStatus = 'Pausing';
+        this.isFlowStatusOK = true;
         this.flowService.pause(id).subscribe((response) => {
             this.isFlowPaused = this.isFlowStarted = response.status === 200;
             this.isFlowResumed = this.isFlowStoped = this.isFlowRestarted = !this.isFlowPaused;
+            this.flowStatus = 'Paused at ' + this.curentDateTime();
+        }, (err) => {
+            this.isFlowStatusOK = false;
+            this.flowStatusError = err;
         });
     }
 
     resume(id: number) {
+        this.flowStatus = 'Resuming';
+        this.isFlowStatusOK = true;
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
             .subscribe((data) => {
@@ -107,12 +132,18 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.resume(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
                             this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
+                            this.flowStatus = 'Resumed at ' + this.curentDateTime();
+                        }, (err) => {
+                            this.isFlowStatusOK = false;
+                            this.flowStatusError = err;
                         });
                     });
             });
     }
 
     restart(id: number) {
+        this.flowStatus = 'Restarting';
+        this.isFlowStatusOK = true;
         this.flowService.getConfiguration(id)
             .map((response) => response.text())
             .subscribe((data) => {
@@ -123,15 +154,25 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.restart(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
                             this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
+                            this.flowStatus = 'Restarted at ' + this.curentDateTime();
+                        }, (err) => {
+                            this.isFlowStatusOK = false;
+                            this.flowStatusError = err;
                         });
                     });
             });
     }
 
     stop(id: number) {
+        this.flowStatus = 'Stopping';
+        this.isFlowStatusOK = true;
         this.flowService.stop(id).subscribe((response) => {
             this.isFlowStoped  =  this.isFlowRestarted = this.isFlowResumed = response.status === 200;
             this.isFlowStarted = this.isFlowPaused = !this.isFlowStoped;
+            this.flowStatus = 'Stoped at ' + this.curentDateTime();
+        }, (err) => {
+            this.isFlowStatusOK = false;
+            this.flowStatusError = err;
         });
     }
 }
