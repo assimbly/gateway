@@ -55,3 +55,11 @@
         </button>
     </div>
 </td>
+<td>
+    <p *ngIf="isFlowStatusOK; else error">{{flowStatus}}</p>
+    <ng-template #error>
+        <p data-toggle="tooltip" title="{{flowStatusError}}">
+            {{flowStatusError.substring(0, 20)}}
+        </p>    
+    </ng-template>
+</td>
