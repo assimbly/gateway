@@ -73,6 +73,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.registerChangeInFlows();
+        this.registerChangeCreatedGateway();
     }
 
     ngOnDestroy() {
@@ -99,6 +100,10 @@ export class FlowComponent implements OnInit, OnDestroy {
             result.push('id');
         }
         return result;
+    }
+
+    registerChangeCreatedGateway() {
+        this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', (response) => this.gatewayExists = false);
     }
 
     private onSuccess(data, headers) {

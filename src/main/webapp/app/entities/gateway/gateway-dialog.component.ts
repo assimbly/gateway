@@ -52,6 +52,7 @@ export class GatewayDialogComponent implements OnInit {
 
     private onSaveSuccess(result: Gateway) {
         this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK'});
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }
