@@ -19,9 +19,10 @@ export class FlowRowComponent implements OnInit {
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
     public isFlowStarted = false;
-    public isFlowPaused = true;
+    public isFlowPaused = false;
     public isFlowResumed = true;
     public isFlowStoped = true;
+    public isFlowRestarted = true;
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
@@ -68,7 +69,8 @@ export class FlowRowComponent implements OnInit {
 
     endpointTooltip(type, uri, options): string {
         if (type === null) {return};
-        return `${type.toLowerCase()}://${uri}?${options}`;
+        const opt = options === null ? '' : `?${options}`;
+        return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
     start(id: number) {
@@ -81,7 +83,7 @@ export class FlowRowComponent implements OnInit {
                         console.log('data' + data2);
                         this.flowService.start(id).subscribe((response) => {
                             this.isFlowStarted = this.isFlowResumed = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = !this.isFlowStarted;
+                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowStarted;
                         });
                     });
             });
@@ -90,11 +92,7 @@ export class FlowRowComponent implements OnInit {
     pause(id: number) {
         this.flowService.pause(id).subscribe((response) => {
             this.isFlowPaused = this.isFlowStarted = response.status === 200;
-            this.isFlowResumed = this.isFlowStoped = !this.isFlowPaused;
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Pause an flow'
-            });
+            this.isFlowResumed = this.isFlowStoped = this.isFlowRestarted = !this.isFlowPaused;
         });
     }
 
@@ -108,11 +106,7 @@ export class FlowRowComponent implements OnInit {
                         console.log('data' + data2);
                         this.flowService.resume(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = !this.isFlowResumed;
-                            this.eventManager.broadcast({
-                                name: 'flowListModification',
-                                content: 'Resume an flow'
-                            });
+                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
                         });
                     });
             });
@@ -127,8 +121,8 @@ export class FlowRowComponent implements OnInit {
                     .subscribe((data2) => {
                         console.log('data' + data2);
                         this.flowService.restart(id).subscribe((response) => {
-                            this.isFlowStarted = this.isFlowResumed = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = !this.isFlowStarted;
+                            this.isFlowResumed = this.isFlowStarted = response.status === 200;
+                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
                         });
                     });
             });
@@ -136,8 +130,8 @@ export class FlowRowComponent implements OnInit {
 
     stop(id: number) {
         this.flowService.stop(id).subscribe((response) => {
-            this.isFlowStoped = this.isFlowPaused = this.isFlowResumed = response.status === 200;
-            this.isFlowStarted = !this.isFlowStoped;
+            this.isFlowStoped  =  this.isFlowRestarted = this.isFlowResumed = response.status === 200;
+            this.isFlowStarted = this.isFlowPaused = !this.isFlowStoped;
         });
     }
 }

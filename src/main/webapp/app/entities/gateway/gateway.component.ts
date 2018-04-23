@@ -11,7 +11,8 @@ import { Principal, ResponseWrapper } from '../../shared';
     templateUrl: './gateway.component.html'
 })
 export class GatewayComponent implements OnInit, OnDestroy {
-gateways: Gateway[];
+
+    gateways: Gateway[] = new Array<Gateway>();
     currentAccount: any;
     eventSubscriber: Subscription;
 
