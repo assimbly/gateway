@@ -7,7 +7,7 @@ import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
 
 @Component({
-    selector: '[jhi-flow-row]',
+    selector: 'jhi-flow-row',
     templateUrl: './flow-row.component.html'
 })
 
@@ -18,10 +18,10 @@ export class FlowRowComponent implements OnInit {
     toEndpoint: ToEndpoint = new ToEndpoint();
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
-    public isFlowStarted: boolean = false;
-    public isFlowPaused: boolean = true;
-    public isFlowResumed: boolean = true;
-    public isFlowStoped: boolean = true;
+    public isFlowStarted = false;
+    public isFlowPaused = true;
+    public isFlowResumed = true;
+    public isFlowStoped = true;
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;

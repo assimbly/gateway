@@ -25,7 +25,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
-    gatewayExists: boolean = false;
+    gatewayExists = false;
 
     constructor(
         private gatewayService: GatewayService,
