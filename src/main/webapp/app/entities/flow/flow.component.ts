@@ -6,7 +6,7 @@ import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { EndpointType } from '../from-endpoint';
-import { GatewayService } from '../gateway';
+import { GatewayService, Gateway } from '../gateway';
 
 @Component({
     selector: 'jhi-flow',
@@ -15,7 +15,9 @@ import { GatewayService } from '../gateway';
 
 export class FlowComponent implements OnInit, OnDestroy {
 
+    gateways: Gateway[];
     flows: Flow[];
+    filteredFlows: Flow[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -67,7 +69,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.loadAll();
     }
     ngOnInit() {
-        this.isGatewayCreated();
+        this.getGateways();
         this.loadAll();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
@@ -80,11 +82,20 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    isGatewayCreated(): void {
+    getFlowsForSelectedGateway(id) {
+        this.filteredFlows = this.flows.filter((flow) => flow.gatewayId === Number(id));
+    }
+
+    getGateways(): void {
         this.gatewayService.query()
             .subscribe((gateways) => {
-                this.gatewayExists = gateways.json.length === 0
+                this.gateways = gateways.json
+                this.isGatewayCreated(this.gateways);
             });
+    }
+
+    isGatewayCreated(gateways: Gateway[]): void {
+        this.gatewayExists = gateways.length === 0;
     }
 
     trackId(index: number, item: Flow) {
@@ -112,6 +123,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
+        this.getFlowsForSelectedGateway(this.gateways[0].id);
     }
 
     private onError(error) {
