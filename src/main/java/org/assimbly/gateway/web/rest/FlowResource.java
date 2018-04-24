@@ -110,6 +110,21 @@ public class FlowResource {
     }
 
     /**
+     * GET  /flows/bygatewayid/:gatewayid : get all the flows for a specific gateway (by gatewaId).
+     *
+     * @param gatewayid
+     * @return the ResponseEntity with status 200 (OK) and the list of flows in body
+     */
+    @GetMapping("/flows/bygatewayid/{gatewayid}")
+    @Timed
+    public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
+    	log.debug("REST request to get flow by following gateway ID : {}", gatewayid);
+        List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
+       return flowMapper.toDto(flows);
+    }
+
+    
+    /**
      * GET  /flows/:id : get the "id" flow.
      *
      * @param id the id of the FlowDTO to retrieve
