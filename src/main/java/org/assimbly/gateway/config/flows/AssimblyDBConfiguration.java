@@ -232,7 +232,7 @@ public class AssimblyDBConfiguration {
 				properties.put("route", "none");
 			}
 
-			if(properties.get("to.uri") == null){
+			if(properties.get("to.uri") == null || properties.get("to.uri").startsWith("wastebin")){
 				properties.put("to.uri","mock:wastebin");		
 			}
 		   	   
@@ -471,7 +471,7 @@ public class AssimblyDBConfiguration {
 			    
 			    serviceId.setTextContent(confServiceId);
 		    	endpoint.appendChild(serviceId);
-			    setServiceFromDB(confServiceId, "from", fromEndpointDB.getService());
+			    setServiceFromDB(confServiceId, "from", confService);
 			}
 
 		    if(confHeader!=null) {
@@ -480,7 +480,7 @@ public class AssimblyDBConfiguration {
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
-			    setHeaderFromDB(confHeaderId, "from", fromEndpointDB.getHeader());
+			    setHeaderFromDB(confHeaderId, "from", confHeader);
 			}
 
 			
@@ -488,7 +488,7 @@ public class AssimblyDBConfiguration {
 	}
 
 	private void setToEndpointsFromDB(Set<ToEndpoint> toEndpointsDB) throws Exception {
-
+	
 		for (ToEndpoint toEndpointDB : toEndpointsDB) {
 
 			String confUri = toEndpointDB.getUri();
@@ -540,7 +540,7 @@ public class AssimblyDBConfiguration {
 					    
 					    serviceId.setTextContent(confServiceId);
 				    	endpoint.appendChild(serviceId);
-					    setServiceFromDB(confServiceId, "to", toEndpointDB.getService());
+					    setServiceFromDB(confServiceId, "to", confService);
 					}
 
 				    if(confHeader!=null) {
@@ -549,7 +549,7 @@ public class AssimblyDBConfiguration {
 				    	
 					    endpoint.appendChild(headerId);
 					    headerId.setTextContent(confHeaderId);
-					    setHeaderFromDB(confHeaderId, "to", toEndpointDB.getHeader());
+					    setHeaderFromDB(confHeaderId, "to", confHeader);
 					}
 				
 				}
