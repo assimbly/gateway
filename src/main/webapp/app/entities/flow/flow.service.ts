@@ -46,6 +46,11 @@ export class FlowService {
             .map((res: Response) => this.convertResponse(res));
     }
 
+    getFlowByGatewayId(gatewayid: Number): Observable<ResponseWrapper> {
+        return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`)
+            .map((res: Response) => this.convertResponse(res));
+    }
+
     delete(id: number): Observable<Response> {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
