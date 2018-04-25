@@ -62,7 +62,7 @@
                     </tr>
                 </thead>
                 <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                    <tr jhi-flow-row *ngFor="let flow of filteredFlows ;trackBy: trackId" [flow]="flow">
+                    <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow">
                     </tr>
                 </tbody>
             </table>
