@@ -6,7 +6,7 @@ import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { EndpointType } from '../from-endpoint';
-import { GatewayService } from '../gateway';
+import { GatewayService, Gateway } from '../gateway';
 
 @Component({
     selector: 'jhi-flow',
@@ -15,6 +15,7 @@ import { GatewayService } from '../gateway';
 
 export class FlowComponent implements OnInit, OnDestroy {
 
+    gateways: Gateway[];
     flows: Flow[];
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -45,30 +46,33 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.reverse = true;
     }
 
-    loadAll() {
-        this.flowService.query({
-            page: this.page,
-            size: this.itemsPerPage,
-            sort: this.sort()
-        }).subscribe(
-            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+    loadFlows() {
+        if (this.gateways.length > 1) {
+            this.getFlowsForSelectedGateway(this.gateways[0].id);
+        } else {
+            this.flowService.query({
+                page: this.page,
+                size: this.itemsPerPage,
+                sort: this.sort()
+            }).subscribe(
+                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+                (res: ResponseWrapper) => this.onError(res.json)
+            );
+        }
     }
 
     reset() {
         this.page = 0;
         this.flows = [];
-        this.loadAll();
+        this.loadFlows();
     }
 
     loadPage(page) {
         this.page = page;
-        this.loadAll();
+        this.loadFlows();
     }
     ngOnInit() {
-        this.isGatewayCreated();
-        this.loadAll();
+        this.getGateways();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
@@ -80,11 +84,25 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    isGatewayCreated(): void {
+    getFlowsForSelectedGateway(id) {
+        this.flowService.getFlowByGatewayId(Number(id))
+            .subscribe(
+                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+                (res: ResponseWrapper) => this.onError(res.json)
+            )
+    }
+
+    getGateways(): void {
         this.gatewayService.query()
             .subscribe((gateways) => {
-                this.gatewayExists = gateways.json.length === 0
+                this.gateways = gateways.json
+                this.isGatewayCreated(this.gateways);
+                this.loadFlows();
             });
+    }
+
+    isGatewayCreated(gateways: Gateway[]): void {
+        this.gatewayExists = gateways.length === 0;
     }
 
     trackId(index: number, item: Flow) {
@@ -107,8 +125,11 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     private onSuccess(data, headers) {
-        this.links = this.parseLinks.parse(headers.get('link'));
+        if (this.gateways.length === 1) {
+            this.links = this.parseLinks.parse(headers.get('link'));
+        }
         this.totalItems = headers.get('X-Total-Count');
+        this.flows = new Array<Flow>();
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
