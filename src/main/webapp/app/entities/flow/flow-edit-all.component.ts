@@ -45,6 +45,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     constructor(
         private eventManager: JhiEventManager,
+        private gatewayService: GatewayService,
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
@@ -78,6 +79,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             (res: ResponseWrapper) => { this.headers = res.json; },
             (res: ResponseWrapper) => this.onError(res.json)
         );
+
+        this.getGateways();
 
         if (id) {
             this.flowService.find(id).subscribe((flow) => {
@@ -144,6 +147,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'flowListModification',
             (response) => this.load(this.flow.id)
         );
+    }
+
+    getGateways() {
+        this.gatewayService.query()
+            .subscribe((gateways) => this.gateways = gateways.json);
     }
 
     save() {
