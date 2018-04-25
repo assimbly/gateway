@@ -17,7 +17,6 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     gateways: Gateway[];
     flows: Flow[];
-    filteredFlows: Flow[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -47,30 +46,33 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.reverse = true;
     }
 
-    loadAll() {
-        this.flowService.query({
-            page: this.page,
-            size: this.itemsPerPage,
-            sort: this.sort()
-        }).subscribe(
-            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+    loadFlows() {
+        if (this.gateways.length > 1) {
+            this.getFlowsForSelectedGateway(this.gateways[0].id);
+        } else {
+            this.flowService.query({
+                page: this.page,
+                size: this.itemsPerPage,
+                sort: this.sort()
+            }).subscribe(
+                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+                (res: ResponseWrapper) => this.onError(res.json)
+            );
+        }
     }
 
     reset() {
         this.page = 0;
         this.flows = [];
-        this.loadAll();
+        this.loadFlows();
     }
 
     loadPage(page) {
         this.page = page;
-        this.loadAll();
+        this.loadFlows();
     }
     ngOnInit() {
         this.getGateways();
-        this.loadAll();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
@@ -83,7 +85,11 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     getFlowsForSelectedGateway(id) {
-        this.filteredFlows = this.flows.filter((flow) => flow.gatewayId === Number(id));
+        this.flowService.getFlowByGatewayId(Number(id))
+            .subscribe(
+                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+                (res: ResponseWrapper) => this.onError(res.json)
+            )
     }
 
     getGateways(): void {
@@ -91,6 +97,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             .subscribe((gateways) => {
                 this.gateways = gateways.json
                 this.isGatewayCreated(this.gateways);
+                this.loadFlows();
             });
     }
 
@@ -118,12 +125,14 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     private onSuccess(data, headers) {
-        this.links = this.parseLinks.parse(headers.get('link'));
+        if (this.gateways.length === 1) {
+            this.links = this.parseLinks.parse(headers.get('link'));
+        }
         this.totalItems = headers.get('X-Total-Count');
+        this.flows = new Array<Flow>();
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
-        this.getFlowsForSelectedGateway(this.gateways[0].id);
     }
 
     private onError(error) {
