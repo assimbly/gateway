@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
-import {NgbTabset} from '@ng-bootstrap/ng-bootstrap';
+import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 
 import { Flow } from './flow.model';
@@ -12,6 +12,8 @@ import { FromEndpointComponent, FromEndpointService, FromEndpoint } from '../fro
 import { ToEndpointService, ToEndpoint } from '../to-endpoint/';
 import { ErrorEndpointComponent, ErrorEndpointService, ErrorEndpoint } from '../error-endpoint/';
 import { Gateway, GatewayService } from '../gateway';
+import { Service, ServiceService } from '../service';
+import { Header, HeaderService } from '../header';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -24,6 +26,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toEndpoint: ToEndpoint;
     errorEndpoint: ErrorEndpoint;
     toEndpoints: ToEndpoint[];
+    services: Service[];
+    headers: Header[];
     isSaving: boolean;
     finished: boolean;
     gateways: Gateway[];
@@ -45,6 +49,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
+        private serviceService: ServiceService,
+        private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute
     ) {
@@ -63,6 +69,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id) {
+        this.serviceService.query().subscribe(
+            (res: ResponseWrapper) => { this.services = res.json; },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+
+        this.headerService.query().subscribe(
+            (res: ResponseWrapper) => { this.headers = res.json; },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+
         if (id) {
             this.flowService.find(id).subscribe((flow) => {
                 if (flow) {
@@ -74,7 +90,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                 this.finished = true;
                             }
                         });
-
                     }
                 }
 
