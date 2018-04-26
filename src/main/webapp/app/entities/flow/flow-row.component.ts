@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
-import { JhiEventManager } from 'ng-jhipster';
+import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
@@ -15,6 +15,7 @@ import * as moment from 'moment';
 export class FlowRowComponent implements OnInit {
 
     @Input() flow: Flow;
+
     fromEndpoint: FromEndpoint = new FromEndpoint();
     toEndpoint: ToEndpoint = new ToEndpoint();
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
@@ -22,7 +23,7 @@ export class FlowRowComponent implements OnInit {
     public isFlowStarted = false;
     public isFlowPaused = false;
     public isFlowResumed = true;
-    public isFlowStoped = true;
+    public isFlowStopped = true;
     public isFlowRestarted = true;
 
     public flowStatus: string;
@@ -45,10 +46,10 @@ export class FlowRowComponent implements OnInit {
 
     ngOnInit() {
         this.isFlowStatusOK = true;
-        this.flowStatus = 'Stoped';
+        this.flowStatus = 'Stopped';
         this.flowStatusToolTip = '';
         this.getFromEndpoint(this.flow.fromEndpointId);
-        this.getToEndpoint(this.flow.id);
+        this.getToEndpointByFlowId(this.flow.id);
         this.getErrorEndpoint(this.flow.errorEndpointId);
     }
 
@@ -60,11 +61,11 @@ export class FlowRowComponent implements OnInit {
             });
     }
 
-    getToEndpoint(id: number) {
-        this.toEndpointService.find(id)
-            .subscribe((toEndpoint) => {
-                this.toEndpoint = toEndpoint;
-                this.toEndpointTooltip = this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options);
+    getToEndpointByFlowId(id: number) {
+        this.toEndpointService.findByFlowId(id)
+            .subscribe((toEndpoints) => {
+                this.toEndpoint = toEndpoints[0];
+                this.toEndpointTooltip = this.endpointTooltip(this.toEndpoint.type, this.toEndpoint.uri, this.toEndpoint.options);
             });
     }
 
@@ -77,7 +78,7 @@ export class FlowRowComponent implements OnInit {
     }
 
     endpointTooltip(type, uri, options): string {
-        if (type === null) {return};
+        if (type === null) { return };
         const opt = options === null ? '' : `?${options}`;
         return `${type.toLowerCase()}://${uri}${opt}`;
     }
@@ -98,7 +99,7 @@ export class FlowRowComponent implements OnInit {
                         console.log('data' + data2);
                         this.flowService.start(id).subscribe((response) => {
                             this.isFlowStarted = this.isFlowResumed = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowStarted;
+                            this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowStarted;
                             this.flowStatus = 'Started';
                             this.flowStatusToolTip = 'Started at ' + this.curentDateTime();
                         }, (err) => {
@@ -114,7 +115,7 @@ export class FlowRowComponent implements OnInit {
         this.isFlowStatusOK = true;
         this.flowService.pause(id).subscribe((response) => {
             this.isFlowPaused = this.isFlowStarted = response.status === 200;
-            this.isFlowResumed = this.isFlowStoped = this.isFlowRestarted = !this.isFlowPaused;
+            this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = !this.isFlowPaused;
             this.flowStatus = 'Paused';
             this.flowStatusToolTip = 'Paused at ' + this.curentDateTime();
         }, (err) => {
@@ -135,7 +136,7 @@ export class FlowRowComponent implements OnInit {
                         console.log('data' + data2);
                         this.flowService.resume(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
+                            this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                             this.flowStatus = 'Resumed';
                             this.flowStatusToolTip = 'Resumed at ' + this.curentDateTime();
                         }, (err) => {
@@ -158,7 +159,7 @@ export class FlowRowComponent implements OnInit {
                         console.log('data' + data2);
                         this.flowService.restart(id).subscribe((response) => {
                             this.isFlowResumed = this.isFlowStarted = response.status === 200;
-                            this.isFlowPaused = this.isFlowStoped = this.isFlowRestarted = !this.isFlowResumed;
+                            this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                             this.flowStatus = 'Restarted';
                             this.flowStatusToolTip = 'Restarted at ' + this.curentDateTime();
                         }, (err) => {
@@ -173,10 +174,10 @@ export class FlowRowComponent implements OnInit {
         this.flowStatus = 'Stopping';
         this.isFlowStatusOK = true;
         this.flowService.stop(id).subscribe((response) => {
-            this.isFlowStoped  =  this.isFlowRestarted = this.isFlowResumed = response.status === 200;
-            this.isFlowStarted = this.isFlowPaused = !this.isFlowStoped;
-            this.flowStatus = 'Stoped';
-            this.flowStatusToolTip = 'Stoped at ' + this.curentDateTime();
+            this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = response.status === 200;
+            this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
+            this.flowStatus = 'Stopped';
+            this.flowStatusToolTip = 'Stopped at ' + this.curentDateTime();
         }, (err) => {
             this.isFlowStatusOK = false;
             this.flowStatusError = err;

@@ -1,11 +1,14 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+
+import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.ToEndpoint;
 
 import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.service.mapper.ToEndpointMapper;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -107,13 +110,12 @@ public class ToEndpointResource {
      */
     @GetMapping("/to-endpoints/byflowid/{id}")
     @Timed
-    public ResponseEntity<ToEndpointDTO> getToEndpointByFlowID(@PathVariable Long id) {
+    public List<ToEndpointDTO> getToEndpointByFlowID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoints by routeid");
         List<ToEndpoint> toEndpoints = toEndpointRepository.findByFlowId(id);
-        ToEndpoint toEndpoint = toEndpoints.get(0);
-        ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(toEndpointDTO));
-    }    
+        return toEndpointMapper.toDto(toEndpoints);
+    }  
+    
     /**
      * GET  /to-endpoints/:id : get the "id" toEndpoint.
      *
