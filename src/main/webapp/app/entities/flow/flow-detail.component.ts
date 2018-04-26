@@ -52,7 +52,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
             this.flow = flow;
             this.getGateway(flow.gatewayId);
             this.getFromEndpoint(flow.fromEndpointId);
-            this.getToEndpoint(flow.id);
+            this.getToEndpointByFlowId(flow.id);
             this.getErrorEndpoint(flow.errorEndpointId);
         });
     }
@@ -71,11 +71,11 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
             .subscribe((fromEndpoint) => this.fromEndpoint = fromEndpoint);
     }
 
-    getToEndpoint(id) {
+    getToEndpointByFlowId(id) {
         if (!id) { return; }
 
-        this.toEndpointService.find(id)
-            .subscribe((toEndpoint) => this.toEndpoint = toEndpoint);
+        this.toEndpointService.findByFlowId(id)
+            .subscribe((toEndpoints) => this.toEndpoint = toEndpoints[0]);
     }
 
     getErrorEndpoint(id) {
