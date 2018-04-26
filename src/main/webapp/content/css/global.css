@@ -249,4 +249,9 @@ custom assimbly css
     cursor: not-allowed;
 }
 
+.input-group-append button.btn{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 /* jhipster-needle-css-add-main JHipster will add new css style */
