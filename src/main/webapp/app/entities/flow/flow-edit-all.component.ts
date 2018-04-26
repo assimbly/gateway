@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { Http, Response } from '@angular/http';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import {NgbTabset} from '@ng-bootstrap/ng-bootstrap';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
@@ -89,29 +91,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 });
 
             });
-        } else {
-
-            if (!this.finished) {
-
-                setTimeout(() => {
-                    this.flow = new Flow();
-                    this.fromEndpoint = new FromEndpoint();
-                    this.toEndpoint = new ToEndpoint();
-                    this.errorEndpoint = new ErrorEndpoint();
-                    this.finished = true;
-                }, 0);
-            } else if (this.createRoute === 4) {
-                this.createRoute += 1;
-                this.flow.id = this.newId;
-                this.toEndpoint.flowId = this.flow.id;
-
-                this.subscribeToSaveResponse(
-                    this.flowService.update(this.flow)
-                );
-                this.subscribeToSaveResponse(
-                    this.toEndpointService.update(this.toEndpoint)
-                );
-            }
+        } else if (!this.finished) {
+            setTimeout(() => {
+                this.flow = new Flow();
+                this.fromEndpoint = new FromEndpoint();
+                this.toEndpoint = new ToEndpoint();
+                this.errorEndpoint = new ErrorEndpoint();
+                this.finished = true;
+            }, 0);
         }
     }
 
@@ -132,100 +119,64 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     save() {
+
         this.isSaving = true;
+
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
-            this.subscribeToSaveResponse(
-                this.fromEndpointService.update(this.fromEndpoint)
-            );
+            const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
+            const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
+            const updateErrorEndpoint = this.flowService.update(this.flow)
+            const updateToEndpoint = this.toEndpointService.update(this.toEndpoint);
 
-            this.subscribeToSaveResponse(
-                this.errorEndpointService.update(this.errorEndpoint)
-            );
+            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoint]).subscribe((results) => {
+                console.log('flow updated');
+                this.isSaving = false;
+            });
+        }else {
 
-            this.subscribeToSaveResponse(
-                this.flowService.update(this.flow)
-            );
+            const saveFlow = this.flowService.create(this.flow);
+            const saveFromEndpoint = this.fromEndpointService.create(this.fromEndpoint);
+            const saveErrorEndpoint = this.errorEndpointService.create(this.errorEndpoint);
+            const saveToEndpoint = this.toEndpointService.create(this.toEndpoint);
 
-            this.subscribeToSaveResponse(
-                this.toEndpointService.update(this.toEndpoint)
-            );
-        } else if (this.fromEndpoint.id === undefined && this.errorEndpoint.id === undefined && this.flow.id === undefined) {
+            forkJoin([saveFlow, saveFromEndpoint, saveErrorEndpoint, saveToEndpoint]).subscribe((results) => {
 
-            this.subscribeToSaveFlowResponse(
-                this.flowService.create(this.flow)
-            );
+                if (results[0].id > 0 && results[0].id > 0 && results[2].id > 0 && results[3].id > 0) {
 
-            this.subscribeToSaveFromEndpointResponse(
-                this.fromEndpointService.create(this.fromEndpoint)
-            );
+                    // update flow (set from and error ids)
+                    this.flow = results[0];
+                    this.flow.fromEndpointId = results[1].id;
+                    this.flow.errorEndpointId = results[2].id;
+                    this.subscribeToSaveResponse(
+                        this.flowService.update(this.flow)
+                    );
 
-            this.subscribeToSaveErrorEndpointResponse(
-                this.errorEndpointService.create(this.errorEndpoint)
-            );
-
-            this.subscribeToSaveToEndpointResponse(
-                this.toEndpointService.create(this.toEndpoint)
-            );
-
-        } else {
-            this.onSaveError()
-            console.log('Cannot save route');
+                    // update toEndpoint (set flow id)
+                    this.toEndpoint = results[3];
+                    this.toEndpoint.flowId = results[0].id;
+                    this.subscribeToSaveResponse(
+                        this.toEndpointService.update(this.toEndpoint)
+                    );
+                    console.log('flow created');
+                    this.finished = true;
+                    this.isSaving = false;
+                } else {
+                    console.log('flow not created');
+                }
+            });
         }
-
-    }
-
-    private subscribeToSaveFlowResponse(result: Observable<Flow>) {
-        result.subscribe((res: Flow) =>
-            this.onSaveSuccessFlow(res), (res: Response) => this.onSaveError());
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
         result.subscribe((res: Flow) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
-    }
-
-    private subscribeToSaveFromEndpointResponse(result: Observable<FromEndpoint>) {
-        result.subscribe((res: FromEndpoint) =>
-            this.onSaveSuccessFromEndpoint(res), (res: Response) => this.onSaveError());
-    }
-
-    private subscribeToSaveErrorEndpointResponse(result: Observable<ErrorEndpoint>) {
-        result.subscribe((res: ErrorEndpoint) =>
-            this.onSaveSuccessErrorEndpoint(res), (res: Response) => this.onSaveError());
-    }
-
-    private subscribeToSaveToEndpointResponse(result: Observable<ToEndpoint>) {
-        result.subscribe((res: ToEndpoint) =>
-            this.onSaveSuccessToEndpoint(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res), (res: Response) => this.onSaveError()
+        );
     }
 
     private onSaveSuccess(result: Flow) {
         this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
         this.isSaving = false;
-    }
-
-    private onSaveSuccessFlow(result: Flow) {
-        this.newId = result.id;
-        this.createRoute += 1;
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
-    }
-
-    private onSaveSuccessFromEndpoint(result: FromEndpoint) {
-        this.flow.fromEndpointId = result.id;
-        this.createRoute += 1;
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
-    }
-
-    private onSaveSuccessErrorEndpoint(result: ErrorEndpoint) {
-        this.flow.errorEndpointId = result.id;
-        this.createRoute += 1;
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
-    }
-
-    private onSaveSuccessToEndpoint(result: ToEndpoint) {
-        this.createRoute += 1;
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
     }
 
     private onSaveError() {

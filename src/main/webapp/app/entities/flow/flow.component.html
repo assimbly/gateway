@@ -30,45 +30,33 @@
         <jhi-alert></jhi-alert>
         <br/>
         <div class="table-responsive" *ngIf="flows">
-            <table class="table table-striped">
-                <thead>
-                    <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-                        <th jhiSortBy="id" id="flowTitleID" [hidden]="!flowTitleID">
-                            <span>ID</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th jhiSortBy="name">
-                            <span>Name</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th jhiSortBy="gatewayId" id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID">
-                            <span>Gateway</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th jhiSortBy="fromEndpointId">
-                            <span>From</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th jhiSortBy="id">
-                            <span>To</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th jhiSortBy="errorEndpointId" id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID">
-                            <span>Endpoint Error</span>
-                            <span class="fa fa-sort"></span>
-                        </th>
-                        <th></th>
-                        <th></th>
-                        <th>
-                            <span>Flow status</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                    <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow">
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+	<table class="table table-striped">
+		<thead>
+			<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
+				[callback]="reset.bind(this)">
+				<th jhiSortBy="id" id="flowTitleID" [hidden]="!flowTitleID"><span>ID</span>
+					<span class="fa fa-sort"></span></th>
+				<th jhiSortBy="name"><span>Name</span> <span class="fa fa-sort"></span>
+				</th>
+				<th jhiSortBy="gatewayId" id="flowTitleGatewayID"
+					[hidden]="!flowTitleGatewayID"><span>Gateway</span> <span
+					class="fa fa-sort"></span></th>
+				<th jhiSortBy="fromEndpointId"><span>From</span> <span
+					class="fa fa-sort"></span></th>
+				<th jhiSortBy="id"><span>To</span> <span class="fa fa-sort"></span>
+				</th>
+				<th jhiSortBy="errorEndpointId" id="flowTitleErrorEndpointID"
+					[hidden]="!flowTitleErrorEndpointID"><span>Endpoint
+						Error</span> <span class="fa fa-sort"></span></th>
+				<th></th>
+				<th></th>
+				<th><span>Flow status</span></th>
+			</tr>
+		</thead>
+		<tbody infinite-scroll (scrolled)="loadPage(page + 1)"
+	[infiniteScrollDisabled]="page >= links['last']"
+	[infiniteScrollDistance]="0">		
+			<tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>        
+		</tbody>
     </ng-template>
 </div>
