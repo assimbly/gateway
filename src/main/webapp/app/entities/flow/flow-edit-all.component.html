@@ -30,7 +30,7 @@
 							<option value="false">false</option>
 						</select>
 					</div>
-					<div class="form-group">
+					<div class="form-group" *ngIf="!singleGateway">
 						<label class="form-control-label" for="field_gateway">Gateway</label>
 						<select class="form-control" id="field_gateway" name="gateway" *ngIf="flow" [(ngModel)]="flow.gatewayId">
 							<option [ngValue]="null"></option>
