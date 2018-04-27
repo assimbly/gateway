@@ -533,26 +533,25 @@ public class AssimblyDBConfiguration {
 				    		options.appendChild(option);
 				    	}
 				    }
-				    
-				    if(confService!=null) {
-				    	String confServiceId = confService.getId().toString();
-					    Element serviceId = doc.createElement("service_id");
-					    
-					    serviceId.setTextContent(confServiceId);
-				    	endpoint.appendChild(serviceId);
-					    setServiceFromDB(confServiceId, "to", confService);
-					}
-
-				    if(confHeader!=null) {
-				    	String confHeaderId = confService.getId().toString();
-					    Element headerId = doc.createElement("service_id");
-				    	
-					    endpoint.appendChild(headerId);
-					    headerId.setTextContent(confHeaderId);
-					    setHeaderFromDB(confHeaderId, "to", confHeader);
-					}
-				
 				}
+				
+			    if(confService!=null) {
+			    	String confServiceId = confService.getId().toString();
+				    Element serviceId = doc.createElement("service_id");
+				    
+				    serviceId.setTextContent(confServiceId);
+			    	endpoint.appendChild(serviceId);
+				    setServiceFromDB(confServiceId, "to", confService);
+				}
+
+			    if(confHeader!=null) {
+			    	String confHeaderId = confService.getId().toString();
+				    Element headerId = doc.createElement("service_id");
+			    	
+				    endpoint.appendChild(headerId);
+				    headerId.setTextContent(confHeaderId);
+				    setHeaderFromDB(confHeaderId, "to", confHeader);
+				}				
 			}			
 		}
 	}
@@ -600,25 +599,24 @@ public class AssimblyDBConfiguration {
 			    		options.appendChild(option);
 			    	}
 			    }
-			    
-			    if(confService!=null) {
-			    	String confServiceId = confService.getId().toString();
-				    Element serviceId = doc.createElement("service_id");
-				    
-				    serviceId.setTextContent(confServiceId);
-			    	endpoint.appendChild(serviceId);
-				    setServiceFromDB(confServiceId, "error", errorEndpointDB.getService());
-				}
-
-			    if(confHeader!=null) {
-			    	String confHeaderId = confService.getId().toString();
-				    Element headerId = doc.createElement("service_id");
-			    	
-				    endpoint.appendChild(headerId);
-				    headerId.setTextContent(confHeaderId);
-				    setHeaderFromDB(confHeaderId, "error", errorEndpointDB.getHeader());
-				}
+			}
 			
+		    if(confService!=null) {
+		    	String confServiceId = confService.getId().toString();
+			    Element serviceId = doc.createElement("service_id");
+			    
+			    serviceId.setTextContent(confServiceId);
+		    	endpoint.appendChild(serviceId);
+			    setServiceFromDB(confServiceId, "error", errorEndpointDB.getService());
+			}
+
+		    if(confHeader!=null) {
+		    	String confHeaderId = confService.getId().toString();
+			    Element headerId = doc.createElement("service_id");
+		    	
+			    endpoint.appendChild(headerId);
+			    headerId.setTextContent(confHeaderId);
+			    setHeaderFromDB(confHeaderId, "error", errorEndpointDB.getHeader());
 			}
 		}
 	}
