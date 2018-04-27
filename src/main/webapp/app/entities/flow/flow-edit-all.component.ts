@@ -124,6 +124,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
+            this.toEndpoint.flowId = this.flow.id;
+
             const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
             const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
             const updateErrorEndpoint = this.flowService.update(this.flow)
@@ -133,7 +135,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 console.log('flow updated');
                 this.isSaving = false;
             });
-        }else {
+        } else {
 
             const saveFlow = this.flowService.create(this.flow);
             const saveFromEndpoint = this.fromEndpointService.create(this.fromEndpoint);
@@ -162,6 +164,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.finished = true;
                     this.isSaving = false;
                 } else {
+                    this.isSaving = false;
                     console.log('flow not created');
                 }
             });
