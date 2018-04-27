@@ -86,8 +86,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
                 }
 
-                this.toEndpointService.findByFlowId(id).subscribe((toEndpoint) => {
-                    this.toEndpoint = toEndpoint;
+                this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
+                    this.toEndpoint = toEndpoints[0];
                 });
 
             });
