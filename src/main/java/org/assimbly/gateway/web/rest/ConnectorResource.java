@@ -1,13 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
-import io.github.jhipster.config.JHipsterProperties;
 import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +23,6 @@ import javax.annotation.PostConstruct;
 @RequestMapping("/api")
 public class ConnectorResource {
 
-    private final Environment env;
-
-    private final JHipsterProperties jHipsterProperties;
 
 	private Connector connector = new CamelConnector();
 
@@ -43,10 +37,9 @@ public class ConnectorResource {
 	private String gatewayConfiguration;
 	private String flowConfiguration;
 
-    public ConnectorResource(Environment env, JHipsterProperties jHipsterProperties) {
-        this.env = env;
-        this.jHipsterProperties = jHipsterProperties;
-    }
+	private String status;
+
+    public ConnectorResource() {}
     
     //configure connector (by gatewayid)
     
@@ -278,10 +271,14 @@ public class ConnectorResource {
 		try {
         	init();
         	flowId = id.toString();
-    		connector.startFlow(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"startFlow","Started flow " + flowId,"Started flow " + flowId,flowId);
+    		status = connector.startFlow(flowId);
+    		if(status.equals("started")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"startFlow","Started flow " + flowId,"Started flow " + flowId,flowId);
+    		}else {
+    			throw new Exception(status);
+    		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"startFlow","Started flow " + flowId,"Started flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"startFlow","Unable to start flow " + flowId,"Unable to start flow " + flowId,flowId,e);
 		}   	
 
     }
@@ -293,12 +290,16 @@ public class ConnectorResource {
 		try {
         	init();
         	flowId = id.toString();
-    		connector.stopFlow(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"stopFlow","Stopped flow " + flowId,"Stopped flow " + flowId,flowId);
+    		status = connector.stopFlow(flowId);
+    		if(status.equals("stopped")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"stopFlow","Stopped flow " + flowId,"Stopped flow " + flowId,flowId);
+    		}else {
+    			throw new Exception(status);
+    		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"stopFlow","Started flow " + flowId,"Stopped flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"stopFlow","Unable to stop flow " + flowId,"Unable to stop flow " + flowId,flowId,e);
 		}
-		
+				
      }
 
     @GetMapping(path = "/connector/{connectorId}/flow/restart/{id}", produces = {"text/plain","application/xml","application/json"})
@@ -308,10 +309,14 @@ public class ConnectorResource {
 		try {
         	init();
         	flowId = id.toString();
-    		connector.restartFlow(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"restartFlow","Restart flow " + flowId,"Restart flow " + flowId,flowId);
+    		status = connector.restartFlow(flowId);
+    		if(status.equals("started")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"restartFlow","Restarted flow " + flowId,"Restarted flow " + flowId,flowId);
+    		}else {
+    			throw new Exception(status);
+    		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"restartFlow","Restart flow " + flowId,"Restart flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"restartFlow","Unable to restart flow " + flowId,"Unable to restart flow " + flowId,flowId,e);
 		}
 
     }    
@@ -323,10 +328,14 @@ public class ConnectorResource {
 		try {
         	init();
         	flowId = id.toString();
-    		connector.pauseFlow(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"pauseFlow","Pause flow " + flowId,"Pause flow " + flowId,flowId);
+    		status = connector.pauseFlow(flowId);
+    		if(status.equals("suspended")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"pauseFlow","Paused flow " + flowId,"Paused flow " + flowId,flowId);
+    		}else {
+    			throw new Exception(status);
+    		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","Pause flow " + flowId,"Pause flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","Unable to pause flow " + flowId,"Unable to pause flow " + flowId,flowId,e);
 		}    	
             
      }
@@ -335,13 +344,17 @@ public class ConnectorResource {
     @Timed
     public ResponseEntity<String> resumeflow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
-		try {
+    	try {
         	init();
         	flowId = id.toString();
-    		connector.resumeFlow(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"resumeFlow","Resume flow " + flowId,"Resume flow " + flowId,flowId);
+    		status = connector.resumeFlow(flowId);
+    		if(status.equals("started")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"resumeFlow","Resumed flow " + flowId,"Resumed flow " + flowId,flowId);
+    		}else {
+    			throw new Exception(status);
+    		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"resumeFlow","Resume flow " + flowId,"Resume flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","Unable to resume flow " + flowId,"Unable to resume flow " + flowId,flowId,e);
 		}     
      }    
     
@@ -352,10 +365,10 @@ public class ConnectorResource {
 		try {
         	init();
         	flowId = id.toString();
-    		String status = connector.getFlowStatus(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getStatusFlow","Status flow " + flowId,status,flowId);
+    		status = connector.getFlowStatus(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getStatusFlow",status,status,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getStatusFlow","Status flow " + flowId,"Get status flow" + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getStatusFlow","Status flow " + flowId,"Get status flow " + flowId,flowId,e);
 		}  
     	
     }
@@ -368,7 +381,7 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String uptime = connector.getFlowUptime(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getUptimeFlow","Uptime flow " + flowId,uptime,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getUptimeFlow",uptime,uptime,flowId);
 		} catch (Exception e) {
 			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getUptimeFlow","Status flow " + flowId,"Get uptime flow " + flowId,flowId,e);
 		}
@@ -377,7 +390,7 @@ public class ConnectorResource {
     
     //private methods    
     
-    //This method is called on application startup and on flow calls
+    //This method is called on application startup and on manage flow calls
     @PostConstruct
     private void init() throws Exception {
     

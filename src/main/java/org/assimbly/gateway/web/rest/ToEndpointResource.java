@@ -111,7 +111,7 @@ public class ToEndpointResource {
     @GetMapping("/to-endpoints/byflowid/{id}")
     @Timed
     public List<ToEndpointDTO> getToEndpointByFlowID(@PathVariable Long id) {
-        log.debug("REST request to get ToEndpoints by routeid");
+        log.debug("REST request to get ToEndpoints by flowId " + id);
         List<ToEndpoint> toEndpoints = toEndpointRepository.findByFlowId(id);
         return toEndpointMapper.toDto(toEndpoints);
     }  
