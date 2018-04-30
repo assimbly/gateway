@@ -273,12 +273,12 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.startFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"startFlow","Started flow " + flowId,"Started flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"startFlow","started","started flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"startFlow","Unable to start flow " + flowId,"Unable to start flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"startFlow","unable to start flow " + flowId,"unable to start flow " + flowId,flowId,e);
 		}   	
 
     }
@@ -292,12 +292,12 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.stopFlow(flowId);
     		if(status.equals("stopped")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"stopFlow","Stopped flow " + flowId,"Stopped flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"stopFlow","stopped","stopped flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"stopFlow","Unable to stop flow " + flowId,"Unable to stop flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"stopFlow","unable to stop flow " + flowId,"unable to stop flow " + flowId,flowId,e);
 		}
 				
      }
@@ -311,12 +311,12 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.restartFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"restartFlow","Restarted flow " + flowId,"Restarted flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"restartFlow","restarted","restarted flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"restartFlow","Unable to restart flow " + flowId,"Unable to restart flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"restartFlow","unable to restart flow " + flowId,"unable to restart flow " + flowId,flowId,e);
 		}
 
     }    
@@ -330,12 +330,12 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.pauseFlow(flowId);
     		if(status.equals("suspended")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"pauseFlow","Paused flow " + flowId,"Paused flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"pauseFlow","paused","paused flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","Unable to pause flow " + flowId,"Unable to pause flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","unable to pause flow " + flowId,"unable to pause flow " + flowId,flowId,e);
 		}    	
             
      }
@@ -349,12 +349,12 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.resumeFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"resumeFlow","Resumed flow " + flowId,"Resumed flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"resumeFlow","resumed","resumed flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","Unable to resume flow " + flowId,"Unable to resume flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","unable to resume flow " + flowId,"unable to resume flow " + flowId,flowId,e);
 		}     
      }    
     
@@ -368,7 +368,7 @@ public class ConnectorResource {
     		status = connector.getFlowStatus(flowId);
 			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getStatusFlow",status,status,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getStatusFlow","Status flow " + flowId,"Get status flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getStatusFlow","unable to get status for flow " + flowId,"unable to get status for flow " + flowId,flowId,e);
 		}  
     	
     }
@@ -383,7 +383,7 @@ public class ConnectorResource {
     		String uptime = connector.getFlowUptime(flowId);
 			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getUptimeFlow",uptime,uptime,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getUptimeFlow","Status flow " + flowId,"Get uptime flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getUptimeFlow","unable to get status flow " + flowId,"unable to get uptime flow " + flowId,flowId,e);
 		}
     	
     }    
