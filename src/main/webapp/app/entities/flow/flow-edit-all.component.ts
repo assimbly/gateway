@@ -106,8 +106,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
                 }
 
-                this.toEndpointService.findByFlowId(id).subscribe((toEndpoint) => {
-                    this.toEndpoint = toEndpoint;
+                this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
+                    this.toEndpoint = toEndpoints[0];
                 });
 
             });
@@ -152,6 +152,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
+            this.toEndpoint.flowId = this.flow.id;
+
             const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
             const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
             const updateErrorEndpoint = this.flowService.update(this.flow)
@@ -192,6 +194,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.finished = true;
                     this.isSaving = false;
                 } else {
+                    this.isSaving = false;
                     console.log('flow not created');
                 }
             });
