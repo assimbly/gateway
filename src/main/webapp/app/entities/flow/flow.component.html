@@ -14,8 +14,6 @@
         <div class="row">
             <label class="col-xl-2 col-md-4 col-12 col-form-label">View flows for given gateway</label>
             <select class="col-xl-4 col-md-4 col-sm-12 form-control" (change)="getFlowsForSelectedGateway($event.target.value)">
-            <!--<select class="col-xl-4 col-md-4 col-sm-12 form-control" [(ngModel)]="selectedGatewayId" >-->
-            <!--<option *ngFor="let gateway of gateways" (select)="getFlowsForSelectedGateway(gateway)">{{gateway.name}}</option>-->
                 <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
             </select>
         </div>

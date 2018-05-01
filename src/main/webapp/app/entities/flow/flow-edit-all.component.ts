@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
@@ -55,7 +55,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private serviceService: ServiceService,
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private router: Router
     ) {
         this.toEndpoints = [];
     }
@@ -192,6 +193,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }
             });
         }
+    }
+
+    navigateToServices() {
+        this.router.navigate(['service']);
+    }
+
+    navigateToHeaders() {
+        this.router.navigate(['header']);
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
