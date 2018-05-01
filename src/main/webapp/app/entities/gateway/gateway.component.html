@@ -3,10 +3,11 @@
         <span>Gateway</span>
     </h2>
     <div *ngIf='gateways.length === 0'>
-  		    <button class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]" *ngIf="!gateways.gateway">
+        <button class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]"
+            *ngIf="!gateways.gateway">
             <span class="fa fa-plus"></span>
-            <span >
-            Create new Gateway
+            <span>
+                Create new Gateway
             </span>
         </button>
     </div>
@@ -17,65 +18,68 @@
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-striped">
             <tbody>
-            <tr *ngFor="let gateway of gateways ;trackBy: trackId">
-
-
-      	    <dl class="row-md jh-entity-details" *ngFor="let gateway of gateways ;trackBy: trackId">
-	        <dt ><span>Name</span></dt>
-	        <dd>
-	            <span>{{gateway.name}}</span>
-	        </dd>
-	        <dt><span>Type</span></dt>
-	        <dd>
-	            <span>{{gateway.type}}</span>
-	        </dd>
-	        <dt><span>Environment Name</span></dt>
-	        <dd>
-	            <span>{{gateway.environmentName}}</span>
-	        </dd>
-	        <dt><span>Stage</span></dt>
-	        <dd>
-	            <span>{{gateway.stage}}</span>
-	        </dd>
-	        <dt><span>Default From Endpoint</span></dt>
-	        <dd>
-	            <span>{{gateway.defaultFromEndpointType}}</span>
-	        </dd>
-	       	<dt><span>Default To Endpoint</span></dt>
-	        <dd>
-	            <span>{{gateway.defaultToEndpointType}}</span>
-	        </dd>
-	        	 <dt><span>Default Error Endpoint</span></dt>
-	        <dd>
-	            <span>{{gateway.defaultErrorEndpointType}}</span>
-	        </dd>
-	    </dl>
-	           <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../gateway', gateway.id ]"
-                                class="btn btn-info btn-sm">
+                <tr *ngFor="let gateway of gateways ;trackBy: trackId">
+                    <dl class="row-md jh-entity-details" >
+                        <dt>
+                            <span>Name</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.name}}</span>
+                        </dd>
+                        <dt>
+                            <span>Type</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.type}}</span>
+                        </dd>
+                        <dt>
+                            <span>Environment Name</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.environmentName}}</span>
+                        </dd>
+                        <dt>
+                            <span>Stage</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.stage}}</span>
+                        </dd>
+                        <dt>
+                            <span>Default From Endpoint</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.defaultFromEndpointType}}</span>
+                        </dd>
+                        <dt>
+                            <span>Default To Endpoint</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.defaultToEndpointType}}</span>
+                        </dd>
+                        <dt>
+                            <span>Default Error Endpoint</span>
+                        </dt>
+                        <dd>
+                            <span>{{gateway.defaultErrorEndpointType}}</span>
+                        </dd>
+                    </dl>
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit" [routerLink]="['../gateway', gateway.id ]" class="btn btn-info btn-sm">
                             <span class="fa fa-eye"></span>
                             <span class="d-none d-md-inline">View</span>
                         </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
+                        <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+                            class="btn btn-primary btn-sm">
                             <span class="fa fa-pencil"></span>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
+                        <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+                            class="btn btn-danger btn-sm">
                             <span class="fa fa-remove"></span>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>
-                </td>
-            </tr>
+                </tr>
             </tbody>
         </table>
     </div>
