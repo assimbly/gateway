@@ -1,8 +1,7 @@
 <div class="row justify-content-start">
 	<div class="col-4">
 
-		<form name="editForm" role="form" novalidate (ngSubmit)="save()"
-			#editForm="ngForm" *ngIf="finished">
+		<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" *ngIf="finished">
 
 			<div>
 				<h2 *ngIf="flow.id">
@@ -16,239 +15,219 @@
 			<div>
 				<jhi-alert-error></jhi-alert-error>
 				<div class="form-group" id="flowId" [hidden]="!flowId">
-					<label for="id">ID</label> <input type="text" class="form-control"
-						id="id" name="id" *ngIf="flow" [(ngModel)]="flow.id"
-						readonly />
+					<label for="id">ID</label>
+					<input type="text" class="form-control" id="id" name="id" *ngIf="flow" [(ngModel)]="flow.id" readonly />
 				</div>
 				<div class="form-group">
-					<label class="form-control-label" for="field_name">Name</label> <input
-						type="text" class="form-control" name="name" id="field_name"
-						*ngIf="flow" [(ngModel)]="flow.name" />
+					<label class="form-control-label" for="field_name">Name</label>
+					<input type="text" class="form-control" name="name" id="field_name" *ngIf="flow" [(ngModel)]="flow.name" />
 				</div>
 				<div class="form-group">
 					<label class="form-control-label" for="field_name">Autostart</label>
-					            <select type="text" class="form-control" name="autoStart" id="field_autostart"
-						*ngIf="flow" [(ngModel)]="flow.autoStart" >
-		                <option value="true">true</option>
-		                <option value="false">false</option>
-            		</select> 
-				</div>				
+					<select type="text" class="form-control" name="autoStart" id="field_autostart" *ngIf="flow" [(ngModel)]="flow.autoStart">
+						<option value="true">true</option>
+						<option value="false">false</option>
+					</select>
+				</div>
 				<div class="form-group">
 					<label class="form-control-label" for="field_gateway">Gateway</label>
-					<input type="text" class="form-control" name="gateway"
-						id="field_gateway" *ngIf="flow"
-						[(ngModel)]="flow.gatewayId" />
+					<select class="form-control" id="field_gateway" name="gateway" *ngIf="flow" [(ngModel)]="flow.gatewayId">
+						<option [ngValue]="null"></option>
+						<option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
+					</select>
 				</div>
-				<div class="form-group" id="flowFromEndpoint"
-					[hidden]="!flowFromEndpoint">
-					<label class="form-control-label" for="field_fromEndpoint">From
-						Endpoint</label> <input type="text" class="form-control"
-						name="fromEndpoint" id="field_fromEndpoint" *ngIf="flow"
-						[(ngModel)]="flow.fromEndpointId" />
+				<div class="form-group" id="flowFromEndpoint" [hidden]="!flowFromEndpoint">
+					<label class="form-control-label" for="field_fromEndpoint">From Endpoint
+					</label>
+					<input type="text" class="form-control" name="fromEndpoint" id="field_fromEndpoint" *ngIf="flow" [(ngModel)]="flow.fromEndpointId"
+					/>
 				</div>
-				<div class="form-group" id="flowErrorEndpoint"
-					[hidden]="!flowErrorEndpoint">
-					<label class="form-control-label" for="field_errorEndpoint">Error
-						Endpoint</label> <input type="text" class="form-control"
-						name="errorEndpoint" id="field_errorEndpoint" *ngIf="flow"
-						[(ngModel)]="flow.errorEndpointId" />
+				<div class="form-group" id="flowErrorEndpoint" [hidden]="!flowErrorEndpoint">
+					<label class="form-control-label" for="field_errorEndpoint">Error Endpoint
+					</label>
+					<input type="text" class="form-control" name="errorEndpoint" id="field_errorEndpoint" *ngIf="flow" [(ngModel)]="flow.errorEndpointId"
+					/>
 				</div>
 
 
 				<!-- styling of tabset is in global.css -->
-				<ngb-tabset> <ngb-tab title="From" id="fromTab">
+				<ngb-tabset>
+					<ngb-tab title="From" id="fromTab">
 
-				<ng-template ngbTabContent> <jhi-alert-error></jhi-alert-error>
+						<ng-template ngbTabContent>
+							<jhi-alert-error></jhi-alert-error>
 
-				<div row id="tabBackground">
-					<div class="col-11">
+							<div row id="tabBackground">
+								<div class="col-11">
 
-						<div class="form-group" id="fromEndpointId"
-							[hidden]="!fromEndpointId">
-							<label for="id">ID</label> <input type="text"
-								class="form-control" id="id" name="id"
-								[(ngModel)]="fromEndpoint.id" readonly />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_type">Type</label> <select
-								class="form-control" name="type" [(ngModel)]="fromEndpoint.type"
-								id="field_type">
-								<option value="ACTIVEMQ">ACTIVEMQ</option>
-								<option value="FILE">FILE</option>
-								<option value="HTTP4">HTTP4</option>
-								<option value="KAFKA">KAFKA</option>
-								<option value="SFTP">SFTP</option>
-								<option value="SJMS">SJMS</option>
-								<option value="SONICMQ">SONICMQ</option>
-								<option value="SQL">SQL</option>
-								<option value="STREAM">STREAM</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_uri">Uri</label> <input
-								type="text" class="form-control" name="uri" id="field_uri"
-								[(ngModel)]="fromEndpoint.uri" />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_options">Options</label>
-							<input type="text" class="form-control" name="options"
-								id="field_options" [(ngModel)]="fromEndpoint.options" />
-						</div>
+									<div class="form-group" id="fromEndpointId" [hidden]="!fromEndpointId">
+										<label for="id">ID</label>
+										<input type="text" class="form-control" id="id" name="id" [(ngModel)]="fromEndpoint.id" readonly />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_type">Type</label>
+										<select class="form-control" name="type" [(ngModel)]="fromEndpoint.type" id="field_type">
+											<option value="ACTIVEMQ">ACTIVEMQ</option>
+											<option value="FILE">FILE</option>
+											<option value="HTTP4">HTTP4</option>
+											<option value="KAFKA">KAFKA</option>
+											<option value="SFTP">SFTP</option>
+											<option value="SJMS">SJMS</option>
+											<option value="SONICMQ">SONICMQ</option>
+											<option value="SQL">SQL</option>
+											<option value="STREAM">STREAM</option>
+											<option value="WASTEBIN">WASTEBIN</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_uri">Uri</label>
+										<input type="text" class="form-control" name="uri" id="field_uri" [(ngModel)]="fromEndpoint.uri" />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_options">Options</label>
+										<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="fromEndpoint.options" />
+									</div>
 
-						<div class="form-group">
-							<label class="form-control-label" for="field_service">Service</label>
-							<select class="form-control" id="field_service" name="service"
-								[(ngModel)]="fromEndpoint.serviceId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="serviceOption.id"
-									*ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_header">Header</label>
-							<select class="form-control" id="field_header" name="header"
-								[(ngModel)]="fromEndpoint.headerId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="headerOption.id"
-									*ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
-							</select>
-						</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_service">Service</label>
+										<select class="form-control" id="field_service" name="service" [(ngModel)]="fromEndpoint.serviceId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.name}}</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_header">Header</label>
+										<select class="form-control" id="field_header" name="header" [(ngModel)]="fromEndpoint.headerId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.name}}</option>
+										</select>
+									</div>
 
-					</div>
-				</div>
-				</ng-template> </ngb-tab> <ngb-tab title="To" id="toTab"> <ng-template
-					ngbTabContent> <jhi-alert-error></jhi-alert-error>
-				<div row id="tabBackground">
-					<div class="col-11">
+								</div>
+							</div>
+						</ng-template>
+					</ngb-tab>
+					<ngb-tab title="To" id="toTab">
+						<ng-template ngbTabContent>
+							<jhi-alert-error></jhi-alert-error>
+							<div row id="tabBackground">
+								<div class="col-11">
 
-						<div class="form-group" id="toEndpointId" [hidden]="!toEndpointId">
-							<label for="id">ID</label> <input type="text"
-								class="form-control" id="id" name="id"
-								[(ngModel)]="toEndpoint.id" readonly />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_type">Type</label> <select
-								class="form-control" name="type" [(ngModel)]="toEndpoint.type"
-								id="field_type">
-								<option value="ACTIVEMQ">ACTIVEMQ</option>
-								<option value="FILE">FILE</option>
-								<option value="HTTP4">HTTP4</option>
-								<option value="KAFKA">KAFKA</option>
-								<option value="SFTP">SFTP</option>
-								<option value="SJMS">SJMS</option>
-								<option value="SONICMQ">SONICMQ</option>
-								<option value="SQL">SQL</option>
-								<option value="STREAM">STREAM</option>
-								<option value="WASTEBIN">WASTEBIN</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_uri">Uri</label> <input
-								type="text" class="form-control" name="uri" id="field_uri"
-								[(ngModel)]="toEndpoint.uri" />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_options">Options</label>
-							<input type="text" class="form-control" name="options"
-								id="field_options" [(ngModel)]="toEndpoint.options" />
-						</div>
+									<div class="form-group" id="toEndpointId" [hidden]="!toEndpointId">
+										<label for="id">ID</label>
+										<input type="text" class="form-control" id="id" name="id" [(ngModel)]="toEndpoint.id" readonly />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_type">Type</label>
+										<select class="form-control" name="type" [(ngModel)]="toEndpoint.type" id="field_type">
+											<option value="ACTIVEMQ">ACTIVEMQ</option>
+											<option value="FILE">FILE</option>
+											<option value="HTTP4">HTTP4</option>
+											<option value="KAFKA">KAFKA</option>
+											<option value="SFTP">SFTP</option>
+											<option value="SJMS">SJMS</option>
+											<option value="SONICMQ">SONICMQ</option>
+											<option value="SQL">SQL</option>
+											<option value="STREAM">STREAM</option>
+											<option value="WASTEBIN">WASTEBIN</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_uri">Uri</label>
+										<input type="text" class="form-control" name="uri" id="field_uri" [(ngModel)]="toEndpoint.uri" />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_options">Options</label>
+										<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="toEndpoint.options" />
+									</div>
 
-						<div class="form-group" id="flowID2"
-							[hidden]="!flowID2">
-							<label class="form-control-label">Flow</label> <input
-								type="text" class="form-control" id="field_flow"
-								name="flow" [(ngModel)]="toEndpoint.flowId" />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_service">Service</label>
-							<select class="form-control" id="field_service" name="service"
-								[(ngModel)]="toEndpoint.serviceId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="serviceOption.id"
-									*ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_header">Header</label>
-							<select class="form-control" id="field_header" name="header"
-								[(ngModel)]="toEndpoint.headerId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="headerOption.id"
-									*ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
-							</select>
-						</div>
+									<div class="form-group" id="flowID2" [hidden]="!flowID2">
+										<label class="form-control-label">Flow</label>
+										<input type="text" class="form-control" id="field_flow" name="flow" [(ngModel)]="toEndpoint.flowId" />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_service">Service</label>
+										<select class="form-control" id="field_service" name="service" [(ngModel)]="toEndpoint.serviceId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.name}}</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_header">Header</label>
+										<select class="form-control" id="field_header" name="header" [(ngModel)]="toEndpoint.headerId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.name}}</option>
+										</select>
+									</div>
 
-					</div>
-				</div>
-				</ng-template> </ngb-tab> <ngb-tab title="Error" id="errorTab"> <ng-template
-					ngbTabContent>
+								</div>
+							</div>
+						</ng-template>
+					</ngb-tab>
+					<ngb-tab title="Error" id="errorTab">
+						<ng-template ngbTabContent>
 
-				<div row id="tabBackground">
-					<div class="col-11">
+							<div row id="tabBackground">
+								<div class="col-11">
 
-						<div class="form-group" id="errorEndpointId"
-							[hidden]="!errorEndpointId">
-							<label for="id">ID</label> <input type="text"
-								class="form-control" id="id" name="id"
-								[(ngModel)]="errorEndpoint.id" readonly />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_type">Type</label> <select
-								class="form-control" name="type"
-								[(ngModel)]="errorEndpoint.type" id="field_type">
-								<option value="ACTIVEMQ">ACTIVEMQ</option>
-								<option value="FILE">FILE</option>
-								<option value="HTTP4">HTTP4</option>
-								<option value="KAFKA">KAFKA</option>
-								<option value="SFTP">SFTP</option>
-								<option value="SJMS">SJMS</option>
-								<option value="SONICMQ">SONICMQ</option>
-								<option value="SQL">SQL</option>
-								<option value="STREAM">STREAM</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_uri">Uri</label> <input
-								type="text" class="form-control" name="uri" id="field_uri"
-								[(ngModel)]="errorEndpoint.uri" />
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_options">Options</label>
-							<input type="text" class="form-control" name="options"
-								id="field_options" [(ngModel)]="errorEndpoint.options" />
-						</div>
+									<div class="form-group" id="errorEndpointId" [hidden]="!errorEndpointId">
+										<label for="id">ID</label>
+										<input type="text" class="form-control" id="id" name="id" [(ngModel)]="errorEndpoint.id" readonly />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_type">Type</label>
+										<select class="form-control" name="type" [(ngModel)]="errorEndpoint.type" id="field_type">
+											<option value="ACTIVEMQ">ACTIVEMQ</option>
+											<option value="FILE">FILE</option>
+											<option value="HTTP4">HTTP4</option>
+											<option value="KAFKA">KAFKA</option>
+											<option value="SFTP">SFTP</option>
+											<option value="SJMS">SJMS</option>
+											<option value="SONICMQ">SONICMQ</option>
+											<option value="SQL">SQL</option>
+											<option value="STREAM">STREAM</option>
+											<option value="WASTEBIN">WASTEBIN</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_uri">Uri</label>
+										<input type="text" class="form-control" name="uri" id="field_uri" [(ngModel)]="errorEndpoint.uri" />
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_options">Options</label>
+										<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="errorEndpoint.options" />
+									</div>
 
-						<div class="form-group">
-							<label class="form-control-label" for="field_service">Service</label>
-							<select class="form-control" id="field_service" name="service"
-								[(ngModel)]="errorEndpoint.serviceId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="serviceOption.id"
-									*ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label class="form-control-label" for="field_header">Header</label>
-							<select class="form-control" id="field_header" name="header"
-								[(ngModel)]="errorEndpoint.headerId">
-								<option [ngValue]="null"></option>
-								<option [ngValue]="headerOption.id"
-									*ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
-							</select>
-						</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_service">Service</label>
+										<select class="form-control" id="field_service" name="service" [(ngModel)]="errorEndpoint.serviceId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.name}}</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-control-label" for="field_header">Header</label>
+										<select class="form-control" id="field_header" name="header" [(ngModel)]="errorEndpoint.headerId">
+											<option [ngValue]="null"></option>
+											<option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.name}}</option>
+										</select>
+									</div>
 
-					</div>
-				</div>
-				</ng-template> </ngb-tab> </ngb-tabset>
+								</div>
+							</div>
+						</ng-template>
+					</ngb-tab>
+				</ngb-tabset>
 			</div>
 
 			<div>
 				<button type="button" class="btn btn-secondary" (click)="clear()">
-					<span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+					<span class="fa fa-ban"></span>&nbsp;
+					<span>Cancel</span>
 				</button>
-				<button type="submit" [disabled]="editForm.form.invalid || isSaving"
-					class="btn btn-primary">
-					<span class="fa fa-save"></span>&nbsp;<span>Save</span>
+				<button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+					<span class="fa fa-save"></span>&nbsp;
+					<span>Save</span>
 				</button>
 			</div>
 		</form>
