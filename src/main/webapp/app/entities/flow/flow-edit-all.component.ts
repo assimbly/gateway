@@ -33,6 +33,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     isSaving: boolean;
     finished: boolean;
     gateways: Gateway[];
+    singleGateway = false;
     createRoute: number;
     newId: number;
     itemsPerPage: number;
@@ -139,7 +140,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     getGateways() {
         this.gatewayService.query()
-            .subscribe((gateways) => this.gateways = gateways.json);
+            .subscribe((gateways) => {
+                this.gateways = gateways.json;
+                this.singleGateway = this.gateways.length === 1;
+            });
     }
 
     save() {
@@ -159,8 +163,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 console.log('flow updated');
                 this.isSaving = false;
             });
-        } else {
-
+        }else {
+            if (this.singleGateway) {
+                this.flow.gatewayId = this.gateways[0].id;
+            }
             const saveFlow = this.flowService.create(this.flow);
             const saveFromEndpoint = this.fromEndpointService.create(this.fromEndpoint);
             const saveErrorEndpoint = this.errorEndpointService.create(this.errorEndpoint);

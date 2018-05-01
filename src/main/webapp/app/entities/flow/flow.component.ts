@@ -27,6 +27,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     reverse: any;
     totalItems: number;
     gatewayExists = false;
+    multipleGateways = false;
+    singleGatewayName: string;
 
     constructor(
         private gatewayService: GatewayService,
@@ -98,11 +100,15 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.gateways = gateways.json
                 this.isGatewayCreated(this.gateways);
                 this.loadFlows();
+                if (!this.multipleGateways) {
+                    this.singleGatewayName = this.gateways[0].name;
+                }
             });
     }
 
     isGatewayCreated(gateways: Gateway[]): void {
         this.gatewayExists = gateways.length === 0;
+        this.multipleGateways = gateways.length > 1;
     }
 
     trackId(index: number, item: Flow) {
