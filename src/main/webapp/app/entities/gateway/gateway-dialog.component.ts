@@ -28,6 +28,11 @@ export class GatewayDialogComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
+        if (typeof this.gateway.id === 'undefined') {
+            this.gateway.defaultFromEndpointType = 'FILE';
+            this.gateway.defaultToEndpointType = 'FILE';
+            this.gateway.defaultErrorEndpointType = 'FILE';
+        }
     }
 
     clear() {
