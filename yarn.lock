@@ -154,6 +154,12 @@
   version "1.0.0-beta.7"
   resolved "https://registry.yarnpkg.com/@ng-bootstrap/ng-bootstrap/-/ng-bootstrap-1.0.0-beta.7.tgz#58bc81f610028f40526529ce40483a95028163b0"
 
+"@ng-select/ng-select@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@ng-select/ng-select/-/ng-select-1.4.0.tgz#39e49fc25565e31c7e0d86d2cf0c4a281e2fc72c"
+  dependencies:
+    tslib "^1.7.1"
+
 "@ngtools/json-schema@1.1.0", "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.1.0.tgz#c3a0c544d62392acc2813a42c8a0dc6f58f86922"

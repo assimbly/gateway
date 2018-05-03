@@ -43,6 +43,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
+    types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
+
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
