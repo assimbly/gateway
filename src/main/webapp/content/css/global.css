@@ -254,4 +254,17 @@ custom assimbly css
     border-bottom-left-radius: 0;
 }
 
+.input-group ng-select{
+    flex: 1 1 auto;
+}
+
+.input-group .ng-select-container{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.ng-select.ng-select-single .ng-select-container { 
+    height: 38px;
+}
+
 /* jhipster-needle-css-add-main JHipster will add new css style */
