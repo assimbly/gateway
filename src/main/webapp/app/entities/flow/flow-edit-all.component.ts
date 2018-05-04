@@ -43,6 +43,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
+    serviceCreated: boolean;
+    headerCreated: boolean;
+    types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
+
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
@@ -75,12 +79,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     load(id) {
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => { this.services = res.json; },
+            (res: ResponseWrapper) => {
+                this.services = res.json;
+                this.serviceCreated = this.services.length > 0;
+            },
             (res: ResponseWrapper) => this.onError(res.json)
         );
 
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => { this.headers = res.json; },
+            (res: ResponseWrapper) => {
+                this.headers = res.json;
+                this.headerCreated = this.headers.length > 0;
+            },
             (res: ResponseWrapper) => this.onError(res.json)
         );
 
@@ -207,6 +217,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     navigateToHeaders() {
         this.router.navigate(['header']);
+    }
+
+    goBack() {
+        this.router.navigate(['flow']);
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {

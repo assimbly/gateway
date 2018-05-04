@@ -22,6 +22,8 @@ import {
     flowPopupRoute,
 } from './';
 import { FlowRowComponent } from './flow-row.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 const ENTITY_STATES = [
     ...flowRoute,
@@ -35,7 +37,9 @@ const ENTITY_STATES = [
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
         RouterModule.forChild(ENTITY_STATES),
-        NgbModule
+        NgbModule,
+        NgSelectModule,
+        FormsModule
     ],
     exports: [
         FlowComponent
