@@ -98,6 +98,11 @@ export class FlowRowComponent implements OnInit {
         }
     }
 
+    flowConfigurationNotObtained(id) {
+        this.isFlowStatusOK = false;
+        this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
+    }
+
     getFromEndpoint(id: number) {
         this.fromEndpointService.find(id)
             .subscribe((fromEndpoint) => {
@@ -149,9 +154,11 @@ export class FlowRowComponent implements OnInit {
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = err;
+                            this.flowStatusError = `Flow with id=${id} is not started.`;
                         });
                     });
+            }, (err) => {
+                this.flowConfigurationNotObtained(id);
             });
     }
 
@@ -165,7 +172,7 @@ export class FlowRowComponent implements OnInit {
             }
         }, (err) => {
             this.isFlowStatusOK = false;
-            this.flowStatusError = err;
+            this.flowStatusError = `Flow with id=${id} is not paused.`;
         });
     }
 
@@ -186,9 +193,11 @@ export class FlowRowComponent implements OnInit {
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = err;
+                            this.flowStatusError = `Flow with id=${id} is not resumed.`;
                         });
                     });
+            }, (err) => {
+                this.flowConfigurationNotObtained(id);
             });
     }
 
@@ -209,9 +218,11 @@ export class FlowRowComponent implements OnInit {
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = err;
+                            this.flowStatusError = `Flow with id=${id} is not restarted.`;
                         });
                     });
+            }, (err) => {
+                this.flowConfigurationNotObtained(id);
             });
     }
 
@@ -225,7 +236,7 @@ export class FlowRowComponent implements OnInit {
             }
         }, (err) => {
             this.isFlowStatusOK = false;
-            this.flowStatusError = err;
+            this.flowStatusError = `Flow with id=${id} is not stopped.`;
         });
     }
 }
