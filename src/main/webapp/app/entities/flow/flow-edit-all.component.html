@@ -76,7 +76,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToServices()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+														<span *ngIf="serviceCreated; else serviceNotCreated">Edit service</span>
+														<ng-template #serviceNotCreated>
+															<span>Create service</span>
+														</ng-template>
 													</button>
 												</div>
 											</div>
@@ -88,7 +91,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToHeaders()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+														<span *ngIf="headerCreated; else headerNotCreated">Edit header</span>
+														<ng-template #headerNotCreated>
+															<span>Create header</span>
+														</ng-template>
 													</button>
 												</div>
 											</div>
@@ -129,7 +135,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToServices()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+														<span *ngIf="serviceCreated; else serviceNotCreated">Edit service</span>
+														<ng-template #serviceNotCreated>
+															<span>Create service</span>
+														</ng-template>
 													</button>
 												</div>	
 											</div>
@@ -141,7 +150,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToHeaders()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+														<span *ngIf="headerCreated; else headerNotCreated">Edit header</span>
+														<ng-template #headerNotCreated>
+															<span>Create header</span>
+														</ng-template>
 													</button>
 												</div>
 											</div>
@@ -177,7 +189,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToServices()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+														<span *ngIf="serviceCreated; else serviceNotCreated">Edit service</span>
+														<ng-template #serviceNotCreated>
+															<span>Create service</span>
+														</ng-template>
 													</button>
 												</div>
 											</div>
@@ -189,7 +204,10 @@
 												<div class="input-group-append">
 													<button type="button" class="btn btn-primary" (click)="navigateToHeaders()">
 														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+														<span *ngIf="headerCreated; else headerNotCreated">Edit header</span>
+														<ng-template #headerNotCreated>
+															<span>Create header</span>
+														</ng-template>
 													</button>
 												</div>
 											</div>
@@ -202,7 +220,7 @@
 				</div>
 
 				<div class="float-right">
-					<button type="button" class="btn btn-secondary" (click)="clear()">
+					<button type="button" class="btn btn-secondary" (click)="goBack()">
 						<span class="fa fa-ban"></span>&nbsp;
 						<span>Cancel</span>
 					</button>
