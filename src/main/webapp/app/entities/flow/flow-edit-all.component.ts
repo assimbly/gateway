@@ -34,6 +34,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     services: Service[];
     headers: Header[];
     isSaving: boolean;
+    savingFlowFailed = false;
+    savingFlowFailedMessage = 'Saving failed (check logs)';
     finished: boolean;
     gateways: Gateway[];
     singleGateway = false;
@@ -225,10 +227,20 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             });
     }
 
-    save() {
+    handleErrorWhileCreatingFlow(flowId?: number, fromEndpointId?: number, errorEndpointId?: number, toEndpointId?: number) {
+        if (flowId !== null) { this.flowService.delete(flowId) };
+        if (fromEndpointId !== null) { this.fromEndpointService.delete(fromEndpointId) };
+        if (errorEndpointId !== null) { this.errorEndpointService.delete(errorEndpointId) };
+        if (toEndpointId !== null) { this.toEndpointService.delete(toEndpointId) };
+        this.savingFlowFailed = true;
+        this.isSaving = false;
+        console.log('flow not created');
+    }
 
+    save() {
         this.isSaving = true;
         this.setOptions();
+        this.savingFlowFailed = false;
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
@@ -243,41 +255,45 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 console.log('flow updated');
                 this.isSaving = false;
             });
-        }else {
+        } else {
             if (this.singleGateway) {
                 this.flow.gatewayId = this.gateways[0].id;
             }
-            const saveFlow = this.flowService.create(this.flow);
-            const saveFromEndpoint = this.fromEndpointService.create(this.fromEndpoint);
-            const saveErrorEndpoint = this.errorEndpointService.create(this.errorEndpoint);
-            const saveToEndpoint = this.toEndpointService.create(this.toEndpoint);
-
-            forkJoin([saveFlow, saveFromEndpoint, saveErrorEndpoint, saveToEndpoint]).subscribe((results) => {
-
-                if (results[0].id > 0 && results[0].id > 0 && results[2].id > 0 && results[3].id > 0) {
-
-                    // update flow (set from and error ids)
-                    this.flow = results[0];
-                    this.flow.fromEndpointId = results[1].id;
-                    this.flow.errorEndpointId = results[2].id;
-                    this.subscribeToSaveResponse(
-                        this.flowService.update(this.flow)
-                    );
-
-                    // update toEndpoint (set flow id)
-                    this.toEndpoint = results[3];
-                    this.toEndpoint.flowId = results[0].id;
-                    this.subscribeToSaveResponse(
-                        this.toEndpointService.update(this.toEndpoint)
-                    );
-                    console.log('flow created');
-                    this.finished = true;
-                    this.isSaving = false;
-                } else {
-                    this.isSaving = false;
-                    console.log('flow not created');
-                }
-            });
+            this.flowService.create(this.flow)
+                .subscribe((flowRes) => {
+                    this.flow = flowRes;
+                    this.fromEndpointService.create(this.fromEndpoint)
+                        .subscribe((fromRes) => {
+                            this.fromEndpoint = fromRes;
+                            this.errorEndpointService.create(this.errorEndpoint)
+                                .subscribe((errorRes) => {
+                                    this.errorEndpoint = errorRes;
+                                    this.flow.fromEndpointId = this.fromEndpoint.id;
+                                    this.flow.errorEndpointId = this.errorEndpoint.id;
+                                    this.flowService.update(this.flow)
+                                        .subscribe((flowUpdated) => {
+                                            this.flow = flowUpdated;
+                                            this.toEndpoint.flowId = this.flow.id;
+                                            this.toEndpointService.create(this.toEndpoint)
+                                                .subscribe((toRes) => {
+                                                    console.log('flow created');
+                                                    this.finished = true;
+                                                    this.isSaving = false;
+                                                }, () => {
+                                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
+                                                });
+                                        }, () => {
+                                            this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
+                                        });
+                                }, () => {
+                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
+                                });
+                        }, () => {
+                            this.handleErrorWhileCreatingFlow(this.flow.id, null, null, null);
+                        });
+                }, () => {
+                    this.handleErrorWhileCreatingFlow(null, null, null, null);
+                });
         }
     }
 
