@@ -25,8 +25,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     flow: Flow;
     fromEndpoint: FromEndpoint;
+    fromEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
     toEndpoint: ToEndpoint;
+    toEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
     errorEndpoint: ErrorEndpoint;
+    errorEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
     toEndpoints: ToEndpoint[];
     services: Service[];
     headers: Header[];
@@ -106,6 +109,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
+                                this.getOptions(this.fromEndpoint, null, null);
                                 this.finished = true;
                             }
                         });
@@ -115,11 +119,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 if (this.flow.errorEndpointId) {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
+                        this.getOptions(null, null, this.errorEndpoint);
                     });
                 }
 
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
                     this.toEndpoint = toEndpoints[0];
+
+                    this.getOptions(null, this.toEndpoint, null);
                 });
 
             });
@@ -132,6 +139,68 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.finished = true;
             }, 0);
         }
+    }
+
+    getOptions(fromEndpoint?: FromEndpoint, toEndpoint?: ToEndpoint, errorEndpoint?: ErrorEndpoint) {
+        const endpoint = fromEndpoint !== null ?
+                fromEndpoint :
+                toEndpoint !== null ?
+                    toEndpoint :
+                    errorEndpoint;
+
+        if (endpoint.options === null) { return; }
+        fromEndpoint !== null ?
+            this.fromEndpointOptions = new Array<Option>() :
+            toEndpoint !== null ?
+                this.toEndpointOptions = new Array<Option>() :
+                this.errorEndpointOptions = new Array<Option>();
+
+        const options = endpoint.options.split('&');
+
+        options.forEach((option) => {
+            const kv = option.split('=');
+            const o = new Option();
+            o.key = kv[0];
+            o.value = kv[1];
+            fromEndpoint !== null ? this.fromEndpointOptions.push(o) : toEndpoint !== null ? this.toEndpointOptions.push(o) : this.errorEndpointOptions.push(o);
+        });
+    }
+
+    setOptions() {
+        let fromIndex = 0;
+        this.fromEndpoint.options = '';
+        this.fromEndpointOptions.forEach((fromOption) => {
+             if (fromOption.key && fromOption.value) {
+                this.fromEndpoint.options += fromIndex > 0 ? `,${fromOption.key}=${fromOption.value}` : `${fromOption.key}=${fromOption.value}`;
+                fromIndex++;
+             }
+        });
+
+        let toIndex = 0;
+        this.toEndpoint.options = '';
+        this.toEndpointOptions.forEach((toOption) => {
+             if (toOption.key && toOption.value) {
+                this.toEndpoint.options += toIndex > 0 ? `,${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
+                toIndex++;
+             }
+        });
+
+        let errIndex = 0;
+        this.errorEndpoint.options = '';
+        this.errorEndpointOptions.forEach((errOption) => {
+             if (errOption.key && errOption.value) {
+                this.errorEndpoint.options += errIndex > 0 ? `,${errOption.key}=${errOption.value}` : `${errOption.key}=${errOption.value}`;
+                errIndex++;
+             }
+        });
+    }
+
+    addOption(options: Array<Option>) {
+        options.push({key: '', value: ''});
+    }
+
+    removeOption(options: Array<Option>, option: Option) {
+        options.splice(options.indexOf(option), 1);
     }
 
     previousState() {
@@ -170,6 +239,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     save() {
         this.isSaving = true;
+        this.setOptions();
         this.savingFlowFailed = false;
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
@@ -257,4 +327,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
+}
+
+export class Option {
+    constructor(
+        public key?: string,
+        public value?: string,
+    ) { }
 }
