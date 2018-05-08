@@ -269,6 +269,15 @@ custom assimbly css
     height: 38px;
 }
 
+.camel-link{
+    margin-left: -1px; 
+}
+
+.camel-link img{
+    height: 20px;
+    vertical-align: text-bottom;
+}
+
 @media (min-width: 768px){
     .flow-btns .btn{
         width: 80px
