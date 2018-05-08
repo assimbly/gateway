@@ -229,6 +229,9 @@
 						<span>Save</span>
 					</button>
 				</div>
+				<div *ngIf="savingFlowFailed">
+					<span class="text-danger">*{{savingFlowFailedMessage}}</span>
+				</div>
 			</form>
 		</div>
 	</div>
