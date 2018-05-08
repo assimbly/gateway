@@ -384,7 +384,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     goBack() {
-        this.router.navigate(['flow']);
+        window.history.back();
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
