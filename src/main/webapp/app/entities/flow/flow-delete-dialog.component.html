@@ -12,7 +12,7 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
         </button>
-        <button type="submit" class="btn btn-danger">
+        <button type="button" class="btn btn-danger" (click)="confirmDelete(flow.id)">
             <span class="fa fa-remove"></span>&nbsp;<span>Delete</span>
         </button>
     </div>
