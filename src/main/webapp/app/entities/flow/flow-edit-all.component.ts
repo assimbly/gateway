@@ -46,6 +46,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     serviceCreated: boolean;
     headerCreated: boolean;
     types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
+    fromTypeFirstLink: string;
+    fromTypeSecondLink: string;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -130,6 +132,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.finished = true;
             }, 0);
         }
+    }
+
+    setTypeLinks() {
+
     }
 
     previousState() {
