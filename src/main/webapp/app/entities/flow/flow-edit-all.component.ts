@@ -194,6 +194,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else if (!this.finished) {
             setTimeout(() => {
                 this.flow = new Flow();
+                this.flow.autoStart = false;
                 this.fromEndpoint = new FromEndpoint();
                 this.toEndpoint = new ToEndpoint();
                 this.errorEndpoint = new ErrorEndpoint();
