@@ -249,7 +249,8 @@ custom assimbly css
     cursor: not-allowed;
 }
 
-.input-group-append button.btn{
+.input-group-append button.btn,
+.left-border-radius-0 {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -258,7 +259,8 @@ custom assimbly css
     flex: 1 1 auto;
 }
 
-.input-group .ng-select-container{
+.input-group .ng-select-container,
+.right-border-radius-0 {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }

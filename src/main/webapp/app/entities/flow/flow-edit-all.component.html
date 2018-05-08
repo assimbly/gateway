@@ -67,7 +67,12 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
-											<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="fromEndpoint.options" />
+											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index">
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="fromOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="fromOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions)"><span class="fa fa-plus"></span></button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption)" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
+											</div>
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
@@ -122,7 +127,12 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
-											<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="toEndpoint.options" />
+											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointOptions; let idx = index">
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointOptions)"><span class="fa fa-plus"></span></button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointOptions, toOption)" [disabled]="toEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
+											</div>
 										</div>
 										<div class="form-group" id="flowID2" [hidden]="!flowID2">
 											<label class="form-control-label">Flow</label>
@@ -180,7 +190,12 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
-											<input type="text" class="form-control" name="options" id="field_options" [(ngModel)]="errorEndpoint.options" />
+											<div class="row mx-0 mb-1" *ngFor="let errOption of errorEndpointOptions; let idx = index">
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="errOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="errOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions)"><span class="fa fa-plus"></span></button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption)" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
+											</div>
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
