@@ -30,6 +30,7 @@ export class FlowRowComponent implements OnInit {
     public flowStatusToolTip: string;
     public flowStatusError: string;
     public isFlowStatusOK: boolean;
+    public flowStatistic: string;
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
@@ -57,6 +58,7 @@ export class FlowRowComponent implements OnInit {
     getFlowStatus(id: number) {
         this.flowService.getFlowStatus(id).subscribe((response) => {
             this.setFlowStatus(response.text());
+            this.setFlowStatistic(response);
         });
     }
 
@@ -96,6 +98,29 @@ export class FlowRowComponent implements OnInit {
                 this.flowStatus = 'Unknown';
                 break;
         }
+    }
+
+    setFlowStatistic(res) {
+        this.flowStatistic = `
+            Start time: 2018-05-03 21:04:23 ${moment().add(res.startTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
+            Running: 2 hours 1 minute<br/>
+            <br/>
+            <b>Processing time:</b><br/>
+            Last: 10 ${res.lastProcessingTime} ms<br/>
+            Min: 22 ${res.minProcessingTime} ms<br/>
+            Max: 40 ${res.maxProcessingTime} ms<br/>
+            Avarage: 22 ${res.meanProcessingTime} ms<br/>
+            <br/>
+            <b>Completed:</b><br/>
+            Number of messages: 10 ${res.exchangesCompleted}<br/>
+            First: 2018-05-03 21:04:23  ${moment().add(res.firstExchangeCompletedTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
+            Last: 2018-05-03 21:04:23  ${moment().add(res.lastExchangeCompletedTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
+            <br/>
+            <b>Failures</b><br/>
+            Number of messages: 10 ${res.exchangesFailed}<br/>
+            First: 2018-05-03 21:04:23 ${moment().add(res.firstExchangeFailureTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
+            Last: 2018-05-03 21:04:23 ${moment().add(res.lastExchangeFailureTimestamp).format('YYYY-MM-DD HH:mm:ss')}
+        `;
     }
 
     flowConfigurationNotObtained(id) {
