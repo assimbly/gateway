@@ -1,7 +1,7 @@
 <td id="flowRowID" [hidden]="!flowRowID">
 	<a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
 </td>
-<td>{{flow.name}}</td>
+<td><a [routerLink]="['../flow', flow.id ]">{{flow.name}}</a></td>
 <td id="flowRowID" [hidden]="!flowRowID">
 	<a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
 </td>
@@ -13,23 +13,6 @@
 </td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 	<a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
-</td>
-<td class="text-right">
-	<div class="btn-group flex-btn-group-container">
-		<button type="submit" [routerLink]="['../flow', flow.id ]" class="btn btn-info btn-sm">
-			<span class="fa fa-eye"></span>
-			<span class="d-none d-md-inline">View</span>
-		</button>
-		<button type="submit" [routerLink]="['../flow/edit-all', flow.id ]" class="btn btn-primary btn-sm">
-			<span class="fa fa-pencil"></span>
-			<span class="d-none d-md-inline">Edit</span>
-		</button>
-		<button type="submit" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
-		 class="btn btn-danger btn-sm">
-			<span class="fa fa-remove"></span>
-			<span class="d-none d-md-inline">Delete</span>
-		</button>
-	</div>
 </td>
 <td class="text-right">
 	<div class="btn-group flex-btn-group-container flow-btns">

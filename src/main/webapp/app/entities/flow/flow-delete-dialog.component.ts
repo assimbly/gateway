@@ -29,11 +29,8 @@ export class FlowDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.flowService.delete(id).subscribe((response) => {
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Deleted an flow'
-            });
             this.activeModal.dismiss(true);
+            window.history.back();
         });
     }
 }
