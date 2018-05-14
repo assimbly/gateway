@@ -51,6 +51,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     serviceCreated: boolean;
     headerCreated: boolean;
     types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
+    fromTypeAssimblyLink: string;
+    fromTypeCamelLink: string;
+    toTypeAssimblyLink: string;
+    toTypeCamelLink: string;
+    errorTypeAssimblyLink: string;
+    errorTypeCamelLink: string;
+    typesLinks: Array<TypeLinks>;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -69,6 +76,58 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private router: Router
     ) {
         this.toEndpoints = [];
+        this.typesLinks = [
+            {
+                name: 'ACTIVEMQ',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/activemq',
+                camelTypeLink: ''
+            },
+            {
+                name: 'FILE',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/file',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/camel-core/src/main/docs/file-component.adoc'
+            },
+            {
+                name: 'HTTP4',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/http4',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-http4/src/main/docs/http4-component.adoc'
+            },
+            {
+                name: 'KAFKA',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/kafka',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-kafka/src/main/docs/kafka-component.adoc'
+            },
+            {
+                name: 'SFTP',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sftp',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-ftp/src/main/docs/sftp-component.adoc'
+            },
+            {
+                name: 'SJMS',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sjms',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-sjms/src/main/docs/sjms-component.adoc'
+            },
+            {
+                name: 'SONICMQ',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sonicmq',
+                camelTypeLink: ''
+            },
+            {
+                name: 'SQL',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sql',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-sql/src/main/docs/sql-component.adoc'
+            },
+            {
+                name: 'STREAM',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/stream',
+                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-stream/src/main/docs/stream-component.adoc'
+            },
+            {
+                name: 'WASTEBIN',
+                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/wastebin',
+                camelTypeLink: ''
+            }
+        ]
     }
 
     ngOnInit() {
@@ -110,6 +169,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
                                 this.getOptions(this.fromEndpoint, null, null);
+                                this.setTypeLinks(this.fromEndpoint, null, null)
                                 this.finished = true;
                             }
                         });
@@ -120,13 +180,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
                         this.getOptions(null, null, this.errorEndpoint);
+                        this.setTypeLinks(null, null, this.errorEndpoint);
                     });
                 }
 
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
                     this.toEndpoint = toEndpoints[0];
-
                     this.getOptions(null, this.toEndpoint, null);
+                    this.setTypeLinks(null, this.toEndpoint, null);
                 });
 
             });
@@ -138,6 +199,23 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.errorEndpoint = new ErrorEndpoint();
                 this.finished = true;
             }, 0);
+        }
+    }
+
+    setTypeLinks(fromEndpoint?: FromEndpoint, toEndpoint?: ToEndpoint, errorEndpoint?: ErrorEndpoint) {
+        let type;
+        if (fromEndpoint !== null) {
+            type = this.typesLinks.find((x) => x.name === fromEndpoint.type.toString());
+            this.fromTypeAssimblyLink = type.assimblyTypeLink;
+            this.fromTypeCamelLink = type.camelTypeLink;
+        } else if (toEndpoint !== null) {
+            type = this.typesLinks.find((x) => x.name === toEndpoint.type.toString());
+            this.toTypeAssimblyLink = type.assimblyTypeLink;
+            this.toTypeCamelLink = type.camelTypeLink;
+        } else if (errorEndpoint !== null) {
+            type = this.typesLinks.find((x) => x.name === errorEndpoint.type.toString());
+            this.errorTypeAssimblyLink = type.assimblyTypeLink;
+            this.errorTypeCamelLink = type.camelTypeLink;
         }
     }
 
@@ -171,7 +249,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.fromEndpoint.options = '';
         this.fromEndpointOptions.forEach((fromOption) => {
              if (fromOption.key && fromOption.value) {
-                this.fromEndpoint.options += fromIndex > 0 ? `,${fromOption.key}=${fromOption.value}` : `${fromOption.key}=${fromOption.value}`;
+                this.fromEndpoint.options += fromIndex > 0 ? `&${fromOption.key}=${fromOption.value}` : `${fromOption.key}=${fromOption.value}`;
                 fromIndex++;
              }
         });
@@ -180,7 +258,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpoint.options = '';
         this.toEndpointOptions.forEach((toOption) => {
              if (toOption.key && toOption.value) {
-                this.toEndpoint.options += toIndex > 0 ? `,${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
+                this.toEndpoint.options += toIndex > 0 ? `&${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
                 toIndex++;
              }
         });
@@ -189,7 +267,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.errorEndpoint.options = '';
         this.errorEndpointOptions.forEach((errOption) => {
              if (errOption.key && errOption.value) {
-                this.errorEndpoint.options += errIndex > 0 ? `,${errOption.key}=${errOption.value}` : `${errOption.key}=${errOption.value}`;
+                this.errorEndpoint.options += errIndex > 0 ? `&${errOption.key}=${errOption.value}` : `${errOption.key}=${errOption.value}`;
                 errIndex++;
              }
         });
@@ -334,4 +412,12 @@ export class Option {
         public key?: string,
         public value?: string,
     ) { }
+}
+
+export class TypeLinks {
+    constructor(
+        public name: string,
+        public assimblyTypeLink: string,
+        public camelTypeLink: string
+    ) {}
 }
