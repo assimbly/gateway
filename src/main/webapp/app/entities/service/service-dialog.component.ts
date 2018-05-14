@@ -52,6 +52,7 @@ export class ServiceDialogComponent implements OnInit {
 
     private onSaveSuccess(result: Service) {
         this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK'});
+        this.eventManager.broadcast({name: 'serviceModified', content: result.id});
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }

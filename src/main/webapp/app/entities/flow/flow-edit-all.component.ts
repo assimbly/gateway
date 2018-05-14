@@ -142,21 +142,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id) {
-        this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
-                this.serviceCreated = this.services.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-
-        this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
-                this.headerCreated = this.headers.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+        this.loadServices();
+        this.loadHeaders();
 
         this.getGateways();
 
@@ -201,6 +188,26 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.finished = true;
             }, 0);
         }
+    }
+
+    loadServices() {
+        this.serviceService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.services = res.json;
+                this.serviceCreated = this.services.length > 0;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+    }
+
+    loadHeaders() {
+        this.headerService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.headers = res.json;
+                this.headerCreated = this.headers.length > 0;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
     }
 
     setTypeLinks(fromEndpoint?: FromEndpoint, toEndpoint?: ToEndpoint, errorEndpoint?: ErrorEndpoint) {
@@ -298,6 +305,50 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
+    createOrEditHeader(endpoint) {
+        (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }]) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }]);
+
+        this.eventManager.subscribe(
+            'headerModified',
+            (res) => this.setHeader(endpoint, res)
+        );
+    }
+
+    createOrEditService(endpoint) {
+        (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }]) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }]);
+
+        this.eventManager.subscribe(
+            'serviceModified',
+            (res) => this.setService(endpoint, res)
+        );
+    }
+
+    setHeader(endpoint, id) {
+        this.headerService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.headers = res.json;
+                this.headerCreated = this.headers.length > 0;
+                endpoint.headerId = this.headers.find((h) => h.id === id.content).id;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+    }
+
+    setService(endpoint, id) {
+        this.serviceService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.services = res.json;
+                this.serviceCreated = this.services.length > 0;
+                endpoint.serviceId = this.services.find((s) => s.id === id.content).id;
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+    }
+
     getGateways() {
         this.gatewayService.query()
             .subscribe((gateways) => {
@@ -374,14 +425,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.handleErrorWhileCreatingFlow(null, null, null, null);
                 });
         }
-    }
-
-    navigateToServices() {
-        this.router.navigate(['service']);
-    }
-
-    navigateToHeaders() {
-        this.router.navigate(['header']);
     }
 
     goBack() {
