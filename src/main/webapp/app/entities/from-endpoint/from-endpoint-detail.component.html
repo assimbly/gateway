@@ -19,13 +19,13 @@
         <dt><span>Service</span></dt>
         <dd>
             <div *ngIf="fromEndpoint.serviceId">
-                <a [routerLink]="['/service', fromEndpoint.serviceId]">{{fromEndpoint.serviceId}}</a>
+                <a [routerLink]="['/service', fromEndpoint.serviceId]">{{serviceName}}</a>
             </div>
         </dd>
         <dt><span>Header</span></dt>
         <dd>
             <div *ngIf="fromEndpoint.headerId">
-                <a [routerLink]="['/header', fromEndpoint.headerId]">{{fromEndpoint.headerId}}</a>
+                <a [routerLink]="['/header', fromEndpoint.headerId]">{{headerName}}</a>
             </div>
         </dd>
     </dl>
