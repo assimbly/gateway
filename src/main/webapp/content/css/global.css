@@ -249,9 +249,39 @@ custom assimbly css
     cursor: not-allowed;
 }
 
-.input-group-append button.btn{
+.input-group-append button.btn,
+.left-border-radius-0 {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+.input-group ng-select{
+    flex: 1 1 auto;
+}
+
+.input-group .ng-select-container,
+.right-border-radius-0 {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.ng-select.ng-select-single .ng-select-container { 
+    height: 38px;
+}
+
+.camel-link{
+    margin-left: -1px; 
+}
+
+.camel-link img{
+    height: 20px;
+    vertical-align: text-bottom;
+}
+
+@media (min-width: 768px){
+    .flow-btns .btn{
+        width: 80px
+    }
 }
 
 /* jhipster-needle-css-add-main JHipster will add new css style */

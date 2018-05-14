@@ -23,6 +23,8 @@ import {
     PageRibbonComponent,
     ErrorComponent
 } from './layouts';
+import { FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     imports: [
@@ -34,6 +36,8 @@ import {
         GatewayAdminModule,
         GatewayAccountModule,
         GatewayEntityModule,
+        NgSelectModule,
+        FormsModule
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
     declarations: [

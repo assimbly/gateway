@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.codahale.metrics.annotation.Timed;
 
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -32,6 +33,8 @@ public class ConnectorResource {
 	private String flowConfiguration;
 
 	private String status;
+
+	private String type;
 
     public ConnectorResource() {}
     
@@ -188,6 +191,29 @@ public class ConnectorResource {
 		}  
 	  
   }
+
+  @GetMapping(path = "/connector/{connectorId}/stats", produces = {"text/plain","application/xml","application/json"})
+  @Timed
+  public ResponseEntity<String> getStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Optional<String> statsType) throws Exception {
+
+  	plainResponse = true;
+
+		try {
+      	init();
+      	if(statsType.isPresent()){
+      		type=statsType.get();
+      	}else {
+      		type="default";
+      	}
+  		String stats = connector.getStats(type, mediaType);
+  		if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",stats,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
+		}
+  }
+
+  
   
 	//manage flow
     @GetMapping(path = "/connector/{connectorId}/hasflow/{id}", produces = {"text/plain","application/xml","application/json"})
@@ -312,7 +338,7 @@ public class ConnectorResource {
     
     @GetMapping(path = "/connector/{connectorId}/flow/status/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> getStatusflow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+    public ResponseEntity<String> getFlowStatus(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
 		try {
         	init();
@@ -327,7 +353,7 @@ public class ConnectorResource {
 
     @GetMapping(path = "/connector/{connectorId}/flow/uptime/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> getUptimeflow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+    public ResponseEntity<String> getFlowUptime(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
 		try {
         	init();
@@ -339,7 +365,82 @@ public class ConnectorResource {
 		}
     	
     }    
+
     
+    @GetMapping(path = "/connector/{connectorId}/flow/lasterror/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowLastError(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String lastError = connector.getFlowLastError(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowNumberOfMessages",lastError,lastError,flowId);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowNumberOfMessages","unable to get last error for flow " + flowId,"unable to get last error for flow " + flowId,flowId,e);
+		}
+    }
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/totalmessages/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowTotalMessages(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String numberOfMessages = connector.getFlowTotalMessages(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowTotalMessages",numberOfMessages,numberOfMessages,flowId);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowTotalMessages","unable to get total messages of flow " + flowId,"unable to get total messages of flow " + flowId,flowId,e);
+		}
+    }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/completedmessages/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowCompletedMessages(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String completedMessages = connector.getFlowCompletedMessages(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowCompletedMessages",completedMessages,completedMessages,flowId);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowCompletedMessages","unable to get completed messages of flow " + flowId,"unable to get completed messages of flow " + flowId,flowId,e);
+		}
+    }
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/failedmessages/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowFailedMessages(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String failedMessages = connector.getFlowFailedMessages(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowFailedMessages",failedMessages,failedMessages,flowId);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowFailedMessages","unable to get failed messages of flow " + flowId,"unable to get failed messages of flow " + flowId,flowId,e);
+		}
+    }
+
+	
+    @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+    	plainResponse = true;
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String flowStats = connector.getFlowStats(flowId, mediaType);
+    		if(flowStats.startsWith("Error")||flowStats.startsWith("Warning")) {plainResponse = false;}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",flowStats,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+		}
+    }
+
     //private methods    
     
     //This method is called on application startup and on manage flow calls
