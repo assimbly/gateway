@@ -278,6 +278,10 @@ custom assimbly css
     vertical-align: text-bottom;
 }
 
+.popover {
+    max-width: 100%;
+}
+
 @media (min-width: 768px){
     .flow-btns .btn{
         width: 80px
