@@ -213,6 +213,9 @@ custom assimbly css
 ========================================================================== */
 #fromTab.active,
 #toTab.active,
+#toTab0.active,
+#toTab1.active,
+#toTab2.active,
 #errorTab.active {
   background-color: crimson;
   border-color: white;
@@ -221,6 +224,9 @@ custom assimbly css
 
 #fromTab,
 #toTab,
+#toTab0,
+#toTab1,
+#toTab2,
 #errorTab {
   background-color: grey;
   border-color: white;
