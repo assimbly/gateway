@@ -36,10 +36,10 @@ export class ToEndpointService {
         });
     }
 
-    findByFlowId(id: number): Observable<ToEndpoint> {
+    findByFlowId(id: number): Observable<Array<ToEndpoint>> {
         return this.http.get(`${this.resourceUrl}/byflowid/${id}`).map((res: Response) => {
             const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
+            return this.convertItemsFromServer(jsonResponse);
         });
     }
 
@@ -68,6 +68,17 @@ export class ToEndpointService {
     private convertItemFromServer(json: any): ToEndpoint {
         const entity: ToEndpoint = Object.assign(new ToEndpoint(), json);
         return entity;
+    }
+
+    /**
+	 * Convert a returned JSON object to Array<ToEndpoint>.
+	 */
+    private convertItemsFromServer(json: any): Array<ToEndpoint> {
+        const entities: Array<ToEndpoint> = new Array<ToEndpoint>();
+        json.forEach((element) => {
+            entities.push(Object.assign(new ToEndpoint(), element));
+        });
+        return entities;
     }
 
     /**
