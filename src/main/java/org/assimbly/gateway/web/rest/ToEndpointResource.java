@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,13 +44,13 @@ public class ToEndpointResource {
     }
 
     /**
-     * POST  /to-endpoints : Create a new toEndpoint.
+     * POST  /to-endpoint : Create a new toEndpoint.
      *
      * @param toEndpointDTO the toEndpointDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new toEndpointDTO, or with status 400 (Bad Request) if the toEndpoint has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping("/to-endpoints")
+    @PostMapping("/to-endpoint")
     @Timed
     public ResponseEntity<ToEndpointDTO> createToEndpoint(@RequestBody ToEndpointDTO toEndpointDTO) throws URISyntaxException {
         log.debug("REST request to save ToEndpoint : {}", toEndpointDTO);
@@ -60,13 +60,30 @@ public class ToEndpointResource {
         ToEndpoint toEndpoint = toEndpointMapper.toEntity(toEndpointDTO);
         toEndpoint = toEndpointRepository.save(toEndpoint);
         ToEndpointDTO result = toEndpointMapper.toDto(toEndpoint);
-        return ResponseEntity.created(new URI("/api/to-endpoints/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/to-endpoint/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
     /**
-     * PUT  /to-endpoints : Updates an existing toEndpoint.
+     * POST  /to-endpoints : Create a new toEndpoints.
+     *
+     * @param toEndpointsDTO the toEndpointsDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new toEndpointDTO, or with status 400 (Bad Request) if the toEndpoint has already an ID
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping("/to-endpoints")
+    @Timed
+    public ResponseEntity<List<ToEndpointDTO>> createToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
+        log.debug("REST request to save List<ToEndpoint> : {}", toEndpointsDTO);
+        List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
+        toEndpoints = toEndpointRepository.save(toEndpoints);
+        List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
+        return ResponseEntity.created(new URI("/api/to-endpoints/")).body(results);
+    }
+
+    /**
+     * PUT  /to-endpoint : Updates an existing toEndpoint.
      *
      * @param toEndpointDTO the toEndpointDTO to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated toEndpointDTO,
@@ -74,7 +91,7 @@ public class ToEndpointResource {
      * or with status 500 (Internal Server Error) if the toEndpointDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PutMapping("/to-endpoints")
+    @PutMapping("/to-endpoint")
     @Timed
     public ResponseEntity<ToEndpointDTO> updateToEndpoint(@RequestBody ToEndpointDTO toEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update ToEndpoint : {}", toEndpointDTO);
@@ -87,6 +104,25 @@ public class ToEndpointResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, toEndpointDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * PUT  /to-endpoints : Updates an existing toEndpoints.
+     *
+     * @param toEndpointsDTO the toEndpointsDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated toEndpointsDTO,
+     * or with status 400 (Bad Request) if the toEndpointsDTO is not valid,
+     * or with status 500 (Internal Server Error) if the toEndpointsDTO couldn't be updated
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PutMapping("/to-endpoints")
+    @Timed
+    public ResponseEntity<List<ToEndpointDTO>> updateToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
+        log.debug("REST request to update ToEndpoints : {}", toEndpointsDTO);
+        List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
+        toEndpoints = toEndpointRepository.save(toEndpoints);
+        List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
+        return ResponseEntity.ok().body(results);
     }
 
     /**
@@ -117,12 +153,12 @@ public class ToEndpointResource {
     }  
     
     /**
-     * GET  /to-endpoints/:id : get the "id" toEndpoint.
+     * GET  /to-endpoint/:id : get the "id" toEndpoint.
      *
      * @param id the id of the toEndpointDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/to-endpoints/{id}")
+    @GetMapping("/to-endpoint/{id}")
     @Timed
     public ResponseEntity<ToEndpointDTO> getToEndpointID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoint : {}", id);
@@ -132,12 +168,12 @@ public class ToEndpointResource {
     }
 
     /**
-     * DELETE  /to-endpoints/:id : delete the "id" toEndpoint.
+     * DELETE  /to-endpoint/:id : delete the "id" toEndpoint.
      *
      * @param id the id of the toEndpointDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/to-endpoints/{id}")
+    @DeleteMapping("/to-endpoint/{id}")
     @Timed
     public ResponseEntity<Void> deleteToEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ToEndpoint : {}", id);
