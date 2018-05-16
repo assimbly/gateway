@@ -2,6 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
+import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
 import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-endpoint.module';
 import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
@@ -39,7 +40,8 @@ const ENTITY_STATES = [
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
         NgSelectModule,
-        FormsModule
+        FormsModule,
+        PopoverModule.forRoot()
     ],
     exports: [
         FlowComponent
