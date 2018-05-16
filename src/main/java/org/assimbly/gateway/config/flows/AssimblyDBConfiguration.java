@@ -434,14 +434,14 @@ public class AssimblyDBConfiguration {
 		    uri.setTextContent(confUri);	
 			endpoint.appendChild(uri);
 				
-			if(confOptions!=null) {
+			if(confOptions!=null && !confOptions.isEmpty()) {
 				
 			    Element options = doc.createElement("options");
 			    endpoint.appendChild(options);
 			    
-			    String[] confOptionsSplitted = confOptions.split(",");
+			    String[] confOptionsSplitted = confOptions.split("&");
 			    
-			    if(confOptionsSplitted.length>0) {
+			    if(confOptionsSplitted.length>1) {
 			    
 				    for(String confOption : confOptionsSplitted) {
 				    	String[] confOptionSplitted = confOption.split("=");
@@ -518,11 +518,11 @@ public class AssimblyDBConfiguration {
 			    uri.setTextContent(confUri);	
 				endpoint.appendChild(uri);
 					
-				if(confOptions!=null) {
+				if(confOptions!=null && !confOptions.isEmpty()) {
 				    Element options = doc.createElement("options");
 				    endpoint.appendChild(options);
 				    
-				    String[] confOptionsSplitted = confOptions.split(",");
+				    String[] confOptionsSplitted = confOptions.split("&");
 				    
 				    for(String confOption : confOptionsSplitted) {
 				    	String[] confOptionSplitted = confOption.split("=");
@@ -584,11 +584,12 @@ public class AssimblyDBConfiguration {
 		    uri.setTextContent(confUri);	
 			endpoint.appendChild(uri);
 				
-			if(confOptions!=null) {
+			if(confOptions!=null  && !confOptions.isEmpty()) {
+				
 			    Element options = doc.createElement("options");
 			    endpoint.appendChild(options);
 			    
-			    String[] confOptionsSplitted = confOptions.split(",");
+			    String[] confOptionsSplitted = confOptions.split("&");
 			    
 			    for(String confOption : confOptionsSplitted) {
 			    	String[] confOptionSplitted = confOption.split("=");
