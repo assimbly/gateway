@@ -87,6 +87,10 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
     }
 
+    getFlowStats(id: number, gatewayid: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`);
+    }
+
     private convertResponse(res: Response): ResponseWrapper {
         const jsonResponse = res.json();
         const result = [];
