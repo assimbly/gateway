@@ -685,5 +685,4 @@ public class AssimblyDBConfiguration {
 	        throw new RuntimeException("Error converting to String", ex);
 	    }
 	}
-
 }
