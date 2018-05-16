@@ -60,7 +60,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_from_type">Type</label>
 											<div class="input-group">
-												<ng-select name="type" [items]="types" [(ngModel)]="fromEndpoint.type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, null, null)"></ng-select>
+												<ng-select name="type" [items]="types" [(ngModel)]="fromEndpoint.type" id="field_from_type" (change)="setTypeLinks([fromEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint.type | lowercase}} component documentation">
@@ -126,7 +126,7 @@
 								</div>
 							</ng-template>
 						</ngb-tab>
-						<ngb-tab title="To" id="toTab">
+						<ngb-tab title="To ({{toIndex+1}})" id="toTab{{toIndex}}" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
 							<ng-template ngbTabContent>
 								<jhi-alert-error></jhi-alert-error>
 								<div row id="tabBackground">
@@ -136,12 +136,12 @@
 											<input type="text" class="form-control" id="id" name="id" [(ngModel)]="toEndpoint.id" readonly />
 										</div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_to_type">Type</label>
+											<label class="form-control-label" for="field_to_type">Type {{toIndex}}</label>
 											<div class="input-group">
-												<ng-select name="type" [items]="types" [(ngModel)]="toEndpoint.type" id="field_to_type" (change)="setTypeLinks(null, toEndpoint, null)"></ng-select>
+												<ng-select name="type" [items]="types" [(ngModel)]="toEndpoint.type" id="field_to_type" (change)="setTypeLinks([toEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{toTypeAssimblyLink}}" [ngClass]="{'disabled': !toTypeAssimblyLink}" target="_blank" title="Assimbly {{toEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{toTypeCamelLink}}" [ngClass]="{'disabled': !toTypeCamelLink}" target="_blank" title="Camel {{toEndpoint.type | lowercase}} component documentation">
+													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{toTypeAssimblyLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeAssimblyLinks[toIndex]}" target="_blank" title="Assimbly {{toEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Camel {{toEndpoint.type | lowercase}} component documentation">
 														<img src="../../../content/images/apache-camel.png"/>
 													</a>
 												</div>
@@ -153,12 +153,14 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
-											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointOptions; let idx = index">
-												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
-												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointOptions)"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointOptions, toOption)" [disabled]="toEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
-											</div>
+											<!-- <div *ngFor="let toEndpointOptions of toEndpointsOptions; index as in"> -->
+												<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx">
+													<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
+													<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
+													<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex])"><span class="fa fa-plus"></span></button>
+													<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption)" [disabled]="toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
+												</div>
+											<!-- </div> -->
 										</div>
 										<div class="form-group" id="flowID2" [hidden]="!flowID2">
 											<label class="form-control-label">Flow</label>
@@ -166,7 +168,7 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
- 											<div class="input-group">
+											<div class="input-group">
 												<ng-select name="service" [items]="services" bindLabel="name" bindValue="id" [(ngModel)]="toEndpoint.serviceId" id="field_service"></ng-select>
 												<div class="input-group-append">
 													<button *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(toEndpoint)">
@@ -189,20 +191,31 @@
 											<div class="input-group">
 												<ng-select name="header" [items]="headers" bindLabel="name" bindValue="id" [(ngModel)]="toEndpoint.headerId" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button *ngIf="headerCreated && toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
+													<button type="button" *ngIf="headerCreated && toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
 														<span class="fa fa-pencil"></span>&nbsp;
 														<span>Edit header</span>
 													</button>
-													<button *ngIf="headerCreated && !toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
+													<button type="button" *ngIf="headerCreated && !toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
 														<span class="fa fa-pencil"></span>&nbsp;
 														<span>New header</span>
 													</button>
-													<button *ngIf="!headerCreated" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
 														<span class="fa fa-pencil"></span>&nbsp;
 														<span>Create header</span>
 													</button>
 												</div>
 											</div>
+										</div>
+
+										<div class="btn-group" role="group">
+											<button type="button" class="btn btn-danger" (click)="removeToEndpoint(toEndpoint)" [disabled]="toEndpoints.length === 1">
+												<span class="fa fa-remove"></span>&nbsp;
+												<span>Remove ToEndpoint</span>
+											</button>
+											<button type="button" class="btn btn-primary" (click)="addNewToEndpoint()" [disabled]="toEndpoints.length > 2">
+												<span class="fa fa-pencil"></span>&nbsp;
+												<span>Add New ToEndpoint</span>
+											</button>
 										</div>
 									</div>
 								</div>
@@ -219,7 +232,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_error_type">Type</label>
 											<div class="input-group">
-												<ng-select name="type" [items]="types" [(ngModel)]="errorEndpoint.type" id="field_error_type" (change)="setTypeLinks(null, null, errorEndpoint)"></ng-select>
+												<ng-select name="type" [items]="types" [(ngModel)]="errorEndpoint.type" id="field_error_type" (change)="setTypeLinks([errorEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{errorTypeAssimblyLink}}" [ngClass]="{'disabled': !errorTypeAssimblyLink}" target="_blank" title="Assimbly {{errorEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Camel {{errorEndpoint.type | lowercase}} component documentation">

@@ -26,11 +26,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     flow: Flow;
     fromEndpoint: FromEndpoint;
     fromEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
-    toEndpoint: ToEndpoint;
-    toEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
+    toEndpointsOptions: Array<Array<Option>> = new Array<Array<Option>>([{key: '', value: ''}]);
     errorEndpoint: ErrorEndpoint;
     errorEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
-    toEndpoints: ToEndpoint[];
+    toEndpoints: ToEndpoint[] = new Array<ToEndpoint>();
     services: Service[];
     headers: Header[];
     isSaving: boolean;
@@ -53,8 +52,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
-    toTypeAssimblyLink: string;
-    toTypeCamelLink: string;
+    toTypeAssimblyLinks: Array<string> = new Array<string>();
+    toTypeCamelLinks: Array<string> = new Array<string>();
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
     typesLinks: Array<TypeLinks>;
@@ -75,7 +74,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router
     ) {
-        this.toEndpoints = [];
+        this.toEndpoints = [new ToEndpoint()];
         this.typesLinks = [
             {
                 name: 'ACTIVEMQ',
@@ -155,8 +154,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
-                                this.getOptions(this.fromEndpoint, null, null);
-                                this.setTypeLinks(this.fromEndpoint, null, null)
+                                this.getOptions([this.fromEndpoint]);
+                                this.setTypeLinks([this.fromEndpoint])
                                 this.finished = true;
                             }
                         });
@@ -166,24 +165,23 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 if (this.flow.errorEndpointId) {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
-                        this.getOptions(null, null, this.errorEndpoint);
-                        this.setTypeLinks(null, null, this.errorEndpoint);
+                        this.getOptions([this.errorEndpoint]);
+                        this.setTypeLinks([this.errorEndpoint]);
                     });
                 }
 
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
-                    this.toEndpoint = toEndpoints[0];
-                    this.getOptions(null, this.toEndpoint, null);
-                    this.setTypeLinks(null, this.toEndpoint, null);
+                    this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
+                    this.getOptions(this.toEndpoints);
+                    this.setTypeLinks(this.toEndpoints);
                 });
-
             });
         } else if (!this.finished) {
             setTimeout(() => {
                 this.flow = new Flow();
                 this.flow.autoStart = false;
                 this.fromEndpoint = new FromEndpoint();
-                this.toEndpoint = new ToEndpoint();
+                this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
                 this.errorEndpoint = new ErrorEndpoint();
                 this.finished = true;
             }, 0);
@@ -210,45 +208,51 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    setTypeLinks(fromEndpoint?: FromEndpoint, toEndpoint?: ToEndpoint, errorEndpoint?: ErrorEndpoint) {
-        let type;
-        if (fromEndpoint !== null) {
-            type = this.typesLinks.find((x) => x.name === fromEndpoint.type.toString());
-            this.fromTypeAssimblyLink = type.assimblyTypeLink;
-            this.fromTypeCamelLink = type.camelTypeLink;
-        } else if (toEndpoint !== null) {
-            type = this.typesLinks.find((x) => x.name === toEndpoint.type.toString());
-            this.toTypeAssimblyLink = type.assimblyTypeLink;
-            this.toTypeCamelLink = type.camelTypeLink;
-        } else if (errorEndpoint !== null) {
-            type = this.typesLinks.find((x) => x.name === errorEndpoint.type.toString());
-            this.errorTypeAssimblyLink = type.assimblyTypeLink;
-            this.errorTypeCamelLink = type.camelTypeLink;
-        }
+    setTypeLinks(endpoints: Array<any>) {
+        endpoints.forEach((endpoint) => {
+            let type;
+            if (endpoint instanceof FromEndpoint) {
+                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.fromTypeAssimblyLink = type.assimblyTypeLink;
+                this.fromTypeCamelLink = type.camelTypeLink;
+            } else if (endpoint instanceof ToEndpoint) {
+                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
+                this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+            } else if (endpoint instanceof ErrorEndpoint) {
+                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.errorTypeAssimblyLink = type.assimblyTypeLink;
+                this.errorTypeCamelLink = type.camelTypeLink;
+            }
+        });
     }
 
-    getOptions(fromEndpoint?: FromEndpoint, toEndpoint?: ToEndpoint, errorEndpoint?: ErrorEndpoint) {
-        const endpoint = fromEndpoint !== null ?
-                fromEndpoint :
-                toEndpoint !== null ?
-                    toEndpoint :
-                    errorEndpoint;
+    getOptions(endpoints: Array<any>) {
+        endpoints.forEach((endpoint, i) => {
+            if (endpoint.options === null) { return; }
+            const options = endpoint.options.split('&');
 
-        if (endpoint.options === null) { return; }
-        fromEndpoint !== null ?
-            this.fromEndpointOptions = new Array<Option>() :
-            toEndpoint !== null ?
-                this.toEndpointOptions = new Array<Option>() :
+            if (endpoint instanceof FromEndpoint) {
+                this.fromEndpointOptions = new Array<Option>();
+            } else if (endpoint instanceof ToEndpoint) {
+                this.toEndpointsOptions[i] = new Array<Option>();
+            } else if (endpoint instanceof ErrorEndpoint) {
                 this.errorEndpointOptions = new Array<Option>();
+            }
 
-        const options = endpoint.options.split('&');
-
-        options.forEach((option) => {
-            const kv = option.split('=');
-            const o = new Option();
-            o.key = kv[0];
-            o.value = kv[1];
-            fromEndpoint !== null ? this.fromEndpointOptions.push(o) : toEndpoint !== null ? this.toEndpointOptions.push(o) : this.errorEndpointOptions.push(o);
+            options.forEach((option) => {
+                const kv = option.split('=');
+                const o = new Option();
+                o.key = kv[0];
+                o.value = kv[1];
+                if (endpoint instanceof FromEndpoint) {
+                    this.fromEndpointOptions.push(o);
+                } else if (endpoint instanceof ToEndpoint) {
+                    this.toEndpointsOptions[i].push(o);
+                } else if (endpoint instanceof ErrorEndpoint) {
+                    this.errorEndpointOptions.push(o);
+                }
+            });
         });
     }
 
@@ -262,13 +266,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
              }
         });
 
-        let toIndex = 0;
-        this.toEndpoint.options = '';
-        this.toEndpointOptions.forEach((toOption) => {
-             if (toOption.key && toOption.value) {
-                this.toEndpoint.options += toIndex > 0 ? `&${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
-                toIndex++;
-             }
+        this.toEndpoints.forEach((toEndpoint, i) => {
+            let toIndex = 0;
+            toEndpoint.options = '';
+            this.toEndpointsOptions[i].forEach((toOption) => {
+                if (toOption.key && toOption.value) {
+                    toEndpoint.options += toIndex > 0 ? `&${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
+                    toIndex++;
+                }
+            });
         });
 
         let errIndex = 0;
@@ -287,6 +293,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     removeOption(options: Array<Option>, option: Option) {
         options.splice(options.indexOf(option), 1);
+    }
+
+    addNewToEndpoint() {
+        this.toEndpoints.push(new ToEndpoint());
+        this.toEndpointsOptions.push(new Array<Option>({key: '', value: ''}));
+    }
+
+    removeToEndpoint(toEndpoint) {
+        const i = this.toEndpoints.indexOf(toEndpoint);
+        this.toEndpoints.splice(i, 1);
+        this.toEndpointsOptions.splice(i, 1);
     }
 
     previousState() {
@@ -374,14 +391,19 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
-            this.toEndpoint.flowId = this.flow.id;
+            this.toEndpoints.forEach((toEndpoint) => {
+                toEndpoint.flowId = this.flow.id;
+            })
 
             const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
             const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
             const updateErrorEndpoint = this.flowService.update(this.flow)
-            const updateToEndpoint = this.toEndpointService.update(this.toEndpoint);
+            const updateToEndpoint: Array<Observable<ToEndpoint>> = new Array<Observable<ToEndpoint>>();
+            this.toEndpoints.forEach((toEndpoint) => {
+                updateToEndpoint.push(this.toEndpointService.update(toEndpoint))
+            });
 
-            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoint]).subscribe((results) => {
+            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint].concat(updateToEndpoint)).subscribe((results) => {
                 console.log('flow updated');
                 this.isSaving = false;
             });
@@ -403,15 +425,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     this.flowService.update(this.flow)
                                         .subscribe((flowUpdated) => {
                                             this.flow = flowUpdated;
-                                            this.toEndpoint.flowId = this.flow.id;
-                                            this.toEndpointService.create(this.toEndpoint)
-                                                .subscribe((toRes) => {
-                                                    console.log('flow created');
-                                                    this.finished = true;
-                                                    this.isSaving = false;
-                                                }, () => {
-                                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
-                                                });
+                                            this.toEndpoints.forEach((toEndpoint) => {
+                                                toEndpoint.flowId = this.flow.id;
+                                                this.toEndpointService.create(toEndpoint)
+                                                    .subscribe((toRes) => {
+                                                        console.log('flow created');
+                                                        this.finished = true;
+                                                        this.isSaving = false;
+                                                    }, () => {
+                                                        this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
+                                                    });
+                                            });
                                         }, () => {
                                             this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
                                         });
