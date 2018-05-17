@@ -21,25 +21,14 @@ import java.net.URISyntaxException;
 @RequestMapping("/api")
 public class ConfigurationResource {
 
-    private final Environment env;
-
-    private final JHipsterProperties jHipsterProperties;
-
 	private String xmlconfiguration;
 
 	@Autowired
 	private AssimblyDBConfiguration assimblyDBConfiguration;
 
 	private String jsonconfiguration;
-	
-    public ConfigurationResource(Environment env, JHipsterProperties jHipsterProperties) {
-        this.env = env;
-        this.jHipsterProperties = jHipsterProperties;
-    }
     
-    //configure gateway from database (by gatewayid)
-    
-    /**
+	/**
      * POST  /configuration/{connectorid}/setconfiguration : Set configuration from XML.
      *
      * @param connectorId (by gatewayId)

@@ -4,13 +4,20 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
+import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.web.rest.util.AutostartUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
 
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
@@ -36,6 +43,13 @@ public class ConnectorResource {
 
 	private String type;
 
+	@Autowired
+	private AssimblyDBConfiguration assimblyDBConfiguration;
+    
+	@Autowired
+	private FlowRepository flowRepository;
+	
+	
     public ConnectorResource() {}
     
     //configure connector (by gatewayid)
@@ -443,8 +457,6 @@ public class ConnectorResource {
 
     //private methods    
     
-    //This method is called on application startup and on manage flow calls
-    @PostConstruct
     private void init() throws Exception {
     
        	if(!connector.isStarted()){
@@ -454,5 +466,31 @@ public class ConnectorResource {
 				e.printStackTrace();
 			}
         }
+	}
+
+    
+    //This method is called on application startup
+    @PostConstruct
+    private void initConnector() throws Exception {
+    
+    	//start connector
+       	if(!connector.isStarted()){
+        	try {
+				connector.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+
+		//start flows with autostart
+       	List<Flow> flows = flowRepository.findAll();;
+		
+		for(Flow flow : flows) {
+       		if(flow.isAutoStart()) {
+       			String configuration = assimblyDBConfiguration.convertDBToXMLFlowConfiguration(flow.getId());
+       			connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+				connector.startFlow(flow.getId().toString());
+       		}
+       	}
 	}
 }

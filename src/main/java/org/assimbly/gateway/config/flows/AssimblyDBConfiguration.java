@@ -434,14 +434,14 @@ public class AssimblyDBConfiguration {
 		    uri.setTextContent(confUri);	
 			endpoint.appendChild(uri);
 				
-			if(confOptions != null && !confOptions.isEmpty()) {
+			if(confOptions!=null && !confOptions.isEmpty()) {
 				
 			    Element options = doc.createElement("options");
 			    endpoint.appendChild(options);
 			    
 			    String[] confOptionsSplitted = confOptions.split("&");
 			    
-			    if(confOptionsSplitted.length > 0) {
+			    if(confOptionsSplitted.length>1) {
 			    
 				    for(String confOption : confOptionsSplitted) {
 				    	String[] confOptionSplitted = confOption.split("=");
@@ -456,7 +456,7 @@ public class AssimblyDBConfiguration {
 			    	
 			    	String[] confOptionSplitted = confOptions.split("=");
 			    	
-			    	if(confOptionSplitted.length > 0){
+			    	if(confOptionSplitted.length>0){
 			    		Element option = doc.createElement(confOptionSplitted[0]);
 					    option.setTextContent(confOptionSplitted[1]);	
 			    		options.appendChild(option);
@@ -518,7 +518,7 @@ public class AssimblyDBConfiguration {
 			    uri.setTextContent(confUri);	
 				endpoint.appendChild(uri);
 					
-				if(confOptions != null && !confOptions.isEmpty()) {
+				if(confOptions!=null && !confOptions.isEmpty()) {
 				    Element options = doc.createElement("options");
 				    endpoint.appendChild(options);
 				    
@@ -584,7 +584,8 @@ public class AssimblyDBConfiguration {
 		    uri.setTextContent(confUri);	
 			endpoint.appendChild(uri);
 				
-			if(confOptions != null && !confOptions.isEmpty()) {
+			if(confOptions!=null  && !confOptions.isEmpty()) {
+				
 			    Element options = doc.createElement("options");
 			    endpoint.appendChild(options);
 			    
@@ -684,5 +685,4 @@ public class AssimblyDBConfiguration {
 	        throw new RuntimeException("Error converting to String", ex);
 	    }
 	}
-
 }
