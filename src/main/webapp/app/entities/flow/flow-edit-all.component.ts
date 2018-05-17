@@ -304,6 +304,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         const i = this.toEndpoints.indexOf(toEndpoint);
         this.toEndpoints.splice(i, 1);
         this.toEndpointsOptions.splice(i, 1);
+        if (typeof toEndpoint.id !== 'undefined') {
+            this.toEndpointService.delete(toEndpoint.id)
+                .subscribe((res) => {
+                    const t = res;
+                });
+        }
     }
 
     previousState() {
@@ -395,15 +401,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 toEndpoint.flowId = this.flow.id;
             })
 
-            const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
-            const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
-            const updateErrorEndpoint = this.flowService.update(this.flow)
-            const updateToEndpoint: Array<Observable<ToEndpoint>> = new Array<Observable<ToEndpoint>>();
-            this.toEndpoints.forEach((toEndpoint) => {
-                updateToEndpoint.push(this.toEndpointService.update(toEndpoint))
-            });
+            const updateFlow = this.fromEndpointService.update(this.fromEndpoint);
+            const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint);
+            const updateErrorEndpoint = this.flowService.update(this.flow);
+            const updateToEndpoints = this.toEndpointService.updateMultiple(this.toEndpoints);
 
-            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint].concat(updateToEndpoint)).subscribe((results) => {
+            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
                 console.log('flow updated');
                 this.isSaving = false;
             });
@@ -427,15 +430,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                             this.flow = flowUpdated;
                                             this.toEndpoints.forEach((toEndpoint) => {
                                                 toEndpoint.flowId = this.flow.id;
-                                                this.toEndpointService.create(toEndpoint)
-                                                    .subscribe((toRes) => {
-                                                        console.log('flow created');
-                                                        this.finished = true;
-                                                        this.isSaving = false;
-                                                    }, () => {
-                                                        this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
-                                                    });
                                             });
+                                            this.toEndpointService.createMultiple(this.toEndpoints)
+                                                .subscribe((toRes) => {
+                                                    console.log('flow created');
+                                                    this.finished = true;
+                                                    this.isSaving = false;
+                                                }, () => {
+                                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
+                                                });
                                         }, () => {
                                             this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
                                         });

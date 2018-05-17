@@ -60,7 +60,7 @@
             </ng-template>
         </ngb-tab>
 
-        <ngb-tab title="To" id="toTab">
+        <ngb-tab title="To ({{toIndex+1}})" id="toTab{{toIndex}}" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
             <ng-template ngbTabContent>
                 <jhi-alert-error></jhi-alert-error>
                 <div row id="tabBackground">
@@ -69,7 +69,7 @@
                             <tr>
                                 <th class="detailsTable">ID</th>
                                 <td class="detailsTable">
-                                    <a [routerLink]="['/to-endpoint', toEndpoint.id]">{{fromEndpoint.id}}</a>
+                                    <a [routerLink]="['/to-endpoint', toEndpoint.id]">{{toEndpoint.id}}</a>
                                 </td>
                             </tr>
                             <tr>
