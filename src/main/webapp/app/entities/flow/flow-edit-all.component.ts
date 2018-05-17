@@ -304,12 +304,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         const i = this.toEndpoints.indexOf(toEndpoint);
         this.toEndpoints.splice(i, 1);
         this.toEndpointsOptions.splice(i, 1);
-        if (typeof toEndpoint.id !== 'undefined') {
-            this.toEndpointService.delete(toEndpoint.id)
-                .subscribe((res) => {
-                    const t = res;
-                });
-        }
     }
 
     previousState() {
@@ -401,12 +395,35 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 toEndpoint.flowId = this.flow.id;
             })
 
-            const updateFlow = this.fromEndpointService.update(this.fromEndpoint);
-            const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint);
-            const updateErrorEndpoint = this.flowService.update(this.flow);
+            const updateFlow = this.flowService.update(this.flow);
+            const updateFromEndpoint = this.fromEndpointService.update(this.fromEndpoint);
+            const updateErrorEndpoint = this.errorEndpointService.update(this.errorEndpoint);
             const updateToEndpoints = this.toEndpointService.updateMultiple(this.toEndpoints);
 
             forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
+
+                const te: Array<ToEndpoint> = results[3];
+                this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
+                    toEndpoints = toEndpoints.filter((e) => {
+                        let s = te.find((t) => t.id === e.id);
+                        if (typeof s === 'undefined') {
+                            return true;
+                        } else {
+                            return s.id !== e.id;
+                        }
+                    });
+
+                    if (toEndpoints.length > 0) {
+                        toEndpoints.forEach((element) => {
+                            this.toEndpointService.delete(element.id).subscribe((r) => {
+                                const y = r;
+                            }, (err) => {
+                                const e = err;
+                            });
+                        });
+                    }
+                });
+
                 console.log('flow updated');
                 this.isSaving = false;
             });
