@@ -395,15 +395,35 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 toEndpoint.flowId = this.flow.id;
             })
 
-            const updateFlow = this.fromEndpointService.update(this.fromEndpoint)
-            const updateFromEndpoint = this.errorEndpointService.update(this.errorEndpoint)
-            const updateErrorEndpoint = this.flowService.update(this.flow)
-            const updateToEndpoint: Array<Observable<ToEndpoint>> = new Array<Observable<ToEndpoint>>();
-            this.toEndpoints.forEach((toEndpoint) => {
-                updateToEndpoint.push(this.toEndpointService.update(toEndpoint))
-            });
+            const updateFlow = this.flowService.update(this.flow);
+            const updateFromEndpoint = this.fromEndpointService.update(this.fromEndpoint);
+            const updateErrorEndpoint = this.errorEndpointService.update(this.errorEndpoint);
+            const updateToEndpoints = this.toEndpointService.updateMultiple(this.toEndpoints);
 
-            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint].concat(updateToEndpoint)).subscribe((results) => {
+            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
+
+                const te: Array<ToEndpoint> = results[3];
+                this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
+                    toEndpoints = toEndpoints.filter((e) => {
+                        let s = te.find((t) => t.id === e.id);
+                        if (typeof s === 'undefined') {
+                            return true;
+                        } else {
+                            return s.id !== e.id;
+                        }
+                    });
+
+                    if (toEndpoints.length > 0) {
+                        toEndpoints.forEach((element) => {
+                            this.toEndpointService.delete(element.id).subscribe((r) => {
+                                const y = r;
+                            }, (err) => {
+                                const e = err;
+                            });
+                        });
+                    }
+                });
+
                 console.log('flow updated');
                 this.isSaving = false;
             });
@@ -427,15 +447,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                             this.flow = flowUpdated;
                                             this.toEndpoints.forEach((toEndpoint) => {
                                                 toEndpoint.flowId = this.flow.id;
-                                                this.toEndpointService.create(toEndpoint)
-                                                    .subscribe((toRes) => {
-                                                        console.log('flow created');
-                                                        this.finished = true;
-                                                        this.isSaving = false;
-                                                    }, () => {
-                                                        this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
-                                                    });
                                             });
+                                            this.toEndpointService.createMultiple(this.toEndpoints)
+                                                .subscribe((toRes) => {
+                                                    console.log('flow created');
+                                                    this.finished = true;
+                                                    this.isSaving = false;
+                                                }, () => {
+                                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
+                                                });
                                         }, () => {
                                             this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
                                         });
