@@ -153,14 +153,12 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
-											<!-- <div *ngFor="let toEndpointOptions of toEndpointsOptions; index as in"> -->
-												<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx">
-													<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
-													<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
-													<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex])"><span class="fa fa-plus"></span></button>
-													<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption)" [disabled]="toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
-												</div>
-											<!-- </div> -->
+											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx">
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex])"><span class="fa fa-plus"></span></button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption)" [disabled]="toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
+											</div>
 										</div>
 										<div class="form-group" id="flowID2" [hidden]="!flowID2">
 											<label class="form-control-label">Flow</label>

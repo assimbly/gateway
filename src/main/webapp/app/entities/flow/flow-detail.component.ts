@@ -22,7 +22,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
     flow: Flow;
     gateway: Gateway;
     fromEndpoint: FromEndpoint;
-    toEndpoint: ToEndpoint;
+    toEndpoints: Array<ToEndpoint>;
     errorEndpoint: ErrorEndpoint;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -75,7 +75,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
         if (!id) { return; }
 
         this.toEndpointService.findByFlowId(id)
-            .subscribe((toEndpoints) => this.toEndpoint = toEndpoints[0]);
+            .subscribe((toEndpoints) => this.toEndpoints = toEndpoints);
     }
 
     getErrorEndpoint(id) {
