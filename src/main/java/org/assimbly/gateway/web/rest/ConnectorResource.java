@@ -7,12 +7,10 @@ import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.web.rest.util.AutostartUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -389,9 +387,9 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String lastError = connector.getFlowLastError(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowNumberOfMessages",lastError,lastError,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowLastError",lastError,lastError,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowNumberOfMessages","unable to get last error for flow " + flowId,"unable to get last error for flow " + flowId,flowId,e);
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowLastError","unable to get last error for flow " + flowId,"unable to get last error for flow " + flowId,flowId,e);
 		}
     }
     
@@ -483,7 +481,7 @@ public class ConnectorResource {
         }
 
 		//start flows with autostart
-       	List<Flow> flows = flowRepository.findAll();;
+       	List<Flow> flows = flowRepository.findAll();
 		
 		for(Flow flow : flows) {
        		if(flow.isAutoStart()) {

@@ -65,7 +65,8 @@ public class AssimblyDBConfiguration {
 	private String connectorId;
 	private String jsonConfiguration;
 
-
+	private List<String> servicesList;
+    private List<String> headersList;
 	
 	public List<TreeMap<String,String>> convertDBToConfiguration(Long gatewayid) throws Exception {
 
@@ -114,6 +115,29 @@ public class AssimblyDBConfiguration {
 		for(Flow flow : flows){
 			if(flow!=null) {
 				convertDBToXMLFlowConfiguration(flow);
+			}
+		}
+
+	   xmlConfiguration = convertDocToString(doc);
+
+		return xmlConfiguration;
+	}
+
+	public String convertDBToXMLConfiguration(Long gatewayId, Boolean autoStart) throws Exception {
+
+		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
+		connectorId = gatewayId.toString();
+		setGeneralPropertiesFromDB(connectorId);
+		
+		for(Flow flow : flows){
+			if(flow!=null && autoStart) {
+				if(flow.isAutoStart()) {
+				convertDBToXMLFlowConfiguration(flow);
+				}
+			}else if(flow!=null && !autoStart) {
+				if(!flow.isAutoStart()) {
+					convertDBToXMLFlowConfiguration(flow);
+				}
 			}
 		}
 
@@ -384,6 +408,9 @@ public class AssimblyDBConfiguration {
 	    rootElement.appendChild(flows);
 	    rootElement.appendChild(services);
 	    rootElement.appendChild(headers);
+	    
+	    servicesList = new ArrayList<String>();
+	    headersList = new ArrayList<String>();    
 		
 	}
 	
@@ -626,46 +653,52 @@ public class AssimblyDBConfiguration {
 	
 	private void setServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
 
-	    Element service = doc.createElement("service");
-	    services.appendChild(service);
+		if(!servicesList.contains(serviceid)) {
+			servicesList.add(serviceid);
 
-	    Element id = doc.createElement("id");
-	    id.appendChild(doc.createTextNode(serviceDB.getId().toString()));
-	    service.appendChild(id);
+		    Element service = doc.createElement("service");
+		    services.appendChild(service);
 
-	    Set<ServiceKeys> serviceKeys = serviceDB.getServiceKeys();
-	    
-		for(ServiceKeys serviceKey : serviceKeys) {
-			String parameterName = serviceKey.getKey();
-			String parameterValue = serviceKey.getValue();
-			  
-			Element serviceParameter = doc.createElement(parameterName);
-			serviceParameter.setTextContent(parameterValue);
-			service.appendChild(serviceParameter);
+		    Element id = doc.createElement("id");
+		    id.appendChild(doc.createTextNode(serviceDB.getId().toString()));
+		    service.appendChild(id);
+
+		    Set<ServiceKeys> serviceKeys = serviceDB.getServiceKeys();
+		    
+			for(ServiceKeys serviceKey : serviceKeys) {
+				String parameterName = serviceKey.getKey();
+				String parameterValue = serviceKey.getValue();
+				  
+				Element serviceParameter = doc.createElement(parameterName);
+				serviceParameter.setTextContent(parameterValue);
+				service.appendChild(serviceParameter);
+			}
 		}
-
-	    
 	}
 	
 	private void setHeaderFromDB(String headerid, String type, Header headerDB) throws Exception {
 
-	    Element header = doc.createElement("header");
-	    headers.appendChild(header);
+		if(!headersList.contains(headerid)) {
+			headersList.add(headerid);
 
-	    Element id = doc.createElement("id");
-	    id.appendChild(doc.createTextNode(headerDB.getId().toString()));
-	    header.appendChild(id);
+		    Element header = doc.createElement("header");
+		    headers.appendChild(header);
 
-	    Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
-	    
-	    
-		for(HeaderKeys headerKey : headerKeys) {
-			String parameterName = headerKey.getKey();
-			String parameterValue = headerKey.getValue();
-			  
-			Element headerParameter = doc.createElement(parameterName);
-			headerParameter.setTextContent(parameterValue);
-			header.appendChild(headerParameter);
+		    Element id = doc.createElement("id");
+		    id.appendChild(doc.createTextNode(headerDB.getId().toString()));
+		    header.appendChild(id);
+
+		    Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
+		    
+		    
+			for(HeaderKeys headerKey : headerKeys) {
+				String parameterName = headerKey.getKey();
+				String parameterValue = headerKey.getValue();
+				  
+				Element headerParameter = doc.createElement(parameterName);
+				headerParameter.setTextContent(parameterValue);
+				header.appendChild(headerParameter);
+			}
 		}
 	}
 	
