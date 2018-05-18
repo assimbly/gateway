@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
+import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 
 import io.github.jhipster.config.JHipsterProperties;
@@ -22,9 +23,13 @@ public class ProfileInfoResource {
 
     private final JHipsterProperties jHipsterProperties;
 
-    public ProfileInfoResource(Environment env, JHipsterProperties jHipsterProperties) {
+    private final ApplicationProperties.Documentation documentation;
+
+    
+    public ProfileInfoResource(Environment env, JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties) {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
+        this.documentation = applicationProperties.getDocumentation();
     }
 
     @GetMapping("/profile-info")
@@ -33,6 +38,15 @@ public class ProfileInfoResource {
         return new ProfileInfoVM(activeProfiles, getRibbonEnv(activeProfiles));
     }
 
+    @GetMapping("/documentation/url")
+    public String getUrl() {
+    	System.out.println("get property url");
+        String blabla = documentation.getCamelUrl();
+        System.out.println("result: " + blabla);
+        return blabla;
+    }
+    
+    
     private String getRibbonEnv(String[] activeProfiles) {
         String[] displayOnActiveProfiles = jHipsterProperties.getRibbon().getDisplayOnActiveProfiles();
         if (displayOnActiveProfiles == null) {
