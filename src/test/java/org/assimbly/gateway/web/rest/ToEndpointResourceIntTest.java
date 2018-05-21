@@ -109,7 +109,7 @@ public class ToEndpointResourceIntTest {
 
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
-        restToEndpointMockMvc.perform(post("/api/to-endpoints")
+        restToEndpointMockMvc.perform(post("/api/to-endpoint")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isCreated());
@@ -166,7 +166,7 @@ public class ToEndpointResourceIntTest {
         toEndpointRepository.saveAndFlush(toEndpoint);
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(get("/api/to-endpoints/{id}", toEndpoint.getId()))
+        restToEndpointMockMvc.perform(get("/api/to-endpoint/{id}", toEndpoint.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(toEndpoint.getId().intValue()))
@@ -200,7 +200,7 @@ public class ToEndpointResourceIntTest {
             .options(UPDATED_OPTIONS);
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(updatedToEndpoint);
 
-        restToEndpointMockMvc.perform(put("/api/to-endpoints")
+        restToEndpointMockMvc.perform(put("/api/to-endpoint")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isOk());
@@ -223,7 +223,7 @@ public class ToEndpointResourceIntTest {
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        restToEndpointMockMvc.perform(put("/api/to-endpoints")
+        restToEndpointMockMvc.perform(put("/api/to-endpoint")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isCreated());
@@ -241,7 +241,7 @@ public class ToEndpointResourceIntTest {
         int databaseSizeBeforeDelete = toEndpointRepository.findAll().size();
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(delete("/api/to-endpoints/{id}", toEndpoint.getId())
+        restToEndpointMockMvc.perform(delete("/api/to-endpoint/{id}", toEndpoint.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
