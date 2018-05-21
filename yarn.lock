@@ -5374,7 +5374,7 @@ ng-jhipster@0.3.6:
     "@ngx-translate/core" "^8.0.0"
     "@ngx-translate/http-loader" "^2.0.0"
 
-ngx-bootstrap@^2.0.5:
+ngx-bootstrap@2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/ngx-bootstrap/-/ngx-bootstrap-2.0.5.tgz#83aab39d1e4fe811fad2b34f7927f9ce19d68daa"
 
