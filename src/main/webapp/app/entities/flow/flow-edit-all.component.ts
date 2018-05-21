@@ -57,6 +57,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
     typesLinks: Array<TypeLinks>;
+    // wikiUrl: string;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -75,58 +76,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private router: Router
     ) {
         this.toEndpoints = [new ToEndpoint()];
-        this.typesLinks = [
-            {
-                name: 'ACTIVEMQ',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/activemq',
-                camelTypeLink: ''
-            },
-            {
-                name: 'FILE',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/file',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/camel-core/src/main/docs/file-component.adoc'
-            },
-            {
-                name: 'HTTP4',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/http4',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-http4/src/main/docs/http4-component.adoc'
-            },
-            {
-                name: 'KAFKA',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/kafka',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-kafka/src/main/docs/kafka-component.adoc'
-            },
-            {
-                name: 'SFTP',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sftp',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-ftp/src/main/docs/sftp-component.adoc'
-            },
-            {
-                name: 'SJMS',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sjms',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-sjms/src/main/docs/sjms-component.adoc'
-            },
-            {
-                name: 'SONICMQ',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sonicmq',
-                camelTypeLink: ''
-            },
-            {
-                name: 'SQL',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/sql',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-sql/src/main/docs/sql-component.adoc'
-            },
-            {
-                name: 'STREAM',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/stream',
-                camelTypeLink: 'https://github.com/apache/camel/blob/master/components/camel-stream/src/main/docs/stream-component.adoc'
-            },
-            {
-                name: 'WASTEBIN',
-                assimblyTypeLink: 'https://github.com/assimbly/gateway/wiki/components/wastebin',
-                camelTypeLink: ''
-            }
-        ]
     }
 
     ngOnInit() {
@@ -209,23 +158,93 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     setTypeLinks(endpoints: Array<any>) {
-        endpoints.forEach((endpoint) => {
-            let type;
-            if (endpoint instanceof FromEndpoint) {
-                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
-                this.fromTypeAssimblyLink = type.assimblyTypeLink;
-                this.fromTypeCamelLink = type.camelTypeLink;
-            } else if (endpoint instanceof ToEndpoint) {
-                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
-                this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
-                this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
-            } else if (endpoint instanceof ErrorEndpoint) {
-                type = this.typesLinks.find((x) => x.name === endpoint.type.toString());
-                this.errorTypeAssimblyLink = type.assimblyTypeLink;
-                this.errorTypeCamelLink = type.camelTypeLink;
-            }
+
+        const wikiDocUrl = this.flowService.getWikiDocUrl();
+        const camelDocUrl = this.flowService.getCamelDocUrl();
+
+        forkJoin([wikiDocUrl, camelDocUrl]).subscribe((results) => {
+
+            const wiki = results[0].text();
+            const camel = results[1].text();
+
+            const typesLinks = [
+                {
+                    name: 'ACTIVEMQ',
+                    assimblyTypeLink: `${wiki}/component-activemq`,
+                    camelTypeLink: ''
+                },
+                {
+                    name: 'FILE',
+                    assimblyTypeLink: `${wiki}/component-file`,
+                    camelTypeLink: `${camel}/camel-core/src/main/docs/file-component.adoc`
+                },
+                {
+                    name: 'HTTP4',
+                    assimblyTypeLink: `${wiki}/component-http4`,
+                    camelTypeLink: `${camel}/components/camel-http4/src/main/docs/http4-component.adoc`
+                },
+                {
+                    name: 'KAFKA',
+                    assimblyTypeLink: `${wiki}/component-kafka`,
+                    camelTypeLink: `${camel}/components/camel-kafka/src/main/docs/kafka-component.adoc`
+                },
+                {
+                    name: 'SFTP',
+                    assimblyTypeLink: `${wiki}/component-sftp`,
+                    camelTypeLink: `${camel}/components/camel-ftp/src/main/docs/sftp-component.adoc`
+                },
+                {
+                    name: 'SJMS',
+                    assimblyTypeLink: `${wiki}/component-sjms`,
+                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`
+                },
+                {
+                    name: 'SONICMQ',
+                    assimblyTypeLink: `${wiki}/component-sonicmq`,
+                    camelTypeLink: ''
+                },
+                {
+                    name: 'SQL',
+                    assimblyTypeLink: `${wiki}/component-sql`,
+                    camelTypeLink: `${camel}/components/camel-sql/src/main/docs/sql-component.adoc`
+                },
+                {
+                    name: 'STREAM',
+                    assimblyTypeLink: `${wiki}/component-stream`,
+                    camelTypeLink: `${camel}/components/camel-stream/src/main/docs/stream-component.adoc`
+                },
+                {
+                    name: 'WASTEBIN',
+                    assimblyTypeLink: `${wiki}/component-wastebin`,
+                    camelTypeLink: ''
+                }
+            ]
+
+            endpoints.forEach((endpoint) => {
+                let type;
+                if (endpoint instanceof FromEndpoint) {
+                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                    this.fromTypeAssimblyLink = type.assimblyTypeLink;
+                    this.fromTypeCamelLink = type.camelTypeLink;
+                } else if (endpoint instanceof ToEndpoint) {
+                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                    this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
+                    this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+                } else if (endpoint instanceof ErrorEndpoint) {
+                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                    this.errorTypeAssimblyLink = type.assimblyTypeLink;
+                    this.errorTypeCamelLink = type.camelTypeLink;
+                }
+            });
         });
     }
+
+    /*getWikiUrl() {
+        this.flowService.getWikiDocUrl()
+            .subscribe((url) => {
+                this.wikiUrl = url.text();
+            })
+    }*/
 
     getOptions(endpoints: Array<any>) {
         endpoints.forEach((endpoint, i) => {

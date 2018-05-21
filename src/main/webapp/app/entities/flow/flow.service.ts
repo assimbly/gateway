@@ -91,6 +91,14 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`);
     }
 
+    getWikiDocUrl() {
+        return this.http.get(`${SERVER_API_URL}/api/wiki-url`);
+    }
+
+    getCamelDocUrl() {
+        return this.http.get(`${SERVER_API_URL}/api/camel-url`)
+    }
+
     private convertResponse(res: Response): ResponseWrapper {
         const jsonResponse = res.json();
         const result = [];
