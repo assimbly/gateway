@@ -12,14 +12,14 @@
     </div>
     <ng-template #gatewayNotExists>
         <div class="row" *ngIf="multipleGateways; else oneGateway">
-            <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flow for gateway</label>
+            <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
             <select class="col-xl-4 col-md-4 col-sm-12 form-control" (change)="getFlowsForSelectedGateway($event.target.value)">
                 <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
             </select>
         </div>
         <ng-template #oneGateway>
             <div>
-                <span>Showing flow for gateway {{singleGatewayName}}</span>
+                <span>Showing flows for gateway <i>{{singleGatewayName}}</i></span>
             </div>
         </ng-template>
         <div class="row mt-3">
