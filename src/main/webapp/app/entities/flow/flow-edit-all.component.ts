@@ -35,6 +35,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
+    savingFlowSuccess = false;
+    savingFlowSuccessMessage = 'Flow successfully saved';
     finished: boolean;
     gateways: Gateway[];
     singleGateway = false;
@@ -171,7 +173,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'ACTIVEMQ',
                     assimblyTypeLink: `${wiki}/component-activemq`,
-                    camelTypeLink: ''
+                    camelTypeLink: `${camel}/components/camel-jms/src/main/docs/jms-component.adoc`
                 },
                 {
                     name: 'FILE',
@@ -201,7 +203,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'SONICMQ',
                     assimblyTypeLink: `${wiki}/component-sonicmq`,
-                    camelTypeLink: ''
+                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`
                 },
                 {
                     name: 'SQL',
@@ -216,7 +218,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'WASTEBIN',
                     assimblyTypeLink: `${wiki}/component-wastebin`,
-                    camelTypeLink: ''
+                    camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`
                 }
             ]
 
@@ -407,6 +409,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.isSaving = true;
         this.setOptions();
         this.savingFlowFailed = false;
+        this.savingFlowSuccess = false;
 
         if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
 
@@ -442,8 +445,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         });
                     }
                 });
-
-                console.log('flow updated');
+                this.savingFlowSuccess = true;
                 this.isSaving = false;
             });
         } else {
@@ -471,6 +473,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                 .subscribe((toRes) => {
                                                     console.log('flow created');
                                                     this.finished = true;
+                                                    this.savingFlowSuccess = true;
                                                     this.isSaving = false;
                                                 }, () => {
                                                     this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
@@ -490,9 +493,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
     }
 
-    goBack() {
-        window.history.back();
-    }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
         result.subscribe((res: Flow) =>
