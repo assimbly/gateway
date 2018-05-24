@@ -62,9 +62,13 @@
 											<div class="input-group">
 												<ng-select name="type" [items]="types" [(ngModel)]="fromEndpoint.type" id="field_from_type" (change)="setTypeLinks([fromEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint.type | lowercase}} component documentation">
-														<img src="../../../content/images/apache-camel.png"/>
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}"
+													 target="_blank" title="Assimbly {{fromEndpoint.type | lowercase}} component documentation">
+														<span class="fa fa-question"></span>
+													</a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}"
+													 target="_blank" title="Camel {{fromEndpoint.type | lowercase}} component documentation">
+														<img  src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
 											</div>
@@ -76,10 +80,17 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
 											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index">
-												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="fromOption.key" />
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="fromOption.value" />
-												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions)"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption)" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}"
+												 placeholder="key" [(ngModel)]="fromOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}"
+												 placeholder="value" [(ngModel)]="fromOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions)">
+													<span class="fa fa-plus"></span>
+												</button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption)"
+												 [disabled]="fromEndpointOptions.length === 1">
+													<span class="fa fa-remove"></span>
+												</button>
 											</div>
 										</div>
 										<div class="form-group">
@@ -87,17 +98,18 @@
 											<div class="input-group">
 												<ng-select name="service" [items]="services" bindLabel="name" bindValue="id" [(ngModel)]="fromEndpoint.serviceId" id="field_service"></ng-select>
 												<div class="input-group-append">
-													<button *ngIf="serviceCreated && fromEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+													<button *ngIf="serviceCreated && fromEndpoint.serviceId" class="btn btn-primary" title="Edit service"  (click)="createOrEditService(fromEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit service</span> -->
 													</button>
-													<button *ngIf="serviceCreated && !fromEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New service</span>
+													<button *ngIf="serviceCreated && !fromEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(fromEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp;
+														<span>New service</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button *ngIf="!serviceCreated" class="btn btn-primary" (click)="createOrEditService(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create service</span>
+													<button *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create service</span> -->
 													</button>
 												</div>
 											</div>
@@ -107,17 +119,18 @@
 											<div class="input-group">
 												<ng-select name="header" [items]="headers" bindLabel="name" bindValue="id" [(ngModel)]="fromEndpoint.headerId" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button *ngIf="headerCreated && fromEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+													<button *ngIf="headerCreated && fromEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(fromEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit header</span> -->
 													</button>
-													<button *ngIf="headerCreated && !fromEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New header</span>
+													<button *ngIf="headerCreated && !fromEndpoint.headerId" class="btn btn-primary" title="New header"  (click)="createOrEditHeader(fromEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp;
+														<span>New header</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button *ngIf="!headerCreated" class="btn btn-primary" (click)="createOrEditHeader(fromEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create header</span>
+													<button *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(fromEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>
@@ -140,9 +153,13 @@
 											<div class="input-group">
 												<ng-select name="type" [items]="types" [(ngModel)]="toEndpoint.type" id="field_to_type" (change)="setTypeLinks([toEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{toTypeAssimblyLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeAssimblyLinks[toIndex]}" target="_blank" title="Assimbly {{toEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Camel {{toEndpoint.type | lowercase}} component documentation">
-														<img src="../../../content/images/apache-camel.png"/>
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeAssimblyLinks[toIndex]}"
+													 target="_blank" title="Assimbly {{toEndpoint.type | lowercase}} component documentation">
+														<span class="fa fa-question"></span>
+													</a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}"
+													 target="_blank" title="Camel {{toEndpoint.type | lowercase}} component documentation">
+														<img src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
 											</div>
@@ -154,10 +171,17 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
 											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx">
-												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="toOption.key" />
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="toOption.value" />
-												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex])"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption)" [disabled]="toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}"
+												 placeholder="key" [(ngModel)]="toOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}"
+												 placeholder="value" [(ngModel)]="toOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex])">
+													<span class="fa fa-plus"></span>
+												</button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption)"
+												 [disabled]="toEndpointsOptions[toIndex].length === 1">
+													<span class="fa fa-remove"></span>
+												</button>
 											</div>
 										</div>
 										<div class="form-group" id="flowID2" [hidden]="!flowID2">
@@ -168,18 +192,20 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
 												<ng-select name="service" [items]="services" bindLabel="name" bindValue="id" [(ngModel)]="toEndpoint.serviceId" id="field_service"></ng-select>
+
 												<div class="input-group-append">
-													<button *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+													<button *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit service</span> -->
 													</button>
-													<button *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New service</span>
+													<button *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)">
+
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+														<!-- <span>New service</span> -->
 													</button>
-													<button *ngIf="!serviceCreated" class="btn btn-primary" (click)="createOrEditService(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create service</span>
+													<button *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(toEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create service</span> -->
 													</button>
 												</div>
 											</div>
@@ -189,30 +215,31 @@
 											<div class="input-group">
 												<ng-select name="header" [items]="headers" bindLabel="name" bindValue="id" [(ngModel)]="toEndpoint.headerId" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+													<button type="button" *ngIf="headerCreated && toEndpoint.headerId" title="Edit header" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
+														<span class="fa fa-pencil  padding-button"></span>&nbsp;
+														<!-- <span>Edit header</span> -->
 													</button>
-													<button type="button" *ngIf="headerCreated && !toEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New header</span>
+													<button type="button" *ngIf="headerCreated && !toEndpoint.headerId" class="btn btn-primary"title="New header" (click)="createOrEditHeader(toEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+														<!-- <span>New header</span> -->
 													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create header</span>
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(toEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>
 										</div>
 
-										<div class="btn-group" role="group">
+										<div class="text-right form-group" role="group">
 											<button type="button" class="btn btn-danger" (click)="removeToEndpoint(toEndpoint)" [disabled]="toEndpoints.length === 1">
 												<span class="fa fa-remove"></span>&nbsp;
-												<span>Remove ToEndpoint</span>
+												<span>Remove To endpoint</span>
 											</button>
 											<button type="button" class="btn btn-primary" (click)="addNewToEndpoint()" [disabled]="toEndpoints.length > 2">
 												<span class="fa fa-pencil"></span>&nbsp;
-												<span>Add New ToEndpoint</span>
+												<span>Add New To endpoint</span>
 											</button>
 										</div>
 									</div>
@@ -232,9 +259,13 @@
 											<div class="input-group">
 												<ng-select name="type" [items]="types" [(ngModel)]="errorEndpoint.type" id="field_error_type" (change)="setTypeLinks([errorEndpoint])"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-outline-secondary rounded-0" href="{{errorTypeAssimblyLink}}" [ngClass]="{'disabled': !errorTypeAssimblyLink}" target="_blank" title="Assimbly {{errorEndpoint.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Camel {{errorEndpoint.type | lowercase}} component documentation">
-														<img src="../../../content/images/apache-camel.png"/>
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{errorTypeAssimblyLink}}" [ngClass]="{'disabled': !errorTypeAssimblyLink}"
+													 target="_blank" title="Assimbly {{errorEndpoint.type | lowercase}} component documentation">
+														<span class="fa fa-question"></span>
+													</a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}"
+													 target="_blank" title="Camel {{errorEndpoint.type | lowercase}} component documentation">
+														<img src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
 											</div>
@@ -246,10 +277,17 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_options">Options</label>
 											<div class="row mx-0 mb-1" *ngFor="let errOption of errorEndpointOptions; let idx = index">
-												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}" placeholder="key" [(ngModel)]="errOption.key" />
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}" placeholder="value" [(ngModel)]="errOption.value" />
-												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions)"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption)" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
+												<input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" name="options-key-{{idx}}" id="field_options-key-{{idx}}"
+												 placeholder="key" [(ngModel)]="errOption.key" />
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" name="options-value-{{idx}}" id="field_options-value-{{idx}}"
+												 placeholder="value" [(ngModel)]="errOption.value" />
+												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions)">
+													<span class="fa fa-plus"></span>
+												</button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption)"
+												 [disabled]="errorEndpointOptions.length === 1">
+													<span class="fa fa-remove"></span>
+												</button>
 											</div>
 										</div>
 										<div class="form-group">
@@ -257,17 +295,18 @@
 											<div class="input-group">
 												<ng-select name="service" [items]="services" bindLabel="name" bindValue="id" [(ngModel)]="errorEndpoint.serviceId" id="field_service"></ng-select>
 												<div class="input-group-append">
-													<button *ngIf="serviceCreated && errorEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit service</span>
+													<button *ngIf="serviceCreated && errorEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(errorEndpoint)">
+															<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit service</span> -->
 													</button>
-													<button *ngIf="serviceCreated && !errorEndpoint.serviceId" class="btn btn-primary" (click)="createOrEditService(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New service</span>
+													<button *ngIf="serviceCreated && !errorEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(errorEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp;
+														<span>New service</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button *ngIf="!serviceCreated" class="btn btn-primary" (click)="createOrEditService(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create service</span>
+													<button *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(errorEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create service</span> -->
 													</button>
 												</div>
 											</div>
@@ -277,17 +316,18 @@
 											<div class="input-group">
 												<ng-select name="header" [items]="headers" bindLabel="name" bindValue="id" [(ngModel)]="errorEndpoint.headerId" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button *ngIf="headerCreated && errorEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Edit header</span>
+													<button *ngIf="headerCreated && errorEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(errorEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit header</span> -->
 													</button>
-													<button *ngIf="headerCreated && !errorEndpoint.headerId" class="btn btn-primary" (click)="createOrEditHeader(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>New header</span>
+													<button *ngIf="headerCreated && !errorEndpoint.headerId" class="btn btn-primary" title="New header" (click)="createOrEditHeader(errorEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
+														<!-- <span>New header</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button *ngIf="!headerCreated" class="btn btn-primary" (click)="createOrEditHeader(errorEndpoint)">
-														<span class="fa fa-pencil"></span>&nbsp;
-														<span>Create header</span>
+													<button *ngIf="!headerCreated" class="btn btn-primary" title="Create header"  (click)="createOrEditHeader(errorEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>
@@ -300,7 +340,7 @@
 				</div>
 
 				<div class="float-right">
-					<button type="button" class="btn btn-secondary" (click)="goBack()">
+					<button type="button" class="btn btn-secondary" [routerLink]="['/']">
 						<span class="fa fa-ban"></span>&nbsp;
 						<span>Cancel</span>
 					</button>
@@ -311,6 +351,9 @@
 				</div>
 				<div *ngIf="savingFlowFailed">
 					<span class="text-danger">*{{savingFlowFailedMessage}}</span>
+				</div>
+				<div *ngIf="savingFlowSuccess">
+					<span class="text-success">*{{savingFlowSuccessMessage}}</span>
 				</div>
 			</form>
 		</div>
