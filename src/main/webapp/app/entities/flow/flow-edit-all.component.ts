@@ -57,10 +57,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
+    fromUriPopoverMessage: string;
     toTypeAssimblyLinks: Array<string> = new Array<string>();
     toTypeCamelLinks: Array<string> = new Array<string>();
+    toUriPlaceholders: Array<string> = new Array<string>();
+    toUriPopoverMessages: Array<string> = new Array<string>();
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
+    errorUriPlaceholder: string;
+    errorUriPopoverMessage: string;
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
 
@@ -111,7 +116,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                 this.fromEndpoint = fromEndpoint;
                                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
                                 this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
-                                this.setTypeLinks(this.fromEndpoint);
+                                this.setTypeLinks(this.fromEndpoint, 0);
                                 this.finished = true;
                             }
                         });
@@ -123,7 +128,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.errorEndpoint = errorEndpoint;
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
                         this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
-                        this.setTypeLinks(this.errorEndpoint);
+                        this.setTypeLinks(this.errorEndpoint, 1);
                     });
                 }
 
@@ -135,7 +140,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         }
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
                         this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
-                        this.setTypeLinks(toEndpoint);
+                        this.setTypeLinks(toEndpoint, i + 2);
                     });
                 });
             });
@@ -178,7 +183,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    setTypeLinks(endpoint: any, e?: Event) {
+    setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
+
+        const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
 
         if (typeof e !== 'undefined') {
             endpoint.type = e;
@@ -196,61 +203,130 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     name: 'ACTIVEMQ',
                     assimblyTypeLink: `${wiki}/component-activemq`,
                     camelTypeLink: `${camel}/components/camel-jms/src/main/docs/jms-component.adoc`,
-                    uriPlaceholder: '[queue:|topic:]destinationName'
+                    uriPlaceholder: 'destinationType:destinationName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>destinationType</b><br/>
+                        <b>Description</b>: <b>Required</b> The kind of destination to use.<br/>
+                        <b>Default</b>: queue<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>destinationName</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of the queue or topic to use as destination.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'FILE',
                     assimblyTypeLink: `${wiki}/component-file`,
                     camelTypeLink: `${camel}/camel-core/src/main/docs/file-component.adoc`,
-                    uriPlaceholder: 'directoryName'
+                    uriPlaceholder: 'directoryName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>directoryName</b><br/>
+                        <b>Description</b>: <b>Required</b> The starting directory.<br/>
+                        <b>Type</b>: File
+                    `
                 },
                 {
                     name: 'HTTP4',
                     assimblyTypeLink: `${wiki}/component-http4`,
                     camelTypeLink: `${camel}/components/camel-http4/src/main/docs/http4-component.adoc`,
-                    uriPlaceholder: 'hostname[:port][/resourceUri]'
+                    uriPlaceholder: 'httpUri',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>httpUri</b><br/>
+                        <b>Description</b>: <b>Required</b> The url of the HTTP endpoint to call.<br/>
+                        <b>Type</b>: URI
+                    `
                 },
                 {
                     name: 'KAFKA',
                     assimblyTypeLink: `${wiki}/component-kafka`,
                     camelTypeLink: `${camel}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
-                    uriPlaceholder: 'topic'
+                    uriPlaceholder: 'topic',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>topic</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics. A producer can only send a message to a single topic.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SFTP',
                     assimblyTypeLink: `${wiki}/component-sftp`,
                     camelTypeLink: `${camel}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
-                    uriPlaceholder: 'host:port/directoryName'
+                    uriPlaceholder: 'host:port/directoryName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>host</b><br/>
+                        <b>Description</b>: <b>Required</b> Hostname of the FTP server.<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>port</b><br/>
+                        <b>Description</b>: Port of the FTP server.<br/>
+                        <b>Type</b>: int<br/>
+                        <br/>
+                        <b>Name</b>: <b>directoryName</b><br/>
+                        <b>Description</b>: The starting directory.<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                    `
                 },
                 {
                     name: 'SJMS',
                     assimblyTypeLink: `${wiki}/component-sjms`,
                     camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                    uriPlaceholder: '[queue:|topic:]destinationName'
+                    uriPlaceholder: 'destinationType:destinationName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>destinationType</b><br/>
+                        <b>Description</b>: The kind of destination to use.<br/>
+                        <b>Default</b>: queue<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>destinationName</b><br/>
+                        <b>Description</b>: <b>Required</b> DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SONICMQ',
                     assimblyTypeLink: `${wiki}/component-sonicmq`,
                     camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                    uriPlaceholder: '[queue:|topic:]destinationName'
+                    uriPlaceholder: 'query',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>query</b><br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SQL',
                     assimblyTypeLink: `${wiki}/component-sql`,
                     camelTypeLink: `${camel}/components/camel-sql/src/main/docs/sql-component.adoc`,
-                    uriPlaceholder: 'select * from table where id=# order by name'
+                    uriPlaceholder: 'query',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>query</b><br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'STREAM',
                     assimblyTypeLink: `${wiki}/component-stream`,
                     camelTypeLink: `${camel}/components/camel-stream/src/main/docs/stream-component.adoc`,
-                    uriPlaceholder: 'kind'
+                    uriPlaceholder: 'kind',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>kind</b><br/>
+                        <b>Description</b>: <b>Required</b> Kind of stream to use such as System.in or System.out.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'WASTEBIN',
                     assimblyTypeLink: `${wiki}/component-wastebin`,
                     camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`,
-                    uriPlaceholder: 'someName'
+                    uriPlaceholder: 'name',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>name</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of mock endpoint.<br/>
+                        <b>Type</b>: String
+                    `
                 }
             ]
 
@@ -260,14 +336,31 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.fromTypeAssimblyLink = type.assimblyTypeLink;
                 this.fromTypeCamelLink = type.camelTypeLink;
                 this.fromUriPlaceholder = type.uriPlaceholder;
+                this.fromUriPopoverMessage = type.uriPopoverMessage;
             } else if (endpoint instanceof ToEndpoint) {
                 type = typesLinks.find((x) => x.name === endpoint.type.toString());
                 this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
                 this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+                this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
+                this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
             } else if (endpoint instanceof ErrorEndpoint) {
                 type = typesLinks.find((x) => x.name === endpoint.type.toString());
                 this.errorTypeAssimblyLink = type.assimblyTypeLink;
                 this.errorTypeCamelLink = type.camelTypeLink;
+                this.errorUriPlaceholder = type.uriPlaceholder;
+                this.errorUriPopoverMessage = type.uriPopoverMessage;
+            }
+
+            endpointForm.patchValue({'type': type.name});
+
+            if (endpointForm.controls.type.value === 'WASTEBIN') {
+                endpointForm.controls.options.disable();
+                endpointForm.controls.service.disable();
+                endpointForm.controls.header.disable();
+            }else {
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
             }
         });
     }
@@ -297,8 +390,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     initializeOption(): FormGroup {
         return new FormGroup({
-            'key': new FormControl(null, Validators.required),
-            'value': new FormControl(null, Validators.required)
+            'key': new FormControl(null),
+            'value': new FormControl(null)
         })
     }
 
@@ -367,6 +460,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let formOptions = this.selectOptions(endpointIndex);
         formOptions.removeAt(index);
         options.splice(index, 1);
+    }
+
+    validateOptions(option: FormGroup) {
+        if (option.value.key || option.value.value) {
+            option.controls.key.setValidators([Validators.required]);
+            option.controls.value.setValidators([Validators.required]);
+        } else {
+            option.controls.key.clearValidators();
+            option.controls.value.clearValidators();
+        }
+        option.controls.key.updateValueAndValidity();
+        option.controls.value.updateValueAndValidity();
     }
 
     selectOptions(endpointIndex): FormArray {
