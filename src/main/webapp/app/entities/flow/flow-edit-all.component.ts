@@ -37,6 +37,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
+    savingFlowSuccess = false;
+    savingFlowSuccessMessage = 'Flow successfully saved';
     finished: boolean;
     gateways: Gateway[];
     singleGateway = false;
@@ -193,7 +195,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'ACTIVEMQ',
                     assimblyTypeLink: `${wiki}/component-activemq`,
-                    camelTypeLink: '',
+                    camelTypeLink: `${camel}/components/camel-jms/src/main/docs/jms-component.adoc`,
                     uriPlaceholder: '[queue:|topic:]destinationName'
                 },
                 {
@@ -229,7 +231,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'SONICMQ',
                     assimblyTypeLink: `${wiki}/component-sonicmq`,
-                    camelTypeLink: '',
+                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
                     uriPlaceholder: '[queue:|topic:]destinationName'
                 },
                 {
@@ -247,7 +249,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'WASTEBIN',
                     assimblyTypeLink: `${wiki}/component-wastebin`,
-                    camelTypeLink: '',
+                    camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`,
                     uriPlaceholder: 'someName'
                 }
             ]
@@ -471,6 +473,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.setDataFromForm();
         this.setOptions();
         this.savingFlowFailed = false;
+        this.savingFlowSuccess = false;
 
         if (!!this.fromEndpoint.id && !!this.errorEndpoint.id && !!this.flow.id) {
 
@@ -506,8 +509,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         });
                     }
                 });
-
-                console.log('flow updated');
+                this.savingFlowSuccess = true;
                 this.isSaving = false;
             });
         } else {
@@ -535,6 +537,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                 .subscribe((toRes) => {
                                                     console.log('flow created');
                                                     this.finished = true;
+                                                    this.savingFlowSuccess = true;
                                                     this.isSaving = false;
                                                 }, () => {
                                                     this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);

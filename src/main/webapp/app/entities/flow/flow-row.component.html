@@ -40,7 +40,7 @@
 </td>
 <td>
 	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
-	<p *ngIf="isFlowStatusOK; else error" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusTemplate">{{flowStatus}}</p>
+	<p>{{flowStatus}} <i *ngIf="isFlowStatusOK; else error" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
 	<ng-template #error>
 		<ng-template #errTemplate let-message="message">{{ flowStatusError }}</ng-template>
 		<p triggers="mouseenter:mouseleave" popoverTitle="Error" [popover]="errTemplate">{{flowStatusError.substring(0, 20)}}</p>
