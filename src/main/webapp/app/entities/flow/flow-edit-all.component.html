@@ -297,11 +297,15 @@
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" placeholder="value" formControlName="value"/>
 												<button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions, '1')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption, '1')" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
-												<div class="col-5 d-inline-block" *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.errors && (editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.dirty || editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.touched)">
-													<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.errors.required" class="invalid-field-message">Option key is required.</div>
+												<div class="col-5 d-inline-block px-0">
+													<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.errors && (editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.dirty || editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.touched)">
+														<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.key.errors.required" class="invalid-field-message">Option key is required.</div>
+													</div>
 												</div>
-												<div class="col-5 d-inline-block" *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.errors && (editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.dirty || editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.touched)">
-													<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.errors.required" class="invalid-field-message">Option value is required.</div>
+												<div class="col-5 d-inline-block px-0">
+													<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.errors && (editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.dirty || editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.touched)">
+														<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx].controls.value.errors.required" class="invalid-field-message">Option value is required.</div>
+													</div>
 												</div>
 											</div>
 										</div>
