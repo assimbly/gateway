@@ -52,6 +52,10 @@ input.ng-touched.ng-invalid:not(form)  {
     color: #dc3545;
 }
 
+.ng-select-disabled>.ng-select-container{
+    background-color: #e9ecef !important;
+}
+
 /* other generic styles */
 
 .jh-card {
