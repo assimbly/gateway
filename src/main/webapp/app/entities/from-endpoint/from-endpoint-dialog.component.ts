@@ -47,7 +47,9 @@ export class FromEndpointDialogComponent implements OnInit {
                     this.serviceService
                         .find(this.fromEndpoint.serviceId)
                         .subscribe((subRes: Service) => {
-                            this.services = [subRes].concat(res.json);
+                            res.json.some((s) => s.id === subRes.id) ?
+                                this.services = res.json :
+                                this.services = [subRes].concat(res.json);
                         }, (subRes: ResponseWrapper) => this.onError(subRes.json));
                 }
             }, (res: ResponseWrapper) => this.onError(res.json));
@@ -60,12 +62,13 @@ export class FromEndpointDialogComponent implements OnInit {
                     this.headerService
                         .find(this.fromEndpoint.headerId)
                         .subscribe((subRes: Header) => {
-                            this.headers = [subRes].concat(res.json);
+                            res.json.some((s) => s.id === subRes.id) ?
+                                this.headers = res.json :
+                                this.headers = [subRes].concat(res.json);
                         }, (subRes: ResponseWrapper) => this.onError(subRes.json));
                 }
             }, (res: ResponseWrapper) => this.onError(res.json));
     }
-
     clear() {
         this.activeModal.dismiss('cancel');
     }
