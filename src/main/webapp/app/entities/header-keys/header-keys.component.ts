@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
@@ -14,6 +14,7 @@ export class HeaderKeysComponent implements OnInit, OnDestroy {
 headerKeys: HeaderKeys[];
     currentAccount: any;
     eventSubscriber: Subscription;
+    @Input() headerId: number;
 
     constructor(
         private headerKeysService: HeaderKeysService,
@@ -37,6 +38,8 @@ headerKeys: HeaderKeys[];
             this.currentAccount = account;
         });
         this.registerChangeInHeaderKeys();
+        this.eventManager.subscribe('headerKeysUpdated', (response) => this.headerKeys = [response]);
+
     }
 
     ngOnDestroy() {

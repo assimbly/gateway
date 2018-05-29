@@ -4,11 +4,14 @@ import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
 
 import { Header } from './header.model';
+import { HeaderKeys } from '../header-keys/header-keys.model';
 import { HeaderPopupService } from './header-popup.service';
 import { HeaderService } from './header.service';
+import { ResponseWrapper } from '../../shared';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { HeaderKeysService } from '../header-keys';
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -17,17 +20,26 @@ import { HeaderService } from './header.service';
 export class HeaderDialogComponent implements OnInit {
 
     header: Header;
+    headers: Header[];
+    headerKeys: HeaderKeys;
     isSaving: boolean;
 
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
+        private headerKeysService: HeaderKeysService,
+        private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager
     ) {
     }
 
     ngOnInit() {
+        this.headerKeys = new HeaderKeys();
         this.isSaving = false;
+        this.headerService.query()
+            .subscribe((res: ResponseWrapper) => {
+            this.headers = res.json;
+            }, (res: ResponseWrapper) => this.onError(res.json));
     }
 
     clear() {
@@ -51,14 +63,28 @@ export class HeaderDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: Header) {
-        this.eventManager.broadcast({ name: 'headerListModification', content: 'OK'});
-        this.eventManager.broadcast({name: 'headerModified', content: result.id});
+        this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
+        this.eventManager.broadcast({ name: 'headerModified', content: result.id });
+        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
+        // this.eventManager.subscribe(
+        //     'headerKeysUpdated',
+        //     (res) => this.header.headerKeys.push(res)
+        // );
         this.isSaving = false;
+        this.headerKeys.headerId = result.id;
         this.activeModal.dismiss(result);
+        this.headerKeysService.create(this.headerKeys).subscribe((res) => {
+            const t = res;
+            console.log(res);
+            this.eventManager.broadcast({ name: 'headerKeysUpdated', content: res });
+        });
     }
 
     private onSaveError() {
         this.isSaving = false;
+    }
+    private onError(error: any) {
+        this.jhiAlertService.error(error.message, null, null);
     }
 }
 
@@ -73,11 +99,11 @@ export class HeaderPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private headerPopupService: HeaderPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.headerPopupService
                     .open(HeaderDialogComponent as Component, params['id']);
             } else {
