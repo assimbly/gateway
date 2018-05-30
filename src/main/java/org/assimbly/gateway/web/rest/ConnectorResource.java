@@ -485,7 +485,7 @@ public class ConnectorResource {
 		
 		for(Flow flow : flows) {
        		if(flow.isAutoStart()) {
-       			String configuration = assimblyDBConfiguration.convertDBToXMLFlowConfiguration(flow.getId());
+       			String configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application");
        			connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
 				connector.startFlow(flow.getId().toString());
        		}

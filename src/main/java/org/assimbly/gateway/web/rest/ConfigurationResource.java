@@ -1,12 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
-import io.github.jhipster.config.JHipsterProperties;
 import io.swagger.annotations.ApiParam;
 
 import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +19,10 @@ import java.net.URISyntaxException;
 @RequestMapping("/api")
 public class ConfigurationResource {
 
-	private String xmlconfiguration;
-
 	@Autowired
 	private AssimblyDBConfiguration assimblyDBConfiguration;
 
-	private String jsonconfiguration;
+	private String configuration;
     
 	/**
      * POST  /configuration/{connectorid}/setconfiguration : Set configuration from XML.
@@ -38,9 +34,10 @@ public class ConfigurationResource {
      */
     @PostMapping(path = "/configuration/{connectorId}/setconfiguration", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> setConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String xmlConfiguration) throws Exception {
+    public ResponseEntity<String> setConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String configuration) throws Exception {
 
-       	try {
+       	try {        	
+        	assimblyDBConfiguration.convertConfigurationToDB(connectorId, mediaType,configuration);
         	mediaType="text/plain";
         	return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setConfiguration","Connector configuration set (not supported yet)");
    		} catch (Exception e) {
@@ -61,20 +58,11 @@ public class ConfigurationResource {
     public ResponseEntity<String> getConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
 
        	try {
-			if(mediaType.equals("application/xml")) {
-				xmlconfiguration = assimblyDBConfiguration.convertDBToXMLConfiguration(connectorId);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",xmlconfiguration,true);
-			}else if(mediaType.equals("application/json")){
-				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONConfiguration(connectorId);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
-			}else {
-				//return json until ini is supported
-				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONConfiguration(connectorId);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
-			}
+			configuration = assimblyDBConfiguration.convertDBToConfiguration(connectorId, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",configuration,true);
        		
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration",xmlconfiguration,e);
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration",configuration,e);
    		}
 
     }    
@@ -89,9 +77,11 @@ public class ConfigurationResource {
      */
     @PostMapping(path = "/configuration/{connectorId}/setflowconfiguration/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String xmlConfiguration) throws Exception {
+    public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String configuration) throws Exception {
 
        	try {
+       		assimblyDBConfiguration.convertFlowConfigurationToDB(connectorId, id,mediaType,configuration);
+       		mediaType="text/plain";
 			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set (not supported yet)");
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
@@ -110,17 +100,8 @@ public class ConfigurationResource {
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
        	try {
-			if(mediaType.equals("application/xml")) {
-				xmlconfiguration = assimblyDBConfiguration.convertDBToXMLFlowConfiguration(id);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",xmlconfiguration,true);
-			}else if(mediaType.equals("application/json")){
-				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONFlowConfiguration(id);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
-			}else {
-				//return json until ini is supported
-				jsonconfiguration = assimblyDBConfiguration.convertDBToJSONFlowConfiguration(id);
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",jsonconfiguration,true);
-			}
+			configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(id, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration",configuration,true);
 			
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration get",e);

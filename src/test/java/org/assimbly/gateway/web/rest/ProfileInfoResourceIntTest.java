@@ -48,7 +48,7 @@ public class ProfileInfoResourceIntTest {
         when(environment.getDefaultProfiles()).thenReturn(activeProfiles);
         when(environment.getActiveProfiles()).thenReturn(activeProfiles);
 
-        ProfileInfoResource profileInfoResource = new ProfileInfoResource(environment, jHipsterProperties);
+        ProfileInfoResource profileInfoResource = new ProfileInfoResource(environment, jHipsterProperties, null);
         this.restProfileMockMvc = MockMvcBuilders
             .standaloneSetup(profileInfoResource)
             .build();
