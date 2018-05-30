@@ -36,6 +36,8 @@ export class FlowRowComponent implements OnInit {
     toEndpointTooltip: string;
     errorEndpointTooltip: string;
 
+    intervalTime: any;
+
     constructor(
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
@@ -108,39 +110,46 @@ export class FlowRowComponent implements OnInit {
 
     setFlowStatistic(res) {
         const r = res.json();
+        clearInterval(this.intervalTime);
         if (r === 0) {
             this.flowStatistic = `Currently there is no statistic for this flow.`;
         } else {
             this.flowStartTime = r.stats.startTimestamp;
-            setInterval(() => {
+            this.intervalTime = setInterval(() => {
                 const now = moment(new Date());
                 const start = moment(this.flowStartTime);
                 const flowRuningTime = moment.duration(now.diff(start));
                 const hours = Math.floor(flowRuningTime.asHours());
                 const minutes = flowRuningTime.minutes();
                 this.flowStatistic = `
-                    Start time: ${moment(r.stats.startTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
-                    Running: ${hours} hours ${minutes} minute <br/>
+                    Start time: ${this.checkDate(r.stats.startTimestamp)}<br/>
+                    Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
                     <br/>
-                    <b>Processing time:</b><br/>
+                    <b>Processing time</b><br/>
                     Last: ${r.stats.lastProcessingTime} ms<br/>
                     Min: ${r.stats.minProcessingTime} ms<br/>
                     Max: ${r.stats.maxProcessingTime} ms<br/>
                     Avarage: ${r.stats.meanProcessingTime} ms<br/>
                     <br/>
-                    <b>Completed:</b><br/>
+                    <b>Completed</b><br/>
                     Number of messages: ${r.stats.exchangesCompleted}<br/>
-                    First: ${moment(r.stats.firstExchangeCompletedTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
-                    Last: ${moment(r.stats.lastExchangeCompletedTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
+                    First: ${this.checkDate(r.stats.firstExchangeCompletedTimestamp)}<br/>
+                    Last: ${this.checkDate(r.stats.lastExchangeCompletedTimestamp)}<br/>
                     <br/>
                     <b>Failures</b><br/>
                     Number of messages: ${r.stats.exchangesFailed}<br/>
-                    First: ${moment(r.stats.firstExchangeFailureTimestamp).format('YYYY-MM-DD HH:mm:ss')}<br/>
-                    Last: ${moment(r.stats.lastExchangeFailureTimestamp).format('YYYY-MM-DD HH:mm:ss')}
+                    First: ${this.checkDate(r.stats.firstExchangeFailureTimestamp)}<br/>
+                    Last: ${this.checkDate(r.stats.lastExchangeFailureTimestamp)}
                 `;
             }, 1000);
         }
     }
+    checkDate(r) {
+    if (r === '1970-01-01T00:59:59.999+0100') {
+        return  '-'
+    }else {
+        return moment(r).format('YYYY-MM-DD HH:mm:ss');
+    } }
 
     flowConfigurationNotObtained(id) {
         this.isFlowStatusOK = false;
@@ -173,7 +182,7 @@ export class FlowRowComponent implements OnInit {
 
     endpointTooltip(type, uri, options): string {
         if (type === null) { return };
-        const opt = options === null ? '' : `?${options}`;
+        const opt = options === '' ? '' : `?${options}`;
         return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
