@@ -24,7 +24,7 @@ import {
 } from './';
 import { FlowRowComponent } from './flow-row.component';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
 
 const ENTITY_STATES = [
     ...flowRoute,
@@ -41,6 +41,7 @@ const ENTITY_STATES = [
         NgbModule,
         NgSelectModule,
         FormsModule,
+        ReactiveFormsModule,
         PopoverModule.forRoot()
     ],
     exports: [
