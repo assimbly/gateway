@@ -9,48 +9,71 @@ import { ResponseWrapper, createRequestOption } from '../../shared';
 @Injectable()
 export class ToEndpointService {
 
-    private resourceUrl =  SERVER_API_URL + 'api/to-endpoints';
+    private resourceUrlToEndpoint =  SERVER_API_URL + 'api/to-endpoint';
+    private resourceUrlToEndpoints =  SERVER_API_URL + 'api/to-endpoints';
 
     constructor(private http: Http) { }
 
     create(toEndpoint: ToEndpoint): Observable<ToEndpoint> {
         const copy = this.convert(toEndpoint);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
+        return this.http.post(this.resourceUrlToEndpoint, copy).map((res: Response) => {
             const jsonResponse = res.json();
             return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
+    createMultiple(toEndpoints: Array<ToEndpoint>): Observable<Array<ToEndpoint>> {
+        const copy = new Array<ToEndpoint>();
+        toEndpoints.forEach((toEndpoint) => {
+            copy.push(this.convert(toEndpoint))
+        });
+        return this.http.post(this.resourceUrlToEndpoints, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemsFromServer(jsonResponse);
         });
     }
 
     update(toEndpoint: ToEndpoint): Observable<ToEndpoint> {
         const copy = this.convert(toEndpoint);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
+        return this.http.put(this.resourceUrlToEndpoint, copy).map((res: Response) => {
             const jsonResponse = res.json();
             return this.convertItemFromServer(jsonResponse);
+        });
+    }
+
+    updateMultiple(toEndpoints: Array<ToEndpoint>): Observable<Array<ToEndpoint>> {
+        const copy = new Array<ToEndpoint>();
+        toEndpoints.forEach((toEndpoint) => {
+            copy.push(this.convert(toEndpoint))
+        });
+        return this.http.put(this.resourceUrlToEndpoints, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemsFromServer(jsonResponse);
         });
     }
 
     find(id: number): Observable<ToEndpoint> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
+        return this.http.get(`${this.resourceUrlToEndpoint}/${id}`).map((res: Response) => {
             const jsonResponse = res.json();
             return this.convertItemFromServer(jsonResponse);
         });
     }
 
-    findByFlowId(id: number): Observable<ToEndpoint> {
-        return this.http.get(`${this.resourceUrl}/byflowid/${id}`).map((res: Response) => {
+    findByFlowId(id: number): Observable<Array<ToEndpoint>> {
+        return this.http.get(`${this.resourceUrlToEndpoints}/byflowid/${id}`).map((res: Response) => {
             const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
+            return this.convertItemsFromServer(jsonResponse);
         });
     }
 
     query(req?: any): Observable<ResponseWrapper> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
+        return this.http.get(this.resourceUrlToEndpoint, options)
             .map((res: Response) => this.convertResponse(res));
     }
 
     delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
+        return this.http.delete(`${this.resourceUrlToEndpoint}/${id}`);
     }
 
     private convertResponse(res: Response): ResponseWrapper {
@@ -68,6 +91,17 @@ export class ToEndpointService {
     private convertItemFromServer(json: any): ToEndpoint {
         const entity: ToEndpoint = Object.assign(new ToEndpoint(), json);
         return entity;
+    }
+
+    /**
+	 * Convert a returned JSON object to Array<ToEndpoint>.
+	 */
+    private convertItemsFromServer(json: any): Array<ToEndpoint> {
+        const entities: Array<ToEndpoint> = new Array<ToEndpoint>();
+        json.forEach((element) => {
+            entities.push(Object.assign(new ToEndpoint(), element));
+        });
+        return entities;
     }
 
     /**

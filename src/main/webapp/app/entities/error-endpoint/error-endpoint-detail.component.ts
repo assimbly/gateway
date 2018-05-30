@@ -5,6 +5,8 @@ import { JhiEventManager } from 'ng-jhipster';
 
 import { ErrorEndpoint } from './error-endpoint.model';
 import { ErrorEndpointService } from './error-endpoint.service';
+import { HeaderService } from '../header/header.service';
+import { ServiceService } from '../service/service.service';
 
 @Component({
     selector: 'jhi-error-endpoint-detail',
@@ -15,10 +17,14 @@ export class ErrorEndpointDetailComponent implements OnInit, OnDestroy {
     errorEndpoint: ErrorEndpoint;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
+    public headerName: string;
+    public serviceName: string;
 
     constructor(
         private eventManager: JhiEventManager,
         private errorEndpointService: ErrorEndpointService,
+        private headerService: HeaderService,
+        private serviceService: ServiceService,
         private route: ActivatedRoute
     ) {
     }
@@ -33,6 +39,16 @@ export class ErrorEndpointDetailComponent implements OnInit, OnDestroy {
     load(id) {
         this.errorEndpointService.find(id).subscribe((errorEndpoint) => {
             this.errorEndpoint = errorEndpoint;
+
+            this.headerService.find(this.errorEndpoint.headerId)
+                .subscribe((header) => {
+                    this.headerName = header.name;
+                });
+
+            this.serviceService.find(this.errorEndpoint.serviceId)
+                .subscribe((service) => {
+                    this.serviceName = service.name;
+                });
         });
     }
     previousState() {
