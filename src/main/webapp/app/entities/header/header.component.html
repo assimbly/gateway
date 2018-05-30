@@ -1,26 +1,25 @@
 <div>
-	<div>
-    <h2>
-        <span>Headers</span>
-        			<button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/', { outlets: { popup: ['header-new'] } }]">
-	            <span class="fa fa-plus"></span>
-	            <span >
-	            Create new Header
-	            </span>
-	        </button>	        
-    		<br/>   
-    		<br/>     
-       		<div class="form-group">
-	            <select class="form-control" id="field_header" name="header" >
-	              <option *ngFor="let header of headers; trackBy: trackId">{{header.name}}</option>
-	            </select>
-	        </div>
-	    </div>
-    </h2>
+    <div>
+        <h2>
+            <span>Headers</span>
+        </h2>
+        <button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/', { outlets: { popup: ['header-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span>Create new Header</span>
+        </button>
+        <br/>
+        <br/>
+        <div class="form-group">
+            <select class="form-control" id="field_header" name="header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)">
+                <option *ngFor="let header of headers; trackBy: trackId" [ngValue]="header.id">{{header.name}}</option>
+            </select>
+        </div>
+    </div>
+
     <jhi-alert></jhi-alert>
     <br/>
-  
-       <!--    -->
+
+    <!--    -->
     <!-- <div class="table-responsive" *ngIf="headers">
         <table class="table table-striped">
             <thead>
@@ -66,4 +65,4 @@
     </div> -->
 </div>
 
-<jhi-header-keys [headerId]="headers[0].id">Loading header keys...</jhi-header-keys>
+<jhi-header-keys [headerKeys]="headerKeys">Loading header keys...</jhi-header-keys>
