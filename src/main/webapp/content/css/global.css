@@ -35,12 +35,25 @@ Generic styles
 ========================================================================== */
 
 /* Error highlight on input fields */
-.ng-valid[required], .ng-valid.required  {
-  border-left: 5px solid green;
+input.ng-valid[required], .ng-valid.required  {
+  border: 1px solid green;
 }
 
-.ng-invalid:not(form)  {
-  border-left: 5px solid red;
+.ng-touched.ng-invalid>.ng-select-container,
+input.ng-touched.ng-invalid:not(form)  {
+  border: 1px solid red;
+}
+
+.invalid-field-message{
+    display: block;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #dc3545;
+}
+
+.ng-select-disabled>.ng-select-container{
+    background-color: #e9ecef !important;
 }
 
 /* other generic styles */
@@ -213,6 +226,9 @@ custom assimbly css
 ========================================================================== */
 #fromTab.active,
 #toTab.active,
+#toTab0.active,
+#toTab1.active,
+#toTab2.active,
 #errorTab.active {
   background-color: crimson;
   border-color: white;
@@ -221,6 +237,9 @@ custom assimbly css
 
 #fromTab,
 #toTab,
+#toTab0,
+#toTab1,
+#toTab2,
 #errorTab {
   background-color: grey;
   border-color: white;
@@ -278,10 +297,32 @@ custom assimbly css
     vertical-align: text-bottom;
 }
 
+.popover {
+    max-width: 100%;
+}
+
 @media (min-width: 768px){
     .flow-btns .btn{
         width: 80px
     }
 }
 
+.bg-gray{
+    background-color: #dee2e6
+}
+
+.h-20{
+    height: 20px;
+}
+.padding-button{
+    padding-left: 11px;
+    padding-right: 10px;
+}
+.p-button-camel{
+    padding: 5px 7px !important;
+}
+.p-question-button{
+    padding-left: 25px;
+    padding-right: 28px;
+}
 /* jhipster-needle-css-add-main JHipster will add new css style */

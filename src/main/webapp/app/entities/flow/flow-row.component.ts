@@ -27,13 +27,16 @@ export class FlowRowComponent implements OnInit {
     public isFlowRestarted = true;
 
     public flowStatus: string;
-    public flowStatusToolTip: string;
     public flowStatusError: string;
     public isFlowStatusOK: boolean;
+    public flowStatistic: string;
+    public flowStartTime: any;
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
     errorEndpointTooltip: string;
+
+    intervalTime: any;
 
     constructor(
         private flowService: FlowService,
@@ -47,11 +50,11 @@ export class FlowRowComponent implements OnInit {
     ngOnInit() {
         this.isFlowStatusOK = true;
         this.flowStatus = 'Stopped';
-        this.flowStatusToolTip = '';
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.getToEndpointByFlowId(this.flow.id);
         this.getErrorEndpoint(this.flow.errorEndpointId);
         this.getFlowStatus(this.flow.id);
+        this.getFlowStats(this.flow.id);
     }
 
     getFlowStatus(id: number) {
@@ -61,6 +64,7 @@ export class FlowRowComponent implements OnInit {
     }
 
     setFlowStatus(status: string): void {
+        this.getFlowStats(this.flow.id);
         switch (status) {
             case 'unconfigured':
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
@@ -98,6 +102,55 @@ export class FlowRowComponent implements OnInit {
         }
     }
 
+    getFlowStats(id: number) {
+        this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe((res) => {
+            this.setFlowStatistic(res);
+        })
+    }
+
+    setFlowStatistic(res) {
+        const r = res.json();
+        clearInterval(this.intervalTime);
+        if (r === 0) {
+            this.flowStatistic = `Currently there is no statistic for this flow.`;
+        } else {
+            this.flowStartTime = r.stats.startTimestamp;
+            this.intervalTime = setInterval(() => {
+                const now = moment(new Date());
+                const start = moment(this.flowStartTime);
+                const flowRuningTime = moment.duration(now.diff(start));
+                const hours = Math.floor(flowRuningTime.asHours());
+                const minutes = flowRuningTime.minutes();
+                this.flowStatistic = `
+                    Start time: ${this.checkDate(r.stats.startTimestamp)}<br/>
+                    Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
+                    <br/>
+                    <b>Processing time</b><br/>
+                    Last: ${r.stats.lastProcessingTime} ms<br/>
+                    Min: ${r.stats.minProcessingTime} ms<br/>
+                    Max: ${r.stats.maxProcessingTime} ms<br/>
+                    Avarage: ${r.stats.meanProcessingTime} ms<br/>
+                    <br/>
+                    <b>Completed</b><br/>
+                    Number of messages: ${r.stats.exchangesCompleted}<br/>
+                    First: ${this.checkDate(r.stats.firstExchangeCompletedTimestamp)}<br/>
+                    Last: ${this.checkDate(r.stats.lastExchangeCompletedTimestamp)}<br/>
+                    <br/>
+                    <b>Failures</b><br/>
+                    Number of messages: ${r.stats.exchangesFailed}<br/>
+                    First: ${this.checkDate(r.stats.firstExchangeFailureTimestamp)}<br/>
+                    Last: ${this.checkDate(r.stats.lastExchangeFailureTimestamp)}
+                `;
+            }, 1000);
+        }
+    }
+    checkDate(r) {
+    if (r === '1970-01-01T00:59:59.999+0100') {
+        return  '-'
+    }else {
+        return moment(r).format('YYYY-MM-DD HH:mm:ss');
+    } }
+
     flowConfigurationNotObtained(id) {
         this.isFlowStatusOK = false;
         this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
@@ -129,7 +182,7 @@ export class FlowRowComponent implements OnInit {
 
     endpointTooltip(type, uri, options): string {
         if (type === null) { return };
-        const opt = options === null ? '' : `?${options}`;
+        const opt = options === '' ? '' : `?${options}`;
         return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
@@ -150,7 +203,6 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.start(id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('started');
-                                this.flowStatusToolTip = 'Started at ' + this.curentDateTime();
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
@@ -168,7 +220,6 @@ export class FlowRowComponent implements OnInit {
         this.flowService.pause(id).subscribe((response) => {
             if (response.status === 200) {
                 this.setFlowStatus('suspended');
-                this.flowStatusToolTip = 'Paused at ' + this.curentDateTime();
             }
         }, (err) => {
             this.isFlowStatusOK = false;
@@ -189,7 +240,6 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.resume(id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('resumed');
-                                this.flowStatusToolTip = 'Resumed at ' + this.curentDateTime();
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
@@ -214,7 +264,6 @@ export class FlowRowComponent implements OnInit {
                         this.flowService.restart(id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('restarted');
-                                this.flowStatusToolTip = 'Restarted at ' + this.curentDateTime();
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
@@ -232,7 +281,6 @@ export class FlowRowComponent implements OnInit {
         this.flowService.stop(id).subscribe((response) => {
             if (response.status === 200) {
                 this.setFlowStatus('stopped');
-                this.flowStatusToolTip = 'Stopped at ' + this.curentDateTime();
             }
         }, (err) => {
             this.isFlowStatusOK = false;
