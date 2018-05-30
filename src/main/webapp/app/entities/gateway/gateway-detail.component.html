@@ -1,55 +1,61 @@
-<div *ngIf="gateway">
-    <h2><span>Gateway</span> {{gateway.id}}</h2>
+<div *ngIf="gateway" class="container">
+    <h2>
+        <span>Gateway</span> {{gateway.id}}
+    </h2>
     <hr>
     <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Name</span></dt>
-        <dd>
-            <span>{{gateway.name}}</span>
-        </dd>
-        <dt><span>Type</span></dt>
-        <dd>
-            <span>{{gateway.type}}</span>
-        </dd>
-        <dt><span>Environment Name</span></dt>
-        <dd>
-            <span>{{gateway.environmentName}}</span>
-        </dd>
-        <dt><span>Stage</span></dt>
-        <dd>
-            <span>{{gateway.stage}}</span>
-        </dd>
-        <dt>
-            <span>Default From Endpoint</span>
-        </dt>
-        <dd>
-            <span>{{gateway.defaultFromEndpointType}}</span>
-        </dd>
-        <dt>
-            <span>Default To Endpoint</span>
-        </dt>
-        <dd>
-            <span>{{gateway.defaultToEndpointType}}</span>
-        </dd>
-        <dt>
-            <span>Default Error Endpoint</span>
-        </dt>
-        <dd>
-            <span>{{gateway.defaultErrorEndpointType}}</span>
-        </dd>
-    </dl>
-
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
-
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th class="bg-gray" colspan="2">
+                    <span class="text-center">
+                        <i>{{gateway.name}}</i>
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <span class="font-weight-bold">Type:</span>
+                </td>
+                <td>{{gateway.type}}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="font-weight-bold">Environment Name:</span>
+                </td>
+                <td>{{gateway.environmentName}}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="font-weight-bold">Stage:</span>
+                </td>
+                <td>{{gateway.stage}}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="font-weight-bold">Default To Endpoint:</span>
+                </td>
+                <td>{{gateway.defaultToEndpointType}}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="font-weight-bold">Default Error Endpoint:</span>
+                </td>
+                <td>{{gateway.defaultErrorEndpointType}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="d-block pull-right">
+        <button type="submit" (click)="previousState()" class="btn btn-info btn-sm">
+            <span class="fa fa-arrow-left"></span>&nbsp;
+            <span> Back</span>
+        </button>
+        <button type="button" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+            class="btn btn-primary btn-sm">
+            <span class="fa fa-pencil"></span>&nbsp;
+            <span> Edit</span>
+        </button>
+    </div>
 </div>

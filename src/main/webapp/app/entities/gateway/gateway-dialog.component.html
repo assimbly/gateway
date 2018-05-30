@@ -8,29 +8,29 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
         <div class="form-group" [hidden]="!gateway.id">
-            <label for="id">ID</label>
+            <label for="id" class="font-weight-bold">ID</label>
             <input type="text" class="form-control" id="id" name="id"
                    [(ngModel)]="gateway.id" readonly />
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_name">Name</label>
+            <label class="form-control-label font-weight-bold" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name"
                 [(ngModel)]="gateway.name" />
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_type">Type</label>
+            <label class="form-control-label font-weight-bold" for="field_type">Type</label>
             <select class="form-control" name="type" [(ngModel)]="gateway.type" id="field_type" >
                 <option value="ADAPTER">ADAPTER</option>
                 <option value="BROKER">BROKER</option>
             </select>
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_environmentName">Environment Name</label>
+            <label class="form-control-label font-weight-bold" for="field_environmentName">Environment Name</label>
             <input type="text" class="form-control" name="environmentName" id="field_environmentName"
                 [(ngModel)]="gateway.environmentName" />
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_stage">Stage</label>
+            <label class="form-control-label font-weight-bold" for="field_stage">Stage</label>
             <select class="form-control" name="stage" [(ngModel)]="gateway.stage" id="field_stage" >
                 <option value="DEVELOPMENT">DEVELOPMENT</option>
                 <option value="TEST">TEST</option>
@@ -39,7 +39,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_defaultFromEndpointType">Default From Endpoint</label>
+            <label class="form-control-label font-weight-bold" for="field_defaultFromEndpointType">Default From Endpoint</label>
             <select class="form-control" name="type"  name="defaultFromEndpointType" id="field_defaultFromEndpointType" [(ngModel)]="gateway.defaultFromEndpointType">
                 <option value="SONICMQ">SONICMQ</option>
                 <option value="ACTIVEMQ">ACTIVEMQ</option>
@@ -54,7 +54,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_defaultToEndpointType">Default To Endpoint</label>
+            <label class="form-control-label font-weight-bold" for="field_defaultToEndpointType">Default To Endpoint</label>
             <select class="form-control" name="type"  name="defaultToEndpointType" id="field_defaultToEndpointType" [(ngModel)]="gateway.defaultToEndpointType">
                 <option value="SONICMQ">SONICMQ</option>
                 <option value="ACTIVEMQ">ACTIVEMQ</option>
@@ -69,7 +69,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label class="form-control-label" for="field_defaultErrorEndpointType">Default Error Endpoint</label>
+            <label class="form-control-label font-weight-bold" for="field_defaultErrorEndpointType">Default Error Endpoint</label>
             <select class="form-control" name="type" name="defaultErrorEndpointType" id="field_defaultErrorEndpointType" [(ngModel)]="gateway.defaultErrorEndpointType" >
                 <option value="SONICMQ">SONICMQ</option>
                 <option value="ACTIVEMQ">ACTIVEMQ</option>
