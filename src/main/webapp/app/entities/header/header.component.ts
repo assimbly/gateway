@@ -16,12 +16,15 @@ import { Principal, ResponseWrapper } from '../../shared';
 })
 
 export class HeaderComponent implements OnInit, OnDestroy {
-headers: Header[];
+    headers: Header[];
     currentAccount: any;
     eventSubscriber: Subscription;
+    headerKeys: Array<HeaderKeys>
+    selectedHeaderId: number;
 
     constructor(
         private headerService: HeaderService,
+        private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private principal: Principal
@@ -32,6 +35,8 @@ headers: Header[];
         this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.headers = res.json;
+                this.selectedHeaderId = this.headers[0].id;
+                this.filterHeaderKeys(this.headers[0].id);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
@@ -48,11 +53,26 @@ headers: Header[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+    filterHeaderKeys(id) {
+        this.headerKeysService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.headerKeys = res.json;
+                this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
+    }
+
     trackId(index: number, item: Header) {
         return item.id;
     }
     registerChangeInHeaders() {
         this.eventSubscriber = this.eventManager.subscribe('headerListModification', (response) => this.loadAll());
+    }
+
+    selectOption(e) {
+        // this.eventManager.broadcast({ name: 'headerSelected', content: this.selectedHeaderId });
+        this.filterHeaderKeys(this.selectedHeaderId);
     }
 
     private onError(error) {
