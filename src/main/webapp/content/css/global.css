@@ -293,6 +293,11 @@ custom assimbly css
         width: 80px
     }
 }
+
+.bg-gray{
+    background-color: #dee2e6
+}
+
 .h-20{
     height: 20px;
 }
