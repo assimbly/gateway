@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { SERVER_API_URL } from '../../app.constants';
 
@@ -59,8 +59,17 @@ export class FlowService {
         return this.http.get(`${this.configurationUrl}/${this.gatewayid}/getflowconfiguration/${id}`);
     }
 
-    setConfiguration(id: number, xmlconfiguration: string): Observable<Response> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+
+    setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<Response> {
+        if (!!header) {
+            let headers = new Headers();
+            headers.append('Accept', header);
+            let options = new RequestOptions();
+            options.headers = headers;
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
+        }else {
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+        }
     }
 
     start(id: number): Observable<Response> {

@@ -244,7 +244,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'topic',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>topic</b><br/>
-                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics. A producer can only send a message to a single topic.<br/>
+                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics.
+                         A producer can only send a message to a single topic.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -291,7 +292,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'query',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>query</b><br/>
-                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -302,7 +304,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'query',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>query</b><br/>
-                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -596,7 +599,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 const te: Array<ToEndpoint> = results[3];
                 this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
                     toEndpoints = toEndpoints.filter((e) => {
-                        let s = te.find((t) => t.id === e.id);
+                        const s = te.find((t) => t.id === e.id);
                         if (typeof s === 'undefined') {
                             return true;
                         } else {
