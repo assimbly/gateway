@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
@@ -43,7 +44,8 @@ const ENTITY_STATES = [
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
-        PopoverModule.forRoot()
+        PopoverModule.forRoot(),
+        AceEditorModule
     ],
     exports: [
         FlowComponent
