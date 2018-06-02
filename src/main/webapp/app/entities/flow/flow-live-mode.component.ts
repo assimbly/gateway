@@ -10,16 +10,11 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class FlowLiveModeComponent implements OnInit {
 
     public xmlEditor: string;
-    public configId: number;
+    public flowId: number;
     public liveModeForm: FormGroup;
     public configuration: any;
     public isConfigurationSet: boolean;
-
-    public isFlowStarted = false;
-    public isFlowPaused = false;
-    public isFlowResumed = true;
-    public isFlowStopped = true;
-    public isFlowRestarted = true;
+    public configuredFlows: Array<ConfiguredFlow> = [];
 
     constructor(
         private flowService: FlowService
@@ -32,97 +27,111 @@ export class FlowLiveModeComponent implements OnInit {
 
     initializeLiveModeForm() {
         this.liveModeForm = new FormGroup({
-            'xmlEditor': new FormControl(this.xmlEditor),
-            'configId': new FormControl(this.configId)
+            'flowId': new FormControl(this.flowId)
         });
     }
 
     setLiveConfiguration() {
-        this.configId = this.liveModeForm.controls.configId.value;
-        this.xmlEditor = this.liveModeForm.controls.xmlEditor.value;
-        this.flowService.setConfiguration(this.configId, this.xmlEditor, 'application/xml')
-            // .map((response) => response.text())
+        this.flowId = this.liveModeForm.controls.flowId.value;
+        this.flowService.setConfiguration(this.flowId, this.xmlEditor, 'application/xml')
+            .map((response) => response.text())
             .subscribe((config) => {
                 this.configuration = config;
                 this.isConfigurationSet = true;
-            }, (err) => {
-                let io = err;
+
+                let configuredFlow = new ConfiguredFlow();
+                configuredFlow.flowId = this.flowId;
+                configuredFlow.isFlowStarted = false;
+                configuredFlow.isFlowPaused = false;
+                configuredFlow.isFlowResumed = true;
+                configuredFlow.isFlowStopped = true;
+                configuredFlow.isFlowRestarted = true;
+                this.configuredFlows.push(configuredFlow);
             });
     }
 
-    start() {
-        this.flowService.start(this.configId).subscribe((response) => {
+    start(configuredFlow: ConfiguredFlow) {
+        this.flowService.start(configuredFlow.flowId).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('started');
+                this.setFlowStatus('started', configuredFlow);
             }
         }, (err) => {
         });
     }
 
-    pause() {
-        this.flowService.pause(this.configId).subscribe((response) => {
+    pause(configuredFlow: ConfiguredFlow) {
+        this.flowService.pause(configuredFlow.flowId).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('suspended');
+                this.setFlowStatus('suspended', configuredFlow);
             }
         }, (err) => {
         });
     }
 
-    resume() {
-        this.flowService.resume(this.configId).subscribe((response) => {
+    resume(configuredFlow: ConfiguredFlow) {
+        this.flowService.resume(configuredFlow.flowId).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('resumed');
+                this.setFlowStatus('resumed', configuredFlow);
             }
         }, (err) => {
         });
     }
 
-    restart() {
-        this.flowService.restart(this.configId).subscribe((response) => {
+    restart(configuredFlow: ConfiguredFlow) {
+        this.flowService.restart(configuredFlow.flowId).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('restarted');
+                this.setFlowStatus('restarted', configuredFlow);
             }
         }, (err) => {
         });
     }
 
-    stop() {
-        this.flowService.stop(this.configId).subscribe((response) => {
+    stop(configuredFlow: ConfiguredFlow) {
+        this.flowService.stop(configuredFlow.flowId).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('stopped');
+                this.setFlowStatus('stopped', configuredFlow);
             }
         }, (err) => {
         });
     }
 
-    setFlowStatus(status: string): void {
+    setFlowStatus(status: string, configuredFlow: ConfiguredFlow): void {
         switch (status) {
             case 'unconfigured':
-                this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
+                configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = configuredFlow.isFlowResumed = true;
+                configuredFlow.isFlowStarted = configuredFlow.isFlowPaused = !configuredFlow.isFlowStopped;
                 break;
             case 'started':
-                this.isFlowStarted = this.isFlowResumed = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowStarted;
+                configuredFlow.isFlowStarted = configuredFlow.isFlowResumed = true;
+                configuredFlow.isFlowPaused = configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = !configuredFlow.isFlowStarted;
                 break;
             case 'suspended':
-                this.isFlowPaused = this.isFlowStarted = true;
-                this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = !this.isFlowPaused;
+                configuredFlow.isFlowPaused = configuredFlow.isFlowStarted = true;
+                configuredFlow.isFlowResumed = configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = !configuredFlow.isFlowPaused;
                 break;
             case 'restarted':
-                this.isFlowResumed = this.isFlowStarted = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
+                configuredFlow.isFlowResumed = configuredFlow.isFlowStarted = true;
+                configuredFlow.isFlowPaused = configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = !configuredFlow.isFlowResumed;
                 break;
             case 'resumed':
-                this.isFlowResumed = this.isFlowStarted = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
+                configuredFlow.isFlowResumed = configuredFlow.isFlowStarted = true;
+                configuredFlow.isFlowPaused = configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = !configuredFlow.isFlowResumed;
                 break;
             case 'stopped':
-                this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
+                configuredFlow.isFlowStopped = configuredFlow.isFlowRestarted = configuredFlow.isFlowResumed = true;
+                configuredFlow.isFlowStarted = configuredFlow.isFlowPaused = !configuredFlow.isFlowStopped;
                 break;
             default:
                 break;
         }
     }
+}
+
+export class ConfiguredFlow {
+    flowId: number;
+    isFlowStarted: boolean;
+    isFlowPaused: boolean;
+    isFlowResumed: boolean;
+    isFlowStopped: boolean;
+    isFlowRestarted: boolean;
 }
