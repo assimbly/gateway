@@ -103,44 +103,46 @@ export class FlowRowComponent implements OnInit {
     }
 
     getFlowStats(id: number) {
-        this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe((res) => {
-            this.setFlowStatistic(res);
-        })
+        this.flowService.getFlowStats(id, this.flow.gatewayId)
+            .map((response) => response.json())
+            .subscribe((res) => {
+                this.setFlowStatistic(res, id);
+            });
     }
 
-    setFlowStatistic(res) {
-        const r = res.json();
+    setFlowStatistic(r, id: number) {
         clearInterval(this.intervalTime);
         if (r === 0) {
             this.flowStatistic = `Currently there is no statistic for this flow.`;
         } else {
-            this.flowStartTime = r.stats.startTimestamp;
             this.intervalTime = setInterval(() => {
-                const now = moment(new Date());
-                const start = moment(this.flowStartTime);
-                const flowRuningTime = moment.duration(now.diff(start));
-                const hours = Math.floor(flowRuningTime.asHours());
-                const minutes = flowRuningTime.minutes();
-                this.flowStatistic = `
-                    Start time: ${this.checkDate(r.stats.startTimestamp)}<br/>
-                    Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
-                    <br/>
-                    <b>Processing time</b><br/>
-                    Last: ${r.stats.lastProcessingTime} ms<br/>
-                    Min: ${r.stats.minProcessingTime} ms<br/>
-                    Max: ${r.stats.maxProcessingTime} ms<br/>
-                    Avarage: ${r.stats.meanProcessingTime} ms<br/>
-                    <br/>
-                    <b>Completed</b><br/>
-                    Number of messages: ${r.stats.exchangesCompleted}<br/>
-                    First: ${this.checkDate(r.stats.firstExchangeCompletedTimestamp)}<br/>
-                    Last: ${this.checkDate(r.stats.lastExchangeCompletedTimestamp)}<br/>
-                    <br/>
-                    <b>Failures</b><br/>
-                    Number of messages: ${r.stats.exchangesFailed}<br/>
-                    First: ${this.checkDate(r.stats.firstExchangeFailureTimestamp)}<br/>
-                    Last: ${this.checkDate(r.stats.lastExchangeFailureTimestamp)}
-                `;
+                this.flowService.getFlowStats(id, this.flow.gatewayId).map((response) => response.json()).subscribe((res) => {
+                    const now = moment(new Date());
+                    const start = moment(res.stats.startTimestamp);
+                    const flowRuningTime = moment.duration(now.diff(start));
+                    const hours = Math.floor(flowRuningTime.asHours());
+                    const minutes = flowRuningTime.minutes();
+                    this.flowStatistic = `
+                        Start time: ${this.checkDate(res.stats.startTimestamp)}<br/>
+                        Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
+                        <br/>
+                        <b>Processing time</b><br/>
+                        Last: ${res.stats.lastProcessingTime} ms<br/>
+                        Min: ${res.stats.minProcessingTime} ms<br/>
+                        Max: ${res.stats.maxProcessingTime} ms<br/>
+                        Avarage: ${res.stats.meanProcessingTime} ms<br/>
+                        <br/>
+                        <b>Completed</b><br/>
+                        Number of messages: ${res.stats.exchangesCompleted}<br/>
+                        First: ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
+                        Last: ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/>
+                        <br/>
+                        <b>Failures</b><br/>
+                        Number of messages: ${res.stats.exchangesFailed}<br/>
+                        First: ${this.checkDate(res.stats.firstExchangeFailureTimestamp)}<br/>
+                        Last: ${this.checkDate(res.stats.lastExchangeFailureTimestamp)}
+                    `;
+                });
             }, 1000);
         }
     }
