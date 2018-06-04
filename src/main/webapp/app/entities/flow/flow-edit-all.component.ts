@@ -16,6 +16,8 @@ import { ErrorEndpointComponent, ErrorEndpointService, ErrorEndpoint } from '../
 import { Gateway, GatewayService } from '../gateway';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
+import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormatWidth } from '@angular/common';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -25,10 +27,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     flow: Flow;
     fromEndpoint: FromEndpoint;
-    fromEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
-    toEndpointsOptions: Array<Array<Option>> = new Array<Array<Option>>([{key: '', value: ''}]);
+    fromEndpointOptions: Array<Option> = [];
+    toEndpointsOptions: Array<Array<Option>> = [[]];
     errorEndpoint: ErrorEndpoint;
-    errorEndpointOptions: Array<Option> = new Array<Option>({key: '', value: ''});
+    errorEndpointOptions: Array<Option> = [];
     toEndpoints: ToEndpoint[] = new Array<ToEndpoint>();
     services: Service[];
     headers: Header[];
@@ -54,12 +56,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     types = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
+    fromUriPlaceholder: string;
+    fromUriPopoverMessage: string;
     toTypeAssimblyLinks: Array<string> = new Array<string>();
     toTypeCamelLinks: Array<string> = new Array<string>();
+    toUriPlaceholders: Array<string> = new Array<string>();
+    toUriPopoverMessages: Array<string> = new Array<string>();
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
+    errorUriPlaceholder: string;
+    errorUriPopoverMessage: string;
     typesLinks: Array<TypeLinks>;
-    // wikiUrl: string;
+    editFlowForm: FormGroup;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -101,12 +109,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.flowService.find(id).subscribe((flow) => {
                 if (flow) {
                     this.flow = flow;
+                    this.initializeForm(this.flow);
                     if (this.flow.fromEndpointId) {
                         this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
-                                this.getOptions([this.fromEndpoint]);
-                                this.setTypeLinks([this.fromEndpoint])
+                                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                                this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
+                                this.setTypeLinks(this.fromEndpoint, 0);
                                 this.finished = true;
                             }
                         });
@@ -116,24 +126,38 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 if (this.flow.errorEndpointId) {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
-                        this.getOptions([this.errorEndpoint]);
-                        this.setTypeLinks([this.errorEndpoint]);
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                        this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
+                        this.setTypeLinks(this.errorEndpoint, 1);
                     });
                 }
 
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
                     this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
-                    this.getOptions(this.toEndpoints);
-                    this.setTypeLinks(this.toEndpoints);
+                    this.toEndpoints.forEach((toEndpoint, i) => {
+                        if (typeof this.toEndpointsOptions[i] === 'undefined') {
+                            this.toEndpointsOptions.push([]);
+                        }
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
+                        this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
+                        this.setTypeLinks(toEndpoint, i + 2);
+                    });
                 });
             });
         } else if (!this.finished) {
             setTimeout(() => {
                 this.flow = new Flow();
                 this.flow.autoStart = false;
+                this.initializeForm(this.flow);
                 this.fromEndpoint = new FromEndpoint();
-                this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                this.fromEndpointOptions = [new Option()];
                 this.errorEndpoint = new ErrorEndpoint();
+                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                this.errorEndpointOptions = [new Option()];
+                this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
+                this.toEndpointsOptions = [[new Option()]];
                 this.finished = true;
             }, 0);
         }
@@ -159,8 +183,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    setTypeLinks(endpoints: Array<any>) {
+    setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
 
+        const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
+
+        if (typeof e !== 'undefined') {
+            endpoint.type = e;
+        }
         const wikiDocUrl = this.flowService.getWikiDocUrl();
         const camelDocUrl = this.flowService.getCamelDocUrl();
 
@@ -173,158 +202,300 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'ACTIVEMQ',
                     assimblyTypeLink: `${wiki}/component-activemq`,
-                    camelTypeLink: `${camel}/components/camel-jms/src/main/docs/jms-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-jms/src/main/docs/jms-component.adoc`,
+                    uriPlaceholder: 'destinationType:destinationName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>destinationType</b><br/>
+                        <b>Description</b>: <b>Required</b> The kind of destination to use.<br/>
+                        <b>Default</b>: queue<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>destinationName</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of the queue or topic to use as destination.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'FILE',
                     assimblyTypeLink: `${wiki}/component-file`,
-                    camelTypeLink: `${camel}/camel-core/src/main/docs/file-component.adoc`
+                    camelTypeLink: `${camel}/camel-core/src/main/docs/file-component.adoc`,
+                    uriPlaceholder: 'directoryName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>directoryName</b><br/>
+                        <b>Description</b>: <b>Required</b> The starting directory.<br/>
+                        <b>Type</b>: File
+                    `
                 },
                 {
                     name: 'HTTP4',
                     assimblyTypeLink: `${wiki}/component-http4`,
-                    camelTypeLink: `${camel}/components/camel-http4/src/main/docs/http4-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-http4/src/main/docs/http4-component.adoc`,
+                    uriPlaceholder: 'httpUri',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>httpUri</b><br/>
+                        <b>Description</b>: <b>Required</b> The url of the HTTP endpoint to call.<br/>
+                        <b>Type</b>: URI
+                    `
                 },
                 {
                     name: 'KAFKA',
                     assimblyTypeLink: `${wiki}/component-kafka`,
-                    camelTypeLink: `${camel}/components/camel-kafka/src/main/docs/kafka-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
+                    uriPlaceholder: 'topic',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>topic</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics.
+                         A producer can only send a message to a single topic.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SFTP',
                     assimblyTypeLink: `${wiki}/component-sftp`,
-                    camelTypeLink: `${camel}/components/camel-ftp/src/main/docs/sftp-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
+                    uriPlaceholder: 'host:port/directoryName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>host</b><br/>
+                        <b>Description</b>: <b>Required</b> Hostname of the FTP server.<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>port</b><br/>
+                        <b>Description</b>: Port of the FTP server.<br/>
+                        <b>Type</b>: int<br/>
+                        <br/>
+                        <b>Name</b>: <b>directoryName</b><br/>
+                        <b>Description</b>: The starting directory.<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                    `
                 },
                 {
                     name: 'SJMS',
                     assimblyTypeLink: `${wiki}/component-sjms`,
-                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
+                    uriPlaceholder: 'destinationType:destinationName',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>destinationType</b><br/>
+                        <b>Description</b>: The kind of destination to use.<br/>
+                        <b>Default</b>: queue<br/>
+                        <b>Type</b>: String<br/>
+                        <br/>
+                        <b>Name</b>: <b>destinationName</b><br/>
+                        <b>Description</b>: <b>Required</b> DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SONICMQ',
                     assimblyTypeLink: `${wiki}/component-sonicmq`,
-                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
+                    uriPlaceholder: 'query',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>query</b><br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'SQL',
                     assimblyTypeLink: `${wiki}/component-sql`,
-                    camelTypeLink: `${camel}/components/camel-sql/src/main/docs/sql-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-sql/src/main/docs/sql-component.adoc`,
+                    uriPlaceholder: 'query',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>query</b><br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'STREAM',
                     assimblyTypeLink: `${wiki}/component-stream`,
-                    camelTypeLink: `${camel}/components/camel-stream/src/main/docs/stream-component.adoc`
+                    camelTypeLink: `${camel}/components/camel-stream/src/main/docs/stream-component.adoc`,
+                    uriPlaceholder: 'kind',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>kind</b><br/>
+                        <b>Description</b>: <b>Required</b> Kind of stream to use such as System.in or System.out.<br/>
+                        <b>Type</b>: String
+                    `
                 },
                 {
                     name: 'WASTEBIN',
                     assimblyTypeLink: `${wiki}/component-wastebin`,
-                    camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`
+                    camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`,
+                    uriPlaceholder: 'name',
+                    uriPopoverMessage: `
+                        <b>Name</b>: <b>name</b><br/>
+                        <b>Description</b>: <b>Required</b> Name of mock endpoint.<br/>
+                        <b>Type</b>: String
+                    `
                 }
             ]
 
-            endpoints.forEach((endpoint) => {
-                let type;
-                if (endpoint instanceof FromEndpoint) {
-                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
-                    this.fromTypeAssimblyLink = type.assimblyTypeLink;
-                    this.fromTypeCamelLink = type.camelTypeLink;
-                } else if (endpoint instanceof ToEndpoint) {
-                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
-                    this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
-                    this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
-                } else if (endpoint instanceof ErrorEndpoint) {
-                    type = typesLinks.find((x) => x.name === endpoint.type.toString());
-                    this.errorTypeAssimblyLink = type.assimblyTypeLink;
-                    this.errorTypeCamelLink = type.camelTypeLink;
-                }
-            });
+            let type;
+            if (endpoint instanceof FromEndpoint) {
+                type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.fromTypeAssimblyLink = type.assimblyTypeLink;
+                this.fromTypeCamelLink = type.camelTypeLink;
+                this.fromUriPlaceholder = type.uriPlaceholder;
+                this.fromUriPopoverMessage = type.uriPopoverMessage;
+            } else if (endpoint instanceof ToEndpoint) {
+                type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
+                this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+                this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
+                this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
+            } else if (endpoint instanceof ErrorEndpoint) {
+                type = typesLinks.find((x) => x.name === endpoint.type.toString());
+                this.errorTypeAssimblyLink = type.assimblyTypeLink;
+                this.errorTypeCamelLink = type.camelTypeLink;
+                this.errorUriPlaceholder = type.uriPlaceholder;
+                this.errorUriPopoverMessage = type.uriPopoverMessage;
+            }
+
+            endpointForm.patchValue({'type': type.name});
+
+            if (endpointForm.controls.type.value === 'WASTEBIN') {
+                endpointForm.controls.options.disable();
+                endpointForm.controls.service.disable();
+                endpointForm.controls.header.disable();
+            }else {
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
+            }
         });
     }
 
-    /*getWikiUrl() {
-        this.flowService.getWikiDocUrl()
-            .subscribe((url) => {
-                this.wikiUrl = url.text();
-            })
-    }*/
+    initializeForm(flow: Flow) {
+        this.editFlowForm = new FormGroup({
+            'id': new FormControl(flow.id),
+            'name': new FormControl(flow.name, Validators.required),
+            'autoStart': new FormControl(flow.autoStart),
+            'gateway': new FormControl(flow.gatewayId),
+            'endpointsData': new FormArray([])
+        });
+    }
 
-    getOptions(endpoints: Array<any>) {
-        endpoints.forEach((endpoint, i) => {
-            if (endpoint.options === null) { return; }
-            const options = endpoint.options.split('&');
+    initializeEndpointData(endpoint?: any): FormGroup {
+        return new FormGroup({
+            'id': new FormControl(endpoint.id),
+            'type': new FormControl(endpoint.type, Validators.required),
+            'uri': new FormControl(endpoint.uri, Validators.required),
+            'options': new FormArray([
+                this.initializeOption()
+            ]),
+            'service': new FormControl(endpoint.serviceId),
+            'header': new FormControl(endpoint.headerId)
+        })
+    }
 
-            if (endpoint instanceof FromEndpoint) {
-                this.fromEndpointOptions = new Array<Option>();
-            } else if (endpoint instanceof ToEndpoint) {
-                this.toEndpointsOptions[i] = new Array<Option>();
-            } else if (endpoint instanceof ErrorEndpoint) {
-                this.errorEndpointOptions = new Array<Option>();
+    initializeOption(): FormGroup {
+        return new FormGroup({
+            'key': new FormControl(null),
+            'value': new FormControl(null)
+        })
+    }
+
+    getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
+        if (endpoint.options === null) { return; }
+        const options = endpoint.options.split('&');
+
+        options.forEach((option, index) => {
+            const kv = option.split('=');
+            const o = new Option();
+            o.key = kv[0];
+            o.value = kv[1];
+            if (typeof endpointForm.controls.options.controls[index] === 'undefined') {
+                endpointForm.controls.options.push(
+                    this.initializeOption()
+                )
             }
 
-            options.forEach((option) => {
-                const kv = option.split('=');
-                const o = new Option();
-                o.key = kv[0];
-                o.value = kv[1];
-                if (endpoint instanceof FromEndpoint) {
-                    this.fromEndpointOptions.push(o);
-                } else if (endpoint instanceof ToEndpoint) {
-                    this.toEndpointsOptions[i].push(o);
-                } else if (endpoint instanceof ErrorEndpoint) {
-                    this.errorEndpointOptions.push(o);
-                }
-            });
+            endpointForm.controls.options.controls[index].patchValue({
+                'key': o.key,
+                'value': o.value
+            })
+
+            if (endpoint instanceof FromEndpoint) {
+                endpointOptions.push(o);
+            } else if (endpoint instanceof ToEndpoint) {
+                endpointOptions.push(o);
+            } else if (endpoint instanceof ErrorEndpoint) {
+                endpointOptions.push(o);
+            }
         });
     }
 
     setOptions() {
-        let fromIndex = 0;
         this.fromEndpoint.options = '';
-        this.fromEndpointOptions.forEach((fromOption) => {
-             if (fromOption.key && fromOption.value) {
-                this.fromEndpoint.options += fromIndex > 0 ? `&${fromOption.key}=${fromOption.value}` : `${fromOption.key}=${fromOption.value}`;
-                fromIndex++;
-             }
-        });
+        this.setEndpointOptions(this.fromEndpointOptions, this.fromEndpoint, this.selectOptions(0));
 
         this.toEndpoints.forEach((toEndpoint, i) => {
-            let toIndex = 0;
             toEndpoint.options = '';
-            this.toEndpointsOptions[i].forEach((toOption) => {
-                if (toOption.key && toOption.value) {
-                    toEndpoint.options += toIndex > 0 ? `&${toOption.key}=${toOption.value}` : `${toOption.key}=${toOption.value}`;
-                    toIndex++;
-                }
-            });
+            this.setEndpointOptions(this.toEndpointsOptions[i], toEndpoint, this.selectOptions(i + 2));
         });
 
-        let errIndex = 0;
         this.errorEndpoint.options = '';
-        this.errorEndpointOptions.forEach((errOption) => {
-             if (errOption.key && errOption.value) {
-                this.errorEndpoint.options += errIndex > 0 ? `&${errOption.key}=${errOption.value}` : `${errOption.key}=${errOption.value}`;
-                errIndex++;
-             }
+        this.setEndpointOptions(this.errorEndpointOptions, this.errorEndpoint, this.selectOptions(1));
+    }
+
+    setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
+        let index = 0;
+        endpointOptions.forEach((option, i) => {
+            option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
+            option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
+            if (option.key && option.value) {
+                endpoint.options += index > 0 ? `&${option.key}=${option.value}` : `${option.key}=${option.value}`;
+                index++;
+            }
         });
     }
 
-    addOption(options: Array<Option>) {
-        options.push({key: '', value: ''});
+    addOption(options: Array<Option>, endpointIndex) {
+        this.selectOptions(endpointIndex).push(this.initializeOption());
+        options.push(new Option());
     }
 
-    removeOption(options: Array<Option>, option: Option) {
-        options.splice(options.indexOf(option), 1);
+    removeOption(options: Array<Option>, option: Option, endpointIndex) {
+        const index = options.indexOf(option);
+        let formOptions = this.selectOptions(endpointIndex);
+        formOptions.removeAt(index);
+        options.splice(index, 1);
+    }
+
+    validateOptions(option: FormGroup) {
+        if (option.value.key || option.value.value) {
+            option.controls.key.setValidators([Validators.required]);
+            option.controls.value.setValidators([Validators.required]);
+        } else {
+            option.controls.key.clearValidators();
+            option.controls.value.clearValidators();
+        }
+        option.controls.key.updateValueAndValidity();
+        option.controls.value.updateValueAndValidity();
+    }
+
+    selectOptions(endpointIndex): FormArray {
+        const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointIndex];
+        return (<FormArray>(<FormGroup>endpointData).controls.options);
     }
 
     addNewToEndpoint() {
         this.toEndpoints.push(new ToEndpoint());
-        this.toEndpointsOptions.push(new Array<Option>({key: '', value: ''}));
+        this.toEndpointsOptions.push([new Option()]);
+
+        const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
+        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
     }
 
-    removeToEndpoint(toEndpoint) {
+    removeToEndpoint(toEndpoint, endpointDataName) {
         const i = this.toEndpoints.indexOf(toEndpoint);
         this.toEndpoints.splice(i, 1);
         this.toEndpointsOptions.splice(i, 1);
+        this.editFlowForm.removeControl(endpointDataName);
+        (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i + 2);
     }
 
     previousState() {
@@ -407,11 +578,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     save() {
         this.isSaving = true;
+        this.setDataFromForm();
         this.setOptions();
         this.savingFlowFailed = false;
         this.savingFlowSuccess = false;
 
-        if (this.fromEndpoint.id !== undefined && this.errorEndpoint.id !== undefined && this.flow.id !== undefined) {
+        if (!!this.fromEndpoint.id && !!this.errorEndpoint.id && !!this.flow.id) {
 
             this.toEndpoints.forEach((toEndpoint) => {
                 toEndpoint.flowId = this.flow.id;
@@ -427,7 +599,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 const te: Array<ToEndpoint> = results[3];
                 this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
                     toEndpoints = toEndpoints.filter((e) => {
-                        let s = te.find((t) => t.id === e.id);
+                        const s = te.find((t) => t.id === e.id);
                         if (typeof s === 'undefined') {
                             return true;
                         } else {
@@ -493,6 +665,35 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
     }
 
+    setDataFromForm() {
+        const flowControls = this.editFlowForm.controls;
+        this.flow.id = flowControls.id.value;
+        this.flow.name = flowControls.name.value;
+        this.flow.autoStart = flowControls.autoStart.value;
+        this.flow.gatewayId = flowControls.gateway.value;
+
+        (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
+            if (index === 0) {
+                this.setDataFromFormOnEndpoint(this.fromEndpoint, (<FormGroup>endpoint).controls);
+            } else if (index === 1) {
+                this.setDataFromFormOnEndpoint(this.errorEndpoint, (<FormGroup>endpoint).controls);
+            } else if (index > 1) {
+                this.setDataFromFormOnEndpoint(this.toEndpoints[index - 2], (<FormGroup>endpoint).controls);
+            }
+        });
+    }
+
+    setDataFromFormOnEndpoint(endpoint, formEndpointData) {
+        endpoint.id = formEndpointData.id.value;
+        endpoint.type = formEndpointData.type.value;
+        endpoint.uri = formEndpointData.uri.value;
+        endpoint.serviceId = formEndpointData.service.value;
+        endpoint.headerId = formEndpointData.header.value;
+    }
+
+    goBack() {
+        window.history.back();
+    }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
         result.subscribe((res: Flow) =>

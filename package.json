@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Messaging Gateway",
   "private": true,
   "license": "UNLICENSED",
@@ -24,6 +24,7 @@
     "jquery": "3.2.1",
     "moment": "^2.22.1",
     "ng-jhipster": "0.3.6",
+    "ng2-ace-editor": "^0.3.7",
     "ngx-bootstrap": "2.0.5",
     "ngx-cookie": "2.0.1",
     "ngx-infinite-scroll": "0.5.1",

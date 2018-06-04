@@ -23,7 +23,7 @@ export class ToEndpointService {
     }
 
     createMultiple(toEndpoints: Array<ToEndpoint>): Observable<Array<ToEndpoint>> {
-        let copy = new Array<ToEndpoint>();
+        const copy = new Array<ToEndpoint>();
         toEndpoints.forEach((toEndpoint) => {
             copy.push(this.convert(toEndpoint))
         });
@@ -42,7 +42,7 @@ export class ToEndpointService {
     }
 
     updateMultiple(toEndpoints: Array<ToEndpoint>): Observable<Array<ToEndpoint>> {
-        let copy = new Array<ToEndpoint>();
+        const copy = new Array<ToEndpoint>();
         toEndpoints.forEach((toEndpoint) => {
             copy.push(this.convert(toEndpoint))
         });

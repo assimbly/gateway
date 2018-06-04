@@ -31,7 +31,7 @@ public final class BodyUtil {
         responseBody.put("status", "failed");
         responseBody.put("statusCode", 400);
         responseBody.put("message", message);
-        responseBody.put("details", "See log for complete stack trace");
+        responseBody.put("details", "See the log for a complete stack trace");
         
         return responseBody.toString();
         
@@ -59,7 +59,7 @@ public final class BodyUtil {
         responseBody.put("status", "failed");
         responseBody.put("statusCode", 400);
         responseBody.put("message", message);
-        responseBody.put("details", "See log for complete stack trace");
+        responseBody.put("details", "See the log for a complete stack trace");
 
         String responseBodyXml = "<response>" + System.lineSeparator() + XML.toString(responseBody) + System.lineSeparator() + "</response>";
         

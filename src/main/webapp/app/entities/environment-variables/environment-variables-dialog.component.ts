@@ -22,6 +22,8 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     isSaving: boolean;
 
     gateways: Gateway[];
+    gatewaysLength: number;
+    gatewayid?: number;
 
     constructor(
         public activeModal: NgbActiveModal,
@@ -35,7 +37,12 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.gatewayService.query()
-            .subscribe((res: ResponseWrapper) => { this.gateways = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe((res: ResponseWrapper) => {
+                this.gateways = res.json;
+                this.gatewaysLength = this.gateways.length;
+                this.gatewayid = this.gateways[0].id;
+                console.log(this.gateways);
+            }, (res: ResponseWrapper) => this.onError(res.json));
     }
 
     clear() {
@@ -44,6 +51,9 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
 
     save() {
         this.isSaving = true;
+        if (this.gatewaysLength === 1) {
+            this.environmentVariables.gatewayId = this.gatewayid;
+        }
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(
                 this.environmentVariablesService.update(this.environmentVariables));
@@ -59,7 +69,7 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: EnvironmentVariables) {
-        this.eventManager.broadcast({ name: 'environmentVariablesListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'environmentVariablesListModification', content: 'OK' });
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }
@@ -88,11 +98,11 @@ export class EnvironmentVariablesPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private environmentVariablesPopupService: EnvironmentVariablesPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.environmentVariablesPopupService
                     .open(EnvironmentVariablesDialogComponent as Component, params['id']);
             } else {

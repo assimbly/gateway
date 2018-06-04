@@ -35,12 +35,25 @@ Generic styles
 ========================================================================== */
 
 /* Error highlight on input fields */
-.ng-valid[required], .ng-valid.required  {
-  border-left: 5px solid green;
+input.ng-valid[required], .ng-valid.required  {
+  border: 1px solid green;
 }
 
-.ng-invalid:not(form)  {
-  border-left: 5px solid red;
+.ng-touched.ng-invalid>.ng-select-container,
+input.ng-touched.ng-invalid:not(form)  {
+  border: 1px solid red;
+}
+
+.invalid-field-message{
+    display: block;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #dc3545;
+}
+
+.ng-select-disabled>.ng-select-container{
+    background-color: #e9ecef !important;
 }
 
 /* other generic styles */
@@ -293,6 +306,11 @@ custom assimbly css
         width: 80px
     }
 }
+
+.bg-gray{
+    background-color: #dee2e6
+}
+
 .h-20{
     height: 20px;
 }
