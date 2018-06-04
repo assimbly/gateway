@@ -1,6 +1,8 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
 
 import { HeaderKeys } from './header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
@@ -11,70 +13,100 @@ import { Header, HeaderService } from '../header';
     selector: 'jhi-header-keys',
     templateUrl: './header-keys.component.html'
 })
-export class HeaderKeysComponent implements OnInit, OnDestroy {
+export class HeaderKeysComponent implements OnInit, OnChanges {
     @Input() headerKeys: HeaderKeys[];
+    @Input() headerId: number;
     currentAccount: any;
-    eventSubscriber: Subscription;
-    // @Input() headerId: number;
+    headerKeySelected: boolean;
+    selectedId: number;
+    isSaving: boolean;
+    headerKey: HeaderKeys;
+    headerKeyId: number;
+    typeHeader: string[] = ['constant', 'xpath'];
 
     constructor(
         private headerService: HeaderService,
         private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
-        private principal: Principal
+        private principal: Principal,
+        private router: Router
     ) {
     }
-
-    /*
-    loadAll() {
-        this.headerService.query().subscribe(
-            (headers: ResponseWrapper) => {
-                // this.headerId = headers.json[0].id;
-                this.filterHeaderKeys(headers.json[0].id);
-                 this.headerKeysService.query().subscribe(
-                    (res: ResponseWrapper) => {
-                        this.headerKeys = res.json;
-                        this.headerKeys = this.headerKeys.filter((k) => k.headerId === this.header.id);
-                    },
-                    (res: ResponseWrapper) => this.onError(res.json)
-                );
-            },
-            (headers: ResponseWrapper) => this.onError(headers.json)
-        );
-    }
-    */
-
-    /*filterHeaderKeys(id) {
-        this.headerKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headerKeys = res.json;
-                this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-    }*/
-
     ngOnInit() {
-        // this.loadAll();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
-        // this.registerChangeInHeaderKeys();
-        this.eventManager.subscribe('headerKeysUpdated', (response) => this.headerKeys = [response]);
+        this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
     }
 
-    ngOnDestroy() {
-        this.eventManager.destroy(this.eventSubscriber);
+    updateHeaderKeys(id: number) {
+        this.headerKeys = this.headerKeys.filter((x) => x.id !== id);
+        if (this.headerKeys.length === 0) {
+           this.addHeaderKeys();
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['headerKeys'] && this.headerKeys !== undefined) {
+            if (this.headerKeys.length === 1 && this.headerKeys[0].id === undefined) {
+                    this.headerKeys[0].isDisabled = false;
+                    this.headerKeys[0].type = this.typeHeader[0];
+            }else {
+                this.headerKeys.forEach((headerKey) => {
+                    headerKey.isDisabled = true;
+                });
+            }
+        }
+    }
+    save(headerKey: HeaderKeys) {
+        this.isSaving = true;
+        if (headerKey.id !== undefined) {
+            this.subscribeToSaveResponse(
+                this.headerKeysService.update(headerKey), false);
+        } else {
+            headerKey.headerId = this.headerId;
+            this.subscribeToSaveResponse(
+                this.headerKeysService.create(headerKey), true);
+        }
+    }
+    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean) {
+        result.subscribe((res: HeaderKeys) =>
+            this.onSaveSuccess(res, isCreate), (res: Response) => this.onSaveError());
+    }
+
+    private onSaveSuccess(result: HeaderKeys, isCreate: boolean) {
+        if (isCreate) {
+            this.headerKeys = this.headerKeys.filter((x) => x.id !== undefined);
+            result.isDisabled = true;
+            this.headerKeys.push(result);
+        }
+        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK'});
+    }
+
+    private onSaveError() {
+        this.isSaving = false;
+    }
+
+    editHeaderKey(headerKey) {
+        headerKey.isDisabled = false;
     }
 
     trackId(index: number, item: HeaderKeys) {
         return item.id;
     }
-    /*registerChangeInHeaderKeys() {
-        this.eventSubscriber = this.eventManager.subscribe('headerKeysListModification', (response) => this.loadAll());
-    }*/
 
+    addHeaderKeys() {
+        const newHeaderKeys = new HeaderKeys();
+        newHeaderKeys.isDisabled = false;
+        newHeaderKeys.type = this.typeHeader[0];
+        this.headerKeys.push(newHeaderKeys);
+    }
+
+    removeHeaderKeys() {
+        const i = this.headerKeys.indexOf(new HeaderKeys());
+        this.headerKeys.splice(i, 1);
+    }
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
