@@ -49,29 +49,31 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.gatewaysLength === 1) {
             this.environmentVariables.gatewayId = this.gatewayid;
         }
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.environmentVariablesService.update(this.environmentVariables));
+                this.environmentVariablesService.update(this.environmentVariables), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.environmentVariablesService.create(this.environmentVariables));
+                this.environmentVariablesService.create(this.environmentVariables), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<EnvironmentVariables>) {
+    private subscribeToSaveResponse(result: Observable<EnvironmentVariables>, closePopup: boolean) {
         result.subscribe((res: EnvironmentVariables) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: EnvironmentVariables) {
+    private onSaveSuccess(result: EnvironmentVariables, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'environmentVariablesListModification', content: 'OK' });
         this.isSaving = false;
-        this.activeModal.dismiss(result);
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
     }
 
     private onSaveError() {

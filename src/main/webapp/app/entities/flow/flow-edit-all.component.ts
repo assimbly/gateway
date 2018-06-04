@@ -593,7 +593,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         console.log('flow not created');
     }
 
-    save() {
+    save(goToOverview: boolean) {
         this.isSaving = true;
         this.setDataFromForm();
         this.setOptions();
@@ -636,6 +636,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 });
                 this.savingFlowSuccess = true;
                 this.isSaving = false;
+                if (goToOverview) {
+                    this.router.navigate(['/']);
+                }
             });
         } else {
             if (this.singleGateway) {
@@ -664,6 +667,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                     this.finished = true;
                                                     this.savingFlowSuccess = true;
                                                     this.isSaving = false;
+                                                    if (goToOverview) {
+                                                        this.router.navigate(['/']);
+                                                    }
                                                 }, () => {
                                                     this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
                                                 });
