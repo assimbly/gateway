@@ -105,15 +105,24 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         this.getGateways();
 
+        const isCloning = this.route.fragment['value'] === 'clone';
+
         if (id) {
             this.flowService.find(id).subscribe((flow) => {
                 if (flow) {
                     this.flow = flow;
+                    if (isCloning) {
+                        this.flow.id = null;
+                    }
                     this.initializeForm(this.flow);
                     if (this.flow.fromEndpointId) {
                         this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
+                                if (isCloning) {
+                                    this.fromEndpoint.id = null;
+                                    this.flow.fromEndpointId = null;
+                                }
                                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
                                 this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
                                 this.setTypeLinks(this.fromEndpoint, 0);
@@ -126,6 +135,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 if (this.flow.errorEndpointId) {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
+                        if (isCloning) {
+                            this.errorEndpoint.id = null;
+                            this.flow.errorEndpointId = null;
+                        }
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
                         this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
                         this.setTypeLinks(this.errorEndpoint, 1);
@@ -135,6 +148,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
                     this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
                     this.toEndpoints.forEach((toEndpoint, i) => {
+                        if (isCloning) {
+                            toEndpoint.id = null;
+                            toEndpoint.flowId = null;
+                        }
                         if (typeof this.toEndpointsOptions[i] === 'undefined') {
                             this.toEndpointsOptions.push([]);
                         }
