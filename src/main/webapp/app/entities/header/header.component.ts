@@ -20,6 +20,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
     headerKeys: Array<HeaderKeys>
+    headerKey: HeaderKeys;
     selectedHeaderId: number;
 
     constructor(
@@ -46,9 +47,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
+        if (this.headerKey !== undefined ) {
+            this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
+        }else {
+            this.eventManager.subscribe('headerKeyDeleted', (res) => res.content)
+        }
         this.registerChangeInHeaders();
+        this.selectOption(this.selectedHeaderId);
     }
 
+    updateHeaderKeys(id: number) {
+        this.headerKeys = this.headerKeys.filter((x) => x.id === id);
+        const newHeaderKeys = new HeaderKeys();
+        this.headerKeys.push(newHeaderKeys);
+    }
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
@@ -58,6 +70,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
             (res: ResponseWrapper) => {
                 this.headerKeys = res.json;
                 this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
+                if (this.headerKeys.length === 0) {
+                    const newHeaderKeys = new HeaderKeys();
+                    newHeaderKeys.isDisabled = false;
+                    this.headerKeys.push(newHeaderKeys);
+                }
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
@@ -71,8 +88,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     selectOption(e) {
-        // this.eventManager.broadcast({ name: 'headerSelected', content: this.selectedHeaderId });
-        this.filterHeaderKeys(this.selectedHeaderId);
+      this.filterHeaderKeys(this.selectedHeaderId);
     }
 
     private onError(error) {

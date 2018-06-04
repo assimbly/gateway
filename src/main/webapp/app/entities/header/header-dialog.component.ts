@@ -66,10 +66,6 @@ export class HeaderDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
-        // this.eventManager.subscribe(
-        //     'headerKeysUpdated',
-        //     (res) => this.header.headerKeys.push(res)
-        // );
         this.isSaving = false;
         this.headerKeys.headerId = result.id;
         this.activeModal.dismiss(result);
