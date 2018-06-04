@@ -34,27 +34,29 @@ export class ServiceDialogComponent implements OnInit {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.service.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.serviceService.update(this.service));
+                this.serviceService.update(this.service), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.serviceService.create(this.service));
+                this.serviceService.create(this.service), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Service>) {
+    private subscribeToSaveResponse(result: Observable<Service>, closePopup: boolean) {
         result.subscribe((res: Service) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: Service) {
+    private onSaveSuccess(result: Service, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK'});
         this.eventManager.broadcast({name: 'serviceModified', content: result.id});
         this.isSaving = false;
-        this.activeModal.dismiss(result);
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
     }
 
     private onSaveError() {
