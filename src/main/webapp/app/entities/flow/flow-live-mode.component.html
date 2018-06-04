@@ -1,0 +1,71 @@
+<div class="container">
+    <h2>Live mode</h2>
+    <hr>
+    <div>
+        <form [formGroup]="liveModeForm" (ngSubmit)="setLiveConfiguration()">
+            <div class="form-group">
+                <label for="xmlEditor">XML configuration</label>
+                <div ace-editor
+                    [(text)]="xmlEditor"
+                    [mode]="'XML'"
+                    [theme]="'xcode'"
+                    [options]="{maxLines: 'Infinity'}"
+                    style="min-height: 250px; width:100%; overflow: auto; border: 1px solid #ced4da"></div>
+            </div>
+            <div class="form-group">
+                <label for="flowId">Flow ID</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="flowId" formControlName="flowId">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">Load</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div *ngIf="isConfigurationSet">
+        <hr>
+        <p class="float-left">Live configuration for flow {{flowId}} is set.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="isConfigurationSet">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Flow ID</th>
+                    <th class="text-center">Manage Flow</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let configuredFlow of configuredFlows">
+                    <td>{{configuredFlow.flowId}}</td>
+                    <td>
+                        <div class="btn-group flex-btn-group-container flow-btns justify-content-center">    
+                            <button type="button" (click)="start(configuredFlow)" class="btn btn-info btn-sm" *ngIf="!configuredFlow.isFlowStarted">
+                                <span class="fa fa-play"></span>
+                                <span class="d-none d-md-inline">Start</span>
+                            </button>
+                            <button type="button" (click)="restart(configuredFlow)" class="btn btn-primary btn-sm" *ngIf="!configuredFlow.isFlowRestarted">
+                                <span class="fa fa-refresh"></span>
+                                <span class="d-none d-md-inline">Restart</span>
+                            </button>
+                            <button type="button" (click)="pause(configuredFlow)" class="btn btn-warning btn-sm" [disabled]="!configuredFlow.isFlowPaused && configuredFlow.isFlowStopped" *ngIf="!configuredFlow.isFlowPaused">
+                                <span class="fa fa-pause"></span>
+                                <span class="d-none d-md-inline">Pause</span>
+                            </button>
+                            <button type="button" (click)="resume(configuredFlow)" class="btn btn-info btn-sm" *ngIf="!configuredFlow.isFlowResumed">
+                                <span class="fa fa-step-forward"></span>
+                                <span class="d-none d-md-inline">Resume</span>
+                            </button>
+                            <button type="button" (click)="stop(configuredFlow)" class="btn btn-danger btn-sm" [disabled]="configuredFlow.isFlowStopped">
+                                <span class="fa fa-stop"></span>
+                                <span class="d-none d-md-inline">Stop</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
