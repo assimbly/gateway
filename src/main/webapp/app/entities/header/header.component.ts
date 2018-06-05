@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
 import { Header } from './header.model';
 import { HeaderService } from './header.service';
@@ -16,12 +17,13 @@ import { Principal, ResponseWrapper } from '../../shared';
 })
 
 export class HeaderComponent implements OnInit, OnDestroy {
-    headers: Header[];
+    public headers: Header[];
     currentAccount: any;
     eventSubscriber: Subscription;
     headerKeys: Array<HeaderKeys>
     headerKey: HeaderKeys;
     selectedHeaderId: number;
+    lastInArray: any;
 
     constructor(
         private headerService: HeaderService,
@@ -36,8 +38,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.headers = res.json;
-                this.selectedHeaderId = this.headers[0].id;
-                this.filterHeaderKeys(this.headers[0].id);
+                this.lastInArray = this.headers[this.headers.length - 1];
+                this.selectedHeaderId = this.lastInArray.id;
+                this.filterHeaderKeys( this.lastInArray.id);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
