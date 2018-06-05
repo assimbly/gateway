@@ -1,4 +1,7 @@
 <div>
+    <h2>
+        <span>Headers key</span>
+    </h2>
     <jhi-alert></jhi-alert>
     <div class="row">
     </div>
@@ -39,8 +42,8 @@
                             value="headerKey.value" [disabled]="headerKey.isDisabled" />
                     </td>
                     <td>
-                        <select class="form-control" id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}"
-                            [(ngModel)]="headerKey.type" [disabled]="headerKey.isDisabled">
+                        <select class="form-control" id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}" [(ngModel)]="headerKey.type"
+                            [disabled]="headerKey.isDisabled">
                             <option [ngValue]="type" *ngFor="let type of typeHeader">{{type}}</option>
                         </select>
                     </td>
@@ -66,14 +69,14 @@
                                 <span class="fa fa-eye"></span>
                             </button>
                             <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey)">
-                                    <span class="fa fa-check"></span>
-                                </button>
-                            <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary"
-                                (click)="editHeaderKey(headerKey)">
+                                <span class="fa fa-check"></span>
+                            </button>
+                            <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge"
+                                class="btn btn-primary" (click)="editHeaderKey(headerKey)">
                                 <span class="fa fa-pencil"></span>
                             </button>
-                            <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey.id + '/delete'} }]">
+                            <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger"
+                                [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey.id + '/delete'} }]">
                                 <span class="fa fa-trash"></span>
                             </button>
                         </div>
