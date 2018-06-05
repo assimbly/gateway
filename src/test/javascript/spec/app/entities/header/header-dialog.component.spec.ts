@@ -47,7 +47,7 @@ describe('Component Tests', () => {
                         spyOn(service, 'update').and.returnValue(Observable.of(entity));
                         comp.header = entity;
                         // WHEN
-                        comp.save();
+                        comp.save(true);
                         tick(); // simulate async
 
                         // THEN
@@ -67,7 +67,7 @@ describe('Component Tests', () => {
                         spyOn(service, 'create').and.returnValue(Observable.of(entity));
                         comp.header = entity;
                         // WHEN
-                        comp.save();
+                        comp.save(true);
                         tick(); // simulate async
 
                         // THEN
