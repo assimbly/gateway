@@ -10,9 +10,12 @@
         <br/>
         <br/>
         <div class="form-group">
-            <select class="form-control" id="field_header" name="header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)">
+            <!-- <select class="form-control" id="field_header" name="header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)">
                 <option *ngFor="let header of headers; trackBy: trackId" [ngValue]="header.id">{{header.name}}</option>
-            </select>
+            </select> -->
+            <!-- <ng-select [items]="headers"  id="field_from_type" [(ngModel)]="selectedHeaderId"  (seleceted)="selectOption($event)"  (data)="refreshValue($event)"></ng-select>
+            {{value.name}} -->
+        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
         </div>
     </div>
 

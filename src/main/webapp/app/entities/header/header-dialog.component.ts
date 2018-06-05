@@ -67,15 +67,9 @@ export class HeaderDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
-        this.headerKeys.headerId = result.id;
         if (closePopup) {
             this.activeModal.dismiss(result);
         }
-        this.headerKeysService.create(this.headerKeys).subscribe((res) => {
-            const t = res;
-            console.log(res);
-            this.eventManager.broadcast({ name: 'headerKeysUpdated', content: res });
-        });
     }
 
     private onSaveError() {
