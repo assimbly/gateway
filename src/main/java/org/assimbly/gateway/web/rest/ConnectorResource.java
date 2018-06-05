@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
-import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
+import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
@@ -42,7 +42,7 @@ public class ConnectorResource {
 	private String type;
 
 	@Autowired
-	private AssimblyDBConfiguration assimblyDBConfiguration;
+	private DBConfiguration assimblyDBConfiguration;
     
 	@Autowired
 	private FlowRepository flowRepository;
@@ -108,13 +108,10 @@ public class ConnectorResource {
     @PostMapping(path = "/connector/{connectorId}/setflowconfiguration/{id}", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String configuration) throws Exception {
-  	
-    	System.out.println("mediaType=" + mediaType);
     	
        	try {
        		connector.setFlowConfiguration(id.toString(), mediaType, configuration);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set");
-			
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set");			
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
    		}
@@ -225,7 +222,19 @@ public class ConnectorResource {
 		}
   }
 
-  
+
+  @GetMapping(path = "/connector/{connectorId}/lasterror", produces = {"text/plain","application/xml","application/json"})
+  @Timed
+  public ResponseEntity<String> getLastError(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+			String error = connector.getLastError();
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",error,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
+		}
+
+  }
   
 	//manage flow
     @GetMapping(path = "/connector/{connectorId}/hasflow/{id}", produces = {"text/plain","application/xml","application/json"})
@@ -436,6 +445,37 @@ public class ConnectorResource {
     }
 
 	
+    @GetMapping(path = "/connector/{connectorId}/flow/documenation/{componenttype}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getDocumentation(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
+
+
+		try {
+    		String documentation = connector.getDocumentation(componenttype, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",documentation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+		}
+    }
+
+
+    @GetMapping(path = "/connector/{connectorId}/flow/validate/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> validateFlow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+    	plainResponse = true;
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		String flowValidation = connector.validateFlow(flowId);
+    		if(flowValidation.startsWith("Error")||flowValidation.startsWith("Warning")) {plainResponse = false;}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",flowValidation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+		}
+    }
+    
     @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
@@ -452,7 +492,8 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
 		}
     }
-
+    
+    
     //private methods    
     
     private void init() throws Exception {
