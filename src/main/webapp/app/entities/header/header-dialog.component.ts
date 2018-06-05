@@ -46,29 +46,31 @@ export class HeaderDialogComponent implements OnInit {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.header.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.headerService.update(this.header));
+                this.headerService.update(this.header), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.headerService.create(this.header));
+                this.headerService.create(this.header), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Header>) {
+    private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
         result.subscribe((res: Header) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: Header) {
+    private onSaveSuccess(result: Header, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
         this.headerKeys.headerId = result.id;
-        this.activeModal.dismiss(result);
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
         this.headerKeysService.create(this.headerKeys).subscribe((res) => {
             const t = res;
             console.log(res);
