@@ -30,11 +30,15 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         private jhiAlertService: JhiAlertService,
         private environmentVariablesService: EnvironmentVariablesService,
         private gatewayService: GatewayService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private route: ActivatedRoute
     ) {
     }
 
     ngOnInit() {
+        if (this.route.fragment['value'] === 'clone') {
+            this.environmentVariables.id = null;
+        }
         this.isSaving = false;
         this.gatewayService.query()
             .subscribe((res: ResponseWrapper) => {
