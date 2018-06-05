@@ -92,6 +92,17 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         headerKey.isDisabled = false;
     }
 
+    cloneHeaderKey(headerKey: HeaderKeys) {
+        const headerKeyForClone = new HeaderKeys(
+            null,
+            headerKey.key,
+            headerKey.value,
+            headerKey.type,
+            headerKey.headerId,
+            false);
+        this.headerKeys.push(headerKeyForClone);
+    }
+
     trackId(index: number, item: HeaderKeys) {
         return item.id;
     }
