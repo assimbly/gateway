@@ -105,15 +105,24 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         this.getGateways();
 
+        const isCloning = this.route.fragment['value'] === 'clone';
+
         if (id) {
             this.flowService.find(id).subscribe((flow) => {
                 if (flow) {
                     this.flow = flow;
+                    if (isCloning) {
+                        this.flow.id = null;
+                    }
                     this.initializeForm(this.flow);
                     if (this.flow.fromEndpointId) {
                         this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
                             if (fromEndpoint) {
                                 this.fromEndpoint = fromEndpoint;
+                                if (isCloning) {
+                                    this.fromEndpoint.id = null;
+                                    this.flow.fromEndpointId = null;
+                                }
                                 (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint))
                                 this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
                                 this.setTypeLinks(this.fromEndpoint, 0);
@@ -126,6 +135,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 if (this.flow.errorEndpointId) {
                     this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
                         this.errorEndpoint = errorEndpoint;
+                        if (isCloning) {
+                            this.errorEndpoint.id = null;
+                            this.flow.errorEndpointId = null;
+                        }
                         (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
                         this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
                         this.setTypeLinks(this.errorEndpoint, 1);
@@ -135,6 +148,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
                     this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
                     this.toEndpoints.forEach((toEndpoint, i) => {
+                        if (isCloning) {
+                            toEndpoint.id = null;
+                            toEndpoint.flowId = null;
+                        }
                         if (typeof this.toEndpointsOptions[i] === 'undefined') {
                             this.toEndpointsOptions.push([]);
                         }
@@ -244,7 +261,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'topic',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>topic</b><br/>
-                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics. A producer can only send a message to a single topic.<br/>
+                        <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics.
+                         A producer can only send a message to a single topic.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -291,7 +309,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'query',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>query</b><br/>
-                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -302,7 +321,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     uriPlaceholder: 'query',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>query</b><br/>
-                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file: or classpath: as prefix and specify the location of the file.<br/>
+                        <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
+                         or classpath: as prefix and specify the location of the file.<br/>
                         <b>Type</b>: String
                     `
                 },
@@ -592,7 +612,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         console.log('flow not created');
     }
 
-    save() {
+    save(goToOverview: boolean) {
         this.isSaving = true;
         this.setDataFromForm();
         this.setOptions();
@@ -615,7 +635,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 const te: Array<ToEndpoint> = results[3];
                 this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
                     toEndpoints = toEndpoints.filter((e) => {
-                        let s = te.find((t) => t.id === e.id);
+                        const s = te.find((t) => t.id === e.id);
                         if (typeof s === 'undefined') {
                             return true;
                         } else {
@@ -635,6 +655,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 });
                 this.savingFlowSuccess = true;
                 this.isSaving = false;
+                if (goToOverview) {
+                    this.router.navigate(['/']);
+                }
             });
         } else {
             if (this.singleGateway) {
@@ -669,6 +692,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                     this.finished = true;
                                                     this.savingFlowSuccess = true;
                                                     this.isSaving = false;
+                                                    if (goToOverview) {
+                                                        this.router.navigate(['/']);
+                                                    }
                                                 }, () => {
                                                     this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
                                                 });

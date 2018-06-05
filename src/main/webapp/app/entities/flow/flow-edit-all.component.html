@@ -2,7 +2,7 @@
 	<div class="row justify-content-center">
 		<div class="col-9">
 
-			<form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">
+			<form [formGroup]="editFlowForm" (ngSubmit)="save(false)" *ngIf="finished" novalidate class="needs-validation">
 
 				<div>
 					<h2 *ngIf="flow.id">
@@ -364,6 +364,10 @@
 						<span>Cancel</span>
 					</button>
 					<button type="submit" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
+						<span class="fa fa-save"></span>&nbsp;
+						<span>Apply</span>
+					</button>
+					<button type="button" (click)="save(true)" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
 						<span class="fa fa-save"></span>&nbsp;
 						<span>Save</span>
 					</button>
