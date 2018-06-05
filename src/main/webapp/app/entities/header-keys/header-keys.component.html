@@ -66,11 +66,15 @@
                                 <span class="fa fa-eye"></span>
                             </button>
                             <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey)">
-                                    <span class="fa fa-check"></span>
-                                </button>
+                                <span class="fa fa-check"></span>
+                            </button>
                             <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary"
                                 (click)="editHeaderKey(headerKey)">
                                 <span class="fa fa-pencil"></span>
+                            </button>
+                            <button type="button" title="Clone" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-info"
+                                (click)="cloneHeaderKey(headerKey)">
+                                <span class="fa fa-clone"></span>
                             </button>
                             <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey.id + '/delete'} }]">
