@@ -22,7 +22,9 @@ export class GatewayDialogComponent implements OnInit {
     constructor(
         public activeModal: NgbActiveModal,
         private gatewayService: GatewayService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private router: ActivatedRoute
+
     ) {
     }
 
@@ -32,6 +34,10 @@ export class GatewayDialogComponent implements OnInit {
             this.gateway.defaultFromEndpointType = 'FILE';
             this.gateway.defaultToEndpointType = 'FILE';
             this.gateway.defaultErrorEndpointType = 'FILE';
+        }
+
+        if (this.router.fragment['value'] === 'clone') {
+            this.gateway.id = null;
         }
     }
 
