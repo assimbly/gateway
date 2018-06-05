@@ -2,7 +2,7 @@
     <h2>
         <span>Headers key</span>
     </h2>
-    <jhi-alert></jhi-alert>
+    
     <div class="row">
     </div>
     <br/>
@@ -80,7 +80,7 @@
                                 <span class="fa fa-clone"></span>
                             </button>
                             <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey.id + '/delete'} }]">
+                                class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey?.id + '/delete'} }]">
                                 <span class="fa fa-trash"></span>
                             </button>
                         </div>

@@ -43,16 +43,16 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     updateHeaderKeys(id: number) {
         this.headerKeys = this.headerKeys.filter((x) => x.id !== id);
         if (this.headerKeys.length === 0) {
-           this.addHeaderKeys();
+            this.addHeaderKeys();
         }
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['headerKeys'] && this.headerKeys !== undefined) {
             if (this.headerKeys.length === 1 && this.headerKeys[0].id === undefined) {
-                    this.headerKeys[0].isDisabled = false;
-                    this.headerKeys[0].type = this.typeHeader[0];
-            }else {
+                this.headerKeys[0].isDisabled = false;
+                this.headerKeys[0].type = this.typeHeader[0];
+            } else {
                 this.headerKeys.forEach((headerKey) => {
                     headerKey.isDisabled = true;
                 });
@@ -61,7 +61,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
     save(headerKey: HeaderKeys) {
         this.isSaving = true;
-        if (headerKey.id !== undefined) {
+        if (!!headerKey.id) {
             this.subscribeToSaveResponse(
                 this.headerKeysService.update(headerKey), false);
         } else {
@@ -77,11 +77,13 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     private onSaveSuccess(result: HeaderKeys, isCreate: boolean) {
         if (isCreate) {
-            this.headerKeys = this.headerKeys.filter((x) => x.id !== undefined);
+            this.headerKeys = this.headerKeys.filter((x) => !!x.id);
             result.isDisabled = true;
             this.headerKeys.push(result);
+        } else {
+            this.headerKeys.find((k) => k.id === result.id).isDisabled = true;
         }
-        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK'});
+        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK' });
     }
 
     private onSaveError() {
@@ -117,8 +119,12 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     removeHeaderKeys() {
         const i = this.headerKeys.indexOf(new HeaderKeys());
         this.headerKeys.splice(i, 1);
+        if (this.headerKeys.length === 0) {
+            this.addHeaderKeys();
+        }
     }
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
+        console.log(error.message);
     }
 }
