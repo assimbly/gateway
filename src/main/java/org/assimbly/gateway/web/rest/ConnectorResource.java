@@ -466,7 +466,7 @@ public class ConnectorResource {
         }
 	}
 
-    
+    /*
     //This method is called on application startup
     @PostConstruct
     private void initConnector() throws Exception {
@@ -490,5 +490,5 @@ public class ConnectorResource {
 				connector.startFlow(flow.getId().toString());
        		}
        	}
-	}
+	}*/
 }

@@ -15,7 +15,6 @@ import { HeaderKeysService } from './header-keys.service';
 export class HeaderKeysDeleteDialogComponent {
 
     headerKeys: HeaderKeys;
-
     constructor(
         private headerKeysService: HeaderKeysService,
         public activeModal: NgbActiveModal,
@@ -29,6 +28,7 @@ export class HeaderKeysDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.headerKeysService.delete(id).subscribe((response) => {
+            this.eventManager.broadcast({ name: 'headerKeyDeleted', content: id });
             this.eventManager.broadcast({
                 name: 'headerKeysListModification',
                 content: 'Deleted an headerKeys'

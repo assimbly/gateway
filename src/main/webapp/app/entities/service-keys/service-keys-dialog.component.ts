@@ -42,26 +42,28 @@ export class ServiceKeysDialogComponent implements OnInit {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.serviceKeys.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.serviceKeysService.update(this.serviceKeys));
+                this.serviceKeysService.update(this.serviceKeys), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.serviceKeysService.create(this.serviceKeys));
+                this.serviceKeysService.create(this.serviceKeys), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<ServiceKeys>) {
+    private subscribeToSaveResponse(result: Observable<ServiceKeys>, closePopup: boolean) {
         result.subscribe((res: ServiceKeys) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: ServiceKeys) {
+    private onSaveSuccess(result: ServiceKeys, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'serviceKeysListModification', content: 'OK'});
         this.isSaving = false;
-        this.activeModal.dismiss(result);
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
     }
 
     private onSaveError() {

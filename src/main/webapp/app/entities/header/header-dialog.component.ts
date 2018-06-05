@@ -4,11 +4,14 @@ import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
 
 import { Header } from './header.model';
+import { HeaderKeys } from '../header-keys/header-keys.model';
 import { HeaderPopupService } from './header-popup.service';
 import { HeaderService } from './header.service';
+import { ResponseWrapper } from '../../shared';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { HeaderKeysService } from '../header-keys';
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -17,48 +20,69 @@ import { HeaderService } from './header.service';
 export class HeaderDialogComponent implements OnInit {
 
     header: Header;
+    headers: Header[];
+    headerKeys: HeaderKeys;
     isSaving: boolean;
 
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
+        private headerKeysService: HeaderKeysService,
+        private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager
     ) {
     }
 
     ngOnInit() {
+        this.headerKeys = new HeaderKeys();
         this.isSaving = false;
+        this.headerService.query()
+            .subscribe((res: ResponseWrapper) => {
+            this.headers = res.json;
+            }, (res: ResponseWrapper) => this.onError(res.json));
     }
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.header.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.headerService.update(this.header));
+                this.headerService.update(this.header), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.headerService.create(this.header));
+                this.headerService.create(this.header), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Header>) {
+    private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
         result.subscribe((res: Header) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: Header) {
-        this.eventManager.broadcast({ name: 'headerListModification', content: 'OK'});
-        this.eventManager.broadcast({name: 'headerModified', content: result.id});
+    private onSaveSuccess(result: Header, closePopup: boolean) {
+        this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
+        this.eventManager.broadcast({ name: 'headerModified', content: result.id });
+        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
-        this.activeModal.dismiss(result);
+        this.headerKeys.headerId = result.id;
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
+        this.headerKeysService.create(this.headerKeys).subscribe((res) => {
+            const t = res;
+            console.log(res);
+            this.eventManager.broadcast({ name: 'headerKeysUpdated', content: res });
+        });
     }
 
     private onSaveError() {
         this.isSaving = false;
+    }
+    private onError(error: any) {
+        this.jhiAlertService.error(error.message, null, null);
     }
 }
 
@@ -73,11 +97,11 @@ export class HeaderPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private headerPopupService: HeaderPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.headerPopupService
                     .open(HeaderDialogComponent as Component, params['id']);
             } else {
