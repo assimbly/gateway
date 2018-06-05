@@ -1,61 +1,66 @@
 <div>
     <h2>
         <span>Services</span>
-        <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
-            <span class="fa fa-plus"></span>
-            <span >
-            Create new Service
-            </span>
-        </button>
     </h2>
-    <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
+    <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
+        <span class="fa fa-plus"></span>
+        <span>
+            Create new Service
+        </span>
+    </button>
     <br/>
-    <div class="table-responsive" *ngIf="services">
+    <br/>
+    <div class="form-group">
+        <select class="form-control" id="field_header" name="header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)">
+            <option *ngFor="let service of services; trackBy: trackId" [ngValue]="header.id">{{header.name}}</option>
+        </select>
+    </div>
+    <jhi-alert></jhi-alert>
+    <br/>
+    <!-- <div class="table-responsive" *ngIf="services">
         <table class="table table-striped">
             <thead>
-            <tr>
-            <th id="serviceTitleID" [hidden]="!serviceTitleID"><span>ID</span></th>
-            <th><span>Name</span></th>
-            <th><span>Type</span></th>
-            </tr>
+                <tr>
+                    <th id="serviceTitleID" [hidden]="!serviceTitleID">
+                        <span>ID</span>
+                    </th>
+                    <th>
+                        <span>Name</span>
+                    </th>
+                    <th>
+                        <span>Type</span>
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let service of services ;trackBy: trackId">
-                <td  id="serviceRowID" [hidden]="!serviceRowID"><a [routerLink]="['../service', service.id ]">{{service.id}}</a></td>
-                <td>{{service.name}}</td>
-                <td>{{service.type}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../service', service.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                <tr *ngFor="let service of services ;trackBy: trackId">
+                    <td id="serviceRowID" [hidden]="!serviceRowID">
+                        <a [routerLink]="['../service', service.id ]">{{service.id}}</a>
+                    </td>
+                    <td>{{service.name}}</td>
+                    <td>{{service.type}}</td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit" [routerLink]="['../service', service.id ]" class="btn btn-info btn-sm">
+                                <span class="fa fa-eye"></span>
+                                <span class="d-none d-md-inline">View</span>
+                            </button>
+                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                <span class="fa fa-pencil"></span>
+                                <span class="d-none d-md-inline">Edit</span>
+                            </button>
+                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                                <span class="fa fa-remove"></span>
+                                <span class="d-none d-md-inline">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
-    </div>
+    </div> -->
 </div>
 
 <jhi-service-keys>Loading routes...</jhi-service-keys>
