@@ -149,6 +149,10 @@
             <span class="fa fa-pencil"></span>&nbsp;
             <span> Edit</span>
         </button>
+        <button type="submit" [routerLink]="['../../flow/edit-all', flow.id ]" fragment="clone" class="btn btn-info">
+            <span class="fa fa-clone"></span>&nbsp;
+            <span> Clone</span>
+        </button>
         <button type="submit" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
 		 class="btn btn-danger">
 			<span class="fa fa-remove"></span>
