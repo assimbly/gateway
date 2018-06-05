@@ -1,4 +1,4 @@
-<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+<form name="editForm" role="form" novalidate #editForm="ngForm">
     <div class="modal-header">
         <h4 class="modal-title" id="myHeaderLabel">Create or edit a Header</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
@@ -19,7 +19,11 @@
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
         </button>
-        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+        <button type="button" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary" (click)="save(false)">
+            <span class="fa fa-save"></span>&nbsp;
+            <span>Apply</span>
+        </button>
+        <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
             <span class="fa fa-save"></span>&nbsp;
             <span>Save</span>
         </button>
