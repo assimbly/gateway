@@ -23,7 +23,6 @@ export class HeaderKeysPopupService {
             if (isOpen) {
                 resolve(this.ngbModalRef);
             }
-
             if (id) {
                 this.headerKeysService.find(id).subscribe((headerKeys) => {
                     this.ngbModalRef = this.headerKeysModalRef(component, headerKeys);
