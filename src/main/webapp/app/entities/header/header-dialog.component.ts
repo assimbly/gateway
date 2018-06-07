@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
@@ -23,13 +23,16 @@ export class HeaderDialogComponent implements OnInit {
     headers: Header[];
     headerKeys: HeaderKeys;
     isSaving: boolean;
+    showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
         private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private route: ActivatedRoute,
+        private router: Router
     ) {
     }
 
@@ -40,6 +43,9 @@ export class HeaderDialogComponent implements OnInit {
             .subscribe((res: ResponseWrapper) => {
             this.headers = res.json;
             }, (res: ResponseWrapper) => this.onError(res.json));
+        if (this.route.fragment['value'] === 'showEditHeaderButton') {
+            this.showEditButton = true;
+        }
     }
 
     clear() {
@@ -55,6 +61,13 @@ export class HeaderDialogComponent implements OnInit {
             this.subscribeToSaveResponse(
                 this.headerService.create(this.header), closePopup);
         }
+    }
+
+    navigateToHeader() {
+        this.router.navigate(['/header']);
+        setTimeout(() => {
+            this.activeModal.close();
+        }, 0);
     }
 
     private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {

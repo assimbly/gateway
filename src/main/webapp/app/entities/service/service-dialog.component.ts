@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
@@ -22,12 +22,15 @@ export class ServiceDialogComponent implements OnInit {
     services: Service[];
     isSaving: boolean;
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
+    showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,
         private serviceService: ServiceService,
         private eventManager: JhiEventManager,
         private jhiAlertService: JhiAlertService,
+        private route: ActivatedRoute,
+        private router: Router
     ) {
     }
 
@@ -38,6 +41,9 @@ export class ServiceDialogComponent implements OnInit {
         .subscribe((res: ResponseWrapper) => {
         this.services = res.json;
         }, (res: ResponseWrapper) => this.onError(res.json));
+        if (this.route.fragment['value'] === 'showEditServiceButton') {
+            this.showEditButton = true;
+        }
     }
 
     clear() {
@@ -53,6 +59,13 @@ export class ServiceDialogComponent implements OnInit {
             this.subscribeToSaveResponse(
                 this.serviceService.create(this.service), closePopup);
         }
+    }
+
+    navigateToService() {
+        this.router.navigate(['/service']);
+        setTimeout(() => {
+            this.activeModal.close();
+        }, 0);
     }
 
     private subscribeToSaveResponse(result: Observable<Service>, closePopup: boolean) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
@@ -16,7 +16,7 @@ import { ErrorEndpointComponent, ErrorEndpointService, ErrorEndpoint } from '../
 import { Gateway, GatewayService } from '../gateway';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
-import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { FormatWidth } from '@angular/common';
 
 @Component({
@@ -68,9 +68,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     errorUriPopoverMessage: string;
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
+    displayNextButton = false;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
+
+    @ViewChild('tabs')
+        private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -123,7 +127,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     this.fromEndpoint.id = null;
                                     this.flow.fromEndpointId = null;
                                 }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint))
                                 this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
                                 this.setTypeLinks(this.fromEndpoint, 0);
                                 this.finished = true;
@@ -139,7 +143,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.errorEndpoint.id = null;
                             this.flow.errorEndpointId = null;
                         }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
                         this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
                         this.setTypeLinks(this.errorEndpoint, 1);
                     });
@@ -155,7 +159,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         if (typeof this.toEndpointsOptions[i] === 'undefined') {
                             this.toEndpointsOptions.push([]);
                         }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
+                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint))
                         this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
                         this.setTypeLinks(toEndpoint, i + 2);
                     });
@@ -176,6 +180,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
                 this.toEndpointsOptions = [[new Option()]];
                 this.finished = true;
+                this.displayNextButton = true;
             }, 0);
         }
     }
@@ -415,6 +420,25 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         })
     }
 
+    updateForm(flow: Flow) {
+        this.editFlowForm.patchValue({
+            'id': flow.id,
+            'name': flow.name,
+            'autoStart': flow.autoStart,
+            'gateway': flow.gatewayId
+        });
+    }
+
+    updateEndpointData(index: number, endpoint?: any) {
+        (<FormArray>this.editFlowForm.controls.endpointsData).controls[index].patchValue({
+            'id': endpoint.id,
+            'type': endpoint.type,
+            'uri': endpoint.uri,
+            'service': endpoint.serviceId,
+            'header': endpoint.headerId
+        })
+    }
+
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
         if (endpoint.options === null) { return; }
         const options = endpoint.options.split('&');
@@ -533,8 +557,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditHeader(endpoint) {
         (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }]) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }]);
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], {fragment: 'showEditHeaderButton'}) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }], {fragment: 'showEditHeaderButton'});
 
         this.eventManager.subscribe(
             'headerModified',
@@ -544,8 +568,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }]) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }]);
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], {fragment: 'showEditServiceButton'}) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }], {fragment: 'showEditServiceButton'});
 
         this.eventManager.subscribe(
             'serviceModified',
@@ -647,12 +671,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.flowService.create(this.flow)
                 .subscribe((flowRes) => {
                     this.flow = flowRes;
+                    this.updateForm(this.flow);
                     this.fromEndpointService.create(this.fromEndpoint)
                         .subscribe((fromRes) => {
                             this.fromEndpoint = fromRes;
+                            this.updateEndpointData(0, this.fromEndpoint);
                             this.errorEndpointService.create(this.errorEndpoint)
                                 .subscribe((errorRes) => {
                                     this.errorEndpoint = errorRes;
+                                    this.updateEndpointData(1, this.errorEndpoint);
                                     this.flow.fromEndpointId = this.fromEndpoint.id;
                                     this.flow.errorEndpointId = this.errorEndpoint.id;
                                     this.flowService.update(this.flow)
@@ -663,6 +690,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                             });
                                             this.toEndpointService.createMultiple(this.toEndpoints)
                                                 .subscribe((toRes) => {
+                                                    toRes.forEach((toEndpoint, i) => {
+                                                        this.updateEndpointData(i + 2, toEndpoint);
+                                                    });
                                                     console.log('flow created');
                                                     this.finished = true;
                                                     this.savingFlowSuccess = true;
@@ -716,6 +746,43 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     goBack() {
         window.history.back();
+    }
+
+    next() {
+        const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
+        const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
+        const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
+        if (index === 0) {
+            this.validateTypeAndUri(endpoints, index);
+            if (endpoints[index].valid) {
+                this.goToNextTab(endpoints, index + 1);
+            }
+        } else if (index === this.ngbTabset.tabs.length - 1) {
+            this.validateTypeAndUri(endpoints, index);
+            if (endpoints[1].valid) {
+                this.goToNextTab(endpoints, 0);
+            }
+        } else {
+            this.validateTypeAndUri(endpoints, index + 1);
+            if (endpoints[index + 1].valid) {
+                this.goToNextTab(endpoints, index + 1);
+            }
+        }
+    }
+
+    goToNextTab(endpoints: AbstractControl[], index) {
+        this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
+        if (endpoints.find((e) => !e.valid)) {
+            this.displayNextButton = true;
+            this.next();
+        } else {
+            this.displayNextButton = false;
+        }
+    }
+
+    validateTypeAndUri(endpoints: AbstractControl[], index: number) {
+        (<FormGroup>endpoints[index]).controls.type.markAsDirty();
+        (<FormGroup>endpoints[index]).controls.uri.markAsDirty();
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
