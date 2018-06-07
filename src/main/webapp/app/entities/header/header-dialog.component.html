@@ -19,6 +19,9 @@
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
         </button>
+        <button type="button" *ngIf="showEditButton" class="btn btn-primary" (click)="navigateToHeader()">
+            <span class="fa fa-pencil"></span>&nbsp;<span>Edit Header Keys</span>
+        </button>
         <button type="button" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary" (click)="save(false)">
             <span class="fa fa-save"></span>&nbsp;
             <span>Apply</span>
