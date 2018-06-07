@@ -29,6 +29,7 @@ export class ServiceKeysDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.serviceKeysService.delete(id).subscribe((response) => {
+            this.eventManager.broadcast({ name: 'serviceKeyDeleted', content: id });
             this.eventManager.broadcast({
                 name: 'serviceKeysListModification',
                 content: 'Deleted an serviceKeys'
