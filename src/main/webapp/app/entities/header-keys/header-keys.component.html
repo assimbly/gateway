@@ -29,7 +29,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index" [ngStyle]="{'background-color': headerKey.isSelected ? '#A9A9A9' : '' }">
+                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index">
                     <td id="headerKeysRowID" [hidden]="!headerKeysRowID">
                         <a [routerLink]="['../header-keys', headerKey.id ]">{{headerKey.id}}</a>
                     </td>

@@ -6,6 +6,7 @@ export class ServiceKeys implements BaseEntity {
         public key?: string,
         public value?: string,
         public type?: string,
+        public isDisabled?: boolean,
         public serviceId?: number
     ) {
     }
