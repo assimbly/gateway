@@ -4,33 +4,43 @@ import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { Service } from './service.model';
 import { ServicePopupService } from './service-popup.service';
 import { ServiceService } from './service.service';
+import { ServiceKeys } from '../service-keys';
+import { ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-service-dialog',
     templateUrl: './service-dialog.component.html'
 })
 export class ServiceDialogComponent implements OnInit {
-
+    serviceKeys: ServiceKeys;
     service: Service;
+    services: Service[];
     isSaving: boolean;
+    typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
     showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,
         private serviceService: ServiceService,
         private eventManager: JhiEventManager,
+        private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
         private router: Router
     ) {
     }
 
     ngOnInit() {
+        this.serviceKeys = new ServiceKeys();
         this.isSaving = false;
+        this.serviceService.query()
+        .subscribe((res: ResponseWrapper) => {
+        this.services = res.json;
+        }, (res: ResponseWrapper) => this.onError(res.json));
         if (this.route.fragment['value'] === 'showEditServiceButton') {
             this.showEditButton = true;
         }
@@ -65,13 +75,16 @@ export class ServiceDialogComponent implements OnInit {
 
     private onSaveSuccess(result: Service, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
         this.eventManager.broadcast({name: 'serviceModified', content: result.id});
         this.isSaving = false;
         if (closePopup) {
             this.activeModal.dismiss(result);
         }
     }
-
+    private onError(error: any) {
+        this.jhiAlertService.error(error.message, null, null);
+    }
     private onSaveError() {
         this.isSaving = false;
     }

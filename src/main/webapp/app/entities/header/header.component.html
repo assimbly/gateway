@@ -10,62 +10,12 @@
         <br/>
         <br/>
         <div class="form-group">
-            <!-- <select class="form-control" id="field_header" name="header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)">
-                <option *ngFor="let header of headers; trackBy: trackId" [ngValue]="header.id">{{header.name}}</option>
-            </select> -->
-            <!-- <ng-select [items]="headers"  id="field_from_type" [(ngModel)]="selectedHeaderId"  (seleceted)="selectOption($event)"  (data)="refreshValue($event)"></ng-select>
-            {{value.name}} -->
         	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
         </div>
     </div>
 
     <jhi-alert></jhi-alert>
     <br/>
-
-    <!--    -->
-    <!-- <div class="table-responsive" *ngIf="headers">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-            <th id="headerTitleID" [hidden]="!headerTitleID"><span>ID</span></th>
-            <th><span>Name</span></th>
-            <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let header of headers ;trackBy: trackId">
-                <td id="headerRowID" [hidden]="!headerRowID"><a [routerLink]="['../header', header.id ]">{{header.id}}</a></td>
-                <td>{{header.name}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../header', header.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div> -->
 </div>
 
 <jhi-header-keys [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
