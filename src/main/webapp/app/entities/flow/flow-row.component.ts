@@ -55,6 +55,7 @@ export class FlowRowComponent implements OnInit {
         this.getErrorEndpoint(this.flow.errorEndpointId);
         this.getFlowStatus(this.flow.id);
         this.getFlowStats(this.flow.id);
+        this.registerTriggeredAction();
     }
 
     getFlowStatus(id: number) {
@@ -188,101 +189,125 @@ export class FlowRowComponent implements OnInit {
         return moment().format('YYYY-MM-DD HH:mm:ss');
     }
 
-    start(id: number) {
+    registerTriggeredAction() {
+        this.eventManager.subscribe('trigerAction', (response) => {
+            switch (response.content) {
+                case 'start':
+                    this.start();
+                    break;
+                case 'stop':
+                    this.stop();
+                    break;
+                case 'pause':
+                    this.pause();
+                    break;
+                case 'restart':
+                    this.restart();
+                    break;
+                case 'resume':
+                    this.resume();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    start() {
         this.flowStatus = 'Starting';
         this.isFlowStatusOK = true;
-        this.flowService.getConfiguration(id)
+        this.flowService.getConfiguration(this.flow.id)
             .map((response) => response.text())
             .subscribe((data) => {
-                this.flowService.setConfiguration(id, data)
+                this.flowService.setConfiguration(this.flow.id, data)
                     .map((response) => response.text())
                     .subscribe((data2) => {
                         console.log('data' + data2);
-                        this.flowService.start(id).subscribe((response) => {
+                        this.flowService.start(this.flow.id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('started');
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${id} is not started.`;
+                            this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
                         });
                     });
             }, (err) => {
-                this.flowConfigurationNotObtained(id);
+                this.flowConfigurationNotObtained(this.flow.id);
             });
     }
 
-    pause(id: number) {
+    pause() {
         this.flowStatus = 'Pausing';
         this.isFlowStatusOK = true;
-        this.flowService.pause(id).subscribe((response) => {
+        this.flowService.pause(this.flow.id).subscribe((response) => {
             if (response.status === 200) {
                 this.setFlowStatus('suspended');
             }
         }, (err) => {
             this.isFlowStatusOK = false;
-            this.flowStatusError = `Flow with id=${id} is not paused.`;
+            this.flowStatusError = `Flow with id=${this.flow.id} is not paused.`;
         });
     }
 
-    resume(id: number) {
+    resume() {
         this.flowStatus = 'Resuming';
         this.isFlowStatusOK = true;
-        this.flowService.getConfiguration(id)
+        this.flowService.getConfiguration(this.flow.id)
             .map((response) => response.text())
             .subscribe((data) => {
-                this.flowService.setConfiguration(id, data)
+                this.flowService.setConfiguration(this.flow.id, data)
                     .map((response) => response.text())
                     .subscribe((data2) => {
                         console.log('data' + data2);
-                        this.flowService.resume(id).subscribe((response) => {
+                        this.flowService.resume(this.flow.id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('resumed');
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${id} is not resumed.`;
+                            this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
                         });
                     });
             }, (err) => {
-                this.flowConfigurationNotObtained(id);
+                this.flowConfigurationNotObtained(this.flow.id);
             });
     }
 
-    restart(id: number) {
+    restart() {
         this.flowStatus = 'Restarting';
         this.isFlowStatusOK = true;
-        this.flowService.getConfiguration(id)
+        this.flowService.getConfiguration(this.flow.id)
             .map((response) => response.text())
             .subscribe((data) => {
-                this.flowService.setConfiguration(id, data)
+                this.flowService.setConfiguration(this.flow.id, data)
                     .map((response) => response.text())
                     .subscribe((data2) => {
                         console.log('data' + data2);
-                        this.flowService.restart(id).subscribe((response) => {
+                        this.flowService.restart(this.flow.id).subscribe((response) => {
                             if (response.status === 200) {
                                 this.setFlowStatus('restarted');
                             }
                         }, (err) => {
                             this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${id} is not restarted.`;
+                            this.flowStatusError = `Flow with id=${this.flow.id} is not restarted.`;
                         });
                     });
             }, (err) => {
-                this.flowConfigurationNotObtained(id);
+                this.flowConfigurationNotObtained(this.flow.id);
             });
     }
 
-    stop(id: number) {
+    stop() {
         this.flowStatus = 'Stopping';
         this.isFlowStatusOK = true;
-        this.flowService.stop(id).subscribe((response) => {
+        this.flowService.stop(this.flow.id).subscribe((response) => {
             if (response.status === 200) {
                 this.setFlowStatus('stopped');
             }
         }, (err) => {
             this.isFlowStatusOK = false;
-            this.flowStatusError = `Flow with id=${id} is not stopped.`;
+            this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
         });
     }
 }

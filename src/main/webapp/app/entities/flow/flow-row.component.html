@@ -16,23 +16,23 @@
 </td>
 <td class="text-right">
 	<div class="btn-group flex-btn-group-container flow-btns">
-		<button type="button" (click)="start(flow.id)" class="btn btn-info btn-sm" *ngIf="!isFlowStarted">
+		<button type="button" (click)="start()" class="btn btn-info btn-sm" *ngIf="!isFlowStarted">
 			<span class="fa fa-play"></span>
 			<span class="d-none d-md-inline">Start</span>
 		</button>
-		<button type="button" (click)="restart(flow.id)" class="btn btn-primary btn-sm" *ngIf="!isFlowRestarted">
+		<button type="button" (click)="restart()" class="btn btn-primary btn-sm" *ngIf="!isFlowRestarted">
 			<span class="fa fa-refresh"></span>
 			<span class="d-none d-md-inline">Restart</span>
 		</button>
-		<button type="button" (click)="pause(flow.id)" class="btn btn-warning btn-sm" [disabled]="!isFlowPaused && isFlowStopped" *ngIf="!isFlowPaused">
+		<button type="button" (click)="pause()" class="btn btn-warning btn-sm" [disabled]="!isFlowPaused && isFlowStopped" *ngIf="!isFlowPaused">
 			<span class="fa fa-pause"></span>
 			<span class="d-none d-md-inline">Pause</span>
 		</button>
-		<button type="button" (click)="resume(flow.id)" class="btn btn-info btn-sm" *ngIf="!isFlowResumed">
+		<button type="button" (click)="resume()" class="btn btn-info btn-sm" *ngIf="!isFlowResumed">
 			<span class="fa fa-step-forward"></span>
 			<span class="d-none d-md-inline">Resume</span>
 		</button>
-		<button type="button" (click)="stop(flow.id)" class="btn btn-danger btn-sm" [disabled]="isFlowStopped">
+		<button type="button" (click)="stop()" class="btn btn-danger btn-sm" [disabled]="isFlowStopped">
 			<span class="fa fa-stop"></span>
 			<span class="d-none d-md-inline">Stop</span>
 		</button>
