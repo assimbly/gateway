@@ -1,66 +1,82 @@
 <div>
     <h2>
         <span>Service Keys</span>
-        <button class="btn btn-primary float-right jh-create-entity create-service-keys" [routerLink]="['/', { outlets: { popup: ['service-keys-new'] } }]">
-            <span class="fa fa-plus"></span>
-            <span >
-            Create new Service Keys
-            </span>
-        </button>
     </h2>
-    <jhi-alert></jhi-alert>
+    <!-- <jhi-alert></jhi-alert> -->
     <div class="row">
     </div>
     <br/>
     <div class="table-responsive" *ngIf="serviceKeys">
-        <table class="table table-striped">
+        <table class="table">
             <thead>
-            <tr>
-            <th><span>ID</span></th>
-            <th><span>Key</span></th>
-            <th><span>Value</span></th>
-            <th><span>Service Keys</span></th>
-            <th></th>
-            </tr>
+                <tr>
+                    <th id="serviceKeysTitleID" [hidden]="!serviceKeysRowTitleID">
+                        <span>ID</span>
+                    </th>
+                    <th>
+                        <span>Key</span>
+                    </th>
+                    <th>
+                        <span>Value</span>
+                    </th>
+                    <th id="serviceKeysTitleKeyID" [hidden]="!serviceKeysRowTitleKeyID">
+                        <span>Service Keys</span>
+                    </th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let serviceKeys of serviceKeys ;trackBy: trackId">
-                <td><a [routerLink]="['../service-keys', serviceKeys.id ]">{{serviceKeys.id}}</a></td>
-                <td>{{serviceKeys.key}}</td>
-                <td>{{serviceKeys.value}}</td>
-                <td>{{serviceKeys.type}}</td>
-                <td>
-                    <div *ngIf="serviceKeys.serviceId">
-                        <a [routerLink]="['../service', serviceKeys.serviceId  ]" >{{serviceKeys.serviceId}}</a>
-                    </div>
-                </td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../service-keys', serviceKeys.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                <tr *ngFor="let serviceKey of serviceKeys ;trackBy: trackId; let idx = index">
+                    <td id="serviceKeysRowID" [hidden]="!serviceKeysRowID">
+                        {{serviceKey.id}}
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
+                            id="serviceKey-key-{{idx}}" [disabled]="serviceKey.isDisabled" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" id="serviceKey-value-{{idx}}"
+                            value="serviceKey.value" [disabled]="serviceKey.isDisabled" />
+                        <td id="serviceKeysRowKeyID" [hidden]="!serviceKeysRowKeyID">
+                            <div *ngIf="serviceKey.serviceId">
+                                <input type="text" class="form-control" id="id" name="id" [(ngModel)]="serviceKey.serviceId" readonly />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="btn-group flex-btn-group-container">
+                                <div class="btn-group flex-btn-group-container">
+
+                                    <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
+                                        <span class="fa fa-plus"></span>
+                                    </button>
+                                    <button type="button" title="Remove" *ngIf="!serviceKey.id" class="btn btn-danger" (click)="removeServiceKeys()">
+                                        <span class="fa fa-remove"></span>
+                                    </button>
+                                    <button type="button" title="Save" *ngIf="!serviceKey.id" class="btn btn-primary" (click)="save(serviceKey)">
+                                        <span class="fa fa-save"></span>
+                                    </button>
+                                    <button type="button" title="View" *ngIf="serviceKey.id" class="btn btn-info" [routerLink]="['../service-keys', serviceKey.id ]">
+                                        <span class="fa fa-eye"></span>
+                                    </button>
+                                    <button type="button" title="Update" *ngIf="serviceKey.id && !serviceKey.isDisabled" class="btn btn-primary" (click)="save(serviceKey)">
+                                        <span class="fa fa-check"></span>
+                                    </button>
+                                    <button type="button" title="Edit" *ngIf="serviceKey.id && serviceKey.isDisabled" replaceUrl="true" queryParamsHandling="merge"
+                                        class="btn btn-primary" (click)="editServiceKey(serviceKey)">
+                                        <span class="fa fa-pencil"></span>
+                                    </button>
+                                    <button type="button" title="Clone" *ngIf="serviceKey.id && serviceKey.isDisabled"
+                                        class="btn btn-info" (click)="cloneServiceKey(serviceKey)">
+                                        <span class="fa fa-clone"></span>
+                                    </button>
+                                    <button type="submit" title="Delete" *ngIf="serviceKey.id" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger"
+                                        [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKey?.id + '/delete'} }]">
+                                        <span class="fa fa-trash"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                </tr>
             </tbody>
         </table>
     </div>
