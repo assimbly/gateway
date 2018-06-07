@@ -662,54 +662,50 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else {
             if (this.singleGateway) {
                 this.flow.gatewayId = this.gateways[0].id;
+                
             }
-            this.flowService.create(this.flow)
-                .subscribe((flowRes) => {
-                    this.flow = flowRes;
-                    this.updateForm(this.flow);
-                    this.fromEndpointService.create(this.fromEndpoint)
-                        .subscribe((fromRes) => {
-                            this.fromEndpoint = fromRes;
-                            this.updateEndpointData(0, this.fromEndpoint);
-                            this.errorEndpointService.create(this.errorEndpoint)
-                                .subscribe((errorRes) => {
-                                    this.errorEndpoint = errorRes;
-                                    this.updateEndpointData(1, this.errorEndpoint);
-                                    this.flow.fromEndpointId = this.fromEndpoint.id;
-                                    this.flow.errorEndpointId = this.errorEndpoint.id;
-                                    this.flowService.update(this.flow)
-                                        .subscribe((flowUpdated) => {
-                                            this.flow = flowUpdated;
-                                            this.toEndpoints.forEach((toEndpoint) => {
-                                                toEndpoint.flowId = this.flow.id;
+
+            this.fromEndpointService.create(this.fromEndpoint)
+                .subscribe((fromRes) => {
+                    this.fromEndpoint = fromRes;
+                    this.updateEndpointData(0, this.fromEndpoint);
+                    this.errorEndpointService.create(this.errorEndpoint)
+                        .subscribe((errorRes) => {
+                            this.errorEndpoint = errorRes;
+                            this.updateEndpointData(1, this.errorEndpoint);
+                            this.flow.fromEndpointId = this.fromEndpoint.id;
+                            this.flow.errorEndpointId = this.errorEndpoint.id;
+                            this.flowService.create(this.flow)
+                                .subscribe((flowUpdated) => {
+                                    this.flow = flowUpdated;
+                                    this.toEndpoints.forEach((toEndpoint) => {
+                                        toEndpoint.flowId = this.flow.id;
+                                    });
+                                    this.toEndpointService.createMultiple(this.toEndpoints)
+                                        .subscribe((toRes) => {
+                                            toRes.forEach((toEndpoint, i) => {
+                                                this.updateEndpointData(i + 2, toEndpoint);
                                             });
-                                            this.toEndpointService.createMultiple(this.toEndpoints)
-                                                .subscribe((toRes) => {
-                                                    toRes.forEach((toEndpoint, i) => {
-                                                        this.updateEndpointData(i + 2, toEndpoint);
-                                                    });
-                                                    console.log('flow created');
-                                                    this.finished = true;
-                                                    this.savingFlowSuccess = true;
-                                                    this.isSaving = false;
-                                                    if (goToOverview) {
-                                                        this.router.navigate(['/']);
-                                                    }
-                                                }, () => {
-                                                    this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
-                                                });
+                                            console.log('flow created');
+                                            this.finished = true;
+                                            this.savingFlowSuccess = true;
+                                            this.isSaving = false;
+                                            if (goToOverview) {
+                                                this.router.navigate(['/']);
+                                            }
                                         }, () => {
-                                            this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
+                                            this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, this.errorEndpoint.id, null);
                                         });
                                 }, () => {
                                     this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
                                 });
                         }, () => {
-                            this.handleErrorWhileCreatingFlow(this.flow.id, null, null, null);
+                            this.handleErrorWhileCreatingFlow(this.flow.id, this.fromEndpoint.id, null, null);
                         });
                 }, () => {
-                    this.handleErrorWhileCreatingFlow(null, null, null, null);
+                    this.handleErrorWhileCreatingFlow(this.flow.id, null, null, null);
                 });
+                
         }
     }
 
