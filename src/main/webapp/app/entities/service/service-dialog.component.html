@@ -27,6 +27,9 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
         </button>
+        <button type="button" *ngIf="showEditButton" class="btn btn-primary" (click)="navigateToService()">
+            <span class="fa fa-pencil"></span>&nbsp;<span>Edit Service Keys</span>
+        </button>
         <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
             <span class="fa fa-save"></span>&nbsp;<span>Apply</span>
         </button>
