@@ -29,6 +29,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     gatewayExists = false;
     multipleGateways = false;
     singleGatewayName: string;
+    flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
 
     constructor(
         private gatewayService: GatewayService,
@@ -128,6 +129,10 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     registerChangeCreatedGateway() {
         this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', (response) => this.gatewayExists = false);
+    }
+
+    trigerAction(action: string) {
+        this.eventManager.broadcast({ name: 'trigerAction', content: action});
     }
 
     private onSuccess(data, headers) {
