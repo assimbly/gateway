@@ -50,7 +50,7 @@
 					</div> -->
 
 					<!-- styling of tabset is in global.css -->
-					<ngb-tabset justify="justified" formArrayName="endpointsData">
+					<ngb-tabset justify="justified" formArrayName="endpointsData" #tabs>
 						<ngb-tab title="From" id="fromTab">
 							<ng-template ngbTabContent>
 								<jhi-alert-error></jhi-alert-error>
@@ -363,13 +363,17 @@
 						<span class="fa fa-ban"></span>&nbsp;
 						<span>Cancel</span>
 					</button>
-					<button type="submit" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
+					<button type="submit" *ngIf="!displayNextButton" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
 						<span class="fa fa-save"></span>&nbsp;
 						<span>Apply</span>
 					</button>
-					<button type="button" (click)="save(true)" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
+					<button type="button" (click)="save(true)" *ngIf="!displayNextButton" [disabled]="editFlowForm.invalid || isSaving" class="btn btn-primary">
 						<span class="fa fa-save"></span>&nbsp;
 						<span>Save</span>
+					</button>
+					<button type="button" (click)="next()" *ngIf="displayNextButton" class="btn btn-primary">
+						<span>Next</span>&nbsp;
+						<span class="fa fa-arrow-right"></span>
 					</button>
 				</div>
 				<div *ngIf="savingFlowFailed">

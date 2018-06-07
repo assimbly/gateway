@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
@@ -16,7 +16,7 @@ import { ErrorEndpointComponent, ErrorEndpointService, ErrorEndpoint } from '../
 import { Gateway, GatewayService } from '../gateway';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
-import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { FormatWidth } from '@angular/common';
 
 @Component({
@@ -68,9 +68,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     errorUriPopoverMessage: string;
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
+    displayNextButton = false;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
+
+    @ViewChild('tabs')
+        private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -176,6 +180,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
                 this.toEndpointsOptions = [[new Option()]];
                 this.finished = true;
+                this.displayNextButton = true;
             }, 0);
         }
     }
@@ -737,6 +742,43 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     goBack() {
         window.history.back();
+    }
+
+    next() {
+        const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
+        const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
+        const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
+        if (index === 0) {
+            this.validateTypeAndUri(endpoints, index);
+            if (endpoints[index].valid) {
+                this.goToNextTab(endpoints, index + 1);
+            }
+        } else if (index === this.ngbTabset.tabs.length - 1) {
+            this.validateTypeAndUri(endpoints, index);
+            if (endpoints[1].valid) {
+                this.goToNextTab(endpoints, 0);
+            }
+        } else {
+            this.validateTypeAndUri(endpoints, index + 1);
+            if (endpoints[index + 1].valid) {
+                this.goToNextTab(endpoints, index + 1);
+            }
+        }
+    }
+
+    goToNextTab(endpoints: AbstractControl[], index) {
+        this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
+        if (endpoints.find((e) => !e.valid)) {
+            this.displayNextButton = true;
+            this.next();
+        } else {
+            this.displayNextButton = false;
+        }
+    }
+
+    validateTypeAndUri(endpoints: AbstractControl[], index: number) {
+        (<FormGroup>endpoints[index]).controls.type.markAsDirty();
+        (<FormGroup>endpoints[index]).controls.uri.markAsDirty();
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
