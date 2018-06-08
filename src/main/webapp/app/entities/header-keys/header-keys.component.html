@@ -1,67 +1,91 @@
 <div>
     <h2>
-        <span>Header Keys</span>
-        <button class="btn btn-primary float-right jh-create-entity create-header-keys" [routerLink]="['/', { outlets: { popup: ['header-keys-new'] } }]">
-            <span class="fa fa-plus"></span>
-            <span >
-            Create new Header Keys
-            </span>
-        </button>
+        <span>Header keys</span>
     </h2>
-    <jhi-alert></jhi-alert>
+    
     <div class="row">
     </div>
     <br/>
     <div class="table-responsive" *ngIf="headerKeys">
-        <table class="table table-striped">
+        <table class="table">
             <thead>
-            <tr>
-            <th id="headerKeysTitleID" [hidden]="!headerKeysRowTitleID"><span>ID</span></th>
-            <th><span>Key</span></th>
-            <th><span>Value</span></th>
-            <th><span>Type</span></th>
-            <th id="headerKeysTitleKeyID" [hidden]="!headerKeysRowTitleKeyID"><span>Header</span></th>
-            <th></th>
-            </tr>
+                <tr>
+                    <th id="headerKeysTitleID" [hidden]="!headerKeysRowTitleID">
+                        <span>ID</span>
+                    </th>
+                    <th>
+                        <span>Key</span>
+                    </th>
+                    <th>
+                        <span>Value</span>
+                    </th>
+                    <th>
+                        <span>Type</span>
+                    </th>
+                    <th id="headerKeysTitleKeyID" [hidden]="!headerKeysRowTitleKeyID">
+                        <span>Header</span>
+                    </th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let headerKeys of headerKeys ;trackBy: trackId">
-                <td id="headerKeysRowID" [hidden]="!headerKeysRowID"><a [routerLink]="['../header-keys', headerKeys.id ]">{{headerKeys.id}}</a></td>
-                <td>{{headerKeys.key}}</td>
-                <td>{{headerKeys.value}}</td>
-                <td>{{headerKeys.type}}</td>
-                <td  id="headerKeysRowKeyID" [hidden]="!headerKeysRowKeyID">
-                    <div *ngIf="headerKeys.headerId">
-                        <a [routerLink]="['../header', headerKeys.headerId  ]" >{{headerKeys.headerId}}</a>
-                    </div>
-                </td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../header-keys', headerKeys.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKeys.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKeys.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index">
+                    <td id="headerKeysRowID" [hidden]="!headerKeysRowID">
+                        <a [routerLink]="['../header-keys', headerKey.id ]">{{headerKey.id}}</a>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="headerKey.key" value="headerKey.key" name="headerKeys-key-{{idx}}" id="headerKeys-key-{{idx}}"
+                            [disabled]="headerKey.isDisabled" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="headerKey.value" name="headerKeys-value-{{idx}}" id="headerKeys-value-{{idx}}"
+                            value="headerKey.value" [disabled]="headerKey.isDisabled" />
+                    </td>
+                    <td>
+                        <select class="form-control" id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}" [(ngModel)]="headerKey.type"
+                            [disabled]="headerKey.isDisabled">
+                            <option [ngValue]="type" *ngFor="let type of typeHeader">{{type}}</option>
+                        </select>
+                    </td>
+                    <td id="headerKeysRowKeyID" [hidden]="!headerKeysRowKeyID">
+                        <div *ngIf="headerKey.headerId">
+                            <a [routerLink]="['../header', headerKey.headerId  ]">{{headerKey.headerId}}</a>
+                            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="headerKey.headerId" readonly />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group flex-btn-group-container">
+
+                            <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
+                                <span class="fa fa-plus"></span>
+                            </button>
+                            <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys()">
+                                <span class="fa fa-remove"></span>
+                            </button>
+                            <button type="button" title="Save" *ngIf="!headerKey.id" class="btn btn-primary" (click)="save(headerKey)">
+                                <span class="fa fa-save"></span>
+                            </button>
+                            <button type="button" title="View" *ngIf="headerKey.id" class="btn btn-info" [routerLink]="['../header-keys', headerKey.id ]">
+                                <span class="fa fa-eye"></span>
+                            </button>
+                            <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey)">
+                                <span class="fa fa-check"></span>
+                            </button>
+                            <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary"
+                                (click)="editHeaderKey(headerKey)">
+                                <span class="fa fa-pencil"></span>
+                            </button>
+                            <button type="button" title="Clone" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-info"
+                                (click)="cloneHeaderKey(headerKey)">
+                                <span class="fa fa-clone"></span>
+                            </button>
+                            <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge"
+                                class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey?.id + '/delete'} }]">
+                                <span class="fa fa-trash"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

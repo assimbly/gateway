@@ -1,4 +1,4 @@
-package org.assimbly.gateway.config.flows;
+package org.assimbly.gateway.config.environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

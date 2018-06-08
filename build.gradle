@@ -52,7 +52,7 @@ dependencyManagement {
 defaultTasks 'bootRun'
 
 group = 'org.assimbly.gateway'
-version = '0.4.0-SNAPSHOT'
+version = '0.5.0-SNAPSHOT'
 
 description = ''
 
@@ -190,6 +190,7 @@ dependencies {
     compile "org.zalando:problem-spring-web"
     compile "org.springframework.cloud:spring-cloud-spring-service-connector"
     compile "org.springframework:spring-context-support"
+    compile "org.springframework:spring-messaging"   
     compile "org.springframework.security:spring-security-config"
     compile "org.springframework.security:spring-security-data"
     compile "org.springframework.security:spring-security-web"

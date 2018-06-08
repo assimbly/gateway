@@ -17,7 +17,7 @@ import { ResponseWrapper } from '../../shared';
     templateUrl: './header-keys-dialog.component.html'
 })
 export class HeaderKeysDialogComponent implements OnInit {
-
+    selectedType: string;
     headerKeys: HeaderKeys;
     isSaving: boolean;
 
@@ -34,10 +34,10 @@ export class HeaderKeysDialogComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
-        this.headerService.query()
-            .subscribe((res: ResponseWrapper) => { this.headers = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+        this.headerService.query().subscribe((res: ResponseWrapper) => {
+            this.headers = res.json;
+            }, (res: ResponseWrapper) => this.onError(res.json));
     }
-
     clear() {
         this.activeModal.dismiss('cancel');
     }

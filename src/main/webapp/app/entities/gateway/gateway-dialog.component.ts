@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
@@ -22,7 +22,9 @@ export class GatewayDialogComponent implements OnInit {
     constructor(
         public activeModal: NgbActiveModal,
         private gatewayService: GatewayService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private router: ActivatedRoute
+
     ) {
     }
 
@@ -33,33 +35,39 @@ export class GatewayDialogComponent implements OnInit {
             this.gateway.defaultToEndpointType = 'FILE';
             this.gateway.defaultErrorEndpointType = 'FILE';
         }
+
+        if (this.router.fragment['value'] === 'clone') {
+            this.gateway.id = null;
+        }
     }
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
-    save() {
+    save(closePopup: boolean) {
         this.isSaving = true;
         if (this.gateway.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.gatewayService.update(this.gateway));
+                this.gatewayService.update(this.gateway), closePopup);
         } else {
             this.subscribeToSaveResponse(
-                this.gatewayService.create(this.gateway));
+                this.gatewayService.create(this.gateway), closePopup);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Gateway>) {
+    private subscribeToSaveResponse(result: Observable<Gateway>, closePopup: boolean) {
         result.subscribe((res: Gateway) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: Gateway) {
+    private onSaveSuccess(result: Gateway, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK'});
         this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK'});
         this.isSaving = false;
-        this.activeModal.dismiss(result);
+        if (closePopup) {
+            this.activeModal.dismiss(result);
+        }
     }
 
     private onSaveError() {
