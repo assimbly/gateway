@@ -7,6 +7,7 @@ export class HeaderKeys implements BaseEntity {
         public value?: string,
         public type?: string,
         public headerId?: number,
+        public isDisabled?: boolean
     ) {
     }
 }

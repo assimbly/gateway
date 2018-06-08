@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
@@ -21,10 +22,11 @@ import {
     FlowDeleteDialogComponent,
     flowRoute,
     flowPopupRoute,
+    FlowLiveModeComponent,
+    FlowRowComponent
 } from './';
-import { FlowRowComponent } from './flow-row.component';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const ENTITY_STATES = [
     ...flowRoute,
@@ -42,7 +44,8 @@ const ENTITY_STATES = [
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
-        PopoverModule.forRoot()
+        PopoverModule.forRoot(),
+        AceEditorModule
     ],
     exports: [
         FlowComponent
@@ -56,7 +59,8 @@ const ENTITY_STATES = [
         FlowDeleteDialogComponent,
         FlowPopupComponent,
         FlowDeletePopupComponent,
-        FlowRowComponent
+        FlowRowComponent,
+        FlowLiveModeComponent
     ],
     entryComponents: [
         FlowComponent,
@@ -66,6 +70,7 @@ const ENTITY_STATES = [
         FlowPopupComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
+        FlowLiveModeComponent
     ],
     providers: [
         FlowService,
@@ -73,4 +78,4 @@ const ENTITY_STATES = [
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayFlowModule {}
+export class GatewayFlowModule { }

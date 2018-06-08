@@ -2,7 +2,7 @@ package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
 
-import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
+import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.net.URISyntaxException;
 public class ConfigurationResource {
 
 	@Autowired
-	private AssimblyDBConfiguration assimblyDBConfiguration;
+	private DBConfiguration assimblyDBConfiguration;
 
 	private String configuration;
     

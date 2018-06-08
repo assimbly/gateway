@@ -1,69 +1,21 @@
 <div>
-	<div>
-    <h2>
-        <span>Headers</span>
-        			<button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/', { outlets: { popup: ['header-new'] } }]">
-	            <span class="fa fa-plus"></span>
-	            <span >
-	            Create new Header
-	            </span>
-	        </button>	        
-    		<br/>   
-    		<br/>     
-       		<div class="form-group">
-	            <select class="form-control" id="field_header" name="header" >
-	              <option *ngFor="let header of headers; trackBy: trackId">{{header.name}}</option>
-	            </select>
-	        </div>
-	    </div>
-    </h2>
+    <div>
+        <button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/', { outlets: { popup: ['header-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span>Create new Header</span>
+        </button>
+        <br/>
+        <h2>
+            <span>Header</span>
+        </h2>        
+        <br/>
+        <div class="form-group">
+        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
+        </div>
+    </div>
+
     <jhi-alert></jhi-alert>
     <br/>
-  
-       <!--    -->
-    <!-- <div class="table-responsive" *ngIf="headers">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-            <th id="headerTitleID" [hidden]="!headerTitleID"><span>ID</span></th>
-            <th><span>Name</span></th>
-            <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let header of headers ;trackBy: trackId">
-                <td id="headerRowID" [hidden]="!headerRowID"><a [routerLink]="['../header', header.id ]">{{header.id}}</a></td>
-                <td>{{header.name}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../header', header.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div> -->
 </div>
 
-<jhi-header-keys>Loading header keys...</jhi-header-keys>
+<jhi-header-keys [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
