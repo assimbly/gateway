@@ -8,7 +8,7 @@ The purpose of Assimbly is to connect these endpoints with the help of a webgui.
 On the background [Apache Camel](https://github.com/apache/camel) does the actual work. Assimbly only implements the point-to-point(s) intergration pattern of Camel.
 So if data only needs to transfered it can connect any supported endpoint by the [Assimbly Connector](https://github.com/assimbly/connector) directly.
 
-![alt text](https://github.com/assimbly/gateway/tree/master/src/main/webapp/content/images/assimbly_screenshot.jpg "Flows page")
+![alt text](src/main/webapp/content/images/assimbly_screenshot.jpg?raw=true "Flows page")
 
 ## Design
 
