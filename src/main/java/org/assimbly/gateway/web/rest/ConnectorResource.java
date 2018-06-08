@@ -444,35 +444,56 @@ public class ConnectorResource {
 		}
     }
 
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/documenation/version", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getDocumentationVersion(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+    		String documentation = connector.getDocumentationVersion();
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentationVersion",documentation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentationVersion",flowId,e);
+		}
+    }
 	
     @GetMapping(path = "/connector/{connectorId}/flow/documenation/{componenttype}", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getDocumentation(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
 
+    	plainResponse = true;
 
 		try {
     		String documentation = connector.getDocumentation(componenttype, mediaType);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",documentation,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentation",documentation,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentation",flowId,e);
 		}
     }
 
-
-    @GetMapping(path = "/connector/{connectorId}/flow/validate/{id}", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/connector/{connectorId}/flow/schema/{componenttype}", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> validateFlow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+    public ResponseEntity<String> getComponentSchema(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
 
     	plainResponse = true;
 
 		try {
-        	init();
-        	flowId = id.toString();
-    		String flowValidation = connector.validateFlow(flowId);
-    		if(flowValidation.startsWith("Error")||flowValidation.startsWith("Warning")) {plainResponse = false;}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",flowValidation,plainResponse);
+    		String documentation = connector.getComponentSchema(componenttype, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getComponentSchema",documentation,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getComponentSchema",flowId,e);
+		}
+    }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/validate/{uri}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> validateFlow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String uri) throws Exception {
+
+		try {
+    		String flowValidation = connector.validateFlow(uri);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"validateFlows",flowValidation);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"validateFlows",flowId,e);
 		}
     }
     
