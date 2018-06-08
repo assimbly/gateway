@@ -2,7 +2,7 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
+import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
 
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -39,7 +39,7 @@ public class GatewayResource {
     private final GatewayMapper gatewayMapper;
 
 	@Autowired
-	private AssimblyDBConfiguration assimblyDBConfiguration;
+	private DBConfiguration assimblyDBConfiguration;
 
     public GatewayResource(GatewayRepository gatewayRepository, GatewayMapper gatewayMapper) {
         this.gatewayRepository = gatewayRepository;

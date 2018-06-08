@@ -3,6 +3,7 @@ package org.assimbly.gateway.web.rest;
 import com.codahale.metrics.annotation.Timed;
 
 import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -63,6 +64,7 @@ public class FlowResource {
             throw new BadRequestAlertException("A new flow cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Flow flow = flowMapper.toEntity(FlowDTO);
+        
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
         return ResponseEntity.created(new URI("/api/flows/" + result.getId()))
