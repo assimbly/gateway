@@ -15,6 +15,7 @@ export class FlowLiveModeComponent implements OnInit {
     public configuration: any;
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
+    public hasLoadError: boolean;
 
     constructor(
         private flowService: FlowService
@@ -37,7 +38,7 @@ export class FlowLiveModeComponent implements OnInit {
             .map((response) => response.text())
             .subscribe((config) => {
                 this.configuration = config;
-                this.isConfigurationSet = true;
+                this.showInfoMessage(true);
 
                 let configuredFlow = new ConfiguredFlow();
                 configuredFlow.flowId = this.flowId;
@@ -47,7 +48,17 @@ export class FlowLiveModeComponent implements OnInit {
                 configuredFlow.isFlowStopped = true;
                 configuredFlow.isFlowRestarted = true;
                 this.configuredFlows.push(configuredFlow);
+            }, (err) => {
+                this.showInfoMessage(false);
             });
+    }
+
+    showInfoMessage(isSuccess) {
+        isSuccess ? this.isConfigurationSet = true : this.hasLoadError = true;
+        setTimeout(() => {
+            this.isConfigurationSet = false;
+            this.hasLoadError = false
+        }, 10000);
     }
 
     start(configuredFlow: ConfiguredFlow) {

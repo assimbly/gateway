@@ -38,11 +38,14 @@ export class ServiceDialogComponent implements OnInit {
         this.serviceKeys = new ServiceKeys();
         this.isSaving = false;
         this.serviceService.query()
-        .subscribe((res: ResponseWrapper) => {
-        this.services = res.json;
-        }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe((res: ResponseWrapper) => {
+                this.services = res.json;
+            }, (res: ResponseWrapper) => this.onError(res.json));
         if (this.route.fragment['value'] === 'showEditServiceButton') {
             this.showEditButton = true;
+        }
+        if (this.route.fragment['value'] === 'clone') {
+            this.service.id = null;
         }
     }
 
@@ -68,6 +71,13 @@ export class ServiceDialogComponent implements OnInit {
         }, 0);
     }
 
+    navigateToServiceDetail(serviceId: number) {
+        this.router.navigate(['/service', serviceId]);
+        setTimeout(() => {
+            this.activeModal.close();
+        }, 0);
+    }
+
     private subscribeToSaveResponse(result: Observable<Service>, closePopup: boolean) {
         result.subscribe((res: Service) =>
             this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
@@ -78,7 +88,9 @@ export class ServiceDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
         this.eventManager.broadcast({name: 'serviceModified', content: result.id});
         this.isSaving = false;
-        if (closePopup) {
+        if (this.route.fragment['value'] === 'clone') {
+            this.navigateToServiceDetail(result.id);
+        } else if (closePopup) {
             this.activeModal.dismiss(result);
         }
     }
