@@ -24,15 +24,20 @@
                 <ng-select [items]="typeServices" bindLabel="type" bindValue="type" id="field_service_type" [(ngModel)]="selectedService.type" [disabled]="disabledServiceType"></ng-select>
             </div>
             <div class="col-md-1 text-right">
-
                 <button type="button" title="Edit" class="btn btn-info" (click)="edit()">
                     <span class="fa fa-edit"></span>
-                </button> 
+                </button>
                 <button type="button" title="Save" class="btn btn-primary" (click)="saveServiceType(selectedService)">
-                        <span class="fa fa-save"></span>
-                    </button>
+                    <span class="fa fa-save"></span>
+                </button>
             </div>
         </div>
+    </div>
+    <div class="float-right">
+        <button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info btn-sm">
+            <span class="fa fa-eye"></span>
+            <span class="d-none d-md-inline">View</span>
+        </button>
     </div>
     <jhi-alert></jhi-alert>
     <br/>

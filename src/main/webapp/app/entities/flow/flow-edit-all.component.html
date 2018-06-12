@@ -65,8 +65,8 @@
 											<div class="input-group">
 												<ng-select [items]="types" formControlName="type" id="field_from_type" (ngModelChange)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint?.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type | lowercase}} component documentation">
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type}} component documentation">
 														<img  src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
@@ -163,8 +163,8 @@
 											<div class="input-group">
 												<ng-select [items]="types" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeAssimblyLinks[toIndex]}" target="_blank" title="Assimbly {{toEndpoint?.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Camel {{toEndpoint?.type | lowercase}} component documentation">
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeAssimblyLinks[toIndex]}" target="_blank" title="Assimbly {{toEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Camel {{toEndpoint?.type}} component documentation">
 														<img src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
@@ -272,8 +272,8 @@
 											<div class="input-group">
 												<ng-select [items]="types" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{errorTypeAssimblyLink}}" [ngClass]="{'disabled': !errorTypeAssimblyLink}" target="_blank" title="Assimbly {{errorEndpoint?.type | lowercase}} component documentation"><span class="fa fa-question"></span></a>
-													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Camel {{errorEndpoint?.type | lowercase}} component documentation">
+													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{errorTypeAssimblyLink}}" [ngClass]="{'disabled': !errorTypeAssimblyLink}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
 														<img src="../../../content/images/apache-camel.png" />
 													</a>
 												</div>
