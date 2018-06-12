@@ -1,16 +1,5 @@
 import { BaseEntity } from './../../shared';
-
-export const enum EndpointType {
-    'SONICMQ',
-    'ACTIVEMQ',
-    'SJMS',
-    'SQL',
-    'HTTP4',
-    'SFTP',
-    'STREAM',
-    'WASTEBIN',
-    'FILE'
-}
+import { EndpointType } from './../../shared/model/endpoint-type'
 
 export class ToEndpoint implements BaseEntity {
     constructor(

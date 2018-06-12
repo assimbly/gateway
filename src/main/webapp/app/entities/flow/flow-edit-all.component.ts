@@ -18,6 +18,7 @@ import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { FormatWidth } from '@angular/common';
+import { EndpointType } from '../../shared/model/endpoint-type';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -171,12 +172,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.flow.autoStart = false;
                 this.initializeForm(this.flow);
                 this.fromEndpoint = new FromEndpoint();
+                this.fromEndpoint.type = EndpointType.FILE;
                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
                 this.fromEndpointOptions = [new Option()];
                 this.errorEndpoint = new ErrorEndpoint();
+                this.errorEndpoint.type = EndpointType.FILE;
                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
                 this.errorEndpointOptions = [new Option()];
                 this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                this.toEndpoints.forEach((endpoint) => {
+                    endpoint.type = EndpointType.FILE;
+                });
                 (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
                 this.toEndpointsOptions = [[new Option()]];
                 this.finished = true;
@@ -667,7 +673,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else {
             if (this.singleGateway) {
                 this.flow.gatewayId = this.gateways[0].id;
-                
             }
 
             this.fromEndpointService.create(this.fromEndpoint)
@@ -710,7 +715,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }, () => {
                     this.handleErrorWhileCreatingFlow(this.flow.id, null, null, null);
                 });
-                
         }
     }
 
