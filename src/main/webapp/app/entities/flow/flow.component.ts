@@ -5,7 +5,6 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
-import { EndpointType } from '../from-endpoint';
 import { GatewayService, Gateway } from '../gateway';
 
 @Component({

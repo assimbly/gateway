@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
@@ -19,7 +19,8 @@ export class ServiceDeleteDialogComponent {
     constructor(
         private serviceService: ServiceService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private router: Router
     ) {
     }
 
@@ -33,7 +34,10 @@ export class ServiceDeleteDialogComponent {
                 name: 'serviceListModification',
                 content: 'Deleted an service'
             });
-            this.activeModal.dismiss(true);
+            this.router.navigate(['/service']);
+            setTimeout(() => {
+                this.activeModal.close();
+            }, 0);
         });
     }
 }

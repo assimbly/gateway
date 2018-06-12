@@ -35,9 +35,6 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
             this.service = service;
         });
     }
-    previousState() {
-        window.history.back();
-    }
 
     ngOnDestroy() {
         this.subscription.unsubscribe();
