@@ -128,10 +128,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     this.fromEndpoint.id = null;
                                     this.flow.fromEndpointId = null;
                                 }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint))
-                                this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
-                                this.setTypeLinks(this.fromEndpoint, 0);
-                                this.finished = true;
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
+                                setTimeout(() => {
+                                    this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
+                                    this.setTypeLinks(this.fromEndpoint, 0);
+                                    this.finished = true;
+                                }, 0);
                             }
                         });
                     }
@@ -145,8 +147,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow.errorEndpointId = null;
                         }
                         (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
-                        this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
-                        this.setTypeLinks(this.errorEndpoint, 1);
+                        setTimeout(() => {
+                            this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
+                            this.setTypeLinks(this.errorEndpoint, 1);
+                        }, 0);
                     });
                 }
 
@@ -160,9 +164,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         if (typeof this.toEndpointsOptions[i] === 'undefined') {
                             this.toEndpointsOptions.push([]);
                         }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint))
-                        this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
-                        this.setTypeLinks(toEndpoint, i + 2);
+                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
+                        setTimeout(() => {
+                            this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
+                            this.setTypeLinks(toEndpoint, i + 2);
+                        }, 0);
                     });
                 });
             });
@@ -446,7 +452,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
-        if (endpoint.options === null) { return; }
+        if (!endpoint.options) { endpoint.options = '' }
         const options = endpoint.options.split('&');
 
         options.forEach((option, index) => {
@@ -634,7 +640,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             this.toEndpoints.forEach((toEndpoint) => {
                 toEndpoint.flowId = this.flow.id;
-            })
+            });
+            console.log(this.fromEndpoint);
+            console.log(this.errorEndpoint);
 
             const updateFlow = this.flowService.update(this.flow);
             const updateFromEndpoint = this.fromEndpointService.update(this.fromEndpoint);
@@ -642,11 +650,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             const updateToEndpoints = this.toEndpointService.updateMultiple(this.toEndpoints);
 
             forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
+                this.flow = results[0];
+                this.fromEndpoint = results[1];
+                this.errorEndpoint = results[2];
+                this.toEndpoints = results[3];
 
-                const te: Array<ToEndpoint> = results[3];
+                if (!goToOverview) {
+                    this.updateForm(this.flow);
+                    this.updateEndpointData(0, this.fromEndpoint);
+                    this.updateEndpointData(1, this.errorEndpoint);
+                    this.toEndpoints.forEach((toEndpoint, i) => {
+                        this.updateEndpointData(i + 2, toEndpoint);
+                    });
+                }
                 this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
                     toEndpoints = toEndpoints.filter((e) => {
-                        const s = te.find((t) => t.id === e.id);
+                        const s = this.toEndpoints.find((t) => t.id === e.id);
                         if (typeof s === 'undefined') {
                             return true;
                         } else {
