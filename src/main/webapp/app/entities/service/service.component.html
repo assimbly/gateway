@@ -33,8 +33,8 @@
             </div>
         </div>
     </div>
-    <div class="float-right">
-        <button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info btn-sm">
+    <div class="float-right" *ngIf="services.length > 0">
+        <button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info btn-sm" [disabled]="services.length === 0">
             <span class="fa fa-eye"></span>
             <span class="d-none d-md-inline">View</span>
         </button>
@@ -43,4 +43,4 @@
     <br/>
 </div>
 
-<jhi-service-keys [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
+<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
