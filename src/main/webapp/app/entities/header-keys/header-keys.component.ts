@@ -59,27 +59,26 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             }
         }
     }
-    save(headerKey: HeaderKeys) {
+    save(headerKey: HeaderKeys, i: number) {
         this.isSaving = true;
         if (!!headerKey.id) {
             this.subscribeToSaveResponse(
-                this.headerKeysService.update(headerKey), false);
+                this.headerKeysService.update(headerKey), false, i);
         } else {
             headerKey.headerId = this.headerId;
             this.subscribeToSaveResponse(
-                this.headerKeysService.create(headerKey), true);
+                this.headerKeysService.create(headerKey), true, i);
         }
     }
-    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean) {
+    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean, i: number) {
         result.subscribe((res: HeaderKeys) =>
-            this.onSaveSuccess(res, isCreate), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
     }
 
-    private onSaveSuccess(result: HeaderKeys, isCreate: boolean) {
+    private onSaveSuccess(result: HeaderKeys, isCreate: boolean, i: number) {
         if (isCreate) {
-            this.headerKeys = this.headerKeys.filter((x) => !!x.id);
             result.isDisabled = true;
-            this.headerKeys.push(result);
+            this.headerKeys.splice(i, 1, result);
         } else {
             this.headerKeys.find((k) => k.id === result.id).isDisabled = true;
         }
@@ -116,8 +115,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         this.headerKeys.push(newHeaderKeys);
     }
 
-    removeHeaderKeys() {
-        const i = this.headerKeys.indexOf(new HeaderKeys());
+    removeHeaderKeys(i: number) {
         this.headerKeys.splice(i, 1);
         if (this.headerKeys.length === 0) {
             this.addHeaderKeys();

@@ -10,10 +10,10 @@
         </h2>        
         <br/>
         <div class="form-group">
-        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
+        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption()"></ng-select>
         </div>
     </div>
-    <div class="float-right">
+    <div class="float-right" *ngIf="headers.length > 0">
         <button type="submit" [routerLink]="['../header', selectedHeaderId ]" class="btn btn-info btn-sm">
             <span class="fa fa-eye"></span>
             <span class="d-none d-md-inline">View</span>
@@ -23,4 +23,4 @@
     <br/>
 </div>
 
-<jhi-header-keys [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
+<jhi-header-keys *ngIf="headers.length > 0" [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>

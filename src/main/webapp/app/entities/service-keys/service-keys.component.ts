@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 export class ServiceKeysComponent implements OnInit, OnChanges {
     @Input() serviceKeys: ServiceKeys[];
     @Input() serviceId: number;
-    // serviceKeys: ServiceKeys[];
+
     currentAccount: any;
     isSaving: boolean;
     serviceKey: ServiceKeys;
@@ -50,15 +50,15 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             }
         }
     }
-    save(serviceKey: ServiceKeys) {
+    save(serviceKey: ServiceKeys, i: number) {
         this.isSaving = true;
         if (!!serviceKey.id) {
             this.subscribeToSaveResponse(
-                this.serviceKeysService.update(serviceKey), false);
+                this.serviceKeysService.update(serviceKey), false, i);
         } else {
             serviceKey.serviceId = this.serviceId;
             this.subscribeToSaveResponse(
-                this.serviceKeysService.create(serviceKey), true);
+                this.serviceKeysService.create(serviceKey), true, i);
         }
     }
     addServiceKeys() {
@@ -67,8 +67,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.serviceKeys.push(newServiceKeys);
     }
 
-    removeServiceKeys() {
-        const i = this.serviceKeys.indexOf(new ServiceKeys());
+    removeServiceKeys(i: number) {
         this.serviceKeys.splice(i, 1);
         if (this.serviceKeys.length === 0) {
             this.addServiceKeys();
@@ -77,9 +76,9 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     editServiceKey(serviceKey) {
         serviceKey.isDisabled = false;
     }
-    private subscribeToSaveResponse(result: Observable<ServiceKeys>, isCreate: boolean) {
+    private subscribeToSaveResponse(result: Observable<ServiceKeys>, isCreate: boolean, i: number) {
         result.subscribe((res: ServiceKeys) =>
-            this.onSaveSuccess(res, isCreate), (res: Response) => this.onSaveError());
+            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
     }
     cloneServiceKey(serviceKey: ServiceKeys) {
         const serviceKeyForClone = new ServiceKeys(
@@ -91,11 +90,10 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             serviceKey.serviceId);
         this.serviceKeys.push(serviceKeyForClone);
     }
-    private onSaveSuccess(result: ServiceKeys, isCreate: boolean) {
+    private onSaveSuccess(result: ServiceKeys, isCreate: boolean, i: number) {
         if (isCreate) {
-            this.serviceKeys = this.serviceKeys.filter((x) => !!x.id);
             result.isDisabled = true;
-            this.serviceKeys.push(result);
+            this.serviceKeys.splice(i, 1, result);
         } else {
             this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }

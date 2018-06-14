@@ -49,16 +49,16 @@
                                     <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
                                         <span class="fa fa-plus"></span>
                                     </button>
-                                    <button type="button" title="Remove" *ngIf="!serviceKey.id" class="btn btn-danger" (click)="removeServiceKeys()">
+                                    <button type="button" title="Remove" *ngIf="!serviceKey.id" class="btn btn-danger" (click)="removeServiceKeys(idx)">
                                         <span class="fa fa-remove"></span>
                                     </button>
-                                    <button type="button" title="Save" *ngIf="!serviceKey.id" class="btn btn-primary" (click)="save(serviceKey)">
+                                    <button type="button" title="Save" *ngIf="!serviceKey.id" class="btn btn-primary" (click)="save(serviceKey, idx)">
                                         <span class="fa fa-save"></span>
                                     </button>
                                     <button type="button" title="View" *ngIf="serviceKey.id" class="btn btn-info" [routerLink]="['../service-keys', serviceKey.id ]">
                                         <span class="fa fa-eye"></span>
                                     </button>
-                                    <button type="button" title="Update" *ngIf="serviceKey.id && !serviceKey.isDisabled" class="btn btn-primary" (click)="save(serviceKey)">
+                                    <button type="button" title="Update" *ngIf="serviceKey.id && !serviceKey.isDisabled" class="btn btn-primary" (click)="save(serviceKey, idx)">
                                         <span class="fa fa-check"></span>
                                     </button>
                                     <button type="button" title="Edit" *ngIf="serviceKey.id && serviceKey.isDisabled" replaceUrl="true" queryParamsHandling="merge"
