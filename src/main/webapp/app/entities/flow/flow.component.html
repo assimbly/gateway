@@ -67,17 +67,9 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *ngFor="let flow of flows ;trackBy: trackId">
-					   <td id="flowRowID" [hidden]="!flowRowID">
-							<a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
-						</td>
-						<td><a [routerLink]="['../flow', flow.id ]">{{flow.name}}</a></td>
-                    </tr>
-                </tbody>
-                <!-- <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+                <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
                     <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>
-                </tbody>-->
+                </tbody>
             </table>
         </div>
     </ng-template>

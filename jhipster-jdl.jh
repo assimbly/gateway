@@ -95,13 +95,13 @@ relationship OneToMany {
 	Flow{toEndpoint} to ToEndpoint
 }
 
-relationship OneToOne {
+relationship ManyToOne {
 	FromEndpoint{service} to Service,
     ToEndpoint{service} to Service,
     ErrorEndpoint{service} to Service
 }
 
-relationship OneToOne {
+relationship ManyToOne {
 	FromEndpoint{header} to Header,
     ToEndpoint{header} to Header,
     ErrorEndpoint{header} to Header
