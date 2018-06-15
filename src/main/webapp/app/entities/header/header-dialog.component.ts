@@ -46,6 +46,9 @@ export class HeaderDialogComponent implements OnInit {
         if (this.route.fragment['value'] === 'showEditHeaderButton') {
             this.showEditButton = true;
         }
+        if (this.route.fragment['value'] === 'clone') {
+            this.header.id = null;
+        }
     }
 
     clear() {
@@ -70,6 +73,13 @@ export class HeaderDialogComponent implements OnInit {
         }, 0);
     }
 
+    navigateToHeaderDetail(headerId: number) {
+        this.router.navigate(['/header', headerId]);
+        setTimeout(() => {
+            this.activeModal.close();
+        }, 0);
+    }
+
     private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
         result.subscribe((res: Header) =>
             this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
@@ -80,7 +90,9 @@ export class HeaderDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
-        if (closePopup) {
+        if (this.route.fragment['value'] === 'clone') {
+            this.navigateToHeaderDetail(result.id);
+        } else if (closePopup) {
             this.activeModal.dismiss(result);
         }
     }

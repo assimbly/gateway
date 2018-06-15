@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
@@ -19,7 +19,8 @@ export class GatewayDeleteDialogComponent {
     constructor(
         private gatewayService: GatewayService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private router: Router
     ) {
     }
 
@@ -34,6 +35,9 @@ export class GatewayDeleteDialogComponent {
                 content: 'Deleted an gateway'
             });
             this.activeModal.dismiss(true);
+            setTimeout(() => {
+                this.router.navigate(['/gateway']);
+            }, 0);
         });
     }
 }

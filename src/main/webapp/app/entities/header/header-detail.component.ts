@@ -35,9 +35,6 @@ export class HeaderDetailComponent implements OnInit, OnDestroy {
             this.header = header;
         });
     }
-    previousState() {
-        window.history.back();
-    }
 
     ngOnDestroy() {
         this.subscription.unsubscribe();
