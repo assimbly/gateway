@@ -84,18 +84,22 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     filterServiceKeys() {
-        this.serviceKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.serviceKeys = res.json;
-                this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
-                if (this.serviceKeys.length === 0) {
-                    const newServiceKeys = new ServiceKeys();
-                    newServiceKeys.isDisabled = false;
-                    this.serviceKeys.push(newServiceKeys);
-                }
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+        if (this.selectedService === null) {
+            this.selectedService = new Service();
+        } else {
+            this.serviceKeysService.query().subscribe(
+                (res: ResponseWrapper) => {
+                    this.serviceKeys = res.json;
+                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
+                    if (this.serviceKeys.length === 0) {
+                        const newServiceKeys = new ServiceKeys();
+                        newServiceKeys.isDisabled = false;
+                        this.serviceKeys.push(newServiceKeys);
+                    }
+                },
+                (res: ResponseWrapper) => this.onError(res.json)
+            );
+        }
     }
     saveServiceType(service: Service) {
         this.isSaving = true;
