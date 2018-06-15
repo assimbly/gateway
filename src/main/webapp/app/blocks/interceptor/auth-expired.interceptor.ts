@@ -5,6 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import { AuthServerProvider } from '../../shared/auth/auth-session.service';
 import { LoginModalService } from '../../shared/login/login-modal.service';
 import { StateStorageService } from '../../shared/auth/state-storage.service';
+import { LoginService } from '../../shared/login/login.service';
+import { Router } from '@angular/router';
 
 export class AuthExpiredInterceptor extends JhiHttpInterceptor {
 
@@ -20,7 +22,7 @@ export class AuthExpiredInterceptor extends JhiHttpInterceptor {
     }
 
     responseIntercept(observable: Observable<Response>): Observable<Response> {
-        return <Observable<Response>> observable.catch((error) => {
+        return <Observable<Response>>observable.catch((error) => {
             if (error.status === 401 && error.text() !== '' && error.json().path && !error.json().path.includes('/api/account')) {
                 const destination = this.stateStorageService.getDestinationState();
                 if (destination !== null) {
@@ -31,10 +33,14 @@ export class AuthExpiredInterceptor extends JhiHttpInterceptor {
                     }
                 } else {
                     this.stateStorageService.storeUrl('/');
+                    const loginService: LoginService = this.injector.get(LoginService);
+                    loginService.logout();
+                    const router: Router = this.injector.get(Router);
+                    router.navigate(['/']);
+
                 }
                 const authServer: AuthServerProvider = this.injector.get(AuthServerProvider);
                 authServer.logout();
-                this.loginServiceModal.open();
             }
             return Observable.throw(error);
         });

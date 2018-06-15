@@ -3,10 +3,14 @@ package org.assimbly.gateway.domain;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
@@ -37,13 +41,13 @@ public class ToEndpoint implements Serializable {
     @ManyToOne
     private Flow flow;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "serviceId")
     private Service service;
 
-    @OneToOne
-    @JoinColumn(unique = true)
-    private Header header;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "headerId")
+       private Header header;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {

@@ -194,6 +194,7 @@ dependencies {
     compile "org.springframework.security:spring-security-config"
     compile "org.springframework.security:spring-security-data"
     compile "org.springframework.security:spring-security-web"
+    compile "io.jsonwebtoken:jjwt"
     compile ("io.springfox:springfox-swagger2") {
         exclude module: 'mapstruct'
     }
