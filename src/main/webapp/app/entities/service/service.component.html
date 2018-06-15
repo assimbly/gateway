@@ -30,10 +30,8 @@
             </div>
         </div>
     </div>
-    <div class="float-right">
-    </div>
     <jhi-alert></jhi-alert>
     <br/>
 </div>
 
-<jhi-service-keys [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
+<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
