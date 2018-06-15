@@ -61,10 +61,10 @@
                             <span>Endpoint Error</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th></th>
                         <th>
                             <span>Flow status</span>
                         </th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
