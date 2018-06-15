@@ -63,7 +63,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_from_type">Type</label>
 											<div class="input-group">
-												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (ngModelChange)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
+												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type}} component documentation">
@@ -175,7 +175,7 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_uri">Uri</label>
-											<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'"/>
+											<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}"/>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.touched)">
 												<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors.required" class="invalid-field-message">Uri is required.</div>
 											</div>
