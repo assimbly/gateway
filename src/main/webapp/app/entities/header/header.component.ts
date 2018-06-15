@@ -17,13 +17,12 @@ import { Principal, ResponseWrapper } from '../../shared';
 })
 
 export class HeaderComponent implements OnInit, OnDestroy {
-    public headers: Header[];
+    public headers: Array<Header> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
     headerKeys: Array<HeaderKeys>
     headerKey: HeaderKeys;
     selectedHeaderId: number;
-    lastInArray: any;
 
     constructor(
         private headerService: HeaderService,
@@ -38,9 +37,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.headers = res.json;
-                this.lastInArray = this.headers[this.headers.length - 1];
-                this.selectedHeaderId = this.lastInArray.id;
-                this.filterHeaderKeys( this.lastInArray.id);
+                if (this.headers.length > 0) {
+                    this.selectedHeaderId = this.headers[this.headers.length - 1].id;
+                    this.filterHeaderKeys(this.selectedHeaderId);
+                }
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
             this.eventManager.subscribe('headerKeyDeleted', (res) => res.content)
         }
         this.registerChangeInHeaders();
-        this.selectOption(this.selectedHeaderId);
+        this.selectOption();
     }
 
     updateHeaderKeys(id: number) {
@@ -90,7 +90,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.eventSubscriber = this.eventManager.subscribe('headerListModification', (response) => this.loadAll());
     }
 
-    selectOption(e) {
+    selectOption() {
       this.filterHeaderKeys(this.selectedHeaderId);
     }
 

@@ -24,4 +24,4 @@
     <br/>
 </div>
 
-<jhi-header-keys [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
+<jhi-header-keys *ngIf="headers.length > 0" [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>

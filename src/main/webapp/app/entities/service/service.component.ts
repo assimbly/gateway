@@ -17,7 +17,7 @@ import { Observable } from 'rxjs/Observable';
 })
 
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
-    public services: Service[];
+    public services: Array<Service> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
     serviceKey: ServiceKeys;
@@ -42,8 +42,10 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
         this.serviceService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.services = res.json;
-                this.selectedService = this.services[this.services.length - 1];
-                this.filterServiceKeys();
+                if (this.services.length > 0) {
+                    this.selectedService = this.services[this.services.length - 1];
+                    this.filterServiceKeys();
+                }
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
