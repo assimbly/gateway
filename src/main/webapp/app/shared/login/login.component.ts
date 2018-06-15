@@ -63,6 +63,7 @@ export class JhiLoginModalComponent implements AfterViewInit {
 
             // // previousState was set in the authExpiredInterceptor before being redirected to login modal.
             // // since login is succesful, go to stored previousState and clear previousState
+            // // ! changed the above behavior to logout and not show login modal, because previousState isn't properly set by authExpiredInterceptor
             const redirect = this.stateStorageService.getUrl();
             if (redirect) {
                 this.stateStorageService.storeUrl(null);

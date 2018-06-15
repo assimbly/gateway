@@ -54,8 +54,11 @@ security:
 
 server:
     session:
+        timeout: 1800
         cookie:
             http-only: true
+        
+
 
 info:
     project:

@@ -15,7 +15,15 @@
 	<a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
 </td>
 <td>
-	
+	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
+	<ng-template #statusFlowButtonTemplate let-message="message"><div [innerHtml]="flowStatusButton"></div></ng-template>
+	<p>
+			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">active</span>
+			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">paused</span>
+			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
+			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
+		 <i (mouseenter)="getFlowStatus(flow.id)" *ngIf="isFlowStatusOK;" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
+
 </td>
 <td class="text-right">
 	<div class="btn-group flex-btn-group-container flow-btns">
@@ -41,14 +49,4 @@
 		</button>
 	</div>
 </td>
-<td>
-	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
-	<ng-template #statusFlowButtonTemplate let-message="message"><div [innerHtml]="flowStatusButton"></div></ng-template>
-	<p>
-			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">active</span>
-			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">paused</span>
-			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
-			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
-		 <i (mouseenter)="getFlowStatus(flow.id)" *ngIf="isFlowStatusOK;" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
-
-</td>
+<td></td>

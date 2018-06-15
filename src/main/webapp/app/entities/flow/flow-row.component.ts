@@ -48,6 +48,9 @@ export class FlowRowComponent implements OnInit {
     public p = false;
     lastError: string;
 
+    flowRowID: string;
+    flowRowErrorEndpointID: string;
+
     intervalTime: any;
 
     constructor(
