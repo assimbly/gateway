@@ -7,6 +7,12 @@ import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
 import * as moment from 'moment';
 
+enum Status {
+    active = 'active',
+    paused = 'paused',
+    inactive = 'inactive',
+    inactiveError = 'inactiveError'
+}
 @Component({
     selector: '[jhi-flow-row]',
     templateUrl: './flow-row.component.html'
@@ -30,11 +36,17 @@ export class FlowRowComponent implements OnInit {
     public flowStatusError: string;
     public isFlowStatusOK: boolean;
     public flowStatistic: string;
+    public flowStatusButton: string;
     public flowStartTime: any;
+    public clickButton = false;
 
     fromEndpointTooltip: string;
     toEndpointTooltip: string;
     errorEndpointTooltip: string;
+    public statusFlow: Status;
+    public previousState: string;
+    public p = false;
+    lastError: string;
 
     flowRowID: string;
     flowRowErrorEndpointID: string;
@@ -53,6 +65,7 @@ export class FlowRowComponent implements OnInit {
     ngOnInit() {
         this.isFlowStatusOK = true;
         this.flowStatus = 'Stopped';
+        this.lastError = '';
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.getToEndpointByFlowId(this.flow.id);
         this.getErrorEndpoint(this.flow.errorEndpointId);
@@ -61,46 +74,87 @@ export class FlowRowComponent implements OnInit {
     }
 
     getFlowStatus(id: number) {
+        this.clickButton = true;
         this.flowService.getFlowStatus(id).subscribe((response) => {
             this.setFlowStatus(response.text());
+        });
+    }
+    getFlowLastError(id: number, action: string) {
+        this.flowService.getFlowLastError(id).subscribe((response) => {
+            this.lastError = response.text() === '0' ? '' : response.text();
+            this.flowStatusButton = `
+            Last action: ${action} <br/>
+            Status: Stopped after error <br/>
+            ${this.lastError}
+`;
+            this.statusFlow = Status.inactiveError;
         });
     }
 
     setFlowStatus(status: string): void {
         this.getFlowStats(this.flow.id);
+        // this.flowStatus = status;
         switch (status) {
             case 'unconfigured':
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
                 this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
-                this.flowStatus = 'Stopped';
+                this.flowStatusButton = `
+                            Last action: Unconfigure <br/>
+                            Status: Flow is unconfigured<br/>
+            `;
+                this.statusFlow = Status.inactive;
                 break;
             case 'started':
                 this.isFlowStarted = this.isFlowResumed = true;
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowStarted;
-                this.flowStatus = 'Started';
+                this.flowStatusButton = `
+                            Last action: Start <br/>
+                            Status: Started succesful
+                        `;
+                this.statusFlow = Status.active;
                 break;
             case 'suspended':
                 this.isFlowPaused = this.isFlowStarted = true;
                 this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = !this.isFlowPaused;
-                this.flowStatus = 'Paused';
+                this.flowStatusButton = `
+                            Last action: Pause <br/>
+                            Status:  Paused succesful
+            `;
+                this.statusFlow = Status.paused;
                 break;
             case 'restarted':
                 this.isFlowResumed = this.isFlowStarted = true;
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
-                this.flowStatus = 'Restarted';
+                this.flowStatusButton = `
+                            Last action: Restart <br/>
+                            Status:  Restarted succesful
+            `;
+                this.statusFlow = Status.active;
                 break;
             case 'resumed':
                 this.isFlowResumed = this.isFlowStarted = true;
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
-                this.flowStatus = 'Resumed';
+                this.flowStatusButton = `
+                            Last action: Resume <br/>
+                            Status:  Resumed succesful
+            `;
+                this.statusFlow = Status.active;
                 break;
             case 'stopped':
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
                 this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
-                this.flowStatus = 'Stopped';
+                this.flowStatusButton = `
+                            Last action: Stop <br/>
+                            Status: Stopped succesful
+            `;
+                this.statusFlow = Status.inactive;
                 break;
             default:
-                this.flowStatus = 'Unknown';
+                this.flowStatusButton = `
+                            Last action: ${this.flowStatus} <br/>
+                            Status: Stopped after error
+            `;
+
                 break;
         }
     }
@@ -112,7 +166,6 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatistic(res);
             });
     }
-
     setFlowStatistic(res) {
         if (res === 0) {
             this.flowStatistic = `Currently there is no statistic for this flow.`;
@@ -207,6 +260,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('started');
                             }
                         }, (err) => {
+                            this.getFlowLastError(this.flow.id, 'Start');
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${id} is not started.`;
                         });
@@ -224,6 +278,7 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatus('suspended');
             }
         }, (err) => {
+            this.getFlowLastError(this.flow.id, 'Pause');
             this.isFlowStatusOK = false;
             this.flowStatusError = `Flow with id=${id} is not paused.`;
         });
@@ -244,6 +299,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('resumed');
                             }
                         }, (err) => {
+                            this.getFlowLastError(this.flow.id, 'Resume');
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${id} is not resumed.`;
                         });
@@ -268,6 +324,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('restarted');
                             }
                         }, (err) => {
+                            this.getFlowLastError(this.flow.id, 'Restart');
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${id} is not restarted.`;
                         });
@@ -285,6 +342,7 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatus('stopped');
             }
         }, (err) => {
+            this.getFlowLastError(this.flow.id, 'Stop');
             this.isFlowStatusOK = false;
             this.flowStatusError = `Flow with id=${id} is not stopped.`;
         });

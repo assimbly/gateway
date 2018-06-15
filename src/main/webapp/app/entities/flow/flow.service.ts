@@ -72,6 +72,7 @@ export class FlowService {
     }
 
     start(id: number): Observable<Response> {
+        console.log(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
     }
 
@@ -93,6 +94,9 @@ export class FlowService {
 
     getFlowStatus(id: number): Observable<Response> {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
+    }
+    getFlowLastError(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`);
     }
 
     getFlowStats(id: number, gatewayid: number): Observable<Response> {
