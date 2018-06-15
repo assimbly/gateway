@@ -11,7 +11,7 @@ export class FlowService {
 
     private resourceUrl = SERVER_API_URL + 'api/flows';
     private connectorUrl = SERVER_API_URL + 'api/connector';
-    private configurationUrl = SERVER_API_URL + 'api/configuration';
+    private environmentUrl  = SERVER_API_URL + 'api/environment'
 
     private gatewayid = 1;
 
@@ -55,9 +55,10 @@ export class FlowService {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
-    getConfiguration(id: number): Observable<Response>  {
-        return this.http.get(`${this.configurationUrl}/${this.gatewayid}/getflowconfiguration/${id}`);
+    getConfiguration(flowid: number): Observable<Response>  {
+        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`);
     }
+
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<Response> {
         if (!!header) {
             let headers = new Headers();
