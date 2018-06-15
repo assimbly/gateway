@@ -75,7 +75,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private eventSubscriber: Subscription;
 
     @ViewChild('tabs')
-        private ngbTabset: NgbTabset
+    private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -357,7 +357,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 {
                     name: 'WASTEBIN',
                     assimblyTypeLink: `${wiki}/component-wastebin`,
-                    camelTypeLink:  `${camel}/camel-core/src/main/docs/mock-component.adoc`,
+                    camelTypeLink: `${camel}/camel-core/src/main/docs/mock-component.adoc`,
                     uriPlaceholder: 'name',
                     uriPopoverMessage: `
                         <b>Name</b>: <b>name</b><br/>
@@ -388,13 +388,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.errorUriPopoverMessage = type.uriPopoverMessage;
             }
 
-            endpointForm.patchValue({'type': type.name});
+            endpointForm.patchValue({ 'type': type.name });
 
             if (endpointForm.controls.type.value === 'WASTEBIN') {
                 endpointForm.controls.options.disable();
                 endpointForm.controls.service.disable();
                 endpointForm.controls.header.disable();
-            }else {
+            } else {
                 endpointForm.controls.options.enable();
                 endpointForm.controls.service.enable();
                 endpointForm.controls.header.enable();
@@ -569,8 +569,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditHeader(endpoint) {
         (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], {fragment: 'showEditHeaderButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }], {fragment: 'showEditHeaderButton'});
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
@@ -580,8 +580,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], {fragment: 'showEditServiceButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }], {fragment: 'showEditServiceButton'});
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
 
         this.eventManager.subscribe(
             'serviceModified',
@@ -630,6 +630,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     save(goToOverview: boolean) {
+
         this.isSaving = true;
         this.setDataFromForm();
         this.setOptions();
@@ -641,54 +642,59 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.toEndpoints.forEach((toEndpoint) => {
                 toEndpoint.flowId = this.flow.id;
             });
-            console.log(this.fromEndpoint);
-            console.log(this.errorEndpoint);
 
             const updateFlow = this.flowService.update(this.flow);
             const updateFromEndpoint = this.fromEndpointService.update(this.fromEndpoint);
             const updateErrorEndpoint = this.errorEndpointService.update(this.errorEndpoint);
             const updateToEndpoints = this.toEndpointService.updateMultiple(this.toEndpoints);
 
-            forkJoin([updateFlow, updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
-                this.flow = results[0];
-                this.fromEndpoint = results[1];
-                this.errorEndpoint = results[2];
-                this.toEndpoints = results[3];
+            updateFlow.subscribe((flowRes) => {
 
-                if (!goToOverview) {
-                    this.updateForm(this.flow);
-                    this.updateEndpointData(0, this.fromEndpoint);
-                    this.updateEndpointData(1, this.errorEndpoint);
-                    this.toEndpoints.forEach((toEndpoint, i) => {
-                        this.updateEndpointData(i + 2, toEndpoint);
-                    });
-                }
-                this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
-                    toEndpoints = toEndpoints.filter((e) => {
-                        const s = this.toEndpoints.find((t) => t.id === e.id);
-                        if (typeof s === 'undefined') {
-                            return true;
-                        } else {
-                            return s.id !== e.id;
-                        }
-                    });
+                this.flow = flowRes;
 
-                    if (toEndpoints.length > 0) {
-                        toEndpoints.forEach((element) => {
-                            this.toEndpointService.delete(element.id).subscribe((r) => {
-                                const y = r;
-                            }, (err) => {
-                                const e = err;
-                            });
+                forkJoin([updateFromEndpoint, updateErrorEndpoint, updateToEndpoints]).subscribe((results) => {
+
+                    this.fromEndpoint = results[0];
+                    this.errorEndpoint = results[1];
+                    this.toEndpoints = results[2];
+
+                    if (!goToOverview) {
+                        this.updateForm(this.flow);
+                        this.updateEndpointData(0, this.fromEndpoint);
+                        this.updateEndpointData(1, this.errorEndpoint);
+                        this.toEndpoints.forEach((toEndpoint, i) => {
+                            this.updateEndpointData(i + 2, toEndpoint);
                         });
                     }
+                    this.toEndpointService.findByFlowId(results[0].id).subscribe((toEndpoints) => {
+                        toEndpoints = toEndpoints.filter((e) => {
+                            const s = this.toEndpoints.find((t) => t.id === e.id);
+                            if (typeof s === 'undefined') {
+                                return true;
+                            } else {
+                                return s.id !== e.id;
+                            }
+                        });
+
+                        if (toEndpoints.length > 0) {
+                            toEndpoints.forEach((element) => {
+                                this.toEndpointService.delete(element.id).subscribe((r) => {
+                                    const y = r;
+                                }, (err) => {
+                                    const e = err;
+                                });
+                            });
+                        }
+                    });
+                    this.savingFlowSuccess = true;
+                    this.isSaving = false;
+                    if (goToOverview) {
+                        this.router.navigate(['/']);
+                    }
                 });
-                this.savingFlowSuccess = true;
-                this.isSaving = false;
-                if (goToOverview) {
-                    this.router.navigate(['/']);
-                }
+
             });
+
         } else {
             if (this.singleGateway) {
                 this.flow.gatewayId = this.gateways[0].id;
@@ -836,5 +842,5 @@ export class TypeLinks {
         public name: string,
         public assimblyTypeLink: string,
         public camelTypeLink: string
-    ) {}
+    ) { }
 }
