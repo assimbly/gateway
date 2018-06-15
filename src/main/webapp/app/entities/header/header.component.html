@@ -11,10 +11,10 @@
         <br/>
        <div class="row">
            <div class="col-md-11">
-	        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
+	        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption()"></ng-select>
            </div>
            <div class="col-md-1 text-right">
-        	 <button type="submit" [routerLink]="['../header', selectedHeaderId ]" class="btn btn-info">
+        	 <button type="submit" [routerLink]="['../header', selectedHeaderId ]" class="btn btn-info" [disabled]="!selectedHeaderId">
     	        <span class="fa fa-eye"></span>
 	        </button>
            </div>
