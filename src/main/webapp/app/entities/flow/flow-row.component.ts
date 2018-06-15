@@ -36,6 +36,9 @@ export class FlowRowComponent implements OnInit {
     toEndpointTooltip: string;
     errorEndpointTooltip: string;
 
+    flowRowID: string;
+    flowRowErrorEndpointID: string;
+
     intervalTime: any;
 
     constructor(
@@ -143,11 +146,12 @@ export class FlowRowComponent implements OnInit {
     }
 
     checkDate(r) {
-    if (r === '1970-01-01T00:59:59.999+0100') {
-        return  '-'
-    }else {
-        return moment(r).format('YYYY-MM-DD HH:mm:ss');
-    } }
+        if (r === '1970-01-01T00:59:59.999+0100') {
+            return '-'
+        } else {
+            return moment(r).format('YYYY-MM-DD HH:mm:ss');
+        }
+    }
 
     flowConfigurationNotObtained(id) {
         this.isFlowStatusOK = false;

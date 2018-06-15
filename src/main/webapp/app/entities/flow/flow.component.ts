@@ -6,6 +6,7 @@ import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { GatewayService, Gateway } from '../gateway';
+import { FlowRowComponent } from './flow-row.component';
 
 @Component({
     selector: 'jhi-flow',
