@@ -9,7 +9,9 @@
 	<a *ngIf="flow.fromEndpointId" [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
 </td>
 <td>
-	<a [routerLink]="['../to-endpoint', flow.id]" data-toggle="tooltip" title="{{toEndpointTooltip}}">{{toEndpoint.type}}</a>
+	<span  *ngFor="let toEndpoint of toEndpoints; let i = index">
+		<a [routerLink]="['../to-endpoint', toEndpoint.id]" data-toggle="tooltip" title="{{toEndpointsTooltips[i]}}">{{toEndpoint.type}}</a><span *ngIf="i < toEndpoints.length - 1">,</span>
+	</span>
 </td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 	<a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
