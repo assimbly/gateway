@@ -33,7 +33,15 @@ export class MaintenanceComponent implements OnInit {
     }
 
     setMaintenance() {
-
+        if (this.hours === undefined) { this.hours = 0; }
+        if (this.minutes === undefined) { this.minutes = 0; }
+        const time = (this.hours * 60 * 60000) + (this.minutes * 60000);
+        const ids = this.selectedFlows.filter((sf) => sf !== null).map((f) => f.id);
+        if (ids.length > 0) {
+            this.flowService.setMaintainance(time, ids).subscribe((res) => {
+                let r = res;
+            });
+        }
     }
 
     selectAll() {
