@@ -2,9 +2,10 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
+import org.assimbly.connector.service.Broker;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
-
+import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -22,6 +23,8 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 /**
  * REST controller for managing Gateway.
@@ -132,6 +135,23 @@ public class GatewayResource {
         log.debug("REST request to delete Gateway : {}", id);
         gatewayRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+    
+    @PostConstruct
+    private void init() throws Exception {
+
+        List<Gateway> gateways = gatewayRepository.findAll();
+        
+        for(Gateway gateway : gateways) {
+        	
+        	GatewayType gatewayType = gateway.getType();
+        	
+        	if(gatewayType == GatewayType.BROKER) {
+                log.info("Starting embedded ActiveMQ broker");
+           		new Broker().start();
+        	}
+
+        }
     }
     
 }
