@@ -292,9 +292,9 @@ public class ConnectorResource {
 
 		try {
 			Boolean hasFlow = connector.hasFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"isStarted",hasFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"hasFlow",hasFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"isStarted","Retrieving flows",e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"hasFlow","Retrieving flows",e);
 		}  
  
     }
@@ -305,9 +305,9 @@ public class ConnectorResource {
 
 		try {
 			Boolean removedFlow = connector.removeFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"isStarted",removedFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"removeFlow",removedFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"isStarted","Retrieving flows",e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"removeFlow","Retrieving flows",e);
 		}  
  
     }    
