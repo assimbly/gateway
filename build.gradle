@@ -202,13 +202,11 @@ dependencies {
     compile "mysql:mysql-connector-java"
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
-	//custom dependencies (non-jhipster)
+	// custom dependencies (non-jhipster)
     compile "org.assimbly:connector:1.0.0"
 	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.5"
 	compile "org.jdom:jdom2:2.0.6"
-	//compile "com.thoughtworks.xstream:xstream:1.4.10"
-    //compile "io.hawt:hawtio-core:1.5.8"    
-    //compile "io.hawt:hawtio-springboot:1.5.8"  
+	// end custom dependencies
     
     testCompile "com.jayway.jsonpath:json-path"
     testCompile ("org.springframework.boot:spring-boot-starter-test") {

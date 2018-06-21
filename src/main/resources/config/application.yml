@@ -112,3 +112,8 @@ application:
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://github.com/apache/camel/blob/master
+
+endpoints:
+  jolokia:
+    enabled: true
+    sensitive: false
