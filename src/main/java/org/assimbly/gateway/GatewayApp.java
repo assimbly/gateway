@@ -1,5 +1,6 @@
 package org.assimbly.gateway;
 
+import org.assimbly.connector.service.Broker;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 
@@ -80,5 +81,6 @@ public class GatewayApp {
             InetAddress.getLocalHost().getHostAddress(),
             env.getProperty("server.port"),
             env.getActiveProfiles());
+        
     }
 }
