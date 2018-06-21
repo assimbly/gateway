@@ -1,6 +1,6 @@
 <div>
     <h2>
-        <span>Headers key</span>
+        <span>Header keys</span>
     </h2>
     
     <div class="row">
@@ -29,7 +29,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index" [ngStyle]="{'background-color': headerKey.isSelected ? '#A9A9A9' : '' }">
+                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index">
                     <td id="headerKeysRowID" [hidden]="!headerKeysRowID">
                         <a [routerLink]="['../header-keys', headerKey.id ]">{{headerKey.id}}</a>
                     </td>
@@ -59,16 +59,16 @@
                             <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
                                 <span class="fa fa-plus"></span>
                             </button>
-                            <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys()">
+                            <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
                                 <span class="fa fa-remove"></span>
                             </button>
-                            <button type="button" title="Save" *ngIf="!headerKey.id" class="btn btn-primary" (click)="save(headerKey)">
+                            <button type="button" title="Save" *ngIf="!headerKey.id" class="btn btn-primary" (click)="save(headerKey, idx)">
                                 <span class="fa fa-save"></span>
                             </button>
                             <button type="button" title="View" *ngIf="headerKey.id" class="btn btn-info" [routerLink]="['../header-keys', headerKey.id ]">
                                 <span class="fa fa-eye"></span>
                             </button>
-                            <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey)">
+                            <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey, idx)">
                                 <span class="fa fa-check"></span>
                             </button>
                             <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary"

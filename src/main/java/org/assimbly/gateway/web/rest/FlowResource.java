@@ -3,6 +3,8 @@ package org.assimbly.gateway.web.rest;
 import com.codahale.metrics.annotation.Timed;
 
 import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.domain.FromEndpoint;
+import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -24,6 +26,7 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * REST controller for managing flow.
@@ -63,6 +66,7 @@ public class FlowResource {
             throw new BadRequestAlertException("A new flow cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Flow flow = flowMapper.toEntity(FlowDTO);
+        
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
         return ResponseEntity.created(new URI("/api/flows/" + result.getId()))
@@ -149,7 +153,7 @@ public class FlowResource {
     @Timed
     public ResponseEntity<Void> deleteflow(@PathVariable Long id) {
         log.debug("REST request to delete complete flow : {}", id);
-        flowRepository.delete(id);
+        flowRepository.delete(id);        
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     

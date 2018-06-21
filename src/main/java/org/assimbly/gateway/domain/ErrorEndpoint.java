@@ -34,14 +34,12 @@ public class ErrorEndpoint implements Serializable {
     @Column(name = "options")
     private String options;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @ManyToOne
     private Service service;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @ManyToOne
     private Header header;
-
+   
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -115,6 +113,7 @@ public class ErrorEndpoint implements Serializable {
     public void setHeader(Header header) {
         this.header = header;
     }
+    
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

@@ -34,17 +34,17 @@ public class Flow implements Serializable {
     @ManyToOne
     private Gateway gateway;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
+    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

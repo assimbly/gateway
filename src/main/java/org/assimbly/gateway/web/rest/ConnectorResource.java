@@ -4,9 +4,10 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
-import org.assimbly.gateway.config.flows.AssimblyDBConfiguration;
+import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class ConnectorResource {
 	private String type;
 
 	@Autowired
-	private AssimblyDBConfiguration assimblyDBConfiguration;
+	private DBConfiguration assimblyDBConfiguration;
     
 	@Autowired
 	private FlowRepository flowRepository;
@@ -108,13 +109,10 @@ public class ConnectorResource {
     @PostMapping(path = "/connector/{connectorId}/setflowconfiguration/{id}", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String configuration) throws Exception {
-  	
-    	System.out.println("mediaType=" + mediaType);
     	
        	try {
        		connector.setFlowConfiguration(id.toString(), mediaType, configuration);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set");
-			
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set");			
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
    		}
@@ -204,28 +202,88 @@ public class ConnectorResource {
 	  
   }
 
+  @PostMapping(path = "/connector/{connectorId}/maintainance/{time}", consumes = {"application/json"}, produces = {"text/plain","application/xml","application/json"})
+  @Timed
+  public ResponseEntity<String> setMaintainance(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long time, @RequestBody List<Long> ids) throws Exception {
+
+		try {
+
+			Thread thread = new Thread(new Runnable()
+			{
+			   public void run()
+			   {					
+					try {
+						for(Long id : ids) {
+							flowId = id.toString();
+							status = connector.getFlowStatus(flowId);
+							if(status.equals("started")) {
+								connector.pauseFlow(flowId);
+							}
+						}
+			        	
+						Thread.sleep(time);
+						
+						for(Long id : ids) {
+
+							flowId = id.toString();
+							status = connector.getFlowStatus(flowId);
+							if(status.equals("suspended")) {
+								connector.resumeFlow(flowId);
+							}
+						}
+
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			   }
+			});
+
+			// start the thread
+			thread.start();
+			
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setMaintainance","Set flows into maintainance mode for " + time + " miliseconds");
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setMaintainance","Set flows into maintainance mode",e);
+		}
+  }
+
+  
+  
   @GetMapping(path = "/connector/{connectorId}/stats", produces = {"text/plain","application/xml","application/json"})
   @Timed
   public ResponseEntity<String> getStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Optional<String> statsType) throws Exception {
 
-  	plainResponse = true;
+	  plainResponse = true;
 
 		try {
-      	init();
-      	if(statsType.isPresent()){
-      		type=statsType.get();
-      	}else {
-      		type="default";
-      	}
-  		String stats = connector.getStats(type, mediaType);
-  		if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",stats,plainResponse);
+	      	init();
+	      	if(statsType.isPresent()){
+	      		type=statsType.get();
+	      	}else {
+	      		type="default";
+	      	}
+	  		String stats = connector.getStats(type, mediaType);
+	  		if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",stats,plainResponse);
 		} catch (Exception e) {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
 		}
   }
 
-  
+
+  @GetMapping(path = "/connector/{connectorId}/lasterror", produces = {"text/plain","application/xml","application/json"})
+  @Timed
+  public ResponseEntity<String> getLastError(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+			String error = connector.getLastError();
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",error,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
+		}
+
+  }
   
 	//manage flow
     @GetMapping(path = "/connector/{connectorId}/hasflow/{id}", produces = {"text/plain","application/xml","application/json"})
@@ -234,9 +292,9 @@ public class ConnectorResource {
 
 		try {
 			Boolean hasFlow = connector.hasFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"isStarted",hasFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"hasFlow",hasFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"isStarted","Retrieving flows",e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"hasFlow","Retrieving flows",e);
 		}  
  
     }
@@ -247,9 +305,9 @@ public class ConnectorResource {
 
 		try {
 			Boolean removedFlow = connector.removeFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"isStarted",removedFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"removeFlow",removedFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"isStarted","Retrieving flows",e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"removeFlow","Retrieving flows",e);
 		}  
  
     }    
@@ -435,7 +493,59 @@ public class ConnectorResource {
 		}
     }
 
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/documenation/version", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getDocumentationVersion(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+    		String documentation = connector.getDocumentationVersion();
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentationVersion",documentation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentationVersion",flowId,e);
+		}
+    }
 	
+    @GetMapping(path = "/connector/{connectorId}/flow/documenation/{componenttype}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getDocumentation(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
+
+    	plainResponse = true;
+
+		try {
+    		String documentation = connector.getDocumentation(componenttype, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentation",documentation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentation",flowId,e);
+		}
+    }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/schema/{componenttype}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getComponentSchema(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
+
+    	plainResponse = true;
+
+		try {
+    		String documentation = connector.getComponentSchema(componenttype, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getComponentSchema",documentation,plainResponse);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getComponentSchema",flowId,e);
+		}
+    }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/validate/{uri}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> validateFlow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String uri) throws Exception {
+
+		try {
+    		String flowValidation = connector.validateFlow(uri);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"validateFlows",flowValidation);
+		} catch (Exception e) {
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"validateFlows",flowId,e);
+		}
+    }
+    
     @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
@@ -452,7 +562,8 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
 		}
     }
-
+    
+    
     //private methods    
     
     private void init() throws Exception {
