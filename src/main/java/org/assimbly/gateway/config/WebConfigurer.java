@@ -89,7 +89,7 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
             container instanceof UndertowEmbeddedServletContainerFactory) {
 
             ((UndertowEmbeddedServletContainerFactory) container)
-                .addBuilderCustomizers(builder ->
+                .addBuilderCustomizers(builder ->                	
                     builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true));
         }
     }

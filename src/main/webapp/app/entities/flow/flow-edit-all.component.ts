@@ -53,9 +53,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
-    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM','WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
+    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
+    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
@@ -78,7 +78,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private camelDocUrl: string;
 
     @ViewChild('tabs')
-        private ngbTabset: NgbTabset
+    private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -359,7 +359,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             {
                 name: 'WASTEBIN',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink:  `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
+                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
                 uriPlaceholder: 'name',
                 uriPopoverMessage: `
                     <b>Name</b>: <b>name</b><br/>
@@ -390,14 +390,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.errorUriPopoverMessage = type.uriPopoverMessage;
         }
 
-        endpointForm.patchValue({'type': type.name});
+        endpointForm.patchValue({ 'type': type.name });
 
         if (endpointForm.controls.type.value === 'WASTEBIN') {
             endpointForm.controls.uri.disable();
             endpointForm.controls.options.disable();
             endpointForm.controls.service.disable();
             endpointForm.controls.header.disable();
-        }else {
+        } else {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();
             endpointForm.controls.service.enable();
@@ -583,8 +583,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditHeader(endpoint) {
         (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], {fragment: 'showEditHeaderButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }], {fragment: 'showEditHeaderButton'});
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
@@ -594,8 +594,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], {fragment: 'showEditServiceButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }], {fragment: 'showEditServiceButton'});
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
 
         this.eventManager.subscribe(
             'serviceModified',
@@ -842,5 +842,5 @@ export class TypeLinks {
         public name: string,
         public assimblyTypeLink: string,
         public camelTypeLink: string
-    ) {}
+    ) { }
 }
