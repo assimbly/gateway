@@ -1,0 +1,31 @@
+<h2>Maintenance</h2>
+<hr>
+<form (ngSubmit)="setMaintenance()">
+    <p>In order to put flows into maintenance mode select flows from given list and set time period for maintenance</p>
+    <div class="input-group px-0 mb-3 col-12 col-md-6 col-xl-4 float-right">
+        <input [(ngModel)]="hours" type="number" name="hours" class="form-control" id="hours" placeholder="hours">
+        <input [(ngModel)]="minutes" min="0" max="59" size="1" maxlength="2" type="number" name="minutes" class="form-control" id="minutes" placeholder="minutes" required>
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-primary">Put into maintenance</button>
+        </div>
+    </div>
+    <div class="table-responsive" *ngIf="flows">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <button *ngIf="!allSelected" type="button" class="btn btn-primary btn-sm" (click)="selectAll()">Select all</button>
+                        <button *ngIf="allSelected" type="button" class="btn btn-primary btn-sm" (click)="deselectAll()">Deselect all</button>
+                    </th>
+                    <th>Flow name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let flow of flows; let i = index">
+                    <td><input [checked]="selectedFlows[i]" type="checkbox" name="flow.name" (change)="select($event, i, flow)"></td>
+                    <td>{{flow.name}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</form>

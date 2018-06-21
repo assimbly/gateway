@@ -1,4 +1,4 @@
-package org.assimbly.gateway.config.flows;
+package org.assimbly.gateway.config.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,7 +40,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
-public class AssimblyDBConfiguration {
+@Transactional
+public class DBConfiguration {
 
     public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
@@ -230,15 +232,15 @@ public class AssimblyDBConfiguration {
 		Document doc = ConvertUtil.convertStringToDoc(xmlConfiguration);
 		
 		//create services
-		List<String> serviceIds = getList(doc, "/connector/services/service/id/text()");
+		List<String> serviceIds = getList(doc, "/connectors/connector/services/service/id/text()");
 		setServicesPropertiesFromXML(doc, serviceIds);
 
 		//create headers
-		List<String> headerIds = getList(doc, "/connector/headers/header/id/text()");
+		List<String> headerIds = getList(doc, "/connectors/connector/headers/header/id/text()");
 		setHeadersPropertiesFromXML(doc, headerIds);
 
 		//create flows
-		List<String> flowIds = getList(doc, "/connector/flows/flow/id/text()");		
+		List<String> flowIds = getList(doc, "/connectors/connector/flows/flow/id/text()");		
 		convertFlowConfigurationToDB(doc, connectorId, flowIds);
 				
 		return "ok";		
@@ -312,7 +314,7 @@ public class AssimblyDBConfiguration {
 			setFlowPropertiesFromXML(doc, connectorId,id);
 		}
 		
-		String result = "blabla";
+		String result = "ok";
 		
 		return result;
 		
@@ -492,20 +494,23 @@ public class AssimblyDBConfiguration {
 	    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	    doc = docBuilder.newDocument();
 
-	    rootElement = doc.createElement("connector");
+	    rootElement = doc.createElement("connectors");
 	    doc.appendChild(rootElement);
+	    
+	    Element connector = doc.createElement("connector");
+	    rootElement.appendChild(connector);
 
 	    Element id = doc.createElement("id");
 	    id.appendChild(doc.createTextNode(connectorId));
-	    rootElement.appendChild(id);
+	    connector.appendChild(id);
 	    
 	    flows = doc.createElement("flows");
 	    services = doc.createElement("services");
 	    headers = doc.createElement("headers");
 	    
-	    rootElement.appendChild(flows);
-	    rootElement.appendChild(services);
-	    rootElement.appendChild(headers);
+	    connector.appendChild(flows);
+	    connector.appendChild(services);
+	    connector.appendChild(headers);
 	    
 	    servicesList = new ArrayList<String>();
 	    headersList = new ArrayList<String>();    
@@ -764,9 +769,10 @@ public class AssimblyDBConfiguration {
 		    Set<ServiceKeys> serviceKeys = serviceDB.getServiceKeys();
 		    
 			for(ServiceKeys serviceKey : serviceKeys) {
+				
 				String parameterName = serviceKey.getKey();
 				String parameterValue = serviceKey.getValue();
-				  
+
 				Element serviceParameter = doc.createElement(parameterName);
 				serviceParameter.setTextContent(parameterValue);
 				service.appendChild(serviceParameter);
@@ -1103,7 +1109,7 @@ public class AssimblyDBConfiguration {
 			  }
 			
 			
-			Map<String, String> serviceMap = getMap(doc, "/connector/services/service[id=" + serviceId + "]/*");
+			Map<String, String> serviceMap = getMap(doc, "/connectors/connector/services/service[id=" + serviceId + "]/*");
 			
 		    for (Map.Entry<String, String> entry : serviceMap.entrySet()) {
 		    	    	
@@ -1168,7 +1174,7 @@ public class AssimblyDBConfiguration {
 	        // Create XPath object
 	        XPathFactory xpathFactory = XPathFactory.newInstance();
 	        XPath xpath = xpathFactory.newXPath();
-	        XPathExpression expr = xpath.compile("/connector/headers/header[id=" + headerId + "]/*");
+	        XPathExpression expr = xpath.compile("/connectors/connector/headers/header[id=" + headerId + "]/*");
 	    	
 	        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 	        for (int i = 0; i < nodes.getLength(); i++) {
@@ -1237,19 +1243,19 @@ public class AssimblyDBConfiguration {
         XPathFactory xpathFactory = XPathFactory.newInstance();
         XPath xpath = xpathFactory.newXPath();
         
-        String fromId = xpath.evaluate("/connector/flows/flow[id=" + id.toString() +"]/from/" + type + "_id",doc);
+        String fromId = xpath.evaluate("/connectors/connector/flows/flow[id=" + id.toString() +"]/from/" + type + "_id",doc);
         
         if(fromId!=null && !fromId.isEmpty()) {
         	list.add(fromId);
         }
 
-        String errorId = xpath.evaluate("/connector/flows/flow[id=" + id.toString() +"]/error/" + type + "_id",doc);
+        String errorId = xpath.evaluate("/connectors/connector/flows/flow[id=" + id.toString() +"]/error/" + type + "_id",doc);
 
         if(errorId!=null && !errorId.isEmpty()) {
         	list.add(errorId);
         }
         
-        XPathExpression expr = xpath.compile("/connector/flows/flow[id=" + id.toString() +"]/to/" + type + "_id/text()");
+        XPathExpression expr = xpath.compile("/connectors/connector/flows/flow[id=" + id.toString() +"]/to/" + type + "_id/text()");
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); i++) {
         	list.add(nodes.item(i).getNodeValue());

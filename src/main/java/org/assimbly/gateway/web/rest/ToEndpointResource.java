@@ -2,13 +2,11 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.ToEndpoint;
 
 import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.service.mapper.ToEndpointMapper;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -180,4 +178,27 @@ public class ToEndpointResource {
         toEndpointRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+    
+    /**
+     * DELETE  /to-endpoints : delete list of toEndpoints.
+     *
+    * @param list of toEndpointsDTO's to delete
+      * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping("/to-endpoints")
+    @Timed
+    public ResponseEntity<Void> deleteToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
+        log.debug("REST request to delete List<ToEndpoint> : {}", toEndpointsDTO);
+        List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
+        
+        ArrayList<String> arrayOfIds = new ArrayList<String>();
+        for (ToEndpoint toEndpoint : toEndpoints) {
+        	arrayOfIds.add(toEndpoint.getId().toString());
+        }    
+	
+        toEndpointRepository.deleteInBatch(toEndpoints);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, arrayOfIds.toString())).build();
+    }
+    
+    
 }

@@ -4,6 +4,8 @@
     ],
     "rules": {
         "class-name": true,
+        "component-selector-name": [ true, "kebab-case" ],
+        "directive-selector-type": [ true, "attribute" ],
         "comment-format": [
             true,
             "check-space"
@@ -88,7 +90,7 @@
             "check-separator",
             "check-type"
         ],
-        "prefer-const": true,
+        "prefer-const": false,
         "arrow-parens": [true],
         "arrow-return-shorthand": [true],
         "import-spacing": true,
@@ -97,7 +99,7 @@
         "space-before-function-paren": [true, "never"],
 
         "directive-selector": [true, "attribute", "jhi", "camelCase"],
-        "component-selector": [true, "element", "jhi", "kebab-case"],
+        "component-selector": ["element", "jhi", "kebab-case"],
         "use-input-property-decorator": true,
         "use-output-property-decorator": true,
         "use-host-property-decorator": true,

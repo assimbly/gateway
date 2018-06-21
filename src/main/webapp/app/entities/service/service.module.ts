@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 
 import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
 import { GatewaySharedModule } from '../../shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
     ServiceService,
     ServicePopupService,
@@ -15,7 +16,7 @@ import {
     serviceRoute,
     servicePopupRoute,
 } from './';
-
+import { NgSelectModule } from '@ng-select/ng-select';
 const ENTITY_STATES = [
     ...serviceRoute,
     ...servicePopupRoute,
@@ -25,6 +26,9 @@ const ENTITY_STATES = [
     imports: [
         GatewaySharedModule,
         GatewayServiceKeysModule,
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
         RouterModule.forChild(ENTITY_STATES)
     ],
     declarations: [

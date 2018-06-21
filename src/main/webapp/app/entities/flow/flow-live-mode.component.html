@@ -24,12 +24,24 @@
         </form>
     </div>
 
+    <div class="float-right">
+        <button type="button" [routerLink]="['/']" class="btn btn-info">
+            <span class="fa fa-arrow-left"></span>&nbsp;
+            <span> Back</span>
+        </button>
+    </div>
+
+    <div *ngIf="hasLoadError">
+        <hr>
+        <p class="float-left text-danger">Live configuration for flow {{flowId}} is NOT set.</p>
+    </div>
+
     <div *ngIf="isConfigurationSet">
         <hr>
         <p class="float-left">Live configuration for flow {{flowId}} is set.</p>
     </div>
 
-    <div class="table-responsive" *ngIf="isConfigurationSet">
+    <div class="table-responsive" *ngIf="configuredFlows.length > 0">
         <table class="table table-striped">
             <thead>
                 <tr>
