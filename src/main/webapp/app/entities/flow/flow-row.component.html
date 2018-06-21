@@ -18,11 +18,11 @@
 	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
 	<ng-template #statusFlowButtonTemplate let-message="message"><div [innerHtml]="flowStatusButton"></div></ng-template>
 	<p>
-			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">active</span>
-			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">paused</span>
-			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
-			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (click)="p!=p"  placement="left" popoverTitle="Stats" [popover]="statusFlowButtonTemplate">inactive</span>
-		 <i (mouseenter)="getFlowStatus(flow.id)" *ngIf="isFlowStatusOK;" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
+			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (mouseenter)="p!=p" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusFlowButtonTemplate">active</span>
+			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
+			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave"popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+		 <i (mouseenter)="getFlowStatus(flow.id)" *ngIf="isFlowStatusOK;" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
 
 </td>
 <td class="text-right">
