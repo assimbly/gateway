@@ -63,7 +63,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_from_type">Type</label>
 											<div class="input-group">
-												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (ngModelChange)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
+												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event);"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type}} component documentation">
@@ -105,7 +105,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
-												<ng-select [items]="services" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
 													<button type="button" *ngIf="serviceCreated && fromEndpoint.serviceId" class="btn btn-primary" title="Edit service"  (click)="createOrEditService(fromEndpoint)">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
@@ -206,7 +206,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
-												<ng-select [items]="services" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
 													<button type="button" *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
@@ -312,7 +312,7 @@
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
-												<ng-select [items]="services" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
 													<button type="button" *ngIf="serviceCreated && errorEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(errorEndpoint)">
 															<span class="fa fa-pencil padding-button"></span>&nbsp;
