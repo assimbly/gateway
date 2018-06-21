@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
@@ -23,7 +22,7 @@ export class FlowRowComponent implements OnInit {
     @Input() flow: Flow;
 
     fromEndpoint: FromEndpoint = new FromEndpoint();
-    toEndpoint: ToEndpoint = new ToEndpoint();
+    toEndpoints: Array<ToEndpoint> = [new ToEndpoint()];
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
     public isFlowStarted = false;
@@ -41,7 +40,7 @@ export class FlowRowComponent implements OnInit {
     public clickButton = false;
 
     fromEndpointTooltip: string;
-    toEndpointTooltip: string;
+    toEndpointsTooltips: Array<string> = [];
     errorEndpointTooltip: string;
     public statusFlow: Status;
     public previousState: string;
@@ -58,7 +57,6 @@ export class FlowRowComponent implements OnInit {
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
-        private eventManager: JhiEventManager
     ) {
     }
 
@@ -222,8 +220,10 @@ export class FlowRowComponent implements OnInit {
     getToEndpointByFlowId(id: number) {
         this.toEndpointService.findByFlowId(id)
             .subscribe((toEndpoints) => {
-                this.toEndpoint = toEndpoints[0];
-                this.toEndpointTooltip = this.endpointTooltip(this.toEndpoint.type, this.toEndpoint.uri, this.toEndpoint.options);
+                this.toEndpoints = toEndpoints;
+                this.toEndpoints.forEach((toEndpoint) => {
+                    this.toEndpointsTooltips.push(this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options));
+                });
             });
     }
 

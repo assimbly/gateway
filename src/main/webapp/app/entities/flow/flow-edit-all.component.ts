@@ -53,9 +53,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
-    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
+    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
+    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM','WASTEBIN'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
@@ -474,7 +474,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         })
     }
 
-    updateForm(flow: Flow) {
+    updateForm() {
+        this.updateFlowData(this.flow);
+        let endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
+        this.updateEndpointData(this.fromEndpoint, endpointsData.controls[0] as FormControl);
+        this.updateEndpointData(this.errorEndpoint, endpointsData.controls[1] as FormControl);
+        this.toEndpoints.forEach((toEndpoint, i) => {
+            this.updateEndpointData(toEndpoint, endpointsData.controls[i + 2] as FormControl);
+        });
+    }
+
+    updateFlowData(flow: Flow) {
         this.editFlowForm.patchValue({
             'id': flow.id,
             'name': flow.name,
@@ -483,8 +493,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         });
     }
 
-    updateEndpointData(index: number, endpoint?: any) {
-        (<FormArray>this.editFlowForm.controls.endpointsData).controls[index].patchValue({
+    updateEndpointData(endpoint: any, endpointData: FormControl) {
+        endpointData.patchValue({
             'id': endpoint.id,
             'type': endpoint.type,
             'uri': endpoint.uri,
@@ -689,12 +699,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.toEndpoints = results[2];
 
                         if (!goToOverview) {
-                            this.updateForm(this.flow);
-                            this.updateEndpointData(0, this.fromEndpoint);
-                            this.updateEndpointData(1, this.errorEndpoint);
-                            this.toEndpoints.forEach((toEndpoint, i) => {
-                                this.updateEndpointData(i + 2, toEndpoint);
-                            });
+                            this.updateForm();
                         }
                         this.toEndpointService.findByFlowId(this.flow.id).subscribe((toEndpoints) => {
                             toEndpoints = toEndpoints.filter((e) => {
@@ -731,11 +736,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.fromEndpointService.create(this.fromEndpoint)
                 .subscribe((fromRes) => {
                     this.fromEndpoint = fromRes;
-                    this.updateEndpointData(0, this.fromEndpoint);
                     this.errorEndpointService.create(this.errorEndpoint)
                         .subscribe((errorRes) => {
                             this.errorEndpoint = errorRes;
-                            this.updateEndpointData(1, this.errorEndpoint);
                             this.flow.fromEndpointId = this.fromEndpoint.id;
                             this.flow.errorEndpointId = this.errorEndpoint.id;
                             this.flowService.create(this.flow)
@@ -746,9 +749,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     });
                                     this.toEndpointService.createMultiple(this.toEndpoints)
                                         .subscribe((toRes) => {
-                                            toRes.forEach((toEndpoint, i) => {
-                                                this.updateEndpointData(i + 2, toEndpoint);
-                                            });
+                                            this.toEndpoints = toRes;
+                                            this.updateForm();
                                             console.log('flow created');
                                             this.finished = true;
                                             this.savingFlowSuccess = true;
@@ -768,6 +770,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }, () => {
                     this.handleErrorWhileCreatingFlow(this.flow.id, null, null, null);
                 });
+
         }
     }
 

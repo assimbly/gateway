@@ -24,7 +24,7 @@
                 <ng-select [items]="typeServices" bindLabel="type" bindValue="type" id="field_service_type" [(ngModel)]="selectedService.type" [disabled]="disabledServiceType"></ng-select>
             </div>
             <div class="col-md-1 text-right">
-              	<button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info">
+              	<button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info" [disabled]="!selectedService.id">
 	            	<span class="fa fa-eye"></span>
         		</button>
             </div>
