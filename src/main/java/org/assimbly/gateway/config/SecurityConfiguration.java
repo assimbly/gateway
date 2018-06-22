@@ -96,10 +96,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/swagger-ui/index.html")
             .antMatchers("/test/**")
             .antMatchers("/h2-console/**")
-            .antMatchers("/jolokia/**")
-        	.antMatchers("/hawtio")
-        	.antMatchers("/hawtio/**")
-        	.antMatchers("/management/**");
+            .antMatchers("/management/jolokia/**")
+            .antMatchers("/jolokia/**");
     }
 
     @Override
@@ -144,7 +142,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/profile-info").permitAll()
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/jolokia").permitAll()            
-            .antMatchers("/management/hawtio/jolokia").permitAll()
+            .antMatchers("/management/jolokia/**").permitAll()            
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/v2/api-docs/**").permitAll()
