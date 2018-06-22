@@ -65,7 +65,6 @@
 											<div class="input-group">
 												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
 												<div class="input-group-append d-flex">
-													<a role="button" class="btn btn-primary rounded-0 p-question-button" href="{{fromTypeAssimblyLink}}" [ngClass]="{'disabled': !fromTypeAssimblyLink}" target="_blank" title="Assimbly {{fromEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type}} component documentation">
 														<img  src="../../../content/images/apache-camel.png" />
 													</a>
@@ -77,8 +76,11 @@
 										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_uri">Uri</label>
-											<ng-template #uriPopover let-message="message"><div [innerHtml]="fromUriPopoverMessage"></div></ng-template>
-											<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" triggers="mouseenter:mouseleave" placement="top" popoverTitle="Path Parameters" [popover]="uriPopover" />
+											<div class="input-group-append">
+												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" />
+												<ng-template #uriPopover let-message="message"><div style="min-width:300px;" [innerHtml]="fromUriPopoverMessage"></div></ng-template>
+												<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" target="_blank" triggers="mouseenter:mouseleave" popoverTitle="URI Info" [popover]="uriPopover"><span class="fa fa-question"></span></a>												
+											</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[0].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[0].controls.uri.touched)">
 												<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors.required" class="invalid-field-message">Uri is required.</div>
 											</div>
@@ -103,6 +105,27 @@
 											</div>
 										</div>
 										<div class="form-group">
+											<label class="form-control-label" for="field_header">Headers</label>
+											<div class="input-group">
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<div class="input-group-append">
+													<button type="button" *ngIf="headerCreated && fromEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(fromEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit header</span> -->
+													</button>
+													<button type="button" *ngIf="headerCreated && !fromEndpoint.headerId" class="btn btn-primary" title="New header"  (click)="createOrEditHeader(fromEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp;
+														<span>New header</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+													</button>
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(fromEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create header</span> -->
+													</button>
+												</div>
+											</div>
+										</div>										
+										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
 												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
@@ -119,27 +142,6 @@
 													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
-													</button>
-												</div>
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
-											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
-												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && fromEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(fromEndpoint)">
-														<span class="fa fa-pencil padding-button"></span>&nbsp;
-														<!-- <span>Edit header</span> -->
-													</button>
-													<button type="button" *ngIf="headerCreated && !fromEndpoint.headerId" class="btn btn-primary" title="New header"  (click)="createOrEditHeader(fromEndpoint)">
-														<!-- <span class="fa fa-pencil"></span>&nbsp;
-														<span>New header</span> -->
-														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
-													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(fromEndpoint)">
-														<span class="fa fa-plus padding-button"></span>&nbsp;
-														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>
@@ -204,27 +206,7 @@
 											<input type="text" class="form-control" id="field_flow" [(ngModel)]="toEndpoint.flowId" />
 										</div> -->
 										<div class="form-group">
-											<label class="form-control-label" for="field_service">Service</label>
-											<div class="input-group">
-												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
-												<div class="input-group-append">
-													<button type="button" *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
-														<span class="fa fa-pencil padding-button"></span>&nbsp;
-														<!-- <span>Edit service</span> -->
-													</button>
-													<button type="button" *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
-														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
-														<!-- <span>New service</span> -->
-													</button>
-													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
-														<span class="fa fa-plus padding-button"></span>&nbsp;
-														<!-- <span>Create service</span> -->
-													</button>
-												</div>
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
+											<label class="form-control-label" for="field_header">Headers</label>
 											<div class="input-group">
 												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
 												<div class="input-group-append">
@@ -240,6 +222,27 @@
 													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create header</span> -->
+													</button>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group">
+											<label class="form-control-label" for="field_service">Service</label>
+											<div class="input-group">
+												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<div class="input-group-append">
+													<button type="button" *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit service</span> -->
+													</button>
+													<button type="button" *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+														<!-- <span>New service</span> -->
+													</button>
+													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create service</span> -->
 													</button>
 												</div>
 											</div>
@@ -310,6 +313,27 @@
 											</div>
 										</div>
 										<div class="form-group">
+											<label class="form-control-label" for="field_header">Headers</label>
+											<div class="input-group">
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header"id="field_header"></ng-select>
+												<div class="input-group-append">
+													<button type="button" *ngIf="headerCreated && errorEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(errorEndpoint)">
+														<span class="fa fa-pencil padding-button"></span>&nbsp;
+														<!-- <span>Edit header</span> -->
+													</button>
+													<button type="button" *ngIf="headerCreated && !errorEndpoint.headerId" class="btn btn-primary" title="New header" (click)="createOrEditHeader(errorEndpoint)">
+														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
+														<!-- <span>New header</span> -->
+														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+													</button>
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header"  (click)="createOrEditHeader(errorEndpoint)">
+														<span class="fa fa-plus padding-button"></span>&nbsp;
+														<!-- <span>Create header</span> -->
+													</button>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
 												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
@@ -326,27 +350,6 @@
 													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(errorEndpoint)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
-													</button>
-												</div>
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
-											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header"id="field_header"></ng-select>
-												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && errorEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(errorEndpoint)">
-														<span class="fa fa-pencil padding-button"></span>&nbsp;
-														<!-- <span>Edit header</span> -->
-													</button>
-													<button type="button" *ngIf="headerCreated && !errorEndpoint.headerId" class="btn btn-primary" title="New header" (click)="createOrEditHeader(errorEndpoint)">
-														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
-														<!-- <span>New header</span> -->
-														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
-													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header"  (click)="createOrEditHeader(errorEndpoint)">
-														<span class="fa fa-plus padding-button"></span>&nbsp;
-														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>

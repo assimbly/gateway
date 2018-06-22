@@ -114,12 +114,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     load(id) {
         forkJoin(
-                this.flowService.getWikiDocUrl(),
-                this.flowService.getCamelDocUrl(),
-                this.serviceService.query(),
-                this.headerService.query(),
-                this.gatewayService.query()
-            )
+            this.flowService.getWikiDocUrl(),
+            this.flowService.getCamelDocUrl(),
+            this.serviceService.query(),
+            this.headerService.query(),
+            this.gatewayService.query()
+        )
             .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
                 this.wikiDocUrl = wikiDocUrl.text();
 
@@ -246,9 +246,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'SonicMQ Connection';
         } else if (type === 'SQL') {
             return 'JDBC Connection';
-        } else if (type === 'KAFKA') {
-            return 'Kafka Connection';
-        } else if (type === 'FILE' || 'HTTP4' || 'SFTP' || 'SJMS' || 'STREAM') {
+        } else if (type === 'SJMS') {
+            return 'MQ Connection';
+        } else if (type === 'FILE' || 'HTTP4' || 'KAFKA' || 'SFTP' || 'SJMS' || 'STREAM' || 'VM' || 'WASTEBIN') {
             return '';
         }
 
@@ -266,14 +266,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-jms/src/main/docs/jms-component.adoc`,
                 uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>destinationType</b><br/>
-                    <b>Description</b>: <b>Required</b> The kind of destination to use.<br/>
+                    <b>Name</b>: destinationType<br/>
+                    <b>Description</b>: The kind of destination to use.<br/>
                     <b>Default</b>: queue<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
-                    <b>Name</b>: <b>destinationName</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of the queue or topic to use as destination.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: Name of the queue or topic to use as destination.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
                 `
             },
             {
@@ -282,9 +285,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/file-component.adoc`,
                 uriPlaceholder: 'directoryName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>directoryName</b><br/>
-                    <b>Description</b>: <b>Required</b> The starting directory.<br/>
-                    <b>Type</b>: File
+                    <b>Name</b>: directoryName<br/>
+                    <b>Description</b>:  The starting directory.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: File <br/><br/>
+                    <b>Example</b>: /home/user/order or C:\\order<br/>
                 `
             },
             {
@@ -293,9 +298,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-http4/src/main/docs/http4-component.adoc`,
                 uriPlaceholder: 'httpUri',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>httpUri</b><br/>
-                    <b>Description</b>: <b>Required</b> The url of the HTTP endpoint to call.<br/>
-                    <b>Type</b>: URI
+                    <b>Name</b>: httpUri<br/>
+                    <b>Description</b>: The url of the HTTP endpoint to call.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: URI <br/><br/>
+                    <b>Example</b>: http://servername:8080/orders<br/>
                 `
             },
             {
@@ -304,10 +311,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
                 uriPlaceholder: 'topic',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>topic</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics.
+                    <b>Name</b>: topic<br/>
+                    <b>Description</b>:  Name of the topic to use. On the consumer you can use comma to separate multiple topics.
                         A producer can only send a message to a single topic.<br/>
-                    <b>Type</b>: String
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: test or test1,test2,test3<br/>
                 `
             },
             {
@@ -316,18 +325,23 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
                 uriPlaceholder: 'host:port/directoryName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>host</b><br/>
-                    <b>Description</b>: <b>Required</b> Hostname of the FTP server.<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Name</b>: host<br/>
+                    <b>Description</b>: Hostname of the FTP server.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/>
                     <br/>
-                    <b>Name</b>: <b>port</b><br/>
+                    <b>Name</b>: port<br/>
                     <b>Description</b>: Port of the FTP server.<br/>
-                    <b>Type</b>: int<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Default</b>: 22<br/>
+                    <b>Data Type</b>: int<br/>
                     <br/>
-                    <b>Name</b>: <b>directoryName</b><br/>
+                    <b>Name</b>: directoryName<br/>
                     <b>Description</b>: The starting directory.<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
+                    <b>Example</b>: servername:22/dir1/subdir<br/>
                 `
             },
             {
@@ -336,26 +350,37 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
                 uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>destinationType</b><br/>
+                    <b>Name</b>: destinationType<br/>
                     <b>Description</b>: The kind of destination to use.<br/>
                     <b>Default</b>: queue<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
-                    <b>Name</b>: <b>destinationName</b><br/>
-                    <b>Description</b>: <b>Required</b> DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
                 `
             },
             {
                 name: 'SONICMQ',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-sonicmq`,
                 camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'query',
+                uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
-                        or classpath: as prefix and specify the location of the file.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationType<br/>
+                    <b>Description</b>: The kind of destination to use.<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Default</b>: queue<br/>
+                    <b>Data Type</b>: String<br/>
+                    <br/>
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
+
                 `
             },
             {
@@ -365,9 +390,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 uriPlaceholder: 'query',
                 uriPopoverMessage: `
                     <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
-                        or classpath: as prefix and specify the location of the file.<br/>
-                    <b>Type</b>: String
+                    <b>Description</b>: Sets the SQL query to perform. <br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: select id from order<br/>
                 `
             },
             {
@@ -376,20 +402,33 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-stream/src/main/docs/stream-component.adoc`,
                 uriPlaceholder: 'kind',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>kind</b><br/>
-                    <b>Description</b>: <b>Required</b> Kind of stream to use such as System.in or System.out.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: kind<br/>
+                    <b>Description</b>: Kind of stream to use such as System.in or System.out.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: out (or in or err)<br/>
+                `
+            },
+            {
+                name: 'VM',
+                assimblyTypeLink: `${this.wikiDocUrl}/component-vm`,
+                camelTypeLink: `${this.camelDocUrl}/components/camel-vm/src/main/docs/vm-component.adoc`,
+                uriPlaceholder: 'queueName',
+                uriPopoverMessage: `
+                    <b>Name</b>: queueName<br/>
+                    <b>Description</b>: Internal queue between two flows<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String<br/><br/>
+                    <b>Example</b>: test<br/>
                 `
             },
             {
                 name: 'WASTEBIN',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
                 camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
-                uriPlaceholder: 'name',
+                uriPlaceholder: '',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>name</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of mock endpoint.<br/>
-                    <b>Type</b>: String
+                    <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
                 `
             }
         ];
