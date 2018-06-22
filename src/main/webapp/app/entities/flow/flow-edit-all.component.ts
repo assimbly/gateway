@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { Response } from '@angular/http';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 import { ResponseWrapper } from '../../shared';
 
@@ -72,13 +72,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     editFlowForm: FormGroup;
     displayNextButton = false;
 
+    fromFilterService: Array<Service> = [];
+    toFilterService: Array<Array<Service>> = [[]];
+    errorFilterService: Array<Service> = [];
+    selectedService: Service = new Service();
+
     private subscription: Subscription;
     private eventSubscriber: Subscription;
     private wikiDocUrl: string;
     private camelDocUrl: string;
 
     @ViewChild('tabs')
-        private ngbTabset: NgbTabset
+    private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -108,132 +113,152 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id) {
-        forkJoin([this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()])
-            .subscribe((results) => {
-                this.wikiDocUrl = results[0].text();
-                this.camelDocUrl = results[1].text();
-            });
+        forkJoin(
+                this.flowService.getWikiDocUrl(),
+                this.flowService.getCamelDocUrl(),
+                this.serviceService.query(),
+                this.headerService.query(),
+                this.gatewayService.query()
+            )
+            .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
+                this.wikiDocUrl = wikiDocUrl.text();
 
-        this.loadServices();
-        this.loadHeaders();
+                this.camelDocUrl = camelDocUrl.text();
 
-        this.getGateways();
+                this.services = services.json;
+                this.serviceCreated = this.services.length > 0;
 
-        const isCloning = this.route.fragment['value'] === 'clone';
+                this.headers = headers.json;
+                this.headerCreated = this.headers.length > 0;
 
-        if (id) {
-            this.flowService.find(id).subscribe((flow) => {
-                if (flow) {
-                    this.flow = flow;
-                    if (isCloning) {
-                        this.flow.id = null;
-                    }
-                    this.initializeForm(this.flow);
-                    if (this.flow.fromEndpointId) {
-                        this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
-                            if (fromEndpoint) {
-                                this.fromEndpoint = fromEndpoint;
-                                if (isCloning) {
-                                    this.fromEndpoint.id = null;
-                                    this.flow.fromEndpointId = null;
-                                }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
-                                setTimeout(() => {
-                                    this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
-                                    this.setTypeLinks(this.fromEndpoint, 0);
-                                    this.finished = true;
-                                }, 0);
+                this.gateways = gateways.json;
+                this.singleGateway = this.gateways.length === 1;
+
+                const isCloning = this.route.fragment['value'] === 'clone';
+                if (id) {
+                    this.flowService.find(id).subscribe((flow) => {
+                        if (flow) {
+                            this.flow = flow;
+                            if (isCloning) {
+                                this.flow.id = null;
                             }
+                            this.initializeForm(this.flow);
+                            if (this.flow.fromEndpointId) {
+                                this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
+                                    if (fromEndpoint) {
+                                        this.fromEndpoint = fromEndpoint;
+                                        if (isCloning) {
+                                            this.fromEndpoint.id = null;
+                                            this.flow.fromEndpointId = null;
+                                        }
+                                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
+                                        setTimeout(() => {
+                                            this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
+                                            this.setTypeLinks(this.fromEndpoint, 0);
+                                            this.finished = true;
+                                        }, 0);
+                                    }
+                                });
+                            }
+                        }
+
+                        if (this.flow.errorEndpointId) {
+                            this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
+                                this.errorEndpoint = errorEndpoint;
+                                if (isCloning) {
+                                    this.errorEndpoint.id = null;
+                                    this.flow.errorEndpointId = null;
+                                }
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
+                                setTimeout(() => {
+                                    this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
+                                    this.setTypeLinks(this.errorEndpoint, 1);
+                                }, 0);
+                            });
+                        }
+
+                        this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
+                            this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
+                            this.toEndpoints.forEach((toEndpoint, i) => {
+                                if (isCloning) {
+                                    toEndpoint.id = null;
+                                    toEndpoint.flowId = null;
+                                }
+                                if (typeof this.toEndpointsOptions[i] === 'undefined') {
+                                    this.toEndpointsOptions.push([]);
+                                }
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
+                                setTimeout(() => {
+                                    this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
+                                    this.setTypeLinks(toEndpoint, i + 2);
+                                }, 0);
+                            });
                         });
-                    }
+                    });
+                } else if (!this.finished) {
+                    setTimeout(() => {
+                        this.flow = new Flow();
+                        this.flow.autoStart = false;
+                        this.initializeForm(this.flow);
+
+                        this.fromEndpoint = new FromEndpoint();
+                        this.fromEndpoint.type = EndpointType.FILE;
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                        this.fromEndpointOptions = [new Option()];
+                        this.setTypeLinks(this.fromEndpoint, 0);
+
+                        this.errorEndpoint = new ErrorEndpoint();
+                        this.errorEndpoint.type = EndpointType.FILE;
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                        this.errorEndpointOptions = [new Option()];
+                        this.setTypeLinks(this.errorEndpoint, 1);
+
+                        this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                        this.toEndpoints.forEach((endpoint, i) => {
+                            endpoint.type = EndpointType.FILE;
+                        });
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
+                        this.toEndpointsOptions = [[new Option()]];
+                        this.setTypeLinks(this.toEndpoints[0], 2);
+
+                        this.finished = true;
+                        this.displayNextButton = true;
+                    }, 0);
                 }
 
-                if (this.flow.errorEndpointId) {
-                    this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
-                        this.errorEndpoint = errorEndpoint;
-                        if (isCloning) {
-                            this.errorEndpoint.id = null;
-                            this.flow.errorEndpointId = null;
-                        }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
-                        setTimeout(() => {
-                            this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
-                            this.setTypeLinks(this.errorEndpoint, 1);
-                        }, 0);
-                    });
-                }
-
-                this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
-                    this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
-                    this.toEndpoints.forEach((toEndpoint, i) => {
-                        if (isCloning) {
-                            toEndpoint.id = null;
-                            toEndpoint.flowId = null;
-                        }
-                        if (typeof this.toEndpointsOptions[i] === 'undefined') {
-                            this.toEndpointsOptions.push([]);
-                        }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
-                        setTimeout(() => {
-                            this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
-                            this.setTypeLinks(toEndpoint, i + 2);
-                        }, 0);
-                    });
-                });
             });
-        } else if (!this.finished) {
-            setTimeout(() => {
-                this.flow = new Flow();
-                this.flow.autoStart = false;
-                this.initializeForm(this.flow);
-                this.fromEndpoint = new FromEndpoint();
-                this.fromEndpoint.type = EndpointType.FILE;
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
-                this.fromEndpointOptions = [new Option()];
-                this.errorEndpoint = new ErrorEndpoint();
-                this.errorEndpoint.type = EndpointType.FILE;
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
-                this.errorEndpointOptions = [new Option()];
-                this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
-                this.toEndpoints.forEach((endpoint) => {
-                    endpoint.type = EndpointType.FILE;
-                });
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
-                this.toEndpointsOptions = [[new Option()]];
-                this.finished = true;
-                this.displayNextButton = true;
-            }, 0);
+    }
+
+    filterServices(endpoint: any) {
+        if (endpoint instanceof ToEndpoint) {
+            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+        } else if (endpoint instanceof FromEndpoint) {
+            this.fromFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+        } else if (endpoint instanceof ErrorEndpoint) {
+            this.errorFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
         }
     }
 
-    loadServices() {
-        this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
-                this.serviceCreated = this.services.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-    }
+    returnServiceType(type: any) {
+        if (type === 'ACTIVEMQ') {
+            return 'ActiveMQ Connection';
+        } else if (type === 'SONICMQ') {
+            return 'SonicMQ Connection';
+        } else if (type === 'SQL') {
+            return 'JDBC Connection';
+        } else if (type === 'KAFKA') {
+            return 'Kafka Connection';
+        } else if (type === 'FILE' || 'HTTP4' || 'SFTP' || 'SJMS' || 'STREAM') {
+            return '';
+        }
 
-    loadHeaders() {
-        this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
-                this.headerCreated = this.headers.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
     }
 
     setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
-
         const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
-
         if (typeof e !== 'undefined') {
             endpoint.type = e;
         }
-
         const typesLinks = [
             {
                 name: 'ACTIVEMQ',
@@ -359,7 +384,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             {
                 name: 'WASTEBIN',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink:  `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
+                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
                 uriPlaceholder: 'name',
                 uriPopoverMessage: `
                     <b>Name</b>: <b>name</b><br/>
@@ -372,36 +397,50 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let type;
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.fromTypeAssimblyLink = type.assimblyTypeLink;
             this.fromTypeCamelLink = type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
             this.fromUriPopoverMessage = type.uriPopoverMessage;
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
             this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
             this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.errorTypeAssimblyLink = type.assimblyTypeLink;
             this.errorTypeCamelLink = type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
             this.errorUriPopoverMessage = type.uriPopoverMessage;
         }
 
-        endpointForm.patchValue({'type': type.name});
-
-        if (endpointForm.controls.type.value === 'WASTEBIN') {
-            endpointForm.controls.uri.disable();
-            endpointForm.controls.options.disable();
-            endpointForm.controls.service.disable();
-            endpointForm.controls.header.disable();
-        }else {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.service.enable();
-            endpointForm.controls.header.enable();
+        endpointForm.patchValue({ 'type': type.name });
+        switch (endpointForm.controls.type.value) {
+            case 'WASTEBIN': {
+                endpointForm.controls.uri.disable();
+                endpointForm.controls.options.disable();
+                endpointForm.controls.service.disable();
+                endpointForm.controls.header.disable();
+                break;
+            }
+            case 'FILE': case 'HTTP4': case 'SFTP': case 'SJMS': case 'STREAM': {
+                endpointForm.controls.service.disable();
+                break;
+            }
+            default: {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
+                break;
+            }
         }
     }
 
@@ -555,8 +594,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
         toEndpoint.type = EndpointType.FILE;
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
+        this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
     }
-
     removeToEndpoint(toEndpoint, endpointDataName) {
         const i = this.toEndpoints.indexOf(toEndpoint);
         this.toEndpoints.splice(i, 1);
@@ -583,8 +622,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditHeader(endpoint) {
         (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], {fragment: 'showEditHeaderButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }], {fragment: 'showEditHeaderButton'});
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
@@ -594,8 +633,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], {fragment: 'showEditServiceButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }], {fragment: 'showEditServiceButton'});
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
 
         this.eventManager.subscribe(
             'serviceModified',
@@ -623,14 +662,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
-    }
-
-    getGateways() {
-        this.gatewayService.query()
-            .subscribe((gateways) => {
-                this.gateways = gateways.json;
-                this.singleGateway = this.gateways.length === 1;
-            });
     }
 
     handleErrorWhileCreatingFlow(flowId?: number, fromEndpointId?: number, errorEndpointId?: number, toEndpointId?: number) {
@@ -842,5 +873,5 @@ export class TypeLinks {
         public name: string,
         public assimblyTypeLink: string,
         public camelTypeLink: string
-    ) {}
+    ) { }
 }

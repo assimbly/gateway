@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { Response } from '@angular/http';
 
 import { Gateway } from './gateway.model';
 import { GatewayService } from './gateway.service';
 import { Principal, ResponseWrapper } from '../../shared';
+import { FlowService } from '../flow/flow.service';
 
 @Component({
     selector: 'jhi-gateway',
@@ -17,6 +19,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
     eventSubscriber: Subscription;
 
     constructor(
+        private flowService: FlowService,
         private gatewayService: GatewayService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
@@ -47,8 +50,13 @@ export class GatewayComponent implements OnInit, OnDestroy {
     trackId(index: number, item: Gateway) {
         return item.id;
     }
+
     registerChangeInGateways() {
         this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', (response) => this.loadAll());
+    }
+
+    downloadConfiguration(gateway: Gateway) {
+        this.flowService.exportGatewayConfiguration(gateway);
     }
 
     private onError(error) {

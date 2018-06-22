@@ -98,8 +98,8 @@ export class FlowRowComponent implements OnInit {
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
                 this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
                 this.flowStatusButton = `
-                            Last action: Unconfigure <br/>
-                            Status: Flow is unconfigured<br/>
+                            Last action: - <br/>
+                            Status: Flow is stopped<br/>
             `;
                 this.statusFlow = Status.inactive;
                 break;
