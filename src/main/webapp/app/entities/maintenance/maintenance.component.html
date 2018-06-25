@@ -6,7 +6,7 @@
         <input [(ngModel)]="hours" type="number" name="hours" class="form-control" id="hours" placeholder="hours">
         <input [(ngModel)]="minutes" min="0" max="59" size="1" maxlength="2" type="number" name="minutes" class="form-control" id="minutes" placeholder="minutes" required>
         <div class="input-group-append">
-            <button type="submit" class="btn btn-primary">Put into maintenance</button>
+            <button type="submit" class="btn btn-primary">Apply</button>
         </div>
     </div>
     <div class="table-responsive" *ngIf="flows">
