@@ -326,3 +326,6 @@ custom assimbly css
     padding-right: 28px;
 }
 /* jhipster-needle-css-add-main JHipster will add new css style */
+.popover {
+    max-width: 21%;
+}

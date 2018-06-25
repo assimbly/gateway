@@ -29,6 +29,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     multipleGateways = false;
     singleGatewayName: string;
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
+    test: any;
 
     constructor(
         private gatewayService: GatewayService,
@@ -131,7 +132,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     trigerAction(action: string) {
-        this.eventManager.broadcast({ name: 'trigerAction', content: action});
+        this.eventManager.broadcast({ name: 'trigerAction', content: action });
     }
 
     private onSuccess(data, headers) {

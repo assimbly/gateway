@@ -22,8 +22,8 @@
         </ng-template>
         <div class="row mt-3">
 
-            <div class="input-group col-6">
-                <ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction"></ng-select>
+            <div class="input-group col-2">
+                <ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
                 <div class="input-group-append">
                     <button type="button" class="btn btn-primary" (click)="trigerAction(selectedAction)">
                         <span>All flows</span>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="col-6 text-right">
+            <div class="col-10 text-right">
                 <button class="btn btn-success" type="submit" [routerLink]="['../live-mode']">
                     <span class="fa fa-plus"></span>
                     <span>Live mode</span>
@@ -40,6 +40,14 @@
                     <span class="fa fa-plus"></span>
                     <span>Create new flow</span>
                 </button>
+                <!-- <div class="input-group col-2">
+                        <ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" (click)="trigerAction(selectedAction)">
+                                <span>All flows</span>
+                            </button>
+                        </div>
+                    </div> -->
             </div>
         </div>
         <br/>
@@ -74,6 +82,7 @@
                         <th>
                             <span>Flow status</span>
                         </th>
+                        <th></th>
                         <th></th>
                     </tr>
                 </thead>
