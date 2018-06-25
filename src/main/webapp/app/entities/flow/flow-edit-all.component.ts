@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { Response } from '@angular/http';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 import { ResponseWrapper } from '../../shared';
 
@@ -53,9 +53,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
-    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM','WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM','VM'];
+    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
+    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
