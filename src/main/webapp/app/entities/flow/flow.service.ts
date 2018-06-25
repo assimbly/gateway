@@ -118,7 +118,7 @@ export class FlowService {
     }
 
     exportGatewayConfiguration(gateway: Gateway) {
-        const url = `${this.connectorUrl}/${gateway.id}/getflowconfiguration/34`;
+        const url = `${this.environmentUrl}/${gateway.id}/flow/34`;
         let headers = new Headers();
         headers.append('Accept', 'application/xml');
         const options = new RequestOptions({responseType: ResponseContentType.Blob });
