@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { forkJoin } from 'rxjs/observable/forkJoin';
@@ -72,13 +72,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     editFlowForm: FormGroup;
     displayNextButton = false;
 
+    fromFilterService: Array<Service> = [];
+    toFilterService: Array<Array<Service>> = [[]];
+    errorFilterService: Array<Service> = [];
+    selectedService: Service = new Service();
+
     private subscription: Subscription;
     private eventSubscriber: Subscription;
     private wikiDocUrl: string;
     private camelDocUrl: string;
 
     @ViewChild('tabs')
-        private ngbTabset: NgbTabset
+    private ngbTabset: NgbTabset
 
     constructor(
         private eventManager: JhiEventManager,
@@ -108,132 +113,152 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id) {
-        forkJoin([this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()])
-            .subscribe((results) => {
-                this.wikiDocUrl = results[0].text();
-                this.camelDocUrl = results[1].text();
-            });
+        forkJoin(
+            this.flowService.getWikiDocUrl(),
+            this.flowService.getCamelDocUrl(),
+            this.serviceService.query(),
+            this.headerService.query(),
+            this.gatewayService.query()
+        )
+            .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
+                this.wikiDocUrl = wikiDocUrl.text();
 
-        this.loadServices();
-        this.loadHeaders();
+                this.camelDocUrl = camelDocUrl.text();
 
-        this.getGateways();
+                this.services = services.json;
+                this.serviceCreated = this.services.length > 0;
 
-        const isCloning = this.route.fragment['value'] === 'clone';
+                this.headers = headers.json;
+                this.headerCreated = this.headers.length > 0;
 
-        if (id) {
-            this.flowService.find(id).subscribe((flow) => {
-                if (flow) {
-                    this.flow = flow;
-                    if (isCloning) {
-                        this.flow.id = null;
-                    }
-                    this.initializeForm(this.flow);
-                    if (this.flow.fromEndpointId) {
-                        this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
-                            if (fromEndpoint) {
-                                this.fromEndpoint = fromEndpoint;
-                                if (isCloning) {
-                                    this.fromEndpoint.id = null;
-                                    this.flow.fromEndpointId = null;
-                                }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
-                                setTimeout(() => {
-                                    this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
-                                    this.setTypeLinks(this.fromEndpoint, 0);
-                                    this.finished = true;
-                                }, 0);
+                this.gateways = gateways.json;
+                this.singleGateway = this.gateways.length === 1;
+
+                const isCloning = this.route.fragment['value'] === 'clone';
+                if (id) {
+                    this.flowService.find(id).subscribe((flow) => {
+                        if (flow) {
+                            this.flow = flow;
+                            if (isCloning) {
+                                this.flow.id = null;
                             }
+                            this.initializeForm(this.flow);
+                            if (this.flow.fromEndpointId) {
+                                this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
+                                    if (fromEndpoint) {
+                                        this.fromEndpoint = fromEndpoint;
+                                        if (isCloning) {
+                                            this.fromEndpoint.id = null;
+                                            this.flow.fromEndpointId = null;
+                                        }
+                                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
+                                        setTimeout(() => {
+                                            this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
+                                            this.setTypeLinks(this.fromEndpoint, 0);
+                                            this.finished = true;
+                                        }, 0);
+                                    }
+                                });
+                            }
+                        }
+
+                        if (this.flow.errorEndpointId) {
+                            this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
+                                this.errorEndpoint = errorEndpoint;
+                                if (isCloning) {
+                                    this.errorEndpoint.id = null;
+                                    this.flow.errorEndpointId = null;
+                                }
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
+                                setTimeout(() => {
+                                    this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
+                                    this.setTypeLinks(this.errorEndpoint, 1);
+                                }, 0);
+                            });
+                        }
+
+                        this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
+                            this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
+                            this.toEndpoints.forEach((toEndpoint, i) => {
+                                if (isCloning) {
+                                    toEndpoint.id = null;
+                                    toEndpoint.flowId = null;
+                                }
+                                if (typeof this.toEndpointsOptions[i] === 'undefined') {
+                                    this.toEndpointsOptions.push([]);
+                                }
+                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
+                                setTimeout(() => {
+                                    this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
+                                    this.setTypeLinks(toEndpoint, i + 2);
+                                }, 0);
+                            });
                         });
-                    }
+                    });
+                } else if (!this.finished) {
+                    setTimeout(() => {
+                        this.flow = new Flow();
+                        this.flow.autoStart = false;
+                        this.initializeForm(this.flow);
+
+                        this.fromEndpoint = new FromEndpoint();
+                        this.fromEndpoint.type = EndpointType.FILE;
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                        this.fromEndpointOptions = [new Option()];
+                        this.setTypeLinks(this.fromEndpoint, 0);
+
+                        this.errorEndpoint = new ErrorEndpoint();
+                        this.errorEndpoint.type = EndpointType.FILE;
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                        this.errorEndpointOptions = [new Option()];
+                        this.setTypeLinks(this.errorEndpoint, 1);
+
+                        this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                        this.toEndpoints.forEach((endpoint, i) => {
+                            endpoint.type = EndpointType.FILE;
+                        });
+                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
+                        this.toEndpointsOptions = [[new Option()]];
+                        this.setTypeLinks(this.toEndpoints[0], 2);
+
+                        this.finished = true;
+                        this.displayNextButton = true;
+                    }, 0);
                 }
 
-                if (this.flow.errorEndpointId) {
-                    this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
-                        this.errorEndpoint = errorEndpoint;
-                        if (isCloning) {
-                            this.errorEndpoint.id = null;
-                            this.flow.errorEndpointId = null;
-                        }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
-                        setTimeout(() => {
-                            this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
-                            this.setTypeLinks(this.errorEndpoint, 1);
-                        }, 0);
-                    });
-                }
-
-                this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
-                    this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
-                    this.toEndpoints.forEach((toEndpoint, i) => {
-                        if (isCloning) {
-                            toEndpoint.id = null;
-                            toEndpoint.flowId = null;
-                        }
-                        if (typeof this.toEndpointsOptions[i] === 'undefined') {
-                            this.toEndpointsOptions.push([]);
-                        }
-                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
-                        setTimeout(() => {
-                            this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
-                            this.setTypeLinks(toEndpoint, i + 2);
-                        }, 0);
-                    });
-                });
             });
-        } else if (!this.finished) {
-            setTimeout(() => {
-                this.flow = new Flow();
-                this.flow.autoStart = false;
-                this.initializeForm(this.flow);
-                this.fromEndpoint = new FromEndpoint();
-                this.fromEndpoint.type = EndpointType.FILE;
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
-                this.fromEndpointOptions = [new Option()];
-                this.errorEndpoint = new ErrorEndpoint();
-                this.errorEndpoint.type = EndpointType.FILE;
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
-                this.errorEndpointOptions = [new Option()];
-                this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
-                this.toEndpoints.forEach((endpoint) => {
-                    endpoint.type = EndpointType.FILE;
-                });
-                (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
-                this.toEndpointsOptions = [[new Option()]];
-                this.finished = true;
-                this.displayNextButton = true;
-            }, 0);
+    }
+
+    filterServices(endpoint: any) {
+        if (endpoint instanceof ToEndpoint) {
+            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+        } else if (endpoint instanceof FromEndpoint) {
+            this.fromFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+        } else if (endpoint instanceof ErrorEndpoint) {
+            this.errorFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
         }
     }
 
-    loadServices() {
-        this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
-                this.serviceCreated = this.services.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-    }
+    returnServiceType(type: any) {
+        if (type === 'ACTIVEMQ') {
+            return 'ActiveMQ Connection';
+        } else if (type === 'SONICMQ') {
+            return 'SonicMQ Connection';
+        } else if (type === 'SQL') {
+            return 'JDBC Connection';
+        } else if (type === 'SJMS') {
+            return 'MQ Connection';
+        } else if (type === 'FILE' || 'HTTP4' || 'KAFKA' || 'SFTP' || 'SJMS' || 'STREAM' || 'VM' || 'WASTEBIN') {
+            return '';
+        }
 
-    loadHeaders() {
-        this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
-                this.headerCreated = this.headers.length > 0;
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
     }
 
     setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
-
         const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
-
         if (typeof e !== 'undefined') {
             endpoint.type = e;
         }
-
         const typesLinks = [
             {
                 name: 'ACTIVEMQ',
@@ -241,14 +266,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-jms/src/main/docs/jms-component.adoc`,
                 uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>destinationType</b><br/>
-                    <b>Description</b>: <b>Required</b> The kind of destination to use.<br/>
+                    <b>Name</b>: destinationType<br/>
+                    <b>Description</b>: The kind of destination to use.<br/>
                     <b>Default</b>: queue<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
-                    <b>Name</b>: <b>destinationName</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of the queue or topic to use as destination.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: Name of the queue or topic to use as destination.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
                 `
             },
             {
@@ -257,9 +285,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/file-component.adoc`,
                 uriPlaceholder: 'directoryName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>directoryName</b><br/>
-                    <b>Description</b>: <b>Required</b> The starting directory.<br/>
-                    <b>Type</b>: File
+                    <b>Name</b>: directoryName<br/>
+                    <b>Description</b>:  The starting directory.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: File <br/><br/>
+                    <b>Example</b>: /home/user/order or C:\\order<br/>
                 `
             },
             {
@@ -268,9 +298,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-http4/src/main/docs/http4-component.adoc`,
                 uriPlaceholder: 'httpUri',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>httpUri</b><br/>
-                    <b>Description</b>: <b>Required</b> The url of the HTTP endpoint to call.<br/>
-                    <b>Type</b>: URI
+                    <b>Name</b>: httpUri<br/>
+                    <b>Description</b>: The url of the HTTP endpoint to call.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: URI <br/><br/>
+                    <b>Example</b>: http://servername:8080/orders<br/>
                 `
             },
             {
@@ -279,10 +311,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
                 uriPlaceholder: 'topic',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>topic</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of the topic to use. On the consumer you can use comma to separate multiple topics.
+                    <b>Name</b>: topic<br/>
+                    <b>Description</b>:  Name of the topic to use. On the consumer you can use comma to separate multiple topics.
                         A producer can only send a message to a single topic.<br/>
-                    <b>Type</b>: String
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: test or test1,test2,test3<br/>
                 `
             },
             {
@@ -291,18 +325,23 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
                 uriPlaceholder: 'host:port/directoryName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>host</b><br/>
-                    <b>Description</b>: <b>Required</b> Hostname of the FTP server.<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Name</b>: host<br/>
+                    <b>Description</b>: Hostname of the FTP server.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/>
                     <br/>
-                    <b>Name</b>: <b>port</b><br/>
+                    <b>Name</b>: port<br/>
                     <b>Description</b>: Port of the FTP server.<br/>
-                    <b>Type</b>: int<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Default</b>: 22<br/>
+                    <b>Data Type</b>: int<br/>
                     <br/>
-                    <b>Name</b>: <b>directoryName</b><br/>
+                    <b>Name</b>: directoryName<br/>
                     <b>Description</b>: The starting directory.<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
+                    <b>Example</b>: servername:22/dir1/subdir<br/>
                 `
             },
             {
@@ -311,26 +350,37 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
                 uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>destinationType</b><br/>
+                    <b>Name</b>: destinationType<br/>
                     <b>Description</b>: The kind of destination to use.<br/>
                     <b>Default</b>: queue<br/>
-                    <b>Type</b>: String<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Data Type</b>: String<br/>
                     <br/>
-                    <b>Name</b>: <b>destinationName</b><br/>
-                    <b>Description</b>: <b>Required</b> DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
                 `
             },
             {
                 name: 'SONICMQ',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-sonicmq`,
                 camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'query',
+                uriPlaceholder: 'destinationType:destinationName',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
-                        or classpath: as prefix and specify the location of the file.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: destinationType<br/>
+                    <b>Description</b>: The kind of destination to use.<br/>
+                    <b>Required</b>: no <br/>
+                    <b>Default</b>: queue<br/>
+                    <b>Data Type</b>: String<br/>
+                    <br/>
+                    <b>Name</b>: destinationName<br/>
+                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
+
                 `
             },
             {
@@ -340,9 +390,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 uriPlaceholder: 'query',
                 uriPopoverMessage: `
                     <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: <b>Required</b> Sets the SQL query to perform. You can externalize the query by using file:
-                        or classpath: as prefix and specify the location of the file.<br/>
-                    <b>Type</b>: String
+                    <b>Description</b>: Sets the SQL query to perform. <br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: select id from order<br/>
                 `
             },
             {
@@ -351,20 +402,33 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 camelTypeLink: `${this.camelDocUrl}/components/camel-stream/src/main/docs/stream-component.adoc`,
                 uriPlaceholder: 'kind',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>kind</b><br/>
-                    <b>Description</b>: <b>Required</b> Kind of stream to use such as System.in or System.out.<br/>
-                    <b>Type</b>: String
+                    <b>Name</b>: kind<br/>
+                    <b>Description</b>: Kind of stream to use such as System.in or System.out.<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String <br/><br/>
+                    <b>Example</b>: out (or in or err)<br/>
+                `
+            },
+            {
+                name: 'VM',
+                assimblyTypeLink: `${this.wikiDocUrl}/component-vm`,
+                camelTypeLink: `${this.camelDocUrl}/components/camel-vm/src/main/docs/vm-component.adoc`,
+                uriPlaceholder: 'queueName',
+                uriPopoverMessage: `
+                    <b>Name</b>: queueName<br/>
+                    <b>Description</b>: Internal queue between two flows<br/>
+                    <b>Required</b>: yes <br/>
+                    <b>Data Type</b>: String<br/><br/>
+                    <b>Example</b>: test<br/>
                 `
             },
             {
                 name: 'WASTEBIN',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink:  `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
-                uriPlaceholder: 'name',
+                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
+                uriPlaceholder: '',
                 uriPopoverMessage: `
-                    <b>Name</b>: <b>name</b><br/>
-                    <b>Description</b>: <b>Required</b> Name of mock endpoint.<br/>
-                    <b>Type</b>: String
+                    <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
                 `
             }
         ];
@@ -372,36 +436,51 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let type;
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.fromTypeAssimblyLink = type.assimblyTypeLink;
             this.fromTypeCamelLink = type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
             this.fromUriPopoverMessage = type.uriPopoverMessage;
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
             this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
             this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
+            endpointForm.controls.service.setValue('');
+            this.filterServices(endpoint);
             this.errorTypeAssimblyLink = type.assimblyTypeLink;
             this.errorTypeCamelLink = type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
             this.errorUriPopoverMessage = type.uriPopoverMessage;
         }
 
-        endpointForm.patchValue({'type': type.name});
+        endpointForm.patchValue({ 'type': type.name });
 
-        if (endpointForm.controls.type.value === 'WASTEBIN') {
-            endpointForm.controls.uri.disable();
-            endpointForm.controls.options.disable();
-            endpointForm.controls.service.disable();
-            endpointForm.controls.header.disable();
-        }else {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.service.enable();
-            endpointForm.controls.header.enable();
+        switch (endpointForm.controls.type.value) {
+            case 'WASTEBIN': {
+                endpointForm.controls.uri.disable();
+                endpointForm.controls.options.disable();
+                endpointForm.controls.service.disable();
+                endpointForm.controls.header.disable();
+                break;
+            }
+            case 'FILE': case 'HTTP4': case 'SFTP': case 'SJMS': case 'STREAM': {
+                endpointForm.controls.service.disable();
+                break;
+            }
+            default: {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
+                break;
+            }
         }
     }
 
@@ -555,8 +634,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
         toEndpoint.type = EndpointType.FILE;
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
+        this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
     }
-
     removeToEndpoint(toEndpoint, endpointDataName) {
         const i = this.toEndpoints.indexOf(toEndpoint);
         this.toEndpoints.splice(i, 1);
@@ -583,8 +662,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditHeader(endpoint) {
         (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], {fragment: 'showEditHeaderButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit'} }], {fragment: 'showEditHeaderButton'});
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
@@ -594,8 +673,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], {fragment: 'showEditServiceButton'}) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit'} }], {fragment: 'showEditServiceButton'});
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
 
         this.eventManager.subscribe(
             'serviceModified',
@@ -623,14 +702,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
-    }
-
-    getGateways() {
-        this.gatewayService.query()
-            .subscribe((gateways) => {
-                this.gateways = gateways.json;
-                this.singleGateway = this.gateways.length === 1;
-            });
     }
 
     handleErrorWhileCreatingFlow(flowId?: number, fromEndpointId?: number, errorEndpointId?: number, toEndpointId?: number) {
@@ -842,5 +913,5 @@ export class TypeLinks {
         public name: string,
         public assimblyTypeLink: string,
         public camelTypeLink: string
-    ) {}
+    ) { }
 }

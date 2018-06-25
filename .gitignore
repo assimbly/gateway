@@ -146,3 +146,4 @@ Desktop.ini
 .eslintcache
 src/main/resources/.h2.server.properties
 package-lock.json
+activemq-data/**
