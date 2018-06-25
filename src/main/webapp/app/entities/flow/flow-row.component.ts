@@ -4,6 +4,7 @@ import { FlowService } from './flow.service';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
+import { JhiEventManager } from 'ng-jhipster';
 import * as moment from 'moment';
 
 enum Status {
@@ -57,6 +58,7 @@ export class FlowRowComponent implements OnInit {
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
+        private eventManager: JhiEventManager
     ) {
     }
 
@@ -250,19 +252,29 @@ export class FlowRowComponent implements OnInit {
         this.eventManager.subscribe('trigerAction', (response) => {
             switch (response.content) {
                 case 'start':
+                if (this.statusFlow === Status.inactive) {
                     this.start();
+                }
                     break;
                 case 'stop':
+                if (this.statusFlow !== Status.inactive) {
                     this.stop();
+                }
                     break;
                 case 'pause':
+                if ( this.statusFlow === Status.active) {
                     this.pause();
+                }
                     break;
                 case 'restart':
+                if ( this.statusFlow === Status.active) {
                     this.restart();
+            }
                     break;
                 case 'resume':
+                if ( this.statusFlow === Status.paused) {
                     this.resume();
+                }
                     break;
                 default:
                     break;

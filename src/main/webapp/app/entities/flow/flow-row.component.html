@@ -24,7 +24,9 @@
 			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
 			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave"popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
 			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
-		 <i (mouseenter)="getFlowStatus(flow.id)" *ngIf="isFlowStatusOK;" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
+		 <i (mouseenter)="getFlowStatus(flow.id)" [hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
+		 <i [hidden]="isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
+
 
 </td>
 <td class="text-right">

@@ -248,7 +248,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'JDBC Connection';
         } else if (type === 'KAFKA') {
             return 'Kafka Connection';
-        } else if (type === 'FILE' || 'HTTP4' || 'SFTP' || 'SJMS' || 'STREAM') {
+        } else if (type === 'FILE' || 'HTTP4' || 'SFTP' || 'SJMS' || 'STREAM' || 'VM') {
             return '';
         }
 
