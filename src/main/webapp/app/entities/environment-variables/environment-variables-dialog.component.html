@@ -12,15 +12,30 @@
             <input type="text" class="form-control" id="id" name="id"
                    [(ngModel)]="environmentVariables.id" readonly />
         </div>
+
+
         <div class="form-group">
             <label class="form-control-label" for="field_key">Key</label>
             <input type="text" class="form-control" name="key" id="field_key"
-                [(ngModel)]="environmentVariables.key" />
+                required minlength="3" maxlength="30"
+                [(ngModel)]="environmentVariables.key"  #key="ngModel"/>
+            <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+                <span *ngIf="key.errors.required" >Name is required.</span>
+                <span *ngIf="key.errors.minlength">Name must be at least 3 characters long.</span>
+                <span *ngIf="key.errors.maxlength">Name can not be longer than 30 characters long.</span>
+            </div>
         </div>
+
         <div class="form-group">
             <label class="form-control-label" for="field_value">Value</label>
             <input type="text" class="form-control" name="value" id="field_value"
-                [(ngModel)]="environmentVariables.value" />
+                required minlength="3" maxlength="30"
+                [(ngModel)]="environmentVariables.value" #value="ngModel"/>
+            <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+                <span *ngIf="value.errors.required" >Value is required.</span>
+                <span *ngIf="value.errors.minlength">Value must be at least 3 characters long.</span>
+                <span *ngIf="value.errors.maxlength">Value can not be longer than 30 characters long.</span>
+            </div>    
         </div>
 
         <div class="form-group">
