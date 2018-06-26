@@ -1,18 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { GatewayPopupService } from './gateway-popup.service';
 import { GatewayService } from './gateway.service';
+import { Gateway } from './gateway.model';
 
 @Component({
     selector: 'jhi-gateway-import-dialog',
     templateUrl: './gateway-import-dialog.component.html'
 })
-export class GatewayImportDialogComponent {
+export class GatewayImportDialogComponent implements AfterContentInit {
 
     gatewayId: number;
+    gateways: Array<Gateway> = [];
     xmlConfiguration: any;
     fileName = 'Choose file';
 
@@ -20,6 +22,13 @@ export class GatewayImportDialogComponent {
         private gatewayService: GatewayService,
         public activeModal: NgbActiveModal
     ) {
+    }
+
+    ngAfterContentInit() {
+        this.gatewayService.query().subscribe((res) => {
+            this.gateways = res.json;
+            this.gatewayId = this.gateways[0].id;
+        });
     }
 
     clear() {
@@ -57,9 +66,9 @@ export class GatewayImportPopupComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
+        this.routeSub = this.route.params.subscribe(() => {
             this.gatewayPopupService
-                .open(GatewayImportDialogComponent as Component, params['id']);
+                .open(GatewayImportDialogComponent as Component);
         });
     }
 
