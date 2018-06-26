@@ -5,6 +5,7 @@ import { GatewayComponent } from './gateway.component';
 import { GatewayDetailComponent } from './gateway-detail.component';
 import { GatewayPopupComponent } from './gateway-dialog.component';
 import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
+import { GatewayImportPopupComponent } from './gateway-import-dialog.component';
 
 export const gatewayRoute: Routes = [
     {
@@ -50,6 +51,16 @@ export const gatewayPopupRoute: Routes = [
     {
         path: 'gateway/:id/delete',
         component: GatewayDeletePopupComponent,
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Gateways'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'gateway/import',
+        component: GatewayImportPopupComponent,
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'Gateways'
