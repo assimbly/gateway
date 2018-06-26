@@ -7,7 +7,9 @@
         <jhi-alert-error></jhi-alert-error>
         <div class="form-group">
             <label class="form-control-label font-weight-bold" for="field_id">Gateway id</label>
-            <input type="number" class="form-control" name="id" id="field_id" [(ngModel)]="gatewayId" />
+            <select class="form-control" name="id" [(ngModel)]="gatewayId" id="field_id" [disabled]="gateways.length === 1">
+                <option *ngFor="let gateway of gateways" value="{{gateway.id}}">{{gateway.id}}</option>
+            </select>
         </div>
         <div class="form-group">
             <label class="form-control-label font-weight-bold">XML configuration</label>
