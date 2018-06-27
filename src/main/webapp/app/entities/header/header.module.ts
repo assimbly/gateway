@@ -16,6 +16,7 @@ import {
     HeaderDeleteDialogComponent,
     headerRoute,
     headerPopupRoute,
+    ForbiddenHeaderNamesValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 const ENTITY_STATES = [
@@ -39,6 +40,7 @@ const ENTITY_STATES = [
         HeaderDeleteDialogComponent,
         HeaderPopupComponent,
         HeaderDeletePopupComponent,
+        ForbiddenHeaderNamesValidatorDirective
     ],
     entryComponents: [
         HeaderComponent,

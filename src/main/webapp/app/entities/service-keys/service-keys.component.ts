@@ -4,7 +4,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { ServiceKeys } from './service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
-import { Principal, ResponseWrapper } from '../../shared';
+import { Principal } from '../../shared';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -15,6 +15,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     @Input() serviceKeys: ServiceKeys[];
     @Input() serviceId: number;
 
+    serviceKeysKeys: Array<string> = [];
     currentAccount: any;
     isSaving: boolean;
     serviceKey: ServiceKeys;
@@ -31,15 +32,18 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
-        this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content))
+        this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
     }
+
     updateServiceKeys(id: number) {
         this.serviceKeys = this.serviceKeys.filter((x) => x.id !== id);
+        this.mapServiceKeysKeys();
         if (this.serviceKeys.length === 0) {
             this.addServiceKeys();
         }
     }
     ngOnChanges(changes: SimpleChanges) {
+        this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
                 this.serviceKeys[0].isDisabled = false;
@@ -65,10 +69,12 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         const newServiceKeys = new ServiceKeys();
         newServiceKeys.isDisabled = false;
         this.serviceKeys.push(newServiceKeys);
+        this.mapServiceKeysKeys();
     }
 
     removeServiceKeys(i: number) {
         this.serviceKeys.splice(i, 1);
+        this.mapServiceKeysKeys();
         if (this.serviceKeys.length === 0) {
             this.addServiceKeys();
         }
@@ -76,6 +82,14 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     editServiceKey(serviceKey) {
         serviceKey.isDisabled = false;
     }
+
+    mapServiceKeysKeys() {
+        if (typeof this.serviceKeys !== 'undefined') {
+            this.serviceKeysKeys = this.serviceKeys.map((sk) => sk.key);
+            this.serviceKeysKeys = this.serviceKeysKeys.filter((k) => k !== undefined);
+        }
+    }
+
     private subscribeToSaveResponse(result: Observable<ServiceKeys>, isCreate: boolean, i: number) {
         result.subscribe((res: ServiceKeys) =>
             this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
@@ -97,6 +111,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         } else {
             this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
+        this.mapServiceKeysKeys();
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });
     }
 
