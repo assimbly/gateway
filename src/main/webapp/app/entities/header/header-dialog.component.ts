@@ -11,7 +11,6 @@ import { HeaderPopupService } from './header-popup.service';
 import { HeaderService } from './header.service';
 import { ResponseWrapper } from '../../shared';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { HeaderKeysService } from '../header-keys';
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -21,6 +20,7 @@ export class HeaderDialogComponent implements OnInit {
 
     header: Header;
     headers: Header[];
+    headerNames: Array<string>;
     headerKeys: HeaderKeys;
     isSaving: boolean;
     showEditButton = false;
@@ -28,7 +28,6 @@ export class HeaderDialogComponent implements OnInit {
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private route: ActivatedRoute,
@@ -42,9 +41,13 @@ export class HeaderDialogComponent implements OnInit {
         this.headerService.query()
             .subscribe((res: ResponseWrapper) => {
             this.headers = res.json;
+            this.headerNames = this.headers.map((h) => h.name);
             }, (res: ResponseWrapper) => this.onError(res.json));
         if (this.route.fragment['value'] === 'showEditHeaderButton') {
             this.showEditButton = true;
+        }
+        if (this.route.fragment['value'] === 'clone') {
+            this.header.id = null;
         }
     }
 
@@ -70,6 +73,13 @@ export class HeaderDialogComponent implements OnInit {
         }, 0);
     }
 
+    navigateToHeaderDetail(headerId: number) {
+        this.router.navigate(['/header', headerId]);
+        setTimeout(() => {
+            this.activeModal.close();
+        }, 0);
+    }
+
     private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
         result.subscribe((res: Header) =>
             this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
@@ -80,7 +90,9 @@ export class HeaderDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
-        if (closePopup) {
+        if (this.route.fragment['value'] === 'clone') {
+            this.navigateToHeaderDetail(result.id);
+        } else if (closePopup) {
             this.activeModal.dismiss(result);
         }
     }

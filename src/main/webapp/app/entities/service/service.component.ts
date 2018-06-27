@@ -17,7 +17,7 @@ import { Observable } from 'rxjs/Observable';
 })
 
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
-    public services: Service[];
+    public services: Array<Service> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
     serviceKey: ServiceKeys;
@@ -42,8 +42,10 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
         this.serviceService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.services = res.json;
-                this.selectedService = this.services[this.services.length - 1];
-                this.filterServiceKeys();
+                if (this.services.length > 0) {
+                    this.selectedService = this.services[this.services.length - 1];
+                    this.filterServiceKeys();
+                }
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
@@ -82,18 +84,22 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     filterServiceKeys() {
-        this.serviceKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.serviceKeys = res.json;
-                this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
-                if (this.serviceKeys.length === 0) {
-                    const newServiceKeys = new ServiceKeys();
-                    newServiceKeys.isDisabled = false;
-                    this.serviceKeys.push(newServiceKeys);
-                }
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+        if (this.selectedService === null) {
+            this.selectedService = new Service();
+        } else {
+            this.serviceKeysService.query().subscribe(
+                (res: ResponseWrapper) => {
+                    this.serviceKeys = res.json;
+                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
+                    if (this.serviceKeys.length === 0) {
+                        const newServiceKeys = new ServiceKeys();
+                        newServiceKeys.isDisabled = false;
+                        this.serviceKeys.push(newServiceKeys);
+                    }
+                },
+                (res: ResponseWrapper) => this.onError(res.json)
+            );
+        }
     }
     saveServiceType(service: Service) {
         this.isSaving = true;

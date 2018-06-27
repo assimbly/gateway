@@ -9,13 +9,19 @@
             <span>Header</span>
         </h2>        
         <br/>
-        <div class="form-group">
-        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption($event)"></ng-select>
-        </div>
+       <div class="row">
+           <div class="col-md-11">
+	        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption()"></ng-select>
+           </div>
+           <div class="col-md-1 text-right">
+        	 <button type="submit" [routerLink]="['../header', selectedHeaderId ]" class="btn btn-info" [disabled]="!selectedHeaderId">
+    	        <span class="fa fa-eye"></span>
+	        </button>
+           </div>
+       </div>
     </div>
-
     <jhi-alert></jhi-alert>
     <br/>
 </div>
 
-<jhi-header-keys [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
+<jhi-header-keys *ngIf="headers.length > 0" [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>

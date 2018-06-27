@@ -33,9 +33,8 @@ public class Service implements Serializable {
     
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "service",cascade = CascadeType.ALL)
     @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ServiceKeys> serviceKeys = new HashSet<>();
-
+    
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

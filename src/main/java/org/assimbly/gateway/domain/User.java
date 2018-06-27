@@ -99,6 +99,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<PersistentToken> persistentTokens = new HashSet<>();
 
+    @ManyToMany
+    private Set<Group> groups = new HashSet<>();
+    
     public Long getId() {
         return id;
     }
@@ -210,6 +213,31 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setPersistentTokens(Set<PersistentToken> persistentTokens) {
         this.persistentTokens = persistentTokens;
+    }
+    
+    public Set<Group> getGroups() {
+        return groups;
+    }
+
+    public User groups(Set<Group> groups) {
+        this.groups = groups;
+        return this;
+    }
+
+    public User addGroup(Group group) {
+        this.groups.add(group);
+        group.getUsers().add(this);
+        return this;
+    }
+
+    public User removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getUsers().remove(this);
+        return this;
+    }
+
+    public void setGroup(Set<Group> groups) {
+        this.groups = groups;
     }
 
     @Override

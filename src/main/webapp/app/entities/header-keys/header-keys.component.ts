@@ -1,13 +1,10 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
 import { HeaderKeys } from './header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
-import { Principal, ResponseWrapper } from '../../shared';
-import { Header, HeaderService } from '../header';
+import { Principal } from '../../shared';
 
 @Component({
     selector: 'jhi-header-keys',
@@ -16,6 +13,8 @@ import { Header, HeaderService } from '../header';
 export class HeaderKeysComponent implements OnInit, OnChanges {
     @Input() headerKeys: HeaderKeys[];
     @Input() headerId: number;
+
+    headerKeysKeys: Array<string> = [];
     currentAccount: any;
     headerKeySelected: boolean;
     selectedId: number;
@@ -25,12 +24,10 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     typeHeader: string[] = ['constant', 'xpath'];
 
     constructor(
-        private headerService: HeaderService,
         private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private principal: Principal,
-        private router: Router
     ) {
     }
     ngOnInit() {
@@ -42,12 +39,14 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     updateHeaderKeys(id: number) {
         this.headerKeys = this.headerKeys.filter((x) => x.id !== id);
+        this.mapHeaderKeysKeys();
         if (this.headerKeys.length === 0) {
             this.addHeaderKeys();
         }
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.mapHeaderKeysKeys();
         if (changes['headerKeys'] && this.headerKeys !== undefined) {
             if (this.headerKeys.length === 1 && this.headerKeys[0].id === undefined) {
                 this.headerKeys[0].isDisabled = false;
@@ -59,27 +58,34 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             }
         }
     }
-    save(headerKey: HeaderKeys) {
+    save(headerKey: HeaderKeys, i: number) {
         this.isSaving = true;
         if (!!headerKey.id) {
             this.subscribeToSaveResponse(
-                this.headerKeysService.update(headerKey), false);
+                this.headerKeysService.update(headerKey), false, i);
         } else {
             headerKey.headerId = this.headerId;
             this.subscribeToSaveResponse(
-                this.headerKeysService.create(headerKey), true);
+                this.headerKeysService.create(headerKey), true, i);
         }
     }
-    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean) {
-        result.subscribe((res: HeaderKeys) =>
-            this.onSaveSuccess(res, isCreate), (res: Response) => this.onSaveError());
+
+    private mapHeaderKeysKeys() {
+        if (typeof this.headerKeys !== 'undefined') {
+            this.headerKeysKeys = this.headerKeys.map((sk) => sk.key);
+            this.headerKeysKeys = this.headerKeysKeys.filter((k) => k !== undefined);
+        }
     }
 
-    private onSaveSuccess(result: HeaderKeys, isCreate: boolean) {
+    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean, i: number) {
+        result.subscribe((res: HeaderKeys) =>
+            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
+    }
+
+    private onSaveSuccess(result: HeaderKeys, isCreate: boolean, i: number) {
         if (isCreate) {
-            this.headerKeys = this.headerKeys.filter((x) => !!x.id);
             result.isDisabled = true;
-            this.headerKeys.push(result);
+            this.headerKeys.splice(i, 1, result);
         } else {
             this.headerKeys.find((k) => k.id === result.id).isDisabled = true;
         }
@@ -114,11 +120,12 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         newHeaderKeys.isDisabled = false;
         newHeaderKeys.type = this.typeHeader[0];
         this.headerKeys.push(newHeaderKeys);
+        this.mapHeaderKeysKeys();
     }
 
-    removeHeaderKeys() {
-        const i = this.headerKeys.indexOf(new HeaderKeys());
+    removeHeaderKeys(i: number) {
         this.headerKeys.splice(i, 1);
+        this.mapHeaderKeysKeys();
         if (this.headerKeys.length === 0) {
             this.addHeaderKeys();
         }
