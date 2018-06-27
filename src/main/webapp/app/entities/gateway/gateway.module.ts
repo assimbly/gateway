@@ -11,6 +11,8 @@ import {
     GatewayPopupComponent,
     GatewayDeletePopupComponent,
     GatewayDeleteDialogComponent,
+    GatewayImportPopupComponent,
+    GatewayImportDialogComponent,
     gatewayRoute,
     gatewayPopupRoute,
 } from './';
@@ -32,6 +34,8 @@ const ENTITY_STATES = [
         GatewayDeleteDialogComponent,
         GatewayPopupComponent,
         GatewayDeletePopupComponent,
+        GatewayImportPopupComponent,
+        GatewayImportDialogComponent
     ],
     entryComponents: [
         GatewayComponent,
@@ -39,6 +43,8 @@ const ENTITY_STATES = [
         GatewayPopupComponent,
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
+        GatewayImportPopupComponent,
+        GatewayImportDialogComponent
     ],
     providers: [
         GatewayService,

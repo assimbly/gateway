@@ -34,19 +34,19 @@ public class Flow implements Serializable {
     @ManyToOne
     private Gateway gateway;
 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
+    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
-
+    
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -145,6 +145,7 @@ public class Flow implements Serializable {
     public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
         this.toEndpoints = toEndpoints;
     }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -175,4 +176,5 @@ public class Flow implements Serializable {
             ", autoStart='" + isAutoStart() + "'" +
             "}";
     }
+
 }

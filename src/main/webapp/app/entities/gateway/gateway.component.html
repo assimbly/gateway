@@ -16,6 +16,13 @@
         </div>
     </div>
     <hr>
+    <div>
+        <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/import'} }]" replaceUrl="true" queryParamsHandling="merge"
+            class="btn btn-info btn-sm float-right mb-3">
+            <span class="fa fa-upload"></span>
+            <span class="d-none d-md-inline">Import XML Configuration</span>
+        </button>
+    </div>
     <jhi-alert></jhi-alert>
     <br/>
     <div class="table-responsive" *ngIf="gateways">
@@ -79,6 +86,10 @@
                 <tr>
                     <td colspan="2">
                         <div class="d-block pull-right">
+                            <button type="button" class="btn btn-info btn-sm" (click)="downloadConfiguration(gateway)">
+                                <span class="fa fa-download"></span>
+                                <span class="d-none d-md-inline">Export XML Configuration</span>
+                            </button>
                             <button type="submit" [routerLink]="['../gateway', gateway.id ]" class="btn btn-info btn-sm">
                                 <span class="fa fa-eye"></span>
                                 <span class="d-none d-md-inline">View</span>
@@ -87,16 +98,6 @@
                                 class="btn btn-primary btn-sm">
                                 <span class="fa fa-pencil"></span>
                                 <span class="d-none d-md-inline">Edit</span>
-                            </button>
-                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" fragment="clone" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-info btn-sm">
-                                <span class="fa fa-clone"></span>
-                                <span class="d-none d-md-inline">Clone</span>
-                            </button>
-                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                                <span class="fa fa-remove"></span>
-                                <span class="d-none d-md-inline">Delete</span>
                             </button>
                         </div>
                     </td>

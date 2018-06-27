@@ -34,12 +34,10 @@ public class FromEndpoint implements Serializable {
     @Column(name = "options")
     private String options;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @ManyToOne
     private Service service;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @ManyToOne
     private Header header;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

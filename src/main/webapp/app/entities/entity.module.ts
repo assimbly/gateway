@@ -10,6 +10,8 @@ import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
 import { GatewayFromEndpointModule } from './from-endpoint/from-endpoint.module';
 import { GatewayToEndpointModule } from './to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.module';
+import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
+import { GatewayGroupModule } from './group/group.module';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
@@ -24,6 +26,8 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
         GatewayFromEndpointModule,
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
+        GatewayMaintenanceModule,
+        GatewayGroupModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     exports: [
@@ -37,6 +41,8 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
         GatewayServiceModule,
         GatewayServiceKeysModule,
         GatewayToEndpointModule,
+        GatewayMaintenanceModule,
+        GatewayGroupModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     declarations: [],

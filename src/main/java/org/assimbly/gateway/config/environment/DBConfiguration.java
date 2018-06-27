@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.ErrorEndpoint;
 import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.domain.Gateway;
@@ -17,12 +19,14 @@ import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
+import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
+@Transactional
 public class DBConfiguration {
 
     public static int PRETTY_PRINT_INDENT_FACTOR = 4;
@@ -62,6 +67,8 @@ public class DBConfiguration {
 	@Autowired
     private HeaderRepository headerRepository;
 
+	@Autowired
+    private EnvironmentVariablesRepository environmentVariablesRepository;
 	
 	private FromEndpoint fromEndpoint;
 
@@ -134,6 +141,9 @@ public class DBConfiguration {
 			configuration = xmlConfiguration;
 		}
 	   
+	    //replace environment variables
+	    configuration = PlaceholdersReplacement(configuration);
+	   
 		return configuration;
 	}
 
@@ -164,7 +174,10 @@ public class DBConfiguration {
 		}else {
 			configuration = xmlConfiguration;
 		}
-	   
+
+	    //replace environment variables
+	    configuration = PlaceholdersReplacement(configuration);
+
 		return configuration;
 	}
 
@@ -212,7 +225,10 @@ public class DBConfiguration {
 			}else {
 				configuration = xmlConfiguration;
 			}
-		   
+
+		    //replace environment variables
+		    configuration = PlaceholdersReplacement(configuration);
+
 		   return configuration;
 
 		}
@@ -1283,5 +1299,23 @@ public class DBConfiguration {
         
         return map;
     }	
-	
+
+    private String PlaceholdersReplacement(String input) {
+
+    	List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
+    	
+	    Map<String, String> values = new HashMap<String, String>();
+
+	    for(EnvironmentVariables environmentVariable : environmentVariables) {
+	    	values.put(environmentVariable.getKey(),environmentVariable.getValue());
+	    }
+	    
+	    StrSubstitutor sub = new StrSubstitutor(values, "${", "}");
+	    
+	    String output = sub.replace(input);
+	    
+	    return output;
+
+    }
+    
 }

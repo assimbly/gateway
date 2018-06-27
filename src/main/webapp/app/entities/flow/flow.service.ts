@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { SERVER_API_URL } from '../../app.constants';
 
 import { Flow } from './flow.model';
 import { ResponseWrapper, createRequestOption } from '../../shared';
+import { saveAs } from 'file-saver/FileSaver';
+import { Gateway } from '../gateway/gateway.model';
 
 @Injectable()
 export class FlowService {
 
     private resourceUrl = SERVER_API_URL + 'api/flows';
     private connectorUrl = SERVER_API_URL + 'api/connector';
-    private configurationUrl = SERVER_API_URL + 'api/configuration';
+    private environmentUrl  = SERVER_API_URL + 'api/environment'
 
     private gatewayid = 1;
 
@@ -55,10 +57,9 @@ export class FlowService {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
-    getConfiguration(id: number): Observable<Response>  {
-        return this.http.get(`${this.configurationUrl}/${this.gatewayid}/getflowconfiguration/${id}`);
+    getConfiguration(flowid: number): Observable<Response>  {
+        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`);
     }
-
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<Response> {
         if (!!header) {
@@ -73,6 +74,7 @@ export class FlowService {
     }
 
     start(id: number): Observable<Response> {
+        console.log(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
     }
 
@@ -95,6 +97,9 @@ export class FlowService {
     getFlowStatus(id: number): Observable<Response> {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
     }
+    getFlowLastError(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`);
+    }
 
     getFlowStats(id: number, gatewayid: number): Observable<Response> {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`);
@@ -106,6 +111,23 @@ export class FlowService {
 
     getCamelDocUrl() {
         return this.http.get(`${SERVER_API_URL}/api/camel-url`)
+    }
+
+    setMaintainance(time: number, flowsIds: Array<number>): Observable<Response> {
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintainance/${time}`, flowsIds);
+    }
+
+    exportGatewayConfiguration(gateway: Gateway) {
+        const url = `${this.environmentUrl}/${gateway.id}`;
+        let headers = new Headers();
+        headers.append('Accept', 'application/xml');
+        const options = new RequestOptions({responseType: ResponseContentType.Blob });
+        options.headers = headers
+        this.http.get(url, options).subscribe((res) => {
+            const b = res.blob();
+            const blob = new Blob([b], { type: 'application/xml' });
+            saveAs(blob, `${gateway.name}.xml`);
+        });
     }
 
     private convertResponse(res: Response): ResponseWrapper {

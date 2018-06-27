@@ -22,6 +22,7 @@ export class HeaderKeysDialogComponent implements OnInit {
     isSaving: boolean;
 
     headers: Header[];
+    typeHeader: string;
 
     constructor(
         public activeModal: NgbActiveModal,
@@ -36,7 +37,7 @@ export class HeaderKeysDialogComponent implements OnInit {
         this.isSaving = false;
         this.headerService.query().subscribe((res: ResponseWrapper) => {
             this.headers = res.json;
-            }, (res: ResponseWrapper) => this.onError(res.json));
+        }, (res: ResponseWrapper) => this.onError(res.json));
     }
     clear() {
         this.activeModal.dismiss('cancel');
@@ -59,7 +60,7 @@ export class HeaderKeysDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: HeaderKeys) {
-        this.eventManager.broadcast({ name: 'headerKeysListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'headerKeysListModification', content: 'OK' });
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }
@@ -88,11 +89,11 @@ export class HeaderKeysPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private headerKeysPopupService: HeaderKeysPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.headerKeysPopupService
                     .open(HeaderKeysDialogComponent as Component, params['id']);
             } else {

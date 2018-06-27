@@ -36,7 +36,15 @@
                             </tr>
                             <tr>
                                 <th>Type</th>
-                                <td>{{fromEndpoint.type}}</td>
+                                <td>
+                                    {{fromEndpoint.type}} 
+                                    <span class="float-right">
+                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{fromTypeAssimblyLink}}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm" href="{{fromTypeCamelLink}}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
+                                            <img src="../../../content/images/apache-camel.png" />
+                                        </a>
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Uri</th>
@@ -74,7 +82,15 @@
                             </tr>
                             <tr>
                                 <th>Type</th>
-                                <td>{{toEndpoint.type}}</td>
+                                <td>
+                                    {{toEndpoint.type}}
+                                    <span class="float-right">
+                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{toTypeAssimblyLinks[toIndex]}}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm" href="{{toTypeCamelLinks[toIndex]}}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
+                                            <img src="../../../content/images/apache-camel.png" />
+                                        </a>
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Uri</th>
@@ -115,7 +131,15 @@
                             </tr>
                             <tr>
                                 <th>Type</th>
-                                <td>{{errorEndpoint.type}}</td>
+                                <td>
+                                    {{errorEndpoint.type}}
+                                    <span class="float-right">
+                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{errorTypeAssimblyLink}}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm" href="{{errorTypeCamelLink}}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
+                                            <img src="../../../content/images/apache-camel.png" />
+                                        </a>
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Uri</th>

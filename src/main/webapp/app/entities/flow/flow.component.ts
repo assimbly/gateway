@@ -5,7 +5,6 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
-import { EndpointType } from '../from-endpoint';
 import { GatewayService, Gateway } from '../gateway';
 
 @Component({
@@ -29,6 +28,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     gatewayExists = false;
     multipleGateways = false;
     singleGatewayName: string;
+    flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
+    test: any;
 
     constructor(
         private gatewayService: GatewayService,
@@ -128,6 +129,10 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     registerChangeCreatedGateway() {
         this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', (response) => this.gatewayExists = false);
+    }
+
+    trigerAction(action: string) {
+        this.eventManager.broadcast({ name: 'trigerAction', content: action });
     }
 
     private onSuccess(data, headers) {

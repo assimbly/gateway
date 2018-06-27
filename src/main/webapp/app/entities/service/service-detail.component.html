@@ -1,30 +1,28 @@
-
 <div *ngIf="service">
     <h2><span>Service</span> {{service.id}}</h2>
     <hr>
     <jhi-alert-error></jhi-alert-error>
     <dl class="row-md jh-entity-details">
         <dt><span>Name</span></dt>
-        <dd>
-            <span>{{service.name}}</span>
-        </dd>
+        <dd><span>{{service.name}}</span></dd>
         <dt><span>Type</span></dt>
-        <dd>
-            <span>{{service.type}}</span>
-        </dd>
+        <dd><span>{{service.type}}</span></dd>
     </dl>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    <button type="button" [routerLink]="['/service']" class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;
+        <span> Back</span>
     </button>
-
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;
+        <span> Edit</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info">
+        <span class="fa fa-clone"></span>&nbsp;
+        <span> Clone</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger">
+        <span class="fa fa-remove"></span>
+        <span class="d-none d-md-inline">Delete</span>
     </button>
 </div>

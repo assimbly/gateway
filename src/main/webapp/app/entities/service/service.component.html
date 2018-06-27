@@ -24,13 +24,9 @@
                 <ng-select [items]="typeServices" bindLabel="type" bindValue="type" id="field_service_type" [(ngModel)]="selectedService.type" [disabled]="disabledServiceType"></ng-select>
             </div>
             <div class="col-md-1 text-right">
-
-                <button type="button" title="Edit" class="btn btn-info" (click)="edit()">
-                    <span class="fa fa-edit"></span>
-                </button> 
-                <button type="button" title="Save" class="btn btn-primary" (click)="saveServiceType(selectedService)">
-                        <span class="fa fa-save"></span>
-                    </button>
+              	<button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info" [disabled]="!selectedService.id">
+	            	<span class="fa fa-eye"></span>
+        		</button>
             </div>
         </div>
     </div>
@@ -38,4 +34,4 @@
     <br/>
 </div>
 
-<jhi-service-keys [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
+<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>

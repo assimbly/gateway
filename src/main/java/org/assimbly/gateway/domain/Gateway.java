@@ -62,6 +62,9 @@ public class Gateway implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<EnvironmentVariables> environmentVariables = new HashSet<>();
 
+    @ManyToMany
+    private Set<Group> groups = new HashSet<>();
+    
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -211,6 +214,33 @@ public class Gateway implements Serializable {
     public void setEnvironmentVariables(Set<EnvironmentVariables> environmentVariables) {
         this.environmentVariables = environmentVariables;
     }
+    
+
+    public Set<Group> getGroups() {
+        return groups;
+    }
+
+    public Gateway groups(Set<Group> groups) {
+        this.groups = groups;
+        return this;
+    }
+
+    public Gateway addGroup(Group group) {
+        this.groups.add(group);
+        group.getGateways().add(this);
+        return this;
+    }
+
+    public Gateway removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getGateways().remove(this);
+        return this;
+    }
+
+    public void setGroup(Set<Group> groups) {
+        this.groups = groups;
+    }
+    
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
