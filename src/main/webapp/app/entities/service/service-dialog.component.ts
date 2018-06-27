@@ -20,6 +20,7 @@ export class ServiceDialogComponent implements OnInit {
     serviceKeys: ServiceKeys;
     service: Service;
     services: Service[];
+    servicesNames: Array<string>;
     isSaving: boolean;
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
     showEditButton = false;
@@ -40,6 +41,7 @@ export class ServiceDialogComponent implements OnInit {
         this.serviceService.query()
             .subscribe((res: ResponseWrapper) => {
                 this.services = res.json;
+                this.servicesNames = this.services.map((s) => s.name);
             }, (res: ResponseWrapper) => this.onError(res.json));
         if (this.route.fragment['value'] === 'showEditServiceButton') {
             this.showEditButton = true;

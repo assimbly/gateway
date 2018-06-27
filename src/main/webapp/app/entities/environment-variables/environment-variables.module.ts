@@ -13,6 +13,7 @@ import {
     EnvironmentVariablesDeleteDialogComponent,
     environmentVariablesRoute,
     environmentVariablesPopupRoute,
+    ForbiddenEnvironmentKeysValidatorDirective
 } from './';
 
 const ENTITY_STATES = [
@@ -32,6 +33,7 @@ const ENTITY_STATES = [
         EnvironmentVariablesDeleteDialogComponent,
         EnvironmentVariablesPopupComponent,
         EnvironmentVariablesDeletePopupComponent,
+        ForbiddenEnvironmentKeysValidatorDirective
     ],
     entryComponents: [
         EnvironmentVariablesComponent,

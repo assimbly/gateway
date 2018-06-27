@@ -13,6 +13,7 @@ import {
     HeaderKeysDeleteDialogComponent,
     headerKeysRoute,
     headerKeysPopupRoute,
+    ForbiddenHeaderKeysValidatorDirective
 } from './';
 
 const ENTITY_STATES = [
@@ -35,6 +36,7 @@ const ENTITY_STATES = [
         HeaderKeysDeleteDialogComponent,
         HeaderKeysPopupComponent,
         HeaderKeysDeletePopupComponent,
+        ForbiddenHeaderKeysValidatorDirective
     ],
     entryComponents: [
         HeaderKeysComponent,
