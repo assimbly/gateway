@@ -6,3 +6,4 @@ export * from './header-delete-dialog.component';
 export * from './header-detail.component';
 export * from './header.component';
 export * from './header.route';
+export * from './header-validation.directive';

@@ -13,6 +13,7 @@ import {
     ServiceKeysDeleteDialogComponent,
     serviceKeysRoute,
     serviceKeysPopupRoute,
+    ForbiddenServiceKeysValidatorDirective
 } from './';
 
 const ENTITY_STATES = [
@@ -35,6 +36,7 @@ const ENTITY_STATES = [
         ServiceKeysDeleteDialogComponent,
         ServiceKeysPopupComponent,
         ServiceKeysDeletePopupComponent,
+        ForbiddenServiceKeysValidatorDirective
     ],
     entryComponents: [
         ServiceKeysComponent,
