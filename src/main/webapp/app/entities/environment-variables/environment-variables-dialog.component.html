@@ -13,28 +13,23 @@
                    [(ngModel)]="environmentVariables.id" readonly />
         </div>
 
-
         <div class="form-group">
             <label class="form-control-label" for="field_key">Key</label>
-            <input type="text" class="form-control" name="key" id="field_key"
-                required minlength="3" maxlength="30"
-                [(ngModel)]="environmentVariables.key"  #key="ngModel"/>
+            <input type="text" class="form-control" name="key" id="field_key" [jhiExistingKeys]="allEnvironmentVariables" 
+                required maxlength="255" [(ngModel)]="environmentVariables.key" #key="ngModel"/>
             <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                <span *ngIf="key.errors.required" >Name is required.</span>
-                <span *ngIf="key.errors.minlength">Name must be at least 3 characters long.</span>
-                <span *ngIf="key.errors.maxlength">Name can not be longer than 30 characters long.</span>
+                <span *ngIf="key.errors.required" >Key is required.</span>
+                <span *ngIf="key.errors.existingKey" >Key already exists.</span>
+
             </div>
         </div>
 
         <div class="form-group">
             <label class="form-control-label" for="field_value">Value</label>
             <input type="text" class="form-control" name="value" id="field_value"
-                required minlength="3" maxlength="30"
-                [(ngModel)]="environmentVariables.value" #value="ngModel"/>
+                required maxlength="255" [(ngModel)]="environmentVariables.value" #value="ngModel"/>
             <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                 <span *ngIf="value.errors.required" >Value is required.</span>
-                <span *ngIf="value.errors.minlength">Value must be at least 3 characters long.</span>
-                <span *ngIf="value.errors.maxlength">Value can not be longer than 30 characters long.</span>
             </div>    
         </div>
 
@@ -45,8 +40,8 @@
                 <option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
             </select>
             <ng-template #oneGateway>
-                    <input type="text" class="form-control" name="gatewayOne" id="field_value" readonly [(ngModel)]="gatewayid"/>
-                </ng-template>
+                <input type="text" class="form-control" name="gatewayOne" id="field_value" readonly [(ngModel)]="gatewayid"/>
+            </ng-template>
         </div>
     </div>
     <div class="modal-footer">

@@ -32,21 +32,18 @@
                     </td>
                     <td>
                         <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
-                            required minlength="3" maxlength="30" id="serviceKey-key-{{idx}}" [disabled]="serviceKey.isDisabled"
-                            #key="ngModel" />
+                            required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" id="serviceKey-key-{{idx}}" 
+                            [disabled]="serviceKey.isDisabled" #key="ngModel" />
                         <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
                             <span *ngIf="key.errors.required">Key is required.</span>
-                            <span *ngIf="key.errors.minlength">Key must be at least 3 characters long.</span>
-                            <span *ngIf="key.errors.maxlength">Key can not be longer than 30 characters long.</span>
+                            <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
                         </div>
                     </td>
                     <td>
                         <input type="text" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" id="serviceKey-value-{{idx}}"
-                            required minlength="3" maxlength="30" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" />
+                            required maxlength="255" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" />
                         <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                             <span *ngIf="value.errors.required">Value is required.</span>
-                            <span *ngIf="value.errors.minlength">Value must be at least 3 characters long.</span>
-                            <span *ngIf="value.errors.maxlength">Value can not be longer than 30 characters long.</span>
                         </div>
                     </td>
                     <td id="serviceKeysRowKeyID" [hidden]="!serviceKeysRowKeyID">

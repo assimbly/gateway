@@ -35,11 +35,19 @@
                     </td>
                     <td>
                         <input type="text" class="form-control" [(ngModel)]="headerKey.key" value="headerKey.key" name="headerKeys-key-{{idx}}" id="headerKeys-key-{{idx}}"
-                            [disabled]="headerKey.isDisabled" />
+                            required maxlength="255" [jhiExistingHeaderKeys]="headerKeysKeys"
+                            [disabled]="headerKey.isDisabled" #key="ngModel" />
+                        <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+                            <span *ngIf="key.errors.required">Key is required.</span>
+                            <span *ngIf="key.errors.existingHeaderKeys">Key already exists.</span>
+                        </div>
                     </td>
                     <td>
                         <input type="text" class="form-control" [(ngModel)]="headerKey.value" name="headerKeys-value-{{idx}}" id="headerKeys-value-{{idx}}"
-                            value="headerKey.value" [disabled]="headerKey.isDisabled" />
+                            required maxlength="255" value="headerKey.value" [disabled]="headerKey.isDisabled" #value="ngModel" />
+                        <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+                            <span *ngIf="value.errors.required">Value is required.</span>
+                        </div>
                     </td>
                     <td>
                         <select class="form-control" id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}" [(ngModel)]="headerKey.type"

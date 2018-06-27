@@ -15,12 +15,11 @@
         <div class="form-group">
             <label class="form-control-label" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name"
-                required minlength="3" maxlength="30"
+                required maxlength="255" [jhiExistingServiceNames]='servicesNames'
                 [(ngModel)]="service.name" #name="ngModel"/>
             <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
                 <span *ngIf="name.errors.required" >Name is required.</span>
-                <span *ngIf="name.errors.minlength">Name must be at least 3 characters long.</span>
-                <span *ngIf="name.errors.maxlength">Name can not be longer than 30 characters long.</span>
+                <span *ngIf="name.errors.existingServiceName">Name already exists.</span>
             </div>
         </div>
         <div class="form-group">
