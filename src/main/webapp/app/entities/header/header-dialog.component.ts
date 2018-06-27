@@ -11,7 +11,6 @@ import { HeaderPopupService } from './header-popup.service';
 import { HeaderService } from './header.service';
 import { ResponseWrapper } from '../../shared';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { HeaderKeysService } from '../header-keys';
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -21,6 +20,7 @@ export class HeaderDialogComponent implements OnInit {
 
     header: Header;
     headers: Header[];
+    headerNames: Array<string>;
     headerKeys: HeaderKeys;
     isSaving: boolean;
     showEditButton = false;
@@ -28,7 +28,6 @@ export class HeaderDialogComponent implements OnInit {
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private route: ActivatedRoute,
@@ -42,6 +41,7 @@ export class HeaderDialogComponent implements OnInit {
         this.headerService.query()
             .subscribe((res: ResponseWrapper) => {
             this.headers = res.json;
+            this.headerNames = this.headers.map((h) => h.name);
             }, (res: ResponseWrapper) => this.onError(res.json));
         if (this.route.fragment['value'] === 'showEditHeaderButton') {
             this.showEditButton = true;

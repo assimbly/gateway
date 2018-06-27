@@ -19,6 +19,7 @@ import { ResponseWrapper } from '../../shared';
 export class EnvironmentVariablesDialogComponent implements OnInit {
 
     environmentVariables: EnvironmentVariables;
+    allEnvironmentVariables: Array<string> = [];
     isSaving: boolean;
 
     gateways: Gateway[];
@@ -47,6 +48,10 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
                 this.gatewayid = this.gateways[0].id;
                 console.log(this.gateways);
             }, (res: ResponseWrapper) => this.onError(res.json));
+
+        this.environmentVariablesService.query().subscribe((res) => {
+            this.allEnvironmentVariables = res.json.map((env) => env.key);
+        });
     }
 
     clear() {
