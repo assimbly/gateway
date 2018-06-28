@@ -20,6 +20,7 @@
         <queueSize>512</queueSize>
         <appender-ref ref="FILE"/>
     </appender>
+
 -->
 
     <logger name="javax.activation" level="WARN"/>
