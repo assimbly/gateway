@@ -1,6 +1,8 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { ReactiveFormsModule } from '@angular/forms';
+
 import { GatewaySharedModule } from '../../shared';
 import {
     EnvironmentVariablesService,
@@ -12,8 +14,7 @@ import {
     EnvironmentVariablesDeletePopupComponent,
     EnvironmentVariablesDeleteDialogComponent,
     environmentVariablesRoute,
-    environmentVariablesPopupRoute,
-    ForbiddenEnvironmentKeysValidatorDirective
+    environmentVariablesPopupRoute
 } from './';
 
 const ENTITY_STATES = [
@@ -24,6 +25,7 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         GatewaySharedModule,
+        ReactiveFormsModule,
         RouterModule.forChild(ENTITY_STATES)
     ],
     declarations: [
@@ -33,7 +35,6 @@ const ENTITY_STATES = [
         EnvironmentVariablesDeleteDialogComponent,
         EnvironmentVariablesPopupComponent,
         EnvironmentVariablesDeletePopupComponent,
-        ForbiddenEnvironmentKeysValidatorDirective
     ],
     entryComponents: [
         EnvironmentVariablesComponent,
