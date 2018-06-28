@@ -6,4 +6,3 @@ export * from './environment-variables-delete-dialog.component';
 export * from './environment-variables-detail.component';
 export * from './environment-variables.component';
 export * from './environment-variables.route';
-export * from './environment-variables-validation.directive';
