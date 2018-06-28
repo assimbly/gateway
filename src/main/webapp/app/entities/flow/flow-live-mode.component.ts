@@ -16,6 +16,13 @@ export class FlowLiveModeComponent implements OnInit {
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
     public hasLoadError: boolean;
+    private hintText =
+`<!--
+    Use this editor to configure flows in a text editor.
+    The live mode can be use to try out new flows.
+    A flows running in live mode is not persistent.
+    Then you need to save the flow.
+-->`;
 
     constructor(
         private flowService: FlowService
@@ -24,6 +31,19 @@ export class FlowLiveModeComponent implements OnInit {
 
     ngOnInit() {
         this.initializeLiveModeForm();
+        this.xmlEditor = this.hintText;
+    }
+
+    onChange() {
+        /* if (this.xmlEditor === '') {
+            this.xmlEditor = this.hintText;
+        } */
+    }
+
+    removeHintText() {
+        if (this.xmlEditor === this.hintText) {
+            this.xmlEditor = '';
+        }
     }
 
     initializeLiveModeForm() {
