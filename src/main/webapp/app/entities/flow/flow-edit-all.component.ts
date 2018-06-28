@@ -630,11 +630,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     addNewToEndpoint() {
         this.toEndpoints.push(new ToEndpoint());
         this.toEndpointsOptions.push([new Option()]);
-
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
         toEndpoint.type = EndpointType.FILE;
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
         this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
+        setTimeout(() => {
+            this.ngbTabset.select(`toTab${this.toEndpoints.indexOf(toEndpoint)}`);
+        }, 0);
     }
     removeToEndpoint(toEndpoint, endpointDataName) {
         const i = this.toEndpoints.indexOf(toEndpoint);
@@ -642,6 +644,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpointsOptions.splice(i, 1);
         this.editFlowForm.removeControl(endpointDataName);
         (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i + 2);
+        setTimeout(() => {
+            this.ngbTabset.select(`toTab${this.toEndpoints.length - 1}`);
+        }, 0);
+
     }
 
     previousState() {
@@ -844,24 +850,30 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next() {
+    next(isNextTab?: boolean) {
         const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
         const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
         const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
         if (index === 0) {
-            this.validateTypeAndUri(endpoints, index);
+            this.validateTypeAndUri(<FormGroup>endpoints[index]);
             if (endpoints[index].valid) {
                 this.goToNextTab(endpoints, index + 1);
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else if (index === this.ngbTabset.tabs.length - 1) {
-            this.validateTypeAndUri(endpoints, index);
+            this.validateTypeAndUri(<FormGroup>endpoints[index]);
             if (endpoints[1].valid) {
                 this.goToNextTab(endpoints, 0);
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else {
-            this.validateTypeAndUri(endpoints, index + 1);
+            this.validateTypeAndUri(<FormGroup>endpoints[index + 1]);
             if (endpoints[index + 1].valid) {
                 this.goToNextTab(endpoints, index + 1);
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
             }
         }
     }
@@ -870,15 +882,20 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
         if (endpoints.find((e) => !e.valid)) {
             this.displayNextButton = true;
-            this.next();
+            this.next(true);
         } else {
             this.displayNextButton = false;
         }
     }
 
-    validateTypeAndUri(endpoints: AbstractControl[], index: number) {
-        (<FormGroup>endpoints[index]).controls.type.markAsDirty();
-        (<FormGroup>endpoints[index]).controls.uri.markAsDirty();
+    validateTypeAndUri(endpoint: FormGroup) {
+        endpoint.controls.type.markAsTouched();
+        endpoint.controls.uri.markAsTouched();
+    }
+
+    markAsUntouchedTypeAndUri(endpoint: FormGroup) {
+        endpoint.controls.type.markAsUntouched();
+        endpoint.controls.uri.markAsUntouched();
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
