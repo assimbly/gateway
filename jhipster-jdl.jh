@@ -58,6 +58,21 @@ entity HeaderKeys {
 	type String	
 }
 
+entity Maintenance {
+	startTime Instant,
+	endTime Instant
+}
+
+entity Group {
+	name String,
+	createDate Instant
+}
+
+entity GroupMember {
+}
+
+entity GroupRights {
+}
 
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP
@@ -113,6 +128,18 @@ relationship OneToMany {
 
 relationship OneToMany {
 	Header{headerKeys} to HeaderKeys
+}
+
+relationship OneToMany {
+	Maintenance{flow} to Flow
+}
+
+relationship ManyToMany {
+	Group{user} to User{group}
+}
+
+relationship ManyoMany {
+	Group{gateway} to Gateway{group}
 }
 
 // Set pagination options

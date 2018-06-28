@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { Response } from '@angular/http';
 
 import { Gateway } from './gateway.model';
 import { GatewayService } from './gateway.service';
