@@ -412,7 +412,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             {
                 name: 'VM',
                 assimblyTypeLink: `${this.wikiDocUrl}/component-vm`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-vm/src/main/docs/vm-component.adoc`,
+                camelTypeLink: `${this.camelDocUrl}/components/camel-core/src/main/docs/vm-component.adoc`,
                 uriPlaceholder: 'queueName',
                 uriPopoverMessage: `
                     <b>Name</b>: queueName<br/>

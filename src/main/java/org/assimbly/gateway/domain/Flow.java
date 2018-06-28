@@ -46,7 +46,7 @@ public class Flow implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
-
+    
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -145,6 +145,7 @@ public class Flow implements Serializable {
     public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
         this.toEndpoints = toEndpoints;
     }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -175,4 +176,5 @@ public class Flow implements Serializable {
             ", autoStart='" + isAutoStart() + "'" +
             "}";
     }
+
 }

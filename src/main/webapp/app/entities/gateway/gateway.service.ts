@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { SERVER_API_URL } from '../../app.constants';
 
@@ -10,6 +10,7 @@ import { ResponseWrapper, createRequestOption } from '../../shared';
 export class GatewayService {
 
     private resourceUrl =  SERVER_API_URL + 'api/gateways';
+    private environmentUrl  = SERVER_API_URL + 'api/environment'
 
     constructor(private http: Http) { }
 
@@ -44,6 +45,14 @@ export class GatewayService {
 
     delete(id: number): Observable<Response> {
         return this.http.delete(`${this.resourceUrl}/${id}`);
+    }
+
+    setGatewayConfiguration(gatewayid, configuration): Observable<Response> {
+        let headers = new Headers();
+        headers.append('Accept', 'application/xml');
+        let options = new RequestOptions();
+        options.headers = headers;
+        return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
     }
 
     private convertResponse(res: Response): ResponseWrapper {

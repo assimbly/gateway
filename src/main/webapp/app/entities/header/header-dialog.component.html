@@ -11,7 +11,13 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_name">Name</label>
-            <input type="text" class="form-control" name="name" id="field_name" [(ngModel)]="header.name" />
+            <input type="text" class="form-control" name="name" id="field_name" 
+                required maxlength="255" [jhiExistingHeaderNames]='headerNames'    
+                [(ngModel)]="header.name" #name="ngModel"/>
+            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
+                <span *ngIf="name.errors.required" >Name is required.</span>
+                <span *ngIf="name.errors.existingHeaderName">Name already exists.</span>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

@@ -1,0 +1,32 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "gateway",
+            "otherEntityName": "gateway",
+            "relationshipType": "many-to-many",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "group"
+        },
+        {
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "many-to-many",
+            "otherEntityField": "login",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "group"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180627083209",
+    "dto": "mapstruct",
+    "service": "serviceImpl",
+    "entityTableName": "group",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

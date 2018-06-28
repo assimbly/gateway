@@ -1,0 +1,28 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "flow",
+            "otherEntityName": "flow",
+            "relationshipType": "many-to-many",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "maintenance"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "startTime",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "endTime",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20180627071131",
+    "dto": "mapstruct",
+    "service": "serviceImpl",
+    "entityTableName": "maintenance",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
