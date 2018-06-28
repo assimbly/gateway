@@ -21,9 +21,10 @@
             </div>
         </ng-template>
         <div class="row mt-3">
+
             <div class="col-12 text-right">
-                <button class="btn btn-success" type="submit" [routerLink]="['../live-mode']">
-                    <span class="fa fa-plus"></span>
+                <button class="btn" type="submit" [routerLink]="['../live-mode']">
+                    <span class="fa fa-code"></span>
                     <span>Live mode</span>
                 </button>
                 <button class="btn btn-primary" type="submit" [routerLink]="['../flow', 'edit-all' ]">
@@ -64,8 +65,22 @@
                         <th>
                             <span>Flow status</span>
                         </th>
-                        <th></th>
-                    </tr>
+                        <th>
+		                   	<div class="col-7"> </div>
+                        	<div  class="input-group float-right col-5">
+								<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-primary btn-sm"
+										(click)="trigerAction(selectedAction)">
+										<span>All</span>
+									</button>
+								</div>
+							</div>
+                        </th>
+						<th>
+						
+						</th>
+					</tr>
                 </thead>
                 <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
                     <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>

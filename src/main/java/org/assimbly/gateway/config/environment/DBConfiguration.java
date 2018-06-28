@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.ErrorEndpoint;
 import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.domain.Gateway;
@@ -17,6 +19,7 @@ import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
+import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
@@ -64,6 +67,8 @@ public class DBConfiguration {
 	@Autowired
     private HeaderRepository headerRepository;
 
+	@Autowired
+    private EnvironmentVariablesRepository environmentVariablesRepository;
 	
 	private FromEndpoint fromEndpoint;
 
@@ -136,6 +141,9 @@ public class DBConfiguration {
 			configuration = xmlConfiguration;
 		}
 	   
+	    //replace environment variables
+	    configuration = PlaceholdersReplacement(configuration);
+	   
 		return configuration;
 	}
 
@@ -166,7 +174,10 @@ public class DBConfiguration {
 		}else {
 			configuration = xmlConfiguration;
 		}
-	   
+
+	    //replace environment variables
+	    configuration = PlaceholdersReplacement(configuration);
+
 		return configuration;
 	}
 
@@ -214,7 +225,10 @@ public class DBConfiguration {
 			}else {
 				configuration = xmlConfiguration;
 			}
-		   
+
+		    //replace environment variables
+		    configuration = PlaceholdersReplacement(configuration);
+
 		   return configuration;
 
 		}
@@ -1285,5 +1299,23 @@ public class DBConfiguration {
         
         return map;
     }	
-	
+
+    private String PlaceholdersReplacement(String input) {
+
+    	List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
+    	
+	    Map<String, String> values = new HashMap<String, String>();
+
+	    for(EnvironmentVariables environmentVariable : environmentVariables) {
+	    	values.put(environmentVariable.getKey(),environmentVariable.getValue());
+	    }
+	    
+	    StrSubstitutor sub = new StrSubstitutor(values, "${", "}");
+	    
+	    String output = sub.replace(input);
+	    
+	    return output;
+
+    }
+    
 }
