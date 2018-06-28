@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FlowService, Flow } from '../flow';
 import { JhiAlertService } from 'ng-jhipster';
+import * as moment from 'moment';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     selector: 'jhi-maintenance',
@@ -14,6 +16,11 @@ export class MaintenanceComponent implements OnInit {
     public minutes: number;
     selectedFlows: Array<Flow> = [];
     allSelected = false;
+    messageFlow: string;
+    intervals: Array<any> = [];
+    maintenanceTimers: Array<string> = [];
+    timeLeft: Array<number> = [];
+    disableFlows: Array<boolean> = [];
 
     constructor(
         private flowService: FlowService,
@@ -35,13 +42,36 @@ export class MaintenanceComponent implements OnInit {
     setMaintenance() {
         if (this.hours === undefined) { this.hours = 0; }
         if (this.minutes === undefined) { this.minutes = 0; }
-        const time = (this.hours * 60 * 60000) + (this.minutes * 60000);
+        let time = this.hours * 3600 * 1000 + this.minutes * 60000;
         const ids = this.selectedFlows.filter((sf) => sf !== null).map((f) => f.id);
         if (ids.length > 0) {
-            this.flowService.setMaintainance(time, ids).subscribe((res) => {
-                let r = res;
+            this.flowService.setMaintainance(time, ids).subscribe(() => {
+                this.messageFlow = `Set flows into maintainance mode for:`;
+                this.displayMaintainanceTimer(this.selectedFlows, time);
+                this.deselectAll();
             });
         }
+    }
+
+    displayMaintainanceTimer(flows: Array<Flow>, time: number) {
+        flows.forEach((flow, i) => {
+            if (flow === null) { return; }
+            this.timeLeft[i] = time;
+            this.intervals[i] = setInterval(() => {
+                this.disableFlows[i] = true;
+                this.timeLeft[i] -= 1000;
+                if (this.timeLeft[i] < 0) {
+                    this.clearInterval(i);
+                } else {
+                    this.maintenanceTimers[i] = moment.utc(this.timeLeft[i]).format('HH[h] mm[min] ss[sec]');
+                }
+            }, 1000)
+        });
+    }
+    clearInterval(id: number) {
+        clearInterval(this.intervals[id]);
+        this.disableFlows[id] = false;
+        this.maintenanceTimers[id] = '';
     }
 
     selectAll() {
