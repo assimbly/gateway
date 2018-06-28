@@ -91,7 +91,6 @@ export class FlowRowComponent implements OnInit {
 
     setFlowStatus(status: string): void {
         this.getFlowStats(this.flow.id);
-        // this.flowStatus = status;
         switch (status) {
             case 'unconfigured':
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
