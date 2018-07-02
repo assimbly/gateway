@@ -71,6 +71,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
     displayNextButton = false;
+    invalidUriMessage: string;
 
     fromFilterService: Array<Service> = [];
     toFilterService: Array<Array<Service>> = [[]];
@@ -142,6 +143,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             if (isCloning) {
                                 this.flow.id = null;
                             }
+                            if (this.singleGateway) {
+                                this.flow.gatewayId = this.gateways[0].id;
+                            }
                             this.initializeForm(this.flow);
                             if (this.flow.fromEndpointId) {
                                 this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
@@ -199,6 +203,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     setTimeout(() => {
                         this.flow = new Flow();
                         this.flow.autoStart = false;
+                        if (this.singleGateway) {
+                            this.flow.gatewayId = this.gateways[0].id;
+                        }
                         this.initializeForm(this.flow);
 
                         this.fromEndpoint = new FromEndpoint();
@@ -850,42 +857,80 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next(isNextTab?: boolean) {
+    next(nextClicked: boolean, isNextTab?: boolean) {
         const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
         const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
         const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
         if (index === 0) {
-            this.validateTypeAndUri(<FormGroup>endpoints[index]);
+            let endpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.fromEndpointOptions, this.fromEndpoint, endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage('FromEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else if (index === this.ngbTabset.tabs.length - 1) {
-            this.validateTypeAndUri(<FormGroup>endpoints[index]);
+            let formEndpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(formEndpoint);
             if (endpoints[1].valid) {
-                this.goToNextTab(endpoints, 0);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.errorEndpointOptions, this.errorEndpoint, formEndpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    }, () => {
+                        this.setInvalidUriMessage('ErrorEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else {
-            this.validateTypeAndUri(<FormGroup>endpoints[index + 1]);
+            let endpoint = <FormGroup>endpoints[index + 1];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index + 1].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.toEndpointsOptions[index - 1], this.toEndpoints[index - 1], endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage(`ToEndpoint (${index})`);
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
             }
         }
     }
 
+    setInvalidUriMessage(endpointName: string) {
+        this.invalidUriMessage = `Uri for ${endpointName} is not valid.`;
+        setTimeout(() => {
+            this.invalidUriMessage = '';
+        }, 15000);
+    }
+
     goToNextTab(endpoints: AbstractControl[], index) {
         this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
         if (endpoints.find((e) => !e.valid)) {
             this.displayNextButton = true;
-            this.next(true);
+            this.next(true, true);
         } else {
             this.displayNextButton = false;
         }
+    }
+
+    formatUri(endpointOptions, endpoint, formEndpoint): string {
+        if (formEndpoint.controls.type.value === null) { return };
+        let formOptions = <FormArray>formEndpoint.controls.options;
+        this.setEndpointOptions(endpointOptions, endpoint, formOptions);
+        return `${formEndpoint.controls.type.value.toLowerCase()}://${formEndpoint.controls.uri.value}${!endpoint.options ? '' : endpoint.options}`;
     }
 
     validateTypeAndUri(endpoint: FormGroup) {

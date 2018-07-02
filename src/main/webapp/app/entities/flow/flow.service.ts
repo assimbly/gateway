@@ -73,6 +73,14 @@ export class FlowService {
         }
     }
 
+    validateFlowsUri(connectorId: number, uri: string): Observable<Response> {
+        let headers = new Headers();
+        headers.append('Uri', uri);
+        let options = new RequestOptions();
+        options.headers = headers;
+        return this.http.get(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
+    }
+
     start(id: number): Observable<Response> {
         console.log(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
