@@ -8,7 +8,7 @@ import { MaintenanceService } from './maintenance.service';
 @Injectable()
 export class MaintenancePopupService {
     private ngbModalRef: NgbModalRef;
-    
+
     constructor(
         private datePipe: DatePipe,
         private modalService: NgbModal,
