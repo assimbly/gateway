@@ -534,10 +534,9 @@ public class ConnectorResource {
 		}
     }
 
-    @GetMapping(path = "/connector/{connectorId}/flow/validate/{uri}", produces = {"text/plain","application/xml","application/json"})
+	@GetMapping(path = "/connector/{connectorId}/flow/validateUri", produces = {"text/plain","application/xml","application/json"})
     @Timed
-    public ResponseEntity<String> validateFlow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String uri) throws Exception {
-
+    public ResponseEntity<String> validateFlowUri(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("Uri") String uri, @PathVariable Long connectorId) throws Exception {
 		try {
     		String flowValidation = connector.validateFlow(uri);
 			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"validateFlows",flowValidation);
