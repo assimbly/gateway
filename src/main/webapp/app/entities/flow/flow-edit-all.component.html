@@ -78,8 +78,8 @@
 											<label class="form-control-label" for="field_uri">Uri</label>
 											<div class="input-group">
 												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" />
-												<ng-template #uriPopover let-message="message"><div style="min-width:300px;" [innerHtml]="fromUriPopoverMessage"></div></ng-template>
-												<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" triggers="mouseenter:mouseleave" popoverTitle="URI Info" [popover]="uriPopover"><span class="fa fa-question"></span></a>												
+												<ng-template #uriPopover let-message="message"><div [innerHtml]="fromUriPopoverMessage"></div></ng-template>
+												 <a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank"><span class="fa fa-question" triggers="mouseenter:mouseleave" popoverTitle="URI Info" container="body" [popover]="uriPopover"></span></a>
 											</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[0].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[0].controls.uri.touched)">
 												<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors.required" class="invalid-field-message">Uri is required.</div>
@@ -133,13 +133,13 @@
 													<button type="button" *ngIf="serviceCreated && fromEndpoint.serviceId" class="btn btn-primary" title="Edit service"  (click)="createOrEditService(fromEndpoint)">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
-													</button>
-													<button type="button" *ngIf="serviceCreated && !fromEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(fromEndpoint)">
+													</button>													
+													<button type="button" *ngIf="serviceCreated && !fromEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(fromEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[0].controls.service.disabled">
 														<!-- <span class="fa fa-pencil"></span>&nbsp;
-														<span>New service</span> -->
+														<span>New header</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint)">
+													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint)">													
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
 													</button>
@@ -179,7 +179,7 @@
 												<div class="input-group">
 														<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" />
 														<ng-template #uriPopover let-message="message"><div style="min-width:300px;" [innerHtml]="toUriPopoverMessages[toIndex]"></div></ng-template>
-														<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" target="_blank" triggers="mouseenter:mouseleave" popoverTitle="URI Info" placement="left" [popover]="uriPopover"><span class="fa fa-question"></span></a>												
+														<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank"><span class="fa fa-question" triggers="mouseenter:mouseleave" popoverTitle="URI Info" container="body" [popover]="uriPopover"></span></a>	
 												</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.touched)">
 												<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors.required" class="invalid-field-message">Uri is required.</div>
@@ -239,7 +239,7 @@
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
 													</button>
-													<button type="button" *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service.disabled">
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 														<!-- <span>New service</span> -->
 													</button>
@@ -292,7 +292,7 @@
 											<div class="input-group">
 													<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" />
 													<ng-template #uriPopover let-message="message"><div style="min-width:300px;" [innerHtml]="errorUriPopoverMessage"></div></ng-template>
-													<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" target="_blank" triggers="mouseenter:mouseleave" popoverTitle="URI Info" placement="left" [popover]="uriPopover"><span class="fa fa-question"></span></a>												
+													<a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank"><span class="fa fa-question" triggers="mouseenter:mouseleave" popoverTitle="URI Info" container="body" [popover]="uriPopover"></span></a>	
 											</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[1].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[1].controls.uri.touched)">
 												<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors.required" class="invalid-field-message">Uri is required.</div>
@@ -348,7 +348,7 @@
 															<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
 													</button>
-													<button type="button" *ngIf="serviceCreated && !errorEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(errorEndpoint)">
+													<button type="button" *ngIf="serviceCreated && !errorEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(errorEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[1].controls.service.disabled">
 														<!-- <span class="fa fa-pencil"></span>&nbsp;
 														<span>New service</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />

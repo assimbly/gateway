@@ -38,6 +38,16 @@ export const servicePopupRoute: Routes = [
         outlet: 'popup'
     },
     {
+        path: 'service-all-new',
+        component: ServiceComponent,
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Services'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
         path: 'service/:id/edit',
         component: ServicePopupComponent,
         data: {

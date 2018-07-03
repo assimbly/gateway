@@ -77,6 +77,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toFilterService: Array<Array<Service>> = [[]];
     errorFilterService: Array<Service> = [];
     selectedService: Service = new Service();
+    closeResult: string;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -477,15 +478,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 endpointForm.controls.header.disable();
                 break;
             }
-            case 'FILE': case 'HTTP4': case 'SFTP': case 'SJMS': case 'STREAM': {
-                endpointForm.controls.service.disable();
+            case 'ACTIVEMQ': case 'SJMS': case 'SONICMQ': case 'SQL': {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
                 break;
             }
             default: {
                 endpointForm.controls.uri.enable();
                 endpointForm.controls.options.enable();
-                endpointForm.controls.service.enable();
                 endpointForm.controls.header.enable();
+                endpointForm.controls.service.disable();
                 break;
             }
         }
@@ -688,7 +692,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
             this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
             this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
-
         this.eventManager.subscribe(
             'serviceModified',
             (res) => this.setService(endpoint, res)
