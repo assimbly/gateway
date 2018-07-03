@@ -16,8 +16,8 @@
             <label class="form-control-label" for="key">Key</label>
             <input type="text" class="form-control" id="key" formControlName="key"/>
             <div *ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)" class="invalid-field-message">
-                <span *ngIf="environmentVariablesForm.controls.key.errors.required" >Key is required.</span>
-                <span *ngIf="this.environmentVariablesForm.controls.key.errors.existingKey" >Key already exists.</span>
+                <span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span>
+                <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>
             </div>
         </div>
 
@@ -25,7 +25,7 @@
             <label class="form-control-label" for="value">Value</label>
             <input type="text" class="form-control" id="value" formControlName="value"/>
             <div *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)" class="invalid-field-message">
-                <span *ngIf="environmentVariablesForm.controls.value.errors.required" >Value is required.</span>
+                <span *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
             </div>
         </div>
 
