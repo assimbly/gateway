@@ -40,7 +40,6 @@ import {
         MaintenanceDeleteDialogComponent,
         MaintenanceDeletePopupComponent,
         MaintenanceDetailComponent
-
     ],
     providers: [
         FlowService

@@ -36,7 +36,7 @@
 					<div class="form-group" *ngIf="!singleGateway">
 						<label class="form-control-label" for="field_gateway">Gateway</label>
 						<select class="form-control" id="field_gateway" *ngIf="flow" formControlName="gateway">
-							<option [ngValue]="null"></option>
+							<!-- <option [ngValue]="null"></option> -->
 							<option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
 						</select>
 					</div>
@@ -50,7 +50,7 @@
 					</div> -->
 
 					<!-- styling of tabset is in global.css -->
-					<ngb-tabset justify="justified" formArrayName="endpointsData" #tabs>
+					<ngb-tabset justify="justified" formArrayName="endpointsData" (tabChange)="next(false)" #tabs>
 						<ngb-tab title="From" id="fromTab">
 							<ng-template ngbTabContent>
 								<jhi-alert-error></jhi-alert-error>
@@ -380,7 +380,7 @@
 						<span class="fa fa-save"></span>&nbsp;
 						<span>Save</span>
 					</button>
-					<button type="button" (click)="next()" *ngIf="displayNextButton" class="btn btn-primary">
+					<button type="button" (click)="next(true)" *ngIf="displayNextButton" class="btn btn-primary">
 						<span>Next</span>&nbsp;
 						<span class="fa fa-arrow-right"></span>
 					</button>
@@ -390,6 +390,9 @@
 				</div>
 				<div *ngIf="savingFlowSuccess">
 					<span class="text-success">*{{savingFlowSuccessMessage}}</span>
+				</div>
+				<div *ngIf="!!invalidUriMessage">
+					<span class="text-danger">*{{invalidUriMessage}}</span>
 				</div>
 			</form>
 		</div>
