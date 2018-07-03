@@ -28,6 +28,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     gatewayExists = false;
     multipleGateways = false;
     singleGatewayName: string;
+    singleGatewayStage: string;
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     test: any;
 
@@ -103,6 +104,7 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.loadFlows();
                 if (!this.multipleGateways) {
                     this.singleGatewayName = this.gateways[0].name;
+                    this.singleGatewayStage = this.gateways[0].stage.toString().toLowerCase();
                 }
             });
     }
