@@ -91,7 +91,7 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     private getAllEnvironmentVariablesKeys() {
         this.environmentVariablesService.query().subscribe((res) => {
             this.allEnvironmentVariablesKeys = res.json.map((env) => env.key);
-            this.environmentVariablesForm.controls.key.setValidators(forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys));
+            this.environmentVariablesForm.controls.key.setValidators([Validators.required, forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)]);
         });
     }
 
