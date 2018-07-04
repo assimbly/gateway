@@ -1,11 +1,20 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaintenanceComponent } from './maintenance.component';
-import { maintenanceRoute } from './maintenance.route'
 import { RouterModule } from '@angular/router';
 import { FlowService } from '../flow';
 import { CommonModule } from '@angular/common';
+
+import {
+    MaintenanceService,
+    MaintenancePopupService,
+    MaintenanceComponent,
+    MaintenanceDialogComponent,
+    MaintenancePopupComponent,
+    MaintenanceDeleteDialogComponent,
+    MaintenanceDeletePopupComponent,
+    MaintenanceDetailComponent,
+    maintenanceRoute
+} from './';
 
 @NgModule({
     imports: [
@@ -15,10 +24,22 @@ import { CommonModule } from '@angular/common';
         RouterModule.forChild(maintenanceRoute)
     ],
     declarations: [
-        MaintenanceComponent
+        MaintenanceComponent,
+        MaintenanceDialogComponent,
+        MaintenancePopupComponent,
+        MaintenancePopupComponent,
+        MaintenanceDeleteDialogComponent,
+        MaintenanceDeletePopupComponent,
+        MaintenanceDetailComponent
     ],
     entryComponents: [
-        MaintenanceComponent
+        MaintenanceComponent,
+        MaintenanceDialogComponent,
+        MaintenancePopupComponent,
+        MaintenancePopupComponent,
+        MaintenanceDeleteDialogComponent,
+        MaintenanceDeletePopupComponent,
+        MaintenanceDetailComponent
     ],
     providers: [
         FlowService
