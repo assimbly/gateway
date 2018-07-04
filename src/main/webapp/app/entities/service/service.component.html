@@ -14,14 +14,14 @@
         <label>
             <strong>Service name:</strong>
         </label>
-        <ng-select [items]="services" bindLabel="name" id="field_service" [(ngModel)]="selectedService" (change)="filterServiceKeys()"></ng-select>
+        <ng-select [items]="services" bindLabel="name" labelForId="field_service" [(ngModel)]="selectedService" (change)="filterServiceKeys()"></ng-select>
         <br/>
         <label>
             <strong>Service type:</strong>
         </label>
         <div class="row">
             <div class="col-md-11">
-                <ng-select [items]="typeServices" bindLabel="type" bindValue="type" id="field_service_type" [(ngModel)]="selectedService.type" [disabled]="disabledServiceType"></ng-select>
+                <ng-select [items]="typeServices" bindLabel="type" bindValue="type" labelForId="field_service_type" [(ngModel)]="selectedService.type" [disabled]="disabledServiceType"></ng-select>
             </div>
             <div class="col-md-1 text-right">
               	<button type="submit" [routerLink]="['../service', selectedService.id ]" class="btn btn-info" [disabled]="!selectedService.id">
@@ -34,4 +34,4 @@
     <br/>
 </div>
 
-<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id">Loading routes...</jhi-service-keys>
+<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id" [service]="selectedService">Loading routes...</jhi-service-keys>

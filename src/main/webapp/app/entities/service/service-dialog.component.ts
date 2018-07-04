@@ -20,7 +20,7 @@ export class ServiceDialogComponent implements OnInit {
     serviceKeys: ServiceKeys;
     service: Service;
     services: Service[];
-    servicesNames: Array<string>;
+    servicesNames: Array<string> = [];
     isSaving: boolean;
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
     showEditButton = false;
