@@ -4,7 +4,8 @@
     <p>In order to put flows into maintenance mode select flows from given list and set time period for maintenance</p>
     <div class="input-group px-0 mb-3 col-12 col-md-6 col-xl-4 float-right">
         <input [(ngModel)]="hours" type="number" name="hours" class="form-control" id="hours" placeholder="hours">
-        <input [(ngModel)]="minutes" min="0" max="59" size="1" maxlength="2" type="number" name="minutes" class="form-control" id="minutes" placeholder="minutes" required>
+        <input [(ngModel)]="minutes" min="0" max="59" size="1" maxlength="2" type="number" name="minutes" class="form-control" id="minutes"
+            placeholder="minutes" required>
         <div class="input-group-append">
             <button type="submit" class="btn btn-primary">Apply</button>
         </div>
@@ -18,12 +19,23 @@
                         <button *ngIf="allSelected" type="button" class="btn btn-primary btn-sm" (click)="deselectAll()">Deselect all</button>
                     </th>
                     <th>Flow name</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let flow of flows; let i = index">
-                    <td><input [checked]="selectedFlows[i]" type="checkbox" name="flow.name" (change)="select($event, i, flow)"></td>
+                    <td>
+                        <input [checked]="selectedFlows[i]" type="checkbox" name="flow.name" (change)="select($event, i, flow)" [disabled]="disableFlows[i]">
+                    </td>
                     <td>{{flow.name}}</td>
+                    <td>
+                        <div *ngIf="!!maintenanceTimers[i]" class="text-center">{{messageFlow}}
+                            <strong>{{maintenanceTimers[i]}}</strong>
+                        </div>
+                        <div *ngIf="maintenanceTimers[i] === ''" class="text-center">Set flow finished:
+                            <i class="fa fa-check fa-lg text-success"></i>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>

@@ -31,7 +31,7 @@ public class Service implements Serializable {
     @Column(name = "jhi_type")
     private String type;
     
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "service",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "service", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<ServiceKeys> serviceKeys = new HashSet<>();
     

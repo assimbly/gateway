@@ -71,11 +71,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
     displayNextButton = false;
+    invalidUriMessage: string;
 
     fromFilterService: Array<Service> = [];
     toFilterService: Array<Array<Service>> = [[]];
     errorFilterService: Array<Service> = [];
     selectedService: Service = new Service();
+    closeResult: string;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -142,6 +144,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             if (isCloning) {
                                 this.flow.id = null;
                             }
+                            if (this.singleGateway) {
+                                this.flow.gatewayId = this.gateways[0].id;
+                            }
                             this.initializeForm(this.flow);
                             if (this.flow.fromEndpointId) {
                                 this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
@@ -199,6 +204,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     setTimeout(() => {
                         this.flow = new Flow();
                         this.flow.autoStart = false;
+                        if (this.singleGateway) {
+                            this.flow.gatewayId = this.gateways[0].id;
+                        }
                         this.initializeForm(this.flow);
 
                         this.fromEndpoint = new FromEndpoint();
@@ -470,15 +478,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 endpointForm.controls.header.disable();
                 break;
             }
-            case 'FILE': case 'HTTP4': case 'SFTP': case 'SJMS': case 'STREAM': {
-                endpointForm.controls.service.disable();
+            case 'ACTIVEMQ': case 'SJMS': case 'SONICMQ': case 'SQL': {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.service.enable();
+                endpointForm.controls.header.enable();
                 break;
             }
             default: {
                 endpointForm.controls.uri.enable();
                 endpointForm.controls.options.enable();
-                endpointForm.controls.service.enable();
                 endpointForm.controls.header.enable();
+                endpointForm.controls.service.disable();
                 break;
             }
         }
@@ -630,11 +641,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     addNewToEndpoint() {
         this.toEndpoints.push(new ToEndpoint());
         this.toEndpointsOptions.push([new Option()]);
-
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
         toEndpoint.type = EndpointType.FILE;
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
         this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
+        setTimeout(() => {
+            this.ngbTabset.select(`toTab${this.toEndpoints.indexOf(toEndpoint)}`);
+        }, 0);
     }
     removeToEndpoint(toEndpoint, endpointDataName) {
         const i = this.toEndpoints.indexOf(toEndpoint);
@@ -642,6 +655,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpointsOptions.splice(i, 1);
         this.editFlowForm.removeControl(endpointDataName);
         (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i + 2);
+        setTimeout(() => {
+            this.ngbTabset.select(`toTab${this.toEndpoints.length - 1}`);
+        }, 0);
+
     }
 
     previousState() {
@@ -675,7 +692,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
             this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
             this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
-
         this.eventManager.subscribe(
             'serviceModified',
             (res) => this.setService(endpoint, res)
@@ -844,41 +860,90 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next() {
+    next(nextClicked: boolean, isNextTab?: boolean) {
         const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
         const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
         const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
         if (index === 0) {
-            this.validateTypeAndUri(endpoints, index);
+            let endpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.fromEndpointOptions, this.fromEndpoint, endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage('FromEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else if (index === this.ngbTabset.tabs.length - 1) {
-            this.validateTypeAndUri(endpoints, index);
+            let formEndpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(formEndpoint);
             if (endpoints[1].valid) {
-                this.goToNextTab(endpoints, 0);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.errorEndpointOptions, this.errorEndpoint, formEndpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    }, () => {
+                        this.setInvalidUriMessage('ErrorEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    });
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else {
-            this.validateTypeAndUri(endpoints, index + 1);
+            let endpoint = <FormGroup>endpoints[index + 1];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index + 1].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.toEndpointsOptions[index - 1], this.toEndpoints[index - 1], endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage(`ToEndpoint (${index})`);
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
+            } else if (isNextTab) {
+                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
             }
         }
+    }
+
+    setInvalidUriMessage(endpointName: string) {
+        this.invalidUriMessage = `Uri for ${endpointName} is not valid.`;
+        setTimeout(() => {
+            this.invalidUriMessage = '';
+        }, 15000);
     }
 
     goToNextTab(endpoints: AbstractControl[], index) {
         this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
         if (endpoints.find((e) => !e.valid)) {
             this.displayNextButton = true;
-            this.next();
+            this.next(true, true);
         } else {
             this.displayNextButton = false;
         }
     }
 
-    validateTypeAndUri(endpoints: AbstractControl[], index: number) {
-        (<FormGroup>endpoints[index]).controls.type.markAsDirty();
-        (<FormGroup>endpoints[index]).controls.uri.markAsDirty();
+    formatUri(endpointOptions, endpoint, formEndpoint): string {
+        if (formEndpoint.controls.type.value === null) { return };
+        let formOptions = <FormArray>formEndpoint.controls.options;
+        this.setEndpointOptions(endpointOptions, endpoint, formOptions);
+        return `${formEndpoint.controls.type.value.toLowerCase()}://${formEndpoint.controls.uri.value}${!endpoint.options ? '' : endpoint.options}`;
+    }
+
+    validateTypeAndUri(endpoint: FormGroup) {
+        endpoint.controls.type.markAsTouched();
+        endpoint.controls.uri.markAsTouched();
+    }
+
+    markAsUntouchedTypeAndUri(endpoint: FormGroup) {
+        endpoint.controls.type.markAsUntouched();
+        endpoint.controls.uri.markAsUntouched();
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
