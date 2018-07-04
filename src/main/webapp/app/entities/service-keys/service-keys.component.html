@@ -27,28 +27,48 @@
             </thead>
             <tbody>
                 <tr *ngFor="let serviceKey of serviceKeys ;trackBy: trackId; let idx = index">
-                    <td id="serviceKeysRowID" [hidden]="!serviceKeysRowID">
+                    <td id="serviceKeysRowID-{{idx}}" [hidden]="!serviceKeysRowID">
                         {{serviceKey.id}}
                     </td>
-                    <td>
+                    <td *ngIf="serviceKey.isRequired; else notRequired">
                         <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
-                            required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" id="serviceKey-key-{{idx}}" 
-                            [disabled]="serviceKey.isDisabled" #key="ngModel" />
-                        <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                            <span *ngIf="key.errors.required">Key is required.</span>
-                            <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
+                            required maxlength="255" id="serviceKey-key-{{idx}}" [disabled]="serviceKey.isDisabled || serviceKey.isRequired"
+                            #requiredKey="ngModel" />
+                        <div *ngIf="requiredKey.invalid && (requiredKey.dirty || requiredKey.touched)" class="invalid-field-message">
+                            <span *ngIf="requiredKey.errors.required">Key is required.</span>
                         </div>
                     </td>
-                    <td>
-                        <input type="text" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" id="serviceKey-value-{{idx}}"
-                            required maxlength="255" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" />
-                        <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+                    <ng-template #notRequired>
+                        <td>
+                            <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
+                                required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" [disabled]="serviceKey.isDisabled || serviceKey.isRequired"
+                                id="serviceKey-key-{{idx}}" #key="ngModel" />
+                            <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+                                <span *ngIf="key.errors.required">Key is required.</span>
+                                <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
+                            </div>
+                        </td>
+                    </ng-template>
+                    <td *ngIf="serviceKey.valueType !== 'list'; else isList">
+                        <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" 
+                            id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" />
+                         <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                             <span *ngIf="value.errors.required">Value is required.</span>
                         </div>
                     </td>
-                    <td id="serviceKeysRowKeyID" [hidden]="!serviceKeysRowKeyID">
+                    <ng-template #isList>
+                        <td>
+                            <select class="form-control" required [(ngModel)]="serviceKey.value" [disabled]="serviceKey.isDisabled" #listValue="ngModel">
+                                <option [value]="l" *ngFor="let l of listVal">{{l}}</option>
+                            </select>
+                            <div *ngIf="listValue.invalid && (listValue.dirty || listValue.touched)" class="invalid-field-message">
+                                <span *ngIf="listValue.errors.required">Value is required.</span>
+                            </div>
+                        </td>
+                    </ng-template>
+                    <td hidden>
                         <div *ngIf="serviceKey.serviceId">
-                            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="serviceKey.serviceId" readonly />
+                            <input type="text" class="form-control" id="id-{{idx}}" name="id" [(ngModel)]="serviceKey.serviceId" readonly />
                         </div>
                     </td>
                     <td>
@@ -57,26 +77,26 @@
                                 <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
                                     <span class="fa fa-plus"></span>
                                 </button>
-                                <button type="button" title="Remove" *ngIf="!serviceKey.id" class="btn btn-danger" (click)="removeServiceKeys(idx)">
+                                <button type="button" title="Remove" *ngIf="!serviceKey.id" [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="removeServiceKeys(idx)">
                                     <span class="fa fa-remove"></span>
                                 </button>
-                                <button type="button" title="Save" [disabled]="key.invalid || value.invalid" *ngIf="!serviceKey.id" class="btn btn-primary" (click)="save(serviceKey, idx)">
+                                <button type="button" title="Save" [disabled]="requiredKey?.invalid || key?.invalid || value?.invalid || listValue?.invalid" *ngIf="!serviceKey.id" class="btn btn-primary" (click)="save(serviceKey, idx)">
                                     <span class="fa fa-save"></span>
                                 </button>
                                 <button type="button" title="View" *ngIf="serviceKey.id" class="btn btn-info" [routerLink]="['../service-keys', serviceKey.id ]">
                                     <span class="fa fa-eye"></span>
                                 </button>
-                                <button type="button" title="Update" [disabled]="key.invalid || value.invalid" *ngIf="serviceKey.id && !serviceKey.isDisabled" class="btn btn-primary" (click)="save(serviceKey, idx)">
+                                <button type="button" title="Update" [disabled]="requiredKey?.invalid || key?.invalid || value?.invalid || listValue?.invalid" *ngIf="serviceKey.id && !serviceKey.isDisabled" class="btn btn-primary" (click)="save(serviceKey, idx)">
                                     <span class="fa fa-check"></span>
                                 </button>
                                 <button type="button" title="Edit" *ngIf="serviceKey.id && serviceKey.isDisabled" replaceUrl="true" queryParamsHandling="merge"
                                     class="btn btn-primary" (click)="editServiceKey(serviceKey)">
                                     <span class="fa fa-pencil"></span>
                                 </button>
-                                <button type="button" title="Clone" *ngIf="serviceKey.id && serviceKey.isDisabled" class="btn btn-info" (click)="cloneServiceKey(serviceKey)">
+                                <button type="button" title="Clone" *ngIf="serviceKey.id && serviceKey.isDisabled"  [disabled]="serviceKey.isRequired" class="btn btn-info" (click)="cloneServiceKey(serviceKey)">
                                     <span class="fa fa-clone"></span>
                                 </button>
-                                <button type="submit" title="Delete" *ngIf="serviceKey.id" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger"
+                                <button type="submit" title="Delete" *ngIf="serviceKey.id" replaceUrl="true"  [disabled]="serviceKey.isRequired" queryParamsHandling="merge" class="btn btn-danger"
                                     [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKey?.id + '/delete'} }]">
                                     <span class="fa fa-trash"></span>
                                 </button>
