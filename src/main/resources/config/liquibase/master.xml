@@ -17,6 +17,7 @@
     <include file="config/liquibase/changelog/20180330121320_added_entity_ServiceKeys.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180627071131_added_entity_Maintenance.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180627083209_added_entity_Group.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180704111405_added_entity_WireTapEndpoint.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20180114132914_added_entity_constraints_EnvironmentVariables.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114132915_added_entity_constraints_Flow.xml" relativeToChangelogFile="false"/>
@@ -26,5 +27,6 @@
     <include file="config/liquibase/changelog/20180114201817_added_entity_constraints_ErrorEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180330121320_added_entity_constraints_ServiceKeys.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180627083209_added_entity_constraints_Group.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180704111405_added_entity_constraints_WireTapEndpoint.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

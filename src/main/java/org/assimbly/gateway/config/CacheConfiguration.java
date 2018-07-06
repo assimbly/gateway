@@ -66,6 +66,7 @@ public class CacheConfiguration {
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".gateways", jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".users", jcacheConfiguration);
+            cm.createCache(org.assimbly.gateway.domain.WireTapEndpoint.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }
