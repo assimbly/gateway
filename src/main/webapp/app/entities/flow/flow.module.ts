@@ -9,6 +9,8 @@ import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-end
 import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
 
+import { Components } from '../../shared/camel/component-type';
+
 import {
     FlowService,
     FlowPopupService,
@@ -73,6 +75,7 @@ const ENTITY_STATES = [
         FlowLiveModeComponent
     ],
     providers: [
+        Components,
         FlowService,
         FlowPopupService,
     ],

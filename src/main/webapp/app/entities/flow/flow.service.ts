@@ -121,8 +121,8 @@ export class FlowService {
         return this.http.get(`${SERVER_API_URL}/api/camel-url`)
     }
 
-    setMaintainance(time: number, flowsIds: Array<number>): Observable<Response> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintainance/${time}`, flowsIds);
+    setMaintenance(time: number, flowsIds: Array<number>): Observable<Response> {
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds);
     }
 
     exportGatewayConfiguration(gateway: Gateway) {

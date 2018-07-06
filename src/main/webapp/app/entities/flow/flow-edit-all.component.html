@@ -61,9 +61,9 @@
 											<input type="text" class="form-control" id="id" readonly formControlName="id"/>
 										</div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_from_type">Type</label>
+											<label class="form-control-label" for="field_from_type">Component</label>
 											<div class="input-group">
-												<ng-select [items]="fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
+												<ng-select [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Camel {{fromEndpoint?.type}} component documentation">
 														<img  src="../../../content/images/apache-camel.png" />
@@ -161,9 +161,9 @@
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />
 										</div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_to_type">Type</label>
+											<label class="form-control-label" for="field_to_type">Component</label>
 											<div class="input-group">
-												<ng-select [items]="toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
+												<ng-select [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Camel {{toEndpoint?.type}} component documentation">
 														<img src="../../../content/images/apache-camel.png" />
@@ -274,9 +274,9 @@
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />
 										</div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_error_type">Type</label>
+											<label class="form-control-label" for="field_error_type">Component</label>
 											<div class="input-group">
-												<ng-select [items]="errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
+												<ng-select [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
 												<div class="input-group-append d-flex">
 													<a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
 														<img src="../../../content/images/apache-camel.png" />

@@ -1,0 +1,38 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "service",
+            "otherEntityName": "service",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "type",
+            "fieldType": "EndpointType",
+            "fieldValues": "SONICMQ, ACTIVEMQ, KAFKA, SJMS, SQL, HTTP4, SFTP, STREAM, WASTEBIN, FILE, VM"
+        },
+        {
+            "fieldName": "uri",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "options",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180704111405",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "wire_tap_endpoint",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

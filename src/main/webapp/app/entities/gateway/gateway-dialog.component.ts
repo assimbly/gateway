@@ -9,6 +9,7 @@ import { JhiEventManager } from 'ng-jhipster';
 import { Gateway } from './gateway.model';
 import { GatewayPopupService } from './gateway-popup.service';
 import { GatewayService } from './gateway.service';
+import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-gateway-dialog',
@@ -23,8 +24,8 @@ export class GatewayDialogComponent implements OnInit {
         public activeModal: NgbActiveModal,
         private gatewayService: GatewayService,
         private eventManager: JhiEventManager,
-        private router: ActivatedRoute
-
+        private router: ActivatedRoute,
+        private components: Components
     ) {
     }
 
@@ -62,8 +63,8 @@ export class GatewayDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: Gateway, closePopup: boolean) {
-        this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK'});
-        this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK'});
+        this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
+        this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK' });
         this.isSaving = false;
         if (closePopup) {
             this.activeModal.dismiss(result);
@@ -86,11 +87,11 @@ export class GatewayPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private gatewayPopupService: GatewayPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.gatewayPopupService
                     .open(GatewayDialogComponent as Component, params['id']);
             } else {
