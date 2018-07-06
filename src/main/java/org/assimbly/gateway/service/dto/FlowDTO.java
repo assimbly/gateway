@@ -23,6 +23,8 @@ public class FlowDTO implements Serializable {
 
     private Long errorEndpointId;
 
+    private Long maintenanceId;
+    
     public Long getId() {
         return id;
     }
@@ -71,6 +73,14 @@ public class FlowDTO implements Serializable {
         this.errorEndpointId = errorEndpointId;
     }
 
+    public Long getMaintenanceId() {
+        return maintenanceId;
+    }
+
+    public void setMaintenanceId(Long maintenanceId) {
+        this.maintenanceId = maintenanceId;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
