@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FlowService } from './flow.service';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Gateway } from '../gateway/gateway.model';
 
 @Component({
     selector: 'jhi-flow-live-mode',
@@ -15,6 +16,7 @@ export class FlowLiveModeComponent implements OnInit {
     public configuration: any;
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
+    public typeFiles= ['XML', 'JSON', 'YAML'];
     public hasLoadError: boolean;
     private hintText =
 `<!--
@@ -72,7 +74,6 @@ export class FlowLiveModeComponent implements OnInit {
                 this.showInfoMessage(false);
             });
     }
-
     showInfoMessage(isSuccess) {
         isSuccess ? this.isConfigurationSet = true : this.hasLoadError = true;
         setTimeout(() => {
