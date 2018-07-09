@@ -1,4 +1,8 @@
 ######################
+# Base Template from https://github.com/github/gitignore
+######################
+
+######################
 # Project Specific
 ######################
 /build/www/**

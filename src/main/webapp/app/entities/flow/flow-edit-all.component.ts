@@ -17,7 +17,7 @@ import { Gateway, GatewayService } from '../gateway';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { EndpointType } from '../../shared/model/endpoint-type';
+import { EndpointType, typesLinks, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -53,9 +53,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
-    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
@@ -98,7 +95,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private components: Components
     ) {
         this.toEndpoints = [new ToEndpoint()];
     }
@@ -256,7 +254,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'JDBC Connection';
         } else if (type === 'SJMS') {
             return 'MQ Connection';
-        } else if (type === 'FILE' || 'HTTP4' || 'KAFKA' || 'SFTP' || 'SJMS' || 'STREAM' || 'VM' || 'WASTEBIN') {
+        } else {
             return '';
         }
 
@@ -267,203 +265,30 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (typeof e !== 'undefined') {
             endpoint.type = e;
         }
-        const typesLinks = [
-            {
-                name: 'ACTIVEMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-activemq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-jms/src/main/docs/jms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: Name of the queue or topic to use as destination.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-                `
-            },
-            {
-                name: 'FILE',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-file`,
-                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/file-component.adoc`,
-                uriPlaceholder: 'directoryName',
-                uriPopoverMessage: `
-                    <b>Name</b>: directoryName<br/>
-                    <b>Description</b>:  The starting directory.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: File <br/><br/>
-                    <b>Example</b>: /home/user/order or C:\\order<br/>
-                `
-            },
-            {
-                name: 'HTTP4',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-http4`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-http4/src/main/docs/http4-component.adoc`,
-                uriPlaceholder: 'httpUri',
-                uriPopoverMessage: `
-                    <b>Name</b>: httpUri<br/>
-                    <b>Description</b>: The url of the HTTP endpoint to call.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: URI <br/><br/>
-                    <b>Example</b>: http://servername:8080/orders<br/>
-                `
-            },
-            {
-                name: 'KAFKA',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-kafka`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
-                uriPlaceholder: 'topic',
-                uriPopoverMessage: `
-                    <b>Name</b>: topic<br/>
-                    <b>Description</b>:  Name of the topic to use. On the consumer you can use comma to separate multiple topics.
-                        A producer can only send a message to a single topic.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: test or test1,test2,test3<br/>
-                `
-            },
-            {
-                name: 'SFTP',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sftp`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
-                uriPlaceholder: 'host:port/directoryName',
-                uriPopoverMessage: `
-                    <b>Name</b>: host<br/>
-                    <b>Description</b>: Hostname of the FTP server.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/>
-                    <br/>
-                    <b>Name</b>: port<br/>
-                    <b>Description</b>: Port of the FTP server.<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Default</b>: 22<br/>
-                    <b>Data Type</b>: int<br/>
-                    <br/>
-                    <b>Name</b>: directoryName<br/>
-                    <b>Description</b>: The starting directory.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Example</b>: servername:22/dir1/subdir<br/>
-                `
-            },
-            {
-                name: 'SJMS',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sjms`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-                `
-            },
-            {
-                name: 'SONICMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sonicmq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-
-                `
-            },
-            {
-                name: 'SQL',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sql`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sql/src/main/docs/sql-component.adoc`,
-                uriPlaceholder: 'query',
-                uriPopoverMessage: `
-                    <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: Sets the SQL query to perform. <br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: select id from order<br/>
-                `
-            },
-            {
-                name: 'STREAM',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-stream`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-stream/src/main/docs/stream-component.adoc`,
-                uriPlaceholder: 'kind',
-                uriPopoverMessage: `
-                    <b>Name</b>: kind<br/>
-                    <b>Description</b>: Kind of stream to use such as System.in or System.out.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: out (or in or err)<br/>
-                `
-            },
-            {
-                name: 'VM',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-vm`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-core/src/main/docs/vm-component.adoc`,
-                uriPlaceholder: 'queueName',
-                uriPopoverMessage: `
-                    <b>Name</b>: queueName<br/>
-                    <b>Description</b>: Internal queue between two flows<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String<br/><br/>
-                    <b>Example</b>: test<br/>
-                `
-            },
-            {
-                name: 'WASTEBIN',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
-                uriPlaceholder: '',
-                uriPopoverMessage: `
-                    <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
-                `
-            }
-        ];
 
         let type;
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
             this.filterServices(endpoint);
-            this.fromTypeAssimblyLink = type.assimblyTypeLink;
-            this.fromTypeCamelLink = type.camelTypeLink;
+            this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
             this.fromUriPopoverMessage = type.uriPopoverMessage;
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
             this.filterServices(endpoint);
-            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
-            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
             this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
             this.filterServices(endpoint);
-            this.errorTypeAssimblyLink = type.assimblyTypeLink;
-            this.errorTypeCamelLink = type.camelTypeLink;
+            this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
             this.errorUriPopoverMessage = type.uriPopoverMessage;
         }
@@ -481,8 +306,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             case 'ACTIVEMQ': case 'SJMS': case 'SONICMQ': case 'SQL': {
                 endpointForm.controls.uri.enable();
                 endpointForm.controls.options.enable();
-                endpointForm.controls.service.enable();
                 endpointForm.controls.header.enable();
+                endpointForm.controls.service.enable();
                 break;
             }
             default: {

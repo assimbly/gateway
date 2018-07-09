@@ -5,6 +5,7 @@ import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
 import { FromEndpoint } from './from-endpoint.model';
 import { FromEndpointPopupService } from './from-endpoint-popup.service';
@@ -12,6 +13,7 @@ import { FromEndpointService } from './from-endpoint.service';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { ResponseWrapper } from '../../shared';
+import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-from-endpoint-dialog',
@@ -32,7 +34,8 @@ export class FromEndpointDialogComponent implements OnInit {
         private fromEndpointService: FromEndpointService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private components: Components
     ) {
     }
 

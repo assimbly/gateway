@@ -42,10 +42,13 @@ public class Flow implements Serializable {
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
+
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(unique = true)
+    private Maintenance maintenance;    
     
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -121,6 +124,19 @@ public class Flow implements Serializable {
         this.errorEndpoint = errorEndpoint;
     }
 
+    public Maintenance getMaintenance() {
+        return maintenance;
+    }
+
+    public Flow maintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
+        return this;
+    }
+
+    public void setMaintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
+    }
+    
     public Set<ToEndpoint> getToEndpoints() {
         return toEndpoints;
     }

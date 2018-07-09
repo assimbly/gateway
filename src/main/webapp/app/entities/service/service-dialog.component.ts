@@ -28,6 +28,8 @@ export class ServiceDialogComponent implements OnInit {
     private requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     private serviceKeysRemoveList: Array<ServiceKeys> = [];
+    // typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
+    showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,

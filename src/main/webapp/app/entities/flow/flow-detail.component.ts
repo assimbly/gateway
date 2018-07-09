@@ -12,6 +12,8 @@ import { GatewayService, Gateway } from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 
+import { EndpointType, typesLinks } from '../../shared/camel/component-type';
+
 @Component({
     selector: 'jhi-flow-detail',
     templateUrl: './flow-detail.component.html',
@@ -24,12 +26,16 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
     fromEndpoint: FromEndpoint;
     toEndpoints: Array<ToEndpoint>;
     errorEndpoint: ErrorEndpoint;
+
+    // typesLinks: Array<TypeLinks>;
+
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     toTypeAssimblyLinks: Array<string> = [];
     toTypeCamelLinks: Array<string> = [];
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
+
     private subscription: Subscription;
     private eventSubscriber: Subscription;
     private wikiDocUrl: string;
@@ -57,10 +63,10 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
 
     load(id) {
         forkJoin([this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()])
-        .subscribe((results) => {
-            this.wikiDocUrl = results[0].text();
-            this.camelDocUrl = results[1].text();
-        });
+            .subscribe((results) => {
+                this.wikiDocUrl = results[0].text();
+                this.camelDocUrl = results[1].text();
+            });
 
         this.flowService.find(id).subscribe((flow) => {
             this.flow = flow;
@@ -128,72 +134,20 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
 
     private setTypeLinks(endpoint: any) {
 
-        const typesLinks = [
-            {
-                name: 'ACTIVEMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-activemq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-jms/src/main/docs/jms-component.adoc`,
-            },
-            {
-                name: 'FILE',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-file`,
-                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/file-component.adoc`,
-            },
-            {
-                name: 'HTTP4',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-http4`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-http4/src/main/docs/http4-component.adoc`,
-            },
-            {
-                name: 'KAFKA',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-kafka`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
-            },
-            {
-                name: 'SFTP',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sftp`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
-            },
-            {
-                name: 'SJMS',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sjms`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-            },
-            {
-                name: 'SONICMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sonicmq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-            },
-            {
-                name: 'SQL',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sql`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sql/src/main/docs/sql-component.adoc`,
-            },
-            {
-                name: 'STREAM',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-stream`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-stream/src/main/docs/stream-component.adoc`,
-            },
-            {
-                name: 'WASTEBIN',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink:  `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
-            }
-        ];
-
         let type;
+
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
-            this.fromTypeAssimblyLink = type.assimblyTypeLink;
-            this.fromTypeCamelLink = type.camelTypeLink;
+            this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
-            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
-            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
-            this.errorTypeAssimblyLink = type.assimblyTypeLink;
-            this.errorTypeCamelLink = type.camelTypeLink;
+            this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
         }
 
     }

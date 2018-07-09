@@ -22,7 +22,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     serviceKey: ServiceKeys;
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
-    listVal: Array<String> = ['com.mysql.jdbc.Driver'];
+    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
 
     constructor(
         private serviceKeysService: ServiceKeysService,
@@ -89,7 +89,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 ]
             },
             {
-                name: 'Kafka Connection',
+                name: 'MQ Connection',
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
@@ -119,7 +119,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 });
             }
             const requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
-            const requiredServiceKeys =  new Array<ServiceKeys>();
+            const requiredServiceKeys = new Array<ServiceKeys>();
             requiredType.serviceKeys.forEach((sk) => {
                 let ersk = this.serviceKeys.find((s) => s.key === sk.serviceKeyName);
                 let rsk = new ServiceKeys();

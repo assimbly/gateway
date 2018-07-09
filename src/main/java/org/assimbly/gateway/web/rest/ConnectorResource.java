@@ -202,9 +202,9 @@ public class ConnectorResource {
 	  
   }
 
-  @PostMapping(path = "/connector/{connectorId}/maintainance/{time}", consumes = {"application/json"}, produces = {"text/plain","application/xml","application/json"})
+  @PostMapping(path = "/connector/{connectorId}/maintenance/{time}", consumes = {"application/json"}, produces = {"text/plain","application/xml","application/json"})
   @Timed
-  public ResponseEntity<String> setMaintainance(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long time, @RequestBody List<Long> ids) throws Exception {
+  public ResponseEntity<String> setMaintenance(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long time, @RequestBody List<Long> ids) throws Exception {
 
 		try {
 
@@ -242,13 +242,11 @@ public class ConnectorResource {
 			// start the thread
 			thread.start();
 			
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setMaintainance","Set flows into maintainance mode for " + time + " miliseconds");
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setMaintenance","Set flows into maintenance mode for " + time + " miliseconds");
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setMaintainance","Set flows into maintainance mode",e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setMaintenance","Set flows into maintenance mode",e);
 		}
   }
-
-  
   
   @GetMapping(path = "/connector/{connectorId}/stats", produces = {"text/plain","application/xml","application/json"})
   @Timed
