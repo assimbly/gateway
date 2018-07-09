@@ -27,7 +27,7 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     isSaving: boolean;
     disabledServiceType= true;
     selectedService: Service = new Service();
-    typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
+    typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
 
     constructor(
         private serviceService: ServiceService,

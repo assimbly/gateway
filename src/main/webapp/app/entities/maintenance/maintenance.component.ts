@@ -45,15 +45,15 @@ export class MaintenanceComponent implements OnInit {
         let time = this.hours * 3600 * 1000 + this.minutes * 60000;
         const ids = this.selectedFlows.filter((sf) => sf !== null).map((f) => f.id);
         if (ids.length > 0) {
-            this.flowService.setMaintainance(time, ids).subscribe(() => {
-                this.messageFlow = `Set flows into maintainance mode for:`;
-                this.displayMaintainanceTimer(this.selectedFlows, time);
+            this.flowService.setMaintenance(time, ids).subscribe(() => {
+                this.messageFlow = `Set flows into maintenance mode for:`;
+                this.displayMaintenanceTimer(this.selectedFlows, time);
                 this.deselectAll();
             });
         }
     }
 
-    displayMaintainanceTimer(flows: Array<Flow>, time: number) {
+    displayMaintenanceTimer(flows: Array<Flow>, time: number) {
         flows.forEach((flow, i) => {
             if (flow === null) { return; }
             this.timeLeft[i] = time;

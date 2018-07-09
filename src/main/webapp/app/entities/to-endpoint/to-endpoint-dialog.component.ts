@@ -13,6 +13,7 @@ import { Flow, FlowService } from '../flow';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { ResponseWrapper } from '../../shared';
+import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-to-endpoint-dialog',
@@ -36,7 +37,8 @@ export class ToEndpointDialogComponent implements OnInit {
         private flowService: FlowService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        private components: Components
     ) {
     }
 
