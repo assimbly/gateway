@@ -9,7 +9,8 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Service } from './service.model';
 import { ServicePopupService } from './service-popup.service';
 import { ServiceService } from './service.service';
-import { ServiceKeys } from '../service-keys';
+import { ServiceKeysService } from '../service-keys/service-keys.service';
+import { ServiceKeys, RequiredServiceKey } from '../service-keys';
 import { ResponseWrapper } from '../../shared';
 
 @Component({
@@ -17,17 +18,21 @@ import { ResponseWrapper } from '../../shared';
     templateUrl: './service-dialog.component.html'
 })
 export class ServiceDialogComponent implements OnInit {
-    serviceKeys: ServiceKeys;
-    service: Service;
-    services: Service[];
+    public serviceKeys: Array<ServiceKeys> = [];
+    public service: Service;
     servicesNames: Array<string> = [];
     isSaving: boolean;
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
-    showEditButton = false;
+    public serviceKeysKeys: Array<string> = [];
+    public listVal: Array<String> = ['com.mysql.jdbc.Driver'];
+    private requiredServiceKey: Array<RequiredServiceKey> = [];
+    private requiredType: RequiredServiceKey;
+    private serviceKeysRemoveList: Array<ServiceKeys> = [];
 
     constructor(
         public activeModal: NgbActiveModal,
         private serviceService: ServiceService,
+        private serviceKeysService: ServiceKeysService,
         private eventManager: JhiEventManager,
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
@@ -36,18 +41,60 @@ export class ServiceDialogComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.serviceKeys = new ServiceKeys();
         this.isSaving = false;
-        this.serviceService.query()
-            .subscribe((res: ResponseWrapper) => {
-                this.services = res.json;
-                this.servicesNames = this.services.map((s) => s.name);
-            }, (res: ResponseWrapper) => this.onError(res.json));
-        if (this.route.fragment['value'] === 'showEditServiceButton') {
-            this.showEditButton = true;
-        }
+        this.addRequiredServiceKeys();
+        this.serviceService.query().subscribe(
+            (res: ResponseWrapper) => {
+                this.servicesNames = res.json.map((s) => s.name)
+                // this.servicesNames.splice(this.servicesNames.indexOf(this.service.name), 1);
+            },
+            (res: ResponseWrapper) => this.onError(res.json)
+        );
         if (this.route.fragment['value'] === 'clone') {
             this.service.id = null;
+        }
+        this.loadServiceKeys();
+    }
+
+    changeType() {
+        if (typeof this.requiredType !== 'undefined') {
+            this.serviceKeysRemoveList = [];
+            this.requiredType.serviceKeys.forEach((rsk) => {
+                this.serviceKeysRemoveList.push(this.serviceKeys.splice(this.serviceKeys.indexOf(
+                    this.serviceKeys.find((sk) => (rsk.serviceKeyName === sk.key && sk.id !== undefined))
+                ), 1)[0])
+            });
+        }
+
+        this.requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
+        const requiredServiceKeys =  new Array<ServiceKeys>();
+        this.requiredType.serviceKeys.forEach((sk) => {
+            let ersk = this.serviceKeys.find((s) => s.key === sk.serviceKeyName);
+            let rsk = new ServiceKeys();
+            if (ersk instanceof ServiceKeys) {
+                rsk = ersk;
+                this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+            }
+            rsk.key = sk.serviceKeyName;
+            rsk.valueType = sk.valueType;
+            rsk.isRequired = true;
+            requiredServiceKeys.push(rsk);
+        });
+        this.serviceKeys.unshift(...requiredServiceKeys);
+        this.mapServiceKeysKeys();
+    }
+
+    addServiceKeys() {
+        const newServiceKeys = new ServiceKeys();
+        this.serviceKeys.push(newServiceKeys);
+        this.mapServiceKeysKeys();
+    }
+
+    removeServiceKeys(i: number) {
+        this.serviceKeys.splice(i, 1);
+        this.mapServiceKeysKeys();
+        if (this.serviceKeys.length === 0) {
+            this.addServiceKeys();
         }
     }
 
@@ -80,6 +127,22 @@ export class ServiceDialogComponent implements OnInit {
         }, 0);
     }
 
+    private loadServiceKeys() {
+        if (this.service.id) {
+            this.serviceKeysService.query().subscribe((res) => {
+                this.serviceKeys = res.json.filter((sk) => sk.serviceId === this.service.id);
+                this.changeType();
+            });
+        }
+    }
+
+    private mapServiceKeysKeys() {
+        if (typeof this.serviceKeys !== 'undefined') {
+            this.serviceKeysKeys = this.serviceKeys.map((sk) => sk.key);
+            this.serviceKeysKeys = this.serviceKeysKeys.filter((k) => k !== undefined);
+        }
+    }
+
     private subscribeToSaveResponse(result: Observable<Service>, closePopup: boolean) {
         result.subscribe((res: Service) =>
             this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
@@ -95,6 +158,24 @@ export class ServiceDialogComponent implements OnInit {
         } else if (closePopup) {
             this.activeModal.dismiss(result);
         }
+
+        this.serviceKeysRemoveList.forEach((skrl) => {
+            this.serviceKeysService.delete(skrl.id).subscribe();
+        });
+
+        this.serviceKeys.forEach((serviceKey) => {
+            serviceKey.serviceId = result.id;
+            if (serviceKey.id) {
+                this.serviceKeysService.update(serviceKey).subscribe((sk) => {
+                    serviceKey = sk;
+                });
+            } else {
+                this.serviceKeysService.create(serviceKey).subscribe((sk) => {
+                    serviceKey = sk;
+                })
+            }
+        });
+        this.serviceKeysService.update(this.serviceKeys[0])
     }
     private onError(error: any) {
         this.jhiAlertService.error(error.message, null, null);
@@ -102,6 +183,41 @@ export class ServiceDialogComponent implements OnInit {
     private onSaveError() {
         this.isSaving = false;
     }
+
+    private addRequiredServiceKeys() {
+        this.requiredServiceKey.push(
+            {
+                name: 'JDBC Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text' },
+                    { serviceKeyName: 'username', valueType: 'text' },
+                    { serviceKeyName: 'password', valueType: 'password' },
+                    { serviceKeyName: 'driver', valueType: 'list' }
+                ]
+            },
+            {
+                name: 'SonicMQ Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text' },
+                    { serviceKeyName: 'username', valueType: 'text' },
+                    { serviceKeyName: 'password', valueType: 'password' }
+                ]
+            },
+            {
+                name: 'ActiveMQ Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text' }
+                ]
+            },
+            {
+                name: 'Kafka Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text' }
+                ]
+            },
+        )
+    }
+
 }
 
 @Component({
