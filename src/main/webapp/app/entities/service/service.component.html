@@ -5,6 +5,7 @@
             Create new Service
         </span>
     </button>
+    <button class="btn btn-primary" [routerLink]="['/service', 'all']">All services</button>
     <br/>
     <h2>
         <span>Service</span>
@@ -34,4 +35,4 @@
     <br/>
 </div>
 
-<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [serviceId]="selectedService.id" [service]="selectedService">Loading routes...</jhi-service-keys>
+<jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [service]="selectedService">Loading routes...</jhi-service-keys>
