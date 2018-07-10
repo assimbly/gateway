@@ -20,16 +20,15 @@ import { ResponseWrapper } from '../../shared';
 export class ServiceDialogComponent implements OnInit {
     public serviceKeys: Array<ServiceKeys> = [];
     public service: Service;
-    servicesNames: Array<string> = [];
-    isSaving: boolean;
-    typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'Kafka Connection'];
+    public servicesNames: Array<string> = [];
+    public isSaving: boolean;
     public serviceKeysKeys: Array<string> = [];
     public listVal: Array<String> = ['com.mysql.jdbc.Driver'];
+    public disableType: boolean;
+    public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
     private requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     private serviceKeysRemoveList: Array<ServiceKeys> = [];
-    // typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
-    showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,
@@ -48,14 +47,15 @@ export class ServiceDialogComponent implements OnInit {
         this.serviceService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.servicesNames = res.json.map((s) => s.name)
-                // this.servicesNames.splice(this.servicesNames.indexOf(this.service.name), 1);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
-        if (this.route.fragment['value'] === 'clone') {
-            this.service.id = null;
+        if (this.route.fragment['value'] && this.route.fragment['value'] !== 'clone') {
+            this.service.type = this.typeServices.find((st) => st === this.route.fragment['value']);
+            this.disableType = this.typeServices.some((st) => st === this.route.fragment['value']);
         }
-        this.loadServiceKeys();
+
+        this.loadServiceKeys(this.route.fragment['value'] === 'clone');
     }
 
     changeType() {
@@ -129,12 +129,16 @@ export class ServiceDialogComponent implements OnInit {
         }, 0);
     }
 
-    private loadServiceKeys() {
+    private loadServiceKeys(cloneHeader: boolean) {
         if (this.service.id) {
             this.serviceKeysService.query().subscribe((res) => {
                 this.serviceKeys = res.json.filter((sk) => sk.serviceId === this.service.id);
                 this.changeType();
+                this.service.id = cloneHeader ? null : this.service.id;
             });
+        }else if (this.service.type) {
+            this.changeType();
+            this.service.id = cloneHeader ? null : this.service.id;
         }
     }
 
@@ -212,7 +216,7 @@ export class ServiceDialogComponent implements OnInit {
                 ]
             },
             {
-                name: 'Kafka Connection',
+                name: 'MQ Connection',
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text' }
                 ]
