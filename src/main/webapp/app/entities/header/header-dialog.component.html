@@ -65,8 +65,8 @@
                                         <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
                                             <span class="fa fa-plus"></span>
                                         </button>
-                                        <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" [disabled]="headerKey.isRequired" queryParamsHandling="merge"
-                                            class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey?.id + '/delete'} }]">
+                                        <button type="button" title="Delete" *ngIf="headerKey.id" [disabled]="headerKey.isRequired" queryParamsHandling="merge"
+                                            class="btn btn-danger" (click)="deleteHeaderKeys(headerKey)">
                                             <span class="fa fa-trash"></span>
                                         </button>
                                         <button type="button" title="Remove" *ngIf="!headerKey.id" [disabled]="headerKey.isRequired" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
