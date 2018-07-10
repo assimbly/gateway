@@ -5,6 +5,8 @@ import { JhiEventManager } from 'ng-jhipster';
 
 import { Header } from './header.model';
 import { HeaderService } from './header.service';
+import { HeaderKeysService } from '../header-keys/header-keys.service';
+import { HeaderKeys } from '../header-keys';
 
 @Component({
     selector: 'jhi-header-detail',
@@ -12,13 +14,15 @@ import { HeaderService } from './header.service';
 })
 export class HeaderDetailComponent implements OnInit, OnDestroy {
 
-    header: Header;
+    public header: Header;
+    public headerKeys: Array<HeaderKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
         private eventManager: JhiEventManager,
         private headerService: HeaderService,
+        private headerKeysService: HeaderKeysService,
         private route: ActivatedRoute
     ) {
     }
@@ -30,9 +34,16 @@ export class HeaderDetailComponent implements OnInit, OnDestroy {
         this.registerChangeInHeaders();
     }
 
-    load(id) {
+    private load(id) {
         this.headerService.find(id).subscribe((header) => {
             this.header = header;
+            this.loadHeaderKeys(this.header.id);
+        });
+    }
+
+    private loadHeaderKeys(id: number) {
+        this.headerKeysService.query().subscribe((res) => {
+            this.headerKeys = res.json.filter((hk) => hk.headerId === id);
         });
     }
 

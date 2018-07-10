@@ -1,24 +1,24 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
-import { ServiceService } from './service.service';
+import { Header } from './header.model';
+import { HeaderService } from './header.service';
 import { Principal, ResponseWrapper } from '../../shared';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
-    selector: 'jhi-service-all',
-    templateUrl: './service-all.component.html'
+    selector: 'jhi-header-all',
+    templateUrl: './header-all.component.html'
 })
 
-export class ServiceAllComponent implements OnInit, OnDestroy {
-    public services: Array<Service> = [];
+export class HeaderAllComponent implements OnInit, OnDestroy {
+    public headers: Array<Header> = [];
     public page: any;
-    private currentAccount: any;
     private eventSubscriber: Subscription;
+    private currentAccount: any;
 
     constructor(
-        private serviceService: ServiceService,
+        private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private principal: Principal
@@ -26,34 +26,34 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.loadAllServices();
+        this.loadAllHeaders();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
-        this.registerChangeInServices();
+        this.registerChangeInHeaders();
     }
 
     reset() {
         this.page = 0;
-        this.services = [];
-        this.loadAllServices();
+        this.headers = [];
+        this.loadAllHeaders();
     }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    private registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', (response) => this.loadAllServices());
-    }
-
-    private loadAllServices() {
-        this.serviceService.query().subscribe(
+    private loadAllHeaders() {
+        this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
-                this.services = res.json;
+                this.headers = res.json;
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
+    }
+
+    private registerChangeInHeaders() {
+        this.eventSubscriber = this.eventManager.subscribe('headerListModification', () => this.loadAllHeaders());
     }
 
     private onError(error) {

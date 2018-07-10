@@ -21,7 +21,7 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" (change)="changeType()" #type="ngModel">
+            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType()" #type="ngModel">
                 <option [ngValue]="type" *ngFor="let type of typeServices">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
@@ -37,12 +37,8 @@
                             <th colspan="3" class="border-top-0">Service Keys</th>
                         </tr>
                         <tr>
-                            <td>
-                                <span>Key</span>
-                            </td>
-                            <td>
-                                <span>Value</span>
-                            </td>
+                            <td><span>Key</span></td>
+                            <td><span>Value</span></td>
                             <td></td>
                         </tr>
                     </thead>
@@ -110,10 +106,6 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
-        </button>
-        <button type="button" *ngIf="showEditButton" class="btn btn-primary" (click)="navigateToService()">
-            <span class="fa fa-pencil"></span>&nbsp;
-            <span>Edit Service Keys</span>
         </button>
         <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
             <span class="fa fa-save"></span>&nbsp;

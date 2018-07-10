@@ -14,8 +14,8 @@ import { ServiceKeys } from '../service-keys';
 })
 export class ServiceDetailComponent implements OnInit, OnDestroy {
 
-    service: Service;
-    serviceKeys: Array<ServiceKeys>;
+    public service: Service;
+    public serviceKeys: Array<ServiceKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
@@ -44,7 +44,7 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
     private loadServiceKeys(id: number) {
         this.serviceKeysService.query().subscribe((res) => {
             this.serviceKeys = res.json.filter((sk) => sk.serviceId === id);
-        })
+        });
     }
 
     ngOnDestroy() {
