@@ -115,6 +115,12 @@ export class ServiceDialogComponent implements OnInit {
         }
     }
 
+    deleteServiceKeys(serviceKey) {
+        this.serviceKeysService.delete(serviceKey.id).subscribe(() => {
+            this.removeServiceKeys(this.serviceKeys.indexOf(serviceKey));
+        })
+    }
+
     navigateToService() {
         this.router.navigate(['/service']);
         setTimeout(() => {

@@ -48,10 +48,6 @@ export class HeaderDialogComponent implements OnInit {
             (res: ResponseWrapper) => this.onError(res.json)
         );
 
-        /* if (this.route.fragment['value'] === 'showEditHeaderButton') {
-            this.showEditButton = true;
-        } */
-
         this.loadHeaderKeys(this.route.fragment['value'] === 'clone');
     }
 
@@ -68,6 +64,12 @@ export class HeaderDialogComponent implements OnInit {
             this.subscribeToSaveResponse(
                 this.headerService.create(this.header), closePopup);
         }
+    }
+
+    deleteHeaderKeys(headerKey) {
+        this.headerKeysService.delete(headerKey.id).subscribe((res) => {
+            this.removeHeaderKeys(this.headerKeys.indexOf(headerKey));
+        });
     }
 
     addHeaderKeys() {
