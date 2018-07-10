@@ -34,13 +34,12 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping(path = "/environment/{gatewayid}", produces = {"text/plain","application/xml", "application/json"})
+    @PostMapping(path = "/environment/{gatewayid}", produces = {"text/plain","application/xml", "application/json"}, consumes = {"text/plain","application/xml", "application/json"})
     @Timed
     public ResponseEntity<String> setGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @RequestBody String configuration) throws Exception {
 
        	try {        	
         	DBConfiguration.convertConfigurationToDB(gatewayid, mediaType, configuration);
-        	mediaType="text/plain";
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set");
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set",e);
@@ -95,7 +94,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/environment/{gatewayid}/flow/{flowid}", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/environment/{gatewayid}/flow/{flowid}", produces = {"text/plain","application/xml","application/json"}, consumes = {"text/plain","application/xml", "application/json"})
     @Timed
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {

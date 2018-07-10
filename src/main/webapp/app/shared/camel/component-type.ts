@@ -7,6 +7,7 @@ export const enum EndpointType {
     DIRECT = 'DIRECT',
     FILE = 'FILE',
     HTTP4 = 'HTTP4',
+    NETTY4 = 'NETTY4',
     KAFKA = 'KAFKA',
     REST = 'REST',
     SFTP = 'SFTP',
@@ -77,6 +78,28 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
         <b>Example</b>: http://servername:8080/orders<br/>
+    `
+    },
+    {
+        name: 'NETTY4',
+        assimblyTypeLink: `/component-netty4`,
+        camelTypeLink: `/components/camel-netty4/src/main/docs/netty4-component.adoc`,
+        uriPlaceholder: 'transport://hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: transport<br/>
+        <b>Description</b>: The network protocol to use (tcp or udp)<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Enumeration. Valid values: tcp, udp<br/>
+        <br/>
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Name of the server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Network port<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Example</b>: tcp://localhost:9999<br/>
     `
     },
     {
@@ -231,9 +254,9 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
-    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
-    wireTapTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
+    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
+    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
+    wireTapTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
 
 }
