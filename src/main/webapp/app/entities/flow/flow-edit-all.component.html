@@ -109,37 +109,37 @@
 											<div class="input-group">
 												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && fromEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(fromEndpoint)">
+													<button type="button" *ngIf="headerCreated && editFlowForm.controls.endpointsData.controls[0].controls.header.value" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(fromEndpoint, editFlowForm.controls.endpointsData.controls[0].controls.header)">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit header</span> -->
 													</button>
-													<button type="button" *ngIf="headerCreated && !fromEndpoint.headerId" class="btn btn-primary" title="New header"  (click)="createOrEditHeader(fromEndpoint)">
+													<button type="button" *ngIf="headerCreated && !editFlowForm.controls.endpointsData.controls[0].controls.header.value" class="btn btn-primary" title="New header"  (click)="createOrEditHeader(fromEndpoint, editFlowForm.controls.endpointsData.controls[0].controls.header)">
 														<!-- <span class="fa fa-pencil"></span>&nbsp;
 														<span>New header</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(fromEndpoint)">
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(fromEndpoint, editFlowForm.controls.endpointsData.controls[0].controls.header)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create header</span> -->
 													</button>
 												</div>
 											</div>
-										</div>										
+										</div>
 										<div class="form-group">
 											<label class="form-control-label" for="field_service">Service</label>
 											<div class="input-group">
 												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="serviceCreated && fromEndpoint.serviceId" class="btn btn-primary" title="Edit service"  (click)="createOrEditService(fromEndpoint)">
+													<button type="button" *ngIf="serviceCreated && editFlowForm.controls.endpointsData.controls[0].controls.service.value" class="btn btn-primary" title="Edit service"  (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm.controls.endpointsData.controls[0].controls.service)">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
 													</button>													
-													<button type="button" *ngIf="serviceCreated && !fromEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(fromEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[0].controls.service.disabled">
+													<button type="button" *ngIf="serviceCreated && !editFlowForm.controls.endpointsData.controls[0].controls.service.value" class="btn btn-primary" title="New service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm.controls.endpointsData.controls[0].controls.service)" [disabled]="editFlowForm.controls.endpointsData.controls[0].controls.service.disabled">
 														<!-- <span class="fa fa-pencil"></span>&nbsp;
 														<span>New header</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint)">													
+													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm.controls.endpointsData.controls[0].controls.service)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
 													</button>
@@ -213,16 +213,16 @@
 											<div class="input-group">
 												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && toEndpoint.headerId" title="Edit header" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="headerCreated && editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header.value" title="Edit header" class="btn btn-primary" (click)="createOrEditHeader(toEndpoint, editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-pencil  padding-button"></span>&nbsp;
 														<!-- <span>Edit header</span> -->
 													</button>
-													<button type="button" *ngIf="headerCreated && !toEndpoint.headerId" class="btn btn-primary"title="New header" (click)="createOrEditHeader(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="headerCreated && !editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header.value" class="btn btn-primary"title="New header" (click)="createOrEditHeader(toEndpoint, editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 														<!-- <span>New header</span> -->
 													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader(toEndpoint, editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create header</span> -->
 													</button>
@@ -235,15 +235,15 @@
 											<div class="input-group">
 												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="serviceCreated && toEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="serviceCreated && editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service.value" class="btn btn-primary" title="Edit service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
 													</button>
-													<button type="button" *ngIf="serviceCreated && !toEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service.disabled">
+													<button type="button" *ngIf="serviceCreated && !editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service.value" class="btn btn-primary" title="New service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service.disabled">
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 														<!-- <span>New service</span> -->
 													</button>
-													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(toEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
+													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm.controls.endpointsData.controls[toIndex+2].controls.service)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
 													</button>
@@ -323,16 +323,16 @@
 											<div class="input-group">
 												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header"id="field_header"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="headerCreated && errorEndpoint.headerId" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(errorEndpoint)">
+													<button type="button" *ngIf="headerCreated && editFlowForm.controls.endpointsData.controls[1].controls.header.value" class="btn btn-primary" title="Edit header" (click)="createOrEditHeader(errorEndpoint, editFlowForm.controls.endpointsData.controls[1].controls.header)">
 														<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit header</span> -->
 													</button>
-													<button type="button" *ngIf="headerCreated && !errorEndpoint.headerId" class="btn btn-primary" title="New header" (click)="createOrEditHeader(errorEndpoint)">
+													<button type="button" *ngIf="headerCreated && !editFlowForm.controls.endpointsData.controls[1].controls.header.value" class="btn btn-primary" title="New header" (click)="createOrEditHeader(errorEndpoint, editFlowForm.controls.endpointsData.controls[1].controls.header)">
 														<!-- <span class="fa fa-pencil"></span>&nbsp; -->
 														<!-- <span>New header</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header"  (click)="createOrEditHeader(errorEndpoint)">
+													<button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header"  (click)="createOrEditHeader(errorEndpoint, editFlowForm.controls.endpointsData.controls[1].controls.header)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create header</span> -->
 													</button>
@@ -344,16 +344,16 @@
 											<div class="input-group">
 												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
 												<div class="input-group-append">
-													<button type="button" *ngIf="serviceCreated && errorEndpoint.serviceId" class="btn btn-primary" title="Edit service" (click)="createOrEditService(errorEndpoint)">
+													<button type="button" *ngIf="serviceCreated && editFlowForm.controls.endpointsData.controls[1].controls.service.value" class="btn btn-primary" title="Edit service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm.controls.endpointsData.controls[1].controls.service)">
 															<span class="fa fa-pencil padding-button"></span>&nbsp;
 														<!-- <span>Edit service</span> -->
 													</button>
-													<button type="button" *ngIf="serviceCreated && !errorEndpoint.serviceId" class="btn btn-primary" title="New service" (click)="createOrEditService(errorEndpoint)" [disabled]="editFlowForm.controls.endpointsData.controls[1].controls.service.disabled">
+													<button type="button" *ngIf="serviceCreated && !editFlowForm.controls.endpointsData.controls[1].controls.service.value" class="btn btn-primary" title="New service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm.controls.endpointsData.controls[1].controls.service)" [disabled]="editFlowForm.controls.endpointsData.controls[1].controls.service.disabled">
 														<!-- <span class="fa fa-pencil"></span>&nbsp;
 														<span>New service</span> -->
 														<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
 													</button>
-													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(errorEndpoint)">
+													<button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service"  (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm.controls.endpointsData.controls[1].controls.service)">
 														<span class="fa fa-plus padding-button"></span>&nbsp;
 														<!-- <span>Create service</span> -->
 													</button>

@@ -14,7 +14,6 @@ import { Observable } from 'rxjs/Observable';
 })
 export class ServiceKeysComponent implements OnInit, OnChanges {
     @Input() serviceKeys: Array<ServiceKeys> = [];
-    @Input() serviceId: number;
     @Input() service: Service;
 
     serviceKeysKeys: Array<string> = [];
@@ -142,7 +141,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.subscribeToSaveResponse(
                 this.serviceKeysService.update(serviceKey), false, i);
         } else {
-            serviceKey.serviceId = this.serviceId;
+            serviceKey.serviceId = this.service.id;
             this.subscribeToSaveResponse(
                 this.serviceKeysService.create(serviceKey), true, i);
         }

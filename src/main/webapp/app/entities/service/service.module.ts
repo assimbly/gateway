@@ -13,9 +13,11 @@ import {
     ServicePopupComponent,
     ServiceDeletePopupComponent,
     ServiceDeleteDialogComponent,
+    ServiceAllComponent,
     serviceRoute,
     servicePopupRoute,
-    ForbiddenServiceNamesValidatorDirective
+    ForbiddenServiceNamesValidatorDirective,
+    ForbiddenServiceKeysValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 const ENTITY_STATES = [
@@ -34,15 +36,18 @@ const ENTITY_STATES = [
     ],
     declarations: [
         ServiceComponent,
+        ServiceAllComponent,
         ServiceDetailComponent,
         ServiceDialogComponent,
         ServiceDeleteDialogComponent,
         ServicePopupComponent,
         ServiceDeletePopupComponent,
-        ForbiddenServiceNamesValidatorDirective
+        ForbiddenServiceNamesValidatorDirective,
+        ForbiddenServiceKeysValidatorDirective
     ],
     entryComponents: [
         ServiceComponent,
+        ServiceAllComponent,
         ServiceDialogComponent,
         ServicePopupComponent,
         ServiceDeleteDialogComponent,
