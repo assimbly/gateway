@@ -5,6 +5,8 @@ import { JhiEventManager } from 'ng-jhipster';
 
 import { Service } from './service.model';
 import { ServiceService } from './service.service';
+import { ServiceKeysService } from '../service-keys/service-keys.service';
+import { ServiceKeys } from '../service-keys';
 
 @Component({
     selector: 'jhi-service-detail',
@@ -12,13 +14,15 @@ import { ServiceService } from './service.service';
 })
 export class ServiceDetailComponent implements OnInit, OnDestroy {
 
-    service: Service;
+    public service: Service;
+    public serviceKeys: Array<ServiceKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
         private eventManager: JhiEventManager,
         private serviceService: ServiceService,
+        private serviceKeysService: ServiceKeysService,
         private route: ActivatedRoute
     ) {
     }
@@ -30,9 +34,16 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
         this.registerChangeInServices();
     }
 
-    load(id) {
+    private load(id) {
         this.serviceService.find(id).subscribe((service) => {
             this.service = service;
+            this.loadServiceKeys(this.service.id);
+        });
+    }
+
+    private loadServiceKeys(id: number) {
+        this.serviceKeysService.query().subscribe((res) => {
+            this.serviceKeys = res.json.filter((sk) => sk.serviceId === id);
         });
     }
 
