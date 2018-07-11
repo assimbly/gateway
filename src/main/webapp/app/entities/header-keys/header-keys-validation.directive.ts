@@ -5,12 +5,11 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
     selector: '[jhiExistingHeaderKeys]',
     providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenHeaderKeysValidatorDirective, multi: true }]
 })
-
 export class ForbiddenHeaderKeysValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
     @Input('jhiExistingHeaderKeys') existingKeys: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-    return this.existingKeys.some((k) => k === control.value) ? { 'existingHeaderKeys': true } : null;
-}
+        return this.existingKeys.some((k) => k === control.value) ? { 'existingHeaderKeys': true } : null;
+    }
 }

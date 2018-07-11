@@ -11,7 +11,6 @@ import { HeaderPopupService } from './header-popup.service';
 import { HeaderService } from './header.service';
 import { ResponseWrapper } from '../../shared';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { HeaderKeysService } from '../header-keys/header-keys.service';
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -21,16 +20,14 @@ export class HeaderDialogComponent implements OnInit {
 
     header: Header;
     headers: Header[];
-    headerNames: Array<string> = [];
-    headerKeys: Array<HeaderKeys> = [];
-    headerKeysKeys: Array<String> = [];
+    headerNames: Array<string>;
+    headerKeys: HeaderKeys;
     isSaving: boolean;
-    public typeHeader: string[] = ['constant', 'xpath'];
+    showEditButton = false;
 
     constructor(
         public activeModal: NgbActiveModal,
         private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private route: ActivatedRoute,
@@ -39,16 +36,19 @@ export class HeaderDialogComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.headerKeys = new HeaderKeys();
         this.isSaving = false;
-        this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
-                this.headerNames = this.headers.map((h) => h.name);
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-
-        this.loadHeaderKeys(this.route.fragment['value'] === 'clone');
+        this.headerService.query()
+            .subscribe((res: ResponseWrapper) => {
+            this.headers = res.json;
+            this.headerNames = this.headers.map((h) => h.name);
+            }, (res: ResponseWrapper) => this.onError(res.json));
+        if (this.route.fragment['value'] === 'showEditHeaderButton') {
+            this.showEditButton = true;
+        }
+        if (this.route.fragment['value'] === 'clone') {
+            this.header.id = null;
+        }
     }
 
     clear() {
@@ -66,28 +66,6 @@ export class HeaderDialogComponent implements OnInit {
         }
     }
 
-    deleteHeaderKeys(headerKey) {
-        this.headerKeysService.delete(headerKey.id).subscribe((res) => {
-            this.removeHeaderKeys(this.headerKeys.indexOf(headerKey));
-        });
-    }
-
-    addHeaderKeys() {
-        const newHeaderKeys = new HeaderKeys();
-        newHeaderKeys.isDisabled = false;
-        newHeaderKeys.type = this.typeHeader[0];
-        this.headerKeys.push(newHeaderKeys);
-        this.mapHeaderKeysKeys();
-    }
-
-    removeHeaderKeys(i: number) {
-        this.headerKeys.splice(i, 1);
-        this.mapHeaderKeysKeys();
-        if (this.headerKeys.length === 0) {
-            this.addHeaderKeys();
-        }
-    }
-
     navigateToHeader() {
         this.router.navigate(['/header']);
         setTimeout(() => {
@@ -100,28 +78,6 @@ export class HeaderDialogComponent implements OnInit {
         setTimeout(() => {
             this.activeModal.close();
         }, 0);
-    }
-
-    private mapHeaderKeysKeys() {
-        if (typeof this.headerKeys !== 'undefined') {
-            this.headerKeysKeys = this.headerKeys.map((hk) => hk.key);
-            this.headerKeysKeys = this.headerKeysKeys.filter((k) => k !== undefined);
-        }
-    }
-
-    private loadHeaderKeys(cloneHeader: boolean) {
-        if (this.header.id) {
-            this.headerKeysService.query().subscribe((res) => {
-                this.headerKeys = res.json.filter((hk) => hk.headerId === this.header.id);
-                if (this.headerKeys.length === 0) {
-                    this.headerKeys.push(new HeaderKeys());
-                }
-                this.header.id = cloneHeader ? null : this.header.id;
-            });
-        }else {
-            this.headerKeys.push(new HeaderKeys());
-            this.header.id = cloneHeader ? null : this.header.id;
-        }
     }
 
     private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
@@ -139,19 +95,6 @@ export class HeaderDialogComponent implements OnInit {
         } else if (closePopup) {
             this.activeModal.dismiss(result);
         }
-
-        this.headerKeys.forEach((headerKey) => {
-            headerKey.headerId = result.id;
-            if (headerKey.id) {
-                this.headerKeysService.update(headerKey).subscribe((hk) => {
-                    headerKey = hk;
-                });
-            } else {
-                this.headerKeysService.create(headerKey).subscribe((hk) => {
-                    headerKey = hk;
-                });
-            }
-        });
     }
 
     private onSaveError() {

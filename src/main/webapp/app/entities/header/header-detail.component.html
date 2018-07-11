@@ -1,66 +1,35 @@
-<div class="container" *ngIf="header">
-    <h2><span>Header</span> {{header.id}}</h2>
+<div *ngIf="header">
+    <h2>
+        <span>Header</span> {{header.id}}</h2>
+    <hr>
     <jhi-alert-error></jhi-alert-error>
-    
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th colspan="2">Details for {{header.name}} header</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="detailsTable">ID</th>
-                    <td class="detailsTable">{{header.id}}</td>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <td>{{header.name}}</td>
-                </tr>
-            </tbody>
-        </table>
+    <dl class="row-md jh-entity-details">
+        <dt>
+            <span>Name</span>
+        </dt>
+        <dd>
+            <span>{{header.name}}</span>
+        </dd>
+    </dl>
 
-        <table class="table table-sm table-bordered" colspan="2">
-            <thead>
-                <tr class="table-active">
-                    <th colspan="3">Header Keys</th>
-                </tr>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let headerKey of headerKeys; let i = index" [ngClass]="{'lastItemBorder' : (headerKeys.length - 1 === i)}">
-                    <td>{{headerKey.key}}</td>
-                    <td>{{headerKey.value}}</td>
-                    <td>{{headerKey.type}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <button type="button" [routerLink]="['/header']" class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;
+        <span> Back</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+        class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;
+        <span> Edit</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+        fragment="clone" class="btn btn-info">
+        <span class="fa fa-clone"></span>&nbsp;
+        <span> Clone</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+        class="btn btn-danger">
+        <span class="fa fa-remove"></span>
+        <span class="d-none d-md-inline">Delete</span>
+    </button>
 
-    <div class="float-right">
-        <button type="button" [routerLink]="['/header']" class="btn btn-info">
-            <span class="fa fa-arrow-left"></span>&nbsp;
-            <span> Back</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
-            class="btn btn-primary">
-            <span class="fa fa-pencil"></span>&nbsp;
-            <span> Edit</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
-            fragment="clone" class="btn btn-info">
-            <span class="fa fa-clone"></span>&nbsp;
-            <span> Clone</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
-            class="btn btn-danger">
-            <span class="fa fa-remove"></span>
-            <span class="d-none d-md-inline">Delete</span>
-        </button>
-    </div>
 </div>

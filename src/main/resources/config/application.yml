@@ -89,7 +89,7 @@ jhipster:
         default-include-pattern: /api/.*
         title: gateway API
         description: gateway API documentation
-        version: 0.7.0
+        version: 0.6.0
         terms-of-service-url:
         contact-name:
         contact-url:

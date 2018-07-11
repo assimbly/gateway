@@ -5,20 +5,11 @@ import { HeaderComponent } from './header.component';
 import { HeaderDetailComponent } from './header-detail.component';
 import { HeaderPopupComponent } from './header-dialog.component';
 import { HeaderDeletePopupComponent } from './header-delete-dialog.component';
-import { HeaderAllComponent } from './header-all.component';
 
 export const headerRoute: Routes = [
     {
-        path: 'header/all',
-        component: HeaderComponent,
-        data: {
-            authorities: ['ROLE_USER'],
-            pageTitle: 'Headers'
-        },
-        canActivate: [UserRouteAccessService]
-    }, {
         path: 'header',
-        component: HeaderAllComponent,
+        component: HeaderComponent,
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'Headers'

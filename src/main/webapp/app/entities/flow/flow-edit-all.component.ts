@@ -71,11 +71,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     invalidUriMessage: string;
 
     fromFilterService: Array<Service> = [];
-    fromServiceType: string;
     toFilterService: Array<Array<Service>> = [[]];
-    toServiceType: Array<string> = [];
     errorFilterService: Array<Service> = [];
-    errorServiceType: string;
     selectedService: Service = new Service();
     closeResult: string;
 
@@ -240,14 +237,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     filterServices(endpoint: any) {
         if (endpoint instanceof ToEndpoint) {
-            this.toServiceType[this.toEndpoints.indexOf(endpoint)] = this.returnServiceType(endpoint.type);
-            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.toServiceType[this.toEndpoints.indexOf(endpoint)]);
+            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
         } else if (endpoint instanceof FromEndpoint) {
-            this.fromServiceType = this.returnServiceType(endpoint.type);
-            this.fromFilterService = this.services.filter((f) => f.type === this.fromServiceType);
+            this.fromFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
         } else if (endpoint instanceof ErrorEndpoint) {
-            this.errorServiceType = this.returnServiceType(endpoint.type);
-            this.errorFilterService = this.services.filter((f) => f.type === this.errorServiceType);
+            this.errorFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
         }
     }
 
@@ -263,6 +257,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else {
             return '';
         }
+
     }
 
     setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
@@ -507,48 +502,44 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    createOrEditHeader(endpoint, formHeader: FormControl) {
-        endpoint.headerId = formHeader.value;
-        (endpoint.headerId) ?
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
+    createOrEditHeader(endpoint) {
+        (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
-            (res) => this.setHeader(endpoint, res, formHeader)
+            (res) => this.setHeader(endpoint, res)
         );
     }
 
-    createOrEditService(endpoint, serviceType: string, formService: FormControl) {
+    createOrEditService(endpoint) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: serviceType }) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: serviceType });
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
         this.eventManager.subscribe(
             'serviceModified',
-            (res) => this.setService(endpoint, res, formService)
+            (res) => this.setService(endpoint, res)
         );
     }
 
-    setHeader(endpoint, id, formHeader: FormControl) {
+    setHeader(endpoint, id) {
         this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.headers = res.json;
                 this.headerCreated = this.headers.length > 0;
                 endpoint.headerId = this.headers.find((h) => h.id === id.content).id;
-                formHeader.patchValue(endpoint.headerId);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
     }
 
-    setService(endpoint, id, formService: FormControl) {
+    setService(endpoint, id) {
         this.serviceService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.services = res.json;
                 this.serviceCreated = this.services.length > 0;
                 endpoint.serviceId = this.services.find((s) => s.id === id.content).id;
-                formService.patchValue(endpoint.serviceId);
-                this.filterServices(endpoint);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );

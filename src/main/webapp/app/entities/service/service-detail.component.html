@@ -1,65 +1,28 @@
-<div class="container" *ngIf="service">
+<div *ngIf="service">
     <h2><span>Service</span> {{service.id}}</h2>
+    <hr>
     <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Name</span></dt>
+        <dd><span>{{service.name}}</span></dd>
+        <dt><span>Type</span></dt>
+        <dd><span>{{service.type}}</span></dd>
+    </dl>
 
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th colspan="2">Details for {{service.name}} service</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="detailsTable">ID</th>
-                    <td class="detailsTable">{{service.id}}</td>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <td>{{service.name}}</td>
-                </tr>
-                <tr class="lastItemBorder">
-                    <th>Type</th>
-                    <td>{{service.type}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table class="table table-sm table-bordered" colspan="2">
-            <thead>
-                <tr class="table-active">
-                    <th colspan="2">Service Keys</th>
-                </tr>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let serviceKey of serviceKeys; let i = index" [ngClass]="{'lastItemBorder' : (serviceKeys.length - 1 === i)}">
-                    <td>{{serviceKey.key}}</td>
-                    <td>{{serviceKey.value}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="float-right">
-        <button type="button" [routerLink]="['/service']" class="btn btn-info">
-            <span class="fa fa-arrow-left"></span>&nbsp;
-            <span> Back</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary">
-            <span class="fa fa-pencil"></span>&nbsp;
-            <span> Edit</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info">
-            <span class="fa fa-clone"></span>&nbsp;
-            <span> Clone</span>
-        </button>
-        <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger">
-            <span class="fa fa-remove"></span>
-            <span class="d-none d-md-inline">Delete</span>
-        </button>    
-    </div>
+    <button type="button" [routerLink]="['/service']" class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;
+        <span> Back</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;
+        <span> Edit</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info">
+        <span class="fa fa-clone"></span>&nbsp;
+        <span> Clone</span>
+    </button>
+    <button type="button" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger">
+        <span class="fa fa-remove"></span>
+        <span class="d-none d-md-inline">Delete</span>
+    </button>
 </div>
