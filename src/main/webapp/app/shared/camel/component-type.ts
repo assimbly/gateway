@@ -280,7 +280,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
-          </flows>
+         </flows>
         </connector>
        </connectors>
        `
@@ -332,7 +332,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
-          </flows>
+         </flows>
         </connector>
        </connectors>
        `
@@ -365,6 +365,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -397,6 +398,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -429,6 +431,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -461,6 +464,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -493,6 +497,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -525,6 +530,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -557,6 +563,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -589,6 +596,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -621,6 +629,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -653,6 +662,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
@@ -685,6 +695,7 @@ export const flowExamples = [
             <uri>file://C:/Test2</uri>
            </to>
           </flow>
+         </flows>
         </connector>
        </connectors>
        `
