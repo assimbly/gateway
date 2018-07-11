@@ -14,6 +14,7 @@ import {
     UserMgmtDialogComponent,
     UserMgmtDeleteDialogComponent,
     LogsComponent,
+    LogViewerComponent,
     JhiMetricsMonitoringModalComponent,
     JhiMetricsMonitoringComponent,
     JhiHealthModalComponent,
@@ -25,9 +26,11 @@ import {
     JhiHealthService,
     JhiMetricsService,
     LogsService,
+    LogViewerService,
     UserResolvePagingParams,
     UserResolve,
-    UserModalService
+    UserModalService,
+    LogViewerLineValidationDirective
 } from './';
 
 @NgModule({
@@ -45,12 +48,14 @@ import {
         UserMgmtDialogComponent,
         UserMgmtDeleteDialogComponent,
         LogsComponent,
+        LogViewerComponent,
         JhiConfigurationComponent,
         JhiHealthCheckComponent,
         JhiHealthModalComponent,
         JhiDocsComponent,
         JhiMetricsMonitoringComponent,
-        JhiMetricsMonitoringModalComponent
+        JhiMetricsMonitoringModalComponent,
+        LogViewerLineValidationDirective
     ],
     entryComponents: [
         UserMgmtDialogComponent,
@@ -64,6 +69,7 @@ import {
         JhiHealthService,
         JhiMetricsService,
         LogsService,
+        LogViewerService,
         UserResolvePagingParams,
         UserResolve,
         UserModalService
