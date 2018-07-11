@@ -97,8 +97,12 @@ enum EndpointType {
    ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
 }
 
+relationship OneToOne {
+	MessageGateway{wiretapEndpint} to WireTapEndpoint
+}
+
 relationship OneToMany {
-	MessageGateway{flowRoute} to Flow
+	MessageGateway{flow} to Flow
 }
 
 relationship OneToMany {
