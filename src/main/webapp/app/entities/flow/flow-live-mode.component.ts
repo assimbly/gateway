@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FlowService } from './flow.service';
 import { FormGroup, FormControl } from '@angular/forms';
+import { flowExamples } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-flow-live-mode',
@@ -10,14 +10,21 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class FlowLiveModeComponent implements OnInit {
 
     public xmlEditor: string;
+    public nameTypeFlow: string;
     public flowId: number;
     public liveModeForm: FormGroup;
     public configuration: any;
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
+    public flowExamples: Array<FlowExamples> = flowExamples;
+    public selectedFlowExample: FlowExamples = new FlowExamples();
+    public test: Array<FlowExamples>;
+    public flowExampleListName: any[] = [];
+    public flowExampleListType: any[] = [];
+    public status = false;
     public hasLoadError: boolean;
     private hintText =
-`<!--
+        `<!--
     Use this editor to configure flows in a text editor.
     The live mode can be use to try out new flows.
     A flows running in live mode is not persistent.
@@ -30,14 +37,10 @@ export class FlowLiveModeComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.flowExampleListName = this.flowExamples.map((x) => x.name).filter((v, i, a) => a.indexOf(v) === i);
+        this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
         this.initializeLiveModeForm();
         this.xmlEditor = this.hintText;
-    }
-
-    onChange() {
-        /* if (this.xmlEditor === '') {
-            this.xmlEditor = this.hintText;
-        } */
     }
 
     removeHintText() {
@@ -51,7 +54,29 @@ export class FlowLiveModeComponent implements OnInit {
             'flowId': new FormControl(this.flowId)
         });
     }
-
+    addExample() {
+        // this.selectedFlowExample
+        if (this.selectedFlowExample.flowtypeFile === 'XML') {
+            this.status = false;
+            this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
+        } else {
+            this.status = true;
+            if (this.xmlEditor !== '') {
+                this.xmlEditor = this.hintText;
+            }
+        }
+        /* this.flowExamples.forEach((f) => {
+            if (t === 'XML') {
+                this.status = false;
+                this.xmlEditor = f.fileExample;
+            } else if (t === 'JSON' || t === 'YAML') {
+                this.status = true;
+                if (this.xmlEditor !== '') {
+                    this.xmlEditor = this.hintText;
+                }
+            }
+        }); */
+    }
     setLiveConfiguration() {
         this.flowId = this.liveModeForm.controls.flowId.value;
         this.flowService.setConfiguration(this.flowId, this.xmlEditor, 'application/xml')
@@ -72,7 +97,17 @@ export class FlowLiveModeComponent implements OnInit {
                 this.showInfoMessage(false);
             });
     }
-
+    saveFlows() {
+        this.flowId = this.liveModeForm.controls.flowId.value;
+        this.flowService.saveFlows(this.flowId, this.xmlEditor, 'application/xml')
+            .map((response) => response.text())
+            .subscribe((response) => {
+                this.configuration = response;
+                this.showInfoMessage(true);
+            }, (err) => {
+                this.showInfoMessage(false);
+            });
+    }
     showInfoMessage(isSuccess) {
         isSuccess ? this.isConfigurationSet = true : this.hasLoadError = true;
         setTimeout(() => {
@@ -165,4 +200,9 @@ export class ConfiguredFlow {
     isFlowResumed: boolean;
     isFlowStopped: boolean;
     isFlowRestarted: boolean;
+}
+export class FlowExamples {
+    name: string;
+    flowtypeFile: string;
+    fileExample: string;
 }

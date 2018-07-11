@@ -104,7 +104,7 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.loadFlows();
                 if (!this.multipleGateways) {
                     this.singleGatewayName = this.gateways[0].name;
-                    this.singleGatewayStage = this.gateways[0].stage.toString().toLowerCase();
+                    this.singleGatewayStage = this.gateways[0].stage ? this.gateways[0].stage.toString().toLowerCase() : '';
                 }
             });
     }

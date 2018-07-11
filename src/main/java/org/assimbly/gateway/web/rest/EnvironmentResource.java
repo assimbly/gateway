@@ -8,6 +8,8 @@ import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -25,7 +27,8 @@ public class EnvironmentResource {
     private DBConfiguration DBConfiguration;
     
 	private String configuration;
-    
+
+    private final Logger log = LoggerFactory.getLogger(EnvironmentResource.class);
 	/**
      * POST  /configuration/{gatewayid}/setconfiguration : Set configuration from XML.
      *
@@ -79,7 +82,11 @@ public class EnvironmentResource {
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
-       	try {
+        log.debug("*************** mediaType {}", mediaType);
+        log.debug("*************** gatewayid {}", gatewayid);
+        log.debug("*************** flowid {}", flowid);
+        log.debug("*************** configuration {}", configuration);   
+        try {
        		DBConfiguration.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set");
    		} catch (Exception e) {
