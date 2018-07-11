@@ -18,12 +18,14 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.WireTapEndpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.repository.WireTapEndpointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,9 @@ public class DBConfiguration {
 	@Autowired
     private GatewayRepository gatewayRepository;
 
+	@Autowired
+    private WireTapEndpointRepository wireTapEndpointRepository;
+	
 	@Autowired
     private FlowRepository flowRepository;
 
@@ -102,6 +107,8 @@ public class DBConfiguration {
 	private Set<HeaderKeys> headerKeys;
 
 	private long headerIdLong;
+
+	private Element offloading;
 	
 	public List<TreeMap<String,String>> convertDBToConfiguration(Long gatewayid) throws Exception {
 
@@ -502,7 +509,7 @@ public class DBConfiguration {
 	}
 
 	//XML set methods
-	private void setGeneralPropertiesFromDB(String connectorId) throws ParserConfigurationException {
+	private void setGeneralPropertiesFromDB(String connectorId) throws Exception {
 
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -518,19 +525,43 @@ public class DBConfiguration {
 	    id.appendChild(doc.createTextNode(connectorId));
 	    connector.appendChild(id);
 	    
+	    offloading = doc.createElement("offloading");
 	    flows = doc.createElement("flows");
 	    services = doc.createElement("services");
 	    headers = doc.createElement("headers");
 	    
+	    connector.appendChild(offloading);
 	    connector.appendChild(flows);
 	    connector.appendChild(services);
 	    connector.appendChild(headers);
 	    
+		setOffloadingPropertiesFromDB(connectorId);
+		
 	    servicesList = new ArrayList<String>();
 	    headersList = new ArrayList<String>();    
 		
 	}
-	
+
+	private void setOffloadingPropertiesFromDB(String connectorId) throws Exception {
+
+	    WireTapEndpoint wiretapEndpoint = wireTapEndpointRepository.findOne(1L);
+	    
+	    //set id
+	    String offloadingId = wiretapEndpoint.getId().toString();	    
+	    Element id = doc.createElement("id");
+	    id.appendChild(doc.createTextNode(offloadingId));
+	    offloading.appendChild(id);
+
+	    //set name
+	    String offloadingName = "offloading";	    
+	    Element name = doc.createElement("name");
+	    name.appendChild(doc.createTextNode(offloadingName));
+	    offloading.appendChild(name);
+	    
+	    setWireTapEndpointFromDB(wiretapEndpoint);
+	    
+	    
+	}
 	
 	private void setFlowPropertiesFromDB(Flow flowDB) throws Exception {
 
@@ -555,6 +586,87 @@ public class DBConfiguration {
 	    setErrorEndpointFromDB(errorEndpoint);
 	    
 	}
+
+	private void setWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
+
+		String confUri = wireTapEndpointDB.getUri();
+		String confcomponentType = wireTapEndpointDB.getType().toString();
+		String confOptions = wireTapEndpointDB.getOptions();
+		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
+		Header confHeader = wireTapEndpointDB.getHeader();
+
+		if(confUri!=null) {
+
+		    Element uri = doc.createElement("uri");
+		    offloading.appendChild(uri);
+			
+			componentType = confcomponentType.toLowerCase();
+			
+			if(componentType.equals("file")||componentType.equals("sftp")) {
+				componentType = componentType + "://";
+			}else if(componentType.equals("http")) {
+				componentType = "http4://";			
+			}else {
+				componentType = componentType + ":";
+			}			
+
+			confUri = componentType + confUri;
+		    uri.setTextContent(confUri);	
+		    offloading.appendChild(uri);
+				
+			if(confOptions!=null && !confOptions.isEmpty()) {
+				
+			    Element options = doc.createElement("options");
+			    offloading.appendChild(options);
+			    
+			    String[] confOptionsSplitted = confOptions.split("&");
+			    
+			    if(confOptionsSplitted.length>1) {
+			    
+				    for(String confOption : confOptionsSplitted) {
+				    	String[] confOptionSplitted = confOption.split("=");
+	
+				    	if(confOptionSplitted.length>0){
+				    		Element option = doc.createElement(confOptionSplitted[0]);
+						    option.setTextContent(confOptionSplitted[1]);	
+				    		options.appendChild(option);
+				    	}
+				    }
+			    }else {
+			    	
+			    	String[] confOptionSplitted = confOptions.split("=");
+			    	
+			    	if(confOptionSplitted.length>0){
+			    		Element option = doc.createElement(confOptionSplitted[0]);
+					    option.setTextContent(confOptionSplitted[1]);	
+			    		options.appendChild(option);
+			    	}
+		    	
+			    }
+			}
+			
+		    if(confService!=null) {
+		    	String confServiceId = confService.getId().toString();
+			    Element serviceId = doc.createElement("service_id");
+			    
+			    serviceId.setTextContent(confServiceId);
+			    offloading.appendChild(serviceId);
+			    setServiceFromDB(confServiceId, "wireTap", confService);
+			}
+
+		    if(confHeader!=null) {
+		    	String confHeaderId = confService.getId().toString();
+			    Element headerId = doc.createElement("service_id");
+		    	
+			    offloading.appendChild(headerId);
+			    headerId.setTextContent(confHeaderId);
+			    setHeaderFromDB(confHeaderId, "wireTap", confHeader);
+			}
+
+			
+		}
+	}
+
 	
 	private void setFromEndpointFromDB(FromEndpoint fromEndpointDB) throws Exception {
 
@@ -813,8 +925,7 @@ public class DBConfiguration {
 		    header.appendChild(id);
 
 		    Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
-		    
-		    
+		    		    
 			for(HeaderKeys headerKey : headerKeys) {
 				String parameterName = headerKey.getKey();
 				String parameterValue = headerKey.getValue();
