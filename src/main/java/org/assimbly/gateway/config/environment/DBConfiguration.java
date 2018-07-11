@@ -141,9 +141,9 @@ public class DBConfiguration {
 	   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 
 	   if(mediaType.contains("json")) {
-			configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
+			configuration = ConvertUtil.convertJsonToXml(xmlConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
+			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
 		}else {
 			configuration = xmlConfiguration;
 		}
@@ -175,9 +175,9 @@ public class DBConfiguration {
 	   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 
 	   if(mediaType.contains("json")) {
-			configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
+			configuration = ConvertUtil.convertJsonToXml(xmlConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
+			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
 		}else {
 			configuration = xmlConfiguration;
 		}
@@ -228,7 +228,7 @@ public class DBConfiguration {
 		   if(mediaType.contains("json")) {
 				configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
 			}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-				configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
+				//xmlConfiguration = ConvertUtil.convertXmltoYaml(flowConfiguration);
 			}else {
 				configuration = xmlConfiguration;
 			}
@@ -245,7 +245,7 @@ public class DBConfiguration {
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(configuration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			xmlConfiguration = ConvertUtil.convertYamlToXml(configuration);
+			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
 		}else {
 			xmlConfiguration = configuration;
 		}
@@ -273,7 +273,7 @@ public class DBConfiguration {
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(flowConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			xmlConfiguration = ConvertUtil.convertYamlToXml(flowConfiguration);
+			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
 		}else {
 			xmlConfiguration = flowConfiguration;
 		}
@@ -573,13 +573,7 @@ public class DBConfiguration {
 	    Element id = doc.createElement("id");
 	    id.appendChild(doc.createTextNode(flowId));
 	    flow.appendChild(id);
-
-	    //set name
-	    String flowName = flowDB.getName();	    
-	    Element name = doc.createElement("name");
-	    name.appendChild(doc.createTextNode(flowName));
-	    flow.appendChild(name);
-	    
+   
 	    //set endpoints
 	    setFromEndpointFromDB(fromEndpoint);
 	    setToEndpointsFromDB(toEndpoints);
@@ -960,7 +954,7 @@ public class DBConfiguration {
 		       flow.setGateway(gateway);
 	       }
 	       
-	       if(flowName==null || flowName.isEmpty()) {
+	       if(flowName==null) {
 	    	   flow.setName(flowId);   
 	       }else {
 	    	   flow.setName(flowName);

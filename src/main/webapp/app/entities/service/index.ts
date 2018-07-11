@@ -7,5 +7,3 @@ export * from './service-detail.component';
 export * from './service.component';
 export * from './service.route';
 export * from './service-validation.directive';
-export * from './service-keys-validation.directive';
-export * from './service-all.component';

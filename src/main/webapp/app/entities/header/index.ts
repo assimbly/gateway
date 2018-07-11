@@ -7,5 +7,3 @@ export * from './header-detail.component';
 export * from './header.component';
 export * from './header.route';
 export * from './header-validation.directive';
-export * from './header-all.component';
-export * from './header-keys-validation.directive';
