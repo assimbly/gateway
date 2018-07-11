@@ -329,3 +329,6 @@ custom assimbly css
 .popover {
     max-width: 21%;
 }
+.border-bottom-none{
+    border-bottom:none !important;
+}

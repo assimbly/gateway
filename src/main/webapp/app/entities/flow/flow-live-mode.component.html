@@ -1,42 +1,68 @@
 <div class="container">
-    <h2>Live mode</h2>
+    <h2>Editor mode</h2>
     <hr>
     <div>
-        <form [formGroup]="liveModeForm" (ngSubmit)="setLiveConfiguration()">
+        <form [formGroup]="liveModeForm" (ngSubmit)="saveFlows()">
             <div class="form-group">
-                <label for="xmlEditor">XML configuration</label>
-                <div ace-editor
-                    [(text)]="xmlEditor"
-                    [mode]="'XML'"
-                    [theme]="'xcode'"
-                    [options]="{maxLines: 'Infinity'}"
-                    (textChanged)="onChange()"
-                    (click)="removeHintText()"
-                    style="min-height: 250px; width:100%; overflow: auto; border: 1px solid #ced4da"></div>
+                <label for="xmlEditor">Configuration</label>
+                <div ace-editor [(text)]="xmlEditor" [mode]="'XML'" [theme]="'xcode'" [options]="{maxLines: 'Infinity'}"
+                    (click)="removeHintText()" style="min-height: 250px; width:100%; overflow: auto; border: 1px solid #ced4da"></div>
             </div>
             <div class="form-group">
                 <label for="flowId">Flow ID</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="flowId" formControlName="flowId">
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary">Load</button>
+                <div class="row">
+                    <div class="col-10">
+                        <input type="text" class="form-control" id="flowId" formControlName="flowId">
                     </div>
+                    <div class="col-2 text-right">
+
+                        <button type="button" (click)="setLiveConfiguration()" class="btn btn-primary">Run live</button>
+
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
                 </div>
+
+
             </div>
         </form>
     </div>
-
-    <div class="float-right">
-        <button type="button" [routerLink]="['/']" class="btn btn-info">
-            <span class="fa fa-arrow-left"></span>&nbsp;
-            <span> Back</span>
-        </button>
+    <div class="row">
+        <div class="col-3">
+            <button type="button" [routerLink]="['/']" class="btn btn-info">
+                <span class="fa fa-arrow-left"></span>&nbsp;
+                <span> Back</span>
+            </button>
+        </div>
+        <div class="col-3">
+            <select class="form-control" name="flowExamleName" [(ngModel)]="selectedFlowExample.name">
+                <option [ngValue]="t" *ngFor="let t of flowExampleListName">{{t}}</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col-8">
+                    <select class="form-control" name="flowExamleType" [(ngModel)]="selectedFlowExample.flowtypeFile">
+                        <option [ngValue]="f" *ngFor="let f of flowExampleListType">{{f}}</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-primary float-right" (click)="addExample()" [disabled]="!selectedFlowExample.flowtypeFile || !selectedFlowExample.name">
+                        <span class="fa fa-plus"></span>&nbsp;
+                        <span> Add example</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-
     <div *ngIf="hasLoadError">
         <hr>
         <p class="float-left text-danger">Live configuration for flow {{flowId}} is NOT set.</p>
     </div>
+    <div *ngIf="status">
+            <hr>
+            <p class="float-left text-danger">JSON, YAML don't exist</p>
+        </div>
 
     <div *ngIf="isConfigurationSet">
         <hr>
@@ -55,7 +81,7 @@
                 <tr *ngFor="let configuredFlow of configuredFlows">
                     <td>{{configuredFlow.flowId}}</td>
                     <td>
-                        <div class="btn-group flex-btn-group-container flow-btns justify-content-center">    
+                        <div class="btn-group flex-btn-group-container flow-btns justify-content-center">
                             <button type="button" (click)="start(configuredFlow)" class="btn btn-info btn-sm" *ngIf="!configuredFlow.isFlowStarted">
                                 <span class="fa fa-play"></span>
                                 <span class="d-none d-md-inline">Start</span>
@@ -64,7 +90,8 @@
                                 <span class="fa fa-refresh"></span>
                                 <span class="d-none d-md-inline">Restart</span>
                             </button>
-                            <button type="button" (click)="pause(configuredFlow)" class="btn btn-warning btn-sm" [disabled]="!configuredFlow.isFlowPaused && configuredFlow.isFlowStopped" *ngIf="!configuredFlow.isFlowPaused">
+                            <button type="button" (click)="pause(configuredFlow)" class="btn btn-warning btn-sm" [disabled]="!configuredFlow.isFlowPaused && configuredFlow.isFlowStopped"
+                                *ngIf="!configuredFlow.isFlowPaused">
                                 <span class="fa fa-pause"></span>
                                 <span class="d-none d-md-inline">Pause</span>
                             </button>
