@@ -1,6 +1,7 @@
 package org.assimbly.gateway.config.environment;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -29,6 +30,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 
 public final class ConvertUtil {
@@ -144,5 +151,41 @@ public final class ConvertUtil {
 		
 		return json;		
 	}
+
+	public static String convertJsonToYaml(String json) throws JSONException, JsonProcessingException, IOException {
+
+		    JsonNode jsonNodeTree = new ObjectMapper().readTree(json);
+		    String yaml = new YAMLMapper().writeValueAsString(jsonNodeTree);
+		    
+		    return yaml;			
+	}
+
+	public static String convertYamlToJson(String yaml) throws JSONException, JsonProcessingException, IOException {
+
+	    ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+	    Object obj = yamlReader.readValue(yaml, Object.class);
+
+	    ObjectMapper jsonWriter = new ObjectMapper();
+	    String json = jsonWriter.writeValueAsString(obj);
+	    
+	    return json;			
+	}	
+	
+
+	public static String convertXmlToYaml(String xml) throws Exception {
+
+		String json = convertXmlToJson(xml);
+		String yaml = convertJsonToYaml(json);
+	    
+	    return yaml;			
+	}
+	
+	public static String convertYamlToXml(String yaml) throws Exception {
+	
+		String json = convertYamlToJson(yaml);
+		String xml = convertJsonToXml(json);
+		
+	    return xml;			
+	}	
 
 }
