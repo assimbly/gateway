@@ -72,6 +72,13 @@ export class FlowService {
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
         }
     }
+    saveFlows(id: number, xmlconfiguration: string, header: string): Observable<Response> {
+        let headers = new Headers();
+            headers.append('Accept', header);
+            let options = new RequestOptions();
+            options.headers = headers;
+            return this.http.post(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
+        }
 
     validateFlowsUri(connectorId: number, uri: string): Observable<Response> {
         let headers = new Headers();
