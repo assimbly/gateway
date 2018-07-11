@@ -25,7 +25,7 @@
             <div class="col-12 text-right">
                 <button class="btn" type="submit" [routerLink]="['../live-mode']">
                     <span class="fa fa-code"></span>
-                    <span>Live mode</span>
+                    <span>Editor mode</span>
                 </button>
                 <button class="btn btn-primary" type="submit" [routerLink]="['../flow', 'edit-all' ]">
                     <span class="fa fa-plus"></span>
@@ -42,7 +42,7 @@
                             <span>ID</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="name">
+                        <th jhiSortBy="name" class="border-bottom-none">
                             <span>Name</span>
                             <span class="fa fa-sort"></span>
                         </th>
@@ -50,11 +50,11 @@
                             <span>Gateway</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="fromEndpointId">
+                        <th jhiSortBy="fromEndpointId" class="border-bottom-none">
                             <span>From</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="id">
+                        <th jhiSortBy="id" class="border-bottom-none">
                             <span>To</span>
                             <span class="fa fa-sort"></span>
                         </th>
@@ -62,10 +62,10 @@
                             <span>Endpoint Error</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th>
+                        <th class="border-bottom-none">
                             <span>Flow status</span>
                         </th>
-                        <th>
+                        <th class="row border-bottom-none">
 		                   	<div class="col-7"> </div>
                         	<div  class="input-group float-right col-5">
 								<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
@@ -77,9 +77,7 @@
 								</div>
 							</div>
                         </th>
-						<th>
-						
-						</th>
+						<th class="border-bottom-none"></th>
 					</tr>
                 </thead>
                 <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
