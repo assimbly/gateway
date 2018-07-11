@@ -260,3 +260,443 @@ export class Components {
     wireTapTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
 
 }
+
+export const flowExamples = [
+    {
+        name: 'FILE',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+          </flows>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'FILE',
+        flowtypeFile: 'JSON',
+        fileExample: `
+        {
+            "connectors": {
+              "connector": {
+                "id": "1",
+                "flows": {
+                  "flow": {
+                    "id": "4",
+                    "name": "fds",
+                    "from": { "uri": "file://C:/Test1d" },
+                    "to": { "uri": "file://C:/Test2e" }
+                  }
+                }
+              }
+            }
+          }
+       `
+    },
+    {
+        name: 'FILE',
+        flowtypeFile: 'YAML',
+        fileExample: `
+        {
+        }
+       `
+    },
+    {
+        name: 'ACTIVEMQ',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+          </flows>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'ACTIVEMQ',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'ACTIVEMQ',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'DIRECT',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'DIRECT',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'DIRECT',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'HTTP4',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'HTTP4',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'HTTP4',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'KAFKA',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'KAFKA',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'KAFKA',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'REST',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'REST',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'REST',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'SFTP',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'SFTP',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'SFTP',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'SJMS',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'SJMS',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'SJMS',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'SONICMQ',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'SONICMQ',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'SONICMQ',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'SQL',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'SQL',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'SQL',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'STREAM',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'STREAM',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'STREAM',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'VM',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'VM',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'VM',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    },
+    {
+        name: 'WASTEBIN',
+        flowtypeFile: 'XML',
+        fileExample: `
+        <connectors>
+        <connector>
+         <id>example</id>
+         <flows>
+          <flow>
+           <id>2</id>
+              <name>example.filetofile</name>
+              <from>
+            <uri>file://C:/Test1</uri>
+           </from>
+           <to>
+            <uri>file://C:/Test2</uri>
+           </to>
+          </flow>
+        </connector>
+       </connectors>
+       `
+    },
+    {
+        name: 'WASTEBIN',
+        flowtypeFile: 'JSON',
+        fileExample: ``
+    },
+    {
+        name: 'WASTEBIN',
+        flowtypeFile: 'YAML',
+        fileExample: ``
+    }
+];
