@@ -1,15 +1,15 @@
 import { BaseEntity } from './../../shared';
 
 export const enum GatewayType {
-    'ADAPTER',
-    'BROKER'
+    ADAPTER = 'ADAPTER',
+    BROKER = 'BROKER'
 }
 
 export const enum EnvironmentType {
-    'DEVELOPMENT',
-    'TEST',
-    'ACCEPTANCE',
-    'PRODUCTION'
+    DEVELOPMENT= 'DEVELOPMENT',
+    TEST= 'TEST',
+    ACCEPTANCE = 'ACCEPTANCE',
+    PRODUCTION = 'PRODUCTION'
 }
 
 export class Gateway implements BaseEntity {
