@@ -15,6 +15,8 @@ import { HeaderService } from './header.service';
 export class HeaderDeleteDialogComponent {
 
     header: Header;
+    message = 'Are you sure you want to delete this Header?';
+    disableDelete: boolean;
 
     constructor(
         private headerService: HeaderService,
@@ -29,7 +31,7 @@ export class HeaderDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.headerService.delete(id).subscribe((response) => {
+        this.headerService.delete(id).subscribe(() => {
             this.eventManager.broadcast({
                 name: 'headerListModification',
                 content: 'Deleted an header'
@@ -38,6 +40,9 @@ export class HeaderDeleteDialogComponent {
             setTimeout(() => {
                 this.activeModal.close();
             }, 0);
+        }, () => {
+            this.message = 'Header ' + this.header.name + ' can not be deleted!';
+            this.disableDelete = true;
         });
     }
 }
