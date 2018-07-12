@@ -235,20 +235,28 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.displayNextButton = true;
                     }, 0);
                 }
-
             });
     }
 
-    filterServices(endpoint: any) {
+    filterServices(endpoint: any, formService: FormControl) {
         if (endpoint instanceof ToEndpoint) {
             this.toServiceType[this.toEndpoints.indexOf(endpoint)] = this.returnServiceType(endpoint.type);
             this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.toServiceType[this.toEndpoints.indexOf(endpoint)]);
+            if (this.toFilterService[this.toEndpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
+                formService.setValue(this.toFilterService[this.toEndpoints.indexOf(endpoint)].find((fs) => fs.id === endpoint.serviceId).id);
+            }
         } else if (endpoint instanceof FromEndpoint) {
             this.fromServiceType = this.returnServiceType(endpoint.type);
             this.fromFilterService = this.services.filter((f) => f.type === this.fromServiceType);
+            if (this.fromFilterService.length > 0 && endpoint.serviceId) {
+                formService.setValue(this.fromFilterService.find((fs) => fs.id === endpoint.serviceId).id);
+            }
         } else if (endpoint instanceof ErrorEndpoint) {
             this.errorServiceType = this.returnServiceType(endpoint.type);
             this.errorFilterService = this.services.filter((f) => f.type === this.errorServiceType);
+            if (this.errorFilterService.length > 0 && endpoint.serviceId) {
+                formService.setValue(this.errorFilterService.find((fs) => fs.id === endpoint.serviceId).id);
+            }
         }
     }
 
@@ -276,7 +284,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
             this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
             this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
@@ -284,7 +292,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
             this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
             this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
@@ -292,7 +300,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
             this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
             this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
@@ -551,7 +559,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.serviceCreated = this.services.length > 0;
                 endpoint.serviceId = this.services.find((s) => s.id === id.content).id;
                 formService.patchValue(endpoint.serviceId);
-                this.filterServices(endpoint);
+                this.filterServices(endpoint, formService);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
