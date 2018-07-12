@@ -26,9 +26,9 @@
 					</div>					<div class="col-3"></div>
 					<div class="col-3 text-right">
 					    <div ngbDropdown class="d-inline-block">
-					      <button class="btn btn-primary" id="exampleDropdown" ngbDropdownToggle>Load Example</button>
+					      <button type="button" class="btn btn-primary" id="exampleDropdown" ngbDropdownToggle>Load Example</button>
 					      <div ngbDropdownMenu aria-labelledby="exampleDropdown" >
-					        <button class="dropdown-item" *ngFor="let componentType of flowExampleListName" (click)="addExample(componentType)">{{componentType}}</button>
+					        <button type="button" class="dropdown-item" *ngFor="let componentType of flowExampleListName" (click)="addExample(componentType)">{{componentType}}</button>
 					      </div>
 					    </div>
 						<button type="button" (click)="setLiveConfiguration()" class="btn btn-primary">Try</button>
