@@ -205,6 +205,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     setTimeout(() => {
                         this.flow = new Flow();
                         this.flow.autoStart = false;
+                        this.flow.offloading = false;
                         if (this.singleGateway) {
                             this.flow.gatewayId = this.gateways[0].id;
                         }
@@ -330,6 +331,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'id': new FormControl(flow.id),
             'name': new FormControl(flow.name, Validators.required),
             'autoStart': new FormControl(flow.autoStart),
+            'offloading': new FormControl(flow.offloading),
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
@@ -370,6 +372,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'id': flow.id,
             'name': flow.name,
             'autoStart': flow.autoStart,
+            'offloading': flow.offloading,
             'gateway': flow.gatewayId
         });
     }
@@ -669,6 +672,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.id = flowControls.id.value;
         this.flow.name = flowControls.name.value;
         this.flow.autoStart = flowControls.autoStart.value;
+        this.flow.offloading = flowControls.offloading.value;
         this.flow.gatewayId = flowControls.gateway.value;
 
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {

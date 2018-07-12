@@ -2,8 +2,6 @@ package org.assimbly.gateway.service.dto;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -17,6 +15,8 @@ public class FlowDTO implements Serializable {
 
     private Boolean autoStart;
 
+    private Boolean offloading;
+    
     private Long gatewayId;
 
     private Long fromEndpointId;
@@ -49,6 +49,13 @@ public class FlowDTO implements Serializable {
         this.autoStart = autoStart;
     }
 
+    public Boolean isOffloading() {
+        return offloading;
+    }
+
+    public void setOffloading(Boolean offloading) {
+        this.offloading = offloading;
+    }
     public Long getGatewayId() {
         return gatewayId;
     }

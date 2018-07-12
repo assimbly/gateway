@@ -31,6 +31,9 @@ public class Flow implements Serializable {
     @Column(name = "auto_start")
     private Boolean autoStart;
 
+    @Column(name = "offloading")
+    private Boolean offloading;
+    
     @ManyToOne
     private Gateway gateway;
 
@@ -83,6 +86,19 @@ public class Flow implements Serializable {
 
     public void setAutoStart(Boolean autoStart) {
         this.autoStart = autoStart;
+    }
+
+    public Boolean isOffloading() {
+        return offloading;
+    }
+
+    public Flow offloading(Boolean offloading) {
+        this.offloading = offloading;
+        return this;
+    }
+
+    public void setOffloading(Boolean offloading) {
+        this.offloading = offloading;
     }
 
     public Gateway getGateway() {

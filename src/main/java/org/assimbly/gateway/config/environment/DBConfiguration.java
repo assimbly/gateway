@@ -163,7 +163,7 @@ public class DBConfiguration {
 		for(Flow flow : flows){
 			if(flow!=null && autoStart) {
 				if(flow.isAutoStart()) {
-				convertDBToXMLFlowConfiguration(flow);
+					convertDBToXMLFlowConfiguration(flow);
 				}
 			}else if(flow!=null && !autoStart) {
 				if(!flow.isAutoStart()) {
@@ -579,6 +579,12 @@ public class DBConfiguration {
 	    Element name = doc.createElement("name");
 	    name.appendChild(doc.createTextNode(flowName));
 	    flow.appendChild(name);
+
+	    //set name
+	    String flowOffloading = flowDB.isOffloading().toString();	    
+	    Element offloading = doc.createElement("offloading");
+	    offloading.appendChild(doc.createTextNode(flowOffloading));
+	    flow.appendChild(offloading);
 	    
 	    //set endpoints
 	    setFromEndpointFromDB(fromEndpoint);
@@ -737,8 +743,8 @@ public class DBConfiguration {
 			}
 
 		    if(confHeader!=null) {
-		    	String confHeaderId = confService.getId().toString();
-			    Element headerId = doc.createElement("service_id");
+		    	String confHeaderId = confHeader.getId().toString();
+			    Element headerId = doc.createElement("headder_id");
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
@@ -807,8 +813,8 @@ public class DBConfiguration {
 				}
 
 			    if(confHeader!=null) {
-			    	String confHeaderId = confService.getId().toString();
-				    Element headerId = doc.createElement("service_id");
+			    	String confHeaderId = confHeader.getId().toString();
+				    Element headerId = doc.createElement("header_id");
 			    	
 				    endpoint.appendChild(headerId);
 				    headerId.setTextContent(confHeaderId);
@@ -874,8 +880,8 @@ public class DBConfiguration {
 			}
 
 		    if(confHeader!=null) {
-		    	String confHeaderId = confService.getId().toString();
-			    Element headerId = doc.createElement("service_id");
+		    	String confHeaderId = confHeader.getId().toString();
+			    Element headerId = doc.createElement("header_id");
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
@@ -943,7 +949,8 @@ public class DBConfiguration {
 	    String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id",doc);
 	    String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name",doc);
 	    String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart",doc);
-
+	    String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading",doc);
+	    
 	    if(!flowId.isEmpty()) {
 	    	
 	       Flow flow = flowRepository.findOne(id);
@@ -970,6 +977,12 @@ public class DBConfiguration {
 	    	   flow.setAutoStart(true);   
 	       }else {
 	    	   flow.setAutoStart(false);
+	       }
+	       
+	       if(flowOffloading!=null && flowOffloading.equals("true")) {
+	    	   flow.setOffloading(true);   
+	       }else {
+	    	   flow.setOffloading(false);
 	       }
 	       
 	       fromEndpoint = getFromEndpointFromXML(flowId, doc);	       

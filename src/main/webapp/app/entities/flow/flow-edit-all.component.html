@@ -33,6 +33,13 @@
 							<option value="false">false</option>
 						</select>
 					</div>
+					<div class="form-group">
+						<label class="form-control-label" for="field_offloading">Offloading</label>
+						<select type="text" class="form-control" id="field_offloading" *ngIf="flow" formControlName="offloading">
+							<option value="true">true</option>
+							<option value="false">false</option>
+						</select>
+					</div>
 					<div class="form-group" *ngIf="!singleGateway">
 						<label class="form-control-label" for="field_gateway">Gateway</label>
 						<select class="form-control" id="field_gateway" *ngIf="flow" formControlName="gateway">
