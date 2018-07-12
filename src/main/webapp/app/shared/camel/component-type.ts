@@ -265,25 +265,27 @@ export const flowExamples = [
     {
         name: 'FILE',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example for windows, you need create the directories on your local machine -->
+            <flow>
+                <id>101</id>
+                <name>example.filetofile</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>file://C:/to</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'FILE',
@@ -317,25 +319,27 @@ export const flowExamples = [
     {
         name: 'ACTIVEMQ',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- this flow only work for a broker gateway -->
+            <flow>
+                <id>102</id>
+                <name>example.filetoactivemq</name>
+                <from>
+                    <uri>file://C:/file1</uri>
+                </from>
+                <to>
+                    <uri>activemq:queue:test</uri>
+                </to>
+                <error>
+                    <uri>file://C:/file3</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'ACTIVEMQ',
@@ -350,25 +354,40 @@ export const flowExamples = [
     {
         name: 'DIRECT',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- to check this example, it's best to try both flows -->
+            <flow>
+                <id>103</id>
+                <name>example.filetodirect</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>direct:test</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+            <flow>
+                <id>104</id>
+                <name>example.directtofile</name>
+                <from>
+                    <uri>direct:test</uri>
+                </from>
+                <to>
+                    <uri>file://C:/to</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'DIRECT',
@@ -383,25 +402,28 @@ export const flowExamples = [
     {
         name: 'HTTP4',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- Send file to local url -->
+            <flow>
+                <id>105</id>
+                <name>example.filetohttp4</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>http4://localhost:8080/test</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
+
     },
     {
         name: 'HTTP4',
@@ -416,25 +438,30 @@ export const flowExamples = [
     {
         name: 'KAFKA',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- Send file to a local Kafka broker with a topich named: test -->
+            <flow>
+                <id>106</id>
+                <name>example.filetokafka</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>kafka:test</uri>
+                    <options>
+                        <brokers>localhost:9092</brokers>
+                    </options>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'KAFKA',
@@ -449,25 +476,27 @@ export const flowExamples = [
     {
         name: 'REST',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- http get from basepaht test -->
+            <flow>
+                <id>107</id>
+                <name>example.filetorest</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>get:test</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'REST',
@@ -482,25 +511,30 @@ export const flowExamples = [
     {
         name: 'SFTP',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example from local directory to some SFTP location -->
+            <flow>
+                <id>108</id>
+                <name>example.filetosftp</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>sftp://username@server/directory</uri>
+                    <options>
+                        <password>secret</password>
+                    </options>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'SFTP',
@@ -515,25 +549,37 @@ export const flowExamples = [
     {
         name: 'SJMS',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example from local directory to JMS queue -->
+            <flow>
+                <id>109</id>
+                <name>example.filetosjms</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>sjms:queue:test</uri>
+                    <service_id>222</service_id>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        <services>
+            <service>
+                <id>222</id>
+                <name>localbroker</name>
+                <username>Administrator</username>
+                <password>Administrator</password>
+                <url>tcp://localhost:2506</url>
+            </service>
+        </services>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'SJMS',
@@ -548,25 +594,37 @@ export const flowExamples = [
     {
         name: 'SONICMQ',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example from local directory to JMS queue -->
+            <flow>
+                <id>110</id>
+                <name>example.filetosjms</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>sonicmq:queue:Sample.Q1</uri>
+                    <service_id>223</service_id>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        <services>
+            <service>
+                <id>223</id>
+                <name>localbroker</name>
+                <username>Administrator</username>
+                <password>Administrator</password>
+                <url>tcp://localhost:2506</url>
+            </service>
+        </services>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'SONICMQ',
@@ -581,25 +639,50 @@ export const flowExamples = [
     {
         name: 'SQL',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example of an insert into a local MySQL database -->
+            <flow>
+                <id>111</id>
+                <name>example.filetosftp</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                   <uri>sql:insert into history (MESSAGE,TYPE) values (:#message,:#type)</uri>
+                    <options>
+                        <dataSource>test.db</dataSource>
+                    </options>
+                    <service_id>224</service_id>
+                    <header_id>331</header_id>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+           <services>
+                <service>
+                    <id>224</id>
+                    <name>test.db</name>
+                    <username>username</username>
+                    <password>example</password>
+                    <url>jdbc:mysql://localhost/dbname</url>
+                    <driver>com.mysql.jdbc.Driver</driver>
+                </service>
+            </services>
+            <headers>
+                <header>
+                     <id>331</id>
+                    <name>mapper</name>
+                    <message type="xpath">/root/message/text()</message>
+                    <date type="xpath">/root/type/text()</date>
+                </header>
+            </headers>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'SQL',
@@ -614,25 +697,27 @@ export const flowExamples = [
     {
         name: 'STREAM',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- check assimbly log viewer to see the output -->
+            <flow>
+                <id>112</id>
+                <name>example.filetostream</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>stream:out</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'STREAM',
@@ -647,25 +732,40 @@ export const flowExamples = [
     {
         name: 'VM',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- to check this example, it's best to try both flows -->
+            <flow>
+                <id>113</id>
+                <name>example.filetovm</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>vm:test</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+            <flow>
+                <id>104</id>
+                <name>example.vmtofile</name>
+                <from>
+                    <uri>vm:test</uri>
+                </from>
+                <to>
+                    <uri>file://C:/to</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'VM',
@@ -680,25 +780,27 @@ export const flowExamples = [
     {
         name: 'WASTEBIN',
         flowtypeFile: 'XML',
-        fileExample: `
-        <connectors>
-        <connector>
-         <id>example</id>
-         <flows>
-          <flow>
-           <id>2</id>
-              <name>example.filetofile</name>
-              <from>
-            <uri>file://C:/Test1</uri>
-           </from>
-           <to>
-            <uri>file://C:/Test2</uri>
-           </to>
-          </flow>
-         </flows>
-        </connector>
-       </connectors>
-       `
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- files send to wastebin -->
+            <flow>
+                <id>114</id>
+                <name>example.filetowastebin</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>wastebin</uri>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
     },
     {
         name: 'WASTEBIN',

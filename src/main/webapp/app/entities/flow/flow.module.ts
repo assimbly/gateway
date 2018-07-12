@@ -24,7 +24,7 @@ import {
     FlowDeleteDialogComponent,
     flowRoute,
     flowPopupRoute,
-    FlowLiveModeComponent,
+    FlowEditorModeComponent,
     FlowRowComponent
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -62,7 +62,7 @@ const ENTITY_STATES = [
         FlowPopupComponent,
         FlowDeletePopupComponent,
         FlowRowComponent,
-        FlowLiveModeComponent
+        FlowEditorModeComponent
     ],
     entryComponents: [
         FlowComponent,
@@ -72,7 +72,7 @@ const ENTITY_STATES = [
         FlowPopupComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
-        FlowLiveModeComponent
+        FlowEditorModeComponent
     ],
     providers: [
         Components,

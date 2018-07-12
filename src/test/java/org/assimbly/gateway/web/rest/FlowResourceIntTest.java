@@ -46,6 +46,9 @@ public class FlowResourceIntTest {
     private static final Boolean DEFAULT_AUTO_START = false;
     private static final Boolean UPDATED_AUTO_START = true;
 
+    private static final Boolean DEFAULT_OFFLOADING = false;
+    private static final Boolean UPDATED_OFFLOADING = true;
+
     @Autowired
     private FlowRepository flowRepository;
 
@@ -88,7 +91,8 @@ public class FlowResourceIntTest {
     public static Flow createEntity(EntityManager em) {
         Flow flow = new Flow()
             .name(DEFAULT_NAME)
-            .autoStart(DEFAULT_AUTO_START);
+            .autoStart(DEFAULT_AUTO_START)
+            .offloading(DEFAULT_OFFLOADING);
         return flow;
     }
 
@@ -115,6 +119,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
+        assertThat(testFlow.isOffloading()).isEqualTo(DEFAULT_OFFLOADING);
     }
 
     @Test
@@ -149,7 +154,8 @@ public class FlowResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())));
+            .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
+            .andExpect(jsonPath("$.[*].offloading").value(hasItem(DEFAULT_OFFLOADING.booleanValue())));
     }
 
     @Test
@@ -164,7 +170,8 @@ public class FlowResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()));
+            .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
+            .andExpect(jsonPath("$.offloading").value(DEFAULT_OFFLOADING.booleanValue()));
     }
 
     @Test
@@ -188,7 +195,8 @@ public class FlowResourceIntTest {
         em.detach(updatedFlow);
         updatedFlow
             .name(UPDATED_NAME)
-            .autoStart(UPDATED_AUTO_START);
+            .autoStart(UPDATED_AUTO_START)
+            .offloading(UPDATED_OFFLOADING);
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
@@ -202,6 +210,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
+        assertThat(testFlow.isOffloading()).isEqualTo(UPDATED_OFFLOADING);
     }
 
     @Test
