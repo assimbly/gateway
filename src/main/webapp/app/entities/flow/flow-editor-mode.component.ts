@@ -65,26 +65,8 @@ export class FlowEditorModeComponent implements OnInit {
 
         this.selectedFlowExample.name = componentType;
 
-        if (this.selectedFlowExample.flowtypeFile === 'XML') {
-            this.status = false;
-            this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
-        } else {
-            this.status = true;
-            if (this.xmlEditor !== '') {
-                this.xmlEditor = this.hintText;
-            }
-        }
-        /* this.flowExamples.forEach((f) => {
-            if (t === 'XML') {
-                this.status = false;
-                this.xmlEditor = f.fileExample;
-            } else if (t === 'JSON' || t === 'YAML') {
-                this.status = true;
-                if (this.xmlEditor !== '') {
-                    this.xmlEditor = this.hintText;
-                }
-            }
-        }); */
+        this.status = false;
+        this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
     }
 
     setLiveConfiguration() {

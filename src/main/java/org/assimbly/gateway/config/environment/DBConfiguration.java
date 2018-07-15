@@ -544,21 +544,26 @@ public class DBConfiguration {
 
 	private void setOffloadingPropertiesFromDB(String connectorId) throws Exception {
 
-	    WireTapEndpoint wiretapEndpoint = wireTapEndpointRepository.findOne(1L);
+	    List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll(); 
 	    
-	    //set id
-	    String offloadingId = wiretapEndpoint.getId().toString();	    
-	    Element id = doc.createElement("id");
-	    id.appendChild(doc.createTextNode(offloadingId));
-	    offloading.appendChild(id);
+	    if(wiretapEndpoints.size() > 0) {
+	    	
+	    	WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
+	    	
+		    //set id
+		    String offloadingId = wiretapEndpoint.getId().toString();	    
+		    Element id = doc.createElement("id");
+		    id.appendChild(doc.createTextNode(offloadingId));
+		    offloading.appendChild(id);
 
-	    //set name
-	    String offloadingName = "offloading";	    
-	    Element name = doc.createElement("name");
-	    name.appendChild(doc.createTextNode(offloadingName));
-	    offloading.appendChild(name);
-	    
-	    setWireTapEndpointFromDB(wiretapEndpoint);
+		    //set name
+		    String offloadingName = "offloading";	    
+		    Element name = doc.createElement("name");
+		    name.appendChild(doc.createTextNode(offloadingName));
+		    offloading.appendChild(name);
+		    
+		    setWireTapEndpointFromDB(wiretapEndpoint);
+	    }
 	    
 	    
 	}
@@ -744,7 +749,7 @@ public class DBConfiguration {
 
 		    if(confHeader!=null) {
 		    	String confHeaderId = confHeader.getId().toString();
-			    Element headerId = doc.createElement("headder_id");
+			    Element headerId = doc.createElement("header_id");
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
@@ -935,10 +940,12 @@ public class DBConfiguration {
 			for(HeaderKeys headerKey : headerKeys) {
 				String parameterName = headerKey.getKey();
 				String parameterValue = headerKey.getValue();
+				String parameterType = headerKey.getType();
 				  
 				Element headerParameter = doc.createElement(parameterName);
 				headerParameter.setTextContent(parameterValue);
-				header.appendChild(headerParameter);
+				headerParameter.setAttribute("type", parameterType);
+				header.appendChild(headerParameter);				
 			}
 		}
 	}
@@ -1440,7 +1447,7 @@ public class DBConfiguration {
 	    	values.put(environmentVariable.getKey(),environmentVariable.getValue());
 	    }
 	    
-	    StrSubstitutor sub = new StrSubstitutor(values, "${", "}");
+	    StrSubstitutor sub = new StrSubstitutor(values, "@{", "}");
 	    
 	    String output = sub.replace(input);
 	    
