@@ -9204,6 +9204,12 @@ xml-char-classes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/xml-char-classes/-/xml-char-classes-1.0.0.tgz#64657848a20ffc5df583a42ad8a277b4512bbc4d"
 
+xml-js@^1.6.7:
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/xml-js/-/xml-js-1.6.7.tgz#a99b40c18a16d3e06537b3ae026a27bd60ffe8ab"
+  dependencies:
+    sax "^1.2.4"
+
 xmlbuilder@8.2.2:
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-8.2.2.tgz#69248673410b4ba42e1a6136551d2922335aa773"
@@ -9237,6 +9243,10 @@ yallist@^2.1.2:
 yallist@^3.0.0, yallist@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.2.tgz#8452b4bb7e83c7c188d8041c1a837c773d6d8bb9"
+
+yaml-js@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/yaml-js/-/yaml-js-0.2.3.tgz#f4cf6c1b3c784f59f55547d7dfcdd06418303291"
 
 yargs-parser@^4.1.0, yargs-parser@^4.2.0:
   version "4.2.1"
