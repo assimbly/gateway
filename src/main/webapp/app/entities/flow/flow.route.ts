@@ -7,7 +7,7 @@ import { FlowDetailComponent } from './flow-detail.component';
 import { FlowEditAllComponent } from './flow-edit-all.component';
 import { FlowPopupComponent } from './flow-dialog.component';
 import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
-import { FlowLiveModeComponent } from './flow-live-mode.component';
+import { FlowEditorModeComponent } from './flow-editor-mode.component';
 
 export const flowRoute: Routes = [
     {
@@ -51,8 +51,8 @@ export const flowRoute: Routes = [
         },
         canActivate: [UserRouteAccessService]
     }, {
-        path: 'live-mode',
-        component: FlowLiveModeComponent,
+        path: 'editor-mode',
+        component: FlowEditorModeComponent,
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'Flows'

@@ -37,6 +37,12 @@ entity ErrorEndpoint {
     options String
 }
 
+entity WireTapEndpoint {
+	type EndpointType,
+    uri String,
+    options String
+}
+
 entity Service {
 	name String,
 	type String	
@@ -60,7 +66,9 @@ entity HeaderKeys {
 
 entity Maintenance {
 	startTime Instant,
-	endTime Instant
+	endTime Instant,
+	duration Instant,
+	frequency String
 }
 
 entity Group {
@@ -69,9 +77,8 @@ entity Group {
 }
 
 entity GroupMember {
-}
-
-entity GroupRights {
+	userId Integer,
+	login String	
 }
 
 enum GatewayType {
@@ -87,11 +94,15 @@ enum ConnectorType {
 }
 
 enum EndpointType {
-   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, WASTEBIN 
+   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
+}
+
+relationship OneToOne {
+	MessageGateway{wiretapEndpint} to WireTapEndpoint
 }
 
 relationship OneToMany {
-	MessageGateway{flowRoute} to Flow
+	MessageGateway{flow} to Flow
 }
 
 relationship OneToMany {
@@ -114,12 +125,14 @@ relationship ManyToOne {
 	FromEndpoint{service} to Service,
     ToEndpoint{service} to Service,
     ErrorEndpoint{service} to Service
+    WireTapEndpoint{service} to Service	
 }
 
 relationship ManyToOne {
 	FromEndpoint{header} to Header,
     ToEndpoint{header} to Header,
     ErrorEndpoint{header} to Header
+    WireTapEndpoint{header} to Header
 }
 
 relationship OneToMany {
@@ -130,12 +143,12 @@ relationship OneToMany {
 	Header{headerKeys} to HeaderKeys
 }
 
-relationship OneToMany {
+relationship OneToOne {
 	Maintenance{flow} to Flow
 }
 
 relationship ManyToMany {
-	Group{user} to User{group}
+	Group{groupMember} to GroupMember{group}
 }
 
 relationship ManyoMany {

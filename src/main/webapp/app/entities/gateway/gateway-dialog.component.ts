@@ -6,9 +6,10 @@ import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Gateway } from './gateway.model';
+import { Gateway, GatewayType, EnvironmentType } from './gateway.model';
 import { GatewayPopupService } from './gateway-popup.service';
 import { GatewayService } from './gateway.service';
+import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-gateway-dialog',
@@ -18,13 +19,15 @@ export class GatewayDialogComponent implements OnInit {
 
     gateway: Gateway;
     isSaving: boolean;
+    public gatewayListType = [GatewayType.ADAPTER, GatewayType.BROKER];
+    public gatewayListStage = [EnvironmentType.ACCEPTANCE, EnvironmentType.DEVELOPMENT, EnvironmentType.PRODUCTION, EnvironmentType.TEST]
 
     constructor(
         public activeModal: NgbActiveModal,
         private gatewayService: GatewayService,
         private eventManager: JhiEventManager,
-        private router: ActivatedRoute
-
+        private router: ActivatedRoute,
+        public components: Components
     ) {
     }
 
@@ -35,12 +38,11 @@ export class GatewayDialogComponent implements OnInit {
             this.gateway.defaultToEndpointType = 'FILE';
             this.gateway.defaultErrorEndpointType = 'FILE';
         }
-
         if (this.router.fragment['value'] === 'clone') {
             this.gateway.id = null;
         }
+        console.log(this.gatewayListType);
     }
-
     clear() {
         this.activeModal.dismiss('cancel');
     }
@@ -55,21 +57,26 @@ export class GatewayDialogComponent implements OnInit {
                 this.gatewayService.create(this.gateway), closePopup);
         }
     }
-
     private subscribeToSaveResponse(result: Observable<Gateway>, closePopup: boolean) {
         result.subscribe((res: Gateway) =>
             this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
     }
 
     private onSaveSuccess(result: Gateway, closePopup: boolean) {
-        this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK'});
-        this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK'});
+        this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
+        this.eventManager.broadcast({ name: 'gatewayCreated', content: 'OK' });
         this.isSaving = false;
         if (closePopup) {
             this.activeModal.dismiss(result);
         }
     }
-
+    setTypeGateway() {
+        if (this.gateway.type.toString() === 'BROKER') {
+            this.gateway.defaultFromEndpointType = EndpointType.ACTIVEMQ;
+            this.gateway.defaultToEndpointType = EndpointType.ACTIVEMQ;
+            this.gateway.defaultErrorEndpointType = EndpointType.ACTIVEMQ;
+         }
+    }
     private onSaveError() {
         this.isSaving = false;
     }
@@ -86,11 +93,11 @@ export class GatewayPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private gatewayPopupService: GatewayPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
+            if (params['id']) {
                 this.gatewayPopupService
                     .open(GatewayDialogComponent as Component, params['id']);
             } else {

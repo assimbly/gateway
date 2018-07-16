@@ -12,6 +12,7 @@ import { ErrorEndpointService } from './error-endpoint.service';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { ResponseWrapper } from '../../shared';
+import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-error-endpoint-dialog',
@@ -32,7 +33,8 @@ export class ErrorEndpointDialogComponent implements OnInit {
         private errorEndpointService: ErrorEndpointService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        public components: Components
     ) {
     }
 

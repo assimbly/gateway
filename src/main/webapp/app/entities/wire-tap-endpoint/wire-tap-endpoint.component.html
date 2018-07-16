@@ -1,0 +1,87 @@
+<div>
+    <h2>
+        <span>Offloading</span>
+        <button class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" [routerLink]="['/', { outlets: { popup: ['wire-tap-endpoint-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Wiretap Endpoint
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+
+
+    <div class="table-responsive" *ngIf="wireTapEndpoints">
+        <table class="table table-bordered table-sm" *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId" style="margin-bottom: 30px;">
+                <thead>
+                        <tr>
+                          <th  class="bg-gray" colspan="2"><span class="text-center"><i>{{wireTapEndpoint.name}}</i></span></th>
+                        </tr>
+                      </thead>
+            <tbody>
+                <tr>
+                    <td lass="w-25">
+                        <span class="font-weight-bold">Type:</span>
+                    </td>
+                    <td class="w-75">
+                        {{wireTapEndpoint.type}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="font-weight-bold">Uri:</span>
+                    </td>
+                    <td>
+                        {{wireTapEndpoint.uri}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="font-weight-bold">Options:</span>
+                    </td>
+                    <td>
+                        {{wireTapEndpoint.options}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="font-weight-bold">Header:</span>
+                    </td>
+                    <td>
+	                    <div *ngIf="wireTapEndpoint.header">
+	                        <a [routerLink]="['../header', wireTapEndpoint.header?.id ]" >{{wireTapEndpoint.header?.id}}</a>
+	                    </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="font-weight-bold">Service:</span>
+                    </td>
+                    <td>
+	                    <div *ngIf="wireTapEndpoint.service">
+	                        <a [routerLink]="['../service', wireTapEndpoint.service?.id ]" >{{wireTapEndpoint.service?.id}}</a>
+	                    </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <div class="d-block pull-right">
+                            <button type="submit" [routerLink]="['../wire-tap-endpoint', wireTapEndpoint.id ]" class="btn btn-info btn-sm">
+                                <span class="fa fa-eye"></span>
+                                <span class="d-none d-md-inline">View</span>
+                            </button>
+                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'wire-tap-endpoint/'+ wireTapEndpoint.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                                <span class="fa fa-pencil"></span>
+                                <span class="d-none d-md-inline">Edit</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+</div>

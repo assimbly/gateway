@@ -1,0 +1,48 @@
+<div>
+    <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
+        <span class="fa fa-plus"></span>
+        <span>
+            Create new Service
+        </span>
+    </button>
+    <br/>
+    <h2>
+        <span>Service</span>
+    </h2>
+    <br/>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+                    <th jhiSortBy="name">
+                        <span>Service name</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th jhiSortBy="type">
+                        <span>Service type</span>
+                        <span class="fa fa-sort"></span>
+                    </th>
+                    <th>
+                        Details
+                    </th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll>
+                <tr *ngFor="let service of services">
+                    <td>
+                        {{service.name}}
+                    </td>
+                    <td>
+                        {{service.type}}
+                    </td>
+                    <td>
+                        <button type="button" [routerLink]="['./', service.id ]" class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span> View details
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

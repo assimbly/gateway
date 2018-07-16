@@ -9,6 +9,8 @@ import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-end
 import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
 
+import { Components } from '../../shared/camel/component-type';
+
 import {
     FlowService,
     FlowPopupService,
@@ -22,7 +24,7 @@ import {
     FlowDeleteDialogComponent,
     flowRoute,
     flowPopupRoute,
-    FlowLiveModeComponent,
+    FlowEditorModeComponent,
     FlowRowComponent
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -60,7 +62,7 @@ const ENTITY_STATES = [
         FlowPopupComponent,
         FlowDeletePopupComponent,
         FlowRowComponent,
-        FlowLiveModeComponent
+        FlowEditorModeComponent
     ],
     entryComponents: [
         FlowComponent,
@@ -70,9 +72,10 @@ const ENTITY_STATES = [
         FlowPopupComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
-        FlowLiveModeComponent
+        FlowEditorModeComponent
     ],
     providers: [
+        Components,
         FlowService,
         FlowPopupService,
     ],

@@ -38,6 +38,10 @@
         {
             "fieldName": "autoStart",
             "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "offloading",
+            "fieldType": "Boolean"
         }
     ],
     "changelogDate": "20180114132915",
