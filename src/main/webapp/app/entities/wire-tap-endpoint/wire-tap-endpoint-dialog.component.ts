@@ -34,7 +34,7 @@ export class WireTapEndpointDialogComponent implements OnInit {
         private serviceService: ServiceService,
         private headerService: HeaderService,
         private eventManager: JhiEventManager,
-        private components: Components
+        public components: Components
     ) {
     }
 

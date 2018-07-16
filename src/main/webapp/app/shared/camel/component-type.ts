@@ -348,10 +348,14 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM'];
+    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
+        'SQL', 'STREAM', 'TELEGRAM', 'VM'];
+
     toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
-    'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN'];
+        'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN'];
+
     errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
+
     wireTapTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
 
 }
@@ -534,7 +538,7 @@ export const flowExamples = [
           uri: "file://C:/error"
     id: "live"
     services: {}`
-    },    {
+    }, {
         name: 'FILE',
         flowtypeFile: 'XML',
         fileExample: `<connectors>
