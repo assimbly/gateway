@@ -27,7 +27,7 @@ export class GatewayDialogComponent implements OnInit {
         private gatewayService: GatewayService,
         private eventManager: JhiEventManager,
         private router: ActivatedRoute,
-        private components: Components
+        public components: Components
     ) {
     }
 

@@ -16,6 +16,8 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     public page: any;
     private currentAccount: any;
     private eventSubscriber: Subscription;
+    predicate: any;
+    reverse: any;
 
     constructor(
         private serviceService: ServiceService,
