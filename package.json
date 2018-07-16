@@ -34,6 +34,8 @@
     "rxjs": "5.5.5",
     "swagger-ui": "2.2.10",
     "tether": "1.4.0",
+    "xml-js": "^1.6.7",
+    "yaml-js": "^0.2.3",
     "zone.js": "0.8.16"
   },
   "devDependencies": {
