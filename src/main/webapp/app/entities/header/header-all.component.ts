@@ -16,7 +16,9 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     public page: any;
     private eventSubscriber: Subscription;
     private currentAccount: any;
-
+    predicate: any;
+    reverse: any;
+    
     constructor(
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,

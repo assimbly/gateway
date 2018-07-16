@@ -8,7 +8,7 @@ import { LogViewerService } from './log-viewer.service';
 export class LogViewerComponent implements OnInit {
 
     public log: string;
-    private lines: number;
+    public lines: number;
 
     constructor(
         private logViewerService: LogViewerService
