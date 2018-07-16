@@ -14,9 +14,11 @@ import {
     HeaderPopupComponent,
     HeaderDeletePopupComponent,
     HeaderDeleteDialogComponent,
+    HeaderAllComponent,
     headerRoute,
     headerPopupRoute,
-    ForbiddenHeaderNamesValidatorDirective
+    ForbiddenHeaderNamesValidatorDirective,
+    ForbiddenHeaderKeysValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 const ENTITY_STATES = [
@@ -35,15 +37,18 @@ const ENTITY_STATES = [
     ],
     declarations: [
         HeaderComponent,
+        HeaderAllComponent,
         HeaderDetailComponent,
         HeaderDialogComponent,
         HeaderDeleteDialogComponent,
         HeaderPopupComponent,
         HeaderDeletePopupComponent,
-        ForbiddenHeaderNamesValidatorDirective
+        ForbiddenHeaderNamesValidatorDirective,
+        ForbiddenHeaderKeysValidatorDirective
     ],
     entryComponents: [
         HeaderComponent,
+        HeaderAllComponent,
         HeaderDialogComponent,
         HeaderPopupComponent,
         HeaderDeleteDialogComponent,

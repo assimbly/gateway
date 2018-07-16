@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { ServiceKeys } from './service-keys.model';
+import { Service } from '../service/service.model';
 import { ServiceKeysService } from './service-keys.service';
 import { Principal } from '../../shared';
 import { Observable } from 'rxjs/Observable';
@@ -12,14 +13,16 @@ import { Observable } from 'rxjs/Observable';
     templateUrl: './service-keys.component.html'
 })
 export class ServiceKeysComponent implements OnInit, OnChanges {
-    @Input() serviceKeys: ServiceKeys[];
-    @Input() serviceId: number;
+    @Input() serviceKeys: Array<ServiceKeys> = [];
+    @Input() service: Service;
 
     serviceKeysKeys: Array<string> = [];
     currentAccount: any;
     isSaving: boolean;
     serviceKey: ServiceKeys;
     eventSubscriber: Subscription;
+    requiredServiceKey: Array<RequiredServiceKey> = [];
+    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
 
     constructor(
         private serviceKeysService: ServiceKeysService,
@@ -29,10 +32,72 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     ) {
     }
     ngOnInit() {
+        this.addRequiredServiceKeys();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
         this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
+    }
+
+    addRequiredServiceKeys() {
+        this.requiredServiceKey.push(
+            {
+                name: 'JDBC Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text'
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text'
+                    },
+                    {
+                        serviceKeyName: 'password ',
+                        valueType: 'password'
+                    },
+                    {
+                        serviceKeyName: 'driver',
+                        valueType: 'list'
+                    }
+                ]
+            },
+            {
+                name: 'SonicMQ Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text'
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text'
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password'
+                    }
+                ]
+            },
+            {
+                name: 'ActiveMQ Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text'
+                    }
+                ]
+            },
+            {
+                name: 'MQ Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text'
+                    }
+                ]
+            },
+        )
     }
 
     updateServiceKeys(id: number) {
@@ -47,11 +112,27 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
                 this.serviceKeys[0].isDisabled = false;
+                this.serviceKeys[0].isRequired = false;
             } else {
                 this.serviceKeys.forEach((serviceKey) => {
                     serviceKey.isDisabled = true;
                 });
             }
+            const requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
+            const requiredServiceKeys = new Array<ServiceKeys>();
+            requiredType.serviceKeys.forEach((sk) => {
+                let ersk = this.serviceKeys.find((s) => s.key === sk.serviceKeyName);
+                let rsk = new ServiceKeys();
+                if (ersk instanceof ServiceKeys) {
+                    rsk = ersk;
+                    this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+                }
+                rsk.key = sk.serviceKeyName;
+                rsk.valueType = sk.valueType;
+                rsk.isRequired = true;
+                requiredServiceKeys.push(rsk);
+            });
+            this.serviceKeys.unshift(...requiredServiceKeys);
         }
     }
     save(serviceKey: ServiceKeys, i: number) {
@@ -60,7 +141,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.subscribeToSaveResponse(
                 this.serviceKeysService.update(serviceKey), false, i);
         } else {
-            serviceKey.serviceId = this.serviceId;
+            serviceKey.serviceId = this.service.id;
             this.subscribeToSaveResponse(
                 this.serviceKeysService.create(serviceKey), true, i);
         }
@@ -101,10 +182,14 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             serviceKey.value,
             null,
             false,
+            true,
+            null,
             serviceKey.serviceId);
         this.serviceKeys.push(serviceKeyForClone);
     }
     private onSaveSuccess(result: ServiceKeys, isCreate: boolean, i: number) {
+        result.isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
+
         if (isCreate) {
             result.isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
@@ -125,4 +210,12 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
+}
+export interface RequiredServiceKey {
+    name: string;
+    serviceKeys: Array<ServiceKeyInformation>;
+}
+export interface ServiceKeyInformation {
+    serviceKeyName: string;
+    valueType: string;
 }

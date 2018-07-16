@@ -1,0 +1,46 @@
+
+<div *ngIf="wireTapEndpoint">
+    <h2><span>Wire Tap Endpoint</span> {{wireTapEndpoint.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Type</span></dt>
+        <dd>
+            <span>{{wireTapEndpoint.type}}</span>
+        </dd>
+        <dt><span>Uri</span></dt>
+        <dd>
+            <span>{{wireTapEndpoint.uri}}</span>
+        </dd>
+        <dt><span>Options</span></dt>
+        <dd>
+            <span>{{wireTapEndpoint.options}}</span>
+        </dd>
+        <dt><span>Service</span></dt>
+        <dd>
+            <div *ngIf="wireTapEndpoint.service">
+                <a [routerLink]="['/service', wireTapEndpoint.service?.id]">{{wireTapEndpoint.service?.id}}</a>
+            </div>
+        </dd>
+        <dt><span>Header</span></dt>
+        <dd>
+            <div *ngIf="wireTapEndpoint.header">
+                <a [routerLink]="['/header', wireTapEndpoint.header?.id]">{{wireTapEndpoint.header?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'wire-tap-endpoint/'+ wireTapEndpoint.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

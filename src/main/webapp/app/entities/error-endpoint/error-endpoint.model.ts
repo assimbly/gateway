@@ -1,5 +1,5 @@
 import { BaseEntity } from './../../shared';
-import { EndpointType } from './../../shared/model/endpoint-type'
+import { EndpointType } from '../../shared/camel/component-type';
 
 export class ErrorEndpoint implements BaseEntity {
     constructor(

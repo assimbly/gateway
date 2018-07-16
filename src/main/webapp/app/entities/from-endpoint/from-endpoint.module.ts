@@ -1,7 +1,12 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { GatewaySharedModule } from '../../shared';
+import { Components } from '../../shared/camel/component-type';
+
 import {
     FromEndpointService,
     FromEndpointPopupService,
@@ -23,7 +28,11 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
+        RouterModule.forChild(ENTITY_STATES),
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+
     ],
     exports: [
         FromEndpointComponent
@@ -44,9 +53,10 @@ const ENTITY_STATES = [
         FromEndpointDeletePopupComponent,
     ],
     providers: [
+        Components,
         FromEndpointService,
         FromEndpointPopupService,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayFromEndpointModule {}
+export class GatewayFromEndpointModule { }

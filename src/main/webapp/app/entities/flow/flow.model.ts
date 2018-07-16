@@ -5,6 +5,7 @@ export class Flow implements BaseEntity {
         public id?: number,
         public name?: string,
         public autoStart?: boolean,
+        public offloading?: boolean,
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,

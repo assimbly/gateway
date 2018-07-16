@@ -31,6 +31,9 @@ public class Flow implements Serializable {
     @Column(name = "auto_start")
     private Boolean autoStart;
 
+    @Column(name = "offloading")
+    private Boolean offloading;
+    
     @ManyToOne
     private Gateway gateway;
 
@@ -42,10 +45,13 @@ public class Flow implements Serializable {
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
-    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = CascadeType.ALL)
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
+
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(unique = true)
+    private Maintenance maintenance;    
     
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -80,6 +86,19 @@ public class Flow implements Serializable {
 
     public void setAutoStart(Boolean autoStart) {
         this.autoStart = autoStart;
+    }
+
+    public Boolean isOffloading() {
+        return offloading;
+    }
+
+    public Flow offloading(Boolean offloading) {
+        this.offloading = offloading;
+        return this;
+    }
+
+    public void setOffloading(Boolean offloading) {
+        this.offloading = offloading;
     }
 
     public Gateway getGateway() {
@@ -121,6 +140,19 @@ public class Flow implements Serializable {
         this.errorEndpoint = errorEndpoint;
     }
 
+    public Maintenance getMaintenance() {
+        return maintenance;
+    }
+
+    public Flow maintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
+        return this;
+    }
+
+    public void setMaintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
+    }
+    
     public Set<ToEndpoint> getToEndpoints() {
         return toEndpoints;
     }

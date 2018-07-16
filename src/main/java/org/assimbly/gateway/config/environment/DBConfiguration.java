@@ -18,12 +18,14 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.WireTapEndpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.repository.WireTapEndpointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,9 @@ public class DBConfiguration {
 	@Autowired
     private GatewayRepository gatewayRepository;
 
+	@Autowired
+    private WireTapEndpointRepository wireTapEndpointRepository;
+	
 	@Autowired
     private FlowRepository flowRepository;
 
@@ -102,6 +107,8 @@ public class DBConfiguration {
 	private Set<HeaderKeys> headerKeys;
 
 	private long headerIdLong;
+
+	private Element offloading;
 	
 	public List<TreeMap<String,String>> convertDBToConfiguration(Long gatewayid) throws Exception {
 
@@ -134,9 +141,9 @@ public class DBConfiguration {
 	   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 
 	   if(mediaType.contains("json")) {
-			configuration = ConvertUtil.convertJsonToXml(xmlConfiguration);
+			configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
+			configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
 		}else {
 			configuration = xmlConfiguration;
 		}
@@ -156,7 +163,7 @@ public class DBConfiguration {
 		for(Flow flow : flows){
 			if(flow!=null && autoStart) {
 				if(flow.isAutoStart()) {
-				convertDBToXMLFlowConfiguration(flow);
+					convertDBToXMLFlowConfiguration(flow);
 				}
 			}else if(flow!=null && !autoStart) {
 				if(!flow.isAutoStart()) {
@@ -168,9 +175,9 @@ public class DBConfiguration {
 	   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 
 	   if(mediaType.contains("json")) {
-			configuration = ConvertUtil.convertJsonToXml(xmlConfiguration);
+			configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
+			configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
 		}else {
 			configuration = xmlConfiguration;
 		}
@@ -221,7 +228,7 @@ public class DBConfiguration {
 		   if(mediaType.contains("json")) {
 				configuration = ConvertUtil.convertXmlToJson(xmlConfiguration);
 			}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-				//xmlConfiguration = ConvertUtil.convertXmltoYaml(flowConfiguration);
+				configuration = ConvertUtil.convertXmlToYaml(xmlConfiguration);
 			}else {
 				configuration = xmlConfiguration;
 			}
@@ -238,7 +245,7 @@ public class DBConfiguration {
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(configuration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
+			xmlConfiguration = ConvertUtil.convertYamlToXml(configuration);
 		}else {
 			xmlConfiguration = configuration;
 		}
@@ -266,7 +273,7 @@ public class DBConfiguration {
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(flowConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
-			//xmlConfiguration = ConvertUtil.convertYamltoXml(flowConfiguration);
+			xmlConfiguration = ConvertUtil.convertYamlToXml(flowConfiguration);
 		}else {
 			xmlConfiguration = flowConfiguration;
 		}
@@ -502,7 +509,7 @@ public class DBConfiguration {
 	}
 
 	//XML set methods
-	private void setGeneralPropertiesFromDB(String connectorId) throws ParserConfigurationException {
+	private void setGeneralPropertiesFromDB(String connectorId) throws Exception {
 
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -518,19 +525,48 @@ public class DBConfiguration {
 	    id.appendChild(doc.createTextNode(connectorId));
 	    connector.appendChild(id);
 	    
+	    offloading = doc.createElement("offloading");
 	    flows = doc.createElement("flows");
 	    services = doc.createElement("services");
 	    headers = doc.createElement("headers");
 	    
+	    connector.appendChild(offloading);
 	    connector.appendChild(flows);
 	    connector.appendChild(services);
 	    connector.appendChild(headers);
 	    
+		setOffloadingPropertiesFromDB(connectorId);
+		
 	    servicesList = new ArrayList<String>();
 	    headersList = new ArrayList<String>();    
 		
 	}
-	
+
+	private void setOffloadingPropertiesFromDB(String connectorId) throws Exception {
+
+	    List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll(); 
+	    
+	    if(wiretapEndpoints.size() > 0) {
+	    	
+	    	WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
+	    	
+		    //set id
+		    String offloadingId = wiretapEndpoint.getId().toString();	    
+		    Element id = doc.createElement("id");
+		    id.appendChild(doc.createTextNode(offloadingId));
+		    offloading.appendChild(id);
+
+		    //set name
+		    String offloadingName = "offloading";	    
+		    Element name = doc.createElement("name");
+		    name.appendChild(doc.createTextNode(offloadingName));
+		    offloading.appendChild(name);
+		    
+		    setWireTapEndpointFromDB(wiretapEndpoint);
+	    }
+	    
+	    
+	}
 	
 	private void setFlowPropertiesFromDB(Flow flowDB) throws Exception {
 
@@ -542,13 +578,106 @@ public class DBConfiguration {
 	    Element id = doc.createElement("id");
 	    id.appendChild(doc.createTextNode(flowId));
 	    flow.appendChild(id);
-   
+
+	    //set name
+	    String flowName = flowDB.getName();	    
+	    Element name = doc.createElement("name");
+	    name.appendChild(doc.createTextNode(flowName));
+	    flow.appendChild(name);
+
+	    //set name
+	    String flowOffloading = flowDB.isOffloading().toString();	    
+	    Element offloading = doc.createElement("offloading");
+	    offloading.appendChild(doc.createTextNode(flowOffloading));
+	    flow.appendChild(offloading);
+	    
 	    //set endpoints
 	    setFromEndpointFromDB(fromEndpoint);
 	    setToEndpointsFromDB(toEndpoints);
 	    setErrorEndpointFromDB(errorEndpoint);
 	    
 	}
+
+	private void setWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
+
+		String confUri = wireTapEndpointDB.getUri();
+		String confcomponentType = wireTapEndpointDB.getType().toString();
+		String confOptions = wireTapEndpointDB.getOptions();
+		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
+		Header confHeader = wireTapEndpointDB.getHeader();
+
+		if(confUri!=null) {
+
+		    Element uri = doc.createElement("uri");
+		    offloading.appendChild(uri);
+			
+			componentType = confcomponentType.toLowerCase();
+			
+			if(componentType.equals("file")||componentType.equals("sftp")) {
+				componentType = componentType + "://";
+			}else if(componentType.equals("http")) {
+				componentType = "http4://";			
+			}else {
+				componentType = componentType + ":";
+			}			
+
+			confUri = componentType + confUri;
+		    uri.setTextContent(confUri);	
+		    offloading.appendChild(uri);
+				
+			if(confOptions!=null && !confOptions.isEmpty()) {
+				
+			    Element options = doc.createElement("options");
+			    offloading.appendChild(options);
+			    
+			    String[] confOptionsSplitted = confOptions.split("&");
+			    
+			    if(confOptionsSplitted.length>1) {
+			    
+				    for(String confOption : confOptionsSplitted) {
+				    	String[] confOptionSplitted = confOption.split("=");
+	
+				    	if(confOptionSplitted.length>0){
+				    		Element option = doc.createElement(confOptionSplitted[0]);
+						    option.setTextContent(confOptionSplitted[1]);	
+				    		options.appendChild(option);
+				    	}
+				    }
+			    }else {
+			    	
+			    	String[] confOptionSplitted = confOptions.split("=");
+			    	
+			    	if(confOptionSplitted.length>0){
+			    		Element option = doc.createElement(confOptionSplitted[0]);
+					    option.setTextContent(confOptionSplitted[1]);	
+			    		options.appendChild(option);
+			    	}
+		    	
+			    }
+			}
+			
+		    if(confService!=null) {
+		    	String confServiceId = confService.getId().toString();
+			    Element serviceId = doc.createElement("service_id");
+			    
+			    serviceId.setTextContent(confServiceId);
+			    offloading.appendChild(serviceId);
+			    setServiceFromDB(confServiceId, "wireTap", confService);
+			}
+
+		    if(confHeader!=null) {
+		    	String confHeaderId = confService.getId().toString();
+			    Element headerId = doc.createElement("service_id");
+		    	
+			    offloading.appendChild(headerId);
+			    headerId.setTextContent(confHeaderId);
+			    setHeaderFromDB(confHeaderId, "wireTap", confHeader);
+			}
+
+			
+		}
+	}
+
 	
 	private void setFromEndpointFromDB(FromEndpoint fromEndpointDB) throws Exception {
 
@@ -619,8 +748,8 @@ public class DBConfiguration {
 			}
 
 		    if(confHeader!=null) {
-		    	String confHeaderId = confService.getId().toString();
-			    Element headerId = doc.createElement("service_id");
+		    	String confHeaderId = confHeader.getId().toString();
+			    Element headerId = doc.createElement("header_id");
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
@@ -689,8 +818,8 @@ public class DBConfiguration {
 				}
 
 			    if(confHeader!=null) {
-			    	String confHeaderId = confService.getId().toString();
-				    Element headerId = doc.createElement("service_id");
+			    	String confHeaderId = confHeader.getId().toString();
+				    Element headerId = doc.createElement("header_id");
 			    	
 				    endpoint.appendChild(headerId);
 				    headerId.setTextContent(confHeaderId);
@@ -756,8 +885,8 @@ public class DBConfiguration {
 			}
 
 		    if(confHeader!=null) {
-		    	String confHeaderId = confService.getId().toString();
-			    Element headerId = doc.createElement("service_id");
+		    	String confHeaderId = confHeader.getId().toString();
+			    Element headerId = doc.createElement("header_id");
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
@@ -807,15 +936,16 @@ public class DBConfiguration {
 		    header.appendChild(id);
 
 		    Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
-		    
-		    
+		    		    
 			for(HeaderKeys headerKey : headerKeys) {
 				String parameterName = headerKey.getKey();
 				String parameterValue = headerKey.getValue();
+				String parameterType = headerKey.getType();
 				  
 				Element headerParameter = doc.createElement(parameterName);
 				headerParameter.setTextContent(parameterValue);
-				header.appendChild(headerParameter);
+				headerParameter.setAttribute("type", parameterType);
+				header.appendChild(headerParameter);				
 			}
 		}
 	}
@@ -826,7 +956,8 @@ public class DBConfiguration {
 	    String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id",doc);
 	    String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name",doc);
 	    String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart",doc);
-
+	    String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading",doc);
+	    
 	    if(!flowId.isEmpty()) {
 	    	
 	       Flow flow = flowRepository.findOne(id);
@@ -843,7 +974,7 @@ public class DBConfiguration {
 		       flow.setGateway(gateway);
 	       }
 	       
-	       if(flowName==null) {
+	       if(flowName==null || flowName.isEmpty()) {
 	    	   flow.setName(flowId);   
 	       }else {
 	    	   flow.setName(flowName);
@@ -853,6 +984,12 @@ public class DBConfiguration {
 	    	   flow.setAutoStart(true);   
 	       }else {
 	    	   flow.setAutoStart(false);
+	       }
+	       
+	       if(flowOffloading!=null && flowOffloading.equals("true")) {
+	    	   flow.setOffloading(true);   
+	       }else {
+	    	   flow.setOffloading(false);
 	       }
 	       
 	       fromEndpoint = getFromEndpointFromXML(flowId, doc);	       
@@ -1310,7 +1447,7 @@ public class DBConfiguration {
 	    	values.put(environmentVariable.getKey(),environmentVariable.getValue());
 	    }
 	    
-	    StrSubstitutor sub = new StrSubstitutor(values, "${", "}");
+	    StrSubstitutor sub = new StrSubstitutor(values, "@{", "}");
 	    
 	    String output = sub.replace(input);
 	    

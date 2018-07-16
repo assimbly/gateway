@@ -12,10 +12,9 @@ import {
     MaintenancePopupComponent,
     MaintenanceDeleteDialogComponent,
     MaintenanceDeletePopupComponent,
-    MaintenanceDetailComponent, 
+    MaintenanceDetailComponent,
     maintenanceRoute
 } from './';
-
 
 @NgModule({
     imports: [
@@ -31,7 +30,7 @@ import {
         MaintenancePopupComponent,
         MaintenanceDeleteDialogComponent,
         MaintenanceDeletePopupComponent,
-        MaintenanceDetailComponent        
+        MaintenanceDetailComponent
     ],
     entryComponents: [
         MaintenanceComponent,
@@ -40,8 +39,7 @@ import {
         MaintenancePopupComponent,
         MaintenanceDeleteDialogComponent,
         MaintenanceDeletePopupComponent,
-        MaintenanceDetailComponent        
-
+        MaintenanceDetailComponent
     ],
     providers: [
         FlowService

@@ -12,6 +12,7 @@ import { GatewayToEndpointModule } from './to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
 import { GatewayGroupModule } from './group/group.module';
+import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
@@ -42,7 +43,8 @@ import { GatewayGroupModule } from './group/group.module';
         GatewayServiceKeysModule,
         GatewayToEndpointModule,
         GatewayMaintenanceModule,
-        GatewayGroupModule
+        GatewayGroupModule,
+        GatewayWireTapEndpointModule,
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     declarations: [],

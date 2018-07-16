@@ -1,27 +1,39 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FlowService } from './flow.service';
 import { FormGroup, FormControl } from '@angular/forms';
+import { flowExamples } from '../../shared/camel/component-type';
 
 @Component({
-    selector: 'jhi-flow-live-mode',
-    templateUrl: './flow-live-mode.component.html'
+    selector: 'jhi-flow-editor-mode',
+    templateUrl: './flow-editor-mode.component.html'
 })
-export class FlowLiveModeComponent implements OnInit {
+export class FlowEditorModeComponent implements OnInit {
 
     public xmlEditor: string;
+    public nameTypeFlow: string;
     public flowId: number;
     public liveModeForm: FormGroup;
     public configuration: any;
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
+    public flowExamples: Array<FlowExamples> = flowExamples;
+    public selectedFlowExample: FlowExamples = new FlowExamples();
+    public test: Array<FlowExamples>;
+    public flowExampleListName: any[] = [];
+    public flowExampleListType: any[] = ['XML', 'JSON', 'YAML'];
+    public status = false;
     public hasLoadError: boolean;
+    public selectedFiletype: string;
     private hintText =
-`<!--
-    Use this editor to configure flows in a text editor.
-    The live mode can be use to try out new flows.
-    A flows running in live mode is not persistent.
-    Then you need to save the flow.
+    `<!--
+    In editor mode you can try new flows!
+
+    1) Create the configuration in XML, JSON or YAML (tip: load an example)
+    2) Choose the ID of your flow and filetype
+    3) Use the "try" button to set the configuration.
+
+    A flow running in editor mode is not persistent. To make a flow persistent save the flow.
+    The flow is then added to the main page.
 -->`;
 
     constructor(
@@ -30,14 +42,11 @@ export class FlowLiveModeComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.flowExampleListName = this.flowExamples.map((x) => x.name).filter((v, i, a) => a.indexOf(v) === i);
+        this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
+        this.selectedFlowExample.flowtypeFile = 'XML';
         this.initializeLiveModeForm();
         this.xmlEditor = this.hintText;
-    }
-
-    onChange() {
-        /* if (this.xmlEditor === '') {
-            this.xmlEditor = this.hintText;
-        } */
     }
 
     removeHintText() {
@@ -50,6 +59,14 @@ export class FlowLiveModeComponent implements OnInit {
         this.liveModeForm = new FormGroup({
             'flowId': new FormControl(this.flowId)
         });
+    }
+
+    addExample(componentType: string) {
+
+        this.selectedFlowExample.name = componentType;
+
+        this.status = false;
+        this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
     }
 
     setLiveConfiguration() {
@@ -68,6 +85,18 @@ export class FlowLiveModeComponent implements OnInit {
                 configuredFlow.isFlowStopped = true;
                 configuredFlow.isFlowRestarted = true;
                 this.configuredFlows.push(configuredFlow);
+            }, (err) => {
+                this.showInfoMessage(false);
+            });
+    }
+
+    saveFlows() {
+        this.flowId = this.liveModeForm.controls.flowId.value;
+        this.flowService.saveFlows(this.flowId, this.xmlEditor, 'application/xml')
+            .map((response) => response.text())
+            .subscribe((response) => {
+                this.configuration = response;
+                this.showInfoMessage(true);
             }, (err) => {
                 this.showInfoMessage(false);
             });
@@ -165,4 +194,10 @@ export class ConfiguredFlow {
     isFlowResumed: boolean;
     isFlowStopped: boolean;
     isFlowRestarted: boolean;
+}
+export class FlowExamples {
+
+    name: string;
+    flowtypeFile: string;
+    fileExample: string;
 }

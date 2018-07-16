@@ -15,6 +15,8 @@ import { ServiceService } from './service.service';
 export class ServiceDeleteDialogComponent {
 
     service: Service;
+    message = 'Are you sure you want to delete this Service?';
+    disableDelete: boolean;
 
     constructor(
         private serviceService: ServiceService,
@@ -29,7 +31,7 @@ export class ServiceDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.serviceService.delete(id).subscribe((response) => {
+        this.serviceService.delete(id).subscribe(() => {
             this.eventManager.broadcast({
                 name: 'serviceListModification',
                 content: 'Deleted an service'
@@ -38,6 +40,9 @@ export class ServiceDeleteDialogComponent {
             setTimeout(() => {
                 this.activeModal.close();
             }, 0);
+        }, () => {
+            this.message = 'Service ' + this.service.name + ' can not be deleted!';
+            this.disableDelete = true;
         });
     }
 }

@@ -32,6 +32,12 @@ public class Maintenance implements Serializable {
     @Column(name = "end_time")
     private Instant endTime;
 
+    @Column(name = "duration")
+    private Instant duration;
+
+    @Column(name = "frequency")
+    private String frequency;
+    
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -67,6 +73,32 @@ public class Maintenance implements Serializable {
         this.endTime = endTime;
     }
 
+    public Instant getDuration() {
+        return duration;
+    }
+
+    public Maintenance duration(Instant duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public void setDuration(Instant duration) {
+        this.duration = duration;
+    }    
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public Maintenance frequency(String frequency) {
+        this.frequency = frequency;
+        return this;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    } 
+    
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

@@ -72,6 +72,21 @@ export class FlowService {
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
         }
     }
+    saveFlows(id: number, xmlconfiguration: string, header: string): Observable<Response> {
+        let headers = new Headers();
+            headers.append('Accept', header);
+            let options = new RequestOptions();
+            options.headers = headers;
+            return this.http.post(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
+        }
+
+    validateFlowsUri(connectorId: number, uri: string): Observable<Response> {
+        let headers = new Headers();
+        headers.append('Uri', uri);
+        let options = new RequestOptions();
+        options.headers = headers;
+        return this.http.get(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
+    }
 
     start(id: number): Observable<Response> {
         console.log(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
@@ -113,8 +128,8 @@ export class FlowService {
         return this.http.get(`${SERVER_API_URL}/api/camel-url`)
     }
 
-    setMaintainance(time: number, flowsIds: Array<number>): Observable<Response> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintainance/${time}`, flowsIds);
+    setMaintenance(time: number, flowsIds: Array<number>): Observable<Response> {
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds);
     }
 
     exportGatewayConfiguration(gateway: Gateway) {

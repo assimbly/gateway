@@ -30,14 +30,23 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="offloading" type="bit">
+                <constraints nullable="true" />
+            </column>
+
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <column name="from_endpoint_id" type="bigint">
                 <constraints unique="true" nullable="true" />
-            </column>            <column name="error_endpoint_id" type="bigint">
+            </column>            
+            <column name="error_endpoint_id" type="bigint">
                 <constraints unique="true" nullable="true" />
             </column>
+            <column name="maintenance_id" type="bigint">
+                <constraints unique="true" nullable="true" />
+            </column>
+            
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
         

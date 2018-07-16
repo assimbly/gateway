@@ -17,7 +17,7 @@ import { Gateway, GatewayService } from '../gateway';
 import { Service, ServiceService } from '../service';
 import { Header, HeaderService } from '../header';
 import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { EndpointType } from '../../shared/model/endpoint-type';
+import { EndpointType, typesLinks, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -53,9 +53,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
-    toTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM', 'WASTEBIN'];
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'KAFKA', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'VM'];
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
@@ -71,11 +68,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
     displayNextButton = false;
+    invalidUriMessage: string;
 
     fromFilterService: Array<Service> = [];
+    fromServiceType: string;
     toFilterService: Array<Array<Service>> = [[]];
+    toServiceType: Array<string> = [];
     errorFilterService: Array<Service> = [];
+    errorServiceType: string;
     selectedService: Service = new Service();
+    closeResult: string;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -96,7 +98,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private components: Components
     ) {
         this.toEndpoints = [new ToEndpoint()];
     }
@@ -141,6 +144,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow = flow;
                             if (isCloning) {
                                 this.flow.id = null;
+                            }
+                            if (this.singleGateway) {
+                                this.flow.gatewayId = this.gateways[0].id;
                             }
                             this.initializeForm(this.flow);
                             if (this.flow.fromEndpointId) {
@@ -199,6 +205,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     setTimeout(() => {
                         this.flow = new Flow();
                         this.flow.autoStart = false;
+                        this.flow.offloading = false;
+                        if (this.singleGateway) {
+                            this.flow.gatewayId = this.gateways[0].id;
+                        }
                         this.initializeForm(this.flow);
 
                         this.fromEndpoint = new FromEndpoint();
@@ -225,17 +235,28 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.displayNextButton = true;
                     }, 0);
                 }
-
             });
     }
 
-    filterServices(endpoint: any) {
+    filterServices(endpoint: any, formService: FormControl) {
         if (endpoint instanceof ToEndpoint) {
-            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+            this.toServiceType[this.toEndpoints.indexOf(endpoint)] = this.returnServiceType(endpoint.type);
+            this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.toServiceType[this.toEndpoints.indexOf(endpoint)]);
+            if (this.toFilterService[this.toEndpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
+                formService.setValue(this.toFilterService[this.toEndpoints.indexOf(endpoint)].find((fs) => fs.id === endpoint.serviceId).id);
+            }
         } else if (endpoint instanceof FromEndpoint) {
-            this.fromFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+            this.fromServiceType = this.returnServiceType(endpoint.type);
+            this.fromFilterService = this.services.filter((f) => f.type === this.fromServiceType);
+            if (this.fromFilterService.length > 0 && endpoint.serviceId) {
+                formService.setValue(this.fromFilterService.find((fs) => fs.id === endpoint.serviceId).id);
+            }
         } else if (endpoint instanceof ErrorEndpoint) {
-            this.errorFilterService = this.services.filter((f) => f.type === this.returnServiceType(endpoint.type));
+            this.errorServiceType = this.returnServiceType(endpoint.type);
+            this.errorFilterService = this.services.filter((f) => f.type === this.errorServiceType);
+            if (this.errorFilterService.length > 0 && endpoint.serviceId) {
+                formService.setValue(this.errorFilterService.find((fs) => fs.id === endpoint.serviceId).id);
+            }
         }
     }
 
@@ -248,10 +269,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'JDBC Connection';
         } else if (type === 'SJMS') {
             return 'MQ Connection';
-        } else if (type === 'FILE' || 'HTTP4' || 'KAFKA' || 'SFTP' || 'SJMS' || 'STREAM' || 'VM' || 'WASTEBIN') {
+        } else {
             return '';
         }
-
     }
 
     setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
@@ -259,203 +279,30 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (typeof e !== 'undefined') {
             endpoint.type = e;
         }
-        const typesLinks = [
-            {
-                name: 'ACTIVEMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-activemq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-jms/src/main/docs/jms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: Name of the queue or topic to use as destination.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-                `
-            },
-            {
-                name: 'FILE',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-file`,
-                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/file-component.adoc`,
-                uriPlaceholder: 'directoryName',
-                uriPopoverMessage: `
-                    <b>Name</b>: directoryName<br/>
-                    <b>Description</b>:  The starting directory.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: File <br/><br/>
-                    <b>Example</b>: /home/user/order or C:\\order<br/>
-                `
-            },
-            {
-                name: 'HTTP4',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-http4`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-http4/src/main/docs/http4-component.adoc`,
-                uriPlaceholder: 'httpUri',
-                uriPopoverMessage: `
-                    <b>Name</b>: httpUri<br/>
-                    <b>Description</b>: The url of the HTTP endpoint to call.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: URI <br/><br/>
-                    <b>Example</b>: http://servername:8080/orders<br/>
-                `
-            },
-            {
-                name: 'KAFKA',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-kafka`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-kafka/src/main/docs/kafka-component.adoc`,
-                uriPlaceholder: 'topic',
-                uriPopoverMessage: `
-                    <b>Name</b>: topic<br/>
-                    <b>Description</b>:  Name of the topic to use. On the consumer you can use comma to separate multiple topics.
-                        A producer can only send a message to a single topic.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: test or test1,test2,test3<br/>
-                `
-            },
-            {
-                name: 'SFTP',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sftp`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-ftp/src/main/docs/sftp-component.adoc`,
-                uriPlaceholder: 'host:port/directoryName',
-                uriPopoverMessage: `
-                    <b>Name</b>: host<br/>
-                    <b>Description</b>: Hostname of the FTP server.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/>
-                    <br/>
-                    <b>Name</b>: port<br/>
-                    <b>Description</b>: Port of the FTP server.<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Default</b>: 22<br/>
-                    <b>Data Type</b>: int<br/>
-                    <br/>
-                    <b>Name</b>: directoryName<br/>
-                    <b>Description</b>: The starting directory.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Example</b>: servername:22/dir1/subdir<br/>
-                `
-            },
-            {
-                name: 'SJMS',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sjms`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-                `
-            },
-            {
-                name: 'SONICMQ',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sonicmq`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sjms/src/main/docs/sjms-component.adoc`,
-                uriPlaceholder: 'destinationType:destinationName',
-                uriPopoverMessage: `
-                    <b>Name</b>: destinationType<br/>
-                    <b>Description</b>: The kind of destination to use.<br/>
-                    <b>Required</b>: no <br/>
-                    <b>Default</b>: queue<br/>
-                    <b>Data Type</b>: String<br/>
-                    <br/>
-                    <b>Name</b>: destinationName<br/>
-                    <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: queue:order (or just order) / topic:order<br/>
-
-                `
-            },
-            {
-                name: 'SQL',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-sql`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-sql/src/main/docs/sql-component.adoc`,
-                uriPlaceholder: 'query',
-                uriPopoverMessage: `
-                    <b>Name</b>: <b>query</b><br/>
-                    <b>Description</b>: Sets the SQL query to perform. <br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: select id from order<br/>
-                `
-            },
-            {
-                name: 'STREAM',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-stream`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-stream/src/main/docs/stream-component.adoc`,
-                uriPlaceholder: 'kind',
-                uriPopoverMessage: `
-                    <b>Name</b>: kind<br/>
-                    <b>Description</b>: Kind of stream to use such as System.in or System.out.<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String <br/><br/>
-                    <b>Example</b>: out (or in or err)<br/>
-                `
-            },
-            {
-                name: 'VM',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-vm`,
-                camelTypeLink: `${this.camelDocUrl}/components/camel-core/src/main/docs/vm-component.adoc`,
-                uriPlaceholder: 'queueName',
-                uriPopoverMessage: `
-                    <b>Name</b>: queueName<br/>
-                    <b>Description</b>: Internal queue between two flows<br/>
-                    <b>Required</b>: yes <br/>
-                    <b>Data Type</b>: String<br/><br/>
-                    <b>Example</b>: test<br/>
-                `
-            },
-            {
-                name: 'WASTEBIN',
-                assimblyTypeLink: `${this.wikiDocUrl}/component-wastebin`,
-                camelTypeLink: `${this.camelDocUrl}/camel-core/src/main/docs/mock-component.adoc`,
-                uriPlaceholder: '',
-                uriPopoverMessage: `
-                    <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
-                `
-            }
-        ];
 
         let type;
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
-            this.fromTypeAssimblyLink = type.assimblyTypeLink;
-            this.fromTypeCamelLink = type.camelTypeLink;
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
+            this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
             this.fromUriPopoverMessage = type.uriPopoverMessage;
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
-            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = type.assimblyTypeLink;
-            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = type.camelTypeLink;
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
+            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
             this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
-            this.filterServices(endpoint);
-            this.errorTypeAssimblyLink = type.assimblyTypeLink;
-            this.errorTypeCamelLink = type.camelTypeLink;
+            this.filterServices(endpoint, endpointForm.controls.service as FormControl);
+            this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
+            this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
             this.errorUriPopoverMessage = type.uriPopoverMessage;
         }
@@ -470,15 +317,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 endpointForm.controls.header.disable();
                 break;
             }
-            case 'FILE': case 'HTTP4': case 'SFTP': case 'SJMS': case 'STREAM': {
-                endpointForm.controls.service.disable();
+            case 'ACTIVEMQ': case 'SJMS': case 'SONICMQ': case 'SQL': {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.header.enable();
+                endpointForm.controls.service.enable();
                 break;
             }
             default: {
                 endpointForm.controls.uri.enable();
                 endpointForm.controls.options.enable();
-                endpointForm.controls.service.enable();
                 endpointForm.controls.header.enable();
+                endpointForm.controls.service.disable();
                 break;
             }
         }
@@ -489,6 +339,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'id': new FormControl(flow.id),
             'name': new FormControl(flow.name, Validators.required),
             'autoStart': new FormControl(flow.autoStart),
+            'offloading': new FormControl(flow.offloading),
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
@@ -529,6 +380,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'id': flow.id,
             'name': flow.name,
             'autoStart': flow.autoStart,
+            'offloading': flow.offloading,
             'gateway': flow.gatewayId
         });
     }
@@ -666,45 +518,48 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    createOrEditHeader(endpoint) {
-        (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' }) :
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' });
+    createOrEditHeader(endpoint, formHeader: FormControl) {
+        endpoint.headerId = formHeader.value;
+        (endpoint.headerId) ?
+            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
+            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
             'headerModified',
-            (res) => this.setHeader(endpoint, res)
+            (res) => this.setHeader(endpoint, res, formHeader)
         );
     }
 
-    createOrEditService(endpoint) {
+    createOrEditService(endpoint, serviceType: string, formService: FormControl) {
         (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: 'showEditServiceButton' }) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: 'showEditServiceButton' });
-
+            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: serviceType }) :
+            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: serviceType });
         this.eventManager.subscribe(
             'serviceModified',
-            (res) => this.setService(endpoint, res)
+            (res) => this.setService(endpoint, res, formService)
         );
     }
 
-    setHeader(endpoint, id) {
+    setHeader(endpoint, id, formHeader: FormControl) {
         this.headerService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.headers = res.json;
                 this.headerCreated = this.headers.length > 0;
                 endpoint.headerId = this.headers.find((h) => h.id === id.content).id;
+                formHeader.patchValue(endpoint.headerId);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
     }
 
-    setService(endpoint, id) {
+    setService(endpoint, id, formService: FormControl) {
         this.serviceService.query().subscribe(
             (res: ResponseWrapper) => {
                 this.services = res.json;
                 this.serviceCreated = this.services.length > 0;
                 endpoint.serviceId = this.services.find((s) => s.id === id.content).id;
+                formService.patchValue(endpoint.serviceId);
+                this.filterServices(endpoint, formService);
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
@@ -825,6 +680,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.id = flowControls.id.value;
         this.flow.name = flowControls.name.value;
         this.flow.autoStart = flowControls.autoStart.value;
+        this.flow.offloading = flowControls.offloading.value;
         this.flow.gatewayId = flowControls.gateway.value;
 
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
@@ -850,42 +706,80 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next(isNextTab?: boolean) {
+    next(nextClicked: boolean, isNextTab?: boolean) {
         const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
         const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
         const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
         if (index === 0) {
-            this.validateTypeAndUri(<FormGroup>endpoints[index]);
+            let endpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.fromEndpointOptions, this.fromEndpoint, endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage('FromEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else if (index === this.ngbTabset.tabs.length - 1) {
-            this.validateTypeAndUri(<FormGroup>endpoints[index]);
+            let formEndpoint = <FormGroup>endpoints[index];
+            this.validateTypeAndUri(formEndpoint);
             if (endpoints[1].valid) {
-                this.goToNextTab(endpoints, 0);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.errorEndpointOptions, this.errorEndpoint, formEndpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    }, () => {
+                        this.setInvalidUriMessage('ErrorEndpoint');
+                        if (nextClicked) { this.goToNextTab(endpoints, 0) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
             }
         } else {
-            this.validateTypeAndUri(<FormGroup>endpoints[index + 1]);
+            let endpoint = <FormGroup>endpoints[index + 1];
+            this.validateTypeAndUri(endpoint);
             if (endpoints[index + 1].valid) {
-                this.goToNextTab(endpoints, index + 1);
+                this.flowService
+                    .validateFlowsUri(this.editFlowForm.controls.gateway.value, this.formatUri(this.toEndpointsOptions[index - 1], this.toEndpoints[index - 1], endpoint))
+                    .subscribe(() => {
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    }, () => {
+                        this.setInvalidUriMessage(`ToEndpoint (${index})`);
+                        if (nextClicked) { this.goToNextTab(endpoints, index + 1) }
+                    });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
             }
         }
     }
 
+    setInvalidUriMessage(endpointName: string) {
+        this.invalidUriMessage = `Uri for ${endpointName} is not valid.`;
+        setTimeout(() => {
+            this.invalidUriMessage = '';
+        }, 15000);
+    }
+
     goToNextTab(endpoints: AbstractControl[], index) {
         this.ngbTabset.select((this.ngbTabset.tabs['_results'])[index].id);
         if (endpoints.find((e) => !e.valid)) {
             this.displayNextButton = true;
-            this.next(true);
+            this.next(true, true);
         } else {
             this.displayNextButton = false;
         }
+    }
+
+    formatUri(endpointOptions, endpoint, formEndpoint): string {
+        if (formEndpoint.controls.type.value === null) { return };
+        let formOptions = <FormArray>formEndpoint.controls.options;
+        this.setEndpointOptions(endpointOptions, endpoint, formOptions);
+        return `${formEndpoint.controls.type.value.toLowerCase()}://${formEndpoint.controls.uri.value}${!endpoint.options ? '' : endpoint.options}`;
     }
 
     validateTypeAndUri(endpoint: FormGroup) {
