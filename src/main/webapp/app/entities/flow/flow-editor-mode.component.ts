@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FlowService } from './flow.service';
-import { FormGroup, FormControl } from '@angular/forms';
 import { flowExamples } from '../../shared/camel/component-type';
 
 @Component({
@@ -12,7 +11,10 @@ export class FlowEditorModeComponent implements OnInit {
     public xmlEditor: string;
     public nameTypeFlow: string;
     public flowId: number;
-    public liveModeForm: FormGroup;
+    public flowIdInEditor: number;
+    public editorEmpty: boolean;
+    public editorFlowIdDoesNotExists: boolean;
+    public flowIdsDoesNotMatch: boolean;
     public configuration: any;
     public isConfigurationSet: boolean;
     public configuredFlows: Array<ConfiguredFlow> = [];
@@ -45,20 +47,56 @@ export class FlowEditorModeComponent implements OnInit {
         this.flowExampleListName = this.flowExamples.map((x) => x.name).filter((v, i, a) => a.indexOf(v) === i);
         this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
         this.selectedFlowExample.flowtypeFile = 'XML';
-        this.initializeLiveModeForm();
         this.xmlEditor = this.hintText;
     }
 
     removeHintText() {
         if (this.xmlEditor === this.hintText) {
             this.xmlEditor = '';
+            this.editorEmpty = true;
         }
+        this.validate();
     }
 
-    initializeLiveModeForm() {
-        this.liveModeForm = new FormGroup({
-            'flowId': new FormControl(this.flowId)
-        });
+    findIdInEditor(): string {
+        let id;
+        try {
+            let obj = JSON.parse(this.xmlEditor);
+            id = obj.connectors.connector.flows.flow.id;
+        } catch (e) {
+            try {
+                let convert = require('xml-js');
+                let obj = JSON.parse(convert.xml2json(this.xmlEditor, {compact: true, spaces: 4}));
+                id = obj.connectors.connector.flows.flow.id._text;
+            } catch (e) {
+                try {
+                    let yaml = require('yaml-js');
+                    let obj = yaml.load(this.xmlEditor);
+                    id = obj.connectors.connector.flows.flow.id;
+                } catch (e) {
+                }
+            }
+        }
+        return id;
+    }
+
+    validate() {
+        this.validateEditor();
+        this.validateFlowIdsMatch();
+        this.validateEditorFlowId();
+    }
+
+    private validateEditor() {
+        this.editorEmpty = !this.xmlEditor;
+        this.flowIdInEditor = Number(this.findIdInEditor());
+    }
+
+    private validateFlowIdsMatch() {
+        this.flowIdsDoesNotMatch = this.flowIdInEditor !== Number(this.flowId);
+    }
+
+    private validateEditorFlowId() {
+        this.editorFlowIdDoesNotExists = isNaN(this.flowIdInEditor);
     }
 
     addExample(componentType: string) {
@@ -74,21 +112,9 @@ export class FlowEditorModeComponent implements OnInit {
                 this.xmlEditor = this.hintText;
             }
         }
-        /* this.flowExamples.forEach((f) => {
-            if (t === 'XML') {
-                this.status = false;
-                this.xmlEditor = f.fileExample;
-            } else if (t === 'JSON' || t === 'YAML') {
-                this.status = true;
-                if (this.xmlEditor !== '') {
-                    this.xmlEditor = this.hintText;
-                }
-            }
-        }); */
     }
 
     setLiveConfiguration() {
-        this.flowId = this.liveModeForm.controls.flowId.value;
         this.flowService.setConfiguration(this.flowId, this.xmlEditor, 'application/xml')
             .map((response) => response.text())
             .subscribe((config) => {
@@ -109,7 +135,6 @@ export class FlowEditorModeComponent implements OnInit {
     }
 
     saveFlows() {
-        this.flowId = this.liveModeForm.controls.flowId.value;
         this.flowService.saveFlows(this.flowId, this.xmlEditor, 'application/xml')
             .map((response) => response.text())
             .subscribe((response) => {
