@@ -1,43 +1,47 @@
 <div class="container">
 	<div>
 		<button type="button" [routerLink]="['/']" class="btn btn-info pull-right">
-			<span class="fa fa-arrow-left"></span>&nbsp; <span> Back</span>
+			<span class="fa fa-arrow-left"></span>&nbsp;
+			<span> Back</span>
 		</button>
 	</div>
 	<h2>Editor mode</h2>
 	<hr>
 	<div>
-		<form [formGroup]="liveModeForm" (ngSubmit)="saveFlows()">
+		<form name="liveModeForm" (ngSubmit)="saveFlows()" #liveModeForm="ngForm" role="form">
 			<div class="form-group">
-				<div ace-editor [(text)]="xmlEditor" [mode]="'XML'"
-					[theme]="'xcode'" [options]="{maxLines: 'Infinity'}"
-					(click)="removeHintText()"
-					style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></div>
+				<div ace-editor [(text)]="xmlEditor" [mode]="'XML'" [theme]="'xcode'" [options]="{maxLines: 'Infinity'}" (click)="removeHintText()"
+				 (keyup)="validate()" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></div>
+				<div *ngIf="editorEmpty" class="invalid-field-message"><span>Configuration is required.</span></div>
 			</div>
 			<div class="form-group">
 				<div class="row">
 					<div class="col-3">
 						<select class="form-control" [(ngModel)]="selectedFlowExample.flowtypeFile" [ngModelOptions]="{standalone: true}" name="flowtypeFile">
-							 <option *ngFor="let f of flowExampleListType" [value]="f">{{f}}</option>
+							<option *ngFor="let f of flowExampleListType" [value]="f">{{f}}</option>
 						</select>
 					</div>
 					<div class="col-3">
-						<input type="text" class="form-control" id="flowId" placeholder="Flow ID" formControlName="flowId">						
-					</div>					
+						<input type="number" class="form-control" id="flowId" name="flowId" required placeholder="Flow ID" [(ngModel)]="flowId" #fId="ngModel"
+						 (keyup)="validate()">
+						<div *ngIf="fId.invalid && (fId.dirty || fId.touched)" class="invalid-field-message">
+							<span *ngIf="fId.errors.required">Flow id is required.</span>
+						</div>
+						<div *ngIf="!fId.errors && editorFlowIdDoesNotExists" class="invalid-field-message"><span>Flow id in configuration is required.</span></div>
+						<div *ngIf="!fId.errors && !editorFlowIdDoesNotExists && flowIdsDoesNotMatch" class="invalid-field-message"><span></span>Flow id does not match with flow id in editor.</span></div>
+					</div>
 					<div class="col-6 text-right">
-					    <div ngbDropdown class="d-inline-block">
-					      <button  type="button" class="btn btn-primary" id="exampleDropdown" ngbDropdownToggle>Load Example</button>
-					      <div ngbDropdownMenu aria-labelledby="exampleDropdown" >
-					        <button class="dropdown-item" type="button" *ngFor="let componentType of flowExampleListName" (click)="addExample(componentType)">{{componentType}}</button>
-					      </div>
-					    </div>
-						<button type="button" (click)="setLiveConfiguration()" class="btn btn-primary">Try</button>
-						<button type="submit" class="btn btn-primary">Save</button>
+						<div ngbDropdown class="d-inline-block">
+							<button type="button" class="btn btn-primary" id="exampleDropdown" ngbDropdownToggle>Load Example</button>
+							<div ngbDropdownMenu aria-labelledby="exampleDropdown">
+								<button type="button" class="dropdown-item" *ngFor="let componentType of flowExampleListName" (click)="addExample(componentType)">{{componentType}}</button>
+							</div>
+						</div>
+						<button type="button" [disabled]="liveModeForm.form.invalid || editorEmpty || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" (click)="setLiveConfiguration()" class="btn btn-primary">Try</button>
+						<button type="submit" [disabled]="liveModeForm.form.invalid || editorEmpty || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" class="btn btn-primary">Save</button>
 					</div>
 				</div>
-				
 			</div>
-			
 		</form>
 	</div>
 	<div *ngIf="hasLoadError">
@@ -66,38 +70,27 @@
 				<tr *ngFor="let configuredFlow of configuredFlows">
 					<td>{{configuredFlow.flowId}}</td>
 					<td>
-						<div
-							class="btn-group flex-btn-group-container flow-btns justify-content-center">
-							<button type="button" (click)="start(configuredFlow)"
-								class="btn btn-info btn-sm"
-								*ngIf="!configuredFlow.isFlowStarted">
-								<span class="fa fa-play"></span> <span
-									class="d-none d-md-inline">Start</span>
+						<div class="btn-group flex-btn-group-container flow-btns justify-content-center">
+							<button type="button" (click)="start(configuredFlow)" class="btn btn-info btn-sm" *ngIf="!configuredFlow.isFlowStarted">
+								<span class="fa fa-play"></span>
+								<span class="d-none d-md-inline">Start</span>
 							</button>
-							<button type="button" (click)="restart(configuredFlow)"
-								class="btn btn-primary btn-sm"
-								*ngIf="!configuredFlow.isFlowRestarted">
-								<span class="fa fa-refresh"></span> <span
-									class="d-none d-md-inline">Restart</span>
+							<button type="button" (click)="restart(configuredFlow)" class="btn btn-primary btn-sm" *ngIf="!configuredFlow.isFlowRestarted">
+								<span class="fa fa-refresh"></span>
+								<span class="d-none d-md-inline">Restart</span>
 							</button>
-							<button type="button" (click)="pause(configuredFlow)"
-								class="btn btn-warning btn-sm"
-								[disabled]="!configuredFlow.isFlowPaused && configuredFlow.isFlowStopped"
-								*ngIf="!configuredFlow.isFlowPaused">
-								<span class="fa fa-pause"></span> <span
-									class="d-none d-md-inline">Pause</span>
+							<button type="button" (click)="pause(configuredFlow)" class="btn btn-warning btn-sm" [disabled]="!configuredFlow.isFlowPaused && configuredFlow.isFlowStopped"
+							 *ngIf="!configuredFlow.isFlowPaused">
+								<span class="fa fa-pause"></span>
+								<span class="d-none d-md-inline">Pause</span>
 							</button>
-							<button type="button" (click)="resume(configuredFlow)"
-								class="btn btn-info btn-sm"
-								*ngIf="!configuredFlow.isFlowResumed">
-								<span class="fa fa-step-forward"></span> <span
-									class="d-none d-md-inline">Resume</span>
+							<button type="button" (click)="resume(configuredFlow)" class="btn btn-info btn-sm" *ngIf="!configuredFlow.isFlowResumed">
+								<span class="fa fa-step-forward"></span>
+								<span class="d-none d-md-inline">Resume</span>
 							</button>
-							<button type="button" (click)="stop(configuredFlow)"
-								class="btn btn-danger btn-sm"
-								[disabled]="configuredFlow.isFlowStopped">
-								<span class="fa fa-stop"></span> <span
-									class="d-none d-md-inline">Stop</span>
+							<button type="button" (click)="stop(configuredFlow)" class="btn btn-danger btn-sm" [disabled]="configuredFlow.isFlowStopped">
+								<span class="fa fa-stop"></span>
+								<span class="d-none d-md-inline">Stop</span>
 							</button>
 						</div>
 					</td>
