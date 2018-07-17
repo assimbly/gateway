@@ -23,10 +23,14 @@
         <div class="row mt-3">
 
             <div class="col-12 text-right">
-                <button class="btn" type="submit" [routerLink]="['../editor-mode']">
+                 <button class="btn" type="button" [routerLink]="['../editor-mode']">
                     <span class="fa fa-code"></span>
                     <span>Editor mode</span>
                 </button>
+                <!-- <button class="btn" type="button" (click)="editorMode()">
+                    <span class="fa fa-code"></span>
+                    <span>Editor mode</span>
+                </button>-->
                 <button class="btn btn-primary" type="submit" [routerLink]="['../flow', 'edit-all' ]">
                     <span class="fa fa-plus"></span>
                     <span>Create new flow</span>
