@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Account, Principal, AccountService, LoginService } from '../../shared';
 import { FlowService } from './flow.service';
 import { flowExamples } from '../../shared/camel/component-type';
 
@@ -8,6 +10,7 @@ import { flowExamples } from '../../shared/camel/component-type';
 })
 export class FlowEditorModeComponent implements OnInit {
 
+    account: Account;
     public xmlEditor: string;
     public nameTypeFlow: string;
     public flowId: number;
@@ -39,15 +42,27 @@ export class FlowEditorModeComponent implements OnInit {
 -->`;
 
     constructor(
-        private flowService: FlowService
+        private flowService: FlowService,
+        private accountService: AccountService,
+        private loginService: LoginService,
+        private router: Router,
+        private principal: Principal
     ) {
     }
 
     ngOnInit() {
+
+        this.principal.identity(true).then((account) => {
+            if (!this.principal.isAuthenticated()) {
+                this.logout();
+            }
+        });
+
         this.flowExampleListName = this.flowExamples.map((x) => x.name).filter((v, i, a) => a.indexOf(v) === i);
         this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
         this.selectedFlowExample.flowtypeFile = 'XML';
         this.xmlEditor = this.hintText;
+
     }
 
     removeHintText() {
@@ -66,7 +81,7 @@ export class FlowEditorModeComponent implements OnInit {
         } catch (e) {
             try {
                 let convert = require('xml-js');
-                let obj = JSON.parse(convert.xml2json(this.xmlEditor, {compact: true, spaces: 4}));
+                let obj = JSON.parse(convert.xml2json(this.xmlEditor, { compact: true, spaces: 4 }));
                 id = obj.connectors.connector.flows.flow.id._text;
             } catch (e) {
                 try {
@@ -227,6 +242,11 @@ export class FlowEditorModeComponent implements OnInit {
             default:
                 break;
         }
+    }
+
+    logout() {
+        this.loginService.logout();
+        this.router.navigate(['']);
     }
 }
 

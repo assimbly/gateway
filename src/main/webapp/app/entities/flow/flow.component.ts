@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { Router } from '@angular/router';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
@@ -38,7 +39,9 @@ export class FlowComponent implements OnInit, OnDestroy {
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
-        private principal: Principal
+        private principal: Principal,
+        private router: Router
+
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -61,7 +64,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             }).subscribe(
                 (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
                 (res: ResponseWrapper) => this.onError(res.json)
-            );
+                );
         }
     }
 
@@ -91,8 +94,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     getFlowsForSelectedGateway(id) {
         this.flowService.getFlowByGatewayId(Number(id))
             .subscribe(
-                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
-                (res: ResponseWrapper) => this.onError(res.json)
+            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+            (res: ResponseWrapper) => this.onError(res.json)
             )
     }
 
