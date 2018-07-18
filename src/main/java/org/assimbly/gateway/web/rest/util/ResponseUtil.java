@@ -18,18 +18,18 @@ public final class ResponseUtil {
     }
 
     
-    public static ResponseEntity<String> createSuccessResponse(long connectorId, String mediaType, String action, String message) throws Exception{
+    public static ResponseEntity<String> createSuccessResponse(long connectorId, String mediaType, String path, String message) throws Exception{
 
-    	log.debug("REST request with action " + action + " for gateway with id " + connectorId);
+    	log.debug("REST request with path " + path + " for gateway with id " + connectorId);
     	
     	switch (mediaType.toLowerCase()) {    	
 	        case "application/json":
 	        	response = ResponseEntity.ok()
-	        		.body(BodyUtil.createSuccessJSONResponse(connectorId, action, message));
+	        		.body(BodyUtil.createSuccessJSONResponse(connectorId, path, message));
 	            break;
 	        case "application/xml":
 	        	response = ResponseEntity.ok()
-	        		.body(BodyUtil.createSuccessXMLResponse(connectorId, action, message));
+	        		.body(BodyUtil.createSuccessXMLResponse(connectorId, path, message));
 	            break;
 	        default: 
 	        	response = ResponseEntity.ok()
@@ -40,9 +40,9 @@ public final class ResponseUtil {
    		return response;    	
     }
 
-    public static ResponseEntity<String> createSuccessResponse(long connectorId, String mediaType, String action, String message, boolean plainResponse) throws Exception{
+    public static ResponseEntity<String> createSuccessResponse(long connectorId, String mediaType, String path, String message, boolean plainResponse) throws Exception{
 
-    	log.debug("REST request with action " + action + " for gateway with id " + connectorId);
+    	log.debug("REST request with path " + path + " for gateway with id " + connectorId);
     
     	if(plainResponse) {
         	response = ResponseEntity.ok()
@@ -52,11 +52,11 @@ public final class ResponseUtil {
         	switch (mediaType.toLowerCase()) {    	
 		        case "application/json":
 		        	response = ResponseEntity.ok()
-		        		.body(BodyUtil.createSuccessJSONResponse(connectorId, action, message));
+		        		.body(BodyUtil.createSuccessJSONResponse(connectorId, path, message));
 		            break;
 		        case "application/xml":
 		        	response = ResponseEntity.ok()
-		        		.body(BodyUtil.createSuccessXMLResponse(connectorId, action, message));
+		        		.body(BodyUtil.createSuccessXMLResponse(connectorId, path, message));
 		            break;
 		        default: 
 		        	response = ResponseEntity.ok()
@@ -69,18 +69,18 @@ public final class ResponseUtil {
    	}
     
     
-    public static ResponseEntity<String> createSuccessResponseWithHeaders(long connectorId, String mediaType, String action, String message, String headerMessage, String headerParam) throws Exception{
+    public static ResponseEntity<String> createSuccessResponseWithHeaders(long connectorId, String mediaType, String path, String message, String headerMessage, String headerParam) throws Exception{
 
-    	log.debug("REST request with action " + action + " for gateway with id " + connectorId);
+    	log.debug("REST request with path " + path + " for gateway with id " + connectorId);
     	
     	switch (mediaType.toLowerCase()) {    	
 	        case "application/json":
 	        	response = ResponseEntity.ok().headers(HeaderUtil.createAlert(headerMessage,headerParam))
-	        		.body(BodyUtil.createSuccessJSONResponse(connectorId, action, message));
+	        		.body(BodyUtil.createSuccessJSONResponse(connectorId, path, message));
 	            break;
 	        case "application/xml":
 	        	response = ResponseEntity.ok().headers(HeaderUtil.createAlert(headerMessage,headerParam))
-	        		.body(BodyUtil.createSuccessXMLResponse(connectorId, action, message));
+	        		.body(BodyUtil.createSuccessXMLResponse(connectorId, path, message));
 	            break;
 	        default: 
 	        	response = ResponseEntity.ok().headers(HeaderUtil.createAlert(headerMessage,headerParam))
@@ -91,24 +91,23 @@ public final class ResponseUtil {
    		return response;    	
     }    
     
-    public static ResponseEntity<String> createFailureResponse(long connectorId, String mediaType, String action, String message, Exception e) throws Exception{
+    public static ResponseEntity<String> createFailureResponse(long connectorId, String mediaType, String path, String message) throws Exception{
 
-		log.error("REST request with action " + action + " for gateway with id " + connectorId + " failed.");
-		e.printStackTrace();
+		log.error("REST request with path " + path + " for gateway with id " + connectorId + " failed.");
 
     	switch (mediaType.toLowerCase()) {    	
 	        case "application/json":
 	        	response = ResponseEntity.badRequest()
-	        		.body(BodyUtil.createFailureJSONResponse(connectorId, action, message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureJSONResponse(connectorId, path, message));
 	            break;
 	        case "application/xml":
 	        	response = ResponseEntity.badRequest()
-	        		.body(BodyUtil.createFailureXMLResponse(connectorId, action, message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureXMLResponse(connectorId, path, message));
 	
 	            break;
 	        default: 
 	        	response = ResponseEntity.badRequest()
-	        		.body(BodyUtil.createFailureTEXTResponse(message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureTEXTResponse(message));
 	            break;
     	}
 		
@@ -116,24 +115,23 @@ public final class ResponseUtil {
 	}	
 
     
-    public static ResponseEntity<String> createFailureResponseWithHeaders(long connectorId, String mediaType, String action, String message, String headerMessage, String headerParam, Exception e) throws Exception{
+    public static ResponseEntity<String> createFailureResponseWithHeaders(long connectorId, String mediaType, String path, String message, String headerMessage, String headerParam) throws Exception{
 
-		log.error("REST request with action " + action + " for gateway with id " + connectorId + " failed.");
-		e.printStackTrace();
+		log.error("REST request with path " + path + " for gateway with id " + connectorId + " failed.");
 
     	switch (mediaType.toLowerCase()) {    	
 	        case "application/json":
 	        	response = ResponseEntity.badRequest().headers(HeaderUtil.createAlert(headerMessage,headerParam))
-	        		.body(BodyUtil.createFailureJSONResponse(connectorId, action, message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureJSONResponse(connectorId, path, message));
 	            break;
 	        case "application/xml":
 	        	response = ResponseEntity.badRequest().headers(HeaderUtil.createAlert(headerMessage,headerParam))
-	        		.body(BodyUtil.createFailureXMLResponse(connectorId, action, message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureXMLResponse(connectorId, path, message));
 	
 	            break;
 	        default: 
 	        	response = ResponseEntity.badRequest().headers(HeaderUtil.createAlert(headerMessage,headerParam))
-	        		.body(BodyUtil.createFailureTEXTResponse(message + " failed: " + e.getMessage()));
+	        		.body(BodyUtil.createFailureTEXTResponse(message));
 	            break;
     	}
 		
