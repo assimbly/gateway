@@ -1,123 +1,124 @@
 <div class="container">
-    
-<form [formGroup]="wireTapForm" novalidate (ngSubmit)="save()" class="needs-validation">
-    <div>
-        <h4 id="myWireTapEndpointLabel"><span *ngIf="!wireTapEndpoint.id">Create</span><span *ngIf="wireTapEndpoint.id">Edit</span> a Wire Tap Endpoint</h4>
-    </div>
-
-    <div>
-        <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" [hidden]="!wireTapEndpoint.id">
-            <label for="id">ID</label>
-            <input type="text" class="form-control" id="id" formControlName="id" readonly />
+    <form [formGroup]="wireTapForm" novalidate (ngSubmit)="save()" class="needs-validation">
+        <div>
+            <h4 id="myWireTapEndpointLabel">
+                <span *ngIf="!wireTapEndpoint.id">Create</span>
+                <span *ngIf="wireTapEndpoint.id">Edit</span> a Wire Tap Endpoint</h4>
         </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="field_type">Type</label>
-            <div class="input-group">
-                <ng-select [items]="components.wireTapTypes" formControlName="type" id="field_type" (change)="setTypeLink($event)"></ng-select>
-                <div class="input-group-append d-flex">
-                    <a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{typeCamelLink}}"
-                        [ngClass]="{'disabled': !typeCamelLink}" target="_blank" title="Camel {{wireTapEndpoint.type}} component documentation">
-                        <img src="../../../content/images/apache-camel.png" />
+        <div>
+            <jhi-alert-error></jhi-alert-error>
+            <div class="form-group" [hidden]="!wireTapEndpoint.id">
+                <label for="field_id">ID</label>
+                <input type="text" class="form-control" id="field_id" formControlName="id" readonly />
+            </div>
+            <div class="form-group">
+                <label class="form-control-label" for="field_type">Type</label>
+                <div class="input-group">
+                    <ng-select [items]="components.wireTapTypes" formControlName="type" id="field_type" (change)="setTypeLink($event)"></ng-select>
+                    <div class="input-group-append d-flex">
+                        <a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{typeCamelLink}}"
+                            [ngClass]="{'disabled': !typeCamelLink}" target="_blank" title="Camel {{wireTapEndpoint.type}} component documentation">
+                            <img src="../../../content/images/apache-camel.png" />
+                        </a>
+                    </div>
+                </div>
+                <div *ngIf="wireTapForm.controls.type.errors && (wireTapForm.controls.type.dirty || wireTapForm.controls.type.touched)" class="invalid-field-message">
+                    <span *ngIf="wireTapForm.controls.type.errors.required">Type is required. Please select one.</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-control-label" for="field_uri">Uri</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholder}}" />
+                    <ng-template #uriPopover let-message="message">
+                        <div [innerHtml]="uriPopoverMessage"></div>
+                    </ng-template>
+                    <a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{typeAssimblyLink}}" placement="left"
+                        target="_blank">
+                        <span class="fa fa-question" triggers="mouseenter:mouseleave" popoverTitle="URI Info" placement="left" container="body" [popover]="uriPopover"></span>
                     </a>
                 </div>
-            </div>
-            <div *ngIf="wireTapForm.controls.type.errors && (wireTapForm.controls.type.dirty || wireTapForm.controls.type.touched)" class="invalid-field-message">
-                <span *ngIf="wireTapForm.controls.type.errors.required">Type is required. Please select one.</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="field_uri">Uri</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholder}}" />
-                <ng-template #uriPopover let-message="message">
-                    <div [innerHtml]="uriPopoverMessage"></div>
-                </ng-template>
-                <a role="button" class="btn btn-primary left-border-radius-0 p-question-button" href="{{typeAssimblyLink}}" placement="left"
-                    target="_blank">
-                    <span class="fa fa-question" triggers="mouseenter:mouseleave" popoverTitle="URI Info" placement="left" container="body" [popover]="uriPopover"></span>
-                </a>
-            </div>
-            <div *ngIf="wireTapForm.controls.uri.errors && (wireTapForm.controls.uri.dirty || wireTapForm.controls.uri.touched)" class="invalid-field-message">
-                <span *ngIf="wireTapForm.controls.uri.errors.required">Uri is required.</span>
-            </div>
-        </div>
-
-        <div class="form-group" formArrayName="options">
-            <label class="form-control-label" for="field_options">Options</label>
-            <div class="row mx-0 mb-1" *ngFor="let option of endpointOptions; let idx = index" [formGroupName]="idx">
-                <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" placeholder="key"
-                    formControlName="key" (focusout)="validateOptions(idx)" />
-                <input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" placeholder="value"
-                    formControlName="value" (focusout)="validateOptions(idx)" />
-                <button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption()">
-                    <span class="fa fa-plus"></span>
-                </button>
-                <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(option)"
-                    [disabled]="endpointOptions.length === 1">
-                    <span class="fa fa-remove"></span>
-                </button>
-                <div class="col-5 d-inline-block px-0">
-                    <div *ngIf="wireTapForm.controls.options.controls[idx].controls.key.errors && (wireTapForm.controls.options.controls[idx].controls.key.dirty || wireTapForm.controls.options.controls[idx].controls.key.touched)" class="invalid-field-message">
-                        <span *ngIf="wireTapForm.controls.options.controls[idx].controls.key.errors.required">Option key is required.</span>
-                    </div>	
+                <div *ngIf="wireTapForm.controls.uri.errors && (wireTapForm.controls.uri.dirty || wireTapForm.controls.uri.touched)" class="invalid-field-message">
+                    <span *ngIf="wireTapForm.controls.uri.errors.required">Uri is required.</span>
                 </div>
-                <div class="col-5 d-inline-block px-0">
-                    <div *ngIf="wireTapForm.controls.options.controls[idx].controls.value.errors && (wireTapForm.controls.options.controls[idx].controls.value.dirty || wireTapForm.controls.options.controls[idx].controls.value.touched)"  class="invalid-field-message">
-                        <span *ngIf="wireTapForm.controls.options.controls[idx].controls.value.errors.required">Option value is required.</span>
+            </div>
+            <div class="form-group" formArrayName="options">
+                <label class="form-control-label" for="field_options">Options</label>
+                <div class="row mx-0 mb-1" *ngFor="let option of endpointOptions; let idx = index" [formGroupName]="idx">
+                    <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" placeholder="key"
+                        formControlName="key" (focusout)="validateOptions(idx)" />
+                    <input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" placeholder="value"
+                        formControlName="value" (focusout)="validateOptions(idx)" />
+                    <button title="Add new option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption()">
+                        <span class="fa fa-plus"></span>
+                    </button>
+                    <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(option)"
+                        [disabled]="endpointOptions.length === 1">
+                        <span class="fa fa-remove"></span>
+                    </button>
+                    <div class="col-5 d-inline-block px-0">
+                        <div *ngIf="wireTapForm.controls.options.controls[idx].controls.key.errors && (wireTapForm.controls.options.controls[idx].controls.key.dirty || wireTapForm.controls.options.controls[idx].controls.key.touched)"
+                            class="invalid-field-message">
+                            <span *ngIf="wireTapForm.controls.options.controls[idx].controls.key.errors.required">Option key is required.</span>
+                        </div>
+                    </div>
+                    <div class="col-5 d-inline-block px-0">
+                        <div *ngIf="wireTapForm.controls.options.controls[idx].controls.value.errors && (wireTapForm.controls.options.controls[idx].controls.value.dirty || wireTapForm.controls.options.controls[idx].controls.value.touched)"
+                            class="invalid-field-message">
+                            <span *ngIf="wireTapForm.controls.options.controls[idx].controls.value.errors.required">Option value is required.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-control-label" for="field_header">Headers</label>
+                <div class="input-group">
+                    <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+                    <div class="input-group-append">
+                        <button type="button" *ngIf="headerCreated && wireTapForm.controls.header.value" class="btn btn-primary" title="Edit header"
+                            (click)="createOrEditHeader()">
+                            <span class="fa fa-pencil padding-button"></span>&nbsp;
+                        </button>
+                        <button type="button" *ngIf="headerCreated && !wireTapForm.controls.header.value" class="btn btn-primary" title="New header"
+                            (click)="createOrEditHeader()">
+                            <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+                        </button>
+                        <button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader()">
+                            <span class="fa fa-plus padding-button"></span>&nbsp;
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-control-label" for="field_service">Service</label>
+                <div class="input-group">
+                    <ng-select [items]="filteredService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+                    <div class="input-group-append">
+                        <button type="button" *ngIf="serviceCreated && wireTapForm.controls.service.value" class="btn btn-primary" title="Edit service"
+                            (click)="createOrEditService()">
+                            <span class="fa fa-pencil padding-button"></span>&nbsp;
+                        </button>
+                        <button type="button" *ngIf="serviceCreated && !wireTapForm.controls.service.value" class="btn btn-primary" title="New service"
+                            (click)="createOrEditService()" [disabled]="wireTapForm.controls.service.disabled">
+                            <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+                        </button>
+                        <button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService()">
+                            <span class="fa fa-plus padding-button"></span>&nbsp;
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="field_header">Headers</label>
-            <div class="input-group">
-                <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
-                <div class="input-group-append">
-                    <button type="button" *ngIf="headerCreated && wireTapForm.controls.header.value" class="btn btn-primary" title="Edit header"
-                        (click)="createOrEditHeader()">
-                        <span class="fa fa-pencil padding-button"></span>&nbsp;
-                    </button>
-                    <button type="button" *ngIf="headerCreated && !wireTapForm.controls.header.value" class="btn btn-primary" title="New header"
-                        (click)="createOrEditHeader()">
-                        <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
-                    </button>
-                    <button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader()">
-                        <span class="fa fa-plus padding-button"></span>&nbsp;
-                    </button>
-                </div>
-            </div>
+        <div class="float-right">
+            <button type="button" (click)="previousState()" class="btn btn-info">
+                <span class="fa fa-arrow-left"></span>&nbsp;
+                <span> Back</span>
+            </button>
+            <button type="submit" [disabled]="wireTapForm.invalid || isSaving" class="btn btn-primary">
+                <span class="fa fa-save"></span>&nbsp;
+                <span *ngIf="!wireTapEndpoint.id">Save</span>
+                <span *ngIf="wireTapEndpoint.id">Update</span>
+            </button>
         </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="field_service">Service</label>
-            <div class="input-group">
-                <ng-select [items]="filteredService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
-                <div class="input-group-append">
-                    <button type="button" *ngIf="serviceCreated && wireTapForm.controls.service.value" class="btn btn-primary" title="Edit service"
-                        (click)="createOrEditService()">
-                        <span class="fa fa-pencil padding-button"></span>&nbsp;
-                    </button>
-                    <button type="button" *ngIf="serviceCreated && !wireTapForm.controls.service.value" class="btn btn-primary" title="New service"
-                        (click)="createOrEditService()" [disabled]="wireTapForm.controls.service.disabled">
-                        <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
-                    </button>
-                    <button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService()">
-                        <span class="fa fa-plus padding-button"></span>&nbsp;
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div>
-        <button type="submit" [disabled]="wireTapForm.invalid || isSaving" class="btn btn-primary">
-            <span class="fa fa-save"></span>&nbsp;
-            <span>Save</span>
-        </button>
-    </div>
-</form>
+    </form>
 </div>
