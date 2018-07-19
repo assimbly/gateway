@@ -45,6 +45,12 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+    delete(id) {
+        this.wireTapEndpointService.delete(id).subscribe((r) => {
+            this.wireTapEndpoints.splice(this.wireTapEndpoints.indexOf(this.wireTapEndpoints.find((w) => w.id === id)), 1)
+        });
+    }
+
     navigateToCreate() {
         this.router.navigate(['/wire-tap-endpoint-create']);
     }
