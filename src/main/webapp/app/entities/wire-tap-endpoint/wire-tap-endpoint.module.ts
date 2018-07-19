@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 import {
@@ -12,9 +13,12 @@ import {
     WireTapEndpointPopupComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
+    WireTapEndpointEditComponent,
     wireTapEndpointRoute,
     wireTapEndpointPopupRoute,
 } from './';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const ENTITY_STATES = [
     ...wireTapEndpointRoute,
@@ -24,10 +28,15 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
+        ReactiveFormsModule,
+        NgSelectModule,
+        FormsModule,
+        RouterModule.forChild(ENTITY_STATES),
+        PopoverModule.forRoot()
     ],
     declarations: [
         WireTapEndpointComponent,
+        WireTapEndpointEditComponent,
         WireTapEndpointDetailComponent,
         WireTapEndpointDialogComponent,
         WireTapEndpointDeleteDialogComponent,
@@ -36,6 +45,7 @@ const ENTITY_STATES = [
     ],
     entryComponents: [
         WireTapEndpointComponent,
+        WireTapEndpointEditComponent,
         WireTapEndpointDialogComponent,
         WireTapEndpointPopupComponent,
         WireTapEndpointDeleteDialogComponent,

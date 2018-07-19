@@ -1,7 +1,7 @@
 <div>
     <h2>
         <span>Offloading</span>
-        <button class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" [routerLink]="['/', { outlets: { popup: ['wire-tap-endpoint-new'] } }]">
+        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" (click)="navigateToCreate()">
             <span class="fa fa-plus"></span>
             <span >
             Create new Wiretap Endpoint
@@ -9,7 +9,6 @@
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-
 
     <div class="table-responsive" *ngIf="wireTapEndpoints">
         <table class="table table-bordered table-sm" *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId" style="margin-bottom: 30px;">
