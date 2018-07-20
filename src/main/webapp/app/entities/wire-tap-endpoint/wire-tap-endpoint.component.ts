@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
     templateUrl: './wire-tap-endpoint.component.html'
 })
 export class WireTapEndpointComponent implements OnInit, OnDestroy {
-    wireTapEndpoints: WireTapEndpoint[];
+    wireTapEndpoints: Array<WireTapEndpoint> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
 
