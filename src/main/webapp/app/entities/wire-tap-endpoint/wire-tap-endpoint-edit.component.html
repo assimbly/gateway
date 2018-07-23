@@ -116,8 +116,7 @@
             </button>
             <button type="submit" [disabled]="wireTapForm.invalid || isSaving" class="btn btn-primary">
                 <span class="fa fa-save"></span>&nbsp;
-                <span *ngIf="!wireTapEndpoint.id">Save</span>
-                <span *ngIf="wireTapEndpoint.id">Update</span>
+                <span>Save</span>
             </button>
         </div>
     </form>
