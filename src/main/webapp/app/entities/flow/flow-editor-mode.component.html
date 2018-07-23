@@ -13,11 +13,12 @@
 				<div ace-editor [(text)]="xmlEditor" [mode]="'XML'" [theme]="'xcode'" [options]="{maxLines: 'Infinity'}" (click)="removeHintText()"
 				 (keyup)="validate()" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></div>
 				<div *ngIf="editorEmpty" class="invalid-field-message"><span>Configuration is required.</span></div>
+				<div *ngIf="!editorEmpty && isConfigurationInvalid" class="invalid-field-message"><span>{{invalidConfigurationMessage}}</span></div>
 			</div>
 			<div class="form-group">
 				<div class="row">
 					<div class="col-3">
-						<select class="form-control" [(ngModel)]="selectedFlowExample.flowtypeFile" [ngModelOptions]="{standalone: true}" name="flowtypeFile">
+						<select class="form-control" [(ngModel)]="selectedFlowExample.flowtypeFile" [ngModelOptions]="{standalone: true}" name="flowtypeFile" (change)="validate()">
 							<option *ngFor="let f of flowExampleListType" [value]="f">{{f}}</option>
 						</select>
 					</div>
@@ -37,8 +38,8 @@
 								<button type="button" class="dropdown-item" *ngFor="let componentType of flowExampleListName" (click)="addExample(componentType)">{{componentType}}</button>
 							</div>
 						</div>
-						<button type="button" [disabled]="liveModeForm.form.invalid || editorEmpty || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" (click)="setLiveConfiguration()" class="btn btn-primary">Try</button>
-						<button type="submit" [disabled]="liveModeForm.form.invalid || editorEmpty || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" class="btn btn-primary">Save</button>
+						<button type="button" [disabled]="liveModeForm.form.invalid || editorEmpty || isConfigurationInvalid || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" (click)="setLiveConfiguration()" class="btn btn-primary">Try</button>
+						<button type="submit" [disabled]="liveModeForm.form.invalid || editorEmpty || isConfigurationInvalid || editorFlowIdDoesNotExists || flowIdsDoesNotMatch" class="btn btn-primary">Save</button>
 					</div>
 				</div>
 			</div>

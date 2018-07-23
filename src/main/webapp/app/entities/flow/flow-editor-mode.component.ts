@@ -29,6 +29,8 @@ export class FlowEditorModeComponent implements OnInit {
     public status = false;
     public hasLoadError: boolean;
     public selectedFiletype: string;
+    public isConfigurationInvalid: boolean;
+    public invalidConfigurationMessage = '';
     private hintText =
     `<!--
     In editor mode you can try new flows!
@@ -75,22 +77,41 @@ export class FlowEditorModeComponent implements OnInit {
 
     findIdInEditor(): string {
         let id;
-        try {
-            let obj = JSON.parse(this.xmlEditor);
-            id = obj.connectors.connector.flows.flow.id;
-        } catch (e) {
-            try {
-                let convert = require('xml-js');
-                let obj = JSON.parse(convert.xml2json(this.xmlEditor, { compact: true, spaces: 4 }));
-                id = obj.connectors.connector.flows.flow.id._text;
-            } catch (e) {
+        switch (this.selectedFlowExample.flowtypeFile) {
+            case 'XML':
+                try {
+                    let convert = require('xml-js');
+                    let obj = JSON.parse(convert.xml2json(this.xmlEditor, { compact: true, spaces: 4 }));
+                    id = obj.connectors.connector.flows.flow.id._text;
+                    this.isConfigurationInvalid = false;
+                }catch (e) {
+                    this.isConfigurationInvalid = true;
+                    this.invalidConfigurationMessage = 'XML configuration is invalid.';
+                }
+                break;
+            case 'JSON':
+                try {
+                    let obj = JSON.parse(this.xmlEditor);
+                    id = obj.connectors.connector.flows.flow.id;
+                    this.isConfigurationInvalid = false;
+                }catch (e) {
+                    this.isConfigurationInvalid = true;
+                    this.invalidConfigurationMessage = 'JSON configuration is invalid.';
+                }
+                break;
+            case 'YAML':
                 try {
                     let yaml = require('yaml-js');
                     let obj = yaml.load(this.xmlEditor);
                     id = obj.connectors.connector.flows.flow.id;
-                } catch (e) {
+                    this.isConfigurationInvalid = false;
+                }catch (e) {
+                    this.isConfigurationInvalid = true;
+                    this.invalidConfigurationMessage = 'YAML configuration is invalid.';
                 }
-            }
+                break;
+            default:
+                break;
         }
         return id;
     }

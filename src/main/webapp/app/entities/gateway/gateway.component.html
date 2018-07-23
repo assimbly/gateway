@@ -9,9 +9,7 @@
             <button class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]"
                 *ngIf="!gateways.gateway">
                 <span class="fa fa-plus"></span>
-                <span>
-                    Create new Gateway
-                </span>
+                <span>Create new Gateway</span>
             </button>
         </div>
     </div>
@@ -23,15 +21,19 @@
             <span class="d-none d-md-inline">Import XML Configuration</span>
         </button>
     </div>
-    <jhi-alert></jhi-alert>
+    <!-- <jhi-alert></jhi-alert> -->
     <br/>
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
-                <thead>
-                        <tr>
-                          <th  class="bg-gray" colspan="2"><span class="text-center"><i>{{gateway.name}}</i></span></th>
-                        </tr>
-                      </thead>
+            <thead>
+                <tr>
+                    <th class="bg-gray" colspan="2">
+                        <span class="text-center">
+                            <i>{{gateway.name}}</i>
+                        </span>
+                    </th>
+                </tr>
+            </thead>
             <tbody>
                 <tr>
                     <td lass="w-25">
