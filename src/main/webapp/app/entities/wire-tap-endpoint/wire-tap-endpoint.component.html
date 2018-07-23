@@ -1,7 +1,7 @@
 <div>
     <h2>
         <span>Offloading</span>
-        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" (click)="navigateToCreate()">
+        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0" (click)="navigateToCreate()">
             <span class="fa fa-plus"></span>
             <span>
                 Create new Wiretap Endpoint
@@ -11,7 +11,7 @@
     <!-- <jhi-alert></jhi-alert> -->
 
     <div class="table-responsive" *ngIf="wireTapEndpoints">
-        <!-- <table class="table table-bordered table-sm" *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId" style="margin-bottom: 30px;">
+        <table class="table table-bordered table-sm" *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
                 <tr>
                     <th class="bg-gray" colspan="2">
@@ -71,52 +71,18 @@
                 <tr>
                     <td colspan="2">
                         <div class="d-block pull-right">
-                            <button type="submit" [routerLink]="['../wire-tap-endpoint', wireTapEndpoint.id ]" class="btn btn-info btn-sm">
-                                <span class="fa fa-eye"></span>
-                                <span class="d-none d-md-inline">View</span>
-                            </button>
-                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'wire-tap-endpoint/'+ wireTapEndpoint.id + '/edit'} }]" replaceUrl="true"
-                                queryParamsHandling="merge" class="btn btn-primary btn-sm">
+                            <button type="button" [routerLink]="['/wire-tap-endpoint-edit', wireTapEndpoint.id]" class="btn btn-primary btn-sm">
                                 <span class="fa fa-pencil"></span>
                                 <span class="d-none d-md-inline">Edit</span>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" (click)="delete(wireTapEndpoint.id)">
+                                <span class="fa fa-remove"></span>
+                                <span class="d-none d-md-inline">Delete</span>
                             </button>
                         </div>
                     </td>
                 </tr>
             </tfoot>
-        </table> -->
-
-        <table class="table table-bordered table-sm" style="margin-bottom: 30px;">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Uri</th>
-                    <th>Options</th>
-                    <th>Header</th>
-                    <th>Service</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId">
-                    <td>{{wireTapEndpoint.type}}</td>
-                    <td>{{wireTapEndpoint.uri}}</td>
-                    <td>{{wireTapEndpoint.options}}</td>
-                    <td>{{wireTapEndpoint.service}}</td>
-                    <td>{{wireTapEndpoint.header}}</td>
-                    <td>
-                        <button type="button" [routerLink]="['/wire-tap-endpoint-edit', wireTapEndpoint.id]" class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" (click)="delete(wireTapEndpoint.id)">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
         </table>
     </div>
-
 </div>
