@@ -2,7 +2,7 @@
 	<a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
 </td>
 <td>
-	<a [routerLink]="['../flow', flow.id ]"  data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
+	<a [routerLink]="['../flow', flow.id ]" data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
 </td>
 <td id="flowRowID" [hidden]="!flowRowID">
 	<a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
@@ -11,25 +11,29 @@
 	<a *ngIf="flow.fromEndpointId" [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
 </td>
 <td>
-	<span  *ngFor="let toEndpoint of toEndpoints; let i = index">
-		<a [routerLink]="['../to-endpoint', toEndpoint.id]" data-toggle="tooltip" title="{{toEndpointsTooltips[i]}}">{{toEndpoint.type}}</a><span *ngIf="i < toEndpoints.length - 1">,</span>
+	<span *ngFor="let toEndpoint of toEndpoints; let i = index">
+		<a [routerLink]="['../to-endpoint', toEndpoint.id]" data-toggle="tooltip" title="{{toEndpointsTooltips[i]}}">{{toEndpoint.type}}</a>
+		<span *ngIf="i < toEndpoints.length - 1">,</span>
 	</span>
 </td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 	<a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
 </td>
 <td>
-	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
-	<ng-template #statusFlowButtonTemplate let-message="message"><div [innerHtml]="flowStatusButton"></div></ng-template>
+	<ng-template #statusTemplate let-message="message">
+		<div [innerHtml]="flowStatistic"></div>
+	</ng-template>
+	<ng-template #statusFlowButtonTemplate let-message="message">
+		<div [innerHtml]="flowStatusButton"></div>
+	</ng-template>
 	<p>
-			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (mouseenter)="p!=p" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusFlowButtonTemplate">active</span>
-			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
-			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave"popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
-			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
-		 <i (mouseenter)="getFlowStatus(flow.id)" [hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
-		 <i [hidden]="isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
-
-
+		<span class="badge badge-success" *ngIf="statusFlow === 'active'" (mouseenter)="p!=p" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusFlowButtonTemplate">active</span>
+		<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
+		<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+		<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+		<i (mouseenter)="getFlowStatus(flow.id)" [hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
+		<i [hidden]="isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
+	</p>
 </td>
 <td class="text-right">
 	<div class="btn-group flex-btn-group-container flow-btns">
