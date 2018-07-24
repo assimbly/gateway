@@ -94,4 +94,9 @@ export class Principal {
     getImageUrl(): String {
         return this.isIdentityResolved() ? this.userIdentity.imageUrl : null;
     }
+
+    isAdmin(): boolean {
+        return this.userIdentity.authorities.includes('ROLE_ADMIN');
+    }
+
 }

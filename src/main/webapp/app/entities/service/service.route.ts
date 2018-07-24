@@ -40,7 +40,7 @@ export const servicePopupRoute: Routes = [
         path: 'service-new',
         component: ServicePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Services'
         },
         canActivate: [UserRouteAccessService],
@@ -60,7 +60,7 @@ export const servicePopupRoute: Routes = [
         path: 'service/:id/edit',
         component: ServicePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Services'
         },
         canActivate: [UserRouteAccessService],
@@ -70,7 +70,7 @@ export const servicePopupRoute: Routes = [
         path: 'service/:id/delete',
         component: ServiceDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Services'
         },
         canActivate: [UserRouteAccessService],

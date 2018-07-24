@@ -31,7 +31,7 @@ export const environmentVariablesPopupRoute: Routes = [
         path: 'environment-variables-new',
         component: EnvironmentVariablesPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'EnvironmentVariables'
         },
         canActivate: [UserRouteAccessService],
@@ -41,7 +41,7 @@ export const environmentVariablesPopupRoute: Routes = [
         path: 'environment-variables/:id/edit',
         component: EnvironmentVariablesPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'EnvironmentVariables'
         },
         canActivate: [UserRouteAccessService],
@@ -51,7 +51,7 @@ export const environmentVariablesPopupRoute: Routes = [
         path: 'environment-variables/:id/delete',
         component: EnvironmentVariablesDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'EnvironmentVariables'
         },
         canActivate: [UserRouteAccessService],

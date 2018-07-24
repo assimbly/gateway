@@ -59,26 +59,6 @@ export class WireTapEndpointEditComponent implements OnInit {
         this.route.params.subscribe((params) => {
             this.load(params['id']);
         });
-
-        /* if (!this.wireTapEndpoint.id) {
-            this.wireTapEndpoint.type = EndpointType.FILE;
-        }
-        this.initializeEndpointData();
-        this.serviceService.query()
-            .subscribe((res: ResponseWrapper) => { this.services = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
-        this.headerService.query()
-            .subscribe((res: ResponseWrapper) => { this.headers = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
-
-        forkJoin(this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()).subscribe(([wikiDocUrl, camelDocUrl]) => {
-            this.wikiDocUrl = wikiDocUrl.text();
-            this.camelDocUrl = camelDocUrl.text();
-
-            if (this.wireTapEndpoint.type) {
-                this.setTypeLink();
-            }
-        });
-
-        this.getOptions(); */
     }
 
     private load(id) {
@@ -357,11 +337,11 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     private onSaveSuccess(result: WireTapEndpoint) {
-        // this.eventManager.broadcast({ name: 'wireTapEndpointListModification', content: 'OK' });
-        this.wireTapEndpoint = result;
+        /* this.wireTapEndpoint = result;
         this.initializeEndpointData();
         this.getOptions();
-        this.isSaving = false;
+        this.isSaving = false; */
+        this.router.navigate(['./wire-tap-endpoint']);
     }
 
     private onSaveError() {

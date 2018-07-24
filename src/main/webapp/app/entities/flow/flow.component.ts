@@ -15,6 +15,7 @@ import { GatewayService, Gateway } from '../gateway';
 
 export class FlowComponent implements OnInit, OnDestroy {
 
+    public isAdmin: boolean;
     gateways: Gateway[];
     flows: Flow[];
     currentAccount: any;
@@ -40,7 +41,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
         private principal: Principal,
-        private router: Router
+        private router: Router,
 
     ) {
         this.flows = [];
@@ -79,6 +80,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.loadFlows();
     }
     ngOnInit() {
+        this.checkPrincipal();
         this.getGateways();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
@@ -138,6 +140,10 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     trigerAction(action: string) {
         this.eventManager.broadcast({ name: 'trigerAction', content: action });
+    }
+
+    private checkPrincipal() {
+        this.principal.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
     }
 
     private onSuccess(data, headers) {

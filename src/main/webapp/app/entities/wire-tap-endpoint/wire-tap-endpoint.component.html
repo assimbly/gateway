@@ -1,7 +1,7 @@
 <div>
     <h2>
         <span>Offloading</span>
-        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0" (click)="navigateToCreate()">
+        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0 && isAdmin" (click)="navigateToCreate()">
             <span class="fa fa-plus"></span>
             <span>
                 Create new Wiretap Endpoint
@@ -67,7 +67,7 @@
                     </td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot *ngIf="isAdmin">
                 <tr>
                     <td colspan="2">
                         <div class="d-block pull-right">
@@ -75,7 +75,7 @@
                                 <span class="fa fa-pencil"></span>
                                 <span class="d-none d-md-inline">Edit</span>
                             </button>
-                            <button type="button" class="btn btn-danger btn-sm" (click)="delete(wireTapEndpoint.id)">
+                            <button type="button"class="btn btn-danger btn-sm" (click)="delete(wireTapEndpoint.id)">
                                 <span class="fa fa-remove"></span>
                                 <span class="d-none d-md-inline">Delete</span>
                             </button>

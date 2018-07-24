@@ -5,6 +5,7 @@ import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { ToEndpoint, ToEndpointService } from '../to-endpoint';
 import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
 import { JhiEventManager } from 'ng-jhipster';
+import { Router } from '@angular/router';
 import * as moment from 'moment';
 
 enum Status {
@@ -21,6 +22,7 @@ enum Status {
 export class FlowRowComponent implements OnInit {
 
     @Input() flow: Flow;
+    @Input() isAdmin: boolean;
 
     fromEndpoint: FromEndpoint = new FromEndpoint();
     toEndpoints: Array<ToEndpoint> = [new ToEndpoint()];
@@ -58,6 +60,7 @@ export class FlowRowComponent implements OnInit {
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
+        private router: Router,
         private eventManager: JhiEventManager
     ) {
     }
@@ -80,6 +83,13 @@ export class FlowRowComponent implements OnInit {
             this.setFlowStatus(response.text());
         });
     }
+
+    navigateToFlow() {
+        this.isAdmin ?
+            this.router.navigate(['../../flow/edit-all', this.flow.id]) :
+            this.router.navigate(['../flow', this.flow.id]);
+    }
+
     getFlowLastError(id: number, action: string, errMesage: string) {
         this.flowService.getFlowLastError(id).subscribe((response) => {
             this.lastError = response.text() === '0' ? errMesage : response.text();
