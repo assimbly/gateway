@@ -54,7 +54,7 @@ export const flowRoute: Routes = [
         path: 'editor-mode',
         component: FlowEditorModeComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]

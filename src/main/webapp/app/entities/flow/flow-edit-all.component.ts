@@ -116,125 +116,124 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id, isCloning?: boolean) {
-        forkJoin(
-            this.flowService.getWikiDocUrl(),
-            this.flowService.getCamelDocUrl(),
-            this.serviceService.query(),
-            this.headerService.query(),
-            this.gatewayService.query()
-        )
-            .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
-                this.wikiDocUrl = wikiDocUrl.text();
+        if (isCloning) {
+            this.flow.id = null;
+            this.flow.fromEndpointId = null;
+            this.flow.errorEndpointId = null;
+            this.flow.toEndpoints = null;
+            this.fromEndpoint.id = null;
+            this.toEndpoints.forEach((toEndpoint) => {
+                toEndpoint.id = null;
+            });
+            this.errorEndpoint.id = null;
 
-                this.camelDocUrl = camelDocUrl.text();
+            this.updateForm();
+        } else {
+            forkJoin(
+                this.flowService.getWikiDocUrl(),
+                this.flowService.getCamelDocUrl(),
+                this.serviceService.query(),
+                this.headerService.query(),
+                this.gatewayService.query()
+            )
+                .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
+                    this.wikiDocUrl = wikiDocUrl.text();
 
-                this.services = services.json;
-                this.serviceCreated = this.services.length > 0;
+                    this.camelDocUrl = camelDocUrl.text();
 
-                this.headers = headers.json;
-                this.headerCreated = this.headers.length > 0;
+                    this.services = services.json;
+                    this.serviceCreated = this.services.length > 0;
 
-                this.gateways = gateways.json;
-                this.singleGateway = this.gateways.length === 1;
+                    this.headers = headers.json;
+                    this.headerCreated = this.headers.length > 0;
 
-                if (id) {
-                    this.flowService.find(id).subscribe((flow) => {
-                        if (flow) {
-                            this.flow = flow;
-                            if (isCloning) {
-                                this.flow.id = null;
+                    this.gateways = gateways.json;
+                    this.singleGateway = this.gateways.length === 1;
+
+                    if (id) {
+                        this.flowService.find(id).subscribe((flow) => {
+                            if (flow) {
+                                this.flow = flow;
+                                if (this.singleGateway) {
+                                    this.flow.gatewayId = this.gateways[0].id;
+                                }
+                                this.initializeForm(this.flow);
+                                if (this.flow.fromEndpointId) {
+                                    this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
+                                        if (fromEndpoint) {
+                                            this.fromEndpoint = fromEndpoint;
+                                            (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
+                                            setTimeout(() => {
+                                                this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
+                                                this.setTypeLinks(this.fromEndpoint, 0);
+                                                this.finished = true;
+                                            }, 0);
+                                        }
+                                    });
+                                }
                             }
+
+                            if (this.flow.errorEndpointId) {
+                                this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
+                                    this.errorEndpoint = errorEndpoint;
+                                    (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
+                                    setTimeout(() => {
+                                        this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
+                                        this.setTypeLinks(this.errorEndpoint, 1);
+                                    }, 0);
+                                });
+                            }
+
+                            this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
+                                this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
+                                this.toEndpoints.forEach((toEndpoint, i) => {
+                                    if (typeof this.toEndpointsOptions[i] === 'undefined') {
+                                        this.toEndpointsOptions.push([]);
+                                    }
+                                    (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
+                                    setTimeout(() => {
+                                        this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
+                                        this.setTypeLinks(toEndpoint, i + 2);
+                                    }, 0);
+                                });
+                            });
+                        });
+                    } else if (!this.finished) {
+                        setTimeout(() => {
+                            this.flow = new Flow();
+                            this.flow.autoStart = false;
+                            this.flow.offloading = false;
                             if (this.singleGateway) {
                                 this.flow.gatewayId = this.gateways[0].id;
                             }
                             this.initializeForm(this.flow);
-                            if (this.flow.fromEndpointId) {
-                                this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
-                                    if (fromEndpoint) {
-                                        this.fromEndpoint = fromEndpoint;
-                                        if (isCloning) {
-                                            this.fromEndpoint.id = null;
-                                            this.flow.fromEndpointId = null;
-                                        }
-                                        (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
-                                        setTimeout(() => {
-                                            this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
-                                            this.setTypeLinks(this.fromEndpoint, 0);
-                                            this.finished = true;
-                                        }, 0);
-                                    }
-                                });
-                            }
-                        }
 
-                        if (this.flow.errorEndpointId) {
-                            this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
-                                this.errorEndpoint = errorEndpoint;
-                                if (isCloning) {
-                                    this.errorEndpoint.id = null;
-                                    this.flow.errorEndpointId = null;
-                                }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
-                                setTimeout(() => {
-                                    this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
-                                    this.setTypeLinks(this.errorEndpoint, 1);
-                                }, 0);
+                            this.fromEndpoint = new FromEndpoint();
+                            this.fromEndpoint.type = this.gateways[0].defaultFromEndpointType;
+                            (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
+                            this.fromEndpointOptions = [new Option()];
+                            this.setTypeLinks(this.fromEndpoint, 0);
+
+                            this.errorEndpoint = new ErrorEndpoint();
+                            this.errorEndpoint.type = this.gateways[0].defaultErrorEndpointType;
+                            (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
+                            this.errorEndpointOptions = [new Option()];
+                            this.setTypeLinks(this.errorEndpoint, 1);
+
+                            this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
+                            this.toEndpoints.forEach((endpoint, i) => {
+                                endpoint.type = this.gateways[0].defaultToEndpointType;
                             });
-                        }
+                            (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
+                            this.toEndpointsOptions = [[new Option()]];
+                            this.setTypeLinks(this.toEndpoints[0], 2);
 
-                        this.toEndpointService.findByFlowId(id).subscribe((toEndpoints) => {
-                            this.toEndpoints = toEndpoints.length === 0 ? [new ToEndpoint()] : toEndpoints;
-                            this.toEndpoints.forEach((toEndpoint, i) => {
-                                if (isCloning) {
-                                    toEndpoint.id = null;
-                                    toEndpoint.flowId = null;
-                                }
-                                if (typeof this.toEndpointsOptions[i] === 'undefined') {
-                                    this.toEndpointsOptions.push([]);
-                                }
-                                (<FormArray>this.editFlowForm.controls.endpointsData).insert(i + 2, this.initializeEndpointData(toEndpoint));
-                                setTimeout(() => {
-                                    this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
-                                    this.setTypeLinks(toEndpoint, i + 2);
-                                }, 0);
-                            });
-                        });
-                    });
-                } else if (!this.finished) {
-                    setTimeout(() => {
-                        this.flow = new Flow();
-                        this.flow.autoStart = false;
-                        this.flow.offloading = false;
-                        if (this.singleGateway) {
-                            this.flow.gatewayId = this.gateways[0].id;
-                        }
-                        this.initializeForm(this.flow);
-
-                        this.fromEndpoint = new FromEndpoint();
-                        this.fromEndpoint.type = this.gateways[0].defaultFromEndpointType;
-                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
-                        this.fromEndpointOptions = [new Option()];
-                        this.setTypeLinks(this.fromEndpoint, 0);
-
-                        this.errorEndpoint = new ErrorEndpoint();
-                        this.errorEndpoint.type = this.gateways[0].defaultErrorEndpointType;
-                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
-                        this.errorEndpointOptions = [new Option()];
-                        this.setTypeLinks(this.errorEndpoint, 1);
-
-                        this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
-                        this.toEndpoints.forEach((endpoint, i) => {
-                            endpoint.type = this.gateways[0].defaultToEndpointType;
-                        });
-                        (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
-                        this.toEndpointsOptions = [[new Option()]];
-                        this.setTypeLinks(this.toEndpoints[0], 2);
-
-                        this.finished = true;
-                        this.displayNextButton = true;
-                    }, 0);
-                }
-            });
+                            this.finished = true;
+                            this.displayNextButton = true;
+                        }, 0);
+                    }
+                });
+        }
     }
 
     filterServices(endpoint: any, formService: FormControl) {
