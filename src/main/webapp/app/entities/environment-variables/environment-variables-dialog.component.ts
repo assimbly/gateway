@@ -73,11 +73,11 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     }
 
     save(closePopup: boolean) {
-        this.isSaving = true;
         this.environmentVariablesForm.controls.key.updateValueAndValidity();
         this.environmentVariablesForm.controls.key.markAsTouched();
         this.environmentVariablesForm.updateValueAndValidity();
         if (this.environmentVariablesForm.invalid) { return; }
+        this.isSaving = true;
         this.environmentVariables = this.environmentVariablesForm.value;
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(
