@@ -21,7 +21,7 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType()" #type="ngModel">
+            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
                 <option [ngValue]="type" *ngFor="let type of typeServices">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">

@@ -28,7 +28,7 @@ export const wireTapEndpointRoute: Routes = [
         path: 'wire-tap-endpoint-create',
         component: WireTapEndpointEditComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService]
@@ -36,7 +36,7 @@ export const wireTapEndpointRoute: Routes = [
         path: 'wire-tap-endpoint-edit/:id',
         component: WireTapEndpointEditComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService]
@@ -48,7 +48,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint-new',
         component: WireTapEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -58,7 +58,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint/:id/edit',
         component: WireTapEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -68,7 +68,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint/:id/delete',
         component: WireTapEndpointDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],
