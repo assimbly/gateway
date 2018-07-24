@@ -391,6 +391,15 @@
 						<span>Next</span>&nbsp;
 						<span class="fa fa-arrow-right"></span>
 					</button>
+					<button type="button" *ngIf="!displayNextButton && flow.id" (click)="load(flow.id, true)" class="btn btn-info">
+						<span class="fa fa-clone"></span>&nbsp;
+						<span> Clone</span>
+					</button>
+					<button type="button" *ngIf="!displayNextButton && flow.id" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+					 class="btn btn-danger">
+						<span class="fa fa-remove"></span>
+						<span class="d-none d-md-inline">Delete</span>
+					</button>
 				</div>
 				<div *ngIf="savingFlowFailed">
 					<span class="text-danger">*{{savingFlowFailedMessage}}</span>

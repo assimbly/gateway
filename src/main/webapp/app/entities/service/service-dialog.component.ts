@@ -58,7 +58,7 @@ export class ServiceDialogComponent implements OnInit {
         this.loadServiceKeys(this.route.fragment['value'] === 'clone');
     }
 
-    changeType() {
+    changeType(cloneHeader: boolean) {
         if (typeof this.requiredType !== 'undefined') {
             this.serviceKeysRemoveList = [];
             this.requiredType.serviceKeys.forEach((rsk) => {
@@ -77,6 +77,7 @@ export class ServiceDialogComponent implements OnInit {
                 rsk = ersk;
                 this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
             }
+            rsk.id = cloneHeader ? null : rsk.id;
             rsk.key = sk.serviceKeyName;
             rsk.valueType = sk.valueType;
             rsk.isRequired = true;
@@ -139,11 +140,11 @@ export class ServiceDialogComponent implements OnInit {
         if (this.service.id) {
             this.serviceKeysService.query().subscribe((res) => {
                 this.serviceKeys = res.json.filter((sk) => sk.serviceId === this.service.id);
-                this.changeType();
+                this.changeType(cloneHeader);
                 this.service.id = cloneHeader ? null : this.service.id;
             });
         }else if (this.service.type) {
-            this.changeType();
+            this.changeType(cloneHeader);
             this.service.id = cloneHeader ? null : this.service.id;
         }
     }
@@ -165,11 +166,7 @@ export class ServiceDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
         this.eventManager.broadcast({name: 'serviceModified', content: result.id});
         this.isSaving = false;
-        if (this.route.fragment['value'] === 'clone') {
-            this.navigateToServiceDetail(result.id);
-        } else if (closePopup) {
-            this.activeModal.dismiss(result);
-        }
+        this.activeModal.dismiss(result);
 
         this.serviceKeysRemoveList.forEach((skrl) => {
             this.serviceKeysService.delete(skrl.id).subscribe();

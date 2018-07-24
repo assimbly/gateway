@@ -23,15 +23,11 @@
         <div class="row mt-3">
 
             <div class="col-12 text-right">
-                 <button class="btn" type="button" [routerLink]="['../editor-mode']">
+                 <button class="btn" type="button" [routerLink]="['../editor-mode']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
                     <span class="fa fa-code"></span>
                     <span>Editor mode</span>
                 </button>
-                <!-- <button class="btn" type="button" (click)="editorMode()">
-                    <span class="fa fa-code"></span>
-                    <span>Editor mode</span>
-                </button>-->
-                <button class="btn btn-primary" type="submit" [routerLink]="['../flow', 'edit-all' ]">
+                <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['../flow', 'edit-all' ]">
                     <span class="fa fa-plus"></span>
                     <span>Create new flow</span>
                 </button>
@@ -85,7 +81,7 @@
 					</tr>
                 </thead>
                 <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                    <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow"></tr>
+                    <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow" [isAdmin]="isAdmin"></tr>
                 </tbody>
             </table>
         </div>

@@ -1,5 +1,5 @@
 <div>
-    <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
+    <button class="btn btn-primary float-right jh-create-entity create-service" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
         <span class="fa fa-plus"></span>
         <span>
             Create new Service
@@ -23,9 +23,7 @@
                         <span>Service type</span>
                         <span class="fa fa-sort"></span>
                     </th>
-                    <th>
-                        Details
-                    </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody infinite-scroll>
@@ -36,10 +34,24 @@
                     <td>
                         {{service.type}}
                     </td>
-                    <td>
-                        <button type="button" [routerLink]="['./', service.id ]" class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span> View details
-                        </button>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="button" *ngIf="!isAdmin" [routerLink]="['./', service.id ]" class="btn btn-info btn-sm">
+                                <span class="fa fa-eye"></span> View details
+                            </button>
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary btn-sm">
+                                <span class="fa fa-pencil"></span>&nbsp;
+                                <span> Edit</span>
+                            </button>
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info btn-sm">
+                                <span class="fa fa-clone"></span>&nbsp;
+                                <span> Clone</span>
+                            </button>
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger btn-sm">
+                                <span class="fa fa-remove"></span>
+                                <span class="d-none d-md-inline">Delete</span>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             </tbody>
