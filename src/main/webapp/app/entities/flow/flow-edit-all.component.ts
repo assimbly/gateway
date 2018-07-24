@@ -212,20 +212,20 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.initializeForm(this.flow);
 
                         this.fromEndpoint = new FromEndpoint();
-                        this.fromEndpoint.type = EndpointType.FILE;
+                        this.fromEndpoint.type = this.gateways[0].defaultFromEndpointType;
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
                         this.fromEndpointOptions = [new Option()];
                         this.setTypeLinks(this.fromEndpoint, 0);
 
                         this.errorEndpoint = new ErrorEndpoint();
-                        this.errorEndpoint.type = EndpointType.FILE;
+                        this.errorEndpoint.type = this.gateways[0].defaultErrorEndpointType;
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
                         this.errorEndpointOptions = [new Option()];
                         this.setTypeLinks(this.errorEndpoint, 1);
 
                         this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
                         this.toEndpoints.forEach((endpoint, i) => {
-                            endpoint.type = EndpointType.FILE;
+                            endpoint.type = this.gateways[0].defaultToEndpointType;
                         });
                         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
                         this.toEndpointsOptions = [[new Option()]];

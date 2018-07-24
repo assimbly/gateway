@@ -7,6 +7,9 @@ import { Flow } from './flow.model';
 import { ResponseWrapper, createRequestOption } from '../../shared';
 import { saveAs } from 'file-saver/FileSaver';
 import { Gateway } from '../gateway/gateway.model';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 @Injectable()
 export class FlowService {
@@ -89,7 +92,6 @@ export class FlowService {
     }
 
     start(id: number): Observable<Response> {
-        console.log(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
     }
 

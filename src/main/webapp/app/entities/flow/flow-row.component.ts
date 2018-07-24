@@ -80,9 +80,9 @@ export class FlowRowComponent implements OnInit {
             this.setFlowStatus(response.text());
         });
     }
-    getFlowLastError(id: number, action: string) {
+    getFlowLastError(id: number, action: string, errMesage: string) {
         this.flowService.getFlowLastError(id).subscribe((response) => {
-            this.lastError = response.text() === '0' ? '' : response.text();
+            this.lastError = response.text() === '0' ? errMesage : response.text();
             this.flowStatusButton = `
             Last action: ${action} <br/>
             Status: Stopped after error <br/>
@@ -154,7 +154,6 @@ export class FlowRowComponent implements OnInit {
                             Last action: ${this.flowStatus} <br/>
                             Status: Stopped after error
             `;
-
                 break;
         }
     }
@@ -296,7 +295,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('started');
                             }
                         }, (err) => {
-                            this.getFlowLastError(this.flow.id, 'Start');
+                            this.getFlowLastError(this.flow.id, 'Start', err.text());
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
                         });
@@ -314,7 +313,7 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatus('suspended');
             }
         }, (err) => {
-            this.getFlowLastError(this.flow.id, 'Pause');
+            this.getFlowLastError(this.flow.id, 'Pause', err.text());
             this.isFlowStatusOK = false;
             this.flowStatusError = `Flow with id=${this.flow.id} is not paused.`;
         });
@@ -335,7 +334,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('resumed');
                             }
                         }, (err) => {
-                            this.getFlowLastError(this.flow.id, 'Resume');
+                            this.getFlowLastError(this.flow.id, 'Resume', err.text());
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
                         });
@@ -360,7 +359,7 @@ export class FlowRowComponent implements OnInit {
                                 this.setFlowStatus('restarted');
                             }
                         }, (err) => {
-                            this.getFlowLastError(this.flow.id, 'Restart');
+                            this.getFlowLastError(this.flow.id, 'Restart', err.text());
                             this.isFlowStatusOK = false;
                             this.flowStatusError = `Flow with id=${this.flow.id} is not restarted.`;
                         });
@@ -378,7 +377,7 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatus('stopped');
             }
         }, (err) => {
-            this.getFlowLastError(this.flow.id, 'Stop');
+            this.getFlowLastError(this.flow.id, 'Stop', err.text());
             this.isFlowStatusOK = false;
             this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
         });
