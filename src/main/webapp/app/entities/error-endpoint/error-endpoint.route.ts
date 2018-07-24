@@ -31,7 +31,7 @@ export const errorEndpointPopupRoute: Routes = [
         path: 'error-endpoint-new',
         component: ErrorEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ErrorEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -41,7 +41,7 @@ export const errorEndpointPopupRoute: Routes = [
         path: 'error-endpoint/:id/edit',
         component: ErrorEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ErrorEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -51,7 +51,7 @@ export const errorEndpointPopupRoute: Routes = [
         path: 'error-endpoint/:id/delete',
         component: ErrorEndpointDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ErrorEndpoints'
         },
         canActivate: [UserRouteAccessService],

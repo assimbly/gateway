@@ -22,7 +22,7 @@ export const flowRoute: Routes = [
         path: 'flow/edit-all',
         component: FlowEditAllComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
@@ -30,7 +30,7 @@ export const flowRoute: Routes = [
         path: 'flow/edit-all/:id',
         component: FlowEditAllComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
@@ -66,7 +66,7 @@ export const flowPopupRoute: Routes = [
         path: 'flow-new',
         component: FlowPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService],
@@ -76,7 +76,7 @@ export const flowPopupRoute: Routes = [
         path: 'flow/:id/edit',
         component: FlowPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService],
@@ -86,7 +86,7 @@ export const flowPopupRoute: Routes = [
         path: 'flow/:id/delete',
         component: FlowDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService],

@@ -42,7 +42,7 @@
         <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
     </button>
 
-    <button type="button"
+    <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
             [routerLink]="['/', { outlets: { popup: 'to-endpoint/'+ toEndpoint.id + '/edit'} }]"
             replaceUrl="true"
             queryParamsHandling="merge"

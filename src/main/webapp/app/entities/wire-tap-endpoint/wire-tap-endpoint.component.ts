@@ -15,6 +15,7 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
     wireTapEndpoints: Array<WireTapEndpoint> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
+    public isAdmin: boolean;
 
     constructor(
         private wireTapEndpointService: WireTapEndpointService,
@@ -35,6 +36,7 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
     }
     ngOnInit() {
         this.loadAll();
+        this.checkPrincipal();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
@@ -60,6 +62,10 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
     }
     registerChangeInWireTapEndpoints() {
         this.eventSubscriber = this.eventManager.subscribe('wireTapEndpointListModification', (response) => this.loadAll());
+    }
+
+    private checkPrincipal() {
+        this.principal.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
     }
 
     private onError(error) {

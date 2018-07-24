@@ -2,7 +2,7 @@
 	<a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
 </td>
 <td>
-	<a [routerLink]="['../flow', flow.id ]" data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
+	<a (click)="navigateToFlow()" data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
 </td>
 <td id="flowRowID" [hidden]="!flowRowID">
 	<a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>

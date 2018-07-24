@@ -115,7 +115,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.registerChangeInFlows();
     }
 
-    load(id) {
+    load(id, isCloning?: boolean) {
         forkJoin(
             this.flowService.getWikiDocUrl(),
             this.flowService.getCamelDocUrl(),
@@ -137,7 +137,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.gateways = gateways.json;
                 this.singleGateway = this.gateways.length === 1;
 
-                const isCloning = this.route.fragment['value'] === 'clone';
                 if (id) {
                     this.flowService.find(id).subscribe((flow) => {
                         if (flow) {

@@ -113,6 +113,9 @@ export class HeaderDialogComponent implements OnInit {
         if (this.header.id) {
             this.headerKeysService.query().subscribe((res) => {
                 this.headerKeys = res.json.filter((hk) => hk.headerId === this.header.id);
+                this.headerKeys.forEach((headerKey) => {
+                    headerKey.id = cloneHeader ? null : headerKey.id;
+                });
                 if (this.headerKeys.length === 0) {
                     this.headerKeys.push(new HeaderKeys());
                 }
@@ -134,11 +137,7 @@ export class HeaderDialogComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
-        if (this.route.fragment['value'] === 'clone') {
-            this.navigateToHeaderDetail(result.id);
-        } else if (closePopup) {
-            this.activeModal.dismiss(result);
-        }
+        this.activeModal.dismiss(result);
 
         this.headerKeys.forEach((headerKey) => {
             headerKey.headerId = result.id;
