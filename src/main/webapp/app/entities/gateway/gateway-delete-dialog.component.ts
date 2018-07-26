@@ -15,6 +15,8 @@ import { GatewayService } from './gateway.service';
 export class GatewayDeleteDialogComponent {
 
     gateway: Gateway;
+    message = 'Are you sure you want to delete this Gateway?';
+    disableDelete: boolean;
 
     constructor(
         private gatewayService: GatewayService,
@@ -38,6 +40,9 @@ export class GatewayDeleteDialogComponent {
             setTimeout(() => {
                 this.router.navigate(['/gateway']);
             }, 0);
+        }, (err) => {
+            this.message = 'Gateway ' + this.gateway.name + ' can not be deleted (gateway is used by a flow)';
+            this.disableDelete = true;
         });
     }
 }

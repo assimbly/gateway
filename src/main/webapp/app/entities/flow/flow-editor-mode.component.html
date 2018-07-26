@@ -47,7 +47,7 @@
 	</div>
 	<div *ngIf="hasLoadError">
 		<hr>
-		<p class="float-left text-danger">Live configuration for flow {{flowId}} is NOT set.</p>
+		<p class="float-left text-danger">{{loadErrorMessage}}</p>
 	</div>
 	<div *ngIf="status">
 		<hr>
