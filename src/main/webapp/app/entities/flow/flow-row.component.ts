@@ -91,15 +91,24 @@ export class FlowRowComponent implements OnInit {
     }
 
     getFlowLastError(id: number, action: string, errMesage: string) {
-        this.flowService.getFlowLastError(id).subscribe((response) => {
-            this.lastError = response.text() === '0' ? errMesage : response.text();
+        if (errMesage) {
             this.flowStatusButton = `
             Last action: ${action} <br/>
             Status: Stopped after error <br/>
-            ${this.lastError}
+            ${errMesage}
 `;
             this.statusFlow = Status.inactiveError;
-        });
+        } else {
+            this.flowService.getFlowLastError(id).subscribe((response) => {
+                this.lastError = response.text() === '0' ? '' : response.text();
+                this.flowStatusButton = `
+                Last action: ${action} <br/>
+                Status: Stopped after error <br/>
+                ${this.lastError}
+    `;
+                this.statusFlow = Status.inactiveError;
+            });
+        }
     }
 
     setFlowStatus(status: string): void {
