@@ -41,7 +41,7 @@ export class ServiceDeleteDialogComponent {
                 this.activeModal.close();
             }, 0);
         }, () => {
-            this.message = 'Service ' + this.service.name + ' can not be deleted!';
+            this.message = 'Service ' + this.service.name + ' can not be deleted (service is used by a flow)';
             this.disableDelete = true;
         });
     }
