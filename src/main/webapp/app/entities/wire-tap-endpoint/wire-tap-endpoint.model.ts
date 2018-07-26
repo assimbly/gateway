@@ -1,5 +1,7 @@
 import { BaseEntity } from './../../shared';
 import { EndpointType } from '../../shared/camel/component-type';
+import { Service } from '../service';
+import { Header } from '../header';
 
 export class WireTapEndpoint implements BaseEntity {
     constructor(
@@ -7,8 +9,8 @@ export class WireTapEndpoint implements BaseEntity {
         public type?: EndpointType,
         public uri?: string,
         public options?: string,
-        public service?: BaseEntity,
-        public header?: BaseEntity,
+        public service?: Service,
+        public header?: Header,
     ) {
     }
 }

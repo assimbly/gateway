@@ -22,7 +22,7 @@ import { Option } from '../flow';
 })
 export class WireTapEndpointEditComponent implements OnInit {
 
-    wireTapEndpoint: WireTapEndpoint = new WireTapEndpoint();
+    wireTapEndpoint: WireTapEndpoint;
     isSaving: boolean;
     typeCamelLink: string;
     wikiDocUrl: string;
@@ -54,6 +54,9 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.wireTapEndpoint = new WireTapEndpoint();
+        this.wireTapEndpoint.service = new Service();
+        this.wireTapEndpoint.header = new Header();
         this.isSaving = false;
         this.initializeEndpointData();
         this.route.params.subscribe((params) => {
@@ -72,7 +75,9 @@ export class WireTapEndpointEditComponent implements OnInit {
             ).subscribe(([wireTapEndpoint, services, headers, wikiDocUrl, camelDocUrl]) => {
                 this.wireTapEndpoint = wireTapEndpoint;
                 this.services = services.json;
+                this.serviceCreated = this.services.length > 0;
                 this.headers = headers.json;
+                this.headerCreated = this.headers.length > 0;
                 this.wikiDocUrl = wikiDocUrl.text();
                 this.camelDocUrl = camelDocUrl.text();
                 this.updateEndpointData();
@@ -88,7 +93,9 @@ export class WireTapEndpointEditComponent implements OnInit {
             ).subscribe(([services, headers, wikiDocUrl, camelDocUrl]) => {
                 this.wireTapEndpoint.type = EndpointType.FILE;
                 this.services = services.json;
+                this.serviceCreated = this.services.length > 0;
                 this.headers = headers.json;
+                this.headerCreated = this.headers.length > 0;
                 this.wikiDocUrl = wikiDocUrl.text();
                 this.camelDocUrl = camelDocUrl.text();
                 this.updateEndpointData();
@@ -116,8 +123,8 @@ export class WireTapEndpointEditComponent implements OnInit {
         this.wireTapEndpoint.id = flowControls.id.value;
         this.wireTapEndpoint.type = flowControls.type.value;
         this.wireTapEndpoint.uri = flowControls.uri.value;
-        this.wireTapEndpoint.header = flowControls.header.value;
-        this.wireTapEndpoint.service = flowControls.service.value ? flowControls.service.value : null;
+        this.wireTapEndpoint.header.id = flowControls.header.value;
+        this.wireTapEndpoint.service.id = flowControls.service.value ? flowControls.service.value : null;
     }
 
     setEndpointOptions() {
@@ -259,7 +266,7 @@ export class WireTapEndpointEditComponent implements OnInit {
         this.serviceType = this.returnServiceType(this.wireTapEndpoint.type);
         this.filteredService = this.services.filter((f) => f.type === this.serviceType);
         if (this.filteredService.length > 0 && this.wireTapEndpoint.service.id) {
-            this.wireTapForm.controls.service.setValue(this.filteredService.find((fs) => fs.id === this.wireTapEndpoint.service.id));
+            this.wireTapForm.controls.service.setValue(this.filteredService.find((fs) => fs.id === this.wireTapEndpoint.service.id).id);
         }
     }
 
@@ -309,8 +316,8 @@ export class WireTapEndpointEditComponent implements OnInit {
             'options': new FormArray([
                 this.initializeOption()
             ]),
-            'service': new FormControl(this.wireTapEndpoint.service),
-            'header': new FormControl(this.wireTapEndpoint.header)
+            'service': new FormControl(this.wireTapEndpoint.service.id),
+            'header': new FormControl(this.wireTapEndpoint.header.id)
         })
     }
 
@@ -326,8 +333,8 @@ export class WireTapEndpointEditComponent implements OnInit {
             'id': this.wireTapEndpoint.id,
             'type': this.wireTapEndpoint.type,
             'uri': this.wireTapEndpoint.uri,
-            'service': this.wireTapEndpoint.service,
-            'header': this.wireTapEndpoint.header
+            'service': this.wireTapEndpoint.service.id,
+            'header': this.wireTapEndpoint.header.id
         });
     }
 

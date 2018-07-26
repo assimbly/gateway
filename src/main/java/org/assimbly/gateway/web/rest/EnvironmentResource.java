@@ -82,10 +82,6 @@ public class EnvironmentResource {
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
-        log.debug("*************** mediaType {}", mediaType);
-        log.debug("*************** gatewayid {}", gatewayid);
-        log.debug("*************** flowid {}", flowid);
-        log.debug("*************** configuration {}", configuration);   
         try {
        		DBConfiguration.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set");
