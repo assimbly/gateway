@@ -28,6 +28,7 @@ export class FlowEditorModeComponent implements OnInit {
     public flowExampleListType: any[] = ['XML', 'JSON', 'YAML'];
     public status = false;
     public hasLoadError: boolean;
+    public loadErrorMessage: string;
     public selectedFiletype: string;
     public isConfigurationInvalid: boolean;
     public invalidConfigurationMessage = '';
@@ -64,7 +65,6 @@ export class FlowEditorModeComponent implements OnInit {
         this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
         this.selectedFlowExample.flowtypeFile = 'XML';
         this.xmlEditor = this.hintText;
-
     }
 
     removeHintText() {
@@ -166,7 +166,10 @@ export class FlowEditorModeComponent implements OnInit {
                 configuredFlow.isFlowRestarted = true;
                 this.configuredFlows.push(configuredFlow);
             }, (err) => {
-                this.showInfoMessage(false);
+                let convert = require('xml-js');
+                let obj = JSON.parse(convert.xml2json(err.text(), { compact: true, spaces: 4 }));
+                let errMessage = obj.response.message._text;
+                this.showInfoMessage(false, errMessage);
             });
     }
 
@@ -177,12 +180,16 @@ export class FlowEditorModeComponent implements OnInit {
                 this.configuration = response;
                 this.showInfoMessage(true);
             }, (err) => {
-                this.showInfoMessage(false);
+                let convert = require('xml-js');
+                let obj = JSON.parse(convert.xml2json(err.text(), { compact: true, spaces: 4 }));
+                let errMessage = obj.response.message._text;
+                this.showInfoMessage(false, errMessage);
             });
     }
 
-    showInfoMessage(isSuccess) {
+    showInfoMessage(isSuccess, errMessage?: string) {
         isSuccess ? this.isConfigurationSet = true : this.hasLoadError = true;
+        this.loadErrorMessage = errMessage ? errMessage : '';
         setTimeout(() => {
             this.isConfigurationSet = false;
             this.hasLoadError = false
