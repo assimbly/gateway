@@ -29,7 +29,7 @@
                 </button>
                 <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['../flow', 'edit-all' ]">
                     <span class="fa fa-plus"></span>
-                    <span>Create new flow</span>
+                    <span>Create flow</span>
                 </button>
             </div>
         </div>
@@ -38,29 +38,24 @@
             <table class="table table-striped table-condensed">
                 <thead class="thead-dark">
                     <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-                        <th jhiSortBy="id" id="flowTitleID" [hidden]="!flowTitleID">
+                        <th id="flowTitleID" [hidden]="!flowTitleID">
                             <span>ID</span>
-                            <span class="fa fa-sort"></span>
                         </th>
                         <th jhiSortBy="name" class="border-bottom-none">
                             <span>Name</span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="gatewayId" id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID">
+                        <th id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID">
                             <span>Gateway</span>
-                            <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="fromEndpointId" class="border-bottom-none">
+                        <th class="border-bottom-none">
                             <span>From</span>
-                            <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="toEndpointId" class="border-bottom-none">
+                        <th class="border-bottom-none">
                             <span>To</span>
-                            <span class="fa fa-sort"></span>
                         </th>
-                        <th jhiSortBy="errorEndpointId" id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID">
+                        <th id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID">
                             <span>Endpoint Error</span>
-                            <span class="fa fa-sort"></span>
                         </th>
                         <th class="border-bottom-none">
                             <span>Flow status</span>
