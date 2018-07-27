@@ -46,7 +46,7 @@
 					</div>
 
 					<!-- styling of tabset is in global.css -->
-					<ngb-tabset justify="justified" formArrayName="endpointsData" (tabChange)="next(false)" #tabs>
+					<ngb-tabset justify="justified" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
 						<ngb-tab title="From" id="fromTab">
 							<ng-template ngbTabContent>
 								<jhi-alert-error></jhi-alert-error>

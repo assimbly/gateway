@@ -5,7 +5,7 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { Response } from '@angular/http';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { NgbTabset } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTabset, NgbTabChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { ResponseWrapper } from '../../shared';
 
 import { Flow } from './flow.model';
@@ -704,7 +704,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next(nextClicked: boolean, isNextTab?: boolean) {
+    next(nextClicked: boolean, isNextTab?: boolean, e?: NgbTabChangeEvent) {
         const activeTab = this.ngbTabset.tabs.find((t) => t.id === this.ngbTabset.activeId);
         const index = (this.ngbTabset.tabs['_results']).indexOf(activeTab);
         const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
@@ -722,6 +722,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
+            } else {
+                e.preventDefault();
             }
         } else if (index === this.ngbTabset.tabs.length - 1) {
             let formEndpoint = <FormGroup>endpoints[index];
@@ -737,6 +739,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index]);
+            } else {
+                e.preventDefault();
             }
         } else {
             let endpoint = <FormGroup>endpoints[index + 1];
@@ -752,6 +756,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     });
             } else if (isNextTab) {
                 this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
+            } else {
+                e.preventDefault();
             }
         }
     }
