@@ -47,7 +47,6 @@ export class HeaderDialogComponent implements OnInit {
             },
             (res: ResponseWrapper) => this.onError(res.json)
         );
-
         this.loadHeaderKeys(this.route.fragment['value'] === 'clone');
     }
 
@@ -117,12 +116,16 @@ export class HeaderDialogComponent implements OnInit {
                     headerKey.id = cloneHeader ? null : headerKey.id;
                 });
                 if (this.headerKeys.length === 0) {
-                    this.headerKeys.push(new HeaderKeys());
+                    let hk = new HeaderKeys();
+                    hk.type = this.typeHeader[0];
+                    this.headerKeys.push(hk);
                 }
                 this.header.id = cloneHeader ? null : this.header.id;
             });
         }else {
-            this.headerKeys.push(new HeaderKeys());
+            let hk = new HeaderKeys();
+            hk.type = this.typeHeader[0];
+            this.headerKeys.push(hk);
             this.header.id = cloneHeader ? null : this.header.id;
         }
     }
