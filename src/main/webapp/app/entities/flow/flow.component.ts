@@ -25,7 +25,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     page: any;
     predicate: any;
     queryCount: any;
-    reverse: any;
+    reverse: boolean;
     totalItems: number;
     gatewayExists = false;
     multipleGateways = false;
@@ -50,7 +50,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.links = {
             last: 0
         };
-        this.predicate = 'id';
+        this.predicate = 'name';
         this.reverse = true;
     }
 
@@ -128,8 +128,8 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-        if (this.predicate !== 'id') {
-            result.push('id');
+        if (this.predicate !== 'name') {
+            result.push('name');
         }
         return result;
     }
