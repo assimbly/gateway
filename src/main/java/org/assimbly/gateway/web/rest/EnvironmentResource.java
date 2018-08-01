@@ -45,7 +45,7 @@ public class EnvironmentResource {
         	DBConfiguration.convertConfigurationToDB(gatewayid, mediaType, configuration);
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set");
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set",e);
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
    		}
     	
     }    
@@ -66,7 +66,7 @@ public class EnvironmentResource {
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
        		
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration, e);
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", e.getMessage());
    		}
 
     }    
@@ -82,15 +82,11 @@ public class EnvironmentResource {
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
-        log.debug("*************** mediaType {}", mediaType);
-        log.debug("*************** gatewayid {}", gatewayid);
-        log.debug("*************** flowid {}", flowid);
-        log.debug("*************** configuration {}", configuration);   
         try {
        		DBConfiguration.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set");
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set", e);
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setFlowConfiguration", e.getMessage());
    		}
     }    
 
@@ -108,7 +104,7 @@ public class EnvironmentResource {
             configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", "Flow configuration get", e);
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", e.getMessage());
    		}
     } 
     
@@ -128,7 +124,7 @@ public class EnvironmentResource {
        		String log = LogUtil.tail(file, lines);
        		return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getLog", log, true);
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", "Log retrieve", e);
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
    		}
     }
     

@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { Router } from '@angular/router';
+import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
-import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
+import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { GatewayService, Gateway } from '../gateway';
 
 @Component({
@@ -14,8 +16,10 @@ import { GatewayService, Gateway } from '../gateway';
 
 export class FlowComponent implements OnInit, OnDestroy {
 
+    public isAdmin: boolean;
     gateways: Gateway[];
     flows: Flow[];
+    fromEndpoints: FromEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -23,7 +27,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     page: any;
     predicate: any;
     queryCount: any;
-    reverse: any;
+    reverse: boolean;
     totalItems: number;
     gatewayExists = false;
     multipleGateways = false;
@@ -35,10 +39,13 @@ export class FlowComponent implements OnInit, OnDestroy {
     constructor(
         private gatewayService: GatewayService,
         private flowService: FlowService,
+        private fromEndpointService: FromEndpointService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
-        private principal: Principal
+        private principal: Principal,
+        private router: Router,
+
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -46,7 +53,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.links = {
             last: 0
         };
-        this.predicate = 'id';
+        this.predicate = 'name';
         this.reverse = true;
     }
 
@@ -61,7 +68,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             }).subscribe(
                 (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
                 (res: ResponseWrapper) => this.onError(res.json)
-            );
+                );
         }
     }
 
@@ -75,8 +82,11 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.page = page;
         this.loadFlows();
     }
+
     ngOnInit() {
+        this.checkPrincipal();
         this.getGateways();
+        this.getFromEndpoints();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
@@ -91,8 +101,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     getFlowsForSelectedGateway(id) {
         this.flowService.getFlowByGatewayId(Number(id))
             .subscribe(
-                (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
-                (res: ResponseWrapper) => this.onError(res.json)
+            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+            (res: ResponseWrapper) => this.onError(res.json)
             )
     }
 
@@ -114,6 +124,14 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.multipleGateways = gateways.length > 1;
     }
 
+    getFromEndpoints(): void {
+
+        this.fromEndpointService.query()
+            .subscribe((data) => {
+                this.fromEndpoints = data.json;
+            });
+    }
+
     trackId(index: number, item: Flow) {
         return item.id;
     }
@@ -123,8 +141,8 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-        if (this.predicate !== 'id') {
-            result.push('id');
+        if (this.predicate !== 'name') {
+            result.push('name');
         }
         return result;
     }
@@ -135,6 +153,10 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     trigerAction(action: string) {
         this.eventManager.broadcast({ name: 'trigerAction', content: action });
+    }
+
+    private checkPrincipal() {
+        this.principal.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
     }
 
     private onSuccess(data, headers) {

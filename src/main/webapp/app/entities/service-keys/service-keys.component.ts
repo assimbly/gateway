@@ -46,19 +46,23 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: 'jdbc:mysql://localhost/dbname'
                     },
                     {
                         serviceKeyName: 'username',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: 'admin'
                     },
                     {
                         serviceKeyName: 'password ',
-                        valueType: 'password'
+                        valueType: 'password',
+                        placeholder: ''
                     },
                     {
                         serviceKeyName: 'driver',
-                        valueType: 'list'
+                        valueType: 'list',
+                        placeholder: ''
                     }
                 ]
             },
@@ -67,15 +71,18 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: 'tcp://localhost:2506'
                     },
                     {
                         serviceKeyName: 'username',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: 'Administrator'
                     },
                     {
                         serviceKeyName: 'password',
-                        valueType: 'password'
+                        valueType: 'password',
+                        placeholder: ''
                     }
                 ]
             },
@@ -84,7 +91,8 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: 'tcp://localhost:61616'
                     }
                 ]
             },
@@ -93,10 +101,11 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
-                        valueType: 'text'
+                        valueType: 'text',
+                        placeholder: ''
                     }
                 ]
-            },
+            }
         )
     }
 
@@ -129,6 +138,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 }
                 rsk.key = sk.serviceKeyName;
                 rsk.valueType = sk.valueType;
+                rsk.placeholder = sk.placeholder;
                 rsk.isRequired = true;
                 requiredServiceKeys.push(rsk);
             });
@@ -184,6 +194,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             false,
             true,
             null,
+            null,
             serviceKey.serviceId);
         this.serviceKeys.push(serviceKeyForClone);
     }
@@ -218,4 +229,5 @@ export interface RequiredServiceKey {
 export interface ServiceKeyInformation {
     serviceKeyName: string;
     valueType: string;
+    placeholder: string;
 }

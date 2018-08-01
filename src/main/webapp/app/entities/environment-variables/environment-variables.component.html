@@ -1,14 +1,14 @@
 <div>
     <h2>
         <span>Environment Variables</span>
-        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]">
+        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <span class="fa fa-plus"></span>
             <span >
-            Create new Environment Variables
+            Create Environment Variables
             </span>
         </button>
     </h2>
-    <jhi-alert></jhi-alert>
+    <!-- <jhi-alert></jhi-alert> -->
     <div class="row">
     </div>
     <br/>
@@ -34,13 +34,7 @@
                     </div>
                 </td>
                 <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../environment-variables', environmentVariables.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
+                    <div class="btn-group flex-btn-group-container" *jhiHasAnyAuthority="'ROLE_ADMIN'">
                         <button type="submit"
                                 [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/edit'} }]"
                                 replaceUrl="true"

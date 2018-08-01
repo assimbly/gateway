@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -377,8 +376,14 @@ public class DBConfiguration {
 				properties.put("route", "none");
 			}
 
-			if(properties.get("to.uri") == null || properties.get("to.uri").startsWith("wastebin")){
-				properties.put("to.uri","mock:wastebin");		
+			if(properties.get("to.uri") == null){
+				properties.put("to.uri","stream:out");
+			}else if(properties.get("to.uri").contains("wastebin")){
+				
+				String uri = properties.get("to.uri");
+				System.out.println("komt hier: " + uri);
+				uri = uri.replace("wastebin:", "mock:wastebin");
+				properties.put("to.uri",uri);		
 			}
 		   	   
 			properties.put("header.contenttype", "text/xml;charset=UTF-8");
@@ -697,11 +702,22 @@ public class DBConfiguration {
 			
 			if(componentType.equals("file")||componentType.equals("sftp")) {
 				componentType = componentType + "://";
-			}else if(componentType.equals("http")) {
-				componentType = "http4://";			
+			}else if(componentType.equals("http")||componentType.equals("http4")) {
+				componentType = "http4://";
+			}else if(componentType.equals("sql")) {
+				if(confService!=null) {
+			    	String confServiceId = confService.getId().toString();
+					if(confOptions.isEmpty() || confOptions==null) {
+						confOptions = "dataSource=" + confServiceId;
+					}else if(!confOptions.contains("dataSource")) {
+						confOptions = "&dataSource=" + confServiceId;;						
+					}
+				}
+				componentType = componentType + ":";
+								
 			}else {
 				componentType = componentType + ":";
-			}			
+			}
 
 			confUri = componentType + confUri;
 		    uri.setTextContent(confUri);	
@@ -763,10 +779,10 @@ public class DBConfiguration {
 	private void setToEndpointsFromDB(Set<ToEndpoint> toEndpointsDB) throws Exception {
 	
 		for (ToEndpoint toEndpointDB : toEndpointsDB) {
-
+			
 			String confUri = toEndpointDB.getUri();
 
-			String confcomponentType = toEndpointDB.getType().toString();
+			String confComponentType = toEndpointDB.getType().toString();
 			String confOptions = toEndpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = toEndpointDB.getService();
 			Header confHeader = toEndpointDB.getHeader();
@@ -777,18 +793,30 @@ public class DBConfiguration {
 			    Element uri = doc.createElement("uri");
 				flow.appendChild(endpoint);
 				
-				componentType = confcomponentType.toLowerCase();
+				componentType = confComponentType.toLowerCase();
 				
 				if(componentType.equals("file")||componentType.equals("sftp")) {
 					componentType = componentType + "://";
-				}else if(componentType.equals("http")) {
-					componentType = "http4://";			
+				}else if(componentType.equals("http")||componentType.equals("http4")) {
+					componentType = "http4://";
+				}else if(componentType.equals("sql")) {
+					if(confService!=null) {
+				    	String confServiceId = confService.getId().toString();
+						if(confOptions.isEmpty() || confOptions==null) {
+							confOptions = "dataSource=" + confServiceId;
+						}else if(!confOptions.contains("dataSource")) {
+							confOptions = "&dataSource=" + confServiceId;;						
+						}
+					}
+					componentType = componentType + ":";
+									
 				}else {
 					componentType = componentType + ":";
-				}			
-
+				}
+				
 				confUri = componentType + confUri;
-			    uri.setTextContent(confUri);	
+
+				uri.setTextContent(confUri);	
 				endpoint.appendChild(uri);
 					
 				if(confOptions!=null && !confOptions.isEmpty()) {
@@ -847,8 +875,19 @@ public class DBConfiguration {
 			
 			if(componentType.equals("file")||componentType.equals("sftp")) {
 				componentType = componentType + "://";
-			}else if(componentType.equals("http")) {
-				componentType = "http4://";			
+			}else if(componentType.equals("http")||componentType.equals("http4")) {
+				componentType = "http4://";
+			}else if(componentType.equals("sql")) {
+				if(confService!=null) {
+			    	String confServiceId = confService.getId().toString();
+					if(confOptions.isEmpty() || confOptions==null) {
+						confOptions = "dataSource=" + confServiceId;
+					}else if(!confOptions.contains("dataSource")) {
+						confOptions = "&dataSource=" + confServiceId;;						
+					}
+				}
+				componentType = componentType + ":";
+								
 			}else {
 				componentType = componentType + ":";
 			}			
@@ -909,6 +948,13 @@ public class DBConfiguration {
 		    id.appendChild(doc.createTextNode(serviceDB.getId().toString()));
 		    service.appendChild(id);
 
+		    Element name = doc.createElement("name");
+		    name.appendChild(doc.createTextNode(serviceDB.getName().toString()));
+		    service.appendChild(name);
+
+		    Element keys = doc.createElement("keys");
+		    service.appendChild(keys);
+		    
 		    Set<ServiceKeys> serviceKeys = serviceDB.getServiceKeys();
 		    
 			for(ServiceKeys serviceKey : serviceKeys) {
@@ -918,7 +964,7 @@ public class DBConfiguration {
 
 				Element serviceParameter = doc.createElement(parameterName);
 				serviceParameter.setTextContent(parameterValue);
-				service.appendChild(serviceParameter);
+				keys.appendChild(serviceParameter);
 			}
 		}
 	}
@@ -935,6 +981,13 @@ public class DBConfiguration {
 		    id.appendChild(doc.createTextNode(headerDB.getId().toString()));
 		    header.appendChild(id);
 
+		    Element name = doc.createElement("name");
+		    name.appendChild(doc.createTextNode(headerDB.getName().toString()));
+		    header.appendChild(name);
+
+		    Element keys = doc.createElement("keys");
+		    header.appendChild(keys);
+		    
 		    Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
 		    		    
 			for(HeaderKeys headerKey : headerKeys) {
@@ -945,7 +998,7 @@ public class DBConfiguration {
 				Element headerParameter = doc.createElement(parameterName);
 				headerParameter.setTextContent(parameterValue);
 				headerParameter.setAttribute("type", parameterType);
-				header.appendChild(headerParameter);				
+				keys.appendChild(headerParameter);				
 			}
 		}
 	}
@@ -1260,21 +1313,16 @@ public class DBConfiguration {
 			  }
 			
 			
-			Map<String, String> serviceMap = getMap(doc, "/connectors/connector/services/service[id=" + serviceId + "]/*");
+			Map<String, String> serviceMap = getMap(doc, "/connectors/connector/services/service[id=" + serviceId + "]/keys/*");
 			
 		    for (Map.Entry<String, String> entry : serviceMap.entrySet()) {
 		    	    	
 		        String key = entry.getKey();
 		        String value = entry.getValue();
 
-	          	if(key.equals("id")) {
-	          		//nothing
-	        	}else if(key.equals("name")) {
-					service.setName(key);
-				}else if(key.equals("type")) {
+	          	if(key.equals("type")) {
 					service.setType(key);
-				}
-	        	else {
+				}else {
 					ServiceKeys serviceKey = new ServiceKeys();
 					serviceKey.setKey(key);
 					serviceKey.setValue(value);
@@ -1325,7 +1373,7 @@ public class DBConfiguration {
 	        // Create XPath object
 	        XPathFactory xpathFactory = XPathFactory.newInstance();
 	        XPath xpath = xpathFactory.newXPath();
-	        XPathExpression expr = xpath.compile("/connectors/connector/headers/header[id=" + headerId + "]/*");
+	        XPathExpression expr = xpath.compile("/connectors/connector/headers/header[id=" + headerId + "]/keys/*");
 	    	
 	        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 	        for (int i = 0; i < nodes.getLength(); i++) {
@@ -1339,19 +1387,12 @@ public class DBConfiguration {
 					type = headerKeyType.getTextContent();
 				}
 
-	          	if(key.equals("id")) {
-	          		//nothing
-	        	}else if(key.equals("name")) {
-					header.setName(key);
-				}else {
-					
-					HeaderKeys headerKey = new HeaderKeys();
-					headerKey.setKey(key);
-					headerKey.setValue(value);
-					headerKey.setType(type);
-					headerKey.setHeader(header);
-					headerKeys.add(headerKey);
-				}
+				HeaderKeys headerKey = new HeaderKeys();
+				headerKey.setKey(key);
+				headerKey.setValue(value);
+				headerKey.setType(type);
+				headerKey.setHeader(header);
+				headerKeys.add(headerKey);
 	        	
 	        }
 		    

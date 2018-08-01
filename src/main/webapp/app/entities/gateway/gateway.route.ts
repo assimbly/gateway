@@ -32,7 +32,7 @@ export const gatewayPopupRoute: Routes = [
         path: 'gateway-new',
         component: GatewayPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Gateways'
         },
         canActivate: [UserRouteAccessService],
@@ -42,7 +42,7 @@ export const gatewayPopupRoute: Routes = [
         path: 'gateway/:id/edit',
         component: GatewayPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Gateways'
         },
         canActivate: [UserRouteAccessService],
@@ -52,7 +52,7 @@ export const gatewayPopupRoute: Routes = [
         path: 'gateway/:id/delete',
         component: GatewayDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Gateways'
         },
         canActivate: [UserRouteAccessService],

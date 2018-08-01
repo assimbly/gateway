@@ -4,14 +4,10 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
-import org.assimbly.gateway.config.environment.DBConfiguration;
-import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -19,11 +15,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Resource to return information about the currently running Spring profiles.
  */
+@ControllerAdvice
 @RestController
 @RequestMapping("/api")
 public class ConnectorResource {
@@ -41,13 +38,6 @@ public class ConnectorResource {
 	private String status;
 
 	private String type;
-
-	@Autowired
-	private DBConfiguration assimblyDBConfiguration;
-    
-	@Autowired
-	private FlowRepository flowRepository;
-	
 	
     public ConnectorResource() {}
     
@@ -67,9 +57,10 @@ public class ConnectorResource {
     	
        	try {
        		connector.setConfiguration(connectorId.toString(), mediaType, configuration);
-   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setConfiguration","Connector configuration set");
+   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setconfiguration","Connector configuration set");
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setConfiguration","Connector configuration set",e);
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/setconfiguration",e.getMessage());
    		}
     	
     }    
@@ -89,10 +80,13 @@ public class ConnectorResource {
     	
     	try {
 			gatewayConfiguration = connector.getConfiguration(connectorId.toString(),mediaType);
-			if(gatewayConfiguration.startsWith("Error")||gatewayConfiguration.startsWith("Warning")) {plainResponse = false;}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getConfiguration",gatewayConfiguration,plainResponse);				
+			if(gatewayConfiguration.startsWith("Error")||gatewayConfiguration.startsWith("Warning")) {
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",gatewayConfiguration);
+			}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",gatewayConfiguration,plainResponse);				
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getConfiguration",gatewayConfiguration,e);
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",e.getMessage());
    		}
 
     }    
@@ -112,9 +106,10 @@ public class ConnectorResource {
     	
        	try {
        		connector.setFlowConfiguration(id.toString(), mediaType, configuration);
-       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set");			
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}","Flow configuration set");			
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setFlowConfiguration","Flow configuration set",e);
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}",e.getMessage());
    		}
     }    
 
@@ -134,10 +129,13 @@ public class ConnectorResource {
     	
     	try {
 			flowConfiguration = connector.getFlowConfiguration(id.toString(),mediaType);
-			if(flowConfiguration.startsWith("Error")||flowConfiguration.startsWith("Warning")) {plainResponse = false;}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowConfiguration",flowConfiguration,plainResponse);				
+			if(flowConfiguration.startsWith("Error")||flowConfiguration.startsWith("Warning")) {
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",flowConfiguration);
+			}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}",flowConfiguration,plainResponse);				
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowConfiguration",flowConfiguration,e);
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}",e.getMessage());
    		}
     }    
 
@@ -155,10 +153,17 @@ public class ConnectorResource {
     @Timed
     public ResponseEntity<String> start(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
        	try {
-   			connector.start();
-   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"start","Connector started");
+       		
+       		if(connector.isStarted()) {
+       			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector already running");	
+       		}else {
+       			connector.start();
+       			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector started");
+       		}	
+   			
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"start","Connector started",e);
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start",e.getMessage());
    		} 
     }
     
@@ -174,10 +179,13 @@ public class ConnectorResource {
    public ResponseEntity<String> stop(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,  @PathVariable Long connectorId) throws Exception {
        
       	try {
+      		String config = connector.getConfiguration(connectorId.toString(), mediaType);
+      		System.out.println("config=" + config);
   			connector.stop();
-  			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"stop","Connector stopped");
+  			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/stop","Connector stopped");
   		} catch (Exception e) {
-  			return ResponseUtil.createFailureResponse(connectorId, mediaType,"stop","Connector stopped",e);
+   			e.printStackTrace();
+  			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/stop",e.getMessage());
   		}
    }
 
@@ -195,9 +203,10 @@ public class ConnectorResource {
  
 		try {
 			Boolean started = connector.isStarted();
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"isStarted",started.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/isStarted",started.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"isStarted","Retrieving connector status",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/isStarted",e.getMessage());
 		}  
 	  
   }
@@ -242,9 +251,10 @@ public class ConnectorResource {
 			// start the thread
 			thread.start();
 			
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"setMaintenance","Set flows into maintenance mode for " + time + " miliseconds");
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/maintenance/{time}","Set flows into maintenance mode for " + time + " miliseconds");
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"setMaintenance","Set flows into maintenance mode",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/maintenance/{time}",e.getMessage());
 		}
   }
   
@@ -263,9 +273,10 @@ public class ConnectorResource {
 	      	}
 	  		String stats = connector.getStats(type, mediaType);
 	  		if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
-				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",stats,plainResponse);
+				return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/stats",stats,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/stats",e.getMessage());
 		}
   }
 
@@ -276,9 +287,10 @@ public class ConnectorResource {
 
 		try {
 			String error = connector.getLastError();
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getStats",error,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/lasterror",error,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getStats","Retrieving connector stats",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/lasterror",e.getMessage());
 		}
 
   }
@@ -290,9 +302,10 @@ public class ConnectorResource {
 
 		try {
 			Boolean hasFlow = connector.hasFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"hasFlow",hasFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/hasflow/{id}",hasFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"hasFlow","Retrieving flows",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/hasflow/{id}",e.getMessage());
 		}  
  
     }
@@ -303,9 +316,10 @@ public class ConnectorResource {
 
 		try {
 			Boolean removedFlow = connector.removeFlow(id.toString());
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"removeFlow",removedFlow.toString());
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/removeflow/{id}",removedFlow.toString());
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"removeFlow","Retrieving flows",e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/removeflow/{id}",e.getMessage());
 		}  
  
     }    
@@ -319,12 +333,13 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.startFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"startFlow","started","started flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/start/{id}","started flow " + flowId,"started flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"startFlow","unable to start flow " + flowId,"unable to start flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/start/{id}",e.getMessage(),"unable to start flow " + flowId,flowId);
 		}   	
 
     }
@@ -338,12 +353,13 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.stopFlow(flowId);
     		if(status.equals("stopped")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"stopFlow","stopped","stopped flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/stop/{id}","stopped flow " + flowId,"stopped flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"stopFlow","unable to stop flow " + flowId,"unable to stop flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/stop/{id}",e.getMessage(),"unable to stop flow " + flowId,flowId);
 		}
 				
      }
@@ -357,12 +373,13 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.restartFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"restartFlow","restarted","restarted flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/restart/{id}","restarted","restarted flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"restartFlow","unable to restart flow " + flowId,"unable to restart flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/restart/{id}",e.getMessage(),"unable to restart flow " + flowId,flowId);
 		}
 
     }    
@@ -375,13 +392,14 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		status = connector.pauseFlow(flowId);
-    		if(status.equals("suspended")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"pauseFlow","paused","paused flow " + flowId,flowId);
+    		if(status.equals("suspended") || status.equals("stopped")) {
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/pause/{id}","paused","paused flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","unable to pause flow " + flowId,"unable to pause flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/pause/{id}",e.getMessage(),"unable to pause flow " + flowId,flowId);
 		}    	
             
      }
@@ -395,12 +413,13 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.resumeFlow(flowId);
     		if(status.equals("started")) {
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"resumeFlow","resumed","resumed flow " + flowId,flowId);
+    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/resume/{id}","resumed","resumed flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
     		}			
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"pauseFlow","unable to resume flow " + flowId,"unable to resume flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/resume/{id}",e.getMessage(),"unable to resume flow " + flowId,flowId);
 		}     
      }    
     
@@ -412,9 +431,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		status = connector.getFlowStatus(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getStatusFlow",status,status,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",status,status,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getStatusFlow","unable to get status for flow " + flowId,"unable to get status for flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",e.getMessage(),"unable to get status for flow " + flowId,flowId);
 		}  
     	
     }
@@ -427,9 +447,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String uptime = connector.getFlowUptime(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getUptimeFlow",uptime,uptime,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/uptime/{id}",uptime,uptime,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getUptimeFlow","unable to get status flow " + flowId,"unable to get uptime flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/uptime/{id}",e.getMessage(),"unable to get uptime flow " + flowId,flowId);
 		}
     	
     }    
@@ -443,9 +464,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String lastError = connector.getFlowLastError(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowLastError",lastError,lastError,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/lasterror/{id}",lastError,lastError,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowLastError","unable to get last error for flow " + flowId,"unable to get last error for flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/lasterror/{id}",e.getMessage(),"unable to get last error for flow " + flowId,flowId);
 		}
     }
     
@@ -457,9 +479,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String numberOfMessages = connector.getFlowTotalMessages(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowTotalMessages",numberOfMessages,numberOfMessages,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/totalmessages/{id}",numberOfMessages,numberOfMessages,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowTotalMessages","unable to get total messages of flow " + flowId,"unable to get total messages of flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/totalmessages/{id}",e.getMessage(),"unable to get total messages of flow " + flowId,flowId);
 		}
     }
 
@@ -471,9 +494,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String completedMessages = connector.getFlowCompletedMessages(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowCompletedMessages",completedMessages,completedMessages,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/completedmessages/{id}",completedMessages,completedMessages,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowCompletedMessages","unable to get completed messages of flow " + flowId,"unable to get completed messages of flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/completedmessages/{id}",e.getMessage(),"unable to get completed messages of flow " + flowId,flowId);
 		}
     }
     
@@ -485,9 +509,10 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		String failedMessages = connector.getFlowFailedMessages(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"getFlowFailedMessages",failedMessages,failedMessages,flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedmessages/{id}",failedMessages,failedMessages,flowId);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"getFlowFailedMessages","unable to get failed messages of flow " + flowId,"unable to get failed messages of flow " + flowId,flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedmessages/{id}",e.getMessage(),"unable to get failed messages of flow " + flowId,flowId);
 		}
     }
 
@@ -498,9 +523,10 @@ public class ConnectorResource {
 
 		try {
     		String documentation = connector.getDocumentationVersion();
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentationVersion",documentation,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/version",documentation,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentationVersion",flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/version",e.getMessage());
 		}
     }
 	
@@ -512,9 +538,13 @@ public class ConnectorResource {
 
 		try {
     		String documentation = connector.getDocumentation(componenttype, mediaType);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getDocumentation",documentation,plainResponse);
+    		if(documentation.startsWith("Unknown")) {
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",documentation);
+			}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",documentation,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getDocumentation",flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",e.getMessage());
 		}
     }
 
@@ -526,9 +556,13 @@ public class ConnectorResource {
 
 		try {
     		String documentation = connector.getComponentSchema(componenttype, mediaType);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getComponentSchema",documentation,plainResponse);
+    		if(documentation.startsWith("Unknown")) {
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/schema/{componenttype}",documentation);
+			}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/schema/{componenttype}",documentation,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getComponentSchema",flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/schema/{componenttype}",e.getMessage());
 		}
     }
 
@@ -537,9 +571,9 @@ public class ConnectorResource {
     public ResponseEntity<String> validateFlowUri(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("Uri") String uri, @PathVariable Long connectorId) throws Exception {
 		try {
     		String flowValidation = connector.validateFlow(uri);
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"validateFlows",flowValidation);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/validateUri",flowValidation);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"validateFlows",flowId,e);
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/validateUri",e.getMessage());
 		}
     }
     
@@ -554,12 +588,24 @@ public class ConnectorResource {
         	flowId = id.toString();
     		String flowStats = connector.getFlowStats(flowId, mediaType);
     		if(flowStats.startsWith("Error")||flowStats.startsWith("Warning")) {plainResponse = false;}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"getFlowStats",flowStats,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",flowStats,plainResponse);
 		} catch (Exception e) {
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"getFlowStats",flowId,e);
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",e.getMessage());
 		}
     }
     
+    // Generates a generic error response (exceptions outside try catch):
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<String> connectorErrorHandler(Exception error, NativeWebRequest request) throws Exception {
+    	
+    	Long connectorId = 0L; // set connectorid to 0, as we may get a string value
+    	String mediaType = request.getNativeRequest(HttpServletRequest.class).getHeader("ACCEPT");
+    	String path = request.getNativeRequest(HttpServletRequest.class).getRequestURI();
+    	String message = error.getMessage();
+
+    	return ResponseUtil.createFailureResponse(connectorId, mediaType,path,message);
+    }
     
     //private methods    
     

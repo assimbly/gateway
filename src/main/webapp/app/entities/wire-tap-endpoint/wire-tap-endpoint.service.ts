@@ -15,6 +15,7 @@ export class WireTapEndpointService {
 
     create(wireTapEndpoint: WireTapEndpoint): Observable<WireTapEndpoint> {
         const copy = this.convert(wireTapEndpoint);
+        copy.service = null;
         return this.http.post(this.resourceUrl, copy).map((res: Response) => {
             const jsonResponse = res.json();
             return this.convertItemFromServer(jsonResponse);

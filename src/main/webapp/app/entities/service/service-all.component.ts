@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class ServiceAllComponent implements OnInit, OnDestroy {
     public services: Array<Service> = [];
     public page: any;
+    public isAdmin: boolean;
     private currentAccount: any;
     private eventSubscriber: Subscription;
     predicate: any;
@@ -29,6 +30,7 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadAllServices();
+        this.isAdmin = this.principal.isAdmin();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });

@@ -31,7 +31,7 @@ export const toEndpointPopupRoute: Routes = [
         path: 'to-endpoint-new',
         component: ToEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ToEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -41,7 +41,7 @@ export const toEndpointPopupRoute: Routes = [
         path: 'to-endpoint/:id/edit',
         component: ToEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ToEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -51,7 +51,7 @@ export const toEndpointPopupRoute: Routes = [
         path: 'to-endpoint/:id/delete',
         component: ToEndpointDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'ToEndpoints'
         },
         canActivate: [UserRouteAccessService],

@@ -40,7 +40,7 @@ export const headerPopupRoute: Routes = [
         path: 'header-new',
         component: HeaderPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Headers'
         },
         canActivate: [UserRouteAccessService],
@@ -50,7 +50,7 @@ export const headerPopupRoute: Routes = [
         path: 'header/:id/edit',
         component: HeaderPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Headers'
         },
         canActivate: [UserRouteAccessService],
@@ -60,7 +60,7 @@ export const headerPopupRoute: Routes = [
         path: 'header/:id/delete',
         component: HeaderDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Headers'
         },
         canActivate: [UserRouteAccessService],
