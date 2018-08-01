@@ -34,9 +34,9 @@ export class GatewayDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         if (typeof this.gateway.id === 'undefined') {
-            this.gateway.defaultFromEndpointType = 'FILE';
-            this.gateway.defaultToEndpointType = 'FILE';
-            this.gateway.defaultErrorEndpointType = 'FILE';
+            this.gateway.defaultFromEndpointType = EndpointType.FILE;
+            this.gateway.defaultToEndpointType = EndpointType.FILE;
+            this.gateway.defaultErrorEndpointType = EndpointType.FILE;
         }
         if (this.router.fragment['value'] === 'clone') {
             this.gateway.id = null;

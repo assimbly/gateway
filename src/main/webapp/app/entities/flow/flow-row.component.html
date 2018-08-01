@@ -2,54 +2,58 @@
 	<a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a>
 </td>
 <td>
-	<a [routerLink]="['../flow', flow.id ]"  data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
+	<a (click)="navigateToFlow()" data-toggle="tooltip" title="ID={{flow.id}}">{{flow.name}}</a>
 </td>
 <td id="flowRowID" [hidden]="!flowRowID">
 	<a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{flow.gatewayId}}</a>
 </td>
 <td>
-	<a *ngIf="flow.fromEndpointId" [routerLink]="['../from-endpoint', flow.fromEndpointId]" data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</a>
+	<span data-toggle="tooltip" title="{{fromEndpointTooltip}}">{{fromEndpoint.type}}</span>
 </td>
 <td>
-	<span  *ngFor="let toEndpoint of toEndpoints; let i = index">
-		<a [routerLink]="['../to-endpoint', toEndpoint.id]" data-toggle="tooltip" title="{{toEndpointsTooltips[i]}}">{{toEndpoint.type}}</a><span *ngIf="i < toEndpoints.length - 1">,</span>
+	<span *ngFor="let toEndpoint of toEndpoints; let i = index">
+		<span data-toggle="tooltip" title="{{toEndpointsTooltips[i]}}">{{toEndpoint.type}}</span>
+		<span *ngIf="i < toEndpoints.length - 1">,</span>
 	</span>
 </td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 	<a *ngIf="flow.errorEndpointId" [routerLink]="['../error-endpoint', flow.errorEndpointId]" data-toggle="tooltip" title="{{errorEndpointTooltip}}">{{flow.errorEndpointId}}</a>
 </td>
 <td>
-	<ng-template #statusTemplate let-message="message"><div [innerHtml]="flowStatistic"></div></ng-template>
-	<ng-template #statusFlowButtonTemplate let-message="message"><div [innerHtml]="flowStatusButton"></div></ng-template>
+	<ng-template #statusTemplate let-message="message">
+		<div [innerHtml]="flowStatistic"></div>
+	</ng-template>
+	<ng-template #statusFlowButtonTemplate let-message="message">
+		<div [innerHtml]="flowStatusButton"></div>
+	</ng-template>
 	<p>
-			<span class="badge badge-success" *ngIf="statusFlow === 'active'" (mouseenter)="p!=p" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusFlowButtonTemplate">active</span>
-			<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
-			<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave"popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
-			<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p"  placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
-		 <i (mouseenter)="getFlowStatus(flow.id)" [hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
-		 <i [hidden]="isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i></p>
-
-
+		<span class="badge badge-success" *ngIf="statusFlow === 'active'" (mouseenter)="p!=p" triggers="mouseenter:mouseleave" placement="left" popoverTitle="Status" [popover]="statusFlowButtonTemplate">active</span>
+		<span class="badge badge-warning" *ngIf="statusFlow === 'paused'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">paused</span>
+		<span class="badge badge-primary" *ngIf="statusFlow === 'inactive'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+		<span class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'" (mouseenter)="p!=p" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Status" [popover]="statusFlowButtonTemplate">inactive</span>
+		<i (mouseenter)="getFlowStatus(flow.id)" [hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
+		<i [hidden]="isFlowStatusOK" triggers="mouseenter:mouseleave" placement="left" triggers="mouseenter:mouseleave" popoverTitle="Stats" [popover]="statusTemplate" class="fa fa-bar-chart"></i>
+	</p>
 </td>
 <td class="text-right">
 	<div class="btn-group flex-btn-group-container flow-btns">
-		<button type="button" (click)="start()" class="btn btn-info btn-sm" *ngIf="!isFlowStarted">
+		<button type="button" (click)="start()" class="btn btn-info btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowStarted">
 			<span class="fa fa-play"></span>
 			<span class="d-none d-md-inline">Start</span>
 		</button>
-		<button type="button" (click)="restart()" class="btn btn-primary btn-sm" *ngIf="!isFlowRestarted">
+		<button type="button" (click)="restart()" class="btn btn-primary btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowRestarted">
 			<span class="fa fa-refresh"></span>
 			<span class="d-none d-md-inline">Restart</span>
 		</button>
-		<button type="button" (click)="pause()" class="btn btn-warning btn-sm" [disabled]="!isFlowPaused && isFlowStopped" *ngIf="!isFlowPaused">
+		<button type="button" (click)="pause()" class="btn btn-warning btn-sm" [disabled]="!isFlowPaused && isFlowStopped || disableActionBtns" *ngIf="!isFlowPaused">
 			<span class="fa fa-pause"></span>
 			<span class="d-none d-md-inline">Pause</span>
 		</button>
-		<button type="button" (click)="resume()" class="btn btn-info btn-sm" *ngIf="!isFlowResumed">
+		<button type="button" (click)="resume()" class="btn btn-info btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowResumed">
 			<span class="fa fa-step-forward"></span>
 			<span class="d-none d-md-inline">Resume</span>
 		</button>
-		<button type="button" (click)="stop()" class="btn btn-danger btn-sm" [disabled]="isFlowStopped">
+		<button type="button" (click)="stop()" class="btn btn-danger btn-sm" [disabled]="isFlowStopped || disableActionBtns">
 			<span class="fa fa-stop"></span>
 			<span class="d-none d-md-inline">Stop</span>
 		</button>

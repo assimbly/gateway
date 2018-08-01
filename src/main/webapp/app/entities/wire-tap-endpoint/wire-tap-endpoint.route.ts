@@ -4,6 +4,7 @@ import { UserRouteAccessService } from '../../shared';
 import { WireTapEndpointComponent } from './wire-tap-endpoint.component';
 import { WireTapEndpointDetailComponent } from './wire-tap-endpoint-detail.component';
 import { WireTapEndpointPopupComponent } from './wire-tap-endpoint-dialog.component';
+import { WireTapEndpointEditComponent } from './wire-tap-endpoint-edit.component';
 import { WireTapEndpointDeletePopupComponent } from './wire-tap-endpoint-delete-dialog.component';
 
 export const wireTapEndpointRoute: Routes = [
@@ -23,6 +24,22 @@ export const wireTapEndpointRoute: Routes = [
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService]
+    }, {
+        path: 'wire-tap-endpoint-create',
+        component: WireTapEndpointEditComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'WireTapEndpoints'
+        },
+        canActivate: [UserRouteAccessService]
+    }, {
+        path: 'wire-tap-endpoint-edit/:id',
+        component: WireTapEndpointEditComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'WireTapEndpoints'
+        },
+        canActivate: [UserRouteAccessService]
     }
 ];
 
@@ -31,7 +48,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint-new',
         component: WireTapEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -41,7 +58,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint/:id/edit',
         component: WireTapEndpointPopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],
@@ -51,7 +68,7 @@ export const wireTapEndpointPopupRoute: Routes = [
         path: 'wire-tap-endpoint/:id/delete',
         component: WireTapEndpointDeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService],

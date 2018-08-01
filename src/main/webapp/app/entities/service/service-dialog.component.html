@@ -1,4 +1,4 @@
-<form name="editForm" role="form" novalidate (ngSubmit)="save(false)" #editForm="ngForm">
+<form name="editForm" role="form" novalidate (ngSubmit)="save(false)" #editForm="ngForm" autocomplete="off">
 
     <div class="modal-header">
         <h4 class="modal-title" id="myServiceLabel">Create or edit a Service</h4>
@@ -21,7 +21,7 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType()" #type="ngModel">
+            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
                 <option [ngValue]="type" *ngFor="let type of typeServices">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
@@ -64,8 +64,9 @@
                                 </td>
                             </ng-template>
                             <td *ngIf="serviceKey.valueType !== 'list'; else isList">
-                                <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}"
-                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel" />
+                                <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" placeholder="{{serviceKey.placeholder}}"
+                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel" 
+                                    [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"/>
                                 <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                                     <span *ngIf="value.errors.required">Value is required.</span>
                                 </div>

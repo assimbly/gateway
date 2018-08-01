@@ -6,6 +6,8 @@ export const enum EndpointType {
     ACTIVEMQ = 'ACTIVEMQ',
     DIRECT = 'DIRECT',
     FILE = 'FILE',
+    FTP = 'FTP',
+    FTPS = 'FTPS',
     HTTP4 = 'HTTP4',
     IMAP = 'IMAP',
     IMAPS = 'IMAPS',
@@ -70,6 +72,56 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: File <br/><br/>
         <b>Example</b>: /home/user/order or C:\\order<br/>
+    `
+    },
+    {
+        name: 'FTP',
+        assimblyTypeLink: `/component-ftp`,
+        camelTypeLink: `/components/camel-ftp/src/main/docs/ftp-component.adoc`,
+        uriPlaceholder: 'host:port/directoryName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname of the FTP server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port of the FTP server.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: 21<br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+        <b>Name</b>: directoryName<br/>
+        <b>Description</b>: The starting directory.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: servername:21/dir1/subdir<br/>
+    `
+    },
+    {
+        name: 'FTPS',
+        assimblyTypeLink: `/component-ftps`,
+        camelTypeLink: `/components/camel-ftp/src/main/docs/ftps-component.adoc`,
+        uriPlaceholder: 'host:port/directoryName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname of the FTPS server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port of the FTP server.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: No default, but commonly runs on port 990 and sometimes on port 21<br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+        <b>Name</b>: directoryName<br/>
+        <b>Description</b>: The starting directory.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: servername:990/dir1/subdir<br/>
     `
     },
     {
@@ -348,15 +400,15 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
+    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
         'SQL', 'STREAM', 'TELEGRAM', 'VM'];
 
-    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
+    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
         'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN'];
 
-    errorTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
 
-    wireTapTypes = ['ACTIVEMQ', 'FILE', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
+    wireTapTypes = ['ACTIVEMQ', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
 
 }
 
@@ -604,6 +656,166 @@ export const flowExamples = [
         id: 122
         to:
           uri: "file://C:/to"
+        type: "default"
+        error:
+          uri: "file://C:/error"
+    id: "live"
+    services: {}`
+    },
+    {
+        name: 'FTP',
+        flowtypeFile: 'XML',
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example from local directory to some FTP location -->
+            <flow>
+                <id>190</id>
+                <name>example.filetoftp</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>ftp://username@server/directory</uri>
+                    <options>
+                        <password>secret</password>
+                    </options>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
+    },
+    {
+        name: 'FTP',
+        flowtypeFile: 'JSON',
+        fileExample: `{
+  "connectors": {
+    "connector": {
+      "flows": {
+        "flow": {
+          "error": {
+            "uri": "file://C:/error"
+          },
+          "from": {
+            "uri": "file://C:/from"
+          },
+          "id": 191,
+          "to": {
+            "options": {
+              "password": "secret"
+            },
+            "uri": "ftp://username@server/directory"
+          },
+          "type": "default"
+        }
+      },
+      "headers": {},
+      "id": "live",
+      "services": {}
+    }
+  }
+}`
+    },
+    {
+        name: 'FTP',
+        flowtypeFile: 'YAML',
+        fileExample: `connectors:
+  connector:
+    headers: {}
+    flows:
+      flow:
+        from:
+          uri: "file://C:/from"
+        id: 192
+        to:
+          options:
+            password: "secret"
+          uri: "ftp://username@server/directory"
+        type: "default"
+        error:
+          uri: "file://C:/error"
+    id: "live"
+    services: {}`
+    },
+    {
+        name: 'FTPS',
+        flowtypeFile: 'XML',
+        fileExample: `<connectors>
+    <connector>
+     <id>example</id>
+        <flows>
+            <!-- example from local directory to some FTPS location -->
+            <flow>
+                <id>190</id>
+                <name>example.filetoftps</name>
+                <from>
+                    <uri>file://C:/from</uri>
+                </from>
+                <to>
+                    <uri>ftps://username@server/directory</uri>
+                    <options>
+                        <password>secret</password>
+                    </options>
+                </to>
+                <error>
+                    <uri>file://C:/error</uri>
+                </error>
+            </flow>
+        </flows>
+    </connector>
+</connectors>`
+    },
+    {
+        name: 'FTPS',
+        flowtypeFile: 'JSON',
+        fileExample: `{
+  "connectors": {
+    "connector": {
+      "flows": {
+        "flow": {
+          "error": {
+            "uri": "file://C:/error"
+          },
+          "from": {
+            "uri": "file://C:/from"
+          },
+          "id": 191,
+          "to": {
+            "options": {
+              "password": "secret"
+            },
+            "uri": "ftps://username@server/directory"
+          },
+          "type": "default"
+        }
+      },
+      "headers": {},
+      "id": "live",
+      "services": {}
+    }
+  }
+}`
+    },
+    {
+        name: 'FTPS',
+        flowtypeFile: 'YAML',
+        fileExample: `connectors:
+  connector:
+    headers: {}
+    flows:
+      flow:
+        from:
+          uri: "file://C:/from"
+        id: 192
+        to:
+          options:
+            password: "secret"
+          uri: "ftps://username@server/directory"
         type: "default"
         error:
           uri: "file://C:/error"

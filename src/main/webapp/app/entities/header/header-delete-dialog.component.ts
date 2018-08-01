@@ -41,7 +41,7 @@ export class HeaderDeleteDialogComponent {
                 this.activeModal.close();
             }, 0);
         }, () => {
-            this.message = 'Header ' + this.header.name + ' can not be deleted!';
+            this.message = 'Header ' + this.header.name + ' can not be deleted (header is used by a flow)';
             this.disableDelete = true;
         });
     }

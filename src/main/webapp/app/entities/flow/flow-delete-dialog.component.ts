@@ -15,6 +15,8 @@ import { FlowService } from './flow.service';
 export class FlowDeleteDialogComponent {
 
     flow: Flow;
+    message = 'Are you sure you want to delete this Flow?';
+    disableDelete: boolean;
 
     constructor(
         private flowService: FlowService,
@@ -28,9 +30,16 @@ export class FlowDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.flowService.delete(id).subscribe((response) => {
-            this.activeModal.dismiss(true);
-            window.history.back();
+        this.flowService.getFlowStatus(id).subscribe((response) => {
+            if (response.text() === 'started') {
+                this.message = 'Active flow can not be deleted. Please stop flow before first.';
+                this.disableDelete = true;
+            } else {
+                this.flowService.delete(id).subscribe((r) => {
+                    this.activeModal.dismiss(true);
+                    window.history.back();
+                });
+            }
         });
     }
 }

@@ -14,11 +14,12 @@ import { Subscription } from 'rxjs/Subscription';
 export class HeaderAllComponent implements OnInit, OnDestroy {
     public headers: Array<Header> = [];
     public page: any;
+    public isAdmin: boolean;
     private eventSubscriber: Subscription;
     private currentAccount: any;
     predicate: any;
     reverse: any;
-    
+
     constructor(
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
@@ -32,6 +33,7 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
+        this.isAdmin = this.principal.isAdmin();
         this.registerChangeInHeaders();
     }
 

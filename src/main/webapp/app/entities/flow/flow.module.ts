@@ -1,4 +1,4 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AceEditorModule } from 'ng2-ace-editor';
@@ -77,7 +77,7 @@ const ENTITY_STATES = [
     providers: [
         Components,
         FlowService,
-        FlowPopupService,
+        FlowPopupService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

@@ -50,8 +50,8 @@
                         </td>
                     </ng-template>
                     <td *ngIf="serviceKey.valueType !== 'list'; else isList">
-                        <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" 
-                            id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" />
+                        <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}"
+                            id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" [disabled]="serviceKey.isDisabled" #value="ngModel" placeholder="{{serviceKey.placeholder}}"/>
                          <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                             <span *ngIf="value.errors.required">Value is required.</span>
                         </div>

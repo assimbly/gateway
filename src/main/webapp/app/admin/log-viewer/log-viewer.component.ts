@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { LogViewerService } from './log-viewer.service';
 
 @Component({
@@ -7,6 +7,7 @@ import { LogViewerService } from './log-viewer.service';
 })
 export class LogViewerComponent implements OnInit {
 
+    @ViewChild('logArea')private logArea: ElementRef;
     public log: string;
     public lines: number;
 
@@ -24,6 +25,11 @@ export class LogViewerComponent implements OnInit {
         let tt = this.lines;
         this.logViewerService.getLogs(this.lines).subscribe((res) => {
             this.log = res.text();
+            setTimeout(() => {
+                try {
+                    this.logArea.nativeElement.scrollTop = this.logArea.nativeElement.scrollHeight;
+                } catch (error) { }
+            }, 0);
         });
     }
 }

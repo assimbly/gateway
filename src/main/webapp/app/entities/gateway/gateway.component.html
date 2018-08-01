@@ -6,12 +6,10 @@
             </h2>
         </div>
         <div class="col-6" *ngIf='gateways.length === 0'>
-            <button class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]"
-                *ngIf="!gateways.gateway">
+            <button type="submit" class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'">
                 <span class="fa fa-plus"></span>
-                <span>
-                    Create new Gateway
-                </span>
+                <span>Create Gateway</span>
             </button>
         </div>
     </div>
@@ -23,15 +21,19 @@
             <span class="d-none d-md-inline">Import XML Configuration</span>
         </button>
     </div>
-    <jhi-alert></jhi-alert>
+    <!-- <jhi-alert></jhi-alert> -->
     <br/>
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
-                <thead>
-                        <tr>
-                          <th  class="bg-gray" colspan="2"><span class="text-center"><i>{{gateway.name}}</i></span></th>
-                        </tr>
-                      </thead>
+            <thead>
+                <tr>
+                    <th class="bg-gray" colspan="2">
+                        <span class="text-center">
+                            <i>{{gateway.name}}</i>
+                        </span>
+                    </th>
+                </tr>
+            </thead>
             <tbody>
                 <tr>
                     <td lass="w-25">
@@ -90,14 +92,15 @@
                                 <span class="fa fa-download"></span>
                                 <span class="d-none d-md-inline">Export XML Configuration</span>
                             </button>
-                            <button type="submit" [routerLink]="['../gateway', gateway.id ]" class="btn btn-info btn-sm">
-                                <span class="fa fa-eye"></span>
-                                <span class="d-none d-md-inline">View</span>
-                            </button>
-                            <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
                                 <span class="fa fa-pencil"></span>
                                 <span class="d-none d-md-inline">Edit</span>
+                            </button>
+                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                                <span class="fa fa-remove"></span>
+                                <span class="d-none d-md-inline">Delete</span>
                             </button>
                         </div>
                     </td>

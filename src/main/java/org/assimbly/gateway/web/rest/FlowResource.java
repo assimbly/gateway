@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -106,9 +110,17 @@ public class FlowResource {
      */
     @GetMapping("/flows")
     @Timed
-    public ResponseEntity<List<FlowDTO>> getAllflows(Pageable pageable) {
+    public ResponseEntity<List<FlowDTO>> getAllflows(@SortDefault(sort = {"name"}, direction = Sort.Direction.ASC) Pageable pageable) {
         log.debug("REST request to get a page of flows");
         Page<Flow> page = flowRepository.findAll(pageable);
+        
+        List<FlowDTO> x = flowMapper.toDto(page.getContent());
+        FlowDTO y = x.get(1);
+        System.out.println("flowid " + y.getName());
+        System.out.println("autostart " + y.isAutoStart());
+
+        System.out.println("to endpoints size" + y.getToEndpoints().size());
+        
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
     }
@@ -121,12 +133,28 @@ public class FlowResource {
      */
     @GetMapping("/flows/bygatewayid/{gatewayid}")
     @Timed
+    public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(@SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable, @PathVariable Long gatewayid) {
+        log.debug("REST request to get a page of flows by gatewayid");
+        Page<Flow> page = flowRepository.findAllByGatewayId(pageable, gatewayid);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
+        return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+    }
+    
+    /*
+    @GetMapping("/flows/bygatewayid/{gatewayid}")
+    @Timed
     public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
-    	log.debug("REST request to get flow by following gateway ID : {}", gatewayid);
+    	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
         List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
+        flows.sort(Comparator.comparing(Flow::getName));
+        
+        for(Flow flow : flows) {
+        	System.out.println("Tname=" + flow.getName());
+        }
+        
        return flowMapper.toDto(flows);
     }
-
+	*/
     
     /**
      * GET  /flows/:id : get the "id" flow.
