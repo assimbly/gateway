@@ -49,9 +49,9 @@
 		<hr>
 		<p class="float-left text-danger">{{loadErrorMessage}}</p>
 	</div>
-	<div *ngIf="status">
+	<div *ngIf="mediaTypeCheck">
 		<hr>
-		<p class="float-left text-danger">JSON and YAML aren't supported yet</p>
+		<p class="float-left text-danger">Unknown mediaType</p>
 	</div>
 
 	<div *ngIf="isConfigurationSet">

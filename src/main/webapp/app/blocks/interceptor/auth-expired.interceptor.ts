@@ -41,7 +41,16 @@ export class AuthExpiredInterceptor extends JhiHttpInterceptor {
                 }
                 const authServer: AuthServerProvider = this.injector.get(AuthServerProvider);
                 authServer.logout();
+            } else if (error.status === 400 && error.text() === 'Full authentication is required to access this resource' && !(error.url.includes('/api/account'))) {
+
+                this.stateStorageService.storeUrl('/');
+                const loginService: LoginService = this.injector.get(LoginService);
+                loginService.logout();
+                const router: Router = this.injector.get(Router);
+                router.navigate(['/']);
+
             }
+
             return Observable.throw(error);
         });
     }

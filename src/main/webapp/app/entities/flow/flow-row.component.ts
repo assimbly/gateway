@@ -22,6 +22,7 @@ enum Status {
 export class FlowRowComponent implements OnInit {
 
     @Input() flow: Flow;
+    @Input() fromEndpoints: FromEndpoint[];
     @Input() isAdmin: boolean;
 
     fromEndpoint: FromEndpoint = new FromEndpoint();
@@ -67,49 +68,21 @@ export class FlowRowComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.setFlowStatusDefaults();
+        this.getFromEndpoint(this.flow.fromEndpointId);
+        this.toEndpoints = this.flow.toEndpoints;
+        this.getToEndpoint();
+        // this.getErrorEndpoint(this.flow.errorEndpointId);
+        this.getFlowStatus(this.flow.id);
+        this.registerTriggeredAction();
+
+    }
+
+    setFlowStatusDefaults() {
         this.isFlowStatusOK = true;
         this.flowStatus = 'Stopped';
         this.lastError = '';
-        this.getFromEndpoint(this.flow.fromEndpointId);
-        this.getToEndpointByFlowId(this.flow.id);
-        this.getErrorEndpoint(this.flow.errorEndpointId);
-        this.getFlowStatus(this.flow.id);
-        this.getFlowStats(this.flow.id);
-        this.registerTriggeredAction();
-    }
-
-    getFlowStatus(id: number) {
-        this.clickButton = true;
-        this.flowService.getFlowStatus(id).subscribe((response) => {
-            this.setFlowStatus(response.text());
-        });
-    }
-
-    navigateToFlow() {
-        this.isAdmin ?
-            this.router.navigate(['../../flow/edit-all', this.flow.id]) :
-            this.router.navigate(['../flow', this.flow.id]);
-    }
-
-    getFlowLastError(id: number, action: string, errMesage: string) {
-        if (errMesage) {
-            this.flowStatusButton = `
-            Last action: ${action} <br/>
-            Status: Stopped after error <br/><br/>
-            ${errMesage}
-`;
-            this.statusFlow = Status.inactiveError;
-        } else {
-            this.flowService.getFlowLastError(id).subscribe((response) => {
-                this.lastError = response.text() === '0' ? '' : response.text();
-                this.flowStatusButton = `
-                Last action: ${action} <br/>
-                Status: Stopped after error <br/><br/>
-                ${this.lastError}
-    `;
-                this.statusFlow = Status.inactiveError;
-            });
-        }
+        this.setFlowStatus(this.flowStatus);
     }
 
     setFlowStatus(status: string): void {
@@ -178,6 +151,40 @@ export class FlowRowComponent implements OnInit {
         }
     }
 
+    getFlowStatus(id: number) {
+        this.clickButton = true;
+        this.flowService.getFlowStatus(id).subscribe((response) => {
+            this.setFlowStatus(response.text());
+        });
+    }
+
+    navigateToFlow() {
+        this.isAdmin ?
+            this.router.navigate(['../../flow/edit-all', this.flow.id]) :
+            this.router.navigate(['../flow', this.flow.id]);
+    }
+
+    getFlowLastError(id: number, action: string, errMesage: string) {
+        if (errMesage) {
+            this.flowStatusButton = `
+            Last action: ${action} <br/>
+            Status: Stopped after error <br/><br/>
+            ${errMesage}
+`;
+            this.statusFlow = Status.inactiveError;
+        } else {
+            this.flowService.getFlowLastError(id).subscribe((response) => {
+                this.lastError = response.text() === '0' ? '' : response.text();
+                this.flowStatusButton = `
+                Last action: ${action} <br/>
+                Status: Stopped after error <br/><br/>
+                ${this.lastError}
+    `;
+                this.statusFlow = Status.inactiveError;
+            });
+        }
+    }
+
     getFlowStats(id: number) {
         this.flowService.getFlowStats(id, this.flow.gatewayId)
             .map((response) => response.json())
@@ -185,6 +192,7 @@ export class FlowRowComponent implements OnInit {
                 this.setFlowStatistic(res);
             });
     }
+
     setFlowStatistic(res) {
         if (res === 0) {
             this.flowStatistic = `Currently there is no statistic for this flow.`;
@@ -231,21 +239,18 @@ export class FlowRowComponent implements OnInit {
     }
 
     getFromEndpoint(id: number) {
-        this.fromEndpointService.find(id)
-            .subscribe((fromEndpoint) => {
-                this.fromEndpoint = fromEndpoint;
-                this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
-            });
+
+        this.fromEndpoints.filter((fromEndpoint) => fromEndpoint.id === id).map((fromEndpoint) => {
+            this.fromEndpoint = fromEndpoint;
+            this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
+        });
+
     }
 
-    getToEndpointByFlowId(id: number) {
-        this.toEndpointService.findByFlowId(id)
-            .subscribe((toEndpoints) => {
-                this.toEndpoints = toEndpoints;
-                this.toEndpoints.forEach((toEndpoint) => {
-                    this.toEndpointsTooltips.push(this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options));
-                });
-            });
+    getToEndpoint() {
+        this.toEndpoints.forEach((toEndpoint) => {
+            this.toEndpointsTooltips.push(this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options));
+        });
     }
 
     getErrorEndpoint(id: number) {
@@ -270,29 +275,29 @@ export class FlowRowComponent implements OnInit {
         this.eventManager.subscribe('trigerAction', (response) => {
             switch (response.content) {
                 case 'start':
-                if (this.statusFlow === Status.inactive) {
-                    this.start();
-                }
+                    if (this.statusFlow === Status.inactive) {
+                        this.start();
+                    }
                     break;
                 case 'stop':
-                if (this.statusFlow !== Status.inactive) {
-                    this.stop();
-                }
+                    if (this.statusFlow !== Status.inactive) {
+                        this.stop();
+                    }
                     break;
                 case 'pause':
-                if ( this.statusFlow === Status.active) {
-                    this.pause();
-                }
+                    if (this.statusFlow === Status.active) {
+                        this.pause();
+                    }
                     break;
                 case 'restart':
-                if ( this.statusFlow === Status.active) {
-                    this.restart();
-            }
+                    if (this.statusFlow === Status.active) {
+                        this.restart();
+                    }
                     break;
                 case 'resume':
-                if ( this.statusFlow === Status.paused) {
-                    this.resume();
-                }
+                    if (this.statusFlow === Status.paused) {
+                        this.resume();
+                    }
                     break;
                 default:
                     break;

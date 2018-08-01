@@ -392,7 +392,7 @@ public class ConnectorResource {
         	init();
         	flowId = id.toString();
     		status = connector.pauseFlow(flowId);
-    		if(status.equals("suspended")) {
+    		if(status.equals("suspended") || status.equals("stopped")) {
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/pause/{id}","paused","paused flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);

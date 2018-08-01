@@ -121,7 +121,7 @@ public final class ResponseUtil {
 
     	switch (mediaType.toLowerCase()) {    	
 	        case "application/json":
-	        	response = ResponseEntity.badRequest().headers(HeaderUtil.createAlert(headerMessage,headerParam))
+	        	response = ResponseEntity.status(400).headers(HeaderUtil.createAlert(headerMessage,headerParam))
 	        		.body(BodyUtil.createFailureJSONResponse(connectorId, path, message));
 	            break;
 	        case "application/xml":

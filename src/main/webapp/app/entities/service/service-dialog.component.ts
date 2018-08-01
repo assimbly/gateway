@@ -23,7 +23,7 @@ export class ServiceDialogComponent implements OnInit {
     public servicesNames: Array<string> = [];
     public isSaving: boolean;
     public serviceKeysKeys: Array<string> = [];
-    public listVal: Array<String> = ['com.mysql.jdbc.Driver'];
+    public listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
     public disableType: boolean;
     public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
     private requiredServiceKey: Array<RequiredServiceKey> = [];
@@ -80,6 +80,7 @@ export class ServiceDialogComponent implements OnInit {
             rsk.id = cloneHeader ? null : rsk.id;
             rsk.key = sk.serviceKeyName;
             rsk.valueType = sk.valueType;
+            rsk.placeholder = sk.placeholder;
             rsk.isRequired = true;
             requiredServiceKeys.push(rsk);
         });
@@ -198,30 +199,30 @@ export class ServiceDialogComponent implements OnInit {
             {
                 name: 'JDBC Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text' },
-                    { serviceKeyName: 'username', valueType: 'text' },
-                    { serviceKeyName: 'password', valueType: 'password' },
-                    { serviceKeyName: 'driver', valueType: 'list' }
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'jdbc:mysql://localhost/dbname' },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'admin' },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '' },
+                    { serviceKeyName: 'driver', valueType: 'list', placeholder: '' }
                 ]
             },
             {
                 name: 'SonicMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text' },
-                    { serviceKeyName: 'username', valueType: 'text' },
-                    { serviceKeyName: 'password', valueType: 'password' }
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:2506' },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'Administrator' },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '' }
                 ]
             },
             {
                 name: 'ActiveMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text' }
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:61616' }
                 ]
             },
             {
                 name: 'MQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text' }
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: '' }
                 ]
             },
         )

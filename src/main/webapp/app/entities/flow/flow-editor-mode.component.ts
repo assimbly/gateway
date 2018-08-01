@@ -26,12 +26,13 @@ export class FlowEditorModeComponent implements OnInit {
     public test: Array<FlowExamples>;
     public flowExampleListName: any[] = [];
     public flowExampleListType: any[] = ['XML', 'JSON', 'YAML'];
-    public status = false;
+    public mediaTypeCheck = false;
     public hasLoadError: boolean;
     public loadErrorMessage: string;
     public selectedFiletype: string;
     public isConfigurationInvalid: boolean;
     public invalidConfigurationMessage = '';
+    private mediaType: string;
     private hintText =
     `<!--
     In editor mode you can try new flows!
@@ -77,6 +78,9 @@ export class FlowEditorModeComponent implements OnInit {
 
     findIdInEditor(): string {
         let id;
+
+        if (this.xmlEditor === this.hintText) { return; }
+
         switch (this.selectedFlowExample.flowtypeFile) {
             case 'XML':
                 try {
@@ -84,7 +88,7 @@ export class FlowEditorModeComponent implements OnInit {
                     let obj = JSON.parse(convert.xml2json(this.xmlEditor, { compact: true, spaces: 4 }));
                     id = obj.connectors.connector.flows.flow.id._text;
                     this.isConfigurationInvalid = false;
-                }catch (e) {
+                } catch (e) {
                     this.isConfigurationInvalid = true;
                     this.invalidConfigurationMessage = 'XML configuration is invalid.';
                 }
@@ -94,7 +98,7 @@ export class FlowEditorModeComponent implements OnInit {
                     let obj = JSON.parse(this.xmlEditor);
                     id = obj.connectors.connector.flows.flow.id;
                     this.isConfigurationInvalid = false;
-                }catch (e) {
+                } catch (e) {
                     this.isConfigurationInvalid = true;
                     this.invalidConfigurationMessage = 'JSON configuration is invalid.';
                 }
@@ -105,7 +109,7 @@ export class FlowEditorModeComponent implements OnInit {
                     let obj = yaml.load(this.xmlEditor);
                     id = obj.connectors.connector.flows.flow.id;
                     this.isConfigurationInvalid = false;
-                }catch (e) {
+                } catch (e) {
                     this.isConfigurationInvalid = true;
                     this.invalidConfigurationMessage = 'YAML configuration is invalid.';
                 }
@@ -138,20 +142,32 @@ export class FlowEditorModeComponent implements OnInit {
     addExample(componentType: string) {
 
         this.selectedFlowExample.name = componentType;
+        this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
 
-        if (this.selectedFlowExample.flowtypeFile === 'XML') {
-            this.status = false;
-            this.xmlEditor = this.flowExamples.find((fe) => fe.name === this.selectedFlowExample.name && fe.flowtypeFile === this.selectedFlowExample.flowtypeFile).fileExample;
-        } else {
-            this.status = true;
-            if (this.xmlEditor !== '') {
-                this.xmlEditor = this.hintText;
-            }
-        }
     }
 
     setLiveConfiguration() {
-        this.flowService.setConfiguration(this.flowId, this.xmlEditor, 'application/xml')
+
+        switch (this.selectedFlowExample.flowtypeFile) {
+            case 'XML':
+                this.mediaType = 'application/xml';
+                this.mediaTypeCheck = false;
+                break;
+            case 'JSON':
+                this.mediaType = 'application/json';
+                this.mediaTypeCheck = false;
+                break;
+            case 'YAML':
+                this.mediaType = 'text/plain';
+                this.mediaTypeCheck = false;
+                break;
+            default:
+                this.mediaType = 'unknown';
+                this.mediaTypeCheck = true;
+                return;
+        }
+
+        this.flowService.setConfiguration(this.flowId, this.xmlEditor, this.mediaType)
             .map((response) => response.text())
             .subscribe((config) => {
                 this.configuration = config;
@@ -171,6 +187,7 @@ export class FlowEditorModeComponent implements OnInit {
                 let errMessage = obj.response.message._text;
                 this.showInfoMessage(false, errMessage);
             });
+
     }
 
     saveFlows() {

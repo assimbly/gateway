@@ -32,7 +32,7 @@ export class FlowDeleteDialogComponent {
     confirmDelete(id: number) {
         this.flowService.getFlowStatus(id).subscribe((response) => {
             if (response.text() === 'started') {
-                this.message = 'Active flow can not be deleted.';
+                this.message = 'Active flow can not be deleted. Please stop flow before first.';
                 this.disableDelete = true;
             } else {
                 this.flowService.delete(id).subscribe((r) => {
