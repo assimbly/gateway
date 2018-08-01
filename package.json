@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Messaging Gateway",
   "private": true,
   "license": "UNLICENSED",
@@ -31,7 +31,7 @@
     "ngx-infinite-scroll": "0.5.1",
     "ngx-webstorage": "2.0.1",
     "reflect-metadata": "0.1.10",
-    "rxjs": "5.5.5",
+    "rxjs": "5.5.12",
     "swagger-ui": "2.2.10",
     "tether": "1.4.0",
     "xml-js": "^1.6.7",

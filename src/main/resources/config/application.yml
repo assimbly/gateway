@@ -54,7 +54,7 @@ security:
 
 server:
     session:
-        timeout: 1800
+        timeout: 14400
         cookie:
             http-only: true
         
@@ -89,7 +89,7 @@ jhipster:
         default-include-pattern: /api/.*
         title: gateway API
         description: gateway API documentation
-        version: 0.7.0
+        version: 0.8.0
         terms-of-service-url:
         contact-name:
         contact-url:

@@ -84,7 +84,7 @@ export class WireTapEndpointEditComponent implements OnInit {
                 this.setTypeLink();
                 this.getOptions();
             });
-        }else {
+        } else {
             forkJoin(
                 this.serviceService.query(),
                 this.headerService.query(),
@@ -329,13 +329,26 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     private updateEndpointData() {
-        this.wireTapForm.patchValue({
-            'id': this.wireTapEndpoint.id,
-            'type': this.wireTapEndpoint.type,
-            'uri': this.wireTapEndpoint.uri,
-            'service': this.wireTapEndpoint.service.id,
-            'header': this.wireTapEndpoint.header.id
-        });
+
+        if (this.wireTapEndpoint !== null) {
+            this.wireTapForm.patchValue({
+                'id': this.wireTapEndpoint.id,
+                'type': this.wireTapEndpoint.type,
+                'uri': this.wireTapEndpoint.uri,
+            });
+        }
+
+        if (this.wireTapEndpoint.service !== null) {
+            this.wireTapForm.patchValue({
+                'service': this.wireTapEndpoint.service.id,
+            });
+        }
+
+        if (this.wireTapEndpoint.header !== null) {
+            this.wireTapForm.patchValue({
+                'header': this.wireTapEndpoint.header.id
+            });
+        }
     }
 
     private subscribeToSaveResponse(result: Observable<WireTapEndpoint>) {

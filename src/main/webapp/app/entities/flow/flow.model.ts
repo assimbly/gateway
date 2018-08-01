@@ -1,4 +1,5 @@
 import { BaseEntity } from './../../shared';
+import { ToEndpoint } from './../to-endpoint';
 
 export class Flow implements BaseEntity {
     constructor(
@@ -9,7 +10,7 @@ export class Flow implements BaseEntity {
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,
-        public toEndpoints?: BaseEntity[],
+        public toEndpoints?: ToEndpoint[]
     ) {
     }
 }

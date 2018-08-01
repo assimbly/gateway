@@ -2,7 +2,12 @@ package org.assimbly.gateway.service.dto;
 
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+
+import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.domain.ToEndpoint;
 
 /**
  * A DTO for the Flow entity.
@@ -24,6 +29,8 @@ public class FlowDTO implements Serializable {
     private Long errorEndpointId;
 
     private Long maintenanceId;
+
+    private Set<ToEndpoint> toEndpoints;
     
     public Long getId() {
         return id;
@@ -87,6 +94,15 @@ public class FlowDTO implements Serializable {
     public void setMaintenanceId(Long maintenanceId) {
         this.maintenanceId = maintenanceId;
     }
+    
+    public Set<ToEndpoint> getToEndpoints() {
+        return toEndpoints;
+    }
+
+    public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
+        this.toEndpoints = toEndpoints;
+    }   
+    
     
     @Override
     public boolean equals(Object o) {

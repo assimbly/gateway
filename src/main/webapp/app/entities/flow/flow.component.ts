@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
+import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
-import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
+import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { GatewayService, Gateway } from '../gateway';
 
 @Component({
@@ -18,6 +19,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     public isAdmin: boolean;
     gateways: Gateway[];
     flows: Flow[];
+    fromEndpoints: FromEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -37,6 +39,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     constructor(
         private gatewayService: GatewayService,
         private flowService: FlowService,
+        private fromEndpointService: FromEndpointService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private parseLinks: JhiParseLinks,
@@ -79,9 +82,11 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.page = page;
         this.loadFlows();
     }
+
     ngOnInit() {
         this.checkPrincipal();
         this.getGateways();
+        this.getFromEndpoints();
         this.principal.identity().then((account) => {
             this.currentAccount = account;
         });
@@ -117,6 +122,14 @@ export class FlowComponent implements OnInit, OnDestroy {
     isGatewayCreated(gateways: Gateway[]): void {
         this.gatewayExists = gateways.length === 0;
         this.multipleGateways = gateways.length > 1;
+    }
+
+    getFromEndpoints(): void {
+
+        this.fromEndpointService.query()
+            .subscribe((data) => {
+                this.fromEndpoints = data.json;
+            });
     }
 
     trackId(index: number, item: Flow) {
