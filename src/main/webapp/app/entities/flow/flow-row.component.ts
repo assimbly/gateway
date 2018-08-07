@@ -36,6 +36,7 @@ export class FlowRowComponent implements OnInit {
     public isFlowRestarted = true;
     public disableActionBtns: boolean;
 
+    public flowDetails: string;
     public flowStatus: string;
     public flowStatusError: string;
     public isFlowStatusOK: boolean;
@@ -191,6 +192,17 @@ export class FlowRowComponent implements OnInit {
             .subscribe((res) => {
                 this.setFlowStatistic(res);
             });
+    }
+
+    getFlowDetails() {
+        this.flowDetails = `
+                Name: ${this.flow.name}<br/>
+                ID: ${this.flow.id}<br/>
+                Autostart: ${this.flow.autoStart}<br/>
+                Offloading: ${this.flow.offloading}<br/>
+                <br/>
+                Click to edit
+        `;
     }
 
     setFlowStatistic(res) {
