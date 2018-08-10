@@ -2,7 +2,7 @@
 Main page styles
 ========================================================================== */
 
-.hipster {
+.assimbly {
     display: inline-block;
     width: 347px;
     height: 497px;
@@ -18,7 +18,7 @@ only screen and (     -o-min-device-pixel-ratio: 2/1),
 only screen and (        min-device-pixel-ratio: 2),
 only screen and (                min-resolution: 192dpi),
 only screen and (                min-resolution: 2dppx) {
-    .hipster {
+    .assimbly {
         background: url("../../content/images/assimbly.png") no-repeat center top;
         background-size: contain;
     }

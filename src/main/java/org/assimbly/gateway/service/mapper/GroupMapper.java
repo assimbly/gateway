@@ -12,7 +12,7 @@ import org.mapstruct.*;
 public interface GroupMapper extends EntityMapper<GroupDTO, Group> {
 
 
-    @Mapping(target = "gateways", ignore = true)
+    //@Mapping(target = "gateways", ignore = true)
     Group toEntity(GroupDTO groupDTO);
 
     default Group fromId(Long id) {
