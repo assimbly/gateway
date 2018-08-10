@@ -199,8 +199,8 @@ export class ServiceDialogComponent implements OnInit {
             {
                 name: 'JDBC Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'jdbc:mysql://localhost/dbname' },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'admin' },
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example jdbc:mysql://localhost/dbname' },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: '' },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '' },
                     { serviceKeyName: 'driver', valueType: 'list', placeholder: '' }
                 ]
@@ -208,15 +208,15 @@ export class ServiceDialogComponent implements OnInit {
             {
                 name: 'SonicMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:2506' },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'Administrator' },
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:2506' },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'Example Administrator' },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '' }
                 ]
             },
             {
                 name: 'ActiveMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:61616' }
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:61616' }
                 ]
             },
             {

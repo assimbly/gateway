@@ -3,11 +3,12 @@ import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
+import { EndpointType } from '../../shared/camel/component-type';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
-import { GatewayService, Gateway } from '../gateway';
+import { GatewayService, Gateway, GatewayType, EnvironmentType } from '../gateway';
 
 @Component({
     selector: 'jhi-flow',
@@ -18,6 +19,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     public isAdmin: boolean;
     gateways: Gateway[];
+    gateway: Gateway;
     flows: Flow[];
     fromEndpoints: FromEndpoint[];
     currentAccount: any;
@@ -31,7 +33,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     totalItems: number;
     gatewayExists = false;
     multipleGateways = false;
+
     singleGatewayName: string;
+    singleGatewayId: number;
     singleGatewayStage: string;
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     test: any;
@@ -111,10 +115,34 @@ export class FlowComponent implements OnInit, OnDestroy {
             .subscribe((gateways) => {
                 this.gateways = gateways.json
                 this.isGatewayCreated(this.gateways);
-                this.loadFlows();
-                if (!this.multipleGateways) {
-                    this.singleGatewayName = this.gateways[0].name;
-                    this.singleGatewayStage = this.gateways[0].stage ? this.gateways[0].stage.toString().toLowerCase() : '';
+
+                if (this.gatewayExists) {
+
+                    this.gateway = new Object();
+                    this.gateway.name = 'default';
+                    this.gateway.type = GatewayType.ADAPTER;
+                    this.gateway.environmentName = 'Dev1';
+                    this.gateway.stage = EnvironmentType.DEVELOPMENT;
+                    this.gateway.defaultFromEndpointType = EndpointType.FILE;
+                    this.gateway.defaultToEndpointType = EndpointType.FILE;
+                    this.gateway.defaultErrorEndpointType = EndpointType.FILE;
+
+                    this.gatewayService.create(this.gateway)
+                        .subscribe((gateway) => {
+                            this.gateway = gateway;
+                            this.gateways.push(this.gateway);
+                            this.gatewayExists = true;
+                            this.singleGatewayName = gateway.name;
+                            this.singleGatewayId = gateway.id;
+                            this.singleGatewayStage = gateway.stage ? gateway.stage.toString().toLowerCase() : '';
+                        })
+                } else {
+                    this.loadFlows();
+                    if (!this.multipleGateways) {
+                        this.singleGatewayName = this.gateways[0].name;
+                        this.singleGatewayId = this.gateways[0].id;
+                        this.singleGatewayStage = this.gateways[0].stage ? this.gateways[0].stage.toString().toLowerCase() : '';
+                    }
                 }
             });
     }
@@ -148,7 +176,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     registerChangeCreatedGateway() {
-        this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', (response) => this.gatewayExists = false);
+        this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', (response) => {
+            this.gatewayExists = false;
+            this.getGateways();
+        });
     }
 
     trigerAction(action: string) {

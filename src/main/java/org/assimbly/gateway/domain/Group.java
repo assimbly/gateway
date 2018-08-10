@@ -28,11 +28,13 @@ public class Group implements Serializable {
     @Column(name = "name")
     private String name;
 
+    /*
     @ManyToMany(mappedBy = "groups")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Gateway> gateways = new HashSet<>();
-
+	*/
+    
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "group_user",
@@ -62,6 +64,7 @@ public class Group implements Serializable {
         this.name = name;
     }
 
+    /*
     public Set<Gateway> getGateways() {
         return gateways;
     }
@@ -70,6 +73,7 @@ public class Group implements Serializable {
         this.gateways = gateways;
         return this;
     }
+
 
     public Group addGateway(Gateway gateway) {
         this.gateways.add(gateway);
@@ -86,7 +90,8 @@ public class Group implements Serializable {
     public void setGateways(Set<Gateway> gateways) {
         this.gateways = gateways;
     }
-
+	*/
+    
     public Set<User> getUsers() {
         return users;
     }

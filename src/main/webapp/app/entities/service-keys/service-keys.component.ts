@@ -47,12 +47,12 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'jdbc:mysql://localhost/dbname'
+                        placeholder: 'Example jdbc:mysql://localhost/dbname'
                     },
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
-                        placeholder: 'admin'
+                        placeholder: ''
                     },
                     {
                         serviceKeyName: 'password ',
@@ -72,12 +72,12 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'tcp://localhost:2506'
+                        placeholder: 'Example tcp://localhost:2506'
                     },
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
-                        placeholder: 'Administrator'
+                        placeholder: 'Example Administrator'
                     },
                     {
                         serviceKeyName: 'password',
@@ -92,7 +92,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'tcp://localhost:61616'
+                        placeholder: 'Example tcp://localhost:61616'
                     }
                 ]
             },

@@ -9,8 +9,8 @@
 		<a (click)="navigateToFlow()" class="fa fa-edit" aria-hidden="true"
 			(mouseenter)="getFlowDetails()" triggers="mouseenter:mouseleave"
 			placement="right" triggers="mouseenter:mouseleave"
-			popoverTitle="Details" [popover]="detailsTemplate"></a> <i
-			style="padding-left: 1em" (mouseenter)="getFlowStatus(flow.id)"
+			popoverTitle="Details" [popover]="detailsTemplate"></a> 
+		<i  style="padding-left: 1em" (mouseenter)="getFlowStatus(flow.id)"
 			[hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave"
 			placement="right" triggers="mouseenter:mouseleave"
 			popoverTitle="Stats" [popover]="statsTemplate"

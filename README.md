@@ -1,6 +1,6 @@
 # Introduction
 
-Assimbly is a messaging gateway. It has the follow characterics:
+Assimbly is a messaging gateway. It has the folloingw characteristics:
 
 1. it's a link between endpoints, allow them to share information and bypass certain protocols.
 2. it's a point of accesss (a portal).
