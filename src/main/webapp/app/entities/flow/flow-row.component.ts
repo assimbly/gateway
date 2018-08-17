@@ -36,6 +36,7 @@ export class FlowRowComponent implements OnInit {
     public isFlowRestarted = true;
     public disableActionBtns: boolean;
 
+    public flowDetails: string;
     public flowStatus: string;
     public flowStatusError: string;
     public isFlowStatusOK: boolean;
@@ -193,6 +194,17 @@ export class FlowRowComponent implements OnInit {
             });
     }
 
+    getFlowDetails() {
+        this.flowDetails = `
+                Name: ${this.flow.name}<br/>
+                ID: ${this.flow.id}<br/>
+                Autostart: ${this.flow.autoStart}<br/>
+                Offloading: ${this.flow.offloading}<br/>
+                <br/>
+                Click to edit
+        `;
+    }
+
     setFlowStatistic(res) {
         if (res === 0) {
             this.flowStatistic = `Currently there is no statistic for this flow.`;
@@ -273,6 +285,7 @@ export class FlowRowComponent implements OnInit {
 
     registerTriggeredAction() {
         this.eventManager.subscribe('trigerAction', (response) => {
+
             switch (response.content) {
                 case 'start':
                     if (this.statusFlow === Status.inactive) {
@@ -280,7 +293,7 @@ export class FlowRowComponent implements OnInit {
                     }
                     break;
                 case 'stop':
-                    if (this.statusFlow !== Status.inactive) {
+                    if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
                         this.stop();
                     }
                     break;
@@ -413,6 +426,7 @@ export class FlowRowComponent implements OnInit {
         this.flowStatus = 'Stopping';
         this.isFlowStatusOK = true;
         this.disableActionBtns = true;
+
         this.flowService.stop(this.flow.id).subscribe((response) => {
             if (response.status === 200) {
                 this.setFlowStatus('stopped');

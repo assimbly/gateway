@@ -1,9 +1,9 @@
 {
   "name": "gateway",
-  "version": "0.8.0",
-  "description": "Messaging Gateway",
+  "version": "0.9.0",
+  "description": "A message gateway based on Apache camel",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache License 2.0",
   "cacheDirectories": [
     "node_modules"
   ],

@@ -8,6 +8,11 @@
             </span>
         </button>
     </h2>
+
+    <div *ngIf="wireTapEndpoints?.length === 0">
+    	<p>Offloading is a default destination where a copy of the source message is send. This copy can used as backup or for data analytics.</p>
+    	<p>This destination is called a wiretap, because its tapping messaging from the main flow</p>
+    </div>
     <!-- <jhi-alert></jhi-alert> -->
 
     <div class="table-responsive" *ngIf="wireTapEndpoints">

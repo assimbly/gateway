@@ -113,14 +113,6 @@ public class FlowResource {
     public ResponseEntity<List<FlowDTO>> getAllflows(@SortDefault(sort = {"name"}, direction = Sort.Direction.ASC) Pageable pageable) {
         log.debug("REST request to get a page of flows");
         Page<Flow> page = flowRepository.findAll(pageable);
-        
-        List<FlowDTO> x = flowMapper.toDto(page.getContent());
-        FlowDTO y = x.get(1);
-        System.out.println("flowid " + y.getName());
-        System.out.println("autostart " + y.isAutoStart());
-
-        System.out.println("to endpoints size" + y.getToEndpoints().size());
-        
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
     }
