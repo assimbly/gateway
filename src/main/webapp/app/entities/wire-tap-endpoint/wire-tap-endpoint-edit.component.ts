@@ -30,6 +30,7 @@ export class WireTapEndpointEditComponent implements OnInit {
     typeAssimblyLink: string;
     endpointOptions: Array<Option> = [];
     wireTapForm: FormGroup;
+    headers: Header[];
     services: Service[];
     filteredService: Service[];
     serviceCreated: boolean;
@@ -37,8 +38,6 @@ export class WireTapEndpointEditComponent implements OnInit {
     serviceType: string;
     uriPlaceholder: string;
     uriPopoverMessage: string;
-
-    headers: Header[];
 
     constructor(
         private jhiAlertService: JhiAlertService,
@@ -106,9 +105,12 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     save() {
+
         this.isSaving = true;
         this.setDataFromForm();
         this.setEndpointOptions();
+        this.isSaving = false;
+
         if (this.wireTapEndpoint.id) {
             this.subscribeToSaveResponse(
                 this.wireTapEndpointService.update(this.wireTapEndpoint));

@@ -1,9 +1,11 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.WireTapEndpoint;
 
+import org.assimbly.gateway.domain.WireTapEndpoint;
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
+import org.assimbly.gateway.service.dto.WireTapEndpointDTO;
+import org.assimbly.gateway.service.mapper.WireTapEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -31,10 +33,13 @@ public class WireTapEndpointResource {
 
     private final WireTapEndpointRepository wireTapEndpointRepository;
 
-    public WireTapEndpointResource(WireTapEndpointRepository wireTapEndpointRepository) {
-        this.wireTapEndpointRepository = wireTapEndpointRepository;
-    }
+    private final WireTapEndpointMapper wireTapEndpointMapper;
 
+    public WireTapEndpointResource(WireTapEndpointRepository wireTapEndpointRepository, WireTapEndpointMapper wireTapEndpointMapper) {
+        this.wireTapEndpointRepository = wireTapEndpointRepository;
+        this.wireTapEndpointMapper = wireTapEndpointMapper;
+    }
+    
     /**
      * POST  /wire-tap-endpoints : Create a new wireTapEndpoint.
      *
@@ -44,12 +49,17 @@ public class WireTapEndpointResource {
      */
     @PostMapping("/wire-tap-endpoints")
     @Timed
-    public ResponseEntity<WireTapEndpoint> createWireTapEndpoint(@RequestBody WireTapEndpoint wireTapEndpoint) throws URISyntaxException {
-        log.debug("REST request to save WireTapEndpoint : {}", wireTapEndpoint);
-        if (wireTapEndpoint.getId() != null) {
+    public ResponseEntity<WireTapEndpointDTO> createWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
+        log.debug("REST request to save WireTapEndpoint : {}", wireTapEndpointDTO);
+        if (wireTapEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new wireTapEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        WireTapEndpoint result = wireTapEndpointRepository.save(wireTapEndpoint);
+        
+        WireTapEndpoint wireTapEndpoint = wireTapEndpointMapper.toEntity(wireTapEndpointDTO);
+        wireTapEndpoint = wireTapEndpointRepository.save(wireTapEndpoint);
+        WireTapEndpointDTO result = wireTapEndpointMapper.toDto(wireTapEndpoint);
+
+        
         return ResponseEntity.created(new URI("/api/wire-tap-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -66,12 +76,15 @@ public class WireTapEndpointResource {
      */
     @PutMapping("/wire-tap-endpoints")
     @Timed
-    public ResponseEntity<WireTapEndpoint> updateWireTapEndpoint(@RequestBody WireTapEndpoint wireTapEndpoint) throws URISyntaxException {
-        log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpoint);
-        if (wireTapEndpoint.getId() == null) {
-            return createWireTapEndpoint(wireTapEndpoint);
+    public ResponseEntity<WireTapEndpointDTO> updateWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
+        log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpointDTO);
+        if (wireTapEndpointDTO.getId() == null) {
+            return createWireTapEndpoint(wireTapEndpointDTO);
         }
-        WireTapEndpoint result = wireTapEndpointRepository.save(wireTapEndpoint);
+        WireTapEndpoint wireTapEndpoint = wireTapEndpointMapper.toEntity(wireTapEndpointDTO);
+        wireTapEndpoint = wireTapEndpointRepository.save(wireTapEndpoint);
+        WireTapEndpointDTO result = wireTapEndpointMapper.toDto(wireTapEndpoint);
+        
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, wireTapEndpoint.getId().toString()))
             .body(result);
