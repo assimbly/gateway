@@ -3,25 +3,18 @@
 		<jhi-flow>Loading routes...</jhi-flow>
 	</div>
 	<div *ngSwitchCase="false">
-		<div class="row">
-			<div class="col-3">
-				<span class="hipster img-fluid rounded"></span>
-			</div>
-			<div class="col-9">
-				<div class="card">
-					<div class="card-header">
-						<b>Welcome to Assimbly</b>
-					</div>
-					<div class="card-block pt-4">
-						<blockquote class="card-blockquote">
-							<p class="tab">A message gateway based on Apache Camel.</p>
-							<br />
-							<p class="tab"><a class="dropdown-item" (click)="login()" id="login"><i class="fa fa-fw fa-sign-in" aria-hidden="true"></i>
-                            <span>Sign in</span>
-                        </a></p>
-						</blockquote>
-					</div>
-				</div>
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h3 class="lead d-flex justify-content-center">A message gateway based on Apache Camel</h3>
+				<h1 class="display-4 d-flex justify-content-center">
+					<b>Assimbly</b>
+				</h1>
+				<p class="d-flex justify-content-center tab">
+					<button (click)="login()"
+						class="btn btn-lg"
+						id="login">Sign in
+					</button>
+				</p>				
 			</div>
 		</div>
 	</div>

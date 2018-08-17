@@ -325,6 +325,29 @@ custom assimbly css
     padding-left: 25px;
     padding-right: 28px;
 }
+
+.assimbly {
+    display: inline-block;
+    width: 347px;
+    height: 497px;
+    background: url("../../content/images/assimbly.png") no-repeat center top;
+    background-size: contain;
+}
+
+/* wait autoprefixer update to allow simple generation of high pixel density media query */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+    .assimbly {
+        background: url("../../content/images/assimbly.png") no-repeat center top;
+        background-size: contain;
+    }
+}
+
 /* jhipster-needle-css-add-main JHipster will add new css style */
 .popover {
     max-width: 21%;
@@ -332,3 +355,4 @@ custom assimbly css
 .border-bottom-none{
     border-bottom:none !important;
 }
+

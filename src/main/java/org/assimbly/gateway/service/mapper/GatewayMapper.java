@@ -11,11 +11,9 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface GatewayMapper extends EntityMapper<GatewayDTO, Gateway> {
 
-
+    //@Mapping(target = "group", ignore = true)
     @Mapping(target = "flows", ignore = true)
     @Mapping(target = "environmentVariables", ignore = true)
-    @Mapping(target = "groups", ignore = true)
-    @Mapping(target = "group", ignore = true)
     Gateway toEntity(GatewayDTO gatewayDTO);
 
     default Gateway fromId(Long id) {

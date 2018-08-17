@@ -1,6 +1,8 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { PopoverModule } from 'ngx-bootstrap';
+
 import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 
@@ -27,7 +29,8 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
+        RouterModule.forChild(ENTITY_STATES),
+        PopoverModule.forRoot(),
     ],
     declarations: [
         GatewayComponent,
