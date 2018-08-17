@@ -62,6 +62,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     optionsPopoverMessage: string;
     headerPopoverMessage: string;
     servicePopoverMessage: string;
+    fromPopoverMessage: string;
+    toPopoverMessage: string;
+    errorPopoverMessage: string;
 
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
@@ -349,12 +352,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
                                          This endpoint is configured at <i>Settings --> Offloading</i>.`;
-        this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation.`;
+        this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view all available options.`;
         this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
         this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit services.`;
+        this.fromPopoverMessage = `Source of messages.`;
+        this.toPopoverMessage = `Destination of messages. Multiple destinations can be configured.`;
+        this.errorPopoverMessage = `Fault destination of messages.`;
 
     }
 

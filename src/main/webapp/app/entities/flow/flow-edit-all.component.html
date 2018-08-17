@@ -85,11 +85,27 @@
 					<ng-template #servicePopover let-message="message">
 								<div [innerHtml]="servicePopoverMessage"></div>
 					</ng-template>
-
+					<ng-template #fromPopover let-message="message">
+						<div [innerHtml]="fromPopoverMessage"></div>
+					</ng-template>
+					<ng-template #toPopover let-message="message">
+						<div [innerHtml]="toPopoverMessage"></div>
+					</ng-template>						
+					<ng-template #errorPopover let-message="message">
+						<div [innerHtml]="errorPopoverMessage"></div>
+					</ng-template>
+					
 					<!-- styling of tabset is in global.css -->
 					<ngb-accordion [closeOthers]="true" activeIds="From" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
-						<ngb-panel title="From" id="fromTab">
-							<span class="fa fa-code"></span>
+						<ngb-panel ngbPanelTitle id="fromTab">
+							 <ng-template ngbPanelTitle>
+								<span><b>From</b></span>
+						      <i triggers="mouseenter:mouseleave"
+							placement="right" triggers="mouseenter:mouseleave"
+							popoverTitle="Info"
+							 [popover]="fromPopover" 
+							class="fa fa-info-circle"></i>
+						    </ng-template>
 							<ng-template ngbPanelContent>
 								<jhi-alert-error></jhi-alert-error>
 									<div class="col-12" style="padding-left: 20px;" [formGroupName]="'0'">
@@ -110,7 +126,7 @@
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
 												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_small.png" />
+													<img src="../../../content/images/assimbly_transparant_small.png" />
 												</a>
 											</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.type.errors && (editFlowForm.controls.endpointsData.controls[0].controls.type.dirty || editFlowForm.controls.endpointsData.controls[0].controls.type.touched)">
@@ -188,7 +204,15 @@
 							</ng-template>
 						</ngb-panel>
 
-						<ngb-panel title="To ({{toIndex+1}})" id="toTab{{toIndex}}" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
+						<ngb-panel ngbPanelTitle id="toTab" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
+							 <ng-template ngbPanelTitle>
+								<span><b>To ({{toIndex+1}})</b></span>
+						      	<i triggers="mouseenter:mouseleave"
+							placement="right" triggers="mouseenter:mouseleave"
+							popoverTitle="Info"
+							 [popover]="toPopover" 
+							class="fa fa-info-circle"></i>
+						    </ng-template>
 							<ng-template ngbPanelContent>
 								<jhi-alert-error></jhi-alert-error>
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
@@ -207,7 +231,7 @@
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
 												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_small.png" />
+													<img src="../../../content/images/assimbly_transparant_small.png" />
 												</a>												
 											</div> 
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.touched)">
@@ -300,7 +324,15 @@
 							</ng-template>
 						</ngb-panel>
 
-						<ngb-panel title="Error" id="errorTab">
+						<ngb-panel ngbPanelTitle id="errorTab">
+							 <ng-template ngbPanelTitle>
+								<span><b>Error</b></span>
+						      <i triggers="mouseenter:mouseleave"
+							placement="right" triggers="mouseenter:mouseleave"
+							popoverTitle="Info"
+							 [popover]="errorPopover" 
+							class="fa fa-info-circle"></i>
+						    </ng-template>
 							<ng-template ngbPanelContent>
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="'1'">
 										<br/>
@@ -318,7 +350,7 @@
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
 												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_small.png" />
+													<img src="../../../content/images/assimbly_transparant_small.png" />
 												</a>
 											</div>
 											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.type.errors && (editFlowForm.controls.endpointsData.controls[1].controls.type.dirty || editFlowForm.controls.endpointsData.controls[1].controls.type.touched)">
