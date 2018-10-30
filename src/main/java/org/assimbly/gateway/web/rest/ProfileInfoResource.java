@@ -40,10 +40,8 @@ public class ProfileInfoResource {
 
     @GetMapping("/documentation/url")
     public String getUrl() {
-    	System.out.println("get property url");
-        String blabla = documentation.getCamelUrl();
-        System.out.println("result: " + blabla);
-        return blabla;
+        String propertyUrl = documentation.getCamelUrl();
+        return propertyUrl;
     }
     
     

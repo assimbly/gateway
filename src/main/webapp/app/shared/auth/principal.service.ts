@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { AccountService } from './account.service';
+import { FlowService } from '../../entities/flow/flow.service';
 
 @Injectable()
 export class Principal {
@@ -10,7 +11,8 @@ export class Principal {
     private authenticationState = new Subject<any>();
 
     constructor(
-        private account: AccountService
+        private account: AccountService,
+        private flowService: FlowService
     ) {}
 
     authenticate(identity) {
@@ -65,6 +67,7 @@ export class Principal {
             if (account) {
                 this.userIdentity = account;
                 this.authenticated = true;
+                this.flowService.connect()
             } else {
                 this.userIdentity = null;
                 this.authenticated = false;
@@ -72,6 +75,9 @@ export class Principal {
             this.authenticationState.next(this.userIdentity);
             return this.userIdentity;
         }).catch((err) => {
+            if (this.flowService.stompClient && this.flowService.stompClient.connected) {
+                    this.flowService.disconnect();
+             }
             this.userIdentity = null;
             this.authenticated = false;
             this.authenticationState.next(this.userIdentity);
