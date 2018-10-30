@@ -5,6 +5,7 @@ import {
     GatewaySharedLibsModule,
     GatewaySharedCommonModule,
     CSRFService,
+    WindowRef,
     AuthServerProvider,
     AccountService,
     UserService,
@@ -32,6 +33,7 @@ import {
         StateStorageService,
         Principal,
         CSRFService,
+        WindowRef,
         AuthServerProvider,
         UserService,
         DatePipe

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable, Observer, Subscription } from 'rxjs';
 import { SERVER_API_URL } from '../../app.constants';
-
+import { Router, NavigationEnd } from '@angular/router';
+import { CSRFService } from '../../shared/auth/csrf.service';
+import { WindowRef } from '../../shared/auth/window.service';
 import { Flow } from './flow.model';
 import { ResponseWrapper, createRequestOption } from '../../shared';
 import { saveAs } from 'file-saver/FileSaver';
@@ -11,16 +13,36 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 
+import * as SockJS from 'sockjs-client';
+import * as Stomp from 'webstomp-client';
+
 @Injectable()
 export class FlowService {
 
+    stompClient = null;
+    subscriber = null;
+    connection: Promise<any>;
+    connectedPromise: any;
+    listener: Observable<any>;
+    listenerObserver: Observer<any>;
+    alreadyConnectedOnce = false;
+    private subscription: Subscription;
+
     private resourceUrl = SERVER_API_URL + 'api/flows';
     private connectorUrl = SERVER_API_URL + 'api/connector';
-    private environmentUrl  = SERVER_API_URL + 'api/environment'
+    private environmentUrl = SERVER_API_URL + 'api/environment'
 
     private gatewayid = 1;
 
-    constructor(private http: Http) { }
+    constructor(
+        private http: Http,
+        private router: Router,
+        private $window: WindowRef,
+        // tslint:disable-next-line: no-unused-variable
+        private csrfService: CSRFService) {
+        this.connection = this.createConnection();
+        this.listener = this.createListener();
+    }
 
     create(flow: Flow): Observable<Flow> {
         const copy = this.convert(flow);
@@ -60,7 +82,7 @@ export class FlowService {
         return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
-    getConfiguration(flowid: number): Observable<Response>  {
+    getConfiguration(flowid: number): Observable<Response> {
         return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`);
     }
 
@@ -71,17 +93,17 @@ export class FlowService {
             let options = new RequestOptions();
             options.headers = headers;
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
-        }else {
+        } else {
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
         }
     }
     saveFlows(id: number, xmlconfiguration: string, header: string): Observable<Response> {
         let headers = new Headers();
-            headers.append('Accept', header);
-            let options = new RequestOptions();
-            options.headers = headers;
-            return this.http.post(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
-        }
+        headers.append('Accept', header);
+        let options = new RequestOptions();
+        options.headers = headers;
+        return this.http.post(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
+    }
 
     validateFlowsUri(connectorId: number, uri: string): Observable<Response> {
         let headers = new Headers();
@@ -114,6 +136,15 @@ export class FlowService {
     getFlowStatus(id: number): Observable<Response> {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
     }
+
+    getFlowAlerts(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`);
+    }
+
+    getFlowNumberOfAlerts(id: number): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`);
+    }
+
     getFlowLastError(id: number): Observable<Response> {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`);
     }
@@ -138,13 +169,83 @@ export class FlowService {
         const url = `${this.environmentUrl}/${gateway.id}`;
         let headers = new Headers();
         headers.append('Accept', 'application/xml');
-        const options = new RequestOptions({responseType: ResponseContentType.Blob });
+        const options = new RequestOptions({ responseType: ResponseContentType.Blob });
         options.headers = headers
         this.http.get(url, options).subscribe((res) => {
             const b = res.blob();
             const blob = new Blob([b], { type: 'application/xml' });
             saveAs(blob, `${gateway.name}.xml`);
         });
+    }
+
+    connect() {
+
+        if (this.connectedPromise === null) {
+            this.connection = this.createConnection();
+        }
+
+        // building absolute path so that websocket doesn't fail when deploying with a context path
+        const loc = this.$window.nativeWindow.location;
+
+        let url;
+        url = '//' + loc.host + loc.pathname + 'websocket/alert';
+
+        console.log('4: url=' + url);
+
+        const socket = new SockJS(url);
+        this.stompClient = Stomp.over(socket);
+
+        const headers = {};
+        headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
+
+        this.stompClient.connect(headers, () => {
+            console.log('8');
+
+            this.connectedPromise('success');
+            this.connectedPromise = null;
+
+        });
+    }
+
+    disconnect() {
+        if (this.stompClient !== null) {
+            this.stompClient.disconnect();
+            this.stompClient = null;
+        }
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+        this.alreadyConnectedOnce = false;
+    }
+
+    receive() {
+        return this.listener;
+    }
+
+    subscribe() {
+        this.connection.then(() => {
+            this.subscriber = this.stompClient.subscribe('/topic/alert', (data) => {
+                this.listenerObserver.next(JSON.parse(data.body));
+            });
+        });
+    }
+
+    unsubscribe() {
+        if (this.subscriber !== null) {
+            this.subscriber.unsubscribe();
+        }
+        this.listener = this.createListener();
+    }
+
+    private createListener(): Observable<any> {
+        return new Observable((observer) => {
+            this.listenerObserver = observer;
+        }).share();
+    }
+
+    private createConnection(): Promise<any> {
+        return new Promise((resolve, reject) => (this.connectedPromise = resolve));
     }
 
     private convertResponse(res: Response): ResponseWrapper {
