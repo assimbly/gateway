@@ -57,13 +57,14 @@ input.ng-touched.ng-invalid:not(form)  {
 }
 
 /* other generic styles */
-
 .jh-card {
-    padding: 1.5%;
+    background-color: white;
+	padding: 1.5%;
+   	min-height: 700px;
+    height: 100%;
     margin-top: 20px;
     border: none;
 }
-
 .error {
     color: white;
     background-color: red;

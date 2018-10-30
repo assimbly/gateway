@@ -381,7 +381,6 @@ public class DBConfiguration {
 			}else if(properties.get("to.uri").contains("wastebin")){
 				
 				String uri = properties.get("to.uri");
-				System.out.println("komt hier: " + uri);
 				uri = uri.replace("wastebin:", "mock:wastebin");
 				properties.put("to.uri",uri);		
 			}

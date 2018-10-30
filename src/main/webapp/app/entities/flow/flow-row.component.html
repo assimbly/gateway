@@ -39,11 +39,13 @@
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 	<!-- <span triggers="mouseenter:mouseleave" placement="right" popoverTitle="URI" [popover]="errorEndpointTooltip">{{errorEndpointId.type}}</span> -->
 </td>
-<td><ng-template #statusFlowButtonTemplate let-message="message">
+<td>
+  <div class="float-left" >
+<ng-template #statusFlowButtonTemplate let-message="message">
 	<div [innerHtml]="flowStatusButton"></div>
 	</ng-template>
 	<p>
-	<h4>
+	<h4 class="float-left">
 		<span class="badge badge-success" *ngIf="statusFlow === 'active'"
 			(mouseenter)="p!=p" triggers="mouseenter:mouseleave"
 			placement="right" popoverTitle="Status"
@@ -61,7 +63,19 @@
 			triggers="mouseenter:mouseleave" popoverTitle="Status"
 			[popover]="statusFlowButtonTemplate">Inactive</span>
 	</h4>
-	</p></td>
+	<ng-template #alertsFlowButtonTemplate let-message="message">
+	<div [innerHtml]="flowAlertsButton"></div>
+	</ng-template>
+	<h4 class="float-left" style="margin-left: 10px;">
+		<span
+			class="badge badge-warning" *ngIf="flowAlerts === 'true'"
+			(mouseenter)="p!=p" placement="right" on-mouseover='getFlowAlerts(flow.id)'
+			triggers="mouseenter:mouseleave" popoverTitle="Show last {{showNumberOfItems}} alerts"
+			[popover]="alertsFlowButtonTemplate">{{numberOfAlerts}} Alerts</span>
+	</h4>
+	</p>	
+	   </div>
+	</td>
 <td class="text-right">
 	<p>
 	<div class="btn-group flex-btn-group-container flow-btns">

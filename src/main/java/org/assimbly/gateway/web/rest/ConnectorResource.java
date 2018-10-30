@@ -4,7 +4,9 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.event.FailureListener;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -14,6 +16,7 @@ import com.codahale.metrics.annotation.Timed;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,15 +32,18 @@ public class ConnectorResource {
 
 	private String flowId;
 
-
 	private boolean plainResponse;
 
 	private String gatewayConfiguration;
 	private String flowConfiguration;
 
 	private String status;
-
 	private String type;
+
+	private boolean connectorIsStarting = false;
+
+    @Autowired
+    FailureListener failureListener;
 	
     public ConnectorResource() {}
     
@@ -157,6 +163,7 @@ public class ConnectorResource {
        		if(connector.isStarted()) {
        			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector already running");	
        		}else {
+				connector.addEventNotifier(failureListener);
        			connector.start();
        			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector started");
        		}	
@@ -516,6 +523,61 @@ public class ConnectorResource {
 		}
     }
 
+    @GetMapping(path = "/connector/{connectorId}/flow/alerts/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowAlertsLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	flowId = id.toString();
+    		String log = connector.getFlowAlertsLog(flowId,100);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlog/{id}",log,log,flowId);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedmessages/{id}",e.getMessage(),"unable to get failed log of flow" + flowId,flowId);
+		}
+    }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/numberofalerts/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowNumberOfAlerts(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	flowId = id.toString();
+    		String numberOfEntries = connector.getFlowAlertsCount(flowId);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",numberOfEntries,numberOfEntries,flowId);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",e.getMessage(),"unable to get failed entries of flow log" + flowId,flowId);
+		}
+    }
+    
+    @GetMapping(path = "/connector/{connectorId}/numberofalerts", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getConnectorNumberOfAlerts(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+    		TreeMap<String,String> numberOfEntriesList = connector.getConnectorAlertsCount();
+    		
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/failedlog/{id}",numberOfEntriesList.toString());
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/failedmessages/{id}",e.getMessage());
+		}
+    }
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/eventlog/{id}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getFlowEventLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	flowId = id.toString();
+    		String log = connector.getFlowEventsLog(flowId,100);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/eventlog/{id}",log,log,flowId);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/eventlog/{id}",e.getMessage(),"unable to get event log of flow " + flowId,flowId);
+		}
+    }
     
     @GetMapping(path = "/connector/{connectorId}/flow/documenation/version", produces = {"text/plain","application/xml","application/json"})
     @Timed
@@ -608,12 +670,24 @@ public class ConnectorResource {
     }
     
     //private methods    
+     private void init() throws Exception {
     
-    private void init() throws Exception {
-    
-       	if(!connector.isStarted()){
+       	if(!connector.isStarted() && !connectorIsStarting){
         	try {
-				connector.start();
+        		
+        		connectorIsStarting = true;
+				connector.addEventNotifier(failureListener);
+        		connector.start();
+		        
+				int count = 1;
+				
+        		do {
+		        	Thread.sleep(10);
+		        	count++;
+		        } while (!connector.isStarted() || count < 3000);
+
+        		connectorIsStarting = false;
+        		
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

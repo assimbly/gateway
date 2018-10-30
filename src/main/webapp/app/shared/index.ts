@@ -9,6 +9,7 @@ export * from './auth/auth-session.service';
 export * from './auth/principal.service';
 export * from './auth/has-any-authority.directive';
 export * from './auth/user-route-access-service';
+export * from './auth/window.service';
 export * from './login/login.component';
 export * from './login/login-modal.service';
 export * from './login/login.service';
