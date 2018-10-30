@@ -70,7 +70,7 @@ public class WireTapEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final WireTapEndpointResource wireTapEndpointResource = new WireTapEndpointResource(wireTapEndpointRepository);
+        final WireTapEndpointResource wireTapEndpointResource = new WireTapEndpointResource(wireTapEndpointRepository, null);
         this.restWireTapEndpointMockMvc = MockMvcBuilders.standaloneSetup(wireTapEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
