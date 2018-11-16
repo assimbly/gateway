@@ -52,7 +52,7 @@ dependencyManagement {
 defaultTasks 'bootRun'
 
 group = 'org.assimbly.gateway'
-version = '1.0.0'
+version = '1.1.0'
 
 description = ''
 
@@ -206,8 +206,6 @@ dependencies {
     compile "org.assimbly:connector:1.0.0"
 	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.5"
 	compile "org.jdom:jdom2:2.0.6"
-	compile "org.aspectj:aspectjweaver:1.9.1"
-	compile "org.aspectj:aspectjrt:1.9.1"
 	compile "org.springframework:spring-websocket:4.3.20.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:4.2.3.RELEASE"
 	

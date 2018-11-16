@@ -129,7 +129,7 @@ public class DBConfiguration {
 
 		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 		connectorId = gatewayId.toString();
-		setGeneralPropertiesFromDB(connectorId);
+		setXMLGeneralPropertiesFromDB(connectorId);
 		
 		for(Flow flow : flows){
 			if(flow!=null) {
@@ -157,7 +157,7 @@ public class DBConfiguration {
 
 		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 		connectorId = gatewayId.toString();
-		setGeneralPropertiesFromDB(connectorId);
+		setXMLGeneralPropertiesFromDB(connectorId);
 		
 		for(Flow flow : flows){
 			if(flow!=null && autoStart) {
@@ -187,6 +187,8 @@ public class DBConfiguration {
 		return configuration;
 	}
 
+	
+	//Converts database flow configuration to a treemap
 	public TreeMap<String, String> convertDBToFlowConfiguration(Long id) throws Exception {
 		
 		   properties = new TreeMap<String, String>();
@@ -209,17 +211,19 @@ public class DBConfiguration {
 
 		}
 	
+	//Convert database flow configuration to a XML, JSON or YAML File
 	public String convertDBToFlowConfiguration(Long id, String mediaType) throws Exception {
 				
 	       Flow flow = flowRepository.findOne(id);
 		   connectorId = flow.getGateway().getId().toString();
-		   setGeneralPropertiesFromDB(connectorId);
+		   setXMLGeneralPropertiesFromDB(connectorId);
 
+		   //check if endpoints are configured
 		   getGeneralFlowPropertiesFromDB(flow);
 			if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
 				 throw new Exception("Set of configuration failed. Endpoint cannot be null");
 			}else {
-				setFlowPropertiesFromDB(flow);
+				setXMLFlowPropertiesFromDB(flow);
 			}
 		   
 		   xmlConfiguration = ConvertUtil.convertDocToString(doc);
@@ -302,7 +306,7 @@ public class DBConfiguration {
 		   if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
 				 throw new Exception("Set of configuration failed. Endpoint cannot be null");
 			}else {
-				setFlowPropertiesFromDB(flow);
+				setXMLFlowPropertiesFromDB(flow);
 			}
 		   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 		   
@@ -427,22 +431,19 @@ public class DBConfiguration {
 		}
 	}	
 	
-	private void getURIProperties(String type, String componentType, String uri, String options) {
+	private void getURIProperties(String type, String componentType, String uri, String confOptions) {
 		
 		componentType = componentType.toLowerCase();
-	
-		if(componentType.equals("file")||componentType.equals("sftp")) {
-			componentType = componentType + "://";
-		}else if(componentType.equals("http")) {
-			componentType = "http4://";			
-		}else {
-			componentType = componentType + ":";
-		}			
 
-		if (options == null) {
+		componentType = setDefaultComponentType(componentType);
+		
+		//note that following doesn't set datasource
+		confOptions = setDefaultOptions(componentType, confOptions);
+		
+		if (confOptions == null) {
 			uri = componentType.toLowerCase() + uri;
 		} else {
-			uri = componentType.toLowerCase() + uri + "?" + options;
+			uri = componentType.toLowerCase() + uri + "?" + confOptions;
 		}
 
 		properties.put(type + ".uri", uri);
@@ -513,7 +514,7 @@ public class DBConfiguration {
 	}
 
 	//XML set methods
-	private void setGeneralPropertiesFromDB(String connectorId) throws Exception {
+	private void setXMLGeneralPropertiesFromDB(String connectorId) throws Exception {
 
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -539,40 +540,15 @@ public class DBConfiguration {
 	    connector.appendChild(services);
 	    connector.appendChild(headers);
 	    
-		setOffloadingPropertiesFromDB(connectorId);
+		setXMLOffloadingPropertiesFromDB(connectorId);
 		
 	    servicesList = new ArrayList<String>();
 	    headersList = new ArrayList<String>();    
 		
 	}
 
-	private void setOffloadingPropertiesFromDB(String connectorId) throws Exception {
 
-	    List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll(); 
-	    
-	    if(wiretapEndpoints.size() > 0) {
-	    	
-	    	WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
-	    	
-		    //set id
-		    String offloadingId = wiretapEndpoint.getId().toString();	    
-		    Element id = doc.createElement("id");
-		    id.appendChild(doc.createTextNode(offloadingId));
-		    offloading.appendChild(id);
-
-		    //set name
-		    String offloadingName = "offloading";	    
-		    Element name = doc.createElement("name");
-		    name.appendChild(doc.createTextNode(offloadingName));
-		    offloading.appendChild(name);
-		    
-		    setWireTapEndpointFromDB(wiretapEndpoint);
-	    }
-	    
-	    
-	}
-	
-	private void setFlowPropertiesFromDB(Flow flowDB) throws Exception {
+	private void setXMLFlowPropertiesFromDB(Flow flowDB) throws Exception {
 
 	    flow = doc.createElement("flow");
 	    flows.appendChild(flow);
@@ -596,13 +572,13 @@ public class DBConfiguration {
 	    flow.appendChild(offloading);
 	    
 	    //set endpoints
-	    setFromEndpointFromDB(fromEndpoint);
-	    setToEndpointsFromDB(toEndpoints);
-	    setErrorEndpointFromDB(errorEndpoint);
+	    setXMLFromEndpointFromDB(fromEndpoint);
+	    setXMLToEndpointsFromDB(toEndpoints);
+	    setXMLErrorEndpointFromDB(errorEndpoint);
 	    
 	}
 
-	private void setWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
+	private void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
 		String confcomponentType = wireTapEndpointDB.getType().toString();
@@ -617,14 +593,18 @@ public class DBConfiguration {
 			
 			componentType = confcomponentType.toLowerCase();
 			
-			if(componentType.equals("file")||componentType.equals("sftp")) {
-				componentType = componentType + "://";
-			}else if(componentType.equals("http")) {
-				componentType = "http4://";			
-			}else {
-				componentType = componentType + ":";
-			}			
+			componentType = setDefaultComponentType(componentType);
+			confOptions = setDefaultOptions(componentType, confOptions);
 
+			if(componentType.equals("sql")) {
+				String confServiceId = confService.getId().toString();
+				if(confOptions.isEmpty() || confOptions==null) {
+					confOptions = "dataSource=" + confServiceId;
+				}else if(!confOptions.contains("dataSource")) {
+					confOptions = "&dataSource=" + confServiceId;;						
+				}
+			}
+			
 			confUri = componentType + confUri;
 		    uri.setTextContent(confUri);	
 		    offloading.appendChild(uri);
@@ -666,7 +646,7 @@ public class DBConfiguration {
 			    
 			    serviceId.setTextContent(confServiceId);
 			    offloading.appendChild(serviceId);
-			    setServiceFromDB(confServiceId, "wireTap", confService);
+			    setXMLServiceFromDB(confServiceId, "wireTap", confService);
 			}
 
 		    if(confHeader!=null) {
@@ -675,7 +655,7 @@ public class DBConfiguration {
 		    	
 			    offloading.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
-			    setHeaderFromDB(confHeaderId, "wireTap", confHeader);
+			    setXMLHeaderFromDB(confHeaderId, "wireTap", confHeader);
 			}
 
 			
@@ -683,7 +663,7 @@ public class DBConfiguration {
 	}
 
 	
-	private void setFromEndpointFromDB(FromEndpoint fromEndpointDB) throws Exception {
+	private void setXMLFromEndpointFromDB(FromEndpoint fromEndpointDB) throws Exception {
 
 		String confUri = fromEndpointDB.getUri();
 		String confcomponentType = fromEndpointDB.getType().toString();
@@ -698,26 +678,19 @@ public class DBConfiguration {
 			flow.appendChild(endpoint);
 			
 			componentType = confcomponentType.toLowerCase();
-			
-			if(componentType.equals("file")||componentType.equals("sftp")) {
-				componentType = componentType + "://";
-			}else if(componentType.equals("http")||componentType.equals("http4")) {
-				componentType = "http4://";
-			}else if(componentType.equals("sql")) {
-				if(confService!=null) {
-			    	String confServiceId = confService.getId().toString();
-					if(confOptions.isEmpty() || confOptions==null) {
-						confOptions = "dataSource=" + confServiceId;
-					}else if(!confOptions.contains("dataSource")) {
-						confOptions = "&dataSource=" + confServiceId;;						
-					}
-				}
-				componentType = componentType + ":";
-								
-			}else {
-				componentType = componentType + ":";
-			}
 
+			componentType = setDefaultComponentType(componentType);
+			confOptions = setDefaultOptions(componentType, confOptions);
+
+			if(componentType.equals("sql")) {
+				String confServiceId = confService.getId().toString();
+				if(confOptions.isEmpty() || confOptions==null) {
+					confOptions = "dataSource=" + confServiceId;
+				}else if(!confOptions.contains("dataSource")) {
+					confOptions = "&dataSource=" + confServiceId;;						
+				}
+			}			
+			
 			confUri = componentType + confUri;
 		    uri.setTextContent(confUri);	
 			endpoint.appendChild(uri);
@@ -759,7 +732,7 @@ public class DBConfiguration {
 			    
 			    serviceId.setTextContent(confServiceId);
 		    	endpoint.appendChild(serviceId);
-			    setServiceFromDB(confServiceId, "from", confService);
+			    setXMLServiceFromDB(confServiceId, "from", confService);
 			}
 
 		    if(confHeader!=null) {
@@ -768,14 +741,14 @@ public class DBConfiguration {
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
-			    setHeaderFromDB(confHeaderId, "from", confHeader);
+			    setXMLHeaderFromDB(confHeaderId, "from", confHeader);
 			}
 
 			
 		}
 	}
 
-	private void setToEndpointsFromDB(Set<ToEndpoint> toEndpointsDB) throws Exception {
+	private void setXMLToEndpointsFromDB(Set<ToEndpoint> toEndpointsDB) throws Exception {
 	
 		for (ToEndpoint toEndpointDB : toEndpointsDB) {
 			
@@ -794,25 +767,18 @@ public class DBConfiguration {
 				
 				componentType = confComponentType.toLowerCase();
 				
-				if(componentType.equals("file")||componentType.equals("sftp")) {
-					componentType = componentType + "://";
-				}else if(componentType.equals("http")||componentType.equals("http4")) {
-					componentType = "http4://";
-				}else if(componentType.equals("sql")) {
-					if(confService!=null) {
-				    	String confServiceId = confService.getId().toString();
-						if(confOptions.isEmpty() || confOptions==null) {
-							confOptions = "dataSource=" + confServiceId;
-						}else if(!confOptions.contains("dataSource")) {
-							confOptions = "&dataSource=" + confServiceId;;						
-						}
-					}
-					componentType = componentType + ":";
-									
-				}else {
-					componentType = componentType + ":";
-				}
+				componentType = setDefaultComponentType(componentType);
+				confOptions = setDefaultOptions(componentType, confOptions);
 				
+				if(componentType.equals("sql")) {
+					String confServiceId = confService.getId().toString();
+					if(confOptions.isEmpty() || confOptions==null) {
+						confOptions = "dataSource=" + confServiceId;
+					}else if(!confOptions.contains("dataSource")) {
+						confOptions = "&dataSource=" + confServiceId;;						
+					}
+				}
+
 				confUri = componentType + confUri;
 
 				uri.setTextContent(confUri);	
@@ -841,7 +807,7 @@ public class DBConfiguration {
 				    
 				    serviceId.setTextContent(confServiceId);
 			    	endpoint.appendChild(serviceId);
-				    setServiceFromDB(confServiceId, "to", confService);
+				    setXMLServiceFromDB(confServiceId, "to", confService);
 				}
 
 			    if(confHeader!=null) {
@@ -850,13 +816,13 @@ public class DBConfiguration {
 			    	
 				    endpoint.appendChild(headerId);
 				    headerId.setTextContent(confHeaderId);
-				    setHeaderFromDB(confHeaderId, "to", confHeader);
+				    setXMLHeaderFromDB(confHeaderId, "to", confHeader);
 				}				
 			}			
 		}
 	}
 	
-	private void setErrorEndpointFromDB(ErrorEndpoint errorEndpointDB) throws Exception {
+	private void setXMLErrorEndpointFromDB(ErrorEndpoint errorEndpointDB) throws Exception {
 
 		String confUri = errorEndpointDB.getUri();
 		String confcomponentType = errorEndpointDB.getType().toString();
@@ -872,23 +838,16 @@ public class DBConfiguration {
 			
 			componentType = confcomponentType.toLowerCase();
 			
-			if(componentType.equals("file")||componentType.equals("sftp")) {
-				componentType = componentType + "://";
-			}else if(componentType.equals("http")||componentType.equals("http4")) {
-				componentType = "http4://";
-			}else if(componentType.equals("sql")) {
-				if(confService!=null) {
-			    	String confServiceId = confService.getId().toString();
-					if(confOptions.isEmpty() || confOptions==null) {
-						confOptions = "dataSource=" + confServiceId;
-					}else if(!confOptions.contains("dataSource")) {
-						confOptions = "&dataSource=" + confServiceId;;						
-					}
+			componentType = setDefaultComponentType(componentType);
+			confOptions = setDefaultOptions(componentType, confOptions);
+			
+			if(componentType.equals("sql")) {
+				String confServiceId = confService.getId().toString();
+				if(confOptions.isEmpty() || confOptions==null) {
+					confOptions = "dataSource=" + confServiceId;
+				}else if(!confOptions.contains("dataSource")) {
+					confOptions = "&dataSource=" + confServiceId;;						
 				}
-				componentType = componentType + ":";
-								
-			}else {
-				componentType = componentType + ":";
 			}			
 
 			confUri = componentType + confUri;
@@ -919,7 +878,7 @@ public class DBConfiguration {
 			    
 			    serviceId.setTextContent(confServiceId);
 		    	endpoint.appendChild(serviceId);
-			    setServiceFromDB(confServiceId, "error", errorEndpointDB.getService());
+			    setXMLServiceFromDB(confServiceId, "error", errorEndpointDB.getService());
 			}
 
 		    if(confHeader!=null) {
@@ -928,14 +887,14 @@ public class DBConfiguration {
 		    	
 			    endpoint.appendChild(headerId);
 			    headerId.setTextContent(confHeaderId);
-			    setHeaderFromDB(confHeaderId, "error", errorEndpointDB.getHeader());
+			    setXMLHeaderFromDB(confHeaderId, "error", errorEndpointDB.getHeader());
 			}
 		}
 	}
 
 	
 	
-	private void setServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
+	private void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
 
 		if(!servicesList.contains(serviceid)) {
 			servicesList.add(serviceid);
@@ -968,7 +927,7 @@ public class DBConfiguration {
 		}
 	}
 	
-	private void setHeaderFromDB(String headerid, String type, Header headerDB) throws Exception {
+	private void setXMLHeaderFromDB(String headerid, String type, Header headerDB) throws Exception {
 
 		if(!headersList.contains(headerid)) {
 			headersList.add(headerid);
@@ -1002,6 +961,59 @@ public class DBConfiguration {
 		}
 	}
 
+	private void setXMLOffloadingPropertiesFromDB(String connectorId) throws Exception {
+
+	    List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll(); 
+	    
+	    if(wiretapEndpoints.size() > 0) {
+	    	
+	    	WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
+	    	
+		    //set id
+		    String offloadingId = wiretapEndpoint.getId().toString();	    
+		    Element id = doc.createElement("id");
+		    id.appendChild(doc.createTextNode(offloadingId));
+		    offloading.appendChild(id);
+
+		    //set name
+		    String offloadingName = "offloading";	    
+		    Element name = doc.createElement("name");
+		    name.appendChild(doc.createTextNode(offloadingName));
+		    offloading.appendChild(name);
+		    
+		    setXMLWireTapEndpointFromDB(wiretapEndpoint);
+	    }
+	}
+	
+	private String setDefaultComponentType(String componentType) {
+		
+		if(componentType.equals("file")||componentType.equals("ftp")||componentType.equals("sftp")||componentType.equals("ftps")) {
+			componentType = componentType + "://";
+		}else if(componentType.equals("http")||componentType.equals("http4")) {
+			componentType = "http4://";
+		}else {
+			componentType = componentType + ":";
+		}
+		
+		return componentType;
+	}
+	
+	private String setDefaultOptions(String componentType, String confOptions) {
+		
+		if (componentType.matches("(file|ftp|sftp|sjms|sonicmq).*")) {
+			if(confOptions.isEmpty() || confOptions==null) {
+				confOptions = "bridgeErrorHandler=true";
+			}else {
+				confOptions = confOptions + "&bridgeErrorHandler=true";
+			}
+		}
+	
+		return confOptions;
+	}
+	
+	
+	//Sets database from XML
+	
 	private String setFlowPropertiesFromXML(Document doc, Long connectorId, Long id) throws Exception {
 		
 		XPath xPath = XPathFactory.newInstance().newXPath();
