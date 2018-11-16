@@ -99,7 +99,7 @@
 						<th class="border-bottom-none"></th>
 					</tr>
                 </thead>
-                <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+                <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
                     <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow" [fromEndpoints]="fromEndpoints" [isAdmin]="isAdmin"></tr>
                 </tbody>
             </table>

@@ -8,15 +8,16 @@
 	<p>
 		<a (click)="navigateToFlow()" class="fa fa-edit" aria-hidden="true"
 			(mouseenter)="getFlowDetails()" triggers="mouseenter:mouseleave"
-			placement="right" triggers="mouseenter:mouseleave"
+			placement="right"
 			popoverTitle="Details" [popover]="detailsTemplate"></a> 
 		<i  style="padding-left: 1em" (mouseenter)="getFlowStatus(flow.id)"
 			[hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave"
-			placement="right" triggers="mouseenter:mouseleave"
-			popoverTitle="Stats" [popover]="statsTemplate"
-			class="fa fa-bar-chart"></i> <i [hidden]="isFlowStatusOK"
-			triggers="mouseenter:mouseleave" placement="right"
-			triggers="mouseenter:mouseleave" popoverTitle="Stats"
+			placement="right" popoverTitle="Stats" [popover]="statsTemplate"
+			class="fa fa-bar-chart"></i>
+		 <i [hidden]="isFlowStatusOK"
+			placement="right"
+			triggers="mouseenter:mouseleave"
+			 popoverTitle="Stats"
 			[popover]="statsTemplate" class="fa fa-bar-chart"></i>
 	</p></td>
 <td id="flowRowID" [hidden]="!flowRowID"><a *ngIf="flow.gatewayId"
@@ -37,7 +38,7 @@
 		</p>
 </span></td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
-	<!-- <span triggers="mouseenter:mouseleave" placement="right" popoverTitle="URI" [popover]="errorEndpointTooltip">{{errorEndpointId.type}}</span> -->
+	<!-- <span triggers="mouseenter" placement="right" popoverTitle="URI" [popover]="errorEndpointTooltip">{{errorEndpointId.type}}</span> -->
 </td>
 <td>
   <div class="float-left" >
@@ -47,20 +48,22 @@
 	<p>
 	<h4 class="float-left">
 		<span class="badge badge-success" *ngIf="statusFlow === 'active'"
-			(mouseenter)="p!=p" triggers="mouseenter:mouseleave"
+			(mouseenter)="p!=p" triggers="mouseenter"
 			placement="right" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Active</span> <span
+			[popover]="statusFlowButtonTemplate">Active</span>
+			 <span
 			class="badge badge-warning" *ngIf="statusFlow === 'paused'"
 			(mouseenter)="p!=p" placement="right"
-			triggers="mouseenter:mouseleave" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Paused</span> <span
+			triggers="mouseenter" popoverTitle="Status"
+			[popover]="statusFlowButtonTemplate">Paused</span> 
+			<span
 			class="badge badge-primary" *ngIf="statusFlow === 'inactive'"
-			(mouseenter)="p!=p" placement="right"
-			triggers="mouseenter:mouseleave" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Inactive</span> <span
+			(mouseenter)="p!=p" placement="right" popoverTitle="Status" triggers="mouseenter"
+			[popover]="statusFlowButtonTemplate">Inactive</span>
+			 <span
 			class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'"
 			(mouseenter)="p!=p" placement="right"
-			triggers="mouseenter:mouseleave" popoverTitle="Status"
+			triggers="mouseenter" popoverTitle="Status"
 			[popover]="statusFlowButtonTemplate">Inactive</span>
 	</h4>
 	<ng-template #alertsFlowButtonTemplate let-message="message">
@@ -70,7 +73,7 @@
 		<span
 			class="badge badge-warning" *ngIf="flowAlerts === 'true'"
 			(mouseenter)="p!=p" placement="right" on-mouseover='getFlowAlerts(flow.id)'
-			triggers="mouseenter:mouseleave" popoverTitle="Show last {{showNumberOfItems}} alerts"
+			triggers="mouseenter" popoverTitle="Show last {{showNumberOfItems}} alerts"
 			[popover]="alertsFlowButtonTemplate">{{numberOfAlerts}} Alerts</span>
 	</h4>
 	</p>	
