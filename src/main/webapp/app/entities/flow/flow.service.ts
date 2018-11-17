@@ -188,14 +188,14 @@ export class FlowService {
         const loc = this.$window.nativeWindow.location;
 
         let url;
-        
-        if(loc.host==='localhost:9000'){
-            //allow websockets on dev
+
+        if (loc.host === 'localhost:9000') {
+            // allow websockets on dev
             url = '//localhost:8080' + loc.pathname + 'websocket/alert';
-        }else{
-           url = '//' + loc.host + loc.pathname + 'websocket/alert';    
+        } else {
+            url = '//' + loc.host + loc.pathname + 'websocket/alert';
         }
-        
+
         const socket = new SockJS(url);
         this.stompClient = Stomp.over(socket);
 
