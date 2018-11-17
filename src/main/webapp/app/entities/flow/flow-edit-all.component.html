@@ -121,7 +121,7 @@
 											<label class="form-control-label" for="field_from_type">Scheme</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="componentPopover" container="body" placement="right" class="fa fa-info-circle"></i>											
 											<div class="input-group">
-												<ng-select [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)" style="margin-right: 200px;"></ng-select>
+												<ng-select [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, false, $event)" style="margin-right: 200px;"></ng-select>
 												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
@@ -229,7 +229,7 @@
 											<label class="form-control-label" for="field_to_type">Scheme</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="componentPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)" style="margin-right: 200px;"></ng-select>
+												<ng-select [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, false, $event)" style="margin-right: 200px;"></ng-select>
 												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
@@ -351,7 +351,7 @@
 											<label class="form-control-label" for="field_error_type">Scheme</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="componentPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)" style="margin-right: 200px;"></ng-select>
+												<ng-select [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, false, $event)" style="margin-right: 200px;"></ng-select>
 												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errrEndpoint?.type}}.">
 													<img src="../../../content/images/apache-camel.png" />
 												</a>

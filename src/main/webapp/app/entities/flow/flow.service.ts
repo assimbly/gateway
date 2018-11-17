@@ -188,10 +188,14 @@ export class FlowService {
         const loc = this.$window.nativeWindow.location;
 
         let url;
-        url = '//' + loc.host + loc.pathname + 'websocket/alert';
-
-        console.log('4: url=' + url);
-
+        
+        if(loc.host==='localhost:9000'){
+            //allow websockets on dev
+            url = '//localhost:8080' + loc.pathname + 'websocket/alert';
+        }else{
+           url = '//' + loc.host + loc.pathname + 'websocket/alert';    
+        }
+        
         const socket = new SockJS(url);
         this.stompClient = Stomp.over(socket);
 
@@ -199,7 +203,6 @@ export class FlowService {
         headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
 
         this.stompClient.connect(headers, () => {
-            console.log('8');
 
             this.connectedPromise('success');
             this.connectedPromise = null;
