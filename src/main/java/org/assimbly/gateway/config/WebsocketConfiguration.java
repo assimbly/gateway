@@ -43,7 +43,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
     	String[] allowedOrigins = Optional.ofNullable(jHipsterProperties.getCors().getAllowedOrigins()).map(origins -> origins.toArray(new String[0])).orElse(new String[0]);
-        
+    	
         registry.addEndpoint("/websocket/alert")
             .setHandshakeHandler(defaultHandshakeHandler())
             .setAllowedOrigins(allowedOrigins)
@@ -66,6 +66,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
                 if (request instanceof ServletServerHttpRequest) {
                     ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+                    System.out.println("request servlet" + servletRequest.getRemoteAddress());
                     attributes.put(IP_ADDRESS, servletRequest.getRemoteAddress());
                 }
                 return true;
