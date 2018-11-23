@@ -133,6 +133,7 @@ public class DBConfiguration {
 		
 		for(Flow flow : flows){
 			if(flow!=null) {
+				System.out.println("E1: " + flow.getName());
 				convertDBToXMLFlowConfiguration(flow);
 			}
 		}
@@ -146,10 +147,10 @@ public class DBConfiguration {
 		}else {
 			configuration = xmlConfiguration;
 		}
-	   
+
 	    //replace environment variables
 	    configuration = PlaceholdersReplacement(configuration);
-	   
+
 		return configuration;
 	}
 
@@ -198,7 +199,7 @@ public class DBConfiguration {
 			if (flow == null) {
 				 throw new Exception("Flow ID does not exists");
 			}
-			
+
 		   getGeneralFlowPropertiesFromDB(flow);
 		      
 			if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
@@ -206,14 +207,14 @@ public class DBConfiguration {
 			}else {
 				getEndpointPropertiesFromDB(flow);	
 			}
-		   
+
 		   return properties;
 
 		}
 	
 	//Convert database flow configuration to a XML, JSON or YAML File
 	public String convertDBToFlowConfiguration(Long id, String mediaType) throws Exception {
-				
+
 	       Flow flow = flowRepository.findOne(id);
 		   connectorId = flow.getGateway().getId().toString();
 		   setXMLGeneralPropertiesFromDB(connectorId);
@@ -225,7 +226,7 @@ public class DBConfiguration {
 			}else {
 				setXMLFlowPropertiesFromDB(flow);
 			}
-		   
+
 		   xmlConfiguration = ConvertUtil.convertDocToString(doc);
 		   
 		   if(mediaType.contains("json")) {
@@ -244,7 +245,7 @@ public class DBConfiguration {
 		}
 
 	public String  convertConfigurationToDB(Long connectorId, String mediaType, String configuration) throws Exception {
-		
+
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(configuration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
@@ -254,7 +255,7 @@ public class DBConfiguration {
 		}
 
 		Document doc = ConvertUtil.convertStringToDoc(xmlConfiguration);
-		
+
 		//create services
 		List<String> serviceIds = getList(doc, "/connectors/connector/services/service/id/text()");
 		setServicesPropertiesFromXML(doc, serviceIds);
@@ -266,13 +267,13 @@ public class DBConfiguration {
 		//create flows
 		List<String> flowIds = getList(doc, "/connectors/connector/flows/flow/id/text()");		
 		convertFlowConfigurationToDB(doc, connectorId, flowIds);
-				
+
 		return "ok";		
 		
 	}
 	
 	public String convertFlowConfigurationToDB(Long connectorId, Long id, String mediaType, String flowConfiguration) throws Exception {
-		
+
 		if(mediaType.contains("json")) {
 			xmlConfiguration = ConvertUtil.convertJsonToXml(flowConfiguration);
 		}else if(mediaType.contains("yaml") || mediaType.contains("text")) {
@@ -300,7 +301,7 @@ public class DBConfiguration {
 
 	//private methods
 	private String convertDBToXMLFlowConfiguration(Flow flow) throws Exception {
-	
+
 		   getGeneralFlowPropertiesFromDB(flow);
 
 		   if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
@@ -332,9 +333,10 @@ public class DBConfiguration {
 
 	
 	private String convertFlowConfigurationToDB(Document doc, Long connectorId, List<String> flowIds) throws Exception {
-		
+
 		for(String flowId : flowIds) {
 			Long id = Long.parseLong(flowId, 10);			
+
 			setFlowPropertiesFromXML(doc, connectorId,id);
 		}
 		
@@ -910,6 +912,10 @@ public class DBConfiguration {
 		    name.appendChild(doc.createTextNode(serviceDB.getName().toString()));
 		    service.appendChild(name);
 
+		    Element serviceType = doc.createElement("type");
+		    serviceType.appendChild(doc.createTextNode(serviceDB.getType().toString()));
+		    service.appendChild(serviceType);
+
 		    Element keys = doc.createElement("keys");
 		    service.appendChild(keys);
 		    
@@ -1003,7 +1009,8 @@ public class DBConfiguration {
 		if (componentType.matches("(file|ftp|sftp|sjms|sonicmq).*")) {
 			if(confOptions.isEmpty() || confOptions==null) {
 				confOptions = "bridgeErrorHandler=true";
-			}else {
+			}else if(!confOptions.contains("bridgeErrorHandler")) 
+			{
 				confOptions = confOptions + "&bridgeErrorHandler=true";
 			}
 		}
@@ -1021,7 +1028,7 @@ public class DBConfiguration {
 	    String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name",doc);
 	    String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart",doc);
 	    String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading",doc);
-	    
+
 	    if(!flowId.isEmpty()) {
 	    	
 	       Flow flow = flowRepository.findOne(id);
@@ -1055,7 +1062,7 @@ public class DBConfiguration {
 	       }else {
 	    	   flow.setOffloading(false);
 	       }
-	       
+			
 	       fromEndpoint = getFromEndpointFromXML(flowId, doc);	       
 	       flow.setFromEndpoint(fromEndpoint);
 
@@ -1066,7 +1073,7 @@ public class DBConfiguration {
 	       flow.toEndpoints(toEndpoints);
 	       
 	       flow = flowRepository.save(flow);
-	       
+
 	       return "flow imported";
 	       
 		}else {
@@ -1094,15 +1101,18 @@ public class DBConfiguration {
 	    }	    
 
 	    //get options
-	    Map<String,String> fromOptionsMap = getMap(doc,"//flows/flow[id='\" + flowId + \"']/from/uri");
+	    Map<String,String> fromOptionsMap = getMap(doc,"//flows/flow[id='" + id + "']/from/options/*");
 	    
 	    for (Map.Entry<String, String> entry : fromOptionsMap.entrySet()) {
-	    	if(fromOptions!=null) {
-	    		fromOptions = fromOptions + "&";
-	    	}
-	        String key = entry.getKey();
+
+	    	String key = entry.getKey();
 	        String value = entry.getValue();
-	        fromOptions = fromOptions + key + "=" + value;
+
+	    	if(fromOptions!=null) {
+	    		fromOptions = fromOptions + "&" + key + "=" + value;;
+	    	}else {
+		        fromOptions = key + "=" + value;
+	    	}
 	    }
 
 	    
@@ -1136,10 +1146,10 @@ public class DBConfiguration {
 		fromEndpoint.setOptions(fromOptions);
 
 		if(fromService!=null) {
-			errorEndpoint.setService(fromService);
+			fromEndpoint.setService(fromService);
 		}
 		if(fromHeader!=null) {
-			errorEndpoint.setHeader(fromHeader);
+			fromEndpoint.setHeader(fromHeader);
 		}
 		
 		return fromEndpoint;
@@ -1172,15 +1182,19 @@ public class DBConfiguration {
 		    }	    
 
 		    //get options
-		    Map<String,String> toOptionsMap = getMap(doc,"//flows/flow[id='\" + flowId + \"']/to/uri");
+		    Map<String,String> toOptionsMap = getMap(doc,"//flows/flow[id='" + id + "']/to/options/*");
 		    
 		    for (Map.Entry<String, String> entry : toOptionsMap.entrySet()) {
-		    	if(toOptions!=null) {
-		    		toOptions = toOptions + "&";
-		    	}
-		        String key = entry.getKey();
+
+		    	String key = entry.getKey();
 		        String value = entry.getValue();
-		        toOptions = toOptions + key + "=" + value;
+
+		    	if(toOptions!=null) {
+		    		toOptions = toOptions + "&" + key + "=" + value;;
+		    	}else {
+		    		toOptions = key + "=" + value;
+		    	}
+
 		    }		    
 
 		    //get service if configured
@@ -1214,10 +1228,10 @@ public class DBConfiguration {
 			toEndpoint.setOptions(toOptions);
 		
 			if(toService!=null) {
-				errorEndpoint.setService(toService);
+				toEndpoint.setService(toService);
 			}
 			if(toHeader!=null) {
-				errorEndpoint.setHeader(toHeader);
+				toEndpoint.setHeader(toHeader);
 			}
 			
 			
@@ -1248,15 +1262,18 @@ public class DBConfiguration {
 
 	    //get options
 
-	    Map<String,String> errorOptionsMap = getMap(doc,"//flows/flow[id='\" + flowId + \"']/error/uri");
+	    Map<String,String> errorOptionsMap = getMap(doc,"//flows/flow[id='" + id + "']/error/options/*");
 	    
 	    for (Map.Entry<String, String> entry : errorOptionsMap.entrySet()) {
-	    	if(errorOptions!=null) {
-	    		errorOptions = errorOptions + "&";
-	    	}
-	        String key = entry.getKey();
+	    	
+	    	String key = entry.getKey();
 	        String value = entry.getValue();
-	        errorOptions = errorOptions + key + "=" + value;
+
+	    	if(errorOptions!=null) {
+	    		errorOptions = errorOptions + "&" + key + "=" + value;;
+	    	}else {
+	    		errorOptions = key + "=" + value;
+	    	}
 	    }
 	    
 	    //get service if configured
@@ -1299,20 +1316,29 @@ public class DBConfiguration {
 
 
 	private String setServicesPropertiesFromXML(Document doc, List<String> serviceIds) throws Exception {
-		
+
+		XPath xPath = XPathFactory.newInstance().newXPath();
+
 		for(String serviceId : serviceIds) {
-			
+
+		    String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
+		    String serviceType = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/type",doc);
+
 			try  
 			  { 
 			    serviceIdLong = Long.parseLong(serviceId, 10);
 			    service = serviceRepository.findOne(serviceIdLong);
-		
+			    
+			    
 			    if(service==null) {
 			    	service = new org.assimbly.gateway.domain.Service();
 			    	serviceKeys = new HashSet<ServiceKeys>();
 			    	service.setId(serviceIdLong);
-			    	service.setName(serviceId);
+			    	service.setName(serviceName);
+			    	service.setType(serviceType);
 			    }else {
+			    	service.setName(serviceName);
+			    	service.setType(serviceType);
 			    	serviceKeys = service.getServiceKeys();
 			    }
 			  }  
@@ -1321,6 +1347,8 @@ public class DBConfiguration {
 			      service = new org.assimbly.gateway.domain.Service();
 			      serviceKeys = new HashSet<ServiceKeys>();
 			      service.setName(serviceId);
+			      service.setType(serviceType);
+
 			  }
 			
 			
