@@ -17,6 +17,7 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     gateways: Array<Gateway> = [];
     xmlConfiguration: any;
     fileName = 'Choose file';
+    importError = false;
 
     constructor(
         private gatewayService: GatewayService,
@@ -46,9 +47,15 @@ export class GatewayImportDialogComponent implements AfterContentInit {
 
     importConfiguration() {
         this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration)
-            .subscribe((r) => {
+            .subscribe(
+            (r) => {
                 this.activeModal.dismiss(true);
-            });
+            },
+            (err) => {
+                this.importError = true;
+                console.log(err)
+            }
+            );
     }
 }
 
@@ -63,7 +70,7 @@ export class GatewayImportPopupComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private gatewayPopupService: GatewayPopupService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(() => {

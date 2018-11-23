@@ -73,7 +73,7 @@
 		<span
 			class="badge badge-warning" *ngIf="flowAlerts === 'true'"
 			(mouseenter)="p!=p" placement="right" on-mouseover='getFlowAlerts(flow.id)'
-			triggers="mouseenter" popoverTitle="Show last {{showNumberOfItems}} alerts"
+			triggers="mouseenter" popoverTitle="Show last alerts"
 			[popover]="alertsFlowButtonTemplate">{{numberOfAlerts}} Alerts</span>
 	</h4>
 	</p>	
