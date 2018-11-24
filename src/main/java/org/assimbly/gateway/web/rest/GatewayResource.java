@@ -41,6 +41,7 @@ public class GatewayResource {
 
     private final GatewayMapper gatewayMapper;
 
+	@SuppressWarnings("unused")
 	@Autowired
 	private DBConfiguration assimblyDBConfiguration;
 
@@ -87,6 +88,24 @@ public class GatewayResource {
         if (gatewayDTO.getId() == null) {
             return createGateway(gatewayDTO);
         }
+       
+        if (gatewayDTO.getType().name().equals("BROKER")) {
+            log.info("Starting embedded ActiveMQ broker");
+       		try {
+				new Broker().start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }else {
+            log.info("Stopping embedded ActiveMQ broker");
+       		try {
+				new Broker().stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+
+        
         Gateway gateway = gatewayMapper.toEntity(gatewayDTO);
         gateway = gatewayRepository.save(gateway);
         GatewayDTO result = gatewayMapper.toDto(gateway);

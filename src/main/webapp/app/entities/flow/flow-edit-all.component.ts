@@ -181,7 +181,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                 this.getOptions(this.fromEndpoint, this.editFlowForm.controls.endpointsData.get('0'), this.fromEndpointOptions);
                                                 this.setTypeLinks(this.fromEndpoint, 0);
                                                 this.finished = true;
-                                            }, 0);
+                                            }, 100);
                                         }
                                     });
                                 }
@@ -194,7 +194,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     setTimeout(() => {
                                         this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
                                         this.setTypeLinks(this.errorEndpoint, 1);
-                                    }, 0);
+                                    }, 100);
                                 });
                             }
 
@@ -208,7 +208,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                     setTimeout(() => {
                                         this.getOptions(toEndpoint, this.editFlowForm.controls.endpointsData.get((i + 2).toString()), this.toEndpointsOptions[i]);
                                         this.setTypeLinks(toEndpoint, i + 2);
-                                    }, 0);
+                                    }, 100);
                                 });
                             });
                         });
