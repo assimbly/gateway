@@ -628,6 +628,24 @@ public class ConnectorResource {
 		}
     }
 
+    @GetMapping(path = "/connector/{connectorId}/flow/options/{componenttype}", produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> getComponentOptions(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
+
+    	plainResponse = true;
+
+		try {
+    		String documentation = connector.getComponentOptions(componenttype, mediaType);
+    		if(documentation.startsWith("Unknown")) {
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/options/{componenttype}",documentation);
+			}
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/options/{componenttype}",documentation,plainResponse);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/options/{componenttype}",e.getMessage());
+		}
+    }    
+    
 	@GetMapping(path = "/connector/{connectorId}/flow/validateUri", produces = {"text/plain","application/xml","application/json"})
     @Timed
     public ResponseEntity<String> validateFlowUri(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("Uri") String uri, @PathVariable Long connectorId) throws Exception {
@@ -695,7 +713,7 @@ public class ConnectorResource {
 	}
 
     /*
-    //This method is called on application startup
+    //This method can be called on application startup
     @PostConstruct
     private void initConnector() throws Exception {
     
