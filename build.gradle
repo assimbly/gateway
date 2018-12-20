@@ -204,11 +204,11 @@ dependencies {
 
 	// custom dependencies (non-jhipster)
     compile "org.assimbly:connector:1.0.0"
+    compile "io.github.assimbly:docconverter:1.1.0"	
 	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.5"
 	compile "org.jdom:jdom2:2.0.6"
 	compile "org.springframework:spring-websocket:4.3.20.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:4.2.3.RELEASE"
-	
 	
 	// end custom dependencies
     
