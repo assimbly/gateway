@@ -153,6 +153,10 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`);
     }
 
+    getComponentOptions(gatewayid: number, componentType: String): Observable<Response> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/schema/` + componentType);
+    }
+
     getWikiDocUrl() {
         return this.http.get(`${SERVER_API_URL}/api/wiki-url`);
     }
