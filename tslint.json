@@ -1,43 +1,20 @@
 {
-    "rulesDirectory": [
-        "node_modules/codelyzer"
-    ],
+    "rulesDirectory": ["node_modules/codelyzer"],
+    "extends": ["tslint-config-prettier"],
     "rules": {
         "class-name": true,
-        "component-selector-name": [ true, "kebab-case" ],
-        "directive-selector-type": [ true, "attribute" ],
-        "comment-format": [
-            true,
-            "check-space"
-        ],
+        "comment-format": [true, "check-space"],
         "curly": true,
         "eofline": true,
         "forin": true,
-        "indent": [
-            true,
-            "spaces"
-        ],
+        "indent": [true, "spaces"],
         "label-position": true,
-        "max-line-length": [
-            true,
-            180
-        ],
+        "max-line-length": [true, 180],
         "member-access": false,
-        "member-ordering": [
-            true,
-            "static-before-instance",
-            "variables-before-functions"
-        ],
+        "member-ordering": [true, "static-before-instance", "variables-before-functions"],
         "no-arg": true,
         "no-bitwise": true,
-        "no-console": [
-            true,
-            "debug",
-            "info",
-            "time",
-            "timeEnd",
-            "trace"
-        ],
+        "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
         "no-construct": true,
         "no-debugger": true,
         "no-duplicate-variable": true,
@@ -50,27 +27,12 @@
         "no-trailing-whitespace": true,
         "no-unused-expression": true,
         "no-var-keyword": true,
-        "no-unused-variable": true,
         "object-literal-sort-keys": false,
-        "one-line": [
-            true,
-            "check-open-brace",
-            "check-catch",
-            "check-else",
-            "check-whitespace"
-        ],
-        "quotemark": [
-            true,
-            "single"
-        ],
+        "one-line": [true, "check-open-brace", "check-catch", "check-else", "check-whitespace"],
+        "quotemark": [true, "single", "avoid-escape"],
         "radix": true,
-        "semicolon": [
-            "always"
-        ],
-        "triple-equals": [
-            true,
-            "allow-null-check"
-        ],
+        "semicolon": [true, "always", "ignore-bound-class-methods"],
+        "triple-equals": [true, "allow-null-check"],
         "typedef-whitespace": [
             true,
             {
@@ -82,24 +44,26 @@
             }
         ],
         "variable-name": false,
-        "whitespace": [
-            true,
-            "check-branch",
-            "check-decl",
-            "check-operator",
-            "check-separator",
-            "check-type"
-        ],
-        "prefer-const": false,
-        "arrow-parens": [true],
+        "whitespace": [true, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
+        "prefer-const": true,
+        "arrow-parens": [true, "ban-single-arg-parens"],
         "arrow-return-shorthand": [true],
         "import-spacing": true,
         "no-consecutive-blank-lines": [true],
         "object-literal-shorthand": true,
-        "space-before-function-paren": [true, "never"],
+        "space-before-function-paren": [
+            true,
+            {
+                "asyncArrow": "always",
+                "anonymous": "never",
+                "constructor": "never",
+                "method": "never",
+                "named": "never"
+            }
+        ],
 
         "directive-selector": [true, "attribute", "jhi", "camelCase"],
-        "component-selector": ["element", "jhi", "kebab-case"],
+        "component-selector": [true, "element", "jhi", "kebab-case"],
         "use-input-property-decorator": true,
         "use-output-property-decorator": true,
         "use-host-property-decorator": true,

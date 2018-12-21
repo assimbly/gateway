@@ -481,10 +481,8 @@ public class DBImportXMLConfiguration {
 
 		for (String serviceId : serviceIds) {
 
-			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",
-					doc);
-			String serviceType = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/type",
-					doc);
+			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name", doc);
+			String serviceType = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/type", doc);
 
 			try {
 				serviceIdLong = Long.parseLong(serviceId, 10);
@@ -517,8 +515,7 @@ public class DBImportXMLConfiguration {
 
 			}
 
-			Map<String, String> serviceMap = getMap(doc,
-					"/connectors/connector/services/service[id=" + serviceId + "]/keys/*");
+			Map<String, String> serviceMap = getMap(doc,"/connectors/connector/services/service[id=" + serviceId + "]/keys/*");
 			Map<String, ServiceKeys> map = new HashMap<>();
 			for (ServiceKeys s : serviceKeys) {
 				map.put(s.getKey(), s);
