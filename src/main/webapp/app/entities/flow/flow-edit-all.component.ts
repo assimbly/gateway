@@ -70,6 +70,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     fromUriPlaceholder: string;
     fromUriPopoverMessage: string;
 
+    fromComponentOptions: any;
+    toComponentOptions: Array<any> = [];
+    errorComponentOptions: any;
+
     toTypeAssimblyLinks: Array<string> = new Array<string>();
     toTypeCamelLinks: Array<string> = new Array<string>();
     toUriPlaceholders: Array<string> = new Array<string>();
@@ -126,6 +130,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.subscription = this.route.params.subscribe((params) => {
             this.load(params['id']);
         });
+
         this.registerChangeInFlows();
     }
 
@@ -292,6 +297,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             endpoint.type = e;
         }
 
+        let componentType = endpoint.type.toString().toLowerCase();
+        if (componentType === 'activemq') {
+            componentType = 'jms';
+        } else if (componentType === 'sonicmq') {
+            componentType = 'sjms';
+        }
+
         let type;
         if (endpoint instanceof FromEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
@@ -301,6 +313,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.fromUriPlaceholder = type.uriPlaceholder;
             this.fromUriPopoverMessage = type.uriPopoverMessage;
+
+            // get options keys
+            this.getComponentOptions(componentType).subscribe((data) => {
+                this.fromComponentOptions = Object.keys(data.properties);
+            });
+
         } else if (endpoint instanceof ToEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
@@ -309,6 +327,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
             this.toUriPlaceholders[this.toEndpoints.indexOf(endpoint)] = type.uriPlaceholder;
             this.toUriPopoverMessages[this.toEndpoints.indexOf(endpoint)] = type.uriPopoverMessage;
+
+            // set options keys
+            this.getComponentOptions(componentType).subscribe((data) => {
+                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties);
+            });
+
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find((x) => x.name === endpoint.type.toString());
             endpointForm.controls.service.setValue('');
@@ -317,6 +341,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
             this.errorUriPlaceholder = type.uriPlaceholder;
             this.errorUriPopoverMessage = type.uriPopoverMessage;
+
+            // set options keys
+            this.getComponentOptions(componentType).subscribe((data) => {
+                this.errorComponentOptions = Object.keys(data.properties);
+            });
+
         }
 
         endpointForm.patchValue({ 'type': type.name });
@@ -354,7 +384,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                          This endpoint is configured at <i>Settings --> Offloading</i>.`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
-                                     Click on the Apache Camel button to view all available options.`;
+                                     Click on the Apache Camel button to view documation on the valid options.`;
         this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
         this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit services.`;
@@ -423,6 +453,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'service': endpoint.serviceId,
             'header': endpoint.headerId
         })
+    }
+
+    getComponentOptions(componentType: String): any {
+        return this.flowService.getComponentOptions(1, componentType).map((options) => {
+            return options.json();
+        });
     }
 
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
