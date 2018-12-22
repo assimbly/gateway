@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Gateway } from './gateway.model';
+import { IGateway } from 'app/shared/model/gateway.model';
+import { AccountService } from 'app/core';
 import { GatewayService } from './gateway.service';
 import { Principal, ResponseWrapper } from '../../shared';
 import { FlowService } from '../flow/flow.service';
@@ -19,24 +21,23 @@ export class GatewayComponent implements OnInit, OnDestroy {
 
     constructor(
         private flowService: FlowService,
-        private gatewayService: GatewayService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.gatewayService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.gateways = res.json;
+            (res: HttpResponse<IGateway[]>) => {
+                this.gateways = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInGateways();
@@ -46,19 +47,19 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: Gateway) {
+    trackId(index: number, item: IGateway) {
         return item.id;
     }
 
     registerChangeInGateways() {
-        this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
     }
 
     downloadConfiguration(gateway: Gateway) {
         this.flowService.exportGatewayConfiguration(gateway);
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

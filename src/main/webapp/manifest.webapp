@@ -19,6 +19,7 @@
       },
       {
           "src": "./content/images/assimbly.png",
+          "src": "./content/images/jhipster_family_member_0_head-512.png",
           "sizes": "512x512",
           "type": "image/png"
       }

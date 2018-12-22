@@ -1,8 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FlowService, Flow } from '../flow';
-import { JhiAlertService } from 'ng-jhipster';
 import * as moment from 'moment';
 import { Observable, Subscription } from 'rxjs';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+
+import { Maintenance } from 'app/shared/model/maintenance.model';
+import { AccountService } from 'app/core';
+import { MaintenanceService } from './maintenance.service';
 
 @Component({
     selector: 'jhi-maintenance',

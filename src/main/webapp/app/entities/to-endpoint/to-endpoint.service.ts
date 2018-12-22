@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { ToEndpoint } from './to-endpoint.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
 
-@Injectable()
-export class ToEndpointService {
+type EntityResponseType = HttpResponse<IToEndpoint>;
+type EntityArrayResponseType = HttpResponse<IToEndpoint[]>;
 
     private resourceUrlToEndpoint =  SERVER_API_URL + 'api/to-endpoint';
     private resourceUrlToEndpoints =  SERVER_API_URL + 'api/to-endpoints';
 
-    constructor(private http: Http) { }
+    @Injectable({ providedIn: 'root' })
+export class ToEndpointService {
+    public resourceUrl = SERVER_API_URL + 'api/to-endpoints';
+
+    constructor(protected http: HttpClient) {}
 
     create(toEndpoint: ToEndpoint): Observable<ToEndpoint> {
         const copy = this.convert(toEndpoint);

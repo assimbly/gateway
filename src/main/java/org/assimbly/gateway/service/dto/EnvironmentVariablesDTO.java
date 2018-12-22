@@ -1,9 +1,6 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -61,7 +58,7 @@ public class EnvironmentVariablesDTO implements Serializable {
         }
 
         EnvironmentVariablesDTO environmentVariablesDTO = (EnvironmentVariablesDTO) o;
-        if(environmentVariablesDTO.getId() == null || getId() == null) {
+        if (environmentVariablesDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), environmentVariablesDTO.getId());
@@ -78,6 +75,7 @@ public class EnvironmentVariablesDTO implements Serializable {
             "id=" + getId() +
             ", key='" + getKey() + "'" +
             ", value='" + getValue() + "'" +
+            ", gateway=" + getGatewayId() +
             "}";
     }
 }

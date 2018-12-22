@@ -1,14 +1,11 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    ServiceKeysService,
-    ServiceKeysPopupService,
     ServiceKeysComponent,
     ServiceKeysDetailComponent,
-    ServiceKeysDialogComponent,
-    ServiceKeysPopupComponent,
+    ServiceKeysUpdateComponent,
     ServiceKeysDeletePopupComponent,
     ServiceKeysDeleteDialogComponent,
     serviceKeysRoute,
@@ -16,10 +13,7 @@ import {
     ForbiddenServiceKeysValidatorDirective
 } from './';
 
-const ENTITY_STATES = [
-    ...serviceKeysRoute,
-    ...serviceKeysPopupRoute,
-];
+const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
 
 @NgModule({
     imports: [
@@ -32,22 +26,17 @@ const ENTITY_STATES = [
     declarations: [
         ServiceKeysComponent,
         ServiceKeysDetailComponent,
-        ServiceKeysDialogComponent,
+        ServiceKeysUpdateComponent,
         ServiceKeysDeleteDialogComponent,
         ServiceKeysPopupComponent,
         ServiceKeysDeletePopupComponent,
         ForbiddenServiceKeysValidatorDirective
     ],
-    entryComponents: [
-        ServiceKeysComponent,
-        ServiceKeysDialogComponent,
-        ServiceKeysPopupComponent,
-        ServiceKeysDeleteDialogComponent,
-        ServiceKeysDeletePopupComponent,
-    ],
+    entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
     providers: [
         ServiceKeysService,
         ServiceKeysPopupService,
+        ServiceKeysDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

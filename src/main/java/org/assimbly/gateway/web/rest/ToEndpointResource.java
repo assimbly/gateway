@@ -3,7 +3,6 @@ package org.assimbly.gateway.web.rest;
 import com.codahale.metrics.annotation.Timed;
 
 import org.assimbly.gateway.domain.ToEndpoint;
-
 import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -55,6 +54,7 @@ public class ToEndpointResource {
         if (toEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new toEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         ToEndpoint toEndpoint = toEndpointMapper.toEntity(toEndpointDTO);
         toEndpoint = toEndpointRepository.save(toEndpoint);
         ToEndpointDTO result = toEndpointMapper.toDto(toEndpoint);
@@ -94,8 +94,9 @@ public class ToEndpointResource {
     public ResponseEntity<ToEndpointDTO> updateToEndpoint(@RequestBody ToEndpointDTO toEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update ToEndpoint : {}", toEndpointDTO);
         if (toEndpointDTO.getId() == null) {
-            return createToEndpoint(toEndpointDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         ToEndpoint toEndpoint = toEndpointMapper.toEntity(toEndpointDTO);
         toEndpoint = toEndpointRepository.save(toEndpoint);
         ToEndpointDTO result = toEndpointMapper.toDto(toEndpoint);
@@ -134,7 +135,7 @@ public class ToEndpointResource {
         log.debug("REST request to get all ToEndpoints");
         List<ToEndpoint> toEndpoints = toEndpointRepository.findAll();
         return toEndpointMapper.toDto(toEndpoints);
-        }
+    }
 
     /**
      * GET  /to-endpoints/:id : get the "id" toEndpoint.
@@ -160,9 +161,9 @@ public class ToEndpointResource {
     @Timed
     public ResponseEntity<ToEndpointDTO> getToEndpointID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoint : {}", id);
-        ToEndpoint toEndpoint = toEndpointRepository.findOne(id);
-        ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(toEndpointDTO));
+        Optional<ToEndpointDTO> toEndpointDTO = toEndpointRepository.findById(id)
+            .map(toEndpointMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(toEndpointDTO);
     }
 
     /**
@@ -175,7 +176,8 @@ public class ToEndpointResource {
     @Timed
     public ResponseEntity<Void> deleteToEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ToEndpoint : {}", id);
-        toEndpointRepository.delete(id);
+
+        toEndpointRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     

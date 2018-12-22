@@ -1,18 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { ServiceKeys } from '../service-keys';
+import { Service } from 'app/shared/model/service.model';
+
 
 @Component({
     selector: 'jhi-service-detail',
     templateUrl: './service-detail.component.html'
 })
-export class ServiceDetailComponent implements OnInit, OnDestroy {
+export class ServiceDetailComponent implements OnInit {
 
     public service: Service;
     public serviceKeys: Array<ServiceKeys>;
@@ -45,17 +44,8 @@ export class ServiceDetailComponent implements OnInit, OnDestroy {
         this.serviceKeysService.query().subscribe((res) => {
             this.serviceKeys = res.json.filter((sk) => sk.serviceId === id);
         });
-    }
 
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-        this.eventManager.destroy(this.eventSubscriber);
-    }
-
-    registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe(
-            'serviceListModification',
-            (response) => this.load(this.service.id)
-        );
+    previousState() {
+        window.history.back();
     }
 }

@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Flow } from './flow.model';
-import { FlowPopupService } from './flow-popup.service';
+import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 
 @Component({
@@ -49,22 +48,32 @@ export class FlowDeleteDialogComponent {
     template: ''
 })
 export class FlowDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
     routeSub: any;
 
-    constructor(
-        private route: ActivatedRoute,
-        private flowPopupService: FlowPopupService
-    ) { }
+    constructor(private flowPopupService: FlowPopupService,protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.flowPopupService
-                .open(FlowDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ flow }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(FlowDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.flow = flow;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

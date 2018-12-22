@@ -1,40 +1,41 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="headerKeys">
+            <h2><span>Header Keys</span> {{headerKeys.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Key</span></dt>
+                <dd>
+                    <span>{{headerKeys.key}}</span>
+                </dd>
+                <dt><span>Value</span></dt>
+                <dd>
+                    <span>{{headerKeys.value}}</span>
+                </dd>
+                <dt><span>Type</span></dt>
+                <dd>
+                    <span>{{headerKeys.type}}</span>
+                </dd>
+                <dt><span>Header</span></dt>
+                <dd>
+                    <div *ngIf="headerKeys.headerId">
+                        <a [routerLink]="['/header', headerKeys.headerId, 'view']">{{headerKeys.headerId}}</a>
+                    </div>
+                </dd>
+            </dl>
 
-<div *ngIf="headerKeys">
-    <h2><span>Header Keys</span> {{headerKeys.id}}</h2>
-    <hr>
-    <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Key</span></dt>
-        <dd>
-            <span>{{headerKeys.key}}</span>
-        </dd>
-        <dt><span>Value</span></dt>
-        <dd>
-            <span>{{headerKeys.value}}</span>
-        </dd>
-        <dt><span>Type</span></dt>
-        <dd>
-            <span>{{headerKeys.type}}</span>
-        </dd>
-        <dt><span>Header</span></dt>
-        <dd>
-            <div *ngIf="headerKeys.headerId">
-                <a [routerLink]="['/header', headerKeys.headerId]">{{headerKeys.headerId}}</a>
-            </div>
-        </dd>
-    </dl>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
-
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKeys.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+            <button type="button"
+                    [routerLink]="['/header-keys', headerKeys.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
 </div>

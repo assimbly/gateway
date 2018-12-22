@@ -4,9 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FlowService } from '../flow';
 import { CommonModule } from '@angular/common';
 
+import { GatewaySharedModule } from 'app/shared';
 import {
-    MaintenanceService,
-    MaintenancePopupService,
     MaintenanceComponent,
     MaintenanceDialogComponent,
     MaintenancePopupComponent,

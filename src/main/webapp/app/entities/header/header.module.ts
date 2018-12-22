@@ -6,12 +6,9 @@ import { GatewaySharedModule } from '../../shared';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
-    HeaderService,
-    HeaderPopupService,
     HeaderComponent,
     HeaderDetailComponent,
-    HeaderDialogComponent,
-    HeaderPopupComponent,
+    HeaderUpdateComponent,
     HeaderDeletePopupComponent,
     HeaderDeleteDialogComponent,
     HeaderAllComponent,

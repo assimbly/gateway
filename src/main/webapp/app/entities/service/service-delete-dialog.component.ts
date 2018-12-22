@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
-import { ServicePopupService } from './service-popup.service';
+import { Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 
 @Component({
@@ -13,7 +12,6 @@ import { ServiceService } from './service.service';
     templateUrl: './service-delete-dialog.component.html'
 })
 export class ServiceDeleteDialogComponent {
-
     service: Service;
     message = 'Are you sure you want to delete this Service?';
     disableDelete: boolean;
@@ -31,7 +29,7 @@ export class ServiceDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.serviceService.delete(id).subscribe(() => {
+        this.serviceService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'serviceListModification',
                 content: 'Deleted an service'
@@ -52,22 +50,30 @@ export class ServiceDeleteDialogComponent {
     template: ''
 })
 export class ServiceDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private servicePopupService: ServicePopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.servicePopupService
-                .open(ServiceDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ service }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(ServiceDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.service = service;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

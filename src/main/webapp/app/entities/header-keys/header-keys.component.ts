@@ -1,10 +1,12 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Observable } from 'rxjs/Observable';
 
-import { HeaderKeys } from './header-keys.model';
+import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { AccountService } from 'app/core';
 import { HeaderKeysService } from './header-keys.service';
-import { Principal } from '../../shared';
 
 @Component({
     selector: 'jhi-header-keys',
@@ -27,11 +29,21 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
-        private principal: Principal,
     ) {
     }
+
+    loadAll() {
+        this.headerKeysService.query().subscribe(
+            (res: HttpResponse<IHeaderKeys[]>) => {
+                this.headerKeys = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+    }
+
     ngOnInit() {
-        this.principal.identity().then((account) => {
+        this.loadAll();
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
@@ -111,7 +123,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         this.headerKeys.push(headerKeyForClone);
     }
 
-    trackId(index: number, item: HeaderKeys) {
+    trackId(index: number, item: IHeaderKeys) {
         return item.id;
     }
 
@@ -130,7 +142,8 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             this.addHeaderKeys();
         }
     }
-    private onError(error) {
+    
+    protected onError(error) {
         this.jhiAlertService.error(error.message, null, null);
         console.log(error.message);
     }

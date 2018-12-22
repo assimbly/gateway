@@ -5,25 +5,19 @@ import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 import {
-    WireTapEndpointService,
-    WireTapEndpointPopupService,
     WireTapEndpointComponent,
     WireTapEndpointDetailComponent,
-    WireTapEndpointDialogComponent,
-    WireTapEndpointPopupComponent,
+    WireTapEndpointUpdateComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
     WireTapEndpointEditComponent,
     wireTapEndpointRoute,
-    wireTapEndpointPopupRoute,
+    wireTapEndpointPopupRoute
 } from './';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-const ENTITY_STATES = [
-    ...wireTapEndpointRoute,
-    ...wireTapEndpointPopupRoute,
-];
+const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
 
 @NgModule({
     imports: [
@@ -38,10 +32,9 @@ const ENTITY_STATES = [
         WireTapEndpointComponent,
         WireTapEndpointEditComponent,
         WireTapEndpointDetailComponent,
-        WireTapEndpointDialogComponent,
+        WireTapEndpointUpdateComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointPopupComponent,
-        WireTapEndpointDeletePopupComponent,
+        WireTapEndpointDeletePopupComponent
     ],
     entryComponents: [
         WireTapEndpointComponent,
@@ -55,6 +48,9 @@ const ENTITY_STATES = [
         Components,
         WireTapEndpointService,
         WireTapEndpointPopupService,
+        WireTapEndpointUpdateComponent,
+        WireTapEndpointDeleteDialogComponent,
+        WireTapEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

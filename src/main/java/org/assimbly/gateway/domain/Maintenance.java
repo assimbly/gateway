@@ -35,6 +35,11 @@ public class Maintenance implements Serializable {
     @Column(name = "duration")
     private Instant duration;
 
+    @ManyToMany(mappedBy = "maintenances")
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
+    private Set<Flow> flows = new HashSet<>();
+
     @Column(name = "frequency")
     private String frequency;
     

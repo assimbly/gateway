@@ -1,9 +1,6 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
@@ -103,7 +100,7 @@ public class GatewayDTO implements Serializable {
         }
 
         GatewayDTO gatewayDTO = (GatewayDTO) o;
-        if(gatewayDTO.getId() == null || getId() == null) {
+        if (gatewayDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), gatewayDTO.getId());

@@ -1,13 +1,12 @@
 package org.assimbly.gateway.repository;
 
 import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.springframework.stereotype.Repository;
-
 import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.Repository;
 
 
 /**
- * Spring Data JPA repository for the ErrorEndpoint entity.
+ * Spring Data  repository for the ErrorEndpoint entity.
  */
 @SuppressWarnings("unused")
 @Repository

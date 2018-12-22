@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { EnvironmentVariables } from './environment-variables.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IEnvironmentVariables>;
+type EntityArrayResponseType = HttpResponse<IEnvironmentVariables[]>;
+
+@Injectable({ providedIn: 'root' })
 export class EnvironmentVariablesService {
+    public resourceUrl = SERVER_API_URL + 'api/environment-variables';
 
-    private resourceUrl =  SERVER_API_URL + 'api/environment-variables';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(environmentVariables: EnvironmentVariables): Observable<EnvironmentVariables> {
-        const copy = this.convert(environmentVariables);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(environmentVariables: IEnvironmentVariables): Observable<EntityResponseType> {
+        return this.http.post<IEnvironmentVariables>(this.resourceUrl, environmentVariables, { observe: 'response' });
     }
 
-    update(environmentVariables: EnvironmentVariables): Observable<EnvironmentVariables> {
-        const copy = this.convert(environmentVariables);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(environmentVariables: IEnvironmentVariables): Observable<EntityResponseType> {
+        return this.http.put<IEnvironmentVariables>(this.resourceUrl, environmentVariables, { observe: 'response' });
     }
 
-    find(id: number): Observable<EnvironmentVariables> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IEnvironmentVariables>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IEnvironmentVariables[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to EnvironmentVariables.
-     */
-    private convertItemFromServer(json: any): EnvironmentVariables {
-        const entity: EnvironmentVariables = Object.assign(new EnvironmentVariables(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a EnvironmentVariables to a JSON which can be sent to the server.
-     */
-    private convert(environmentVariables: EnvironmentVariables): EnvironmentVariables {
-        const copy: EnvironmentVariables = Object.assign({}, environmentVariables);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

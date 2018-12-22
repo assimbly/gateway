@@ -89,12 +89,14 @@ public class FlowResource {
      */
     @PutMapping("/flows")
     @Timed
-    public ResponseEntity<FlowDTO> updateflow(@RequestBody FlowDTO FlowDTO) throws URISyntaxException {
-        log.debug("REST request to update flow : {}", FlowDTO);
-        if (FlowDTO.getId() == null) {
-            return createflow(FlowDTO);
+
+    public ResponseEntity<FlowDTO> updateFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
+        log.debug("REST request to update Flow : {}", flowDTO);
+        if (flowDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Flow flow = flowMapper.toEntity(FlowDTO);
+
+        Flow flow = flowMapper.toEntity(flowDTO);
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
         return ResponseEntity.ok()
@@ -110,11 +112,11 @@ public class FlowResource {
      */
     @GetMapping("/flows")
     @Timed
-    public ResponseEntity<List<FlowDTO>> getAllflows(@SortDefault(sort = {"name"}, direction = Sort.Direction.ASC) Pageable pageable) {
-        log.debug("REST request to get a page of flows");
-        Page<Flow> page = flowRepository.findAll(pageable);
+    public ResponseEntity<List<FlowDTO>> getAllFlows(Pageable pageable) {
+        log.debug("REST request to get a page of Flows");
+        Page<FlowDTO> page = flowRepository.findAll(pageable).map(flowMapper::toDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
-        return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
@@ -156,11 +158,11 @@ public class FlowResource {
      */
     @GetMapping("/flows/{id}")
     @Timed
-    public ResponseEntity<FlowDTO> getflow(@PathVariable Long id) {
-        log.debug("REST request to get flow : {}", id);
-        Flow flow = flowRepository.findOne(id);
-        FlowDTO FlowDTO = flowMapper.toDto(flow);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(FlowDTO));
+    public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
+        log.debug("REST request to get Flow : {}", id);
+        Optional<FlowDTO> flowDTO = flowRepository.findById(id)
+            .map(flowMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(flowDTO);
     }
 
     /**
@@ -171,9 +173,10 @@ public class FlowResource {
      */
     @DeleteMapping("/flows/{id}")
     @Timed
-    public ResponseEntity<Void> deleteflow(@PathVariable Long id) {
-        log.debug("REST request to delete complete flow : {}", id);
-        flowRepository.delete(id);        
+    public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
+        log.debug("REST request to delete Flow : {}", id);
+
+        flowRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     

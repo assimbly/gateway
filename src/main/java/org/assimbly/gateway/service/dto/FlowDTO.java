@@ -1,12 +1,9 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.ToEndpoint;
 
 /**
@@ -114,7 +111,7 @@ public class FlowDTO implements Serializable {
         }
 
         FlowDTO flowDTO = (FlowDTO) o;
-        if(flowDTO.getId() == null || getId() == null) {
+        if (flowDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), flowDTO.getId());
@@ -131,6 +128,10 @@ public class FlowDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
+            ", offloading='" + isOffloading() + "'" +
+            ", gateway=" + getGatewayId() +
+            ", fromEndpoint=" + getFromEndpointId() +
+            ", errorEndpoint=" + getErrorEndpointId() +
             "}";
     }
 }

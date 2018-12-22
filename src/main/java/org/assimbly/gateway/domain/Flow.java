@@ -1,6 +1,7 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -35,6 +36,7 @@ public class Flow implements Serializable {
     private Boolean offloading;
     
     @ManyToOne
+    @JsonIgnoreProperties("")
     private Gateway gateway;
 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
@@ -50,6 +52,7 @@ public class Flow implements Serializable {
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinColumn(unique = true)
     private Maintenance maintenance;    
     

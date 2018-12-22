@@ -1,5 +1,5 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Environment Variables</span>
         <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <span class="fa fa-plus"></span>
@@ -30,17 +30,15 @@
                 <td>{{environmentVariables.value}}</td>
                 <td  id="environmentVariablesRowGatewayID" [hidden]="!environmentVariablesRowGatewayID">
                     <div *ngIf="environmentVariables.gatewayId">
-                        <a [routerLink]="['../gateway', environmentVariables.gatewayId  ]" >{{environmentVariables.gatewayId}}</a>
+                        <a [routerLink]="['../gateway', environmentVariables.gatewayId , 'view' ]" >{{environmentVariables.gatewayId}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container" *jhiHasAnyAuthority="'ROLE_ADMIN'">
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -57,7 +55,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

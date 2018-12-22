@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
-import { Header } from './header.model';
+import { IHeader } from 'app/shared/model/header.model';
+import { AccountService } from 'app/core';
 import { HeaderService } from './header.service';
 import { HeaderKeysComponent, HeaderKeysService, HeaderKeys } from '../../entities/header-keys';
 import { Principal, ResponseWrapper } from '../../shared';
@@ -42,12 +44,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
                     this.filterHeaderKeys(this.selectedHeaderId);
                 }
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         if (this.headerKey !== undefined ) {
@@ -86,15 +89,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
     trackId(index: number, item: Header) {
         return item.id;
     }
+
     registerChangeInHeaders() {
-        this.eventSubscriber = this.eventManager.subscribe('headerListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('headerListModification', response => this.loadAll());
     }
 
     selectOption() {
       this.filterHeaderKeys(this.selectedHeaderId);
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

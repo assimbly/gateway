@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { WireTapEndpoint } from './wire-tap-endpoint.model';
-import { WireTapEndpointPopupService } from './wire-tap-endpoint-popup.service';
+import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
 
 @Component({
@@ -13,22 +12,20 @@ import { WireTapEndpointService } from './wire-tap-endpoint.service';
     templateUrl: './wire-tap-endpoint-delete-dialog.component.html'
 })
 export class WireTapEndpointDeleteDialogComponent {
-
-    wireTapEndpoint: WireTapEndpoint;
+    wireTapEndpoint: IWireTapEndpoint;
 
     constructor(
-        private wireTapEndpointService: WireTapEndpointService,
+        protected wireTapEndpointService: WireTapEndpointService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+        protected eventManager: JhiEventManager
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.wireTapEndpointService.delete(id).subscribe((response) => {
+        this.wireTapEndpointService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'wireTapEndpointListModification',
                 content: 'Deleted an wireTapEndpoint'
@@ -43,22 +40,33 @@ export class WireTapEndpointDeleteDialogComponent {
     template: ''
 })
 export class WireTapEndpointDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private wireTapEndpointPopupService: WireTapEndpointPopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.wireTapEndpointPopupService
-                .open(WireTapEndpointDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ wireTapEndpoint }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(WireTapEndpointDeleteDialogComponent as Component, {
+                    size: 'lg',
+                    backdrop: 'static'
+                });
+                this.ngbModalRef.componentInstance.wireTapEndpoint = wireTapEndpoint;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

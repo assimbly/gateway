@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { ServiceKeys } from './service-keys.model';
-import { ServiceKeysPopupService } from './service-keys-popup.service';
+import { IServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
 
 @Component({
@@ -13,15 +12,13 @@ import { ServiceKeysService } from './service-keys.service';
     templateUrl: './service-keys-delete-dialog.component.html'
 })
 export class ServiceKeysDeleteDialogComponent {
-
-    serviceKeys: ServiceKeys;
+    serviceKeys: IServiceKeys;
 
     constructor(
-        private serviceKeysService: ServiceKeysService,
+        protected serviceKeysService: ServiceKeysService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+        protected eventManager: JhiEventManager
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -44,22 +41,33 @@ export class ServiceKeysDeleteDialogComponent {
     template: ''
 })
 export class ServiceKeysDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private serviceKeysPopupService: ServiceKeysPopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.serviceKeysPopupService
-                .open(ServiceKeysDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ serviceKeys }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(ServiceKeysDeleteDialogComponent as Component, {
+                    size: 'lg',
+                    backdrop: 'static'
+                });
+                this.ngbModalRef.componentInstance.serviceKeys = serviceKeys;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

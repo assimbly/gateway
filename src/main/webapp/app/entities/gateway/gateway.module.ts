@@ -7,24 +7,18 @@ import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 
 import {
-    GatewayService,
-    GatewayPopupService,
     GatewayComponent,
     GatewayDetailComponent,
-    GatewayDialogComponent,
-    GatewayPopupComponent,
+    GatewayUpdateComponent,
     GatewayDeletePopupComponent,
     GatewayDeleteDialogComponent,
     GatewayImportPopupComponent,
     GatewayImportDialogComponent,
     gatewayRoute,
-    gatewayPopupRoute,
+    gatewayPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...gatewayRoute,
-    ...gatewayPopupRoute,
-];
+const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
 
 @NgModule({
     imports: [
@@ -35,7 +29,7 @@ const ENTITY_STATES = [
     declarations: [
         GatewayComponent,
         GatewayDetailComponent,
-        GatewayDialogComponent,
+        GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
         GatewayPopupComponent,
         GatewayDeletePopupComponent,

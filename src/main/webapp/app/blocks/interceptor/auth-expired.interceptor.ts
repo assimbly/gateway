@@ -1,57 +1,43 @@
-import { JhiHttpInterceptor } from 'ng-jhipster';
-import { Injector } from '@angular/core';
-import { RequestOptionsArgs, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { AuthServerProvider } from '../../shared/auth/auth-session.service';
-import { LoginModalService } from '../../shared/login/login-modal.service';
-import { StateStorageService } from '../../shared/auth/state-storage.service';
-import { LoginService } from '../../shared/login/login.service';
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthServerProvider } from 'app/core/auth/auth-session.service';
+import { LoginModalService } from 'app/core/login/login-modal.service';
+import { StateStorageService } from 'app/core/auth/state-storage.service';
 
-export class AuthExpiredInterceptor extends JhiHttpInterceptor {
-
+@Injectable()
+export class AuthExpiredInterceptor implements HttpInterceptor {
     constructor(
-        private injector: Injector,
-        private stateStorageService: StateStorageService,
-        private loginServiceModal: LoginModalService) {
-        super();
-    }
+        private loginModalService: LoginModalService,
+        private authServerProvider: AuthServerProvider,
+        private stateStorageService: StateStorageService
+    ) {}
 
-    requestIntercept(options?: RequestOptionsArgs): RequestOptionsArgs {
-        return options;
-    }
+    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return next.handle(request).pipe(
+            tap(
+                (event: HttpEvent<any>) => {},
+                (err: any) => {
+                    if (err instanceof HttpErrorResponse) {
+                        if (err.status === 401 && err.url && !err.url.includes('/api/account')) {
+                            const destination = this.stateStorageService.getDestinationState();
+                            if (destination !== null) {
+                                const to = destination.destination;
+                                const toParams = destination.params;
+                                if (to.name === 'accessdenied') {
+                                    this.stateStorageService.storePreviousState(to.name, toParams);
+                                }
+                            } else {
+                                this.stateStorageService.storeUrl('/');
+                            }
 
-    responseIntercept(observable: Observable<Response>): Observable<Response> {
-        return <Observable<Response>>observable.catch((error) => {
-            if (error.status === 401 && error.text() !== '' && error.json().path && !error.json().path.includes('/api/account')) {
-                const destination = this.stateStorageService.getDestinationState();
-                if (destination !== null) {
-                    const to = destination.destination;
-                    const toParams = destination.params;
-                    if (to.name === 'accessdenied') {
-                        this.stateStorageService.storePreviousState(to.name, toParams);
+                            this.authServerProvider.logout();
+                            this.loginModalService.open();
+                        }
                     }
-                } else {
-                    this.stateStorageService.storeUrl('/');
-                    const loginService: LoginService = this.injector.get(LoginService);
-                    loginService.logout();
-                    const router: Router = this.injector.get(Router);
-                    router.navigate(['/']);
-
                 }
-                const authServer: AuthServerProvider = this.injector.get(AuthServerProvider);
-                authServer.logout();
-            } else if (error.status === 400 && error.text() === 'Full authentication is required to access this resource' && !(error.url.includes('/api/account'))) {
-
-                this.stateStorageService.storeUrl('/');
-                const loginService: LoginService = this.injector.get(LoginService);
-                loginService.logout();
-                const router: Router = this.injector.get(Router);
-                router.navigate(['/']);
-
-            }
-
-            return Observable.throw(error);
-        });
+            )
+        );
     }
 }

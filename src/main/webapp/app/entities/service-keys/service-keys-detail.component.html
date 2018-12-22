@@ -1,4 +1,4 @@
-
+<div class="row justify-content-center">
 <div *ngIf="serviceKeys">
     <h2><span>Service Keys</span> {{serviceKeys.id}}</h2>
     <hr>
@@ -23,18 +23,11 @@
             </div>
         </dd>
     </dl>
-
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
-
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+            <button type="button"
+                    [routerLink]="['/service-keys', serviceKeys.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
 </div>

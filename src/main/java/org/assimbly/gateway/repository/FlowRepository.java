@@ -5,14 +5,13 @@ import java.util.List;
 import javax.persistence.OrderBy;
 
 import org.assimbly.gateway.domain.Flow;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
-
 
 /**
- * Spring Data JPA repository for the Flow entity.
+ * Spring Data  repository for the Flow entity.
  */
 @Repository
 public interface FlowRepository extends JpaRepository<Flow, Long> {

@@ -25,7 +25,6 @@ The main design goals are:
 
 More on the [rationale](https://github.com/assimbly/gateway/wiki/Rationale-&-Advantages)
 
-
 ## Documentation
 
 You find documentation on the [wiki](https://github.com/assimbly/gateway/wiki) like:

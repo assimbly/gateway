@@ -5,12 +5,9 @@ import { GatewayServiceKeysModule } from '../../entities/service-keys/service-ke
 import { GatewaySharedModule } from '../../shared';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-    ServiceService,
-    ServicePopupService,
     ServiceComponent,
     ServiceDetailComponent,
-    ServiceDialogComponent,
-    ServicePopupComponent,
+    ServiceUpdateComponent,
     ServiceDeletePopupComponent,
     ServiceDeleteDialogComponent,
     ServiceAllComponent,
@@ -38,7 +35,7 @@ const ENTITY_STATES = [
         ServiceComponent,
         ServiceAllComponent,
         ServiceDetailComponent,
-        ServiceDialogComponent,
+        ServiceUpdateComponent,
         ServiceDeleteDialogComponent,
         ServicePopupComponent,
         ServiceDeletePopupComponent,
@@ -57,6 +54,7 @@ const ENTITY_STATES = [
         ServiceService,
         ServicePopupService,
     ],
+    entryComponents: [ServiceComponent, ServiceUpdateComponent, ServiceDeleteDialogComponent, ServiceDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayServiceModule { }
