@@ -1,0 +1,66 @@
+<div>
+    <h2>
+        <span>Service Keys</span>
+        <button class="btn btn-primary float-right jh-create-entity create-service-keys" [routerLink]="['/', { outlets: { popup: ['service-keys-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Service Keys
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="serviceKeys">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span>ID</span></th>
+            <th><span>Key</span></th>
+            <th><span>Value</span></th>
+            <th><span>Service Keys</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let serviceKeys of serviceKeys ;trackBy: trackId">
+                <td><a [routerLink]="['../service-keys', serviceKeys.id ]">{{serviceKeys.id}}</a></td>
+                <td>{{serviceKeys.key}}</td>
+                <td>{{serviceKeys.value}}</td>
+                <td>
+                    <div *ngIf="serviceKeys.serviceKeysId">
+                        <a [routerLink]="['../service', serviceKeys.serviceKeysId  ]" >{{serviceKeys.serviceKeysId}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../service-keys', serviceKeys.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

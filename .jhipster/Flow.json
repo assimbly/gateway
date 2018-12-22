@@ -1,0 +1,53 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "gateway",
+            "otherEntityName": "gateway",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "fromEndpoint",
+            "otherEntityName": "fromEndpoint",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "flowRoute"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "errorEndpoint",
+            "otherEntityName": "errorEndpoint",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "flowRoute"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "toEndpoint",
+            "otherEntityName": "toEndpoint",
+            "otherEntityRelationshipName": "flowRoute"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "autoStart",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "offloading",
+            "fieldType": "Boolean"
+        }
+    ],
+    "changelogDate": "20180114132915",
+    "dto": "mapstruct",
+    "service": "no",
+    "entityTableName": "flow_route",
+    "jpaMetamodelFiltering": false,
+    "pagination": "infinite-scroll"
+}

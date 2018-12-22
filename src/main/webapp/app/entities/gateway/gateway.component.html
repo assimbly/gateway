@@ -1,0 +1,70 @@
+<div>
+    <h2>
+        <span>Gateways</span>
+        <button class="btn btn-primary float-right jh-create-entity create-gateway" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Gateway
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="gateways">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span>ID</span></th>
+            <th><span>Name</span></th>
+            <th><span>Type</span></th>
+            <th><span>Environment Name</span></th>
+            <th><span>Stage</span></th>
+            <th><span>Default From Endpoint Type</span></th>
+            <th><span>Default To Endpoint Type</span></th>
+            <th><span>Default Error Endpoint Type</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let gateway of gateways ;trackBy: trackId">
+                <td><a [routerLink]="['../gateway', gateway.id ]">{{gateway.id}}</a></td>
+                <td>{{gateway.name}}</td>
+                <td>{{gateway.type}}</td>
+                <td>{{gateway.environmentName}}</td>
+                <td>{{gateway.stage}}</td>
+                <td>{{gateway.defaultFromEndpointType}}</td>
+                <td>{{gateway.defaultToEndpointType}}</td>
+                <td>{{gateway.defaultErrorEndpointType}}</td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../gateway', gateway.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

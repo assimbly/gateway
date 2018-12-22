@@ -1,0 +1,80 @@
+<div>
+    <h2>
+        <span>Flows</span>
+        <button class="btn btn-primary float-right jh-create-entity create-flow" [routerLink]="['/', { outlets: { popup: ['flow-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Flow
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="flows">
+        <table class="table table-striped">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+            <th jhiSortBy="id"><span>ID</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="name"><span>Name</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="autoStart"><span>Auto Start</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="offloading"><span>Offloading</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="gatewayId"><span>Gateway</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="fromEndpointId"><span>From Endpoint</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="errorEndpointId"><span>Error Endpoint</span> <span class="fa fa-sort"></span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+            <tr *ngFor="let flow of flows ;trackBy: trackId">
+                <td><a [routerLink]="['../flow', flow.id ]">{{flow.id}}</a></td>
+                <td>{{flow.name}}</td>
+                <td>{{flow.autoStart}}</td>
+                <td>{{flow.offloading}}</td>
+                <td>
+                    <div *ngIf="flow.gatewayId">
+                        <a [routerLink]="['../gateway', flow.gatewayId  ]" >{{flow.gatewayId}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="flow.fromEndpointId">
+                        <a [routerLink]="['../from-endpoint', flow.fromEndpointId  ]" >{{flow.fromEndpointId}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="flow.errorEndpointId">
+                        <a [routerLink]="['../error-endpoint', flow.errorEndpointId  ]" >{{flow.errorEndpointId}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../flow', flow.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/edit'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

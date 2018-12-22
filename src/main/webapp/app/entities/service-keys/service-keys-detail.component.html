@@ -1,0 +1,36 @@
+
+<div *ngIf="serviceKeys">
+    <h2><span>Service Keys</span> {{serviceKeys.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Key</span></dt>
+        <dd>
+            <span>{{serviceKeys.key}}</span>
+        </dd>
+        <dt><span>Value</span></dt>
+        <dd>
+            <span>{{serviceKeys.value}}</span>
+        </dd>
+        <dt><span>Service Keys</span></dt>
+        <dd>
+            <div *ngIf="serviceKeys.serviceKeysId">
+                <a [routerLink]="['/service', serviceKeys.serviceKeysId]">{{serviceKeys.serviceKeysId}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'service-keys/'+ serviceKeys.id + '/edit'} }]"
+            replaceUrl="true"
+            queryParamsHandling="merge"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

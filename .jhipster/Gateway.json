@@ -1,0 +1,55 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "flowRoute",
+            "otherEntityName": "flowRoute",
+            "otherEntityRelationshipName": "gateway"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "environmentVariables",
+            "otherEntityName": "environmentVariables",
+            "otherEntityRelationshipName": "gateway"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "type",
+            "fieldType": "GatewayType",
+            "fieldValues": "FILE,BROKER"
+        },
+        {
+            "fieldName": "environmentName",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "stage",
+            "fieldType": "EnvironmentType",
+            "fieldValues": "DEVELOPMENT,TEST,ACCEPTANCE,PRODUCTION"
+        },
+        {
+            "fieldName": "defaultFromEndpointType",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "defaultToEndpointType",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "defaultErrorEndpointType",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180114132913",
+    "dto": "mapstruct",
+    "service": "no",
+    "entityTableName": "gateway",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
