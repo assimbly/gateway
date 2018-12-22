@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 
+import { UserRouteAccessService } from '../../../shared';
 import { PasswordResetInitComponent } from './password-reset-init.component';
 
 export const passwordResetInitRoute: Route = {
@@ -8,5 +9,6 @@ export const passwordResetInitRoute: Route = {
     data: {
         authorities: [],
         pageTitle: 'Password'
-    }
+    },
+    canActivate: [UserRouteAccessService]
 };

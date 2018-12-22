@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import javax.validation.constraints.Email;
+import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -43,7 +43,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @JsonIgnore
     @NotNull
     @Size(min = 60, max = 60)
-    @Column(name = "password_hash", length = 60, nullable = false)
+    @Column(name = "password_hash", length = 60)
     private String password;
 
     @Size(max = 50)
@@ -55,8 +55,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 254)
-    @Column(length = 254, unique = true)
+    @Size(min = 5, max = 100)
+    @Column(length = 100, unique = true)
     private String email;
 
     @NotNull
@@ -99,6 +99,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<PersistentToken> persistentTokens = new HashSet<>();
 
+    @ManyToMany
+    private Set<Group> groups = new HashSet<>();
+    
     public Long getId() {
         return id;
     }
@@ -210,6 +213,31 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setPersistentTokens(Set<PersistentToken> persistentTokens) {
         this.persistentTokens = persistentTokens;
+    }
+    
+    public Set<Group> getGroups() {
+        return groups;
+    }
+
+    public User groups(Set<Group> groups) {
+        this.groups = groups;
+        return this;
+    }
+
+    public User addGroup(Group group) {
+        this.groups.add(group);
+        group.getUsers().add(this);
+        return this;
+    }
+
+    public User removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getUsers().remove(this);
+        return this;
+    }
+
+    public void setGroup(Set<Group> groups) {
+        this.groups = groups;
     }
 
     @Override

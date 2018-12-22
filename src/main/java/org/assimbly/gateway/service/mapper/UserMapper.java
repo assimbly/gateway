@@ -18,21 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserMapper {
 
-    public List<UserDTO> usersToUserDTOs(List<User> users) {
-        return users.stream()
-            .filter(Objects::nonNull)
-            .map(this::userToUserDTO)
-            .collect(Collectors.toList());
-    }
-
     public UserDTO userToUserDTO(User user) {
         return new UserDTO(user);
     }
 
-    public List<User> userDTOsToUsers(List<UserDTO> userDTOs) {
-        return userDTOs.stream()
+    public List<UserDTO> usersToUserDTOs(List<User> users) {
+        return users.stream()
             .filter(Objects::nonNull)
-            .map(this::userDTOToUser)
+            .map(this::userToUserDTO)
             .collect(Collectors.toList());
     }
 
@@ -50,24 +43,18 @@ public class UserMapper {
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
-            user.setAuthorities(authorities);
+            if (authorities != null) {
+                user.setAuthorities(authorities);
+            }
             return user;
         }
     }
 
-
-    private Set<Authority> authoritiesFromStrings(Set<String> authoritiesAsString) {
-        Set<Authority> authorities = new HashSet<>();
-
-        if(authoritiesAsString != null){
-            authorities = authoritiesAsString.stream().map(string -> {
-                Authority auth = new Authority();
-                auth.setName(string);
-                return auth;
-            }).collect(Collectors.toSet());
-        }
-
-        return authorities;
+    public List<User> userDTOsToUsers(List<UserDTO> userDTOs) {
+        return userDTOs.stream()
+            .filter(Objects::nonNull)
+            .map(this::userDTOToUser)
+            .collect(Collectors.toList());
     }
 
     public User userFromId(Long id) {
@@ -77,5 +64,13 @@ public class UserMapper {
         User user = new User();
         user.setId(id);
         return user;
+    }
+
+    public Set<Authority> authoritiesFromStrings(Set<String> strings) {
+        return strings.stream().map(string -> {
+            Authority auth = new Authority();
+            auth.setName(string);
+            return auth;
+        }).collect(Collectors.toSet());
     }
 }

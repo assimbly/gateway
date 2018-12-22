@@ -4,7 +4,9 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,11 +39,13 @@ public class ExceptionTranslatorTestController {
     }
 
     @GetMapping("/test/missing-servlet-request-part")
-    public void missingServletRequestPartException(@RequestPart String part) {
+    public void missingServletRequestPartException() throws Exception {
+        throw new MissingServletRequestPartException("missing Servlet request part");
     }
 
     @GetMapping("/test/missing-servlet-request-parameter")
-    public void missingServletRequestParameterException(@RequestParam String param) {
+    public void missingServletRequestParameterException() throws Exception {
+        throw new MissingServletRequestParameterException("missing Servlet request parameter", "parameter type");
     }
 
     @GetMapping("/test/access-denied")
