@@ -20,22 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Utility class for testing REST controllers.
  */
-public final class TestUtil {
-
-    private static final ObjectMapper mapper = createObjectMapper();
+public class TestUtil {
 
     /** MediaType for JSON UTF8 */
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
             MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
-
-
-    private static ObjectMapper createObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
-    }
 
     /**
      * Convert an object to JSON byte array.
@@ -47,6 +37,12 @@ public final class TestUtil {
      */
     public static byte[] convertObjectToJsonBytes(Object object)
             throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
+
         return mapper.writeValueAsBytes(object);
     }
 
@@ -109,8 +105,9 @@ public final class TestUtil {
     /**
      * Verifies the equals/hashcode contract on the domain object.
      */
-    public static <T> void equalsVerifier(Class<T> clazz) throws Exception {
-        T domainObject1 = clazz.getConstructor().newInstance();
+    @SuppressWarnings("unchecked")
+    public static void equalsVerifier(Class clazz) throws Exception {
+        Object domainObject1 = clazz.getConstructor().newInstance();
         assertThat(domainObject1.toString()).isNotNull();
         assertThat(domainObject1).isEqualTo(domainObject1);
         assertThat(domainObject1.hashCode()).isEqualTo(domainObject1.hashCode());
@@ -119,7 +116,7 @@ public final class TestUtil {
         assertThat(domainObject1).isNotEqualTo(testOtherObject);
         assertThat(domainObject1).isNotEqualTo(null);
         // Test with an instance of the same class
-        T domainObject2 = clazz.getConstructor().newInstance();
+        Object domainObject2 = clazz.getConstructor().newInstance();
         assertThat(domainObject1).isNotEqualTo(domainObject2);
         // HashCodes are equals because the objects are not persisted yet
         assertThat(domainObject1.hashCode()).isEqualTo(domainObject2.hashCode());
@@ -136,6 +133,4 @@ public final class TestUtil {
         registrar.registerFormatters(dfcs);
         return dfcs;
     }
-
-    private TestUtil() {}
 }

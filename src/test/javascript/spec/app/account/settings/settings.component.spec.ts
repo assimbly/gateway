@@ -1,30 +1,35 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 import { GatewayTestModule } from '../../../test.module';
-import { AccountService } from 'app/core';
-import { SettingsComponent } from 'app/account/settings/settings.component';
+import { Principal, AccountService } from '../../../../../../main/webapp/app/shared';
+import { SettingsComponent } from '../../../../../../main/webapp/app/account/settings/settings.component';
 
 describe('Component Tests', () => {
+
     describe('SettingsComponent', () => {
+
         let comp: SettingsComponent;
         let fixture: ComponentFixture<SettingsComponent>;
         let mockAuth: any;
+        let mockPrincipal: any;
 
         beforeEach(async(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
                 declarations: [SettingsComponent],
-                providers: []
+                providers: [
+                ]
             })
-                .overrideTemplate(SettingsComponent, '')
-                .compileComponents();
+            .overrideTemplate(SettingsComponent, '')
+            .compileComponents();
         }));
 
         beforeEach(() => {
             fixture = TestBed.createComponent(SettingsComponent);
             comp = fixture.componentInstance;
             mockAuth = fixture.debugElement.injector.get(AccountService);
+            mockPrincipal = fixture.debugElement.injector.get(Principal);
         });
 
         it('should send the current identity upon save', () => {
@@ -38,14 +43,14 @@ describe('Component Tests', () => {
                 langKey: 'en',
                 login: 'john'
             };
-            mockAuth.setIdentityResponse(accountValues);
+            mockPrincipal.setResponse(accountValues);
 
             // WHEN
             comp.settingsAccount = accountValues;
             comp.save();
 
             // THEN
-            expect(mockAuth.identitySpy).toHaveBeenCalled();
+            expect(mockPrincipal.identitySpy).toHaveBeenCalled();
             expect(mockAuth.saveSpy).toHaveBeenCalledWith(accountValues);
             expect(comp.settingsAccount).toEqual(accountValues);
         });
@@ -56,7 +61,7 @@ describe('Component Tests', () => {
                 firstName: 'John',
                 lastName: 'Doe'
             };
-            mockAuth.setIdentityResponse(accountValues);
+            mockPrincipal.setResponse(accountValues);
 
             // WHEN
             comp.save();
@@ -68,7 +73,7 @@ describe('Component Tests', () => {
 
         it('should notify of error upon failed save', () => {
             // GIVEN
-            mockAuth.saveSpy.and.returnValue(throwError('ERROR'));
+            mockAuth.saveSpy.and.returnValue(Observable.throw('ERROR'));
 
             // WHEN
             comp.save();

@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
         "sourceMap": true,
@@ -11,15 +11,19 @@
         "skipLibCheck": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "build/www/app",
-        "lib": ["es7", "dom"],
-        "typeRoots": ["node_modules/@types"],
+        "lib": ["es6", "dom"],
+        "typeRoots": [
+            "node_modules/@types"
+        ],
         "baseUrl": "./",
         "paths": {
-            "app/*": ["src/main/webapp/app/*"]
-        },
-        "importHelpers": true,
-        "allowJs": true
+            "@angular/*": [
+                "../node_modules/@angular/*"
+            ]
+        }
     },
-    "include": ["src/main/webapp/app", "src/test/javascript/"],
-    "exclude": ["node_modules"]
+    "include": [
+        "src/main/webapp/app",
+        "src/test/javascript/"
+    ]
 }

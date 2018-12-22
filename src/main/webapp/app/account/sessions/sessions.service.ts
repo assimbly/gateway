@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
-import { SERVER_API_URL } from 'app/app.constants';
 import { Session } from './session.model';
+import { SERVER_API_URL } from '../../app.constants';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SessionsService {
-    public resourceUrl = SERVER_API_URL + 'api/account/sessions/';
-    constructor(private http: HttpClient) {}
+
+    private resourceUrl = SERVER_API_URL + 'api/account/sessions/';
+    constructor(private http: Http) { }
 
     findAll(): Observable<Session[]> {
-        return this.http.get<Session[]>(this.resourceUrl);
+        return this.http.get(this.resourceUrl).map((res: Response) => res.json());
     }
 
-    delete(series: string): Observable<HttpResponse<any>> {
-        return this.http.delete(`${this.resourceUrl}${series}`, { observe: 'response' });
+    delete(series: string): Observable<Response> {
+        return this.http.delete(`${this.resourceUrl}${series}`);
     }
 }

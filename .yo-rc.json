@@ -3,7 +3,7 @@
     "promptValues": {
       "packageName": "org.assimbly.gateway"
     },
-    "jhipsterVersion": "5.7.2",
+    "jhipsterVersion": "4.13.3",
     "baseName": "gateway",
     "packageName": "org.assimbly.gateway",
     "packageFolder": "org/assimbly/gateway",
@@ -28,7 +28,6 @@
     "applicationType": "monolith",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "enableTranslation": false,
-    "otherModules": []
+    "enableTranslation": false
   }
 }

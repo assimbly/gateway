@@ -3,13 +3,10 @@ package org.assimbly.gateway.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-/**
- * Configure the converters to use the ISO format for dates by default.
- */
 @Configuration
-public class DateTimeFormatConfiguration implements WebMvcConfigurer {
+public class DateTimeFormatConfiguration extends WebMvcConfigurerAdapter {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

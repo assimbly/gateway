@@ -2,63 +2,59 @@ import './vendor.ts';
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Ng2Webstorage } from 'ngx-webstorage';
-import { NgJhipsterModule } from 'ng-jhipster';
+import { PopoverModule } from 'ngx-bootstrap';
 
-import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
-import { ErrorHandlerInterceptor } from './blocks/interceptor/errorhandler.interceptor';
-import { NotificationInterceptor } from './blocks/interceptor/notification.interceptor';
-import { GatewaySharedModule } from 'app/shared';
-import { GatewayCoreModule } from 'app/core';
-import { GatewayAppRoutingModule } from './app-routing.module';
+import { GatewaySharedModule, UserRouteAccessService } from './shared';
+import { GatewayAppRoutingModule} from './app-routing.module';
 import { GatewayHomeModule } from './home/home.module';
+import { GatewayAdminModule } from './admin/admin.module';
 import { GatewayAccountModule } from './account/account.module';
 import { GatewayEntityModule } from './entities/entity.module';
-import * as moment from 'moment';
+import { customHttpProvider } from './blocks/interceptor/http.provider';
+import { PaginationConfig } from './blocks/config/uib-pagination.config';
+
 // jhipster-needle-angular-add-module-import JHipster will add new module here
-import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent, ErrorComponent } from './layouts';
+
+import {
+    JhiMainComponent,
+    NavbarComponent,
+    FooterComponent,
+    ProfileService,
+    PageRibbonComponent,
+    ErrorComponent
+} from './layouts';
+import { FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     imports: [
         BrowserModule,
         GatewayAppRoutingModule,
-        Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-' }),
-        NgJhipsterModule.forRoot({
-            // set below to true to make alerts look like toast
-            alertAsToast: false,
-            alertTimeout: 5000
-        }),
-        GatewaySharedModule.forRoot(),
-        GatewayCoreModule,
+        Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-'}),
+        GatewaySharedModule,
         GatewayHomeModule,
+        GatewayAdminModule,
         GatewayAccountModule,
+        GatewayEntityModule,
+        NgSelectModule,
+        FormsModule,
+        PopoverModule.forRoot()
         // jhipster-needle-angular-add-module JHipster will add new module here
-        GatewayEntityModule
     ],
-    declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],
+    declarations: [
+        JhiMainComponent,
+        NavbarComponent,
+        ErrorComponent,
+        PageRibbonComponent,
+        FooterComponent
+    ],
     providers: [
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: AuthExpiredInterceptor,
-            multi: true
-        },
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: ErrorHandlerInterceptor,
-            multi: true
-        },
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: NotificationInterceptor,
-            multi: true
-        }
+        ProfileService,
+        customHttpProvider(),
+        PaginationConfig,
+        UserRouteAccessService
     ],
-    bootstrap: [JhiMainComponent]
+    bootstrap: [ JhiMainComponent ]
 })
-export class GatewayAppModule {
-    constructor(private dpConfig: NgbDatepickerConfig) {
-        this.dpConfig.minDate = { year: moment().year() - 100, month: 1, day: 1 };
-    }
-}
+export class GatewayAppModule {}

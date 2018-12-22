@@ -1,8 +1,13 @@
 ######################
+# Base Template from https://github.com/github/gitignore
+######################
+
+######################
 # Project Specific
 ######################
 /build/www/**
 /src/test/javascript/coverage/
+/src/test/javascript/PhantomJS*/
 
 ######################
 # Node
@@ -12,7 +17,6 @@ node_tmp/
 node_modules/
 npm-debug.log.*
 /.awcache/*
-/.cache-loader/*
 
 ######################
 # SASS
@@ -31,12 +35,15 @@ tmp/**/*
 *.bak
 *.swp
 *~.nib
+.sts4-cache/
+.sts-cache/
 local.properties
 .classpath
 .settings/
 .loadpath
 .factorypath
 /src/main/resources/rebel.xml
+.h2.server.properties
 
 # External tool builders
 .externalToolBuilders/**
@@ -60,7 +67,6 @@ local.properties
 *.ids
 *.orig
 classes/
-out/
 
 ######################
 # Visual Studio Code
@@ -142,3 +148,7 @@ Desktop.ini
 # ESLint
 ######################
 .eslintcache
+src/main/resources/.h2.server.properties
+package-lock.json
+activemq-data/**
+*.lock

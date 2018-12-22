@@ -3,13 +3,13 @@ package org.assimbly.gateway.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.time.LocalDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import java.io.Serializable;
-import java.time.LocalDate;
+
 
 /**
  * Persistent tokens are used by Spring Security to automatically log in users.
@@ -43,6 +43,7 @@ public class PersistentToken implements Serializable {
 
     @Column(name = "user_agent")
     private String userAgent;
+        
 
     @JsonIgnore
     @ManyToOne
