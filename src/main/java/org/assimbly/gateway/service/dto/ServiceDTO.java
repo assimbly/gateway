@@ -1,6 +1,5 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -49,7 +48,7 @@ public class ServiceDTO implements Serializable {
         }
 
         ServiceDTO serviceDTO = (ServiceDTO) o;
-        if(serviceDTO.getId() == null || getId() == null) {
+        if (serviceDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), serviceDTO.getId());

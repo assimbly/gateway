@@ -1,12 +1,14 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ServiceKeys } from './service-keys.model';
 import { Service } from '../service/service.model';
-import { ServiceKeysService } from './service-keys.service';
-import { Principal } from '../../shared';
 import { Observable } from 'rxjs/Observable';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
+import { AccountService } from 'app/core';
+import { ServiceKeysService } from './service-keys.service';
 
 @Component({
     selector: 'jhi-service-keys',
@@ -31,9 +33,19 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         private principal: Principal
     ) {
     }
+
+    loadAll() {
+        this.serviceKeysService.query().subscribe(
+            (res: HttpResponse<ServiceKeys[]>) => {
+                this.serviceKeys = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+    }
+
     ngOnInit() {
-        this.addRequiredServiceKeys();
-        this.principal.identity().then((account) => {
+        this.loadAll();
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
@@ -218,8 +230,13 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     trackId(index: number, item: ServiceKeys) {
         return item.id;
     }
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+
+    registerChangeInServiceKeys() {
+        this.eventSubscriber = this.eventManager.subscribe('serviceKeysListModification', response => this.loadAll());
+    }
+
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }
 export interface RequiredServiceKey {

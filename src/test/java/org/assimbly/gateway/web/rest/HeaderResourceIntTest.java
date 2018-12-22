@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +63,9 @@ public class HeaderResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restHeaderMockMvc;
 
     private Header header;
@@ -73,7 +78,8 @@ public class HeaderResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -145,7 +151,7 @@ public class HeaderResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(header.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getHeader() throws Exception {
@@ -173,10 +179,11 @@ public class HeaderResourceIntTest {
     public void updateHeader() throws Exception {
         // Initialize the database
         headerRepository.saveAndFlush(header);
+
         int databaseSizeBeforeUpdate = headerRepository.findAll().size();
 
         // Update the header
-        Header updatedHeader = headerRepository.findOne(header.getId());
+        Header updatedHeader = headerRepository.findById(header.getId()).get();
         // Disconnect from session so that the updates on updatedHeader are not directly saved in db
         em.detach(updatedHeader);
         updatedHeader
@@ -203,15 +210,15 @@ public class HeaderResourceIntTest {
         // Create the Header
         HeaderDTO headerDTO = headerMapper.toDto(header);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restHeaderMockMvc.perform(put("/api/headers")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Header in the database
         List<Header> headerList = headerRepository.findAll();
-        assertThat(headerList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(headerList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -219,6 +226,7 @@ public class HeaderResourceIntTest {
     public void deleteHeader() throws Exception {
         // Initialize the database
         headerRepository.saveAndFlush(header);
+
         int databaseSizeBeforeDelete = headerRepository.findAll().size();
 
         // Get the header

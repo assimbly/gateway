@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { HeaderKeys } from './header-keys.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IHeaderKeys>;
+type EntityArrayResponseType = HttpResponse<IHeaderKeys[]>;
+
+@Injectable({ providedIn: 'root' })
 export class HeaderKeysService {
+    public resourceUrl = SERVER_API_URL + 'api/header-keys';
 
-    private resourceUrl =  SERVER_API_URL + 'api/header-keys';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(headerKeys: HeaderKeys): Observable<HeaderKeys> {
-        const copy = this.convert(headerKeys);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(headerKeys: IHeaderKeys): Observable<EntityResponseType> {
+        return this.http.post<IHeaderKeys>(this.resourceUrl, headerKeys, { observe: 'response' });
     }
 
-    update(headerKeys: HeaderKeys): Observable<HeaderKeys> {
-        const copy = this.convert(headerKeys);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(headerKeys: IHeaderKeys): Observable<EntityResponseType> {
+        return this.http.put<IHeaderKeys>(this.resourceUrl, headerKeys, { observe: 'response' });
     }
 
-    find(id: number): Observable<HeaderKeys> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IHeaderKeys>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IHeaderKeys[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to HeaderKeys.
-     */
-    private convertItemFromServer(json: any): HeaderKeys {
-        const entity: HeaderKeys = Object.assign(new HeaderKeys(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a HeaderKeys to a JSON which can be sent to the server.
-     */
-    private convert(headerKeys: HeaderKeys): HeaderKeys {
-        const copy: HeaderKeys = Object.assign({}, headerKeys);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

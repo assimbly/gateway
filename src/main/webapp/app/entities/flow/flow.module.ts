@@ -12,8 +12,6 @@ import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-
 import { Components } from '../../shared/camel/component-type';
 
 import {
-    FlowService,
-    FlowPopupService,
     FlowComponent,
     FlowConfigurationComponent,
     FlowDetailComponent,
@@ -30,10 +28,7 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-const ENTITY_STATES = [
-    ...flowRoute,
-    ...flowPopupRoute,
-];
+const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 
 @NgModule({
     imports: [

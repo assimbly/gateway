@@ -19,9 +19,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,6 +65,9 @@ public class WireTapEndpointResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restWireTapEndpointMockMvc;
 
     private WireTapEndpoint wireTapEndpoint;
@@ -75,7 +80,8 @@ public class WireTapEndpointResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -151,7 +157,7 @@ public class WireTapEndpointResourceIntTest {
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getWireTapEndpoint() throws Exception {
@@ -181,10 +187,11 @@ public class WireTapEndpointResourceIntTest {
     public void updateWireTapEndpoint() throws Exception {
         // Initialize the database
         wireTapEndpointRepository.saveAndFlush(wireTapEndpoint);
+
         int databaseSizeBeforeUpdate = wireTapEndpointRepository.findAll().size();
 
         // Update the wireTapEndpoint
-        WireTapEndpoint updatedWireTapEndpoint = wireTapEndpointRepository.findOne(wireTapEndpoint.getId());
+        WireTapEndpoint updatedWireTapEndpoint = wireTapEndpointRepository.findById(wireTapEndpoint.getId()).get();
         // Disconnect from session so that the updates on updatedWireTapEndpoint are not directly saved in db
         em.detach(updatedWireTapEndpoint);
         updatedWireTapEndpoint
@@ -213,15 +220,15 @@ public class WireTapEndpointResourceIntTest {
 
         // Create the WireTapEndpoint
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restWireTapEndpointMockMvc.perform(put("/api/wire-tap-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(wireTapEndpoint)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the WireTapEndpoint in the database
         List<WireTapEndpoint> wireTapEndpointList = wireTapEndpointRepository.findAll();
-        assertThat(wireTapEndpointList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(wireTapEndpointList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -229,6 +236,7 @@ public class WireTapEndpointResourceIntTest {
     public void deleteWireTapEndpoint() throws Exception {
         // Initialize the database
         wireTapEndpointRepository.saveAndFlush(wireTapEndpoint);
+
         int databaseSizeBeforeDelete = wireTapEndpointRepository.findAll().size();
 
         // Get the wireTapEndpoint

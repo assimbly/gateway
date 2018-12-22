@@ -1,9 +1,6 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -41,7 +38,7 @@ public class HeaderDTO implements Serializable {
         }
 
         HeaderDTO headerDTO = (HeaderDTO) o;
-        if(headerDTO.getId() == null || getId() == null) {
+        if (headerDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), headerDTO.getId());

@@ -2,7 +2,6 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.domain.EnvironmentVariables;
-
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -54,6 +53,7 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() != null) {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
         environmentVariables = environmentVariablesRepository.save(environmentVariables);
         EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
@@ -76,8 +76,9 @@ public class EnvironmentVariablesResource {
     public ResponseEntity<EnvironmentVariablesDTO> updateEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
         log.debug("REST request to update EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() == null) {
-            return createEnvironmentVariables(environmentVariablesDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
         environmentVariables = environmentVariablesRepository.save(environmentVariables);
         EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
@@ -97,7 +98,7 @@ public class EnvironmentVariablesResource {
         log.debug("REST request to get all EnvironmentVariables");
         List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
         return environmentVariablesMapper.toDto(environmentVariables);
-        }
+    }
 
     /**
      * GET  /environment-variables/:id : get the "id" environmentVariables.
@@ -109,9 +110,9 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to get EnvironmentVariables : {}", id);
-        EnvironmentVariables environmentVariables = environmentVariablesRepository.findOne(id);
-        EnvironmentVariablesDTO environmentVariablesDTO = environmentVariablesMapper.toDto(environmentVariables);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(environmentVariablesDTO));
+        Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesRepository.findById(id)
+            .map(environmentVariablesMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(environmentVariablesDTO);
     }
 
     /**
@@ -124,7 +125,8 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
-        environmentVariablesRepository.delete(id);
+
+        environmentVariablesRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

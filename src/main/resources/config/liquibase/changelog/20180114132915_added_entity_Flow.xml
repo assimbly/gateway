@@ -26,11 +26,11 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="auto_start" type="bit">
+            <column name="auto_start" type="boolean">
                 <constraints nullable="true" />
             </column>
 
-            <column name="offloading" type="bit">
+            <column name="offloading" type="boolean">
                 <constraints nullable="true" />
             </column>
 
@@ -38,10 +38,9 @@
                 <constraints nullable="true" />
             </column>
             <column name="from_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" />
-            </column>            
-            <column name="error_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" />
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_route_from_endpoint_id" />
+            </column>            <column name="error_endpoint_id" type="bigint">
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_route_error_endpoint_id" />
             </column>
             <column name="maintenance_id" type="bigint">
                 <constraints unique="true" nullable="true" />

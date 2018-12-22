@@ -1,15 +1,14 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async, inject, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ErrorEndpointDeleteDialogComponent } from '../../../../../../main/webapp/app/entities/error-endpoint/error-endpoint-delete-dialog.component';
-import { ErrorEndpointService } from '../../../../../../main/webapp/app/entities/error-endpoint/error-endpoint.service';
+import { ErrorEndpointDeleteDialogComponent } from 'app/entities/error-endpoint/error-endpoint-delete-dialog.component';
+import { ErrorEndpointService } from 'app/entities/error-endpoint/error-endpoint.service';
 
 describe('Component Tests', () => {
-
     describe('ErrorEndpoint Management Delete Component', () => {
         let comp: ErrorEndpointDeleteDialogComponent;
         let fixture: ComponentFixture<ErrorEndpointDeleteDialogComponent>;
@@ -17,19 +16,13 @@ describe('Component Tests', () => {
         let mockEventManager: any;
         let mockActiveModal: any;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ErrorEndpointDeleteDialogComponent],
-                providers: [
-                    ErrorEndpointService
-                ]
+                declarations: [ErrorEndpointDeleteDialogComponent]
             })
-            .overrideTemplate(ErrorEndpointDeleteDialogComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(ErrorEndpointDeleteDialogComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(ErrorEndpointDeleteDialogComponent);
             comp = fixture.componentInstance;
             service = fixture.debugElement.injector.get(ErrorEndpointService);
@@ -38,24 +31,22 @@ describe('Component Tests', () => {
         });
 
         describe('confirmDelete', () => {
-            it('Should call delete service on confirmDelete',
-                inject([],
-                    fakeAsync(() => {
-                        // GIVEN
-                        spyOn(service, 'delete').and.returnValue(Observable.of({}));
+            it('Should call delete service on confirmDelete', inject(
+                [],
+                fakeAsync(() => {
+                    // GIVEN
+                    spyOn(service, 'delete').and.returnValue(of({}));
 
-                        // WHEN
-                        comp.confirmDelete(123);
-                        tick();
+                    // WHEN
+                    comp.confirmDelete(123);
+                    tick();
 
-                        // THEN
-                        expect(service.delete).toHaveBeenCalledWith(123);
-                        expect(mockActiveModal.dismissSpy).toHaveBeenCalled();
-                        expect(mockEventManager.broadcastSpy).toHaveBeenCalled();
-                    })
-                )
-            );
+                    // THEN
+                    expect(service.delete).toHaveBeenCalledWith(123);
+                    expect(mockActiveModal.dismissSpy).toHaveBeenCalled();
+                    expect(mockEventManager.broadcastSpy).toHaveBeenCalled();
+                })
+            ));
         });
     });
-
 });

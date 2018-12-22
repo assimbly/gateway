@@ -1,6 +1,5 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +50,7 @@ public class GroupDTO implements Serializable {
         }
 
         GroupDTO groupDTO = (GroupDTO) o;
-        if(groupDTO.getId() == null || getId() == null) {
+        if (groupDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), groupDTO.getId());

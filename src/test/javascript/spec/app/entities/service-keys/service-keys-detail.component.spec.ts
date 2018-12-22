@@ -1,51 +1,40 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ServiceKeysDetailComponent } from '../../../../../../main/webapp/app/entities/service-keys/service-keys-detail.component';
-import { ServiceKeysService } from '../../../../../../main/webapp/app/entities/service-keys/service-keys.service';
-import { ServiceKeys } from '../../../../../../main/webapp/app/entities/service-keys/service-keys.model';
+import { ServiceKeysDetailComponent } from 'app/entities/service-keys/service-keys-detail.component';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
 
 describe('Component Tests', () => {
-
     describe('ServiceKeys Management Detail Component', () => {
         let comp: ServiceKeysDetailComponent;
         let fixture: ComponentFixture<ServiceKeysDetailComponent>;
-        let service: ServiceKeysService;
+        const route = ({ data: of({ serviceKeys: new ServiceKeys(123) }) } as any) as ActivatedRoute;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
                 declarations: [ServiceKeysDetailComponent],
-                providers: [
-                    ServiceKeysService
-                ]
+                providers: [{ provide: ActivatedRoute, useValue: route }]
             })
-            .overrideTemplate(ServiceKeysDetailComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(ServiceKeysDetailComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(ServiceKeysDetailComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(ServiceKeysService);
         });
 
         describe('OnInit', () => {
             it('Should call load all on init', () => {
                 // GIVEN
 
-                spyOn(service, 'find').and.returnValue(Observable.of(new ServiceKeys(123)));
-
                 // WHEN
                 comp.ngOnInit();
 
                 // THEN
-                expect(service.find).toHaveBeenCalledWith(123);
-                expect(comp.serviceKeys).toEqual(jasmine.objectContaining({id: 123}));
+                expect(comp.serviceKeys).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });
-
 });

@@ -1,7 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
 
 import { FromEndpoint } from './from-endpoint.model';
 import { FromEndpointService } from './from-endpoint.service';
@@ -12,7 +10,8 @@ import { ServiceService } from '../service/service.service';
     selector: 'jhi-from-endpoint-detail',
     templateUrl: './from-endpoint-detail.component.html'
 })
-export class FromEndpointDetailComponent implements OnInit, OnDestroy {
+export class FromEndpointDetailComponent implements OnInit {
+    fromEndpoint: IFromEndpoint;
 
     fromEndpoint: FromEndpoint;
     private subscription: Subscription;
@@ -30,14 +29,7 @@ export class FromEndpointDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
-        });
-        this.registerChangeInFromEndpoints();
-    }
-
-    load(id) {
-        this.fromEndpointService.find(id).subscribe((fromEndpoint) => {
+        this.activatedRoute.data.subscribe(({ fromEndpoint }) => {
             this.fromEndpoint = fromEndpoint;
 
             this.headerService.find(this.fromEndpoint.headerId)
@@ -51,19 +43,8 @@ export class FromEndpointDetailComponent implements OnInit, OnDestroy {
                 });
         });
     }
+
     previousState() {
         window.history.back();
-    }
-
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-        this.eventManager.destroy(this.eventSubscriber);
-    }
-
-    registerChangeInFromEndpoints() {
-        this.eventSubscriber = this.eventManager.subscribe(
-            'fromEndpointListModification',
-            (response) => this.load(this.fromEndpoint.id)
-        );
     }
 }

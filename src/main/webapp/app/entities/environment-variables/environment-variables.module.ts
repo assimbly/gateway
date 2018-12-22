@@ -5,22 +5,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { GatewaySharedModule } from '../../shared';
 import {
-    EnvironmentVariablesService,
-    EnvironmentVariablesPopupService,
     EnvironmentVariablesComponent,
     EnvironmentVariablesDetailComponent,
-    EnvironmentVariablesDialogComponent,
-    EnvironmentVariablesPopupComponent,
+    EnvironmentVariablesUpdateComponent,
     EnvironmentVariablesDeletePopupComponent,
     EnvironmentVariablesDeleteDialogComponent,
     environmentVariablesRoute,
     environmentVariablesPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...environmentVariablesRoute,
-    ...environmentVariablesPopupRoute,
-];
+const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopupRoute];
 
 @NgModule({
     imports: [
@@ -31,21 +25,15 @@ const ENTITY_STATES = [
     declarations: [
         EnvironmentVariablesComponent,
         EnvironmentVariablesDetailComponent,
-        EnvironmentVariablesDialogComponent,
+        EnvironmentVariablesUpdateComponent,
         EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesPopupComponent,
-        EnvironmentVariablesDeletePopupComponent,
+        EnvironmentVariablesDeletePopupComponent
     ],
     entryComponents: [
         EnvironmentVariablesComponent,
-        EnvironmentVariablesDialogComponent,
-        EnvironmentVariablesPopupComponent,
+        EnvironmentVariablesUpdateComponent,
         EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesDeletePopupComponent,
-    ],
-    providers: [
-        EnvironmentVariablesService,
-        EnvironmentVariablesPopupService,
+        EnvironmentVariablesDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

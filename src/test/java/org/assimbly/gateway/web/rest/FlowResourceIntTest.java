@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +69,9 @@ public class FlowResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restFlowMockMvc;
 
     private Flow flow;
@@ -79,7 +84,8 @@ public class FlowResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -157,7 +163,7 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
             .andExpect(jsonPath("$.[*].offloading").value(hasItem(DEFAULT_OFFLOADING.booleanValue())));
     }
-
+    
     @Test
     @Transactional
     public void getFlow() throws Exception {
@@ -187,10 +193,11 @@ public class FlowResourceIntTest {
     public void updateFlow() throws Exception {
         // Initialize the database
         flowRepository.saveAndFlush(flow);
+
         int databaseSizeBeforeUpdate = flowRepository.findAll().size();
 
         // Update the flow
-        Flow updatedFlow = flowRepository.findOne(flow.getId());
+        Flow updatedFlow = flowRepository.findById(flow.getId()).get();
         // Disconnect from session so that the updates on updatedFlow are not directly saved in db
         em.detach(updatedFlow);
         updatedFlow
@@ -221,15 +228,15 @@ public class FlowResourceIntTest {
         // Create the Flow
         FlowDTO flowDTO = flowMapper.toDto(flow);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restFlowMockMvc.perform(put("/api/flows")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Flow in the database
         List<Flow> flowList = flowRepository.findAll();
-        assertThat(flowList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(flowList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -237,6 +244,7 @@ public class FlowResourceIntTest {
     public void deleteFlow() throws Exception {
         // Initialize the database
         flowRepository.saveAndFlush(flow);
+
         int databaseSizeBeforeDelete = flowRepository.findAll().size();
 
         // Get the flow

@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +70,9 @@ public class ToEndpointResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restToEndpointMockMvc;
 
     private ToEndpoint toEndpoint;
@@ -80,7 +85,8 @@ public class ToEndpointResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -158,7 +164,7 @@ public class ToEndpointResourceIntTest {
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getToEndpoint() throws Exception {
@@ -188,10 +194,11 @@ public class ToEndpointResourceIntTest {
     public void updateToEndpoint() throws Exception {
         // Initialize the database
         toEndpointRepository.saveAndFlush(toEndpoint);
+
         int databaseSizeBeforeUpdate = toEndpointRepository.findAll().size();
 
         // Update the toEndpoint
-        ToEndpoint updatedToEndpoint = toEndpointRepository.findOne(toEndpoint.getId());
+        ToEndpoint updatedToEndpoint = toEndpointRepository.findById(toEndpoint.getId()).get();
         // Disconnect from session so that the updates on updatedToEndpoint are not directly saved in db
         em.detach(updatedToEndpoint);
         updatedToEndpoint
@@ -222,15 +229,16 @@ public class ToEndpointResourceIntTest {
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
-        restToEndpointMockMvc.perform(put("/api/to-endpoint")
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restToEndpointMockMvc.perform(put("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the ToEndpoint in the database
         List<ToEndpoint> toEndpointList = toEndpointRepository.findAll();
-        assertThat(toEndpointList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(toEndpointList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -238,6 +246,7 @@ public class ToEndpointResourceIntTest {
     public void deleteToEndpoint() throws Exception {
         // Initialize the database
         toEndpointRepository.saveAndFlush(toEndpoint);
+
         int databaseSizeBeforeDelete = toEndpointRepository.findAll().size();
 
         // Get the toEndpoint

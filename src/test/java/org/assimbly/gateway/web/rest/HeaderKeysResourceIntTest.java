@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +69,9 @@ public class HeaderKeysResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restHeaderKeysMockMvc;
 
     private HeaderKeys headerKeys;
@@ -79,7 +84,8 @@ public class HeaderKeysResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -157,7 +163,7 @@ public class HeaderKeysResourceIntTest {
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getHeaderKeys() throws Exception {
@@ -187,10 +193,11 @@ public class HeaderKeysResourceIntTest {
     public void updateHeaderKeys() throws Exception {
         // Initialize the database
         headerKeysRepository.saveAndFlush(headerKeys);
+
         int databaseSizeBeforeUpdate = headerKeysRepository.findAll().size();
 
         // Update the headerKeys
-        HeaderKeys updatedHeaderKeys = headerKeysRepository.findOne(headerKeys.getId());
+        HeaderKeys updatedHeaderKeys = headerKeysRepository.findById(headerKeys.getId()).get();
         // Disconnect from session so that the updates on updatedHeaderKeys are not directly saved in db
         em.detach(updatedHeaderKeys);
         updatedHeaderKeys
@@ -221,15 +228,15 @@ public class HeaderKeysResourceIntTest {
         // Create the HeaderKeys
         HeaderKeysDTO headerKeysDTO = headerKeysMapper.toDto(headerKeys);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restHeaderKeysMockMvc.perform(put("/api/header-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerKeysDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the HeaderKeys in the database
         List<HeaderKeys> headerKeysList = headerKeysRepository.findAll();
-        assertThat(headerKeysList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(headerKeysList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -237,6 +244,7 @@ public class HeaderKeysResourceIntTest {
     public void deleteHeaderKeys() throws Exception {
         // Initialize the database
         headerKeysRepository.saveAndFlush(headerKeys);
+
         int databaseSizeBeforeDelete = headerKeysRepository.findAll().size();
 
         // Get the headerKeys

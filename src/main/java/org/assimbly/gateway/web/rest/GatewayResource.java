@@ -1,7 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
 import org.assimbly.connector.service.Broker;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
@@ -64,6 +63,7 @@ public class GatewayResource {
         if (gatewayDTO.getId() != null) {
             throw new BadRequestAlertException("A new gateway cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         Gateway gateway = gatewayMapper.toEntity(gatewayDTO);
         gateway = gatewayRepository.save(gateway);
         GatewayDTO result = gatewayMapper.toDto(gateway);
@@ -86,7 +86,7 @@ public class GatewayResource {
     public ResponseEntity<GatewayDTO> updateGateway(@RequestBody GatewayDTO gatewayDTO) throws URISyntaxException {
         log.debug("REST request to update Gateway : {}", gatewayDTO);
         if (gatewayDTO.getId() == null) {
-            return createGateway(gatewayDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
        
         if (gatewayDTO.getType().name().equals("BROKER")) {
@@ -105,7 +105,6 @@ public class GatewayResource {
 			}
         }
 
-        
         Gateway gateway = gatewayMapper.toEntity(gatewayDTO);
         gateway = gatewayRepository.save(gateway);
         GatewayDTO result = gatewayMapper.toDto(gateway);
@@ -125,7 +124,7 @@ public class GatewayResource {
         log.debug("REST request to get all Gateways");
         List<Gateway> gateways = gatewayRepository.findAll();
         return gatewayMapper.toDto(gateways);
-        }
+    }
 
     /**
      * GET  /gateways/:id : get the "id" gateway.
@@ -137,9 +136,9 @@ public class GatewayResource {
     @Timed
     public ResponseEntity<GatewayDTO> getGateway(@PathVariable Long id) {
         log.debug("REST request to get Gateway : {}", id);
-        Gateway gateway = gatewayRepository.findOne(id);
-        GatewayDTO gatewayDTO = gatewayMapper.toDto(gateway);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(gatewayDTO));
+        Optional<GatewayDTO> gatewayDTO = gatewayRepository.findById(id)
+            .map(gatewayMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(gatewayDTO);
     }
 
     /**
@@ -152,7 +151,8 @@ public class GatewayResource {
     @Timed
     public ResponseEntity<Void> deleteGateway(@PathVariable Long id) {
         log.debug("REST request to delete Gateway : {}", id);
-        gatewayRepository.delete(id);
+
+        gatewayRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     

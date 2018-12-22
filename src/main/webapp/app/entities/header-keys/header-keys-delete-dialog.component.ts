@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { HeaderKeys } from './header-keys.model';
-import { HeaderKeysPopupService } from './header-keys-popup.service';
+import { HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
 
 @Component({
@@ -13,14 +12,12 @@ import { HeaderKeysService } from './header-keys.service';
     templateUrl: './header-keys-delete-dialog.component.html'
 })
 export class HeaderKeysDeleteDialogComponent {
-
     headerKeys: HeaderKeys;
     constructor(
-        private headerKeysService: HeaderKeysService,
+        protected headerKeysService: HeaderKeysService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+        protected eventManager: JhiEventManager
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -43,22 +40,30 @@ export class HeaderKeysDeleteDialogComponent {
     template: ''
 })
 export class HeaderKeysDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private headerKeysPopupService: HeaderKeysPopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.headerKeysPopupService
-                .open(HeaderKeysDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ headerKeys }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(HeaderKeysDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.headerKeys = headerKeys;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

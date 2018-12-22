@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { WireTapEndpoint } from './wire-tap-endpoint.model';
+import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
+import { AccountService } from 'app/core';
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
 import { Principal, ResponseWrapper } from '../../shared';
 import { Router } from '@angular/router';
@@ -28,16 +30,16 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
 
     loadAll() {
         this.wireTapEndpointService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.wireTapEndpoints = res.json;
+            (res: HttpResponse<IWireTapEndpoint[]>) => {
+                this.wireTapEndpoints = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.checkPrincipal();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInWireTapEndpoints();
@@ -60,15 +62,12 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
     trackId(index: number, item: WireTapEndpoint) {
         return item.id;
     }
+
     registerChangeInWireTapEndpoints() {
-        this.eventSubscriber = this.eventManager.subscribe('wireTapEndpointListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('wireTapEndpointListModification', response => this.loadAll());
     }
 
-    private checkPrincipal() {
-        this.principal.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
-    }
-
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

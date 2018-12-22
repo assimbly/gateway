@@ -1,11 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { EndpointType } from '../../shared/camel/component-type';
 
-import { Flow } from './flow.model';
+import { IFlow } from 'app/shared/model/flow.model';
+import { AccountService } from 'app/core';
+
+import { ITEMS_PER_PAGE } from 'app/shared';
 import { FlowService } from './flow.service';
 import { FromEndpoint, FromEndpointService } from '../from-endpoint';
 import { GatewayService, Gateway, GatewayType, EnvironmentType } from '../gateway';
@@ -49,7 +53,6 @@ export class FlowComponent implements OnInit, OnDestroy {
         private parseLinks: JhiParseLinks,
         private principal: Principal,
         private router: Router,
-
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -73,7 +76,7 @@ export class FlowComponent implements OnInit, OnDestroy {
                 (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
                 (res: ResponseWrapper) => this.onError(res.json)
                 );
-        }
+        }        
     }
 
     reset() {
@@ -88,10 +91,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.checkPrincipal();
         this.getGateways();
         this.getFromEndpoints();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInFlows();
@@ -163,8 +165,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     trackId(index: number, item: Flow) {
         return item.id;
     }
+
     registerChangeInFlows() {
-        this.eventSubscriber = this.eventManager.subscribe('flowListModification', (response) => this.reset());
+        this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.reset());
     }
 
     sort() {
@@ -201,7 +204,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         }
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

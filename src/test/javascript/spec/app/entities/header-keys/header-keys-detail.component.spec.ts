@@ -1,51 +1,40 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysDetailComponent } from '../../../../../../main/webapp/app/entities/header-keys/header-keys-detail.component';
-import { HeaderKeysService } from '../../../../../../main/webapp/app/entities/header-keys/header-keys.service';
-import { HeaderKeys } from '../../../../../../main/webapp/app/entities/header-keys/header-keys.model';
+import { HeaderKeysDetailComponent } from 'app/entities/header-keys/header-keys-detail.component';
+import { HeaderKeys } from 'app/shared/model/header-keys.model';
 
 describe('Component Tests', () => {
-
     describe('HeaderKeys Management Detail Component', () => {
         let comp: HeaderKeysDetailComponent;
         let fixture: ComponentFixture<HeaderKeysDetailComponent>;
-        let service: HeaderKeysService;
+        const route = ({ data: of({ headerKeys: new HeaderKeys(123) }) } as any) as ActivatedRoute;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
                 declarations: [HeaderKeysDetailComponent],
-                providers: [
-                    HeaderKeysService
-                ]
+                providers: [{ provide: ActivatedRoute, useValue: route }]
             })
-            .overrideTemplate(HeaderKeysDetailComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(HeaderKeysDetailComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(HeaderKeysDetailComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(HeaderKeysService);
         });
 
         describe('OnInit', () => {
             it('Should call load all on init', () => {
                 // GIVEN
 
-                spyOn(service, 'find').and.returnValue(Observable.of(new HeaderKeys(123)));
-
                 // WHEN
                 comp.ngOnInit();
 
                 // THEN
-                expect(service.find).toHaveBeenCalledWith(123);
-                expect(comp.headerKeys).toEqual(jasmine.objectContaining({id: 123}));
+                expect(comp.headerKeys).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });
-
 });

@@ -53,12 +53,10 @@ public class Gateway implements Serializable {
     private String defaultErrorEndpointType;
 
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Flow> flows = new HashSet<>();
 
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<EnvironmentVariables> environmentVariables = new HashSet<>();
 

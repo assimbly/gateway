@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ToEndpoint } from './to-endpoint.model';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { AccountService } from 'app/core';
 import { ToEndpointService } from './to-endpoint.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-to-endpoint',
     templateUrl: './to-endpoint.component.html'
 })
 export class ToEndpointComponent implements OnInit, OnDestroy {
-toEndpoints: ToEndpoint[];
+    toEndpoints: IToEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private toEndpointService: ToEndpointService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected toEndpointService: ToEndpointService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.toEndpointService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.toEndpoints = res.json;
+            (res: HttpResponse<IToEndpoint[]>) => {
+                this.toEndpoints = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInToEndpoints();
@@ -43,14 +44,15 @@ toEndpoints: ToEndpoint[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: ToEndpoint) {
+    trackId(index: number, item: IToEndpoint) {
         return item.id;
     }
+
     registerChangeInToEndpoints() {
-        this.eventSubscriber = this.eventManager.subscribe('toEndpointListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('toEndpointListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

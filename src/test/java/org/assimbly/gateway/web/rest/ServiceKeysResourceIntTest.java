@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +66,9 @@ public class ServiceKeysResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restServiceKeysMockMvc;
 
     private ServiceKeys serviceKeys;
@@ -76,7 +81,8 @@ public class ServiceKeysResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -151,7 +157,7 @@ public class ServiceKeysResourceIntTest {
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getServiceKeys() throws Exception {
@@ -180,10 +186,11 @@ public class ServiceKeysResourceIntTest {
     public void updateServiceKeys() throws Exception {
         // Initialize the database
         serviceKeysRepository.saveAndFlush(serviceKeys);
+
         int databaseSizeBeforeUpdate = serviceKeysRepository.findAll().size();
 
         // Update the serviceKeys
-        ServiceKeys updatedServiceKeys = serviceKeysRepository.findOne(serviceKeys.getId());
+        ServiceKeys updatedServiceKeys = serviceKeysRepository.findById(serviceKeys.getId()).get();
         // Disconnect from session so that the updates on updatedServiceKeys are not directly saved in db
         em.detach(updatedServiceKeys);
         updatedServiceKeys
@@ -212,15 +219,15 @@ public class ServiceKeysResourceIntTest {
         // Create the ServiceKeys
         ServiceKeysDTO serviceKeysDTO = serviceKeysMapper.toDto(serviceKeys);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restServiceKeysMockMvc.perform(put("/api/service-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceKeysDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the ServiceKeys in the database
         List<ServiceKeys> serviceKeysList = serviceKeysRepository.findAll();
-        assertThat(serviceKeysList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(serviceKeysList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -228,6 +235,7 @@ public class ServiceKeysResourceIntTest {
     public void deleteServiceKeys() throws Exception {
         // Initialize the database
         serviceKeysRepository.saveAndFlush(serviceKeys);
+
         int databaseSizeBeforeDelete = serviceKeysRepository.findAll().size();
 
         // Get the serviceKeys

@@ -77,7 +77,7 @@ public class GroupResource {
     public ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO groupDTO) throws URISyntaxException {
         log.debug("REST request to update Group : {}", groupDTO);
         if (groupDTO.getId() == null) {
-            return createGroup(groupDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
         Group group = groupMapper.toEntity(groupDTO);
@@ -92,14 +92,14 @@ public class GroupResource {
     /**
      * GET  /groups : get all the groups.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many)
      * @return the ResponseEntity with status 200 (OK) and the list of groups in body
      */
     @GetMapping("/groups")
     @Timed
-    public List<GroupDTO> getAllGroups() {
+    public List<GroupDTO> getAllGroups(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Groups");
-        List<Group> groups = groupRepository.findAll();
-        return groupMapper.toDto(groups);
+        return groupService.findAll();
     }
 
     /**
@@ -112,10 +112,8 @@ public class GroupResource {
     @Timed
     public ResponseEntity<GroupDTO> getGroup(@PathVariable Long id) {
         log.debug("REST request to get Group : {}", id);
-        Group group = groupRepository.findOne(id);
-        GroupDTO groupDTO = groupMapper.toDto(group);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(groupDTO));
-
+        Optional<GroupDTO> groupDTO = groupService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(groupDTO);
     }
 
     /**

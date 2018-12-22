@@ -3,7 +3,6 @@ import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@a
 import { Observable, Observer, Subscription } from 'rxjs';
 import { SERVER_API_URL } from '../../app.constants';
 import { Router, NavigationEnd } from '@angular/router';
-import { CSRFService } from '../../shared/auth/csrf.service';
 import { WindowRef } from '../../shared/auth/window.service';
 import { Flow } from './flow.model';
 import { ResponseWrapper, createRequestOption } from '../../shared';
@@ -16,8 +15,8 @@ import 'rxjs/add/observable/throw';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 
-@Injectable()
-export class FlowService {
+type EntityResponseType = HttpResponse<IFlow>;
+type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
     stompClient = null;
     subscriber = null;
@@ -44,30 +43,19 @@ export class FlowService {
         this.listener = this.createListener();
     }
 
-    create(flow: Flow): Observable<Flow> {
-        const copy = this.convert(flow);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(flow: IFlow): Observable<EntityResponseType> {
+        return this.http.post<IFlow>(this.resourceUrl, flow, { observe: 'response' });
     }
 
-    update(flow: Flow): Observable<Flow> {
-        const copy = this.convert(flow);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(flow: IFlow): Observable<EntityResponseType> {
+        return this.http.put<IFlow>(this.resourceUrl, flow, { observe: 'response' });
     }
 
-    find(id: number): Observable<Flow> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IFlow>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
         return this.http.get(this.resourceUrl, options)
             .map((res: Response) => this.convertResponse(res));
@@ -272,11 +260,7 @@ export class FlowService {
         return entity;
     }
 
-    /**
-     * Convert a Flow to a JSON which can be sent to the server.
-     */
-    private convert(flow: Flow): Flow {
-        const copy: Flow = Object.assign({}, flow);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

@@ -1,8 +1,8 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>To Endpoints</span>
-        <button class="btn btn-primary float-right jh-create-entity create-to-endpoint" [routerLink]="['/', { outlets: { popup: ['to-endpoint-new'] } }]">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-to-endpoint" [routerLink]="['/to-endpoint/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create To Endpoint
             </span>
@@ -28,39 +28,37 @@
             </thead>
             <tbody>
             <tr *ngFor="let toEndpoint of toEndpoints ;trackBy: trackId">
-                <td><a [routerLink]="['../to-endpoint', toEndpoint.id ]">{{toEndpoint.id}}</a></td>
+                <td><a [routerLink]="['/to-endpoint', toEndpoint.id, 'view' ]">{{toEndpoint.id}}</a></td>
                 <td>{{toEndpoint.type}}</td>
                 <td>{{toEndpoint.uri}}</td>
                 <td>{{toEndpoint.options}}</td>
                 <td>
                     <div *ngIf="toEndpoint.flowId">
-                        <a [routerLink]="['../flow', toEndpoint.flowId  ]" >{{toEndpoint.flowId}}</a>
+                        <a [routerLink]="['../flow', toEndpoint.flowId , 'view' ]" >{{toEndpoint.flowId}}</a>
                     </div>
                 </td>
                 <td>
                     <div *ngIf="toEndpoint.serviceId">
-                        <a [routerLink]="['../service', toEndpoint.serviceId  ]" >{{toEndpoint.serviceId}}</a>
+                        <a [routerLink]="['../service', toEndpoint.serviceId , 'view' ]" >{{toEndpoint.serviceId}}</a>
                     </div>
                 </td>
                 <td>
                     <div *ngIf="toEndpoint.headerId">
-                        <a [routerLink]="['../header', toEndpoint.headerId  ]" >{{toEndpoint.headerId}}</a>
+                        <a [routerLink]="['../header', toEndpoint.headerId , 'view' ]" >{{toEndpoint.headerId}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../to-endpoint', toEndpoint.id ]"
+                                [routerLink]="['/to-endpoint', toEndpoint.id, 'view' ]"
                                 class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
+                            <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'to-endpoint/'+ toEndpoint.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/to-endpoint', toEndpoint.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -68,7 +66,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

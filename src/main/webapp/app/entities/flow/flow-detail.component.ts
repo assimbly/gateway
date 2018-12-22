@@ -1,7 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
 
 import { Flow } from './flow.model';
 import { FlowService } from './flow.service';
@@ -19,7 +17,7 @@ import { EndpointType, typesLinks } from '../../shared/camel/component-type';
     templateUrl: './flow-detail.component.html',
     providers: [NgbTabsetConfig]
 })
-export class FlowDetailComponent implements OnInit, OnDestroy {
+export class FlowDetailComponent implements OnInit {
 
     flow: Flow;
     gateway: Gateway;
