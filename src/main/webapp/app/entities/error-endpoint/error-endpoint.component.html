@@ -1,16 +1,14 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Error Endpoints</span>
-        <button class="btn btn-primary float-right jh-create-entity create-error-endpoint" [routerLink]="['/', { outlets: { popup: ['error-endpoint-new'] } }]">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-error-endpoint" [routerLink]="['/error-endpoint/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create new Error Endpoint
             </span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="errorEndpoints">
         <table class="table table-striped">
@@ -27,34 +25,32 @@
             </thead>
             <tbody>
             <tr *ngFor="let errorEndpoint of errorEndpoints ;trackBy: trackId">
-                <td><a [routerLink]="['../error-endpoint', errorEndpoint.id ]">{{errorEndpoint.id}}</a></td>
+                <td><a [routerLink]="['/error-endpoint', errorEndpoint.id, 'view' ]">{{errorEndpoint.id}}</a></td>
                 <td>{{errorEndpoint.type}}</td>
                 <td>{{errorEndpoint.uri}}</td>
                 <td>{{errorEndpoint.options}}</td>
                 <td>
                     <div *ngIf="errorEndpoint.serviceId">
-                        <a [routerLink]="['../service', errorEndpoint.serviceId  ]" >{{errorEndpoint.serviceId}}</a>
+                        <a [routerLink]="['../service', errorEndpoint.serviceId , 'view' ]" >{{errorEndpoint.serviceId}}</a>
                     </div>
                 </td>
                 <td>
                     <div *ngIf="errorEndpoint.headerId">
-                        <a [routerLink]="['../header', errorEndpoint.headerId  ]" >{{errorEndpoint.headerId}}</a>
+                        <a [routerLink]="['../header', errorEndpoint.headerId , 'view' ]" >{{errorEndpoint.headerId}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../error-endpoint', errorEndpoint.id ]"
+                                [routerLink]="['/error-endpoint', errorEndpoint.id, 'view' ]"
                                 class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
+                            <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'error-endpoint/'+ errorEndpoint.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/error-endpoint', errorEndpoint.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -62,7 +58,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

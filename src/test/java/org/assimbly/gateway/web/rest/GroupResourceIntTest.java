@@ -12,9 +12,12 @@ import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -22,13 +25,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -47,8 +54,14 @@ public class GroupResourceIntTest {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Mock
+    private GroupRepository groupRepositoryMock;
+
     @Autowired
     private GroupMapper groupMapper;
+
+    @Mock
+    private GroupService groupServiceMock;
 
     @Autowired
     private GroupService groupService;
@@ -65,6 +78,9 @@ public class GroupResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restGroupMockMvc;
 
     private Group group;
@@ -77,7 +93,8 @@ public class GroupResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -149,6 +166,39 @@ public class GroupResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(group.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
+    
+    @SuppressWarnings({"unchecked"})
+    public void getAllGroupsWithEagerRelationshipsIsEnabled() throws Exception {
+        GroupResource groupResource = new GroupResource(groupServiceMock);
+        when(groupServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        MockMvc restGroupMockMvc = MockMvcBuilders.standaloneSetup(groupResource)
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setControllerAdvice(exceptionTranslator)
+            .setConversionService(createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter).build();
+
+        restGroupMockMvc.perform(get("/api/groups?eagerload=true"))
+        .andExpect(status().isOk());
+
+        verify(groupServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public void getAllGroupsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        GroupResource groupResource = new GroupResource(groupServiceMock);
+            when(groupServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+            MockMvc restGroupMockMvc = MockMvcBuilders.standaloneSetup(groupResource)
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setControllerAdvice(exceptionTranslator)
+            .setConversionService(createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter).build();
+
+        restGroupMockMvc.perform(get("/api/groups?eagerload=true"))
+        .andExpect(status().isOk());
+
+            verify(groupServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
 
     @Test
     @Transactional
@@ -177,10 +227,11 @@ public class GroupResourceIntTest {
     public void updateGroup() throws Exception {
         // Initialize the database
         groupRepository.saveAndFlush(group);
+
         int databaseSizeBeforeUpdate = groupRepository.findAll().size();
 
         // Update the group
-        Group updatedGroup = groupRepository.findOne(group.getId());
+        Group updatedGroup = groupRepository.findById(group.getId()).get();
         // Disconnect from session so that the updates on updatedGroup are not directly saved in db
         em.detach(updatedGroup);
         updatedGroup
@@ -207,15 +258,15 @@ public class GroupResourceIntTest {
         // Create the Group
         GroupDTO groupDTO = groupMapper.toDto(group);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGroupMockMvc.perform(put("/api/groups")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(groupDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Group in the database
         List<Group> groupList = groupRepository.findAll();
-        assertThat(groupList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(groupList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -223,6 +274,7 @@ public class GroupResourceIntTest {
     public void deleteGroup() throws Exception {
         // Initialize the database
         groupRepository.saveAndFlush(group);
+
         int databaseSizeBeforeDelete = groupRepository.findAll().size();
 
         // Get the group

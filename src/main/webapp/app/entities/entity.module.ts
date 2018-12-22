@@ -16,6 +16,7 @@ import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpo
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
+    // prettier-ignore
     imports: [
         GatewayGatewayModule,
         GatewayEnvironmentVariablesModule,

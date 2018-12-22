@@ -1,16 +1,14 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Wire Tap Endpoints</span>
-        <button class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" [routerLink]="['/', { outlets: { popup: ['wire-tap-endpoint-new'] } }]">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" [routerLink]="['/wire-tap-endpoint/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create new Wire Tap Endpoint
             </span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="wireTapEndpoints">
         <table class="table table-striped">
@@ -27,34 +25,32 @@
             </thead>
             <tbody>
             <tr *ngFor="let wireTapEndpoint of wireTapEndpoints ;trackBy: trackId">
-                <td><a [routerLink]="['../wire-tap-endpoint', wireTapEndpoint.id ]">{{wireTapEndpoint.id}}</a></td>
+                <td><a [routerLink]="['/wire-tap-endpoint', wireTapEndpoint.id, 'view' ]">{{wireTapEndpoint.id}}</a></td>
                 <td>{{wireTapEndpoint.type}}</td>
                 <td>{{wireTapEndpoint.uri}}</td>
                 <td>{{wireTapEndpoint.options}}</td>
                 <td>
                     <div *ngIf="wireTapEndpoint.service">
-                        <a [routerLink]="['../service', wireTapEndpoint.service?.id ]" >{{wireTapEndpoint.service?.id}}</a>
+                        <a [routerLink]="['../service', wireTapEndpoint.service?.id, 'view' ]" >{{wireTapEndpoint.service?.id}}</a>
                     </div>
                 </td>
                 <td>
                     <div *ngIf="wireTapEndpoint.header">
-                        <a [routerLink]="['../header', wireTapEndpoint.header?.id ]" >{{wireTapEndpoint.header?.id}}</a>
+                        <a [routerLink]="['../header', wireTapEndpoint.header?.id, 'view' ]" >{{wireTapEndpoint.header?.id}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../wire-tap-endpoint', wireTapEndpoint.id ]"
+                                [routerLink]="['/wire-tap-endpoint', wireTapEndpoint.id, 'view' ]"
                                 class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
+                            <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'wire-tap-endpoint/'+ wireTapEndpoint.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/wire-tap-endpoint', wireTapEndpoint.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -62,7 +58,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

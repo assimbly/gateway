@@ -1,48 +1,33 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    WireTapEndpointService,
-    WireTapEndpointPopupService,
     WireTapEndpointComponent,
     WireTapEndpointDetailComponent,
-    WireTapEndpointDialogComponent,
-    WireTapEndpointPopupComponent,
+    WireTapEndpointUpdateComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
     wireTapEndpointRoute,
-    wireTapEndpointPopupRoute,
+    wireTapEndpointPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...wireTapEndpointRoute,
-    ...wireTapEndpointPopupRoute,
-];
+const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         WireTapEndpointComponent,
         WireTapEndpointDetailComponent,
-        WireTapEndpointDialogComponent,
+        WireTapEndpointUpdateComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointPopupComponent,
-        WireTapEndpointDeletePopupComponent,
+        WireTapEndpointDeletePopupComponent
     ],
     entryComponents: [
         WireTapEndpointComponent,
-        WireTapEndpointDialogComponent,
-        WireTapEndpointPopupComponent,
+        WireTapEndpointUpdateComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointDeletePopupComponent,
-    ],
-    providers: [
-        WireTapEndpointService,
-        WireTapEndpointPopupService,
+        WireTapEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

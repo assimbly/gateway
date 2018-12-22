@@ -1,49 +1,23 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    HeaderService,
-    HeaderPopupService,
     HeaderComponent,
     HeaderDetailComponent,
-    HeaderDialogComponent,
-    HeaderPopupComponent,
+    HeaderUpdateComponent,
     HeaderDeletePopupComponent,
     HeaderDeleteDialogComponent,
     headerRoute,
-    headerPopupRoute,
+    headerPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...headerRoute,
-    ...headerPopupRoute,
-];
+const ENTITY_STATES = [...headerRoute, ...headerPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
-    declarations: [
-        HeaderComponent,
-        HeaderDetailComponent,
-        HeaderDialogComponent,
-        HeaderDeleteDialogComponent,
-        HeaderPopupComponent,
-        HeaderDeletePopupComponent,
-    ],
-    entryComponents: [
-        HeaderComponent,
-        HeaderDialogComponent,
-        HeaderPopupComponent,
-        HeaderDeleteDialogComponent,
-        HeaderDeletePopupComponent,
-    ],
-    providers: [
-        HeaderService,
-        HeaderPopupService,
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
+    declarations: [HeaderComponent, HeaderDetailComponent, HeaderUpdateComponent, HeaderDeleteDialogComponent, HeaderDeletePopupComponent],
+    entryComponents: [HeaderComponent, HeaderUpdateComponent, HeaderDeleteDialogComponent, HeaderDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayHeaderModule {}

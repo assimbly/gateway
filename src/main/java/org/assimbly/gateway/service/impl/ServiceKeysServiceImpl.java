@@ -7,11 +7,13 @@ import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.service.mapper.ServiceKeysMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +43,7 @@ public class ServiceKeysServiceImpl implements ServiceKeysService {
     @Override
     public ServiceKeysDTO save(ServiceKeysDTO serviceKeysDTO) {
         log.debug("Request to save ServiceKeys : {}", serviceKeysDTO);
+
         ServiceKeys serviceKeys = serviceKeysMapper.toEntity(serviceKeysDTO);
         serviceKeys = serviceKeysRepository.save(serviceKeys);
         return serviceKeysMapper.toDto(serviceKeys);
@@ -60,6 +63,7 @@ public class ServiceKeysServiceImpl implements ServiceKeysService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+
     /**
      * Get one serviceKeys by id.
      *
@@ -68,10 +72,10 @@ public class ServiceKeysServiceImpl implements ServiceKeysService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ServiceKeysDTO findOne(Long id) {
+    public Optional<ServiceKeysDTO> findOne(Long id) {
         log.debug("Request to get ServiceKeys : {}", id);
-        ServiceKeys serviceKeys = serviceKeysRepository.findOne(id);
-        return serviceKeysMapper.toDto(serviceKeys);
+        return serviceKeysRepository.findById(id)
+            .map(serviceKeysMapper::toDto);
     }
 
     /**
@@ -82,6 +86,6 @@ public class ServiceKeysServiceImpl implements ServiceKeysService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete ServiceKeys : {}", id);
-        serviceKeysRepository.delete(id);
+        serviceKeysRepository.deleteById(id);
     }
 }

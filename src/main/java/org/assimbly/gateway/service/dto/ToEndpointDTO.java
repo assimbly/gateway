@@ -1,9 +1,6 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
@@ -92,7 +89,7 @@ public class ToEndpointDTO implements Serializable {
         }
 
         ToEndpointDTO toEndpointDTO = (ToEndpointDTO) o;
-        if(toEndpointDTO.getId() == null || getId() == null) {
+        if (toEndpointDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), toEndpointDTO.getId());
@@ -110,6 +107,9 @@ public class ToEndpointDTO implements Serializable {
             ", type='" + getType() + "'" +
             ", uri='" + getUri() + "'" +
             ", options='" + getOptions() + "'" +
+            ", flow=" + getFlowId() +
+            ", service=" + getServiceId() +
+            ", header=" + getHeaderId() +
             "}";
     }
 }

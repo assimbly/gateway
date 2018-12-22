@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Header } from './header.model';
+import { IHeader } from 'app/shared/model/header.model';
+import { AccountService } from 'app/core';
 import { HeaderService } from './header.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-header',
     templateUrl: './header.component.html'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-headers: Header[];
+    headers: IHeader[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private headerService: HeaderService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected headerService: HeaderService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            (res: HttpResponse<IHeader[]>) => {
+                this.headers = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInHeaders();
@@ -43,14 +44,15 @@ headers: Header[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: Header) {
+    trackId(index: number, item: IHeader) {
         return item.id;
     }
+
     registerChangeInHeaders() {
-        this.eventSubscriber = this.eventManager.subscribe('headerListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('headerListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

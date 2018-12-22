@@ -7,11 +7,15 @@ import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +45,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDTO save(GroupDTO groupDTO) {
         log.debug("Request to save Group : {}", groupDTO);
+
         Group group = groupMapper.toEntity(groupDTO);
         group = groupRepository.save(group);
         return groupMapper.toDto(group);
@@ -61,6 +66,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * Get all the Group with eager load of many-to-many relationships.
+     *
+     * @return the list of entities
+     */
+    public Page<GroupDTO> findAllWithEagerRelationships(Pageable pageable) {
+        return groupRepository.findAllWithEagerRelationships(pageable).map(groupMapper::toDto);
+    }
+    
+
+    /**
      * Get one group by id.
      *
      * @param id the id of the entity
@@ -68,10 +83,10 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     @Transactional(readOnly = true)
-    public GroupDTO findOne(Long id) {
+    public Optional<GroupDTO> findOne(Long id) {
         log.debug("Request to get Group : {}", id);
-        Group group = groupRepository.findOneWithEagerRelationships(id);
-        return groupMapper.toDto(group);
+        return groupRepository.findOneWithEagerRelationships(id)
+            .map(groupMapper::toDto);
     }
 
     /**
@@ -82,6 +97,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Group : {}", id);
-        groupRepository.delete(id);
+        groupRepository.deleteById(id);
     }
 }

@@ -22,11 +22,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +72,9 @@ public class MaintenanceResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restMaintenanceMockMvc;
 
     private Maintenance maintenance;
@@ -82,7 +87,8 @@ public class MaintenanceResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -157,7 +163,7 @@ public class MaintenanceResourceIntTest {
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(DEFAULT_START_TIME.toString())))
             .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getMaintenance() throws Exception {
@@ -186,10 +192,11 @@ public class MaintenanceResourceIntTest {
     public void updateMaintenance() throws Exception {
         // Initialize the database
         maintenanceRepository.saveAndFlush(maintenance);
+
         int databaseSizeBeforeUpdate = maintenanceRepository.findAll().size();
 
         // Update the maintenance
-        Maintenance updatedMaintenance = maintenanceRepository.findOne(maintenance.getId());
+        Maintenance updatedMaintenance = maintenanceRepository.findById(maintenance.getId()).get();
         // Disconnect from session so that the updates on updatedMaintenance are not directly saved in db
         em.detach(updatedMaintenance);
         updatedMaintenance
@@ -218,15 +225,15 @@ public class MaintenanceResourceIntTest {
         // Create the Maintenance
         MaintenanceDTO maintenanceDTO = maintenanceMapper.toDto(maintenance);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMaintenanceMockMvc.perform(put("/api/maintenances")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(maintenanceDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Maintenance in the database
         List<Maintenance> maintenanceList = maintenanceRepository.findAll();
-        assertThat(maintenanceList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(maintenanceList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -234,6 +241,7 @@ public class MaintenanceResourceIntTest {
     public void deleteMaintenance() throws Exception {
         // Initialize the database
         maintenanceRepository.saveAndFlush(maintenance);
+
         int databaseSizeBeforeDelete = maintenanceRepository.findAll().size();
 
         // Get the maintenance

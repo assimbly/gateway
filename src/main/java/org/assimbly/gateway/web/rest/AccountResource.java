@@ -9,6 +9,7 @@ import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
 import org.assimbly.gateway.service.MailService;
 import org.assimbly.gateway.service.UserService;
+import org.assimbly.gateway.service.dto.PasswordChangeDTO;
 import org.assimbly.gateway.service.dto.UserDTO;
 import org.assimbly.gateway.web.rest.errors.*;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
@@ -66,8 +67,6 @@ public class AccountResource {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
-        userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
     }
@@ -83,7 +82,7 @@ public class AccountResource {
     public void activateAccount(@RequestParam(value = "key") String key) {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
-            throw new InternalServerErrorException("No user was found for this reset key");
+            throw new InternalServerErrorException("No user was found for this activation key");
         }
     }
 
@@ -135,22 +134,22 @@ public class AccountResource {
         }
         userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
             userDTO.getLangKey(), userDTO.getImageUrl());
-   }
+    }
 
     /**
      * POST  /account/change-password : changes the current user's password
      *
-     * @param password the new password
+     * @param passwordChangeDto current and new password
      * @throws InvalidPasswordException 400 (Bad Request) if the new password is incorrect
      */
     @PostMapping(path = "/account/change-password")
     @Timed
-    public void changePassword(@RequestBody String password) {
-        if (!checkPasswordLength(password)) {
+    public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
+        if (!checkPasswordLength(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        userService.changePassword(password);
-   }
+        userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
+    }
 
     /**
      * GET  /account/sessions : get the current open sessions.
@@ -193,7 +192,7 @@ public class AccountResource {
             .ifPresent(u ->
                 persistentTokenRepository.findByUser(u).stream()
                     .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(), decodedSeries))
-                    .findAny().ifPresent(t -> persistentTokenRepository.delete(decodedSeries)));
+                    .findAny().ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries)));
     }
 
     /**

@@ -1,7 +1,9 @@
 package org.assimbly.gateway.service;
 
 import org.assimbly.gateway.service.dto.MaintenanceDTO;
+
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service Interface for managing Maintenance.
@@ -23,13 +25,14 @@ public interface MaintenanceService {
      */
     List<MaintenanceDTO> findAll();
 
+
     /**
      * Get the "id" maintenance.
      *
      * @param id the id of the entity
      * @return the entity
      */
-    MaintenanceDTO findOne(Long id);
+    Optional<MaintenanceDTO> findOne(Long id);
 
     /**
      * Delete the "id" maintenance.

@@ -1,15 +1,14 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async, inject, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ServiceKeysDeleteDialogComponent } from '../../../../../../main/webapp/app/entities/service-keys/service-keys-delete-dialog.component';
-import { ServiceKeysService } from '../../../../../../main/webapp/app/entities/service-keys/service-keys.service';
+import { ServiceKeysDeleteDialogComponent } from 'app/entities/service-keys/service-keys-delete-dialog.component';
+import { ServiceKeysService } from 'app/entities/service-keys/service-keys.service';
 
 describe('Component Tests', () => {
-
     describe('ServiceKeys Management Delete Component', () => {
         let comp: ServiceKeysDeleteDialogComponent;
         let fixture: ComponentFixture<ServiceKeysDeleteDialogComponent>;
@@ -17,19 +16,13 @@ describe('Component Tests', () => {
         let mockEventManager: any;
         let mockActiveModal: any;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ServiceKeysDeleteDialogComponent],
-                providers: [
-                    ServiceKeysService
-                ]
+                declarations: [ServiceKeysDeleteDialogComponent]
             })
-            .overrideTemplate(ServiceKeysDeleteDialogComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(ServiceKeysDeleteDialogComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(ServiceKeysDeleteDialogComponent);
             comp = fixture.componentInstance;
             service = fixture.debugElement.injector.get(ServiceKeysService);
@@ -38,24 +31,22 @@ describe('Component Tests', () => {
         });
 
         describe('confirmDelete', () => {
-            it('Should call delete service on confirmDelete',
-                inject([],
-                    fakeAsync(() => {
-                        // GIVEN
-                        spyOn(service, 'delete').and.returnValue(Observable.of({}));
+            it('Should call delete service on confirmDelete', inject(
+                [],
+                fakeAsync(() => {
+                    // GIVEN
+                    spyOn(service, 'delete').and.returnValue(of({}));
 
-                        // WHEN
-                        comp.confirmDelete(123);
-                        tick();
+                    // WHEN
+                    comp.confirmDelete(123);
+                    tick();
 
-                        // THEN
-                        expect(service.delete).toHaveBeenCalledWith(123);
-                        expect(mockActiveModal.dismissSpy).toHaveBeenCalled();
-                        expect(mockEventManager.broadcastSpy).toHaveBeenCalled();
-                    })
-                )
-            );
+                    // THEN
+                    expect(service.delete).toHaveBeenCalledWith(123);
+                    expect(mockActiveModal.dismissSpy).toHaveBeenCalled();
+                    expect(mockEventManager.broadcastSpy).toHaveBeenCalled();
+                })
+            ));
         });
     });
-
 });

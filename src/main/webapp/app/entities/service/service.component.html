@@ -1,16 +1,14 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Services</span>
-        <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/service/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create new Service
             </span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="services">
         <table class="table table-striped">
@@ -29,7 +27,7 @@
             </thead>
             <tbody>
             <tr *ngFor="let service of services ;trackBy: trackId">
-                <td><a [routerLink]="['../service', service.id ]">{{service.id}}</a></td>
+                <td><a [routerLink]="['/service', service.id, 'view' ]">{{service.id}}</a></td>
                 <td>{{service.name}}</td>
                 <td>{{service.type}}</td>
                 <td>{{service.url}}</td>
@@ -40,17 +38,15 @@
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../service', service.id ]"
+                                [routerLink]="['/service', service.id, 'view' ]"
                                 class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
+                            <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/service', service.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -58,7 +54,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

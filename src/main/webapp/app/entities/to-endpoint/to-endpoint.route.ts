@@ -1,10 +1,32 @@
-import { Routes } from '@angular/router';
-
-import { UserRouteAccessService } from '../../shared';
+import { Injectable } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { UserRouteAccessService } from 'app/core';
+import { Observable, of } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { ToEndpointService } from './to-endpoint.service';
 import { ToEndpointComponent } from './to-endpoint.component';
 import { ToEndpointDetailComponent } from './to-endpoint-detail.component';
-import { ToEndpointPopupComponent } from './to-endpoint-dialog.component';
+import { ToEndpointUpdateComponent } from './to-endpoint-update.component';
 import { ToEndpointDeletePopupComponent } from './to-endpoint-delete-dialog.component';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+
+@Injectable({ providedIn: 'root' })
+export class ToEndpointResolve implements Resolve<IToEndpoint> {
+    constructor(private service: ToEndpointService) {}
+
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ToEndpoint> {
+        const id = route.params['id'] ? route.params['id'] : null;
+        if (id) {
+            return this.service.find(id).pipe(
+                filter((response: HttpResponse<ToEndpoint>) => response.ok),
+                map((toEndpoint: HttpResponse<ToEndpoint>) => toEndpoint.body)
+            );
+        }
+        return of(new ToEndpoint());
+    }
+}
 
 export const toEndpointRoute: Routes = [
     {
@@ -15,9 +37,37 @@ export const toEndpointRoute: Routes = [
             pageTitle: 'ToEndpoints'
         },
         canActivate: [UserRouteAccessService]
-    }, {
-        path: 'to-endpoint/:id',
+    },
+    {
+        path: 'to-endpoint/:id/view',
         component: ToEndpointDetailComponent,
+        resolve: {
+            toEndpoint: ToEndpointResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'ToEndpoints'
+        },
+        canActivate: [UserRouteAccessService]
+    },
+    {
+        path: 'to-endpoint/new',
+        component: ToEndpointUpdateComponent,
+        resolve: {
+            toEndpoint: ToEndpointResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'ToEndpoints'
+        },
+        canActivate: [UserRouteAccessService]
+    },
+    {
+        path: 'to-endpoint/:id/edit',
+        component: ToEndpointUpdateComponent,
+        resolve: {
+            toEndpoint: ToEndpointResolve
+        },
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'ToEndpoints'
@@ -28,28 +78,11 @@ export const toEndpointRoute: Routes = [
 
 export const toEndpointPopupRoute: Routes = [
     {
-        path: 'to-endpoint-new',
-        component: ToEndpointPopupComponent,
-        data: {
-            authorities: ['ROLE_USER'],
-            pageTitle: 'ToEndpoints'
-        },
-        canActivate: [UserRouteAccessService],
-        outlet: 'popup'
-    },
-    {
-        path: 'to-endpoint/:id/edit',
-        component: ToEndpointPopupComponent,
-        data: {
-            authorities: ['ROLE_USER'],
-            pageTitle: 'ToEndpoints'
-        },
-        canActivate: [UserRouteAccessService],
-        outlet: 'popup'
-    },
-    {
         path: 'to-endpoint/:id/delete',
         component: ToEndpointDeletePopupComponent,
+        resolve: {
+            toEndpoint: ToEndpointResolve
+        },
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'ToEndpoints'

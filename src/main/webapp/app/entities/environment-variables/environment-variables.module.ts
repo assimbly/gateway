@@ -1,48 +1,33 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    EnvironmentVariablesService,
-    EnvironmentVariablesPopupService,
     EnvironmentVariablesComponent,
     EnvironmentVariablesDetailComponent,
-    EnvironmentVariablesDialogComponent,
-    EnvironmentVariablesPopupComponent,
+    EnvironmentVariablesUpdateComponent,
     EnvironmentVariablesDeletePopupComponent,
     EnvironmentVariablesDeleteDialogComponent,
     environmentVariablesRoute,
-    environmentVariablesPopupRoute,
+    environmentVariablesPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...environmentVariablesRoute,
-    ...environmentVariablesPopupRoute,
-];
+const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         EnvironmentVariablesComponent,
         EnvironmentVariablesDetailComponent,
-        EnvironmentVariablesDialogComponent,
+        EnvironmentVariablesUpdateComponent,
         EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesPopupComponent,
-        EnvironmentVariablesDeletePopupComponent,
+        EnvironmentVariablesDeletePopupComponent
     ],
     entryComponents: [
         EnvironmentVariablesComponent,
-        EnvironmentVariablesDialogComponent,
-        EnvironmentVariablesPopupComponent,
+        EnvironmentVariablesUpdateComponent,
         EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesDeletePopupComponent,
-    ],
-    providers: [
-        EnvironmentVariablesService,
-        EnvironmentVariablesPopupService,
+        EnvironmentVariablesDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

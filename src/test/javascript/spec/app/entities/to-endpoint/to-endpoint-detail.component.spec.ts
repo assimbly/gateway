@@ -1,51 +1,40 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ToEndpointDetailComponent } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint-detail.component';
-import { ToEndpointService } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint.service';
-import { ToEndpoint } from '../../../../../../main/webapp/app/entities/to-endpoint/to-endpoint.model';
+import { ToEndpointDetailComponent } from 'app/entities/to-endpoint/to-endpoint-detail.component';
+import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
 
 describe('Component Tests', () => {
-
     describe('ToEndpoint Management Detail Component', () => {
         let comp: ToEndpointDetailComponent;
         let fixture: ComponentFixture<ToEndpointDetailComponent>;
-        let service: ToEndpointService;
+        const route = ({ data: of({ toEndpoint: new ToEndpoint(123) }) } as any) as ActivatedRoute;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
                 declarations: [ToEndpointDetailComponent],
-                providers: [
-                    ToEndpointService
-                ]
+                providers: [{ provide: ActivatedRoute, useValue: route }]
             })
-            .overrideTemplate(ToEndpointDetailComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(ToEndpointDetailComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(ToEndpointDetailComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(ToEndpointService);
         });
 
         describe('OnInit', () => {
             it('Should call load all on init', () => {
                 // GIVEN
 
-                spyOn(service, 'find').and.returnValue(Observable.of(new ToEndpoint(123)));
-
                 // WHEN
                 comp.ngOnInit();
 
                 // THEN
-                expect(service.find).toHaveBeenCalledWith(123);
-                expect(comp.toEndpoint).toEqual(jasmine.objectContaining({id: 123}));
+                expect(comp.toEndpoint).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });
-
 });

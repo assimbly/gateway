@@ -1,49 +1,23 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    FlowService,
-    FlowPopupService,
     FlowComponent,
     FlowDetailComponent,
-    FlowDialogComponent,
-    FlowPopupComponent,
+    FlowUpdateComponent,
     FlowDeletePopupComponent,
     FlowDeleteDialogComponent,
     flowRoute,
-    flowPopupRoute,
+    flowPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...flowRoute,
-    ...flowPopupRoute,
-];
+const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
-    declarations: [
-        FlowComponent,
-        FlowDetailComponent,
-        FlowDialogComponent,
-        FlowDeleteDialogComponent,
-        FlowPopupComponent,
-        FlowDeletePopupComponent,
-    ],
-    entryComponents: [
-        FlowComponent,
-        FlowDialogComponent,
-        FlowPopupComponent,
-        FlowDeleteDialogComponent,
-        FlowDeletePopupComponent,
-    ],
-    providers: [
-        FlowService,
-        FlowPopupService,
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
+    declarations: [FlowComponent, FlowDetailComponent, FlowUpdateComponent, FlowDeleteDialogComponent, FlowDeletePopupComponent],
+    entryComponents: [FlowComponent, FlowUpdateComponent, FlowDeleteDialogComponent, FlowDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayFlowModule {}

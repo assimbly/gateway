@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { HeaderKeys } from './header-keys.model';
+import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { AccountService } from 'app/core';
 import { HeaderKeysService } from './header-keys.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-header-keys',
     templateUrl: './header-keys.component.html'
 })
 export class HeaderKeysComponent implements OnInit, OnDestroy {
-headerKeys: HeaderKeys[];
+    headerKeys: IHeaderKeys[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private headerKeysService: HeaderKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected headerKeysService: HeaderKeysService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.headerKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headerKeys = res.json;
+            (res: HttpResponse<IHeaderKeys[]>) => {
+                this.headerKeys = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInHeaderKeys();
@@ -43,14 +44,15 @@ headerKeys: HeaderKeys[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: HeaderKeys) {
+    trackId(index: number, item: IHeaderKeys) {
         return item.id;
     }
+
     registerChangeInHeaderKeys() {
-        this.eventSubscriber = this.eventManager.subscribe('headerKeysListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('headerKeysListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

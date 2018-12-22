@@ -1,6 +1,7 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -35,21 +36,18 @@ public class Flow implements Serializable {
     private Boolean offloading;
 
     @ManyToOne
+    @JsonIgnoreProperties("")
     private Gateway gateway;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @OneToOne    @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @OneToOne    @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
 
     @OneToMany(mappedBy = "flowRoute")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

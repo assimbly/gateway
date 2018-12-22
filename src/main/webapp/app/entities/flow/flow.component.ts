@@ -1,18 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 
-import { Flow } from './flow.model';
+import { IFlow } from 'app/shared/model/flow.model';
+import { AccountService } from 'app/core';
+
+import { ITEMS_PER_PAGE } from 'app/shared';
 import { FlowService } from './flow.service';
-import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-flow',
     templateUrl: './flow.component.html'
 })
 export class FlowComponent implements OnInit, OnDestroy {
-
-    flows: Flow[];
+    flows: IFlow[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -24,11 +26,11 @@ export class FlowComponent implements OnInit, OnDestroy {
     totalItems: number;
 
     constructor(
-        private flowService: FlowService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private parseLinks: JhiParseLinks,
-        private principal: Principal
+        protected flowService: FlowService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected parseLinks: JhiParseLinks,
+        protected accountService: AccountService
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -41,14 +43,16 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadAll() {
-        this.flowService.query({
-            page: this.page,
-            size: this.itemsPerPage,
-            sort: this.sort()
-        }).subscribe(
-            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
+        this.flowService
+            .query({
+                page: this.page,
+                size: this.itemsPerPage,
+                sort: this.sort()
+            })
+            .subscribe(
+                (res: HttpResponse<IFlow[]>) => this.paginateFlows(res.body, res.headers),
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
     }
 
     reset() {
@@ -61,9 +65,10 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.page = page;
         this.loadAll();
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInFlows();
@@ -73,11 +78,12 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: Flow) {
+    trackId(index: number, item: IFlow) {
         return item.id;
     }
+
     registerChangeInFlows() {
-        this.eventSubscriber = this.eventManager.subscribe('flowListModification', (response) => this.reset());
+        this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.reset());
     }
 
     sort() {
@@ -88,15 +94,15 @@ export class FlowComponent implements OnInit, OnDestroy {
         return result;
     }
 
-    private onSuccess(data, headers) {
+    protected paginateFlows(data: IFlow[], headers: HttpHeaders) {
         this.links = this.parseLinks.parse(headers.get('link'));
-        this.totalItems = headers.get('X-Total-Count');
+        this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

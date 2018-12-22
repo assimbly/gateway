@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Service } from './service.model';
+import { IService } from 'app/shared/model/service.model';
+import { AccountService } from 'app/core';
 import { ServiceService } from './service.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-service',
     templateUrl: './service.component.html'
 })
 export class ServiceComponent implements OnInit, OnDestroy {
-services: Service[];
+    services: IService[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private serviceService: ServiceService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected serviceService: ServiceService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
+            (res: HttpResponse<IService[]>) => {
+                this.services = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInServices();
@@ -43,14 +44,15 @@ services: Service[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: Service) {
+    trackId(index: number, item: IService) {
         return item.id;
     }
+
     registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

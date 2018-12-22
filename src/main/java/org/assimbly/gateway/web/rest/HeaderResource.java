@@ -2,7 +2,6 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.domain.Header;
-
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -54,6 +53,7 @@ public class HeaderResource {
         if (headerDTO.getId() != null) {
             throw new BadRequestAlertException("A new header cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         Header header = headerMapper.toEntity(headerDTO);
         header = headerRepository.save(header);
         HeaderDTO result = headerMapper.toDto(header);
@@ -76,8 +76,9 @@ public class HeaderResource {
     public ResponseEntity<HeaderDTO> updateHeader(@RequestBody HeaderDTO headerDTO) throws URISyntaxException {
         log.debug("REST request to update Header : {}", headerDTO);
         if (headerDTO.getId() == null) {
-            return createHeader(headerDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         Header header = headerMapper.toEntity(headerDTO);
         header = headerRepository.save(header);
         HeaderDTO result = headerMapper.toDto(header);
@@ -97,7 +98,7 @@ public class HeaderResource {
         log.debug("REST request to get all Headers");
         List<Header> headers = headerRepository.findAll();
         return headerMapper.toDto(headers);
-        }
+    }
 
     /**
      * GET  /headers/:id : get the "id" header.
@@ -109,9 +110,9 @@ public class HeaderResource {
     @Timed
     public ResponseEntity<HeaderDTO> getHeader(@PathVariable Long id) {
         log.debug("REST request to get Header : {}", id);
-        Header header = headerRepository.findOne(id);
-        HeaderDTO headerDTO = headerMapper.toDto(header);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(headerDTO));
+        Optional<HeaderDTO> headerDTO = headerRepository.findById(id)
+            .map(headerMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(headerDTO);
     }
 
     /**
@@ -124,7 +125,8 @@ public class HeaderResource {
     @Timed
     public ResponseEntity<Void> deleteHeader(@PathVariable Long id) {
         log.debug("REST request to delete Header : {}", id);
-        headerRepository.delete(id);
+
+        headerRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +83,9 @@ public class GatewayResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restGatewayMockMvc;
 
     private Gateway gateway;
@@ -93,7 +98,8 @@ public class GatewayResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -183,7 +189,7 @@ public class GatewayResourceIntTest {
             .andExpect(jsonPath("$.[*].defaultToEndpointType").value(hasItem(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].defaultErrorEndpointType").value(hasItem(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getGateway() throws Exception {
@@ -217,10 +223,11 @@ public class GatewayResourceIntTest {
     public void updateGateway() throws Exception {
         // Initialize the database
         gatewayRepository.saveAndFlush(gateway);
+
         int databaseSizeBeforeUpdate = gatewayRepository.findAll().size();
 
         // Update the gateway
-        Gateway updatedGateway = gatewayRepository.findOne(gateway.getId());
+        Gateway updatedGateway = gatewayRepository.findById(gateway.getId()).get();
         // Disconnect from session so that the updates on updatedGateway are not directly saved in db
         em.detach(updatedGateway);
         updatedGateway
@@ -259,15 +266,15 @@ public class GatewayResourceIntTest {
         // Create the Gateway
         GatewayDTO gatewayDTO = gatewayMapper.toDto(gateway);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGatewayMockMvc.perform(put("/api/gateways")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(gatewayDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Gateway in the database
         List<Gateway> gatewayList = gatewayRepository.findAll();
-        assertThat(gatewayList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(gatewayList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -275,6 +282,7 @@ public class GatewayResourceIntTest {
     public void deleteGateway() throws Exception {
         // Initialize the database
         gatewayRepository.saveAndFlush(gateway);
+
         int databaseSizeBeforeDelete = gatewayRepository.findAll().size();
 
         // Get the gateway

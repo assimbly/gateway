@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { WireTapEndpoint } from './wire-tap-endpoint.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IWireTapEndpoint>;
+type EntityArrayResponseType = HttpResponse<IWireTapEndpoint[]>;
+
+@Injectable({ providedIn: 'root' })
 export class WireTapEndpointService {
+    public resourceUrl = SERVER_API_URL + 'api/wire-tap-endpoints';
 
-    private resourceUrl =  SERVER_API_URL + 'api/wire-tap-endpoints';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(wireTapEndpoint: WireTapEndpoint): Observable<WireTapEndpoint> {
-        const copy = this.convert(wireTapEndpoint);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(wireTapEndpoint: IWireTapEndpoint): Observable<EntityResponseType> {
+        return this.http.post<IWireTapEndpoint>(this.resourceUrl, wireTapEndpoint, { observe: 'response' });
     }
 
-    update(wireTapEndpoint: WireTapEndpoint): Observable<WireTapEndpoint> {
-        const copy = this.convert(wireTapEndpoint);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(wireTapEndpoint: IWireTapEndpoint): Observable<EntityResponseType> {
+        return this.http.put<IWireTapEndpoint>(this.resourceUrl, wireTapEndpoint, { observe: 'response' });
     }
 
-    find(id: number): Observable<WireTapEndpoint> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IWireTapEndpoint>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IWireTapEndpoint[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to WireTapEndpoint.
-     */
-    private convertItemFromServer(json: any): WireTapEndpoint {
-        const entity: WireTapEndpoint = Object.assign(new WireTapEndpoint(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a WireTapEndpoint to a JSON which can be sent to the server.
-     */
-    private convert(wireTapEndpoint: WireTapEndpoint): WireTapEndpoint {
-        const copy: WireTapEndpoint = Object.assign({}, wireTapEndpoint);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

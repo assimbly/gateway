@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { Flow } from './flow.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IFlow } from 'app/shared/model/flow.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IFlow>;
+type EntityArrayResponseType = HttpResponse<IFlow[]>;
+
+@Injectable({ providedIn: 'root' })
 export class FlowService {
+    public resourceUrl = SERVER_API_URL + 'api/flows';
 
-    private resourceUrl =  SERVER_API_URL + 'api/flows';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(flow: Flow): Observable<Flow> {
-        const copy = this.convert(flow);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(flow: IFlow): Observable<EntityResponseType> {
+        return this.http.post<IFlow>(this.resourceUrl, flow, { observe: 'response' });
     }
 
-    update(flow: Flow): Observable<Flow> {
-        const copy = this.convert(flow);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(flow: IFlow): Observable<EntityResponseType> {
+        return this.http.put<IFlow>(this.resourceUrl, flow, { observe: 'response' });
     }
 
-    find(id: number): Observable<Flow> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IFlow>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IFlow[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to Flow.
-     */
-    private convertItemFromServer(json: any): Flow {
-        const entity: Flow = Object.assign(new Flow(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a Flow to a JSON which can be sent to the server.
-     */
-    private convert(flow: Flow): Flow {
-        const copy: Flow = Object.assign({}, flow);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

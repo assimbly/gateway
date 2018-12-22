@@ -7,11 +7,13 @@ import org.assimbly.gateway.service.dto.MaintenanceDTO;
 import org.assimbly.gateway.service.mapper.MaintenanceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +43,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     @Override
     public MaintenanceDTO save(MaintenanceDTO maintenanceDTO) {
         log.debug("Request to save Maintenance : {}", maintenanceDTO);
+
         Maintenance maintenance = maintenanceMapper.toEntity(maintenanceDTO);
         maintenance = maintenanceRepository.save(maintenance);
         return maintenanceMapper.toDto(maintenance);
@@ -60,6 +63,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+
     /**
      * Get one maintenance by id.
      *
@@ -68,10 +72,10 @@ public class MaintenanceServiceImpl implements MaintenanceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public MaintenanceDTO findOne(Long id) {
+    public Optional<MaintenanceDTO> findOne(Long id) {
         log.debug("Request to get Maintenance : {}", id);
-        Maintenance maintenance = maintenanceRepository.findOne(id);
-        return maintenanceMapper.toDto(maintenance);
+        return maintenanceRepository.findById(id)
+            .map(maintenanceMapper::toDto);
     }
 
     /**
@@ -82,6 +86,6 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Maintenance : {}", id);
-        maintenanceRepository.delete(id);
+        maintenanceRepository.deleteById(id);
     }
 }

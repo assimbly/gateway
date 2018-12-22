@@ -2,7 +2,6 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.domain.WireTapEndpoint;
-
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -69,7 +68,7 @@ public class WireTapEndpointResource {
     public ResponseEntity<WireTapEndpoint> updateWireTapEndpoint(@RequestBody WireTapEndpoint wireTapEndpoint) throws URISyntaxException {
         log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpoint);
         if (wireTapEndpoint.getId() == null) {
-            return createWireTapEndpoint(wireTapEndpoint);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         WireTapEndpoint result = wireTapEndpointRepository.save(wireTapEndpoint);
         return ResponseEntity.ok()
@@ -87,7 +86,7 @@ public class WireTapEndpointResource {
     public List<WireTapEndpoint> getAllWireTapEndpoints() {
         log.debug("REST request to get all WireTapEndpoints");
         return wireTapEndpointRepository.findAll();
-        }
+    }
 
     /**
      * GET  /wire-tap-endpoints/:id : get the "id" wireTapEndpoint.
@@ -99,8 +98,8 @@ public class WireTapEndpointResource {
     @Timed
     public ResponseEntity<WireTapEndpoint> getWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to get WireTapEndpoint : {}", id);
-        WireTapEndpoint wireTapEndpoint = wireTapEndpointRepository.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(wireTapEndpoint));
+        Optional<WireTapEndpoint> wireTapEndpoint = wireTapEndpointRepository.findById(id);
+        return ResponseUtil.wrapOrNotFound(wireTapEndpoint);
     }
 
     /**
@@ -113,7 +112,8 @@ public class WireTapEndpointResource {
     @Timed
     public ResponseEntity<Void> deleteWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete WireTapEndpoint : {}", id);
-        wireTapEndpointRepository.delete(id);
+
+        wireTapEndpointRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

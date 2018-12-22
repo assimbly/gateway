@@ -1,48 +1,33 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    FromEndpointService,
-    FromEndpointPopupService,
     FromEndpointComponent,
     FromEndpointDetailComponent,
-    FromEndpointDialogComponent,
-    FromEndpointPopupComponent,
+    FromEndpointUpdateComponent,
     FromEndpointDeletePopupComponent,
     FromEndpointDeleteDialogComponent,
     fromEndpointRoute,
-    fromEndpointPopupRoute,
+    fromEndpointPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...fromEndpointRoute,
-    ...fromEndpointPopupRoute,
-];
+const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         FromEndpointComponent,
         FromEndpointDetailComponent,
-        FromEndpointDialogComponent,
+        FromEndpointUpdateComponent,
         FromEndpointDeleteDialogComponent,
-        FromEndpointPopupComponent,
-        FromEndpointDeletePopupComponent,
+        FromEndpointDeletePopupComponent
     ],
     entryComponents: [
         FromEndpointComponent,
-        FromEndpointDialogComponent,
-        FromEndpointPopupComponent,
+        FromEndpointUpdateComponent,
         FromEndpointDeleteDialogComponent,
-        FromEndpointDeletePopupComponent,
-    ],
-    providers: [
-        FromEndpointService,
-        FromEndpointPopupService,
+        FromEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

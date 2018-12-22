@@ -29,15 +29,15 @@ public class Group implements Serializable {
     private String name;
 
     @ManyToMany(mappedBy = "groups")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
     private Set<Gateway> gateways = new HashSet<>();
 
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "group_user",
-               joinColumns = @JoinColumn(name="groups_id", referencedColumnName="id"),
-               inverseJoinColumns = @JoinColumn(name="users_id", referencedColumnName="id"))
+               joinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"),
+               inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"))
     private Set<User> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

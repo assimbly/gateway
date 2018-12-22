@@ -1,49 +1,29 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    GatewayService,
-    GatewayPopupService,
     GatewayComponent,
     GatewayDetailComponent,
-    GatewayDialogComponent,
-    GatewayPopupComponent,
+    GatewayUpdateComponent,
     GatewayDeletePopupComponent,
     GatewayDeleteDialogComponent,
     gatewayRoute,
-    gatewayPopupRoute,
+    gatewayPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...gatewayRoute,
-    ...gatewayPopupRoute,
-];
+const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         GatewayComponent,
         GatewayDetailComponent,
-        GatewayDialogComponent,
+        GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
-        GatewayPopupComponent,
-        GatewayDeletePopupComponent,
+        GatewayDeletePopupComponent
     ],
-    entryComponents: [
-        GatewayComponent,
-        GatewayDialogComponent,
-        GatewayPopupComponent,
-        GatewayDeleteDialogComponent,
-        GatewayDeletePopupComponent,
-    ],
-    providers: [
-        GatewayService,
-        GatewayPopupService,
-    ],
+    entryComponents: [GatewayComponent, GatewayUpdateComponent, GatewayDeleteDialogComponent, GatewayDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayGatewayModule {}

@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Header } from './header.model';
-import { HeaderPopupService } from './header-popup.service';
+import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
 
 @Component({
@@ -13,22 +12,16 @@ import { HeaderService } from './header.service';
     templateUrl: './header-delete-dialog.component.html'
 })
 export class HeaderDeleteDialogComponent {
+    header: IHeader;
 
-    header: Header;
-
-    constructor(
-        private headerService: HeaderService,
-        public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+    constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.headerService.delete(id).subscribe((response) => {
+        this.headerService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'headerListModification',
                 content: 'Deleted an header'
@@ -43,22 +36,30 @@ export class HeaderDeleteDialogComponent {
     template: ''
 })
 export class HeaderDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private headerPopupService: HeaderPopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.headerPopupService
-                .open(HeaderDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ header }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(HeaderDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.header = header;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

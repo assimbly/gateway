@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { ToEndpoint } from './to-endpoint.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IToEndpoint>;
+type EntityArrayResponseType = HttpResponse<IToEndpoint[]>;
+
+@Injectable({ providedIn: 'root' })
 export class ToEndpointService {
+    public resourceUrl = SERVER_API_URL + 'api/to-endpoints';
 
-    private resourceUrl =  SERVER_API_URL + 'api/to-endpoints';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(toEndpoint: ToEndpoint): Observable<ToEndpoint> {
-        const copy = this.convert(toEndpoint);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(toEndpoint: IToEndpoint): Observable<EntityResponseType> {
+        return this.http.post<IToEndpoint>(this.resourceUrl, toEndpoint, { observe: 'response' });
     }
 
-    update(toEndpoint: ToEndpoint): Observable<ToEndpoint> {
-        const copy = this.convert(toEndpoint);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(toEndpoint: IToEndpoint): Observable<EntityResponseType> {
+        return this.http.put<IToEndpoint>(this.resourceUrl, toEndpoint, { observe: 'response' });
     }
 
-    find(id: number): Observable<ToEndpoint> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IToEndpoint>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IToEndpoint[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to ToEndpoint.
-     */
-    private convertItemFromServer(json: any): ToEndpoint {
-        const entity: ToEndpoint = Object.assign(new ToEndpoint(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a ToEndpoint to a JSON which can be sent to the server.
-     */
-    private convert(toEndpoint: ToEndpoint): ToEndpoint {
-        const copy: ToEndpoint = Object.assign({}, toEndpoint);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

@@ -1,16 +1,14 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Environment Variables</span>
-        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/environment-variables/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create new Environment Variables
             </span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="environmentVariables">
         <table class="table table-striped">
@@ -25,28 +23,26 @@
             </thead>
             <tbody>
             <tr *ngFor="let environmentVariables of environmentVariables ;trackBy: trackId">
-                <td><a [routerLink]="['../environment-variables', environmentVariables.id ]">{{environmentVariables.id}}</a></td>
+                <td><a [routerLink]="['/environment-variables', environmentVariables.id, 'view' ]">{{environmentVariables.id}}</a></td>
                 <td>{{environmentVariables.key}}</td>
                 <td>{{environmentVariables.value}}</td>
                 <td>
                     <div *ngIf="environmentVariables.gatewayId">
-                        <a [routerLink]="['../gateway', environmentVariables.gatewayId  ]" >{{environmentVariables.gatewayId}}</a>
+                        <a [routerLink]="['../gateway', environmentVariables.gatewayId , 'view' ]" >{{environmentVariables.gatewayId}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../environment-variables', environmentVariables.id ]"
+                                [routerLink]="['/environment-variables', environmentVariables.id, 'view' ]"
                                 class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
+                            <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
                                 class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
@@ -54,7 +50,7 @@
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
+                            <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline">Delete</span>
                         </button>
                     </div>

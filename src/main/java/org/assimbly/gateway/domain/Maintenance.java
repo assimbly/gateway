@@ -33,8 +33,8 @@ public class Maintenance implements Serializable {
     private Instant endTime;
 
     @ManyToMany(mappedBy = "maintenances")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
     private Set<Flow> flows = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

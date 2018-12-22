@@ -1,49 +1,29 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    MaintenanceService,
-    MaintenancePopupService,
     MaintenanceComponent,
     MaintenanceDetailComponent,
-    MaintenanceDialogComponent,
-    MaintenancePopupComponent,
+    MaintenanceUpdateComponent,
     MaintenanceDeletePopupComponent,
     MaintenanceDeleteDialogComponent,
     maintenanceRoute,
-    maintenancePopupRoute,
+    maintenancePopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...maintenanceRoute,
-    ...maintenancePopupRoute,
-];
+const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         MaintenanceComponent,
         MaintenanceDetailComponent,
-        MaintenanceDialogComponent,
+        MaintenanceUpdateComponent,
         MaintenanceDeleteDialogComponent,
-        MaintenancePopupComponent,
-        MaintenanceDeletePopupComponent,
+        MaintenanceDeletePopupComponent
     ],
-    entryComponents: [
-        MaintenanceComponent,
-        MaintenanceDialogComponent,
-        MaintenancePopupComponent,
-        MaintenanceDeleteDialogComponent,
-        MaintenanceDeletePopupComponent,
-    ],
-    providers: [
-        MaintenanceService,
-        MaintenancePopupService,
-    ],
+    entryComponents: [MaintenanceComponent, MaintenanceUpdateComponent, MaintenanceDeleteDialogComponent, MaintenanceDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayMaintenanceModule {}

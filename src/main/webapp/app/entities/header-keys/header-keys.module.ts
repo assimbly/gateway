@@ -1,49 +1,29 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    HeaderKeysService,
-    HeaderKeysPopupService,
     HeaderKeysComponent,
     HeaderKeysDetailComponent,
-    HeaderKeysDialogComponent,
-    HeaderKeysPopupComponent,
+    HeaderKeysUpdateComponent,
     HeaderKeysDeletePopupComponent,
     HeaderKeysDeleteDialogComponent,
     headerKeysRoute,
-    headerKeysPopupRoute,
+    headerKeysPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...headerKeysRoute,
-    ...headerKeysPopupRoute,
-];
+const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         HeaderKeysComponent,
         HeaderKeysDetailComponent,
-        HeaderKeysDialogComponent,
+        HeaderKeysUpdateComponent,
         HeaderKeysDeleteDialogComponent,
-        HeaderKeysPopupComponent,
-        HeaderKeysDeletePopupComponent,
+        HeaderKeysDeletePopupComponent
     ],
-    entryComponents: [
-        HeaderKeysComponent,
-        HeaderKeysDialogComponent,
-        HeaderKeysPopupComponent,
-        HeaderKeysDeleteDialogComponent,
-        HeaderKeysDeletePopupComponent,
-    ],
-    providers: [
-        HeaderKeysService,
-        HeaderKeysPopupService,
-    ],
+    entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayHeaderKeysModule {}

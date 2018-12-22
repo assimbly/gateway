@@ -2,7 +2,6 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.domain.Flow;
-
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -59,6 +58,7 @@ public class FlowResource {
         if (flowDTO.getId() != null) {
             throw new BadRequestAlertException("A new flow cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         Flow flow = flowMapper.toEntity(flowDTO);
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
@@ -81,8 +81,9 @@ public class FlowResource {
     public ResponseEntity<FlowDTO> updateFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to update Flow : {}", flowDTO);
         if (flowDTO.getId() == null) {
-            return createFlow(flowDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         Flow flow = flowMapper.toEntity(flowDTO);
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
@@ -101,9 +102,9 @@ public class FlowResource {
     @Timed
     public ResponseEntity<List<FlowDTO>> getAllFlows(Pageable pageable) {
         log.debug("REST request to get a page of Flows");
-        Page<Flow> page = flowRepository.findAll(pageable);
+        Page<FlowDTO> page = flowRepository.findAll(pageable).map(flowMapper::toDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
-        return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
@@ -116,9 +117,9 @@ public class FlowResource {
     @Timed
     public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
         log.debug("REST request to get Flow : {}", id);
-        Flow flow = flowRepository.findOne(id);
-        FlowDTO flowDTO = flowMapper.toDto(flow);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(flowDTO));
+        Optional<FlowDTO> flowDTO = flowRepository.findById(id)
+            .map(flowMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(flowDTO);
     }
 
     /**
@@ -131,7 +132,8 @@ public class FlowResource {
     @Timed
     public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
         log.debug("REST request to delete Flow : {}", id);
-        flowRepository.delete(id);
+
+        flowRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

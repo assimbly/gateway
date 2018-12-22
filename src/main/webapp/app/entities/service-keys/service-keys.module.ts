@@ -1,49 +1,29 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
-    ServiceKeysService,
-    ServiceKeysPopupService,
     ServiceKeysComponent,
     ServiceKeysDetailComponent,
-    ServiceKeysDialogComponent,
-    ServiceKeysPopupComponent,
+    ServiceKeysUpdateComponent,
     ServiceKeysDeletePopupComponent,
     ServiceKeysDeleteDialogComponent,
     serviceKeysRoute,
-    serviceKeysPopupRoute,
+    serviceKeysPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...serviceKeysRoute,
-    ...serviceKeysPopupRoute,
-];
+const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         ServiceKeysComponent,
         ServiceKeysDetailComponent,
-        ServiceKeysDialogComponent,
+        ServiceKeysUpdateComponent,
         ServiceKeysDeleteDialogComponent,
-        ServiceKeysPopupComponent,
-        ServiceKeysDeletePopupComponent,
+        ServiceKeysDeletePopupComponent
     ],
-    entryComponents: [
-        ServiceKeysComponent,
-        ServiceKeysDialogComponent,
-        ServiceKeysPopupComponent,
-        ServiceKeysDeleteDialogComponent,
-        ServiceKeysDeletePopupComponent,
-    ],
-    providers: [
-        ServiceKeysService,
-        ServiceKeysPopupService,
-    ],
+    entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayServiceKeysModule {}

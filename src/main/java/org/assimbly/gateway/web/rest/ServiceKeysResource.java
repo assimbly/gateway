@@ -68,7 +68,7 @@ public class ServiceKeysResource {
     public ResponseEntity<ServiceKeysDTO> updateServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
         log.debug("REST request to update ServiceKeys : {}", serviceKeysDTO);
         if (serviceKeysDTO.getId() == null) {
-            return createServiceKeys(serviceKeysDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         ServiceKeysDTO result = serviceKeysService.save(serviceKeysDTO);
         return ResponseEntity.ok()
@@ -86,7 +86,7 @@ public class ServiceKeysResource {
     public List<ServiceKeysDTO> getAllServiceKeys() {
         log.debug("REST request to get all ServiceKeys");
         return serviceKeysService.findAll();
-        }
+    }
 
     /**
      * GET  /service-keys/:id : get the "id" serviceKeys.
@@ -98,8 +98,8 @@ public class ServiceKeysResource {
     @Timed
     public ResponseEntity<ServiceKeysDTO> getServiceKeys(@PathVariable Long id) {
         log.debug("REST request to get ServiceKeys : {}", id);
-        ServiceKeysDTO serviceKeysDTO = serviceKeysService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(serviceKeysDTO));
+        Optional<ServiceKeysDTO> serviceKeysDTO = serviceKeysService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(serviceKeysDTO);
     }
 
     /**

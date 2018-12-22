@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Group } from './group.model';
+import { IGroup } from 'app/shared/model/group.model';
+import { AccountService } from 'app/core';
 import { GroupService } from './group.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-group',
     templateUrl: './group.component.html'
 })
 export class GroupComponent implements OnInit, OnDestroy {
-groups: Group[];
+    groups: IGroup[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private groupService: GroupService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected groupService: GroupService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.groupService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.groups = res.json;
+            (res: HttpResponse<IGroup[]>) => {
+                this.groups = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInGroups();
@@ -43,14 +44,15 @@ groups: Group[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: Group) {
+    trackId(index: number, item: IGroup) {
         return item.id;
     }
+
     registerChangeInGroups() {
-        this.eventSubscriber = this.eventManager.subscribe('groupListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('groupListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

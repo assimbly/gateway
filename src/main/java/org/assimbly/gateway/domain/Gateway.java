@@ -53,15 +53,11 @@ public class Gateway implements Serializable {
     private String defaultErrorEndpointType;
 
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<FlowRoute> flowRoutes = new HashSet<>();
-
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<EnvironmentVariables> environmentVariables = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

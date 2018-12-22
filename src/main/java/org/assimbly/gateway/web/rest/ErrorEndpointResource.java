@@ -2,7 +2,6 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.domain.ErrorEndpoint;
-
 import org.assimbly.gateway.repository.ErrorEndpointRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -54,6 +53,7 @@ public class ErrorEndpointResource {
         if (errorEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new errorEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         ErrorEndpoint errorEndpoint = errorEndpointMapper.toEntity(errorEndpointDTO);
         errorEndpoint = errorEndpointRepository.save(errorEndpoint);
         ErrorEndpointDTO result = errorEndpointMapper.toDto(errorEndpoint);
@@ -76,8 +76,9 @@ public class ErrorEndpointResource {
     public ResponseEntity<ErrorEndpointDTO> updateErrorEndpoint(@RequestBody ErrorEndpointDTO errorEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update ErrorEndpoint : {}", errorEndpointDTO);
         if (errorEndpointDTO.getId() == null) {
-            return createErrorEndpoint(errorEndpointDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         ErrorEndpoint errorEndpoint = errorEndpointMapper.toEntity(errorEndpointDTO);
         errorEndpoint = errorEndpointRepository.save(errorEndpoint);
         ErrorEndpointDTO result = errorEndpointMapper.toDto(errorEndpoint);
@@ -97,7 +98,7 @@ public class ErrorEndpointResource {
         log.debug("REST request to get all ErrorEndpoints");
         List<ErrorEndpoint> errorEndpoints = errorEndpointRepository.findAll();
         return errorEndpointMapper.toDto(errorEndpoints);
-        }
+    }
 
     /**
      * GET  /error-endpoints/:id : get the "id" errorEndpoint.
@@ -109,9 +110,9 @@ public class ErrorEndpointResource {
     @Timed
     public ResponseEntity<ErrorEndpointDTO> getErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to get ErrorEndpoint : {}", id);
-        ErrorEndpoint errorEndpoint = errorEndpointRepository.findOne(id);
-        ErrorEndpointDTO errorEndpointDTO = errorEndpointMapper.toDto(errorEndpoint);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(errorEndpointDTO));
+        Optional<ErrorEndpointDTO> errorEndpointDTO = errorEndpointRepository.findById(id)
+            .map(errorEndpointMapper::toDto);
+        return ResponseUtil.wrapOrNotFound(errorEndpointDTO);
     }
 
     /**
@@ -124,7 +125,8 @@ public class ErrorEndpointResource {
     @Timed
     public ResponseEntity<Void> deleteErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ErrorEndpoint : {}", id);
-        errorEndpointRepository.delete(id);
+
+        errorEndpointRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

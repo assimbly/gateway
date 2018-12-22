@@ -22,11 +22,11 @@
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="start_time" type="timestamp">
+            <column name="start_time" type="datetime">
                 <constraints nullable="true" />
             </column>
 
-            <column name="end_time" type="timestamp">
+            <column name="end_time" type="datetime">
                 <constraints nullable="true" />
             </column>
 

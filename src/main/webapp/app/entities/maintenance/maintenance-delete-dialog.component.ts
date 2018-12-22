@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Maintenance } from './maintenance.model';
-import { MaintenancePopupService } from './maintenance-popup.service';
+import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { MaintenanceService } from './maintenance.service';
 
 @Component({
@@ -13,22 +12,20 @@ import { MaintenanceService } from './maintenance.service';
     templateUrl: './maintenance-delete-dialog.component.html'
 })
 export class MaintenanceDeleteDialogComponent {
-
-    maintenance: Maintenance;
+    maintenance: IMaintenance;
 
     constructor(
-        private maintenanceService: MaintenanceService,
+        protected maintenanceService: MaintenanceService,
         public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+        protected eventManager: JhiEventManager
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.maintenanceService.delete(id).subscribe((response) => {
+        this.maintenanceService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'maintenanceListModification',
                 content: 'Deleted an maintenance'
@@ -43,22 +40,33 @@ export class MaintenanceDeleteDialogComponent {
     template: ''
 })
 export class MaintenanceDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private maintenancePopupService: MaintenancePopupService
-    ) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.maintenancePopupService
-                .open(MaintenanceDeleteDialogComponent as Component, params['id']);
+        this.activatedRoute.data.subscribe(({ maintenance }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(MaintenanceDeleteDialogComponent as Component, {
+                    size: 'lg',
+                    backdrop: 'static'
+                });
+                this.ngbModalRef.componentInstance.maintenance = maintenance;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

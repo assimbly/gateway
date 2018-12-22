@@ -21,9 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,6 +81,9 @@ public class ServiceResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restServiceMockMvc;
 
     private Service service;
@@ -91,7 +96,8 @@ public class ServiceResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -181,7 +187,7 @@ public class ServiceResourceIntTest {
             .andExpect(jsonPath("$.[*].driver").value(hasItem(DEFAULT_DRIVER.toString())))
             .andExpect(jsonPath("$.[*].configuration").value(hasItem(DEFAULT_CONFIGURATION.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getService() throws Exception {
@@ -215,10 +221,11 @@ public class ServiceResourceIntTest {
     public void updateService() throws Exception {
         // Initialize the database
         serviceRepository.saveAndFlush(service);
+
         int databaseSizeBeforeUpdate = serviceRepository.findAll().size();
 
         // Update the service
-        Service updatedService = serviceRepository.findOne(service.getId());
+        Service updatedService = serviceRepository.findById(service.getId()).get();
         // Disconnect from session so that the updates on updatedService are not directly saved in db
         em.detach(updatedService);
         updatedService
@@ -257,15 +264,15 @@ public class ServiceResourceIntTest {
         // Create the Service
         ServiceDTO serviceDTO = serviceMapper.toDto(service);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restServiceMockMvc.perform(put("/api/services")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Service in the database
         List<Service> serviceList = serviceRepository.findAll();
-        assertThat(serviceList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(serviceList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -273,6 +280,7 @@ public class ServiceResourceIntTest {
     public void deleteService() throws Exception {
         // Initialize the database
         serviceRepository.saveAndFlush(service);
+
         int databaseSizeBeforeDelete = serviceRepository.findAll().size();
 
         // Get the service

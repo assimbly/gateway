@@ -68,7 +68,7 @@ public class MaintenanceResource {
     public ResponseEntity<MaintenanceDTO> updateMaintenance(@RequestBody MaintenanceDTO maintenanceDTO) throws URISyntaxException {
         log.debug("REST request to update Maintenance : {}", maintenanceDTO);
         if (maintenanceDTO.getId() == null) {
-            return createMaintenance(maintenanceDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         MaintenanceDTO result = maintenanceService.save(maintenanceDTO);
         return ResponseEntity.ok()
@@ -86,7 +86,7 @@ public class MaintenanceResource {
     public List<MaintenanceDTO> getAllMaintenances() {
         log.debug("REST request to get all Maintenances");
         return maintenanceService.findAll();
-        }
+    }
 
     /**
      * GET  /maintenances/:id : get the "id" maintenance.
@@ -98,8 +98,8 @@ public class MaintenanceResource {
     @Timed
     public ResponseEntity<MaintenanceDTO> getMaintenance(@PathVariable Long id) {
         log.debug("REST request to get Maintenance : {}", id);
-        MaintenanceDTO maintenanceDTO = maintenanceService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(maintenanceDTO));
+        Optional<MaintenanceDTO> maintenanceDTO = maintenanceService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(maintenanceDTO);
     }
 
     /**

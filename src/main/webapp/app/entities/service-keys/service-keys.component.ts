@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ServiceKeys } from './service-keys.model';
+import { IServiceKeys } from 'app/shared/model/service-keys.model';
+import { AccountService } from 'app/core';
 import { ServiceKeysService } from './service-keys.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-service-keys',
     templateUrl: './service-keys.component.html'
 })
 export class ServiceKeysComponent implements OnInit, OnDestroy {
-serviceKeys: ServiceKeys[];
+    serviceKeys: IServiceKeys[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private serviceKeysService: ServiceKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected serviceKeysService: ServiceKeysService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.serviceKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.serviceKeys = res.json;
+            (res: HttpResponse<IServiceKeys[]>) => {
+                this.serviceKeys = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInServiceKeys();
@@ -43,14 +44,15 @@ serviceKeys: ServiceKeys[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: ServiceKeys) {
+    trackId(index: number, item: IServiceKeys) {
         return item.id;
     }
+
     registerChangeInServiceKeys() {
-        this.eventSubscriber = this.eventManager.subscribe('serviceKeysListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('serviceKeysListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }
