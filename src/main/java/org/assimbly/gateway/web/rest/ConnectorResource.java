@@ -635,7 +635,7 @@ public class ConnectorResource {
     	plainResponse = true;
 
 		try {
-    		String documentation = connector.getComponentOptions(componenttype, mediaType);
+    		String documentation = connector.getComponentParameters(componenttype, mediaType);
     		if(documentation.startsWith("Unknown")) {
 				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/options/{componenttype}",documentation);
 			}
