@@ -75,9 +75,9 @@ public class WireTapEndpointResource {
      */
     @PutMapping("/wire-tap-endpoints")
     @Timed
-    public ResponseEntity<WireTapEndpoint> updateWireTapEndpoint(@RequestBody WireTapEndpoint wireTapEndpoint) throws URISyntaxException {
-        log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpoint);
-        if (wireTapEndpoint.getId() == null) {
+    public ResponseEntity<WireTapEndpointDTO> updateWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
+        log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpointDTO);
+        if (wireTapEndpointDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         WireTapEndpoint wireTapEndpoint = wireTapEndpointMapper.toEntity(wireTapEndpointDTO);
@@ -85,7 +85,7 @@ public class WireTapEndpointResource {
         WireTapEndpointDTO result = wireTapEndpointMapper.toDto(wireTapEndpoint);
         
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, wireTapEndpoint.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, wireTapEndpointDTO.getId().toString()))
             .body(result);
     }
 

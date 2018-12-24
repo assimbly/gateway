@@ -1,16 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { HeaderKeys } from './header-keys.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
+import { Header } from 'app/shared/model/header.model';
 import { HeaderKeysPopupService } from './header-keys-popup.service';
 import { HeaderKeysService } from './header-keys.service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
+import { HeaderService } from '../header';
+import { HttpResponse } from "@angular/common/http";
 
 @Component({
     selector: 'jhi-header-keys-dialog',
@@ -35,9 +35,9 @@ export class HeaderKeysDialogComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
-        this.headerService.query().subscribe((res: ResponseWrapper) => {
-            this.headers = res.json;
-        }, (res: ResponseWrapper) => this.onError(res.json));
+        this.headerService.query().subscribe((res) => {
+            this.headers = res.body;
+        }, (res) => this.onError(res.body));
     }
     clear() {
         this.activeModal.dismiss('cancel');
@@ -54,9 +54,15 @@ export class HeaderKeysDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<HeaderKeys>) {
-        result.subscribe((res: HeaderKeys) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeaderKeys>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: HeaderKeys) {

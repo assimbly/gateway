@@ -1,23 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+
 import { Observable, Observer, Subscription } from 'rxjs';
+
 import { SERVER_API_URL } from '../../app.constants';
 import { Router, NavigationEnd } from '@angular/router';
 import { WindowRef } from '../../shared/auth/window.service';
-import { Flow } from './flow.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { createRequestOption } from '../../shared';
 import { saveAs } from 'file-saver/FileSaver';
-import { Gateway } from '../gateway/gateway.model';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import { IGateway, Gateway } from 'app/shared/model/gateway.model';
+import { IFlow, Flow } from 'app/shared/model/flow.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
+import { tap } from "rxjs/operators";
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
+@Injectable({ providedIn: 'root' })
+export class FlowService {
+    
     stompClient = null;
     subscriber = null;
     connection: Promise<any>;
@@ -29,22 +32,26 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
     private resourceUrl = SERVER_API_URL + 'api/flows';
     private connectorUrl = SERVER_API_URL + 'api/connector';
-    private environmentUrl = SERVER_API_URL + 'api/environment'
+    private environmentUrl = SERVER_API_URL + 'api/environment';
 
     private gatewayid = 1;
 
     constructor(
-        private http: Http,
         private router: Router,
         private $window: WindowRef,
+        protected http: HttpClient
         // tslint:disable-next-line: no-unused-variable
-        private csrfService: CSRFService) {
+     ) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
     }
 
     create(flow: IFlow): Observable<EntityResponseType> {
         return this.http.post<IFlow>(this.resourceUrl, flow, { observe: 'response' });
+    }
+
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     update(flow: IFlow): Observable<EntityResponseType> {
@@ -57,117 +64,114 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
     query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IFlow[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    getFlowByGatewayId(gatewayid: Number): Observable<ResponseWrapper> {
-        return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`)
-            .map((res: Response) => this.convertResponse(res));
+    getFlowByGatewayId(gatewayid: Number): Observable<EntityResponseType> {
+        return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
+    getConfiguration(flowid: number): Observable<any> {
+        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, { observe: 'response' });
     }
 
-    getConfiguration(flowid: number): Observable<Response> {
-        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`);
-    }
-
-    setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<Response> {
+    setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<EntityResponseType> {
         if (!!header) {
-            let headers = new Headers();
-            headers.append('Accept', header);
-            let options = new RequestOptions();
-            options.headers = headers;
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
+            const options = {
+                    headers: new HttpHeaders({'Accept': 'application/xml'})
+            };
+            return this.http.post<any>(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
         } else {
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+            return this.http.post<any>(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
         }
     }
-    saveFlows(id: number, xmlconfiguration: string, header: string): Observable<Response> {
-        let headers = new Headers();
-        headers.append('Accept', header);
-        let options = new RequestOptions();
-        options.headers = headers;
-        return this.http.post(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
+
+    saveFlows(id: number, xmlconfiguration: string, header: string): Observable<EntityResponseType> {
+        const options = {
+                headers: new HttpHeaders({'Accept': 'application/xml'})
+        };
+        return this.http.post<any>(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
     }
 
-    validateFlowsUri(connectorId: number, uri: string): Observable<Response> {
-        let headers = new Headers();
-        headers.append('Uri', uri);
-        let options = new RequestOptions();
-        options.headers = headers;
-        return this.http.get(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
+    validateFlowsUri(connectorId: number, uri: string): Observable<EntityResponseType> {
+        const options = {
+                headers: new HttpHeaders({'Accept': 'application/xml'})
+        };
+        return this.http.get<any>(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
     }
 
-    start(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`);
+    start(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response' });
     }
 
-    pause(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`);
+    pause(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response' });
     }
 
-    resume(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`);
+    resume(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response' });
     }
 
-    restart(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`);
+    restart(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response' });
     }
 
-    stop(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`);
+    stop(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response' });
     }
 
-    getFlowStatus(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`);
+    getFlowStatus(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response' });
     }
 
-    getFlowAlerts(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`);
+    getFlowAlerts(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response' });
     }
 
-    getFlowNumberOfAlerts(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`);
+    getFlowNumberOfAlerts(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, { observe: 'response' });
     }
 
-    getFlowLastError(id: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`);
+    getFlowLastError(id: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response' });
     }
 
-    getFlowStats(id: number, gatewayid: number): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`);
+    getFlowStats(id: number, gatewayid: number): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`, { observe: 'response' });
     }
 
-    getComponentOptions(gatewayid: number, componentType: String): Observable<Response> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/schema/` + componentType);
+    getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/schema/` + componentType, { observe: 'response' });
     }
 
     getWikiDocUrl() {
-        return this.http.get(`${SERVER_API_URL}/api/wiki-url`);
+        return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response' });
     }
 
     getCamelDocUrl() {
-        return this.http.get(`${SERVER_API_URL}/api/camel-url`)
+        return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response' });
     }
 
-    setMaintenance(time: number, flowsIds: Array<number>): Observable<Response> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds);
+    setMaintenance(time: number, flowsIds: Array<number>): Observable<any> {
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, { observe: 'response' });
     }
 
-    exportGatewayConfiguration(gateway: Gateway) {
+    exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
-        let headers = new Headers();
-        headers.append('Accept', 'application/xml');
-        const options = new RequestOptions({ responseType: ResponseContentType.Blob });
-        options.headers = headers
-        this.http.get(url, options).subscribe((res) => {
-            const b = res.blob();
-            const blob = new Blob([b], { type: 'application/xml' });
-            saveAs(blob, `${gateway.name}.xml`);
-        });
+                
+        this.http.get(url, { headers: new HttpHeaders({
+            'Accept': 'application/xml',
+            'Content-Type': 'application/octet-stream',
+            }), responseType: 'blob'}).pipe (
+            tap (
+              // Log the result or error
+              data => {console.log('You received data')
+                  const blob = new Blob([data], { type: 'application/xml' });
+                  saveAs(blob, `${gateway.name}.xml`);              
+              },
+              error => console.log(error)
+            )
+           );
     }
 
     connect() {
@@ -192,7 +196,7 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
         this.stompClient = Stomp.over(socket);
 
         const headers = {};
-        headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
+        // headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
 
         this.stompClient.connect(headers, () => {
 
@@ -220,7 +224,7 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
     subscribe() {
         this.connection.then(() => {
-            this.subscriber = this.stompClient.subscribe('/topic/alert', (data) => {
+            this.subscriber = this.stompClient.subscribe('/topic/alert', data => {
                 this.listenerObserver.next(JSON.parse(data.body));
             });
         });
@@ -234,33 +238,21 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
     }
 
     private createListener(): Observable<any> {
-        return new Observable((observer) => {
+        return new Observable(observer => {
             this.listenerObserver = observer;
-        }).share();
+        });
     }
 
     private createConnection(): Promise<any> {
         return new Promise((resolve, reject) => (this.connectedPromise = resolve));
     }
 
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
     /**
      * Convert a returned JSON object to Flow.
      */
-    private convertItemFromServer(json: any): Flow {
-        const entity: Flow = Object.assign(new Flow(), json);
+    private convertItemFromServer(json: any): IFlow {
+        const entity: IFlow = Object.assign(new Flow(), json);
         return entity;
     }
 
-    delete(id: number): Observable<HttpResponse<any>> {
-        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
-    }
 }

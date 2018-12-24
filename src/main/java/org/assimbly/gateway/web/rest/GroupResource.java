@@ -6,12 +6,14 @@ import org.assimbly.gateway.domain.Group;
 import org.assimbly.gateway.repository.GroupRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.GroupService;
 import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,13 +37,15 @@ public class GroupResource {
     private final GroupRepository groupRepository;
 
     private final GroupMapper groupMapper;
+
+	private JpaRepository<Group, Long> groupService;
     
     public GroupResource(GroupRepository groupRepository, GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
     }
 
-    /**
+	/**
      * POST  /groups : Create a new group.
      *
      * @param groupDTO the groupDTO to create
@@ -97,7 +101,7 @@ public class GroupResource {
      */
     @GetMapping("/groups")
     @Timed
-    public List<GroupDTO> getAllGroups(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+    public List<Group> getAllGroups(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Groups");
         return groupService.findAll();
     }
@@ -110,9 +114,9 @@ public class GroupResource {
      */
     @GetMapping("/groups/{id}")
     @Timed
-    public ResponseEntity<GroupDTO> getGroup(@PathVariable Long id) {
+    public ResponseEntity<Group> getGroup(@PathVariable Long id) {
         log.debug("REST request to get Group : {}", id);
-        Optional<GroupDTO> groupDTO = groupService.findOne(id);
+        Optional<Group> groupDTO = groupService.findById(id);
         return ResponseUtil.wrapOrNotFound(groupDTO);
     }
 
@@ -126,7 +130,7 @@ public class GroupResource {
     @Timed
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         log.debug("REST request to delete Group : {}", id);
-        groupRepository.delete(id);
+        groupRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

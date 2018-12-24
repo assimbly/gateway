@@ -1,23 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import { SERVER_API_URL } from '../../app.constants';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { createRequestOption } from 'app/shared';
-import { IGateway } from 'app/shared/model/gateway.model';
+import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 
+type EntityResponseType = HttpResponse<Gateway>;
+type EntityArrayResponseType = HttpResponse<Gateway[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GatewayService {
-    public resourceUrl = SERVER_API_URL + 'api/gateways';
 
-    type EntityResponseType = HttpResponse<IGateway>;
-    type EntityArrayResponseType = HttpResponse<IGateway[]>;
-
-        private resourceUrl =  SERVER_API_URL + 'api/gateways';
-        private environmentUrl  = SERVER_API_URL + 'api/environment'
-
-        
+    private resourceUrl =  SERVER_API_URL + 'api/gateways';
+    private environmentUrl  = SERVER_API_URL + 'api/environment';
+    
     constructor(protected http: HttpClient) {}
 
     create(gateway: IGateway): Observable<EntityResponseType> {
@@ -28,46 +24,32 @@ export class GatewayService {
         return this.http.put<IGateway>(this.resourceUrl, gateway, { observe: 'response' });
     }
 
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    }
+
     find(id: number): Observable<EntityResponseType> {
         return this.http.get<IGateway>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IGateway[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    setGatewayConfiguration(gatewayid, configuration): Observable<Response> {
-        let headers = new Headers();
-        headers.append('Accept', 'application/xml');
-        let options = new RequestOptions();
-        options.headers = headers;
-        return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
+    setGatewayConfiguration(gatewayid, configuration): Observable<HttpResponse<any>> {
+        const options = {
+                headers: new HttpHeaders({'Accept': 'application/xml'})
+        };
+        return this.http.post<any>(`${this.environmentUrl}/${gatewayid}`, configuration, options);
     }
 
     /**
      * Convert a returned JSON object to Gateway.
      */
-    private convertItemFromServer(json: any): Gateway {
-        const entity: Gateway = Object.assign(new Gateway(), json);
+    private convertItemFromServer(json: any): IGateway {
+        const entity: IGateway = Object.assign(new Gateway(), json);
         return entity;
     }
 
-    delete(id: number): Observable<HttpResponse<any>> {
-        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
-    }
 }

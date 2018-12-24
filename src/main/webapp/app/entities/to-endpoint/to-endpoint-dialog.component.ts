@@ -1,18 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ToEndpoint } from './to-endpoint.model';
-import { ToEndpointPopupService } from './to-endpoint-popup.service';
+import { IToEndpoint, ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IHeader, Header } from 'app/shared/model/header.model';
 import { ToEndpointService } from './to-endpoint.service';
-import { Flow, FlowService } from '../flow';
-import { Service, ServiceService } from '../service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
+import { FlowService } from '../flow';
+import { ServiceService } from '../service';
+import { HeaderService } from '../header';
 import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
@@ -45,33 +46,33 @@ export class ToEndpointDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.flowService.query()
-            .subscribe((res: ResponseWrapper) => { this.flows = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe(res => { this.flows = res.body; }, res => this.onError(res));
         this.serviceService
             .query({filter: 'toendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe(res => {
                 if (!this.toEndpoint.serviceId) {
-                    this.services = res.json;
+                    this.services = res.body;
                 } else {
                     this.serviceService
                         .find(this.toEndpoint.serviceId)
-                        .subscribe((subRes: Service) => {
-                            this.services = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe(subRes => {
+                            this.services.push(subRes.body);
+                        }, subRes => this.onError(subRes.body));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, res => this.onError(res.json));
         this.headerService
             .query({filter: 'toendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe((res) => {
                 if (!this.toEndpoint.headerId) {
-                    this.headers = res.json;
+                    this.headers = res.body;
                 } else {
                     this.headerService
                         .find(this.toEndpoint.headerId)
-                        .subscribe((subRes: Header) => {
-                            this.headers = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe((subRes) => {
+                            this.headers.push(subRes.body);
+                        }, subRes => this.onError(subRes.body));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, (res) => this.onError(res.body));
     }
 
     clear() {
@@ -130,20 +131,10 @@ export class ToEndpointPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private toEndpointPopupService: ToEndpointPopupService
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
-                this.toEndpointPopupService
-                    .open(ToEndpointDialogComponent as Component, params['id']);
-            } else {
-                this.toEndpointPopupService
-                    .open(ToEndpointDialogComponent as Component);
-            }
-        });
     }
 
     ngOnDestroy() {

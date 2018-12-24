@@ -24,9 +24,7 @@ import {
     JhiMetricsService,
     LogsService,
     LogViewerService,
-    UserResolvePagingParams,
     UserResolve,
-    UserModalService,
     LogViewerLineValidationDirective
 } from './';
 
@@ -53,7 +51,6 @@ import {
         LogViewerLineValidationDirective
     ],
     entryComponents: [
-        UserMgmtDialogComponent,
         UserMgmtDeleteDialogComponent,
         JhiHealthModalComponent,
         JhiMetricsMonitoringModalComponent,
@@ -65,9 +62,7 @@ import {
         JhiMetricsService,
         LogsService,
         LogViewerService,
-        UserResolvePagingParams,
-        UserResolve,
-        UserModalService
+        UserResolve
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

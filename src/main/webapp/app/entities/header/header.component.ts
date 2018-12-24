@@ -5,10 +5,10 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
 import { IHeader } from 'app/shared/model/header.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { AccountService } from 'app/core';
 import { HeaderService } from './header.service';
-import { HeaderKeysComponent, HeaderKeysService, HeaderKeys } from '../../entities/header-keys';
-import { Principal, ResponseWrapper } from '../../shared';
+import { HeaderKeysComponent, HeaderKeysService } from '../../entities/header-keys';
 
 @Component({
     selector: 'jhi-header',
@@ -19,26 +19,25 @@ import { Principal, ResponseWrapper } from '../../shared';
 })
 
 export class HeaderComponent implements OnInit, OnDestroy {
-    public headers: Array<Header> = [];
+    public headers: Array<IHeader> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
-    headerKeys: Array<HeaderKeys>
-    headerKey: HeaderKeys;
+    headerKeys: Array<IHeaderKeys>
+    headerKey: IHeaderKeys;
     selectedHeaderId: number;
 
     constructor(
         private headerService: HeaderService,
         private headerKeysService: HeaderKeysService,
         private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        private eventManager: JhiEventManager
     ) {
     }
 
     loadAll() {
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            (res) => {
+                this.headers = res.body;
                 if (this.headers.length > 0) {
                     this.selectedHeaderId = this.headers[this.headers.length - 1].id;
                     this.filterHeaderKeys(this.selectedHeaderId);
@@ -50,9 +49,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
-            this.currentAccount = account;
-        });
         if (this.headerKey !== undefined ) {
             this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
         }else {
@@ -73,20 +69,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     filterHeaderKeys(id) {
         this.headerKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headerKeys = res.json;
+            (res) => {
+                this.headerKeys = res.body;
                 this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
                 if (this.headerKeys.length === 0) {
                     const newHeaderKeys = new HeaderKeys();
-                    newHeaderKeys.isDisabled = false;
+                    (newHeaderKeys as any).isDisabled = false;
                     this.headerKeys.push(newHeaderKeys);
                 }
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res.json)
         );
     }
 
-    trackId(index: number, item: Header) {
+    trackId(index: number, item: IHeader) {
         return item.id;
     }
 

@@ -1,8 +1,8 @@
-import { IFlowRoute } from 'app/shared/model/flow-route.model';
+import { IFlow } from 'app/shared/model/flow.model';
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 export const enum GatewayType {
-    FILE = 'FILE',
+    ADAPTER = 'ADAPTER',
     BROKER = 'BROKER'
 }
 
@@ -22,7 +22,7 @@ export interface IGateway {
     defaultFromEndpointType?: string;
     defaultToEndpointType?: string;
     defaultErrorEndpointType?: string;
-    flowRoutes?: IFlowRoute[];
+    flows?: IFlow[];
     environmentVariables?: IEnvironmentVariables[];
 }
 
@@ -36,7 +36,7 @@ export class Gateway implements IGateway {
         public defaultFromEndpointType?: string,
         public defaultToEndpointType?: string,
         public defaultErrorEndpointType?: string,
-        public flowRoutes?: IFlowRoute[],
+        public flows?: IFlow[],
         public environmentVariables?: IEnvironmentVariables[]
     ) {}
 }

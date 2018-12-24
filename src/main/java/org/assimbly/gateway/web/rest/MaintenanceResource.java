@@ -96,9 +96,9 @@ public class MaintenanceResource {
      */
     @GetMapping("/maintenances")
     @Timed
-    public List<MaintenanceDTO> getAllMaintenances() {
+    public List<Maintenance> getAllMaintenances() {
         log.debug("REST request to get all Maintenances");
-        return maintenanceService.findAll();
+        return maintenanceRepository.findAll();
     }
 
     /**
@@ -109,9 +109,9 @@ public class MaintenanceResource {
      */
     @GetMapping("/maintenances/{id}")
     @Timed
-    public ResponseEntity<MaintenanceDTO> getMaintenance(@PathVariable Long id) {
+    public ResponseEntity<Maintenance> getMaintenance(@PathVariable Long id) {
         log.debug("REST request to get Maintenance : {}", id);
-        Optional<MaintenanceDTO> maintenanceDTO = maintenanceService.findOne(id);
+        Optional<Maintenance> maintenanceDTO = maintenanceRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(maintenanceDTO);
     }
 
@@ -125,7 +125,7 @@ public class MaintenanceResource {
     @Timed
     public ResponseEntity<Void> deleteMaintenance(@PathVariable Long id) {
         log.debug("REST request to delete Maintenance : {}", id);
-        maintenanceRepository.delete(id);
+        maintenanceRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

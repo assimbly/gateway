@@ -1,13 +1,13 @@
 /* tslint:disable max-line-length */
 import { ComponentFixture, TestBed, async, inject, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
 import { EnvironmentVariablesDialogComponent } from '../../../../../../main/webapp/app/entities/environment-variables/environment-variables-dialog.component';
 import { EnvironmentVariablesService } from '../../../../../../main/webapp/app/entities/environment-variables/environment-variables.service';
-import { EnvironmentVariables } from '../../../../../../main/webapp/app/entities/environment-variables/environment-variables.model';
+import { EnvironmentVariables } from '../../../../../../main/webapp/app/shared/model/environment-variables.model';
 import { GatewayService } from '../../../../../../main/webapp/app/entities/gateway';
 
 describe('Component Tests', () => {
@@ -46,10 +46,10 @@ describe('Component Tests', () => {
                     fakeAsync(() => {
                         // GIVEN
                         const entity = new EnvironmentVariables(123);
-                        spyOn(service, 'update').and.returnValue(Observable.of(entity));
+                        spyOn(service, 'update').and.returnValue(of(entity));
                         comp.environmentVariables = entity;
                         // WHEN
-                        comp.save(true);
+                        comp.save();
                         tick(); // simulate async
 
                         // THEN
@@ -66,10 +66,10 @@ describe('Component Tests', () => {
                     fakeAsync(() => {
                         // GIVEN
                         const entity = new EnvironmentVariables();
-                        spyOn(service, 'create').and.returnValue(Observable.of(entity));
+                        spyOn(service, 'create').and.returnValue(of(entity));
                         comp.environmentVariables = entity;
                         // WHEN
-                        comp.save(true);
+                        comp.save();
                         tick(); // simulate async
 
                         // THEN

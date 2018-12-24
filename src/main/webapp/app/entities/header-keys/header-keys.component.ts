@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { AccountService } from 'app/core';
 import { HeaderKeysService } from './header-keys.service';
 
@@ -13,7 +13,7 @@ import { HeaderKeysService } from './header-keys.service';
     templateUrl: './header-keys.component.html'
 })
 export class HeaderKeysComponent implements OnInit, OnChanges {
-    @Input() headerKeys: HeaderKeys[];
+    @Input() headerKeys: IHeaderKeys[];
     @Input() headerId: number;
 
     headerKeysKeys: Array<string> = [];
@@ -21,7 +21,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     headerKeySelected: boolean;
     selectedId: number;
     isSaving: boolean;
-    headerKey: HeaderKeys;
+    headerKey: IHeaderKeys;
     headerKeyId: number;
     typeHeader: string[] = ['constant', 'xpath'];
 
@@ -43,9 +43,6 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
-            this.currentAccount = account;
-        });
         this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
     }
 
@@ -61,16 +58,16 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         this.mapHeaderKeysKeys();
         if (changes['headerKeys'] && this.headerKeys !== undefined) {
             if (this.headerKeys.length === 1 && this.headerKeys[0].id === undefined) {
-                this.headerKeys[0].isDisabled = false;
+                (this.headerKeys[0] as any).isDisabled = false;
                 this.headerKeys[0].type = this.typeHeader[0];
             } else {
                 this.headerKeys.forEach((headerKey) => {
-                    headerKey.isDisabled = true;
+                    (headerKey as any).isDisabled = true;
                 });
             }
         }
     }
-    save(headerKey: HeaderKeys, i: number) {
+    save(headerKey: IHeaderKeys, i: number) {
         this.isSaving = true;
         if (!!headerKey.id) {
             this.subscribeToSaveResponse(
@@ -89,17 +86,23 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<HeaderKeys>, isCreate: boolean, i: number) {
-        result.subscribe((res: HeaderKeys) =>
-            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeaderKeys>>,closePopup, i: number) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,closePopup,i);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
-    private onSaveSuccess(result: HeaderKeys, isCreate: boolean, i: number) {
+    private onSaveSuccess(result: IHeaderKeys, isCreate: boolean, i: number) {
         if (isCreate) {
-            result.isDisabled = true;
+            (result as any).isDisabled = true;
             this.headerKeys.splice(i, 1, result);
         } else {
-            this.headerKeys.find((k) => k.id === result.id).isDisabled = true;
+            //this.headerKeys.find(k => k.id === result.id).isDisabled = true;
         }
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK' });
     }
@@ -112,14 +115,13 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         headerKey.isDisabled = false;
     }
 
-    cloneHeaderKey(headerKey: HeaderKeys) {
+    cloneHeaderKey(headerKey: IHeaderKeys) {
         const headerKeyForClone = new HeaderKeys(
-            null,
+            headerKey.headerId,
             headerKey.key,
             headerKey.value,
             headerKey.type,
-            headerKey.headerId,
-            false);
+            headerKey.headerId);
         this.headerKeys.push(headerKeyForClone);
     }
 
@@ -129,7 +131,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     addHeaderKeys() {
         const newHeaderKeys = new HeaderKeys();
-        newHeaderKeys.isDisabled = false;
+        (newHeaderKeys as any).isDisabled = false;
         newHeaderKeys.type = this.typeHeader[0];
         this.headerKeys.push(newHeaderKeys);
         this.mapHeaderKeysKeys();

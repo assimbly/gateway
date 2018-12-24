@@ -75,7 +75,7 @@ public class ToEndpointResource {
     public ResponseEntity<List<ToEndpointDTO>> createToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to save List<ToEndpoint> : {}", toEndpointsDTO);
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
-        toEndpoints = toEndpointRepository.save(toEndpoints);
+        toEndpoints = toEndpointRepository.saveAll(toEndpoints);
         List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
         return ResponseEntity.created(new URI("/api/to-endpoints/")).body(results);
     }
@@ -119,7 +119,7 @@ public class ToEndpointResource {
     public ResponseEntity<List<ToEndpointDTO>> updateToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to update ToEndpoints : {}", toEndpointsDTO);
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
-        toEndpoints = toEndpointRepository.save(toEndpoints);
+        toEndpoints = toEndpointRepository.saveAll(toEndpoints);
         List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
         return ResponseEntity.ok().body(results);
     }

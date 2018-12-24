@@ -7,8 +7,7 @@ import { CommonModule } from '@angular/common';
 import { GatewaySharedModule } from 'app/shared';
 import {
     MaintenanceComponent,
-    MaintenanceDialogComponent,
-    MaintenancePopupComponent,
+    MaintenanceUpdateComponent,
     MaintenanceDeleteDialogComponent,
     MaintenanceDeletePopupComponent,
     MaintenanceDetailComponent,
@@ -24,18 +23,14 @@ import {
     ],
     declarations: [
         MaintenanceComponent,
-        MaintenanceDialogComponent,
-        MaintenancePopupComponent,
-        MaintenancePopupComponent,
+        MaintenanceUpdateComponent,
         MaintenanceDeleteDialogComponent,
         MaintenanceDeletePopupComponent,
         MaintenanceDetailComponent
     ],
     entryComponents: [
         MaintenanceComponent,
-        MaintenanceDialogComponent,
-        MaintenancePopupComponent,
-        MaintenancePopupComponent,
+        MaintenanceUpdateComponent,
         MaintenanceDeleteDialogComponent,
         MaintenanceDeletePopupComponent,
         MaintenanceDetailComponent

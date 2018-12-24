@@ -1,10 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
+import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
-import { Principal, ResponseWrapper } from '../../shared';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'jhi-service-all',
@@ -23,17 +22,12 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     constructor(
         private serviceService: ServiceService,
         private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        private eventManager: JhiEventManager
     ) {
     }
 
     ngOnInit() {
         this.loadAllServices();
-        this.isAdmin = this.principal.isAdmin();
-        this.principal.identity().then((account) => {
-            this.currentAccount = account;
-        });
         this.registerChangeInServices();
     }
 
@@ -53,10 +47,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
 
     private loadAllServices() {
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
+            (res) => {
+                this.services = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res)
         );
     }
 

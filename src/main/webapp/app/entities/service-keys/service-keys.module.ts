@@ -28,14 +28,11 @@ const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
         ServiceKeysDetailComponent,
         ServiceKeysUpdateComponent,
         ServiceKeysDeleteDialogComponent,
-        ServiceKeysPopupComponent,
         ServiceKeysDeletePopupComponent,
         ForbiddenServiceKeysValidatorDirective
     ],
     entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
     providers: [
-        ServiceKeysService,
-        ServiceKeysPopupService,
         ServiceKeysDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

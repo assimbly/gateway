@@ -3,7 +3,6 @@ package org.assimbly.gateway.config.environment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.docconverter.DocConverter;
@@ -37,8 +36,6 @@ public class DBExportXMLConfiguration {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
-	private TreeMap<String, String> properties;
-
 	public String options;
 	public String componentType;
 	public String uri;
@@ -61,9 +58,6 @@ public class DBExportXMLConfiguration {
 
 	private Set<ToEndpoint> toEndpoints;
 
-	private org.assimbly.gateway.domain.Service service;
-
-	private Header header;
 	public String xmlConfiguration;
 	private Element rootElement;
 	private Document doc;
@@ -81,8 +75,6 @@ public class DBExportXMLConfiguration {
 	private Element offloading;
 
 	private Node environmentVariablesList;
-
-	private List<TreeMap<String, String>> propertiesList;
 
 	public String getXMLConfiguration(Long gatewayId) throws Exception {
 
@@ -106,7 +98,7 @@ public class DBExportXMLConfiguration {
 
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
-		Flow flow = flowRepository.findOne(id);
+		Flow flow = flowRepository.findById(id).get();
 
 		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
 
@@ -152,7 +144,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
 
 		connectorId = gatewayId.toString();
-		Gateway gateway = gatewayRepository.findOne(gatewayId);
+		Gateway gateway = gatewayRepository.findById(gatewayId).get();
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();

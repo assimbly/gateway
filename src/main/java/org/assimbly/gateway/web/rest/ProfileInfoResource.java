@@ -46,7 +46,9 @@ public class ProfileInfoResource {
     
     
     private String getRibbonEnv(String[] activeProfiles) {
-        String[] displayOnActiveProfiles = jHipsterProperties.getRibbon().getDisplayOnActiveProfiles();
+    	/*
+        String[] displayOnActiveProfiles = jHipsterProperties.
+        		.getRibbon().getDisplayOnActiveProfiles();
         if (displayOnActiveProfiles == null) {
             return null;
         }
@@ -55,7 +57,7 @@ public class ProfileInfoResource {
         ribbonProfiles.retainAll(springBootProfiles);
         if (!ribbonProfiles.isEmpty()) {
             return ribbonProfiles.get(0);
-        }
+        }*/
         return null;
     }
 

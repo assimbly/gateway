@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ServiceKeys } from './service-keys.model';
-import { ServiceKeysPopupService } from './service-keys-popup.service';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
-import { Service, ServiceService } from '../service';
-import { ResponseWrapper } from '../../shared';
+import { ServiceService } from '../service';
 
 @Component({
     selector: 'jhi-service-keys-dialog',
@@ -35,7 +34,7 @@ export class ServiceKeysDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.serviceService.query()
-            .subscribe((res: ResponseWrapper) => { this.services = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe(res => { this.services = res.body; }, res => this.onError(res.body));
     }
 
     clear() {
@@ -53,11 +52,17 @@ export class ServiceKeysDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<ServiceKeys>, closePopup: boolean) {
-        result.subscribe((res: ServiceKeys) =>
-            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IServiceKeys>>,closePopup) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,closePopup);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
-
+    
     private onSaveSuccess(result: ServiceKeys, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'serviceKeysListModification', content: 'OK'});
         this.isSaving = false;
@@ -88,20 +93,10 @@ export class ServiceKeysPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private serviceKeysPopupService: ServiceKeysPopupService
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
-                this.serviceKeysPopupService
-                    .open(ServiceKeysDialogComponent as Component, params['id']);
-            } else {
-                this.serviceKeysPopupService
-                    .open(ServiceKeysDialogComponent as Component);
-            }
-        });
     }
 
     ngOnDestroy() {

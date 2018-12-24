@@ -6,7 +6,6 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { AccountService } from 'app/core';
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
-import { Principal, ResponseWrapper } from '../../shared';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,7 +13,7 @@ import { Router } from '@angular/router';
     templateUrl: './wire-tap-endpoint.component.html'
 })
 export class WireTapEndpointComponent implements OnInit, OnDestroy {
-    wireTapEndpoints: Array<WireTapEndpoint> = [];
+    wireTapEndpoints: Array<IWireTapEndpoint> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
     public isAdmin: boolean;
@@ -23,7 +22,6 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
         private wireTapEndpointService: WireTapEndpointService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
-        private principal: Principal,
         private router: Router
     ) {
     }
@@ -39,9 +37,6 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
-            this.currentAccount = account;
-        });
         this.registerChangeInWireTapEndpoints();
     }
 
@@ -59,7 +54,7 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
         this.router.navigate(['/wire-tap-endpoint-create']);
     }
 
-    trackId(index: number, item: WireTapEndpoint) {
+    trackId(index: number, item: IWireTapEndpoint) {
         return item.id;
     }
 

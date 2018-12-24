@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { ToEndpoint } from './to-endpoint.model';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
 import { ToEndpointService } from './to-endpoint.service';
 import { HeaderService } from '../header/header.service';
 import { ServiceService } from '../service/service.service';
+import { Subscription } from "rxjs";
+import { JhiEventManager } from "ng-jhipster";
 
 @Component({
     selector: 'jhi-to-endpoint-detail',
@@ -12,7 +14,7 @@ import { ServiceService } from '../service/service.service';
 })
 export class ToEndpointDetailComponent implements OnInit {
 
-    toEndpoint: ToEndpoint;
+    toEndpoint: IToEndpoint;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
     public headerName: string;
@@ -28,17 +30,17 @@ export class ToEndpointDetailComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.activatedRoute.data.subscribe(({ toEndpoint }) => {
+        this.route.data.subscribe(({ toEndpoint }) => {
             this.toEndpoint = toEndpoint;
 
             this.headerService.find(this.toEndpoint.headerId)
                 .subscribe((header) => {
-                    this.headerName = header.name;
+                    this.headerName = header.body.name;
                 });
 
             this.serviceService.find(this.toEndpoint.serviceId)
                 .subscribe((service) => {
-                    this.serviceName = service.name;
+                    this.serviceName = service.body.name;
                 });
         });
     }

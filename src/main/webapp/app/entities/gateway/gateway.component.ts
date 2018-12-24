@@ -6,21 +6,21 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { AccountService } from 'app/core';
 import { GatewayService } from './gateway.service';
-import { Principal, ResponseWrapper } from '../../shared';
 import { FlowService } from '../flow/flow.service';
 
 @Component({
     selector: 'jhi-gateway',
-    templateUrl: './gateway.component.html'
+    templateUrl: './gateway.component.html'    
 })
 export class GatewayComponent implements OnInit, OnDestroy {
 
-    gateways: Gateway[] = new Array<Gateway>();
+    gateways: IGateway[] = new Array<IGateway>();
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private flowService: FlowService,
+        protected flowService: FlowService,
+        protected gatewayService: GatewayService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
@@ -55,8 +55,8 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
     }
 
-    downloadConfiguration(gateway: Gateway) {
-        this.flowService.exportGatewayConfiguration(gateway);
+    downloadConfiguration(gateway: IGateway) {
+       this.flowService.exportGatewayConfiguration(gateway);
     }
 
     protected onError(errorMessage: string) {

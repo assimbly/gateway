@@ -100,7 +100,7 @@ public class FlowResource {
         flow = flowRepository.save(flow);
         FlowDTO result = flowMapper.toDto(flow);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, FlowDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, new FlowDTO().getId().toString()))
             .body(result);
     }
 

@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Service } from '../service/service.model';
-import { Observable } from 'rxjs/Observable';
+import { Service } from 'app/shared/model/service.model';
+import { Observable } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
-import { ServiceKeys } from 'app/shared/model/service-keys.model';
+import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core';
 import { ServiceKeysService } from './service-keys.service';
 
@@ -15,13 +15,13 @@ import { ServiceKeysService } from './service-keys.service';
     templateUrl: './service-keys.component.html'
 })
 export class ServiceKeysComponent implements OnInit, OnChanges {
-    @Input() serviceKeys: Array<ServiceKeys> = [];
+    @Input() serviceKeys: Array<IServiceKeys> = [];
     @Input() service: Service;
 
     serviceKeysKeys: Array<string> = [];
     currentAccount: any;
     isSaving: boolean;
-    serviceKey: ServiceKeys;
+    serviceKey: IServiceKeys;
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
     listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
@@ -29,8 +29,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     constructor(
         private serviceKeysService: ServiceKeysService,
         private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        private eventManager: JhiEventManager
     ) {
     }
 
@@ -45,9 +44,6 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
-            this.currentAccount = account;
-        });
         this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
     }
 
@@ -132,11 +128,11 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
-                this.serviceKeys[0].isDisabled = false;
-                this.serviceKeys[0].isRequired = false;
+                (this.serviceKeys[0] as any).isDisabled = false;
+                (this.serviceKeys[0] as any).isRequired = false;
             } else {
                 this.serviceKeys.forEach((serviceKey) => {
-                    serviceKey.isDisabled = true;
+                    (serviceKey as any).isDisabled = true;
                 });
             }
             const requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
@@ -149,9 +145,9 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
                 }
                 rsk.key = sk.serviceKeyName;
-                rsk.valueType = sk.valueType;
-                rsk.placeholder = sk.placeholder;
-                rsk.isRequired = true;
+                (rsk as any).valueType = sk.valueType;
+                (rsk as any).placeholder = sk.placeholder;
+                (rsk as any).isRequired = true;
                 requiredServiceKeys.push(rsk);
             });
             this.serviceKeys.unshift(...requiredServiceKeys);
@@ -163,14 +159,14 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.subscribeToSaveResponse(
                 this.serviceKeysService.update(serviceKey), false, i);
         } else {
-            serviceKey.serviceId = this.service.id;
+            serviceKey.serviceKeysId = this.service.id;
             this.subscribeToSaveResponse(
                 this.serviceKeysService.create(serviceKey), true, i);
         }
     }
     addServiceKeys() {
         const newServiceKeys = new ServiceKeys();
-        newServiceKeys.isDisabled = false;
+        (newServiceKeys as any).isDisabled = false;
         this.serviceKeys.push(newServiceKeys);
         this.mapServiceKeysKeys();
     }
@@ -193,31 +189,34 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<ServiceKeys>, isCreate: boolean, i: number) {
-        result.subscribe((res: ServiceKeys) =>
-            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
-    }
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IServiceKeys>>,isCreate: boolean, i: number) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,isCreate,i);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
+    }    
+    
     cloneServiceKey(serviceKey: ServiceKeys) {
         const serviceKeyForClone = new ServiceKeys(
-            null,
+            serviceKey.id,
             serviceKey.key,
             serviceKey.value,
-            null,
-            false,
-            true,
-            null,
-            null,
-            serviceKey.serviceId);
+            serviceKey.serviceKeysId,
+            );
         this.serviceKeys.push(serviceKeyForClone);
     }
-    private onSaveSuccess(result: ServiceKeys, isCreate: boolean, i: number) {
-        result.isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
+    private onSaveSuccess(result: IServiceKeys, isCreate: boolean, i: number) {
+        (result as any).isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
 
         if (isCreate) {
-            result.isDisabled = true;
+            (result as any).isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
         } else {
-            this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
+            //this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
         this.mapServiceKeysKeys();
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });
@@ -227,7 +226,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.isSaving = false;
     }
 
-    trackId(index: number, item: ServiceKeys) {
+    trackId(index: number, item: IServiceKeys) {
         return item.id;
     }
 

@@ -23,22 +23,19 @@ const ENTITY_STATES = [...groupRoute, ...groupPopupRoute];
     ],
     declarations: [
         GroupComponent,
+        GroupUpdateComponent,
         GroupDetailComponent,
-        GroupDialogComponent,
         GroupDeleteDialogComponent,
-        GroupPopupComponent,
         GroupDeletePopupComponent,
     ],
     entryComponents: [
         GroupComponent,
-        GroupDialogComponent,
-        GroupPopupComponent,
+        GroupUpdateComponent,
+        GroupDetailComponent,
         GroupDeleteDialogComponent,
         GroupDeletePopupComponent,
     ],
     providers: [
-        GroupService,
-        GroupPopupService,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
