@@ -1,7 +1,7 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { HeaderKeys } from './header-keys.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class HeaderKeysPopupService {
             }
             if (id) {
                 this.headerKeysService.find(id).subscribe((headerKeys) => {
-                    this.ngbModalRef = this.headerKeysModalRef(component, headerKeys);
+                    this.ngbModalRef = this.headerKeysModalRef(component, headerKeys.body);
                     resolve(this.ngbModalRef);
                 });
             } else {
@@ -38,7 +38,7 @@ export class HeaderKeysPopupService {
         });
     }
 
-    headerKeysModalRef(component: Component, headerKeys: HeaderKeys): NgbModalRef {
+    headerKeysModalRef(component: Component, headerKeys: IHeaderKeys): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
         modalRef.componentInstance.headerKeys = headerKeys;
         modalRef.result.then((result) => {

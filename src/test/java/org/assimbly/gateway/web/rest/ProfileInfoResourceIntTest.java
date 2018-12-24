@@ -40,9 +40,9 @@ public class ProfileInfoResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         String mockProfile[] = { "test" };
-        JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
-        ribbon.setDisplayOnActiveProfiles(mockProfile);
-        when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
+        //JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
+        //ribbon.setDisplayOnActiveProfiles(mockProfile);
+        //when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
 
         String activeProfiles[] = {"test"};
         when(environment.getDefaultProfiles()).thenReturn(activeProfiles);
@@ -63,9 +63,9 @@ public class ProfileInfoResourceIntTest {
 
     @Test
     public void getProfileInfoWithoutRibbon() throws Exception {
-        JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
-        ribbon.setDisplayOnActiveProfiles(null);
-        when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
+        //JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
+        //ribbon.setDisplayOnActiveProfiles(null);
+        //when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
 
         restProfileMockMvc.perform(get("/api/profile-info"))
             .andExpect(status().isOk())

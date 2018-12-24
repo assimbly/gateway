@@ -1,6 +1,5 @@
 package org.assimbly.gateway;
 
-import org.assimbly.connector.service.Broker;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 
@@ -10,10 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
@@ -21,7 +21,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
-@SpringBootApplication
+// @SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway"})
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 public class GatewayApp {
 

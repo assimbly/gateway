@@ -39,15 +39,11 @@ const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
     entryComponents: [
         WireTapEndpointComponent,
         WireTapEndpointEditComponent,
-        WireTapEndpointDialogComponent,
-        WireTapEndpointPopupComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent,
     ],
     providers: [
         Components,
-        WireTapEndpointService,
-        WireTapEndpointPopupService,
         WireTapEndpointUpdateComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent

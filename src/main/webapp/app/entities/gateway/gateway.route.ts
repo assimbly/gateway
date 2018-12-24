@@ -4,7 +4,7 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@a
 import { UserRouteAccessService } from 'app/core';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 import { GatewayService } from './gateway.service';
 import { GatewayComponent } from './gateway.component';
 import { GatewayDetailComponent } from './gateway-detail.component';
@@ -16,12 +16,12 @@ import { GatewayImportPopupComponent } from './gateway-import-dialog.component';
 export class GatewayResolve implements Resolve<IGateway> {
     constructor(private service: GatewayService) {}
 
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Gateway> {
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IGateway> {
         const id = route.params['id'] ? route.params['id'] : null;
         if (id) {
             return this.service.find(id).pipe(
-                filter((response: HttpResponse<Gateway>) => response.ok),
-                map((gateway: HttpResponse<Gateway>) => gateway.body)
+                filter((response: HttpResponse<IGateway>) => response.ok),
+                map((gateway: HttpResponse<IGateway>) => gateway.body)
             );
         }
         return of(new Gateway());

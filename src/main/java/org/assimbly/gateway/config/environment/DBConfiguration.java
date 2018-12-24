@@ -2,33 +2,20 @@ package org.assimbly.gateway.config.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.assimbly.gateway.domain.Flow;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.domain.FromEndpoint;
-import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
-import org.assimbly.gateway.repository.FlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
+@SuppressWarnings("deprecation")
 @Service
 public class DBConfiguration {
 
@@ -38,13 +25,6 @@ public class DBConfiguration {
 	private TreeMap<String, String> properties;
 	private String xmlConfiguration;
 	private String configuration;
-
-	private FromEndpoint fromEndpoint;
-	private ErrorEndpoint errorEndpoint;
-	private Set<ToEndpoint> toEndpoints;
-
-	@Autowired
-	private FlowRepository flowRepository;
 
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;

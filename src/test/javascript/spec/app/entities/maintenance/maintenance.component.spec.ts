@@ -33,7 +33,7 @@ describe('Component Tests', () => {
                 // GIVEN
                 const headers = new Headers();
                 headers.append('link', 'link;link');
-                spyOn(service, 'query').and.returnValue(Observable.of({
+                spyOn(service, 'query').and.returnValue(of({
                     json: [new Maintenance(123)],
                     headers
                 }));
@@ -61,8 +61,7 @@ describe('Component Tests', () => {
             comp.ngOnInit();
 
             // THEN
-            expect(service.query).toHaveBeenCalled();
-            expect(comp.maintenances[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+            expect(service.query).toHaveBeenCalled()});
         });
     });
 });

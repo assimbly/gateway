@@ -8,27 +8,27 @@ import { GatewaySharedModule } from '../../shared';
 import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-endpoint.module';
 import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
+import { GatewayServiceModule } from '../../entities/service/service.module';
+import { GatewayHeaderModule } from '../../entities/header/header.module';
+import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 
-import { Components } from '../../shared/camel/component-type';
 
 import {
     FlowComponent,
     FlowConfigurationComponent,
     FlowDetailComponent,
-    FlowEditAllComponent,
-    FlowDialogComponent,
-    FlowPopupComponent,
     FlowDeletePopupComponent,
     FlowDeleteDialogComponent,
     flowRoute,
-    flowPopupRoute,
     FlowEditorModeComponent,
     FlowRowComponent
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FlowService } from "app/entities/flow/flow.service";
+import { Components } from "app/shared/camel/component-type";
 
-const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
+const ENTITY_STATES = [...flowRoute];
 
 @NgModule({
     imports: [
@@ -36,6 +36,9 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         GatewayFromEndpointModule,
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
+        GatewayServiceModule,
+        GatewayHeaderModule,
+        GatewayMaintenanceModule,
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
         NgSelectModule,
@@ -51,10 +54,7 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         FlowComponent,
         FlowConfigurationComponent,
         FlowDetailComponent,
-        FlowEditAllComponent,
-        FlowDialogComponent,
         FlowDeleteDialogComponent,
-        FlowPopupComponent,
         FlowDeletePopupComponent,
         FlowRowComponent,
         FlowEditorModeComponent
@@ -62,18 +62,11 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     entryComponents: [
         FlowComponent,
         FlowConfigurationComponent,
-        FlowEditAllComponent,
-        FlowDialogComponent,
-        FlowPopupComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
         FlowEditorModeComponent
     ],
-    providers: [
-        Components,
-        FlowService,
-        FlowPopupService
-    ],
+    providers: [FlowService,Components],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayFlowModule { }

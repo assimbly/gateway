@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FlowService, Flow } from '../flow';
+import { FlowService } from '../flow';
+import { IFlow, Flow } from 'app/shared/model/flow.model';
+
 import * as moment from 'moment';
 import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -36,7 +38,7 @@ export class MaintenanceComponent implements OnInit {
     ngOnInit() {
         this.flowService.query().subscribe(
             (res) => {
-                this.flows = res.json
+                this.flows = res.body
             },
             (err) => {
                 this.jhiAlertService.error(err.json.message, null, null)

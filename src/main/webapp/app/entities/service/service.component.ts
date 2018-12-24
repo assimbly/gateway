@@ -3,11 +3,12 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Service } from 'app/shared/model/service.model';
+import { IService, Service } from 'app/shared/model/service.model';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core';
 import { ServiceService } from './service.service';
-import { ServiceKeysComponent, ServiceKeysService, ServiceKeys } from '../../entities/service-keys';
-import { Observable } from 'rxjs/Observable';
+import { ServiceKeysComponent, ServiceKeysService } from '../../entities/service-keys';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'jhi-service',
@@ -18,6 +19,7 @@ import { Observable } from 'rxjs/Observable';
 })
 
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
+    [x: string]: any;
     public services: Array<Service> = [];
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -48,10 +50,10 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
-                this.serviceKeys[0].isDisabled = false;
+                (this.serviceKeys[0] as any).isDisabled = false;
             } else {
-                this.serviceKeys.forEach((serviceKey) => {
-                    serviceKey.isDisabled = true;
+                this.serviceKeys.forEach(serviceKey => {
+                    (serviceKey as any).isDisabled = true;
                 });
             }
         }
@@ -63,14 +65,14 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             this.currentAccount = account;
         });
         if (this.serviceKey !== undefined ) {
-            this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content))
+            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(res.content))
         }else {
-            this.eventManager.subscribe('serviceKeyDeleted', (res) => res.content)
+            this.eventManager.subscribe('serviceKeyDeleted', res => res.content)
         }
         this.registerChangeInServices();
     }
     updateServiceKeys(id: number) {
-        this.serviceKeys = this.serviceKeys.filter((x) => x.id === id);
+        this.serviceKeys = this.serviceKeys.filter(x => x.id === id);
         const newServiceKeys = new ServiceKeys();
         this.serviceKeys.push(newServiceKeys);
     }
@@ -84,16 +86,16 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             this.selectedService = new Service();
         } else {
             this.serviceKeysService.query().subscribe(
-                (res: ResponseWrapper) => {
+                res => {
                     this.serviceKeys = res.json;
-                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
+                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceKeysId === this.selectedService.id);
                     if (this.serviceKeys.length === 0) {
                         const newServiceKeys = new ServiceKeys();
-                        newServiceKeys.isDisabled = false;
+                        (newServiceKeys as any).isDisabled = false;
                         this.serviceKeys.push(newServiceKeys);
                     }
                 },
-                (res: ResponseWrapper) => this.onError(res.json)
+                (res) => this.onError(res.json)
             );
         }
     }
@@ -105,10 +107,17 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
                 this.disabledServiceType = true;
             }
     
-    private subscribeToSaveResponse(result: Observable<Service>) {
-        result.subscribe((res: Service) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IService>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
+    
     private onSaveSuccess(result: Service) {
         this.isSaving = false;
     }

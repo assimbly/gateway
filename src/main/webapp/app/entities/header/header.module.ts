@@ -34,11 +34,10 @@ const ENTITY_STATES = [
     ],
     declarations: [
         HeaderComponent,
+        HeaderUpdateComponent ,
         HeaderAllComponent,
         HeaderDetailComponent,
-        HeaderDialogComponent,
         HeaderDeleteDialogComponent,
-        HeaderPopupComponent,
         HeaderDeletePopupComponent,
         ForbiddenHeaderNamesValidatorDirective,
         ForbiddenHeaderKeysValidatorDirective
@@ -46,14 +45,10 @@ const ENTITY_STATES = [
     entryComponents: [
         HeaderComponent,
         HeaderAllComponent,
-        HeaderDialogComponent,
-        HeaderPopupComponent,
         HeaderDeleteDialogComponent,
         HeaderDeletePopupComponent,
     ],
     providers: [
-        HeaderService,
-        HeaderPopupService,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

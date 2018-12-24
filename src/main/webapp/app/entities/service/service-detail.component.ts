@@ -3,8 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
-import { ServiceKeys } from '../service-keys';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { Service } from 'app/shared/model/service.model';
+import { Subscription } from "rxjs";
+import { JhiEventManager } from "ng-jhipster";
 
 
 @Component({
@@ -35,17 +37,22 @@ export class ServiceDetailComponent implements OnInit {
 
     private load(id) {
         this.serviceService.find(id).subscribe((service) => {
-            this.service = service;
+            this.service = service.body;
             this.loadServiceKeys(this.service.id);
         });
     }
 
     private loadServiceKeys(id: number) {
         this.serviceKeysService.query().subscribe((res) => {
-            this.serviceKeys = res.json.filter((sk) => sk.serviceId === id);
+            this.serviceKeys = res.body.filter((sk) => sk.serviceKeysId === id);
         });
-
-    previousState() {
-        window.history.back();
     }
+    
+    registerChangeInServices() {
+        this.eventSubscriber = this.eventManager.subscribe(
+            'serviceListModification',
+            (response) => this.load(this.service.id)
+        );
+    }     
+    
 }

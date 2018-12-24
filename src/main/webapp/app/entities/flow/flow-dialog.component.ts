@@ -1,18 +1,23 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
-import { Flow } from './flow.model';
-import { FlowPopupService } from './flow-popup.service';
+import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
-import { Gateway, GatewayService } from '../gateway';
-import { FromEndpoint, FromEndpointService } from '../from-endpoint';
-import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
-import { ResponseWrapper } from '../../shared';
+import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
+import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IHeader, Header } from 'app/shared/model/header.model';
+
+
+import { GatewayService } from '../gateway';
+import { FromEndpointService } from '../from-endpoint';
+import { ErrorEndpointService } from '../error-endpoint';
+import { IGateway } from "app/shared/model/gateway.model";
 
 @Component({
     selector: 'jhi-flow-dialog',
@@ -23,11 +28,11 @@ export class FlowDialogComponent implements OnInit {
     flow: Flow;
     isSaving: boolean;
 
-    gateways: Gateway[];
+    gateways: IGateway[];
 
-    fromendpoints: FromEndpoint[];
+    fromendpoints: IFromEndpoint[];
 
-    errorendpoints: ErrorEndpoint[];
+    errorendpoints: IErrorEndpoint[];
 
     constructor(
         public activeModal: NgbActiveModal,
@@ -43,33 +48,34 @@ export class FlowDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.gatewayService.query()
-            .subscribe((res: ResponseWrapper) => { this.gateways = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe(res => { this.gateways = res.body; }, res => this.onError(res.body));
         this.fromEndpointService
             .query({filter: 'flow-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe(res => {
                 if (!this.flow.fromEndpointId) {
-                    this.fromendpoints = res.json;
+                    this.fromendpoints = res.body;
                 } else {
                     this.fromEndpointService
                         .find(this.flow.fromEndpointId)
-                        .subscribe((subRes: FromEndpoint) => {
-                            this.fromendpoints = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe(subRes => {
+                            this.fromendpoints.push(subRes.body);
+                        }, (subRes) => this.onError(subRes));                       
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            });
+        
         this.errorEndpointService
             .query({filter: 'flow-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe(res => {
                 if (!this.flow.errorEndpointId) {
-                    this.errorendpoints = res.json;
+                    this.errorendpoints = res.body;
                 } else {
                     this.errorEndpointService
                         .find(this.flow.errorEndpointId)
-                        .subscribe((subRes: ErrorEndpoint) => {
-                            this.errorendpoints = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe(subRes => {
+                            this.errorendpoints.push(subRes.body);
+                        }, subRes => this.onError(subRes.body));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, res => this.onError(res.body));
     }
 
     clear() {
@@ -87,9 +93,15 @@ export class FlowDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Flow>) {
-        result.subscribe((res: Flow) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IFlow>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: Flow) {
@@ -106,7 +118,7 @@ export class FlowDialogComponent implements OnInit {
         this.jhiAlertService.error(error.message, null, null);
     }
 
-    trackGatewayById(index: number, item: Gateway) {
+    trackGatewayById(index: number, item: IGateway) {
         return item.id;
     }
 
@@ -128,20 +140,10 @@ export class FlowPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private flowPopupService: FlowPopupService
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
-                this.flowPopupService
-                    .open(FlowDialogComponent as Component, params['id']);
-            } else {
-                this.flowPopupService
-                    .open(FlowDialogComponent as Component);
-            }
-        });
     }
 
     ngOnDestroy() {

@@ -2,11 +2,12 @@ import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
-import { Maintenance } from './maintenance.model';
+import { IMaintenance, Maintenance } from 'app/shared/model/maintenance.model';
 import { MaintenanceService } from './maintenance.service';
 
 @Injectable()
 export class MaintenancePopupService {
+    maintenance: any;
     private ngbModalRef: NgbModalRef;
 
     constructor(
@@ -28,9 +29,9 @@ export class MaintenancePopupService {
 
             if (id) {
                 this.maintenanceService.find(id).subscribe((maintenance) => {
-                    maintenance.startTime = new Date(this.datePipe.transform(maintenance.startTime, 'yyyy-MM-ddTHH:mm:ss'));
-                    maintenance.endTime = new Date(this.datePipe.transform(maintenance.endTime, 'yyyy-MM-ddTHH:mm:ss'));
-                    this.ngbModalRef = this.maintenanceModalRef(component, maintenance);
+                    this.maintenance.startTime = new Date(this.datePipe.transform(maintenance.body.startTime, 'yyyy-MM-ddTHH:mm:ss'));
+                    this.maintenance.endTime = new Date(this.datePipe.transform(maintenance.body.endTime, 'yyyy-MM-ddTHH:mm:ss'));
+                    this.ngbModalRef = this.maintenanceModalRef(component, maintenance.body);
                     resolve(this.ngbModalRef);
                 });
             } else {

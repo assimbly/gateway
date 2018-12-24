@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
@@ -100,7 +99,7 @@ public class DBImportXMLConfiguration {
 		String defaultErrorEndpointType = xPath.evaluate("//connectors/connector/defaultErrorEndpointType", doc);
 
 		if (!gatewayId.isEmpty()) {
-			Gateway gateway = gatewayRepository.findOne(connectorId);
+			Gateway gateway = gatewayRepository.findById(connectorId).get();
 
 			if (gateway == null) {
 				gateway = new Gateway();
@@ -156,8 +155,8 @@ public class DBImportXMLConfiguration {
 
 		if (!flowId.isEmpty()) {
 
-			Flow flow = flowRepository.findOne(id);
-			Gateway gateway = gatewayRepository.findOne(connectorId);
+			Flow flow = flowRepository.findById(id).get();
+			Gateway gateway = gatewayRepository.findById(connectorId).get();
 
 			if (flow == null) {
 				flow = new Flow();
@@ -261,7 +260,7 @@ public class DBImportXMLConfiguration {
 		org.assimbly.gateway.domain.Service fromService;
 		try {
 			Long serviceId = Long.parseLong(fromServiceId, 10);
-			fromService = serviceRepository.findOne(serviceId);
+			fromService = serviceRepository.findById(serviceId).get();
 		} catch (NumberFormatException nfe) {
 			fromService = null;
 		}
@@ -270,7 +269,7 @@ public class DBImportXMLConfiguration {
 		Header fromHeader;
 		try {
 			Long headerId = Long.parseLong(fromHeaderId, 10);
-			fromHeader = headerRepository.findOne(headerId);
+			fromHeader = headerRepository.findById(headerId).get();
 		} catch (NumberFormatException nfe) {
 			fromHeader = null;
 		}
@@ -368,7 +367,7 @@ public class DBImportXMLConfiguration {
 		org.assimbly.gateway.domain.Service toService;
 		try {
 			Long serviceId = Long.parseLong(toServiceId, 10);
-			toService = serviceRepository.findOne(serviceId);
+			toService = serviceRepository.findById(serviceId).get();
 		} catch (NumberFormatException nfe) {
 			toService = null;
 		}
@@ -377,7 +376,7 @@ public class DBImportXMLConfiguration {
 		Header toHeader;
 		try {
 			Long headerId = Long.parseLong(toHeaderId, 10);
-			toHeader = headerRepository.findOne(headerId);
+			toHeader = headerRepository.findById(headerId).get();
 		} catch (NumberFormatException nfe) {
 			toHeader = null;
 		}
@@ -443,7 +442,7 @@ public class DBImportXMLConfiguration {
 		org.assimbly.gateway.domain.Service errorService;
 		try {
 			Long serviceId = Long.parseLong(errorServiceId, 10);
-			errorService = serviceRepository.findOne(serviceId);
+			errorService = serviceRepository.findById(serviceId).get();
 		} catch (NumberFormatException nfe) {
 			errorService = null;
 		}
@@ -452,7 +451,7 @@ public class DBImportXMLConfiguration {
 		Header errorHeader;
 		try {
 			Long headerId = Long.parseLong(errorHeaderId, 10);
-			errorHeader = headerRepository.findOne(headerId);
+			errorHeader = headerRepository.findById(headerId).get();
 		} catch (NumberFormatException nfe) {
 			errorHeader = null;
 		}
@@ -488,7 +487,7 @@ public class DBImportXMLConfiguration {
 
 			try {
 				serviceIdLong = Long.parseLong(serviceId, 10);
-				service = serviceRepository.findOne(serviceIdLong);
+				service = serviceRepository.findById(serviceIdLong).get();
 
 				if (service == null) {
 					service = new org.assimbly.gateway.domain.Service();
@@ -571,7 +570,7 @@ public class DBImportXMLConfiguration {
 
 			try {
 				headerIdLong = Long.parseLong(headerId, 10);
-				header = headerRepository.findOne(headerIdLong);
+				header = headerRepository.findById(headerIdLong).get();
 
 				if (header == null) {
 					header = new Header();
@@ -681,7 +680,7 @@ public class DBImportXMLConfiguration {
 			}
 		}
 
-		environmentVariablesRepository.save(environmentVariablesList);
+		environmentVariablesRepository.saveAll(environmentVariablesList);
 
 	}
 
@@ -715,42 +714,6 @@ public class DBImportXMLConfiguration {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			list.add(nodes.item(i).getNodeValue());
 		}
-
-		return list;
-	}
-
-	private List<String> getListFromFlow(Document doc, Long id, String type) throws XPathExpressionException {
-
-		// Create list
-		List<String> list = new ArrayList<>();
-
-		// Create XPath object
-		XPathFactory xpathFactory = XPathFactory.newInstance();
-		XPath xpath = xpathFactory.newXPath();
-
-		String fromId = xpath
-				.evaluate("/connectors/connector/flows/flow[id=" + id.toString() + "]/from/" + type + "_id", doc);
-
-		if (fromId != null && !fromId.isEmpty()) {
-			list.add(fromId);
-		}
-
-		String errorId = xpath
-				.evaluate("/connectors/connector/flows/flow[id=" + id.toString() + "]/error/" + type + "_id", doc);
-
-		if (errorId != null && !errorId.isEmpty()) {
-			list.add(errorId);
-		}
-
-		XPathExpression expr = xpath
-				.compile("/connectors/connector/flows/flow[id=" + id.toString() + "]/to/" + type + "_id/text()");
-		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-		for (int i = 0; i < nodes.getLength(); i++) {
-			list.add(nodes.item(i).getNodeValue());
-		}
-
-		// remove duplicates
-		list = new ArrayList<>(new HashSet<>(list));
 
 		return list;
 	}

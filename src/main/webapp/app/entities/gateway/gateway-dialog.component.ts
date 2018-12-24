@@ -1,13 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Gateway, GatewayType, EnvironmentType } from './gateway.model';
-import { GatewayPopupService } from './gateway-popup.service';
+import { IGateway, Gateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
 import { GatewayService } from './gateway.service';
 import { EndpointType, Components } from '../../shared/camel/component-type';
 
@@ -65,9 +64,16 @@ export class GatewayDialogComponent implements OnInit {
             this.subscribeToSaveResponse(this.gatewayService.create(this.gateway), closePopup);
         }
     }
-    private subscribeToSaveResponse(result: Observable<Gateway>, closePopup: boolean) {
-        result.subscribe((res: Gateway) =>
-            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
+
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IGateway>>,closePopup) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,closePopup);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: Gateway, closePopup: boolean) {
@@ -115,20 +121,11 @@ export class GatewayPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private gatewayPopupService: GatewayPopupService
+        private route: ActivatedRoute
     ) { }
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if (params['id']) {
-                this.gatewayPopupService
-                    .open(GatewayDialogComponent as Component, params['id']);
-            } else {
-                this.gatewayPopupService
-                    .open(GatewayDialogComponent as Component);
-            }
-        });
+        
     }
 
     ngOnDestroy() {

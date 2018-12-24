@@ -6,29 +6,16 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.ErrorEndpoint;
 import org.assimbly.gateway.domain.FromEndpoint;
-import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
-import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
-import org.assimbly.gateway.domain.WireTapEndpoint;
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.repository.GatewayRepository;
-import org.assimbly.gateway.repository.WireTapEndpointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 @Service
 @Transactional
@@ -43,16 +30,8 @@ public class DBExportProperties {
 	public String uri;
 
 	@Autowired
-	private GatewayRepository gatewayRepository;
-
-	@Autowired
 	private FlowRepository flowRepository;
 
-	@Autowired
-	private WireTapEndpointRepository wireTapEndpointRepository;
-
-	@Autowired
-	private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	private FromEndpoint fromEndpoint;
 
@@ -64,22 +43,10 @@ public class DBExportProperties {
 
 	private Header header;
 	public String xmlConfiguration;
-	private Element rootElement;
-	private Document doc;
-	private Element flows;
-	private Element services;
-	private Element headers;
-	private Element flow;
+	private Flow flow;
 	public String connectorId;
 
-	private List<String> servicesList;
-	private List<String> headersList;
-
 	public String configuration;
-
-	private Element offloading;
-
-	private Node environmentVariablesList;
 
 	private List<TreeMap<String, String>> propertiesList;
 
@@ -106,7 +73,7 @@ public class DBExportProperties {
 
 		properties = new TreeMap<String, String>();
 
-		Flow flow = flowRepository.findOne(id);
+		flow = flowRepository.findById(id).get();
 
 		if (flow == null) {
 			throw new Exception("Flow ID does not exists");

@@ -46,8 +46,6 @@ const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
     ],
     providers: [
         Components,
-        FromEndpointService,
-        FromEndpointPopupService,
         FromEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

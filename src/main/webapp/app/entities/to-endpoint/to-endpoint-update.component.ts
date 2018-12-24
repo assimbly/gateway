@@ -92,8 +92,8 @@ export class ToEndpointUpdateComponent implements OnInit {
         }
     }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<IToEndpoint>>) {
-        result.subscribe((res: HttpResponse<IToEndpoint>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+    protected subscribeToSaveResponse(result: Observable<IToEndpoint>) {
+        result.subscribe((res) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
 
     protected onSaveSuccess() {

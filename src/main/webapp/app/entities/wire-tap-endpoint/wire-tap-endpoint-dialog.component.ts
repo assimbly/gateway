@@ -1,17 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { WireTapEndpoint } from './wire-tap-endpoint.model';
-import { WireTapEndpointPopupService } from './wire-tap-endpoint-popup.service';
+import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
-import { Service, ServiceService } from '../service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IHeader, Header } from 'app/shared/model/header.model';
+import { ServiceService } from '../service';
+import { HeaderService } from '../header';
 import { Components } from '../../shared/camel/component-type';
 
 @Component({
@@ -20,7 +20,7 @@ import { Components } from '../../shared/camel/component-type';
 })
 export class WireTapEndpointDialogComponent implements OnInit {
 
-    wireTapEndpoint: WireTapEndpoint;
+    wireTapEndpoint: IWireTapEndpoint;
     isSaving: boolean;
 
     services: Service[];
@@ -41,9 +41,9 @@ export class WireTapEndpointDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.serviceService.query()
-            .subscribe((res: ResponseWrapper) => { this.services = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe(res => { this.services = res.body; }, res => this.onError(res.body));
         this.headerService.query()
-            .subscribe((res: ResponseWrapper) => { this.headers = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
+            .subscribe(res => { this.headers = res.body; }, res => this.onError(res.body));
     }
 
     clear() {
@@ -61,12 +61,19 @@ export class WireTapEndpointDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<WireTapEndpoint>) {
-        result.subscribe((res: WireTapEndpoint) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IWireTapEndpoint>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
-
-    private onSaveSuccess(result: WireTapEndpoint) {
+    
+    private onSaveSuccess(result: IWireTapEndpoint) {
         this.eventManager.broadcast({ name: 'wireTapEndpointListModification', content: 'OK' });
         this.isSaving = false;
         this.activeModal.dismiss(result);
@@ -98,20 +105,10 @@ export class WireTapEndpointPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private wireTapEndpointPopupService: WireTapEndpointPopupService
+        private route: ActivatedRoute
     ) { }
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if (params['id']) {
-                this.wireTapEndpointPopupService
-                    .open(WireTapEndpointDialogComponent as Component, params['id']);
-            } else {
-                this.wireTapEndpointPopupService
-                    .open(WireTapEndpointDialogComponent as Component);
-            }
-        });
     }
 
     ngOnDestroy() {

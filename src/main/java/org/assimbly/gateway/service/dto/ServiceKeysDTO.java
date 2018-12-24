@@ -85,7 +85,6 @@ public class ServiceKeysDTO implements Serializable {
             "id=" + getId() +
             ", key='" + getKey() + "'" +
             ", value='" + getValue() + "'" +
-            ", serviceKeys=" + getServiceKeysId() +
             "}";
     }
 }

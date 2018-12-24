@@ -6,11 +6,13 @@ import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.repository.ServiceKeysRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.ServiceKeysService;
 import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.service.mapper.ServiceKeysMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,8 @@ public class ServiceKeysResource {
     private final ServiceKeysRepository serviceKeysRepository;
 
     private final ServiceKeysMapper serviceKeysMapper;
+
+	private JpaRepository<ServiceKeys, Long> serviceKeysService;
 
     public ServiceKeysResource(ServiceKeysRepository serviceKeysRepository, ServiceKeysMapper serviceKeysMapper) {
         this.serviceKeysRepository = serviceKeysRepository;
@@ -93,7 +97,7 @@ public class ServiceKeysResource {
      */
     @GetMapping("/service-keys")
     @Timed
-    public List<ServiceKeysDTO> getAllServiceKeys() {
+    public List<ServiceKeys> getAllServiceKeys() {
         log.debug("REST request to get all ServiceKeys");
         return serviceKeysService.findAll();
     }
@@ -106,9 +110,9 @@ public class ServiceKeysResource {
      */
     @GetMapping("/service-keys/{id}")
     @Timed
-    public ResponseEntity<ServiceKeysDTO> getServiceKeys(@PathVariable Long id) {
+    public ResponseEntity<ServiceKeys> getServiceKeys(@PathVariable Long id) {
         log.debug("REST request to get ServiceKeys : {}", id);
-        Optional<ServiceKeysDTO> serviceKeysDTO = serviceKeysService.findOne(id);
+        Optional<ServiceKeys> serviceKeysDTO = serviceKeysService.findById(id);
         return ResponseUtil.wrapOrNotFound(serviceKeysDTO);
     }
 
@@ -122,7 +126,7 @@ public class ServiceKeysResource {
     @Timed
     public ResponseEntity<Void> deleteServiceKeys(@PathVariable Long id) {
         log.debug("REST request to delete ServiceKeys : {}", id);
-        serviceKeysRepository.delete(id);
+        serviceKeysRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

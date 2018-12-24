@@ -6,7 +6,7 @@ import { JhiAlertService } from 'ng-jhipster';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { IGateway } from 'app/shared/model/gateway.model';
+import { Gateway } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway';
 
 @Component({
@@ -17,7 +17,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables;
     isSaving: boolean;
 
-    gateways: IGateway[];
+    gateways: Gateway[];
 
     constructor(
         protected jhiAlertService: JhiAlertService,
@@ -32,7 +32,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             this.environmentVariables = environmentVariables;
         });
         this.gatewayService.query().subscribe(
-            (res: HttpResponse<IGateway[]>) => {
+            (res: HttpResponse<Gateway[]>) => {
                 this.gateways = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
@@ -72,7 +72,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
         this.jhiAlertService.error(errorMessage, null, null);
     }
 
-    trackGatewayById(index: number, item: IGateway) {
+    trackGatewayById(index: number, item: Gateway) {
         return item.id;
     }
 }

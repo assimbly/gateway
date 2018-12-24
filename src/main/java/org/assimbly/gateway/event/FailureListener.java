@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 // This class listens to failure events in camel exchanges (routes) and send them to the websocket topic: topic/alert
 // Check the following page for all EventObject instances of Camel: http://camel.apache.org/maven/current/camel-core/apidocs/org/apache/camel/management/event/package-summary.html

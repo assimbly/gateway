@@ -1,7 +1,7 @@
 <div>
     <h2 id="page-heading">
         <span>Environment Variables</span>
-        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/', { outlets: { popup: ['environment-variables-new'] } }]" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/environment-variables/new']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <span class="fa fa-plus"></span>
             <span >
             Create Environment Variables

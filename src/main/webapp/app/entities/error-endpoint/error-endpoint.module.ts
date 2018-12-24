@@ -45,8 +45,6 @@ const ENTITY_STATES = [...errorEndpointRoute, ...errorEndpointPopupRoute];
     ],
     providers: [
         Components,
-        ErrorEndpointService,
-        ErrorEndpointPopupService,
         ErrorEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

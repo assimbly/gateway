@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { Header } from './header.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
-import { Principal, ResponseWrapper } from '../../shared';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
+import { IHeader } from "app/shared/model/header.model";
 
 @Component({
     selector: 'jhi-header-all',
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 
 export class HeaderAllComponent implements OnInit, OnDestroy {
-    public headers: Array<Header> = [];
+    public headers: Array<IHeader> = [];
     public page: any;
     public isAdmin: boolean;
     private eventSubscriber: Subscription;
@@ -23,17 +23,12 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     constructor(
         private headerService: HeaderService,
         private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        private eventManager: JhiEventManager
     ) {
     }
 
     ngOnInit() {
         this.loadAllHeaders();
-        this.principal.identity().then((account) => {
-            this.currentAccount = account;
-        });
-        this.isAdmin = this.principal.isAdmin();
         this.registerChangeInHeaders();
     }
 
@@ -49,10 +44,10 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
 
     private loadAllHeaders() {
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            (res) => {
+                this.headers = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res.body)
         );
     }
 

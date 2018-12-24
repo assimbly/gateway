@@ -6,7 +6,7 @@
             </h2>
         </div>
         <div class="col-6" *ngIf='gateways.length === 0'>
-            <button type="submit" class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/', { outlets: { popup: ['gateway-new'] } }]"
+            <button type="submit" class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/gateway/new']"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'">
                 <span class="fa fa-plus"></span>
                 <span>Create Gateway</span>
@@ -84,6 +84,7 @@
                     </td>
                 </tr>
             </tbody>
+            <!-- 
             <tfoot>
                 <tr>
                     <td colspan="2">
@@ -105,7 +106,7 @@
                         </div>
                     </td>
                 </tr>
-            </tfoot>
+            </tfoot>  -->
         </table>
     </div>
 </div>

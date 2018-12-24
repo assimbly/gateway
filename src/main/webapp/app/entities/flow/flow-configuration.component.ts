@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 import {NgbTabset} from '@ng-bootstrap/ng-bootstrap';
 
-import { Flow } from './flow.model';
-import { FlowService } from './flow.service';
-import { FromEndpointComponent, FromEndpointService, FromEndpoint } from '../../entities/from-endpoint/';
-import { ErrorEndpointComponent, ErrorEndpointService, ErrorEndpoint } from '../../entities/error-endpoint/';
+import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
+import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
+import { FromEndpointComponent, FromEndpointService } from '../../entities/from-endpoint/';
+import { ErrorEndpointComponent, ErrorEndpointService } from '../../entities/error-endpoint/';
+import { FlowService } from "app/entities/flow";
 
 @Component({
     selector: 'jhi-flow-configuration',
@@ -41,7 +43,7 @@ export class FlowConfigurationComponent implements OnInit, OnDestroy {
 
     load(id) {
         this.flowService.find(id).subscribe((flow) => {
-            this.flow = flow;
+            this.flow = flow.body;
         });
     }
     previousState() {

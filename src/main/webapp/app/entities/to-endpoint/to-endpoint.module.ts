@@ -35,23 +35,13 @@ const ENTITY_STATES = [...toEndpointRoute, ...toEndpointPopupRoute];
         ToEndpointDetailComponent,
         ToEndpointUpdateComponent,
         ToEndpointDeleteDialogComponent,
-        ToEndpointPopupComponent,
         ToEndpointDeletePopupComponent,
-    ],
-    entryComponents: [
-        ToEndpointComponent,
-        ToEndpointDialogComponent,
-        ToEndpointPopupComponent,
-        ToEndpointDeleteDialogComponent,
-        ToEndpointDeletePopupComponent,
-    ],
-    providers: [
-        Components,
-        ToEndpointService,
-        ToEndpointPopupService,
-        ToEndpointDeletePopupComponent
     ],
     entryComponents: [ToEndpointComponent, ToEndpointUpdateComponent, ToEndpointDeleteDialogComponent, ToEndpointDeletePopupComponent],
+    providers: [
+        Components,
+        ToEndpointDeletePopupComponent
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayToEndpointModule {}

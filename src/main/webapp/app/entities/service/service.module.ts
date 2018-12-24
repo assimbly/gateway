@@ -37,24 +37,13 @@ const ENTITY_STATES = [
         ServiceDetailComponent,
         ServiceUpdateComponent,
         ServiceDeleteDialogComponent,
-        ServicePopupComponent,
         ServiceDeletePopupComponent,
         ForbiddenServiceNamesValidatorDirective,
         ForbiddenServiceKeysValidatorDirective
     ],
-    entryComponents: [
-        ServiceComponent,
-        ServiceAllComponent,
-        ServiceDialogComponent,
-        ServicePopupComponent,
-        ServiceDeleteDialogComponent,
-        ServiceDeletePopupComponent,
-    ],
-    providers: [
-        ServiceService,
-        ServicePopupService,
-    ],
     entryComponents: [ServiceComponent, ServiceUpdateComponent, ServiceDeleteDialogComponent, ServiceDeletePopupComponent],
+    providers: [
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayServiceModule { }

@@ -13,7 +13,7 @@ import { FlowService } from './flow.service';
 })
 export class FlowDeleteDialogComponent {
 
-    flow: Flow;
+    flow: IFlow;
     message = 'Are you sure you want to delete this Flow?';
     disableDelete: boolean;
 
@@ -52,7 +52,7 @@ export class FlowDeletePopupComponent implements OnInit, OnDestroy {
 
     routeSub: any;
 
-    constructor(private flowPopupService: FlowPopupService,protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ flow }) => {

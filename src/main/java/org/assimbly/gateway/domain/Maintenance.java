@@ -1,6 +1,5 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -8,8 +7,6 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -34,11 +31,6 @@ public class Maintenance implements Serializable {
 
     @Column(name = "duration")
     private Instant duration;
-
-    @ManyToMany(mappedBy = "maintenances")
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JsonIgnore
-    private Set<Flow> flows = new HashSet<>();
 
     @Column(name = "frequency")
     private String frequency;

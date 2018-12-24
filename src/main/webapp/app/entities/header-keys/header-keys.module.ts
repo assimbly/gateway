@@ -28,23 +28,13 @@ const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
         HeaderKeysDetailComponent,
         HeaderKeysUpdateComponent,
         HeaderKeysDeleteDialogComponent,
-        HeaderKeysPopupComponent,
         HeaderKeysDeletePopupComponent,
         ForbiddenHeaderKeysValidatorDirective
     ],
-    entryComponents: [
-        HeaderKeysComponent,
-        HeaderKeysDialogComponent,
-        HeaderKeysPopupComponent,
-        HeaderKeysDeleteDialogComponent,
-        HeaderKeysDeletePopupComponent,
-    ],
+    entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
     providers: [
-        HeaderKeysService,
-        HeaderKeysPopupService,
         HeaderKeysDeletePopupComponent
     ],
-    entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayHeaderKeysModule {}
