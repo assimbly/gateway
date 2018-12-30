@@ -49,4 +49,4 @@ const ENTITY_STATES = [...errorEndpointRoute, ...errorEndpointPopupRoute];
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayErrorEndpointModule { }
+export class GatewayErrorEndpointModule {}

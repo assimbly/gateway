@@ -4,6 +4,7 @@ import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 import { Subscription } from 'rxjs';
+import { AccountService } from "app/core";
 
 @Component({
     selector: 'jhi-service-all',
@@ -20,9 +21,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     reverse: any;
 
     constructor(
-        private serviceService: ServiceService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager
+            protected serviceService: ServiceService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
     ) {
     }
 
@@ -46,6 +48,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     }
 
     private loadAllServices() {
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.isAdmin = this.accountService.isAdmin();
         this.serviceService.query().subscribe(
             (res) => {
                 this.services = res.body;

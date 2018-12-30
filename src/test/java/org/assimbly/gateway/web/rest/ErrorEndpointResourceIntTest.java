@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.ErrorEndpoint;
 import org.assimbly.gateway.repository.ErrorEndpointRepository;
+import org.assimbly.gateway.service.ErrorEndpointService;
 import org.assimbly.gateway.service.dto.ErrorEndpointDTO;
 import org.assimbly.gateway.service.mapper.ErrorEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -43,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class ErrorEndpointResourceIntTest {
 
-    private static final EndpointType DEFAULT_TYPE = EndpointType.SONICMQ;
-    private static final EndpointType UPDATED_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType DEFAULT_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType UPDATED_TYPE = EndpointType.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -57,6 +58,9 @@ public class ErrorEndpointResourceIntTest {
 
     @Autowired
     private ErrorEndpointMapper errorEndpointMapper;
+
+    @Autowired
+    private ErrorEndpointService errorEndpointService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -80,7 +84,7 @@ public class ErrorEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ErrorEndpointResource errorEndpointResource = new ErrorEndpointResource(errorEndpointRepository, errorEndpointMapper);
+        final ErrorEndpointResource errorEndpointResource = new ErrorEndpointResource(errorEndpointService);
         this.restErrorEndpointMockMvc = MockMvcBuilders.standaloneSetup(errorEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

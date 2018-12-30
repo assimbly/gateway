@@ -1,12 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.EnvironmentVariables;
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
+import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
-import org.assimbly.gateway.service.mapper.EnvironmentVariablesMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +28,10 @@ public class EnvironmentVariablesResource {
 
     private static final String ENTITY_NAME = "environmentVariables";
 
-    private final EnvironmentVariablesRepository environmentVariablesRepository;
+    private final EnvironmentVariablesService environmentVariablesService;
 
-    private final EnvironmentVariablesMapper environmentVariablesMapper;
-
-    public EnvironmentVariablesResource(EnvironmentVariablesRepository environmentVariablesRepository, EnvironmentVariablesMapper environmentVariablesMapper) {
-        this.environmentVariablesRepository = environmentVariablesRepository;
-        this.environmentVariablesMapper = environmentVariablesMapper;
+    public EnvironmentVariablesResource(EnvironmentVariablesService environmentVariablesService) {
+        this.environmentVariablesService = environmentVariablesService;
     }
 
     /**
@@ -53,10 +48,7 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() != null) {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
         }
-
-        EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
-        environmentVariables = environmentVariablesRepository.save(environmentVariables);
-        EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
         return ResponseEntity.created(new URI("/api/environment-variables/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -78,10 +70,7 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
-        environmentVariables = environmentVariablesRepository.save(environmentVariables);
-        EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, environmentVariablesDTO.getId().toString()))
             .body(result);
@@ -96,8 +85,7 @@ public class EnvironmentVariablesResource {
     @Timed
     public List<EnvironmentVariablesDTO> getAllEnvironmentVariables() {
         log.debug("REST request to get all EnvironmentVariables");
-        List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
-        return environmentVariablesMapper.toDto(environmentVariables);
+        return environmentVariablesService.findAll();
     }
 
     /**
@@ -110,8 +98,7 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to get EnvironmentVariables : {}", id);
-        Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesRepository.findById(id)
-            .map(environmentVariablesMapper::toDto);
+        Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesService.findOne(id);
         return ResponseUtil.wrapOrNotFound(environmentVariablesDTO);
     }
 
@@ -125,8 +112,7 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
-
-        environmentVariablesRepository.deleteById(id);
+        environmentVariablesService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

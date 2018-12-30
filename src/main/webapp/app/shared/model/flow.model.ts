@@ -1,10 +1,10 @@
-import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { IToEndpoint } from 'app/shared/model//to-endpoint.model';
 
 export interface IFlow {
     id?: number;
     name?: string;
     autoStart?: boolean;
-    offloading?: boolean;
+    offLoading?: boolean;
     gatewayId?: number;
     fromEndpointId?: number;
     errorEndpointId?: number;
@@ -16,13 +16,13 @@ export class Flow implements IFlow {
         public id?: number,
         public name?: string,
         public autoStart?: boolean,
-        public offloading?: boolean,
+        public offLoading?: boolean,
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,
         public toEndpoints?: IToEndpoint[]
     ) {
         this.autoStart = this.autoStart || false;
-        this.offloading = this.offloading || false;
+        this.offLoading = this.offLoading || false;
     }
 }

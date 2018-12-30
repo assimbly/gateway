@@ -13,6 +13,20 @@
                 <dd>
                     <span>{{maintenance.endTime}}</span>
                 </dd>
+                <dt><span>Duration</span></dt>
+                <dd>
+                    <span>{{maintenance.duration}}</span>
+                </dd>
+                <dt><span>Frequency</span></dt>
+                <dd>
+                    <span>{{maintenance.frequency}}</span>
+                </dd>
+                <dt><span>Flow</span></dt>
+                <dd>
+                    <div *ngIf="maintenance.flowId">
+                        <a [routerLink]="['/flow', maintenance.flowId, 'view']">{{maintenance.flowId}}</a>
+                    </div>
+                </dd>
             </dl>
 
             <button type="submit"

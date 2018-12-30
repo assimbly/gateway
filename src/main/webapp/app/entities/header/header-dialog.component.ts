@@ -11,6 +11,7 @@ import { HeaderService } from './header.service';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { filter } from "rxjs/operators";
+import { HeaderPopupService } from "app/entities/header";
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -72,7 +73,7 @@ export class HeaderDialogComponent implements OnInit {
 
     addHeaderKeys() {
         const newHeaderKeys = new HeaderKeys();
-        (newHeaderKeys as any).isDisabled = false;
+        newHeaderKeys.isDisabled = false;
         newHeaderKeys.type = this.typeHeader[0];
         this.headerKeys.push(newHeaderKeys);
         this.mapHeaderKeysKeys();
@@ -170,11 +171,20 @@ export class HeaderPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private headerPopupService: HeaderPopupService
     ) { }
 
     ngOnInit() {
-
+        this.routeSub = this.route.params.subscribe((params) => {
+            if (params['id']) {
+                this.headerPopupService
+                    .open(HeaderDialogComponent as Component, params['id']);
+            } else {
+                this.headerPopupService
+                    .open(HeaderDialogComponent as Component);
+            }
+        });
     }
 
     ngOnDestroy() {

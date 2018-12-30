@@ -30,7 +30,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="offloading" type="boolean">
+            <column name="off_loading" type="boolean">
                 <constraints nullable="true" />
             </column>
 
@@ -38,14 +38,10 @@
                 <constraints nullable="true" />
             </column>
             <column name="from_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_route_from_endpoint_id" />
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_from_endpoint_id" />
             </column>            <column name="error_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_route_error_endpoint_id" />
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_error_endpoint_id" />
             </column>
-            <column name="maintenance_id" type="bigint">
-                <constraints unique="true" nullable="true" />
-            </column>
-            
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
         

@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.repository.HeaderRepository;
+import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -52,6 +53,9 @@ public class HeaderResourceIntTest {
     private HeaderMapper headerMapper;
 
     @Autowired
+    private HeaderService headerService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -73,7 +77,7 @@ public class HeaderResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final HeaderResource headerResource = new HeaderResource(headerRepository, headerMapper);
+        final HeaderResource headerResource = new HeaderResource(headerService);
         this.restHeaderMockMvc = MockMvcBuilders.standaloneSetup(headerResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

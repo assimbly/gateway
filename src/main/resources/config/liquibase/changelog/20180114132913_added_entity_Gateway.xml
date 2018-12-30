@@ -38,6 +38,10 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="connector_type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
             <column name="default_from_endpoint_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -49,7 +53,9 @@
             <column name="default_error_endpoint_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-
+            <column name="wiretap_endpoint_id" type="bigint">
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_gateway_wiretap_endpoint_id" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
         

@@ -1,14 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipName": "flow",
-            "otherEntityName": "flow",
-            "relationshipType": "many-to-many",
-            "ownerSide": false,
-            "otherEntityRelationshipName": "maintenance"
-        }
-    ],
+    "name": "Maintenance",
     "fields": [
         {
             "fieldName": "startTime",
@@ -17,12 +8,33 @@
         {
             "fieldName": "endTime",
             "fieldType": "Instant"
+        },
+        {
+            "fieldName": "duration",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "frequency",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "flow",
+            "otherEntityName": "flow",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "maintenance"
         }
     ],
     "changelogDate": "20180627071131",
-    "dto": "mapstruct",
-    "service": "serviceImpl",
     "entityTableName": "maintenance",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
-    "pagination": "no"
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

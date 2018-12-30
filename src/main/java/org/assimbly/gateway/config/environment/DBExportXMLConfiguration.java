@@ -19,6 +19,7 @@ import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,11 +79,9 @@ public class DBExportXMLConfiguration {
 
 	public String getXMLConfiguration(Long gatewayId) throws Exception {
 
-		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
-
 		setXMLGeneralPropertiesFromDB(gatewayId);
 
-		System.out.println("x1");
+		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 
 		for (Flow flow : flows) {
 			if (flow != null) {
@@ -226,7 +225,7 @@ public class DBExportXMLConfiguration {
 		flow.appendChild(name);
 
 		// set name
-		String flowOffloading = flowDB.isOffloading().toString();
+		String flowOffloading = flowDB.isOffLoading().toString();
 		Element offloading = doc.createElement("offloading");
 		offloading.appendChild(doc.createTextNode(flowOffloading));
 		flow.appendChild(offloading);

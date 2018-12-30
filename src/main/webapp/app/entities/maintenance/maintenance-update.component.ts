@@ -22,6 +22,7 @@ export class MaintenanceUpdateComponent implements OnInit {
     flows: IFlow[];
     startTime: string;
     endTime: string;
+    duration: string;
 
     constructor(
         protected jhiAlertService: JhiAlertService,
@@ -36,10 +37,20 @@ export class MaintenanceUpdateComponent implements OnInit {
             this.maintenance = maintenance;
             this.startTime = this.maintenance.startTime != null ? this.maintenance.startTime.format(DATE_TIME_FORMAT) : null;
             this.endTime = this.maintenance.endTime != null ? this.maintenance.endTime.format(DATE_TIME_FORMAT) : null;
+            this.duration = this.maintenance.duration != null ? this.maintenance.duration.format(DATE_TIME_FORMAT) : null;
         });
-        this.flowService.query().subscribe(
+        this.flowService.query({ filter: 'maintenance-is-null' }).subscribe(
             (res: HttpResponse<IFlow[]>) => {
-                this.flows = res.body;
+                if (!this.maintenance.flowId) {
+                    this.flows = res.body;
+                } else {
+                    this.flowService.find(this.maintenance.flowId).subscribe(
+                        (subRes: HttpResponse<IFlow>) => {
+                            this.flows = [subRes.body].concat(res.body);
+                        },
+                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
+                    );
+                }
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -53,6 +64,7 @@ export class MaintenanceUpdateComponent implements OnInit {
         this.isSaving = true;
         this.maintenance.startTime = this.startTime != null ? moment(this.startTime, DATE_TIME_FORMAT) : null;
         this.maintenance.endTime = this.endTime != null ? moment(this.endTime, DATE_TIME_FORMAT) : null;
+        this.maintenance.duration = this.duration != null ? moment(this.duration, DATE_TIME_FORMAT) : null;
         if (this.maintenance.id !== undefined) {
             this.subscribeToSaveResponse(this.maintenanceService.update(this.maintenance));
         } else {

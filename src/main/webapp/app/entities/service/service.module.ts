@@ -1,15 +1,16 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
-import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
-import { GatewaySharedModule } from '../../shared';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { GatewaySharedModule } from 'app/shared';
+import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
 import {
     ServiceComponent,
     ServiceDetailComponent,
     ServiceUpdateComponent,
     ServiceDeletePopupComponent,
     ServiceDeleteDialogComponent,
+    ServiceDialogComponent,
     ServiceAllComponent,
     serviceRoute,
     servicePopupRoute,
@@ -17,6 +18,10 @@ import {
     ForbiddenServiceKeysValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ServiceService } from "app/entities/service/service.service";
+import { ServicePopupService } from "app/entities/service/service-popup.service";
+import { ServicePopupComponent } from "app/entities/service/service-dialog.component";
+
 const ENTITY_STATES = [
     ...serviceRoute,
     ...servicePopupRoute,
@@ -36,14 +41,18 @@ const ENTITY_STATES = [
         ServiceAllComponent,
         ServiceDetailComponent,
         ServiceUpdateComponent,
+        ServiceDialogComponent,        
         ServiceDeleteDialogComponent,
         ServiceDeletePopupComponent,
+        ServicePopupComponent,
         ForbiddenServiceNamesValidatorDirective,
         ForbiddenServiceKeysValidatorDirective
     ],
-    entryComponents: [ServiceComponent, ServiceUpdateComponent, ServiceDeleteDialogComponent, ServiceDeletePopupComponent],
+    entryComponents: [ServiceComponent,  ServiceAllComponent, ServiceUpdateComponent, ServiceDeleteDialogComponent,  ServiceDialogComponent, ServiceDeletePopupComponent,  ServicePopupComponent],
     providers: [
-    ],
+                ServiceService,
+                ServicePopupService
+        ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayServiceModule { }
+export class GatewayServiceModule {}

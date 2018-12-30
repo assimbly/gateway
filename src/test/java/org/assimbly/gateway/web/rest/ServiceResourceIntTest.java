@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Service;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.service.mapper.ServiceMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -55,6 +56,9 @@ public class ServiceResourceIntTest {
     private ServiceMapper serviceMapper;
 
     @Autowired
+    private ServiceService serviceService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -76,7 +80,7 @@ public class ServiceResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ServiceResource serviceResource = new ServiceResource(serviceRepository, serviceMapper);
+        final ServiceResource serviceResource = new ServiceResource(serviceService);
         this.restServiceMockMvc = MockMvcBuilders.standaloneSetup(serviceResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -196,9 +200,9 @@ public class ServiceResourceIntTest {
         updatedService
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE);
-        ServiceDTO serviceDTO = serviceMapper.toDto(service);
+        ServiceDTO serviceDTO = serviceMapper.toDto(updatedService);
 
-		restServiceMockMvc.perform(put("/api/services")
+        restServiceMockMvc.perform(put("/api/services")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceDTO)))
             .andExpect(status().isOk());

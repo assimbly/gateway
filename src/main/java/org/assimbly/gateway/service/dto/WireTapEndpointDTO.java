@@ -82,7 +82,7 @@ public class WireTapEndpointDTO implements Serializable {
         }
 
         WireTapEndpointDTO wireTapEndpointDTO = (WireTapEndpointDTO) o;
-        if(wireTapEndpointDTO.getId() == null || getId() == null) {
+        if (wireTapEndpointDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), wireTapEndpointDTO.getId());
@@ -100,6 +100,8 @@ public class WireTapEndpointDTO implements Serializable {
             ", type='" + getType() + "'" +
             ", uri='" + getUri() + "'" +
             ", options='" + getOptions() + "'" +
+            ", service=" + getServiceId() +
+            ", header=" + getHeaderId() +
             "}";
     }
 }

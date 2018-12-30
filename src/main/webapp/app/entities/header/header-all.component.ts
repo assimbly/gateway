@@ -5,6 +5,7 @@ import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
 import { Subscription } from 'rxjs';
 import { IHeader } from "app/shared/model/header.model";
+import { AccountService } from "app/core";
 
 @Component({
     selector: 'jhi-header-all',
@@ -12,7 +13,7 @@ import { IHeader } from "app/shared/model/header.model";
 })
 
 export class HeaderAllComponent implements OnInit, OnDestroy {
-    public headers: Array<IHeader> = [];
+    public headers: IHeader[] = [];
     public page: any;
     public isAdmin: boolean;
     private eventSubscriber: Subscription;
@@ -21,9 +22,10 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     reverse: any;
 
     constructor(
-        private headerService: HeaderService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager
+        protected headerService: HeaderService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
     ) {
     }
 
@@ -43,6 +45,10 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     }
 
     private loadAllHeaders() {
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.isAdmin = this.accountService.isAdmin();
         this.headerService.query().subscribe(
             (res) => {
                 this.headers = res.body;

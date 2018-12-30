@@ -12,11 +12,12 @@ import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 
-
 import {
     FlowComponent,
+    FlowEditAllComponent,
     FlowConfigurationComponent,
     FlowDetailComponent,
+    FlowUpdateComponent,
     FlowDeletePopupComponent,
     FlowDeleteDialogComponent,
     flowRoute,
@@ -52,21 +53,27 @@ const ENTITY_STATES = [...flowRoute];
     ],
     declarations: [
         FlowComponent,
-        FlowConfigurationComponent,
+        FlowUpdateComponent,
+        FlowEditAllComponent,
+        FlowConfigurationComponent,        
         FlowDetailComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
+        FlowConfigurationComponent,
         FlowRowComponent,
         FlowEditorModeComponent
     ],
     entryComponents: [
-        FlowComponent,
-        FlowConfigurationComponent,
-        FlowDeleteDialogComponent,
-        FlowDeletePopupComponent,
-        FlowEditorModeComponent
+		FlowComponent,
+		FlowUpdateComponent,
+        FlowEditAllComponent,
+		FlowDeleteDialogComponent,
+		FlowConfigurationComponent,		
+		FlowDeletePopupComponent,
+        FlowEditorModeComponent,
+        FlowConfigurationComponent
     ],
-    providers: [FlowService,Components],
+    providers: [FlowService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayFlowModule { }
+export class GatewayFlowModule {}

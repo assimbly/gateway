@@ -1,27 +1,28 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FlowService } from '../flow';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-
 import * as moment from 'moment';
-import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-
-import { Maintenance } from 'app/shared/model/maintenance.model';
+import { WindowRef } from '../../shared/auth/window.service';
+import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { AccountService } from 'app/core';
 import { MaintenanceService } from './maintenance.service';
+import { FlowService } from "app/entities/flow";
 
 @Component({
     selector: 'jhi-maintenance',
-    templateUrl: './maintenance.component.html',
+    templateUrl: './maintenance.component.html'
 })
-
-export class MaintenanceComponent implements OnInit {
-
-    public flows: Array<Flow> = [];
+export class MaintenanceComponent implements OnInit, OnDestroy {
+    maintenances: IMaintenance[];
+    currentAccount: any;
+    eventSubscriber: Subscription;
+    flows: IFlow[];
+    //flows: Array<IFlow> = [];
     public hours: number;
     public minutes: number;
-    selectedFlows: Array<Flow> = [];
+    selectedFlows: IFlow[] = [];
     allSelected = false;
     messageFlow: string;
     intervals: Array<any> = [];
@@ -30,22 +31,54 @@ export class MaintenanceComponent implements OnInit {
     disableFlows: Array<boolean> = [];
 
     constructor(
-        private flowService: FlowService,
-        private jhiAlertService: JhiAlertService,
-    ) {
-    }
+        protected maintenanceService: MaintenanceService,
+		protected flowService: FlowService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
-    ngOnInit() {
+    loadAll() {
         this.flowService.query().subscribe(
-            (res) => {
-                this.flows = res.body
+                (res: HttpResponse<IFlow[]>) => {
+                    this.flows = res.body
+                },
+                (err) => {
+                    (res: HttpErrorResponse) => this.onError(res.message)
+                }
+        );
+        this.maintenanceService.query().subscribe(
+            (res: HttpResponse<IMaintenance[]>) => {
+                this.maintenances = res.body;
             },
-            (err) => {
-                this.jhiAlertService.error(err.json.message, null, null)
-            }
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
 
+    ngOnInit() {
+        this.loadAll();
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.registerChangeInMaintenances();
+    }
+
+    ngOnDestroy() {
+        this.eventManager.destroy(this.eventSubscriber);
+    }
+
+    trackId(index: number, item: IMaintenance) {
+        return item.id;
+    }
+
+    registerChangeInMaintenances() {
+        this.eventSubscriber = this.eventManager.subscribe('maintenanceListModification', response => this.loadAll());
+    }
+
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
+    }
+    
     setMaintenance() {
         if (this.hours === undefined) { this.hours = 0; }
         if (this.minutes === undefined) { this.minutes = 0; }

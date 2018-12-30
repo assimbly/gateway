@@ -1,12 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.repository.ErrorEndpointRepository;
+import org.assimbly.gateway.service.ErrorEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.ErrorEndpointDTO;
-import org.assimbly.gateway.service.mapper.ErrorEndpointMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +28,10 @@ public class ErrorEndpointResource {
 
     private static final String ENTITY_NAME = "errorEndpoint";
 
-    private final ErrorEndpointRepository errorEndpointRepository;
+    private final ErrorEndpointService errorEndpointService;
 
-    private final ErrorEndpointMapper errorEndpointMapper;
-
-    public ErrorEndpointResource(ErrorEndpointRepository errorEndpointRepository, ErrorEndpointMapper errorEndpointMapper) {
-        this.errorEndpointRepository = errorEndpointRepository;
-        this.errorEndpointMapper = errorEndpointMapper;
+    public ErrorEndpointResource(ErrorEndpointService errorEndpointService) {
+        this.errorEndpointService = errorEndpointService;
     }
 
     /**
@@ -53,10 +48,7 @@ public class ErrorEndpointResource {
         if (errorEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new errorEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
-
-        ErrorEndpoint errorEndpoint = errorEndpointMapper.toEntity(errorEndpointDTO);
-        errorEndpoint = errorEndpointRepository.save(errorEndpoint);
-        ErrorEndpointDTO result = errorEndpointMapper.toDto(errorEndpoint);
+        ErrorEndpointDTO result = errorEndpointService.save(errorEndpointDTO);
         return ResponseEntity.created(new URI("/api/error-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -78,10 +70,7 @@ public class ErrorEndpointResource {
         if (errorEndpointDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        ErrorEndpoint errorEndpoint = errorEndpointMapper.toEntity(errorEndpointDTO);
-        errorEndpoint = errorEndpointRepository.save(errorEndpoint);
-        ErrorEndpointDTO result = errorEndpointMapper.toDto(errorEndpoint);
+        ErrorEndpointDTO result = errorEndpointService.save(errorEndpointDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, errorEndpointDTO.getId().toString()))
             .body(result);
@@ -96,8 +85,7 @@ public class ErrorEndpointResource {
     @Timed
     public List<ErrorEndpointDTO> getAllErrorEndpoints() {
         log.debug("REST request to get all ErrorEndpoints");
-        List<ErrorEndpoint> errorEndpoints = errorEndpointRepository.findAll();
-        return errorEndpointMapper.toDto(errorEndpoints);
+        return errorEndpointService.findAll();
     }
 
     /**
@@ -110,8 +98,7 @@ public class ErrorEndpointResource {
     @Timed
     public ResponseEntity<ErrorEndpointDTO> getErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to get ErrorEndpoint : {}", id);
-        Optional<ErrorEndpointDTO> errorEndpointDTO = errorEndpointRepository.findById(id)
-            .map(errorEndpointMapper::toDto);
+        Optional<ErrorEndpointDTO> errorEndpointDTO = errorEndpointService.findOne(id);
         return ResponseUtil.wrapOrNotFound(errorEndpointDTO);
     }
 
@@ -125,8 +112,7 @@ public class ErrorEndpointResource {
     @Timed
     public ResponseEntity<Void> deleteErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ErrorEndpoint : {}", id);
-
-        errorEndpointRepository.deleteById(id);
+        errorEndpointService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

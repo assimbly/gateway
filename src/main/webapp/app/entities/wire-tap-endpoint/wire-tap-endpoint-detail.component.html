@@ -19,14 +19,14 @@
                 </dd>
                 <dt><span>Service</span></dt>
                 <dd>
-                    <div *ngIf="wireTapEndpoint.service">
-                        <a [routerLink]="['/service', wireTapEndpoint.service?.id, 'view']">{{wireTapEndpoint.service?.id}}</a>
+                    <div *ngIf="wireTapEndpoint.serviceId">
+                        <a [routerLink]="['/service', wireTapEndpoint.serviceId, 'view']">{{wireTapEndpoint.serviceId}}</a>
                     </div>
                 </dd>
                 <dt><span>Header</span></dt>
                 <dd>
-                    <div *ngIf="wireTapEndpoint.header">
-                        <a [routerLink]="['/header', wireTapEndpoint.header?.id, 'view']">{{wireTapEndpoint.header?.id}}</a>
+                    <div *ngIf="wireTapEndpoint.headerId">
+                        <a [routerLink]="['/header', wireTapEndpoint.headerId, 'view']">{{wireTapEndpoint.headerId}}</a>
                     </div>
                 </dd>
             </dl>

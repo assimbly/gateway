@@ -5,6 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { GatewayService } from './gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
+import { GatewayPopupService } from "app/entities/gateway";
 
 @Component({
     selector: 'jhi-gateway-import-dialog',
@@ -45,8 +46,7 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     }
 
     importConfiguration() {
-        this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration)
-            .subscribe(
+        this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration).subscribe(
             r => {
                 this.activeModal.dismiss(true);
             },
@@ -67,11 +67,15 @@ export class GatewayImportPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute
+        protected route: ActivatedRoute,
+        protected gatewayPopupService: GatewayPopupService
     ) { }
 
     ngOnInit() {
-        
+        this.routeSub = this.route.params.subscribe(() => {
+            this.gatewayPopupService
+                .open(GatewayImportDialogComponent as Component);
+        });
     }
 
     ngOnDestroy() {

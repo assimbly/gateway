@@ -47,7 +47,7 @@ export class FlowUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.fromEndpointService.query({ filter: 'flowroute-is-null' }).subscribe(
+        this.fromEndpointService.query({ filter: 'flow-is-null' }).subscribe(
             (res: HttpResponse<IFromEndpoint[]>) => {
                 if (!this.flow.fromEndpointId) {
                     this.fromendpoints = res.body;
@@ -62,7 +62,7 @@ export class FlowUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.errorEndpointService.query({ filter: 'flowroute-is-null' }).subscribe(
+        this.errorEndpointService.query({ filter: 'flow-is-null' }).subscribe(
             (res: HttpResponse<IErrorEndpoint[]>) => {
                 if (!this.flow.errorEndpointId) {
                     this.errorendpoints = res.body;

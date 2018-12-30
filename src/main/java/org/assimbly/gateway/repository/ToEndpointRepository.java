@@ -3,6 +3,7 @@ package org.assimbly.gateway.repository;
 import java.util.List;
 
 import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 

@@ -8,10 +8,13 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Gateway and its DTO GatewayDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {WireTapEndpointMapper.class})
 public interface GatewayMapper extends EntityMapper<GatewayDTO, Gateway> {
 
-    //@Mapping(target = "group", ignore = true)
+    @Mapping(source = "wiretapEndpoint.id", target = "wiretapEndpointId")
+    GatewayDTO toDto(Gateway gateway);
+
+    @Mapping(source = "wiretapEndpointId", target = "wiretapEndpoint")
     @Mapping(target = "flows", ignore = true)
     @Mapping(target = "environmentVariables", ignore = true)
     Gateway toEntity(GatewayDTO gatewayDTO);

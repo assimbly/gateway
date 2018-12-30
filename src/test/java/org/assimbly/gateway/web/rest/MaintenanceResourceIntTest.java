@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Maintenance;
 import org.assimbly.gateway.repository.MaintenanceRepository;
+import org.assimbly.gateway.service.MaintenanceService;
 import org.assimbly.gateway.service.dto.MaintenanceDTO;
 import org.assimbly.gateway.service.mapper.MaintenanceMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -50,11 +51,20 @@ public class MaintenanceResourceIntTest {
     private static final Instant DEFAULT_END_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_END_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final Instant DEFAULT_DURATION = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DURATION = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final String DEFAULT_FREQUENCY = "AAAAAAAAAA";
+    private static final String UPDATED_FREQUENCY = "BBBBBBBBBB";
+
     @Autowired
     private MaintenanceRepository maintenanceRepository;
 
     @Autowired
     private MaintenanceMapper maintenanceMapper;
+
+    @Autowired
+    private MaintenanceService maintenanceService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -78,7 +88,7 @@ public class MaintenanceResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final MaintenanceResource maintenanceResource = new MaintenanceResource(maintenanceRepository, maintenanceMapper);
+        final MaintenanceResource maintenanceResource = new MaintenanceResource(maintenanceService);
         this.restMaintenanceMockMvc = MockMvcBuilders.standaloneSetup(maintenanceResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -96,7 +106,9 @@ public class MaintenanceResourceIntTest {
     public static Maintenance createEntity(EntityManager em) {
         Maintenance maintenance = new Maintenance()
             .startTime(DEFAULT_START_TIME)
-            .endTime(DEFAULT_END_TIME);
+            .endTime(DEFAULT_END_TIME)
+            .duration(DEFAULT_DURATION)
+            .frequency(DEFAULT_FREQUENCY);
         return maintenance;
     }
 
@@ -123,6 +135,8 @@ public class MaintenanceResourceIntTest {
         Maintenance testMaintenance = maintenanceList.get(maintenanceList.size() - 1);
         assertThat(testMaintenance.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testMaintenance.getEndTime()).isEqualTo(DEFAULT_END_TIME);
+        assertThat(testMaintenance.getDuration()).isEqualTo(DEFAULT_DURATION);
+        assertThat(testMaintenance.getFrequency()).isEqualTo(DEFAULT_FREQUENCY);
     }
 
     @Test
@@ -157,7 +171,9 @@ public class MaintenanceResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(maintenance.getId().intValue())))
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(DEFAULT_START_TIME.toString())))
-            .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())));
+            .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())))
+            .andExpect(jsonPath("$.[*].duration").value(hasItem(DEFAULT_DURATION.toString())))
+            .andExpect(jsonPath("$.[*].frequency").value(hasItem(DEFAULT_FREQUENCY.toString())));
     }
     
     @Test
@@ -172,7 +188,9 @@ public class MaintenanceResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(maintenance.getId().intValue()))
             .andExpect(jsonPath("$.startTime").value(DEFAULT_START_TIME.toString()))
-            .andExpect(jsonPath("$.endTime").value(DEFAULT_END_TIME.toString()));
+            .andExpect(jsonPath("$.endTime").value(DEFAULT_END_TIME.toString()))
+            .andExpect(jsonPath("$.duration").value(DEFAULT_DURATION.toString()))
+            .andExpect(jsonPath("$.frequency").value(DEFAULT_FREQUENCY.toString()));
     }
 
     @Test
@@ -197,7 +215,9 @@ public class MaintenanceResourceIntTest {
         em.detach(updatedMaintenance);
         updatedMaintenance
             .startTime(UPDATED_START_TIME)
-            .endTime(UPDATED_END_TIME);
+            .endTime(UPDATED_END_TIME)
+            .duration(UPDATED_DURATION)
+            .frequency(UPDATED_FREQUENCY);
         MaintenanceDTO maintenanceDTO = maintenanceMapper.toDto(updatedMaintenance);
 
         restMaintenanceMockMvc.perform(put("/api/maintenances")
@@ -211,6 +231,8 @@ public class MaintenanceResourceIntTest {
         Maintenance testMaintenance = maintenanceList.get(maintenanceList.size() - 1);
         assertThat(testMaintenance.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testMaintenance.getEndTime()).isEqualTo(UPDATED_END_TIME);
+        assertThat(testMaintenance.getDuration()).isEqualTo(UPDATED_DURATION);
+        assertThat(testMaintenance.getFrequency()).isEqualTo(UPDATED_FREQUENCY);
     }
 
     @Test

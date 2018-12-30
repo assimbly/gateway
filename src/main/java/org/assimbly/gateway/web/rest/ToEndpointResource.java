@@ -4,10 +4,13 @@ import com.codahale.metrics.annotation.Timed;
 
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.ToEndpointRepository;
+import org.assimbly.gateway.service.ToEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.dto.FromEndpointDTO;
 import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.service.mapper.ToEndpointMapper;
+
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +34,20 @@ public class ToEndpointResource {
 
     private static final String ENTITY_NAME = "toEndpoint";
 
-    private final ToEndpointRepository toEndpointRepository;
+    private final ToEndpointService toEndpointService;
 
-    private final ToEndpointMapper toEndpointMapper;
+	private final ToEndpointRepository toEndpointRepository;
 
-    public ToEndpointResource(ToEndpointRepository toEndpointRepository, ToEndpointMapper toEndpointMapper) {
+	private final ToEndpointMapper toEndpointMapper;
+
+    public ToEndpointResource(ToEndpointService toEndpointService, ToEndpointRepository toEndpointRepository, ToEndpointMapper toEndpointMapper) {
+        this.toEndpointService = toEndpointService;
         this.toEndpointRepository = toEndpointRepository;
         this.toEndpointMapper = toEndpointMapper;
     }
 
     /**
-     * POST  /to-endpoint : Create a new toEndpoint.
+     * POST  /to-endpoints : Create a new toEndpoint.
      *
      * @param toEndpointDTO the toEndpointDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new toEndpointDTO, or with status 400 (Bad Request) if the toEndpoint has already an ID
@@ -55,10 +61,8 @@ public class ToEndpointResource {
             throw new BadRequestAlertException("A new toEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        ToEndpoint toEndpoint = toEndpointMapper.toEntity(toEndpointDTO);
-        toEndpoint = toEndpointRepository.save(toEndpoint);
-        ToEndpointDTO result = toEndpointMapper.toDto(toEndpoint);
-        return ResponseEntity.created(new URI("/api/to-endpoint/" + result.getId()))
+        ToEndpointDTO result = toEndpointService.save(toEndpointDTO);
+        return ResponseEntity.created(new URI("/api/from-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -74,10 +78,12 @@ public class ToEndpointResource {
     @Timed
     public ResponseEntity<List<ToEndpointDTO>> createToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to save List<ToEndpoint> : {}", toEndpointsDTO);
+        
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
         toEndpoints = toEndpointRepository.saveAll(toEndpoints);
         List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
-        return ResponseEntity.created(new URI("/api/to-endpoints/")).body(results);
+        return ResponseEntity.created(new URI("/api/to-endpoints/"))
+        		.body(results);
     }
 
     /**
@@ -96,10 +102,7 @@ public class ToEndpointResource {
         if (toEndpointDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        ToEndpoint toEndpoint = toEndpointMapper.toEntity(toEndpointDTO);
-        toEndpoint = toEndpointRepository.save(toEndpoint);
-        ToEndpointDTO result = toEndpointMapper.toDto(toEndpoint);
+        ToEndpointDTO result = toEndpointService.save(toEndpointDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, toEndpointDTO.getId().toString()))
             .body(result);
@@ -121,6 +124,7 @@ public class ToEndpointResource {
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
         toEndpoints = toEndpointRepository.saveAll(toEndpoints);
         List<ToEndpointDTO> results = toEndpointMapper.toDto(toEndpoints);
+        
         return ResponseEntity.ok().body(results);
     }
 
@@ -133,12 +137,11 @@ public class ToEndpointResource {
     @Timed
     public List<ToEndpointDTO> getAllToEndpoints() {
         log.debug("REST request to get all ToEndpoints");
-        List<ToEndpoint> toEndpoints = toEndpointRepository.findAll();
-        return toEndpointMapper.toDto(toEndpoints);
+        return toEndpointService.findAll();
     }
 
     /**
-     * GET  /to-endpoints/:id : get the "id" toEndpoint.
+     * GET  /to-endpoints/byflowid/:id : get the "id" toEndpoint.
      *
      * @param id the id of the toEndpointDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
@@ -161,23 +164,21 @@ public class ToEndpointResource {
     @Timed
     public ResponseEntity<ToEndpointDTO> getToEndpointID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoint : {}", id);
-        Optional<ToEndpointDTO> toEndpointDTO = toEndpointRepository.findById(id)
-            .map(toEndpointMapper::toDto);
+        Optional<ToEndpointDTO> toEndpointDTO = toEndpointService.findOne(id);
         return ResponseUtil.wrapOrNotFound(toEndpointDTO);
     }
 
     /**
-     * DELETE  /to-endpoint/:id : delete the "id" toEndpoint.
+     * DELETE  /to-endpoints/:id : delete the "id" toEndpoint.
      *
      * @param id the id of the toEndpointDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/to-endpoint/{id}")
+    @DeleteMapping("/to-endpoints/{id}")
     @Timed
     public ResponseEntity<Void> deleteToEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ToEndpoint : {}", id);
-
-        toEndpointRepository.deleteById(id);
+        toEndpointService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     

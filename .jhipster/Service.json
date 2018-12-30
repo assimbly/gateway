@@ -1,6 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [],
+    "name": "Service",
     "fields": [
         {
             "fieldName": "name",
@@ -9,32 +8,23 @@
         {
             "fieldName": "type",
             "fieldType": "String"
-        },
+        }
+    ],
+    "relationships": [
         {
-            "fieldName": "url",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "username",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "password",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "driver",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "configuration",
-            "fieldType": "String"
+            "relationshipType": "one-to-many",
+            "relationshipName": "serviceKeys",
+            "otherEntityName": "serviceKeys",
+            "otherEntityRelationshipName": "service"
         }
     ],
     "changelogDate": "20180114132919",
     "entityTableName": "service",
     "dto": "mapstruct",
     "pagination": "no",
-    "service": "no",
-    "jpaMetamodelFiltering": false
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

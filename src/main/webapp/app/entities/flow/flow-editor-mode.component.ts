@@ -157,6 +157,7 @@ export class FlowEditorModeComponent implements OnInit {
                 return;
         }
 
+        /*
         this.flowService.setConfiguration(this.flowId, this.xmlEditor, this.mediaType)
             .pipe(map(config => {
                 this.configuration = config;
@@ -176,7 +177,7 @@ export class FlowEditorModeComponent implements OnInit {
                 let errMessage = obj.response.message._text;
                 this.showInfoMessage(false, errMessage);
             }));
-
+             */
     }
 
     saveFlows() {
@@ -186,7 +187,7 @@ export class FlowEditorModeComponent implements OnInit {
                 this.showInfoMessage(true);
             }, (err) => {
                 let convert = require('xml-js');
-                let obj = JSON.parse(convert.xml2json(err.text(), { compact: true, spaces: 4 }));
+                let obj = JSON.parse(convert.xml2json(err, { compact: true, spaces: 4 }));
                 let errMessage = obj.response.message._text;
                 this.showInfoMessage(false, errMessage);
             }));

@@ -52,7 +52,8 @@ export class MaintenanceService {
     protected convertDateFromClient(maintenance: IMaintenance): IMaintenance {
         const copy: IMaintenance = Object.assign({}, maintenance, {
             startTime: maintenance.startTime != null && maintenance.startTime.isValid() ? maintenance.startTime.toJSON() : null,
-            endTime: maintenance.endTime != null && maintenance.endTime.isValid() ? maintenance.endTime.toJSON() : null
+            endTime: maintenance.endTime != null && maintenance.endTime.isValid() ? maintenance.endTime.toJSON() : null,
+            duration: maintenance.duration != null && maintenance.duration.isValid() ? maintenance.duration.toJSON() : null
         });
         return copy;
     }
@@ -61,6 +62,7 @@ export class MaintenanceService {
         if (res.body) {
             res.body.startTime = res.body.startTime != null ? moment(res.body.startTime) : null;
             res.body.endTime = res.body.endTime != null ? moment(res.body.endTime) : null;
+            res.body.duration = res.body.duration != null ? moment(res.body.duration) : null;
         }
         return res;
     }
@@ -70,6 +72,7 @@ export class MaintenanceService {
             res.body.forEach((maintenance: IMaintenance) => {
                 maintenance.startTime = maintenance.startTime != null ? moment(maintenance.startTime) : null;
                 maintenance.endTime = maintenance.endTime != null ? moment(maintenance.endTime) : null;
+                maintenance.duration = maintenance.duration != null ? moment(maintenance.duration) : null;
             });
         }
         return res;

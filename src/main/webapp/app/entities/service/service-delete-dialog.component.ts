@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Service } from 'app/shared/model/service.model';
+import { IService } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 
 @Component({
@@ -12,17 +12,9 @@ import { ServiceService } from './service.service';
     templateUrl: './service-delete-dialog.component.html'
 })
 export class ServiceDeleteDialogComponent {
-    service: Service;
-    message = 'Are you sure you want to delete this Service?';
-    disableDelete: boolean;
+    service: IService;
 
-    constructor(
-        private serviceService: ServiceService,
-        public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager,
-        private router: Router
-    ) {
-    }
+    constructor(protected serviceService: ServiceService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -34,13 +26,7 @@ export class ServiceDeleteDialogComponent {
                 name: 'serviceListModification',
                 content: 'Deleted an service'
             });
-            this.router.navigate(['/service']);
-            setTimeout(() => {
-                this.activeModal.close();
-            }, 0);
-        }, () => {
-            this.message = 'Service ' + this.service.name + ' can not be deleted (service is used by a flow)';
-            this.disableDelete = true;
+            this.activeModal.dismiss(true);
         });
     }
 }

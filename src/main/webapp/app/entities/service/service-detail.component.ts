@@ -1,38 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { ServiceService } from './service.service';
+import { IService } from 'app/shared/model/service.model';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { Service } from 'app/shared/model/service.model';
 import { Subscription } from "rxjs";
 import { JhiEventManager } from "ng-jhipster";
-
+import { ServiceService } from "app/entities/service";
 
 @Component({
     selector: 'jhi-service-detail',
     templateUrl: './service-detail.component.html'
 })
 export class ServiceDetailComponent implements OnInit {
-
-    public service: Service;
-    public serviceKeys: Array<ServiceKeys>;
+    service: IService;
+public serviceKeys: Array<ServiceKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
-        private eventManager: JhiEventManager,
-        private serviceService: ServiceService,
-        private serviceKeysService: ServiceKeysService,
-        private route: ActivatedRoute
-    ) {
-    }
+		protected eventManager: JhiEventManager,
+        protected serviceService: ServiceService,
+        protected serviceKeysService: ServiceKeysService,
+		protected activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ service }) => {
+            this.service = service;
         });
-        this.registerChangeInServices();
+    }
+
+    previousState() {
+        window.history.back();
     }
 
     private load(id) {
@@ -44,7 +44,7 @@ export class ServiceDetailComponent implements OnInit {
 
     private loadServiceKeys(id: number) {
         this.serviceKeysService.query().subscribe((res) => {
-            this.serviceKeys = res.body.filter((sk) => sk.serviceKeysId === id);
+            this.serviceKeys = res.body.filter((sk) => sk.serviceId === id);
         });
     }
     

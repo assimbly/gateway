@@ -8,7 +8,7 @@
         <div class="col-6" *ngIf='gateways.length === 0'>
             <button type="submit" class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/gateway/new']"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'">
-                <span class="fa fa-plus"></span>
+	            <fa-icon [icon]="'plus'"></fa-icon>
                 <span>Create Gateway</span>
             </button>
         </div>
@@ -20,8 +20,8 @@
             <span class="fa fa-upload"></span>
             <span class="d-none d-md-inline">Import XML Configuration</span>
         </button>
-    </div>
-    <!-- <jhi-alert></jhi-alert> -->
+    </div>    
+    <!-- <jhi-alert></jhi-alert>-->
     <br/>
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
@@ -84,7 +84,6 @@
                     </td>
                 </tr>
             </tbody>
-            <!-- 
             <tfoot>
                 <tr>
                     <td colspan="2">
@@ -93,20 +92,23 @@
                                 <span class="fa fa-download"></span>
                                 <span class="d-none d-md-inline">Export XML Configuration</span>
                             </button>
-                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge"
+                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', gateway.id, 'edit']" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
-                                <span class="fa fa-pencil"></span>
-                                <span class="d-none d-md-inline">Edit</span>
-                            </button>
-                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'gateway/'+ gateway.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
-                                <span class="fa fa-remove"></span>
-                                <span class="d-none d-md-inline">Delete</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>  -->
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
         </table>
     </div>
 </div>

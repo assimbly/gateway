@@ -1,14 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
-import org.assimbly.gateway.domain.Maintenance;
-import org.assimbly.gateway.repository.MaintenanceRepository;
+import org.assimbly.gateway.service.MaintenanceService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.MaintenanceDTO;
-import org.assimbly.gateway.service.mapper.MaintenanceMapper;
-
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +28,10 @@ public class MaintenanceResource {
 
     private static final String ENTITY_NAME = "maintenance";
 
-    private final MaintenanceRepository maintenanceRepository;
+    private final MaintenanceService maintenanceService;
 
-    private final MaintenanceMapper maintenanceMapper;
-    
-    public MaintenanceResource(MaintenanceRepository maintenanceRepository, MaintenanceMapper maintenanceMapper) {
-        this.maintenanceRepository = maintenanceRepository;
-        this.maintenanceMapper = maintenanceMapper;
+    public MaintenanceResource(MaintenanceService maintenanceService) {
+        this.maintenanceService = maintenanceService;
     }
 
     /**
@@ -55,9 +48,7 @@ public class MaintenanceResource {
         if (maintenanceDTO.getId() != null) {
             throw new BadRequestAlertException("A new maintenance cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Maintenance maintenance = maintenanceMapper.toEntity(maintenanceDTO);
-        maintenance = maintenanceRepository.save(maintenance);
-        MaintenanceDTO result = maintenanceMapper.toDto(maintenance);
+        MaintenanceDTO result = maintenanceService.save(maintenanceDTO);
         return ResponseEntity.created(new URI("/api/maintenances/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -79,11 +70,7 @@ public class MaintenanceResource {
         if (maintenanceDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        Maintenance maintenance = maintenanceMapper.toEntity(maintenanceDTO);
-        maintenance = maintenanceRepository.save(maintenance);
-        MaintenanceDTO result = maintenanceMapper.toDto(maintenance);
-        
+        MaintenanceDTO result = maintenanceService.save(maintenanceDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, maintenanceDTO.getId().toString()))
             .body(result);
@@ -96,9 +83,9 @@ public class MaintenanceResource {
      */
     @GetMapping("/maintenances")
     @Timed
-    public List<Maintenance> getAllMaintenances() {
+    public List<MaintenanceDTO> getAllMaintenances() {
         log.debug("REST request to get all Maintenances");
-        return maintenanceRepository.findAll();
+        return maintenanceService.findAll();
     }
 
     /**
@@ -109,9 +96,9 @@ public class MaintenanceResource {
      */
     @GetMapping("/maintenances/{id}")
     @Timed
-    public ResponseEntity<Maintenance> getMaintenance(@PathVariable Long id) {
+    public ResponseEntity<MaintenanceDTO> getMaintenance(@PathVariable Long id) {
         log.debug("REST request to get Maintenance : {}", id);
-        Optional<Maintenance> maintenanceDTO = maintenanceRepository.findById(id);
+        Optional<MaintenanceDTO> maintenanceDTO = maintenanceService.findOne(id);
         return ResponseUtil.wrapOrNotFound(maintenanceDTO);
     }
 
@@ -125,7 +112,7 @@ public class MaintenanceResource {
     @Timed
     public ResponseEntity<Void> deleteMaintenance(@PathVariable Long id) {
         log.debug("REST request to delete Maintenance : {}", id);
-        maintenanceRepository.deleteById(id);
+        maintenanceService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

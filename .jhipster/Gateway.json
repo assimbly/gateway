@@ -1,19 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipType": "one-to-many",
-            "relationshipName": "flowRoute",
-            "otherEntityName": "flowRoute",
-            "otherEntityRelationshipName": "gateway"
-        },
-        {
-            "relationshipType": "one-to-many",
-            "relationshipName": "environmentVariables",
-            "otherEntityName": "environmentVariables",
-            "otherEntityRelationshipName": "gateway"
-        }
-    ],
+    "name": "Gateway",
     "fields": [
         {
             "fieldName": "name",
@@ -22,7 +8,7 @@
         {
             "fieldName": "type",
             "fieldType": "GatewayType",
-            "fieldValues": "FILE,BROKER"
+            "fieldValues": "ADAPTER,BROKER,API,SOAP"
         },
         {
             "fieldName": "environmentName",
@@ -32,6 +18,11 @@
             "fieldName": "stage",
             "fieldType": "EnvironmentType",
             "fieldValues": "DEVELOPMENT,TEST,ACCEPTANCE,PRODUCTION"
+        },
+        {
+            "fieldName": "connectorType",
+            "fieldType": "ConnectorType",
+            "fieldValues": "CAMEL,SPRINGINTEGRATION,CURL"
         },
         {
             "fieldName": "defaultFromEndpointType",
@@ -46,10 +37,35 @@
             "fieldType": "String"
         }
     ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "wiretapEndpoint",
+            "otherEntityName": "wireTapEndpoint",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "gateway"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "flow",
+            "otherEntityName": "flow",
+            "otherEntityRelationshipName": "gateway"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "environmentVariables",
+            "otherEntityName": "environmentVariables",
+            "otherEntityRelationshipName": "gateway"
+        }
+    ],
     "changelogDate": "20180114132913",
-    "dto": "mapstruct",
-    "service": "no",
     "entityTableName": "gateway",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
-    "pagination": "no"
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

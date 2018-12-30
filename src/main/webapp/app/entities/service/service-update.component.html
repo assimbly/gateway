@@ -1,59 +1,118 @@
 <div class="row justify-content-center">
     <div class="col-8">
-        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
-            <h2 id="jhi-service-heading">Create or edit a Service</h2>
-            <div>
-                <jhi-alert-error></jhi-alert-error>
-                <div class="form-group" [hidden]="!service.id">
-                    <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id"
-                        [(ngModel)]="service.id" readonly />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_name">Name</label>
-                    <input type="text" class="form-control" name="name" id="field_name"
-                        [(ngModel)]="service.name" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_type">Type</label>
-                    <input type="text" class="form-control" name="type" id="field_type"
-                        [(ngModel)]="service.type" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_url">Url</label>
-                    <input type="text" class="form-control" name="url" id="field_url"
-                        [(ngModel)]="service.url" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_username">Username</label>
-                    <input type="text" class="form-control" name="username" id="field_username"
-                        [(ngModel)]="service.username" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_password">Password</label>
-                    <input type="text" class="form-control" name="password" id="field_password"
-                        [(ngModel)]="service.password" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_driver">Driver</label>
-                    <input type="text" class="form-control" name="driver" id="field_driver"
-                        [(ngModel)]="service.driver" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_configuration">Configuration</label>
-                    <input type="text" class="form-control" name="configuration" id="field_configuration"
-                        [(ngModel)]="service.configuration" />
-                </div>
-
-            </div>
-            <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
+		<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" autocomplete="off">
+		
+		    <div class="modal-header">
+		        <h4 class="modal-title" id="myServiceLabel">Create or edit a Service</h4>
+		    </div>
+		    <div class="modal-body">
+		        <jhi-alert-error></jhi-alert-error>
+		        <div class="form-group" [hidden]="!service.id">
+		            <label for="id">ID</label>
+		            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="service.id" readonly />
+		        </div>
+		        <div class="form-group">
+		            <label class="form-control-label" for="field_name">Name</label>
+		            <input type="text" class="form-control" name="name" id="field_name" required maxlength="255" [jhiExistingServiceNames]='servicesNames'
+		                [(ngModel)]="service.name" #name="ngModel" />
+		            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
+		                <span *ngIf="name.errors.required">Name is required.</span>
+		                <span *ngIf="name.errors.existingServiceName">Name already exists.</span>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="form-control-label" for="field_type">Type</label>
+		            <select class="form-control" id="field_service" name="serviceKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
+		                <option [ngValue]="type" *ngFor="let type of typeServices">{{type}}</option>
+		            </select>
+		            <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
+		                <span *ngIf="type.errors.required">Type is required.</span>
+		            </div>
+		        </div>
+		
+		        <div>
+		            <div class="table-responsive" *ngIf="serviceKeys">
+		                <table class="table">
+		                    <thead>
+		                        <tr>
+		                            <th colspan="3" class="border-top-0">Service Keys</th>
+		                        </tr>
+		                        <tr>
+		                            <td><span>Key</span></td>
+		                            <td><span>Value</span></td>
+		                            <td></td>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        <tr *ngFor="let serviceKey of serviceKeys; let idx = index">
+		                            <td *ngIf="serviceKey.isRequired; else notRequired">
+		                                <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
+		                                    required maxlength="255" id="serviceKey-key-{{idx}}" [disabled]="serviceKey.isRequired"
+		                                    #requiredKey="ngModel" />
+		                                <div *ngIf="requiredKey.invalid && (requiredKey.dirty || requiredKey.touched)" class="invalid-field-message">
+		                                    <span *ngIf="requiredKey.errors.required">Key is required.</span>
+		                                </div>
+		                            </td>
+		                            <ng-template #notRequired>
+		                                <td>
+		                                    <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
+		                                        required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" [disabled]="serviceKey.isRequired"
+		                                        id="serviceKey-key-{{idx}}" #key="ngModel" />
+		                                    <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+		                                        <span *ngIf="key.errors.required">Key is required.</span>
+		                                        <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
+		                                    </div>
+		                                </td>
+		                            </ng-template>
+		                            <td *ngIf="serviceKey.valueType !== 'list'; else isList">
+		                                <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" placeholder="{{serviceKey.placeholder}}"
+		                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel" 
+		                                    [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"/>
+		                                <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+		                                    <span *ngIf="value.errors.required">Value is required.</span>
+		                                </div>
+		                            </td>
+		                            <ng-template #isList>
+		                                <td>
+		                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
+		                                        <option [value]="l" *ngFor="let l of listVal">{{l}}</option>
+		                                    </select>
+		                                    <div *ngIf="listValue.invalid && (listValue.dirty || listValue.touched)" class="invalid-field-message">
+		                                        <span *ngIf="listValue.errors.required">Value is required.</span>
+		                                    </div>
+		                                </td>
+		                            </ng-template>
+		                            <td>
+		                                <div class="btn-group flex-btn-group-container">
+		                                    <div class="btn-group flex-btn-group-container">
+		                                        <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
+		                                            <span class="fa fa-plus"></span>
+		                                        </button>
+		                                        <button type="submit" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" 
+		                                            class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
+		                                            <span class="fa fa-trash"></span>
+		                                        </button>
+		                                        <button type="button" title="Remove" *ngIf="!serviceKey.id" [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="removeServiceKeys(idx)">
+		                                            <span class="fa fa-remove"></span>
+		                                        </button>
+		                                    </div>
+		                                </div>
+		                            </td>
+		                        </tr>
+		                    </tbody>
+		                </table>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="modal-footer">
+                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="navigateToService()">
                     <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
                 </button>
                 <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
-                </button>
-            </div>
-        </form>
+		            <span class="fa fa-save"></span>&nbsp;
+		            <span>Save</span>
+		        </button>
+		    </div>
+		</form>
     </div>
 </div>

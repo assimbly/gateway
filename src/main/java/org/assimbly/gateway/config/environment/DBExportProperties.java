@@ -12,6 +12,8 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.FlowService;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,11 @@ public class DBExportProperties {
 	@Autowired
 	private FlowRepository flowRepository;
 
+	@Autowired
+	private FlowRepository flowMapper;
+
+	@Autowired
+	private FlowService flowService;
 
 	private FromEndpoint fromEndpoint;
 
@@ -54,11 +61,12 @@ public class DBExportProperties {
 	public List<TreeMap<String, String>> getProperties(Long gatewayId) throws Exception {
 
 		propertiesList = new ArrayList<>();
-		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
-
+		List<Flow> flows= flowRepository.findAllByGatewayId(gatewayId);
+		
 		for (Flow flow : flows) {
+			
 			if (flow != null) {
-				TreeMap<String, String> flowConfiguration = getFlowProperties(flow);
+				TreeMap<String, String> flowConfiguration = getFlowProperties(flow.getId());
 				if (flowConfiguration != null) {
 					propertiesList.add(flowConfiguration);
 				}

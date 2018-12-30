@@ -34,7 +34,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     page: any;
     predicate: any;
     queryCount: any;
-    reverse: boolean;
+    reverse: any;
     totalItems: number;
     gatewayExists = false;
     multipleGateways = false;
@@ -46,13 +46,14 @@ export class FlowComponent implements OnInit, OnDestroy {
     test: any;
 
     constructor(
-        private gatewayService: GatewayService,
-        private flowService: FlowService,
-        private fromEndpointService: FromEndpointService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private parseLinks: JhiParseLinks,
-        private router: Router,
+        protected flowService: FlowService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected parseLinks: JhiParseLinks,
+        protected accountService: AccountService,
+		protected gatewayService: GatewayService,
+        protected fromEndpointService: FromEndpointService,
+        protected router: Router,
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -72,12 +73,13 @@ export class FlowComponent implements OnInit, OnDestroy {
                 page: this.page,
                 size: this.itemsPerPage,
                 sort: this.sort()
-            }).subscribe(
-                res => this.onSuccess(res, res.headers),
-                res => this.onError(res)
-                );
+            })
+            .subscribe(
+                (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
         }
-    }
+    }    
 
     reset() {
         this.page = 0;
@@ -93,6 +95,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.getGateways();
         this.getFromEndpoints();
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
     }

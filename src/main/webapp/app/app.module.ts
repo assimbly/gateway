@@ -2,7 +2,7 @@ import './vendor.ts';
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Ng2Webstorage } from 'ngx-webstorage';
 import { PopoverModule } from 'ngx-bootstrap';
@@ -28,6 +28,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
     imports: [
         BrowserModule,
         GatewayAppRoutingModule,
+        HttpClientModule,
         Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-' }),
         NgJhipsterModule.forRoot({
             // set below to true to make alerts look like toast
@@ -46,6 +47,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
     ],
     declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],
     providers: [
+        HttpClientModule,  
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthExpiredInterceptor,

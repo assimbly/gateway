@@ -73,12 +73,20 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     }
 
     save() {
+        //validate keys and values
         this.environmentVariablesForm.controls.key.updateValueAndValidity();
-        this.environmentVariablesForm.controls.key.markAsTouched();
+        if(this.environmentVariables.id===null){
+            this.environmentVariablesForm.controls.key.markAsTouched();
+        }
         this.environmentVariablesForm.updateValueAndValidity();
-        if (this.environmentVariablesForm.invalid) { return; }
+        if (this.environmentVariablesForm.invalid) {
+            this.isSaving = false;
+            return; }
+        
         this.isSaving = true;
         this.environmentVariables = this.environmentVariablesForm.value;
+        
+        //save environment variable
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(this.environmentVariablesService.update(this.environmentVariables));
         } else {

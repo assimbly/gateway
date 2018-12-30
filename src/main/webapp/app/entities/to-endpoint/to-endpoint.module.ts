@@ -35,7 +35,7 @@ const ENTITY_STATES = [...toEndpointRoute, ...toEndpointPopupRoute];
         ToEndpointDetailComponent,
         ToEndpointUpdateComponent,
         ToEndpointDeleteDialogComponent,
-        ToEndpointDeletePopupComponent,
+        ToEndpointDeletePopupComponent
     ],
     entryComponents: [ToEndpointComponent, ToEndpointUpdateComponent, ToEndpointDeleteDialogComponent, ToEndpointDeletePopupComponent],
     providers: [

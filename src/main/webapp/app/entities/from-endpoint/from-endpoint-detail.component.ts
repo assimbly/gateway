@@ -2,11 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { FromEndpointService } from './from-endpoint.service';
-import { HeaderService } from '../header/header.service';
-import { ServiceService } from '../service/service.service';
-import { Subscription } from "rxjs";
-import { JhiEventManager } from "ng-jhipster";
 
 @Component({
     selector: 'jhi-from-endpoint-detail',
@@ -15,33 +10,11 @@ import { JhiEventManager } from "ng-jhipster";
 export class FromEndpointDetailComponent implements OnInit {
     fromEndpoint: IFromEndpoint;
 
-    private subscription: Subscription;
-    private eventSubscriber: Subscription;
-    public headerName: string;
-    public serviceName: string;
-
-    constructor(
-        private eventManager: JhiEventManager,
-        private fromEndpointService: FromEndpointService,
-        private headerService: HeaderService,
-        private serviceService: ServiceService,
-        private route: ActivatedRoute
-    ) {
-    }
+    constructor(protected activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.route.data.subscribe(({ fromEndpoint }) => {
+        this.activatedRoute.data.subscribe(({ fromEndpoint }) => {
             this.fromEndpoint = fromEndpoint;
-
-            this.headerService.find(this.fromEndpoint.headerId)
-                .subscribe((header) => {
-                    this.headerName = header.body.name;
-                });
-
-            this.serviceService.find(this.fromEndpoint.serviceId)
-                .subscribe((service) => {
-                    this.serviceName = service.body.name;
-                });
         });
     }
 

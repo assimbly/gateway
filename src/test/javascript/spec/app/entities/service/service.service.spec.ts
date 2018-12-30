@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(ServiceService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new Service(0, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new Service(0, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {
@@ -56,12 +56,7 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         name: 'BBBBBB',
-                        type: 'BBBBBB',
-                        url: 'BBBBBB',
-                        username: 'BBBBBB',
-                        password: 'BBBBBB',
-                        driver: 'BBBBBB',
-                        configuration: 'BBBBBB'
+                        type: 'BBBBBB'
                     },
                     elemDefault
                 );
@@ -79,12 +74,7 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         name: 'BBBBBB',
-                        type: 'BBBBBB',
-                        url: 'BBBBBB',
-                        username: 'BBBBBB',
-                        password: 'BBBBBB',
-                        driver: 'BBBBBB',
-                        configuration: 'BBBBBB'
+                        type: 'BBBBBB'
                     },
                     elemDefault
                 );

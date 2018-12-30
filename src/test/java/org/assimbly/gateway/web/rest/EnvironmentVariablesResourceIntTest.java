@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
+import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
 import org.assimbly.gateway.service.mapper.EnvironmentVariablesMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -55,6 +56,9 @@ public class EnvironmentVariablesResourceIntTest {
     private EnvironmentVariablesMapper environmentVariablesMapper;
 
     @Autowired
+    private EnvironmentVariablesService environmentVariablesService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -76,7 +80,7 @@ public class EnvironmentVariablesResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final EnvironmentVariablesResource environmentVariablesResource = new EnvironmentVariablesResource(environmentVariablesRepository, environmentVariablesMapper);
+        final EnvironmentVariablesResource environmentVariablesResource = new EnvironmentVariablesResource(environmentVariablesService);
         this.restEnvironmentVariablesMockMvc = MockMvcBuilders.standaloneSetup(environmentVariablesResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

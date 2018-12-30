@@ -24,7 +24,7 @@ export class LogViewerComponent implements OnInit {
     getLogs() {
         let tt = this.lines;
         this.logViewerService.getLogs(this.lines).subscribe((res) => {
-            this.log = res.text();
+            this.log = res.body;
             setTimeout(() => {
                 try {
                     this.logArea.nativeElement.scrollTop = this.logArea.nativeElement.scrollHeight;

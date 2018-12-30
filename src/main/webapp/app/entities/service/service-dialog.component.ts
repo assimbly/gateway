@@ -12,6 +12,7 @@ import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { RequiredServiceKey } from '../service-keys';
+import { ServicePopupService } from "app/entities/service/service-popup.service";
 
 @Component({
     selector: 'jhi-service-dialog',
@@ -32,12 +33,12 @@ export class ServiceDialogComponent implements OnInit {
 
     constructor(
         public activeModal: NgbActiveModal,
-        private serviceService: ServiceService,
-        private serviceKeysService: ServiceKeysService,
-        private eventManager: JhiEventManager,
-        private jhiAlertService: JhiAlertService,
-        private route: ActivatedRoute,
-        private router: Router
+        protected serviceService: ServiceService,
+        protected serviceKeysService: ServiceKeysService,
+        protected eventManager: JhiEventManager,
+        protected jhiAlertService: JhiAlertService,
+        protected activatedRoute: ActivatedRoute,
+        protected router: Router
     ) {
     }
 
@@ -45,17 +46,22 @@ export class ServiceDialogComponent implements OnInit {
         this.isSaving = false;
         this.addRequiredServiceKeys();
         this.serviceService.query().subscribe(
-            res => {
-                this.servicesNames = res.body.map((s) => s.name)
-            },
-            res => this.onError(res.json)
-        );
-        if (this.route.fragment['value'] && this.route.fragment['value'] !== 'clone') {
-            this.service.type = this.typeServices.find((st) => st === this.route.fragment['value']);
-            this.disableType = this.typeServices.some((st) => st === this.route.fragment['value']);
+                (res) => {
+                    this.servicesNames = res.body.map((s) => s.name)
+                },
+                (res) => this.onError(res.body)
+        );        
+        if (this.activatedRoute.fragment['value'] && this.activatedRoute.fragment['value'] !== 'clone') {
+            this.service.type = this.typeServices.find((st) => st === this.activatedRoute.fragment['value']);
+            this.disableType = this.typeServices.some((st) => st === this.activatedRoute.fragment['value']);
         }
 
-        this.loadServiceKeys(this.route.fragment['value'] === 'clone');
+        if (this.activatedRoute.fragment['value'] === 'clone') {
+            this.loadServiceKeys(true);
+        }else{
+            this.loadServiceKeys(false);
+        }
+        
     }
 
     changeType(cloneHeader: boolean) {
@@ -67,21 +73,24 @@ export class ServiceDialogComponent implements OnInit {
                 ), 1)[0])
             });
         }
-
-        this.requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
+        
+        this.requiredType = this.requiredServiceKey.find(x => x.name === this.service.type);
+        
         const requiredServiceKeys =  new Array<ServiceKeys>();
         this.requiredType.serviceKeys.forEach((sk) => {
-            let ersk = this.serviceKeys.find((s) => s.key === sk.serviceKeyName);
+            let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
-            if (ersk instanceof ServiceKeys) {
-                rsk = ersk;
-                this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+            if(typeof ersk !== 'undefined'){
+                if (ersk.value !== '') {
+                    rsk = ersk;
+                    this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+                }
             }
             rsk.id = cloneHeader ? null : rsk.id;
             rsk.key = sk.serviceKeyName;
-            (rsk as any).valueType = sk.valueType;
-            (rsk as any).placeholder = sk.placeholder;
-            (rsk as any).isRequired = true;
+            rsk.valueType = sk.valueType;
+            rsk.placeholder = sk.placeholder;
+            rsk.isRequired = true;
             requiredServiceKeys.push(rsk);
         });
         this.serviceKeys.unshift(...requiredServiceKeys);
@@ -102,8 +111,8 @@ export class ServiceDialogComponent implements OnInit {
         }
     }
 
-    clear() {
-        this.activeModal.dismiss('cancel');
+    previousState() {
+        window.history.back();
     }
 
     save(closePopup: boolean) {
@@ -121,6 +130,11 @@ export class ServiceDialogComponent implements OnInit {
         this.serviceKeysService.delete(serviceKey.id).subscribe(() => {
             this.removeServiceKeys(this.serviceKeys.indexOf(serviceKey));
         })
+    }
+    
+    clear() {
+        console.log("clear");
+        this.activeModal.dismiss('cancel');
     }
 
     navigateToService() {
@@ -140,7 +154,7 @@ export class ServiceDialogComponent implements OnInit {
     private loadServiceKeys(cloneHeader: boolean) {
         if (this.service.id) {
             this.serviceKeysService.query().subscribe((res) => {
-                this.serviceKeys = res.body.filter((sk) => sk.serviceKeysId === this.service.id);
+                this.serviceKeys = res.body.filter((sk) => sk.serviceId === this.service.id);
                 this.changeType(cloneHeader);
                 this.service.id = cloneHeader ? null : this.service.id;
             });
@@ -180,7 +194,7 @@ export class ServiceDialogComponent implements OnInit {
         });
 
         this.serviceKeys.forEach((serviceKey) => {
-            serviceKey.serviceKeysId = result.id;
+            serviceKey.serviceId = result.id;
             if (serviceKey.id) {
                 this.serviceKeysService.update(serviceKey).subscribe((sk) => {
                     serviceKey = sk.body;
@@ -245,10 +259,20 @@ export class ServicePopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private servicePopupService: ServicePopupService
     ) {}
 
     ngOnInit() {
+        this.routeSub = this.route.params.subscribe((params) => {
+            if ( params['id'] ) {
+                this.servicePopupService
+                    .open(ServiceDialogComponent as Component, params['id']);
+            } else {
+                this.servicePopupService
+                    .open(ServiceDialogComponent as Component);
+            }
+        });
     }
 
     ngOnDestroy() {

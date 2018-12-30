@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.repository.HeaderKeysRepository;
+import org.assimbly.gateway.service.HeaderKeysService;
 import org.assimbly.gateway.service.dto.HeaderKeysDTO;
 import org.assimbly.gateway.service.mapper.HeaderKeysMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -58,6 +59,9 @@ public class HeaderKeysResourceIntTest {
     private HeaderKeysMapper headerKeysMapper;
 
     @Autowired
+    private HeaderKeysService headerKeysService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -79,7 +83,7 @@ public class HeaderKeysResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final HeaderKeysResource headerKeysResource = new HeaderKeysResource(headerKeysRepository, headerKeysMapper);
+        final HeaderKeysResource headerKeysResource = new HeaderKeysResource(headerKeysService);
         this.restHeaderKeysMockMvc = MockMvcBuilders.standaloneSetup(headerKeysResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

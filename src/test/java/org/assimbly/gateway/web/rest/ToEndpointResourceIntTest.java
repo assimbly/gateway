@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.ToEndpointRepository;
+import org.assimbly.gateway.service.ToEndpointService;
 import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.service.mapper.ToEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -43,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class ToEndpointResourceIntTest {
 
-    private static final EndpointType DEFAULT_TYPE = EndpointType.SONICMQ;
-    private static final EndpointType UPDATED_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType DEFAULT_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType UPDATED_TYPE = EndpointType.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -57,6 +58,9 @@ public class ToEndpointResourceIntTest {
 
     @Autowired
     private ToEndpointMapper toEndpointMapper;
+
+    @Autowired
+    private ToEndpointService toEndpointService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -80,7 +84,7 @@ public class ToEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ToEndpointResource toEndpointResource = new ToEndpointResource(toEndpointRepository, toEndpointMapper);
+        final ToEndpointResource toEndpointResource = new ToEndpointResource(toEndpointService, toEndpointRepository, toEndpointMapper);
         this.restToEndpointMockMvc = MockMvcBuilders.standaloneSetup(toEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -115,7 +119,7 @@ public class ToEndpointResourceIntTest {
 
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
-        restToEndpointMockMvc.perform(post("/api/to-endpoint")
+        restToEndpointMockMvc.perform(post("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isCreated());
@@ -172,7 +176,7 @@ public class ToEndpointResourceIntTest {
         toEndpointRepository.saveAndFlush(toEndpoint);
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(get("/api/to-endpoint/{id}", toEndpoint.getId()))
+        restToEndpointMockMvc.perform(get("/api/to-endpoints/{id}", toEndpoint.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(toEndpoint.getId().intValue()))
@@ -207,7 +211,7 @@ public class ToEndpointResourceIntTest {
             .options(UPDATED_OPTIONS);
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(updatedToEndpoint);
 
-        restToEndpointMockMvc.perform(put("/api/to-endpoint")
+        restToEndpointMockMvc.perform(put("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isOk());
@@ -229,7 +233,6 @@ public class ToEndpointResourceIntTest {
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
 
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restToEndpointMockMvc.perform(put("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -250,7 +253,7 @@ public class ToEndpointResourceIntTest {
         int databaseSizeBeforeDelete = toEndpointRepository.findAll().size();
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(delete("/api/to-endpoint/{id}", toEndpoint.getId())
+        restToEndpointMockMvc.perform(delete("/api/to-endpoints/{id}", toEndpoint.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
