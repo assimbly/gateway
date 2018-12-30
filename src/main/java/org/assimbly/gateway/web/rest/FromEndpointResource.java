@@ -1,12 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.FromEndpoint;
-import org.assimbly.gateway.repository.FromEndpointRepository;
+import org.assimbly.gateway.service.FromEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.FromEndpointDTO;
-import org.assimbly.gateway.service.mapper.FromEndpointMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +28,10 @@ public class FromEndpointResource {
 
     private static final String ENTITY_NAME = "fromEndpoint";
 
-    private final FromEndpointRepository fromEndpointRepository;
+    private final FromEndpointService fromEndpointService;
 
-    private final FromEndpointMapper fromEndpointMapper;
-
-    public FromEndpointResource(FromEndpointRepository fromEndpointRepository, FromEndpointMapper fromEndpointMapper) {
-        this.fromEndpointRepository = fromEndpointRepository;
-        this.fromEndpointMapper = fromEndpointMapper;
+    public FromEndpointResource(FromEndpointService fromEndpointService) {
+        this.fromEndpointService = fromEndpointService;
     }
 
     /**
@@ -53,10 +48,7 @@ public class FromEndpointResource {
         if (fromEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new fromEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
-
-        FromEndpoint fromEndpoint = fromEndpointMapper.toEntity(fromEndpointDTO);
-        fromEndpoint = fromEndpointRepository.save(fromEndpoint);
-        FromEndpointDTO result = fromEndpointMapper.toDto(fromEndpoint);
+        FromEndpointDTO result = fromEndpointService.save(fromEndpointDTO);
         return ResponseEntity.created(new URI("/api/from-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -78,10 +70,7 @@ public class FromEndpointResource {
         if (fromEndpointDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        FromEndpoint fromEndpoint = fromEndpointMapper.toEntity(fromEndpointDTO);
-        fromEndpoint = fromEndpointRepository.save(fromEndpoint);
-        FromEndpointDTO result = fromEndpointMapper.toDto(fromEndpoint);
+        FromEndpointDTO result = fromEndpointService.save(fromEndpointDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, fromEndpointDTO.getId().toString()))
             .body(result);
@@ -96,8 +85,7 @@ public class FromEndpointResource {
     @Timed
     public List<FromEndpointDTO> getAllFromEndpoints() {
         log.debug("REST request to get all FromEndpoints");
-        List<FromEndpoint> fromEndpoints = fromEndpointRepository.findAll();
-        return fromEndpointMapper.toDto(fromEndpoints);
+        return fromEndpointService.findAll();
     }
 
     /**
@@ -110,8 +98,7 @@ public class FromEndpointResource {
     @Timed
     public ResponseEntity<FromEndpointDTO> getFromEndpoint(@PathVariable Long id) {
         log.debug("REST request to get FromEndpoint : {}", id);
-        Optional<FromEndpointDTO> fromEndpointDTO = fromEndpointRepository.findById(id)
-            .map(fromEndpointMapper::toDto);
+        Optional<FromEndpointDTO> fromEndpointDTO = fromEndpointService.findOne(id);
         return ResponseUtil.wrapOrNotFound(fromEndpointDTO);
     }
 
@@ -125,8 +112,7 @@ public class FromEndpointResource {
     @Timed
     public ResponseEntity<Void> deleteFromEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete FromEndpoint : {}", id);
-
-        fromEndpointRepository.deleteById(id);
+        fromEndpointService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

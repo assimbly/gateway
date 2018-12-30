@@ -1,23 +1,12 @@
+import { IServiceKeys } from 'app/shared/model//service-keys.model';
+
 export interface IService {
     id?: number;
     name?: string;
     type?: string;
-    url?: string;
-    username?: string;
-    password?: string;
-    driver?: string;
-    configuration?: string;
+    serviceKeys?: IServiceKeys[];
 }
 
 export class Service implements IService {
-    constructor(
-        public id?: number,
-        public name?: string,
-        public type?: string,
-        public url?: string,
-        public username?: string,
-        public password?: string,
-        public driver?: string,
-        public configuration?: string
-    ) {}
+    constructor(public id?: number, public name?: string, public type?: string, public serviceKeys?: IServiceKeys[]) {}
 }

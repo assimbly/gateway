@@ -14,16 +14,7 @@ import { GatewayService } from './gateway.service';
 export class GatewayDeleteDialogComponent {
     gateway: IGateway;
 
-    message = 'Are you sure you want to delete this Gateway?';
-    disableDelete: boolean;
-
-    constructor(
-        private gatewayService: GatewayService,
-        public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager,
-        private router: Router
-    ) {
-    }
+    constructor(protected gatewayService: GatewayService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected router: Router) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -32,18 +23,13 @@ export class GatewayDeleteDialogComponent {
     confirmDelete(id: number) {
         this.gatewayService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
-                name: 'gatewayListModification',
-                content: 'Deleted an gateway'
+                name: 'fromEndpointListModification',
+                content: 'Deleted an fromEndpoint'
             });
             this.activeModal.dismiss(true);
-            setTimeout(() => {
-                this.router.navigate(['/gateway']);
-            }, 0);
-        }, (err) => {
-            this.message = 'Gateway ' + this.gateway.name + ' can not be deleted (gateway is used by a flow)';
-            this.disableDelete = true;
         });
     }
+    
 }
 
 @Component({

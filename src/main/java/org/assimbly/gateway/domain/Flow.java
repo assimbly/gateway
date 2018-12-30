@@ -32,11 +32,11 @@ public class Flow implements Serializable {
     @Column(name = "auto_start")
     private Boolean autoStart;
 
-    @Column(name = "offloading")
-    private Boolean offloading;
-    
+    @Column(name = "off_loading")
+    private Boolean offLoading;
+
     @ManyToOne
-    @JsonIgnoreProperties("")
+    @JsonIgnoreProperties("flows")
     private Gateway gateway;
 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
@@ -51,9 +51,11 @@ public class Flow implements Serializable {
     @JsonIgnore
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
     
+    /*
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private Maintenance maintenance; 
+    */ 
     
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -90,17 +92,17 @@ public class Flow implements Serializable {
         this.autoStart = autoStart;
     }
 
-    public Boolean isOffloading() {
-        return offloading;
+    public Boolean isOffLoading() {
+        return offLoading;
     }
 
-    public Flow offloading(Boolean offloading) {
-        this.offloading = offloading;
+    public Flow offLoading(Boolean offLoading) {
+        this.offLoading = offLoading;
         return this;
     }
 
-    public void setOffloading(Boolean offloading) {
-        this.offloading = offloading;
+    public void setOffLoading(Boolean offLoading) {
+        this.offLoading = offLoading;
     }
 
     public Gateway getGateway() {
@@ -142,6 +144,7 @@ public class Flow implements Serializable {
         this.errorEndpoint = errorEndpoint;
     }
 
+    /*
     public Maintenance getMaintenance() {
         return maintenance;
     }
@@ -153,7 +156,7 @@ public class Flow implements Serializable {
 
     public void setMaintenance(Maintenance maintenance) {
         this.maintenance = maintenance;
-    }
+    }*/
     
     public Set<ToEndpoint> getToEndpoints() {
         return toEndpoints;
@@ -208,6 +211,7 @@ public class Flow implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
+            ", offLoading='" + isOffLoading() + "'" +
             "}";
     }
 

@@ -1,13 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipName": "header",
-            "otherEntityName": "header",
-            "relationshipType": "many-to-one",
-            "otherEntityField": "id"
-        }
-    ],
+    "name": "HeaderKeys",
     "fields": [
         {
             "fieldName": "key",
@@ -22,10 +14,21 @@
             "fieldType": "String"
         }
     ],
+    "relationships": [
+        {
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
     "changelogDate": "20180114132921",
     "entityTableName": "header_keys",
     "dto": "mapstruct",
     "pagination": "no",
-    "service": "no",
-    "jpaMetamodelFiltering": false
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

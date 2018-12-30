@@ -1,4 +1,4 @@
-import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { IHeaderKeys } from 'app/shared/model//header-keys.model';
 
 export interface IHeader {
     id?: number;

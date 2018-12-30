@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { HeaderKeys } from 'app/shared/model/header-keys.model';
+import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
 
 @Component({
@@ -12,7 +12,8 @@ import { HeaderKeysService } from './header-keys.service';
     templateUrl: './header-keys-delete-dialog.component.html'
 })
 export class HeaderKeysDeleteDialogComponent {
-    headerKeys: HeaderKeys;
+    headerKeys: IHeaderKeys;
+
     constructor(
         protected headerKeysService: HeaderKeysService,
         public activeModal: NgbActiveModal,
@@ -24,8 +25,7 @@ export class HeaderKeysDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.headerKeysService.delete(id).subscribe((response) => {
-            this.eventManager.broadcast({ name: 'headerKeyDeleted', content: id });
+        this.headerKeysService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'headerKeysListModification',
                 content: 'Deleted an headerKeys'

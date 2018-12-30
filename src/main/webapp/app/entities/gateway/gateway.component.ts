@@ -10,11 +10,10 @@ import { FlowService } from '../flow/flow.service';
 
 @Component({
     selector: 'jhi-gateway',
-    templateUrl: './gateway.component.html'    
+    templateUrl: './gateway.component.html'
 })
 export class GatewayComponent implements OnInit, OnDestroy {
-
-    gateways: IGateway[] = new Array<IGateway>();
+    gateways: IGateway[] = [];
     currentAccount: any;
     eventSubscriber: Subscription;
 

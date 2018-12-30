@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
-
 import { Observable, Observer, Subscription } from 'rxjs';
 
-import { SERVER_API_URL } from '../../app.constants';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+
 import { Router, NavigationEnd } from '@angular/router';
 import { WindowRef } from '../../shared/auth/window.service';
-import { createRequestOption } from '../../shared';
 import { saveAs } from 'file-saver/FileSaver';
 import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
@@ -20,6 +20,9 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
 @Injectable({ providedIn: 'root' })
 export class FlowService {
+    public resourceUrl = SERVER_API_URL + 'api/flows';
+    public connectorUrl = SERVER_API_URL + 'api/connector';
+    public environmentUrl = SERVER_API_URL + 'api/environment';
     
     stompClient = null;
     subscriber = null;
@@ -30,17 +33,11 @@ export class FlowService {
     alreadyConnectedOnce = false;
     private subscription: Subscription;
 
-    private resourceUrl = SERVER_API_URL + 'api/flows';
-    private connectorUrl = SERVER_API_URL + 'api/connector';
-    private environmentUrl = SERVER_API_URL + 'api/environment';
-
     private gatewayid = 1;
 
-    constructor(
-        private router: Router,
-        private $window: WindowRef,
-        protected http: HttpClient
-        // tslint:disable-next-line: no-unused-variable
+    constructor(protected http: HttpClient,
+		 protected router: Router,
+         protected $window: WindowRef,
      ) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
@@ -48,10 +45,6 @@ export class FlowService {
 
     create(flow: IFlow): Observable<EntityResponseType> {
         return this.http.post<IFlow>(this.resourceUrl, flow, { observe: 'response' });
-    }
-
-    delete(id: number): Observable<HttpResponse<any>> {
-        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     update(flow: IFlow): Observable<EntityResponseType> {
@@ -67,22 +60,26 @@ export class FlowService {
         return this.http.get<IFlow[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    }
+
     getFlowByGatewayId(gatewayid: Number): Observable<EntityResponseType> {
         return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { observe: 'response' });
     }
 
-    getConfiguration(flowid: number): Observable<any> {
+    getConfiguration(flowid: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, { observe: 'response' });
     }
 
-    setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<EntityResponseType> {
+    setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
         if (!!header) {
             const options = {
-                    headers: new HttpHeaders({'Accept': 'application/xml'})
+                    headers: new HttpHeaders({observe: 'response', responseType: 'text','Accept': 'application/xml'})
             };
-            return this.http.post<any>(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
         } else {
-            return this.http.post<any>(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration);
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {observe: 'response', responseType: 'text' });
         }
     }
 
@@ -100,43 +97,43 @@ export class FlowService {
         return this.http.get<any>(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
     }
 
-    start(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response' });
+    start(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, {observe: 'response', responseType: 'text' });
     }
 
-    pause(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response' });
+    pause(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, {observe: 'response', responseType: 'text' });
     }
 
-    resume(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response' });
+    resume(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, {observe: 'response', responseType: 'text' });
     }
 
-    restart(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response' });
+    restart(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, {observe: 'response', responseType: 'text' });
     }
 
-    stop(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response' });
+    stop(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, {observe: 'response', responseType: 'text' });
     }
 
     getFlowStatus(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowAlerts(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowNumberOfAlerts(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, { observe: 'response' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowLastError(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response', responseType: 'text' });
     }
 
-    getFlowStats(id: number, gatewayid: number): Observable<any> {
+    getFlowStats(id: number, gatewayid: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`, { observe: 'response' });
     }
 
@@ -144,34 +141,29 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/schema/` + componentType, { observe: 'response' });
     }
 
-    getWikiDocUrl() {
-        return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response' });
+    getWikiDocUrl(): Observable<HttpResponse<any>> {
+        return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response',responseType: 'text' });
     }
 
-    getCamelDocUrl() {
-        return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response' });
+    getCamelDocUrl(): Observable<HttpResponse<any>> {
+        return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response',responseType: 'text' });
     }
 
-    setMaintenance(time: number, flowsIds: Array<number>): Observable<any> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, { observe: 'response' });
+    setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, { observe: 'response', responseType: 'text' });
     }
 
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
-                
         this.http.get(url, { headers: new HttpHeaders({
             'Accept': 'application/xml',
             'Content-Type': 'application/octet-stream',
-            }), responseType: 'blob'}).pipe (
-            tap (
-              // Log the result or error
-              data => {console.log('You received data')
-                  const blob = new Blob([data], { type: 'application/xml' });
+            }), observe: 'response', responseType: 'blob'}).subscribe(data => {
+                  const blob = new Blob([data.body], { type: 'application/xml' });
                   saveAs(blob, `${gateway.name}.xml`);              
               },
               error => console.log(error)
             )
-           );
     }
 
     connect() {

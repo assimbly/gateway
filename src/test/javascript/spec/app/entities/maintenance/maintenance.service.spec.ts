@@ -25,7 +25,7 @@ describe('Service Tests', () => {
             httpMock = injector.get(HttpTestingController);
             currentDate = moment();
 
-            elemDefault = new Maintenance(0, currentDate, currentDate);
+            elemDefault = new Maintenance(0, currentDate, currentDate, currentDate, 'AAAAAAA');
         });
 
         describe('Service methods', async () => {
@@ -33,7 +33,8 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         startTime: currentDate.format(DATE_TIME_FORMAT),
-                        endTime: currentDate.format(DATE_TIME_FORMAT)
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT)
                     },
                     elemDefault
                 );
@@ -51,14 +52,16 @@ describe('Service Tests', () => {
                     {
                         id: 0,
                         startTime: currentDate.format(DATE_TIME_FORMAT),
-                        endTime: currentDate.format(DATE_TIME_FORMAT)
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT)
                     },
                     elemDefault
                 );
                 const expected = Object.assign(
                     {
                         startTime: currentDate,
-                        endTime: currentDate
+                        endTime: currentDate,
+                        duration: currentDate
                     },
                     returnedFromService
                 );
@@ -74,7 +77,9 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         startTime: currentDate.format(DATE_TIME_FORMAT),
-                        endTime: currentDate.format(DATE_TIME_FORMAT)
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT),
+                        frequency: 'BBBBBB'
                     },
                     elemDefault
                 );
@@ -82,7 +87,8 @@ describe('Service Tests', () => {
                 const expected = Object.assign(
                     {
                         startTime: currentDate,
-                        endTime: currentDate
+                        endTime: currentDate,
+                        duration: currentDate
                     },
                     returnedFromService
                 );
@@ -98,14 +104,17 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         startTime: currentDate.format(DATE_TIME_FORMAT),
-                        endTime: currentDate.format(DATE_TIME_FORMAT)
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT),
+                        frequency: 'BBBBBB'
                     },
                     elemDefault
                 );
                 const expected = Object.assign(
                     {
                         startTime: currentDate,
-                        endTime: currentDate
+                        endTime: currentDate,
+                        duration: currentDate
                     },
                     returnedFromService
                 );

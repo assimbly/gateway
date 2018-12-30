@@ -121,6 +121,7 @@ public class Service implements Serializable {
         return "Service{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", type='" + getType() + "'" +
             "}";
     }
 }

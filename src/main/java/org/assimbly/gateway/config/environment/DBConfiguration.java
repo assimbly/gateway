@@ -100,6 +100,9 @@ public class DBConfiguration {
 	// imports connector configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
 
+		System.out.println("Komt hier convertConfigurationToDB");
+		System.out.println("xml=" + configuration);
+
 		// get the configuration as XML Document
 		Document doc = getDocument(mediaType, configuration);
 

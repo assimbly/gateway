@@ -25,8 +25,7 @@ import { Subscription } from "rxjs";
     providers: [NgbTabsetConfig]
 })
 export class FlowDetailComponent implements OnInit {
-
-    flow: Flow;
+    flow: IFlow;
     gateway: Gateway;
     fromEndpoint: FromEndpoint;
     toEndpoints: Array<ToEndpoint>;
@@ -47,25 +46,24 @@ export class FlowDetailComponent implements OnInit {
     private camelDocUrl: string;
 
     constructor(
-        public tabsetConfig: NgbTabsetConfig,
-        private gatewayService: GatewayService,
-        private fromEndpointService: FromEndpointService,
-        private toEndpointService: ToEndpointService,
-        private errorEndpointService: ErrorEndpointService,
-        private eventManager: JhiEventManager,
-        private flowService: FlowService,
-        private route: ActivatedRoute
-    ) {
+		public tabsetConfig: NgbTabsetConfig,
+        protected gatewayService: GatewayService,
+        protected fromEndpointService: FromEndpointService,
+        protected toEndpointService: ToEndpointService,
+        protected errorEndpointService: ErrorEndpointService,
+        protected eventManager: JhiEventManager,
+        protected flowService: FlowService,
+		protected activatedRoute: ActivatedRoute
+	){
         tabsetConfig.justify = 'fill';
-    }
+	}
 
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ flow }) => {
+            this.flow = flow;
         });
-        this.registerChangeInFlows();
     }
-
+    
     load(id) {
         forkJoin([this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()])
             .subscribe((results) => {
@@ -104,7 +102,8 @@ export class FlowDetailComponent implements OnInit {
 
         this.toEndpointService.findByFlowId(id)
             .subscribe(toEndpoints => {
-                this.toEndpoints = toEndpoints;
+                
+                this.toEndpoints = toEndpoints.body;
                 this.toEndpoints.forEach((toEndpoint) => {
                     this.setTypeLinks(toEndpoint);
                 });

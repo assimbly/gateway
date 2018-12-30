@@ -57,7 +57,7 @@ describe('Service Tests', () => {
                     {
                         name: 'BBBBBB',
                         autoStart: true,
-                        offloading: true
+                        offLoading: true
                     },
                     elemDefault
                 );
@@ -76,7 +76,7 @@ describe('Service Tests', () => {
                     {
                         name: 'BBBBBB',
                         autoStart: true,
-                        offloading: true
+                        offLoading: true
                     },
                     elemDefault
                 );

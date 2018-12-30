@@ -8,16 +8,20 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
     HeaderComponent,
     HeaderDetailComponent,
+    HeaderDialogComponent,    
     HeaderUpdateComponent,
     HeaderDeletePopupComponent,
     HeaderDeleteDialogComponent,
     HeaderAllComponent,
     headerRoute,
     headerPopupRoute,
+    HeaderPopupService,
     ForbiddenHeaderNamesValidatorDirective,
     ForbiddenHeaderKeysValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { HeaderPopupComponent } from "app/entities/header/header-dialog.component";
+import { HeaderService } from "app/entities/header/header.service";
 const ENTITY_STATES = [
     ...headerRoute,
     ...headerPopupRoute,
@@ -33,23 +37,28 @@ const ENTITY_STATES = [
         RouterModule.forChild(ENTITY_STATES)
     ],
     declarations: [
-        HeaderComponent,
-        HeaderUpdateComponent ,
-        HeaderAllComponent,
-        HeaderDetailComponent,
-        HeaderDeleteDialogComponent,
-        HeaderDeletePopupComponent,
-        ForbiddenHeaderNamesValidatorDirective,
-        ForbiddenHeaderKeysValidatorDirective
-    ],
+			HeaderComponent,
+			HeaderDetailComponent,
+			HeaderDialogComponent,			
+			HeaderUpdateComponent,
+			HeaderAllComponent,
+			HeaderDeleteDialogComponent,
+			HeaderDeletePopupComponent,
+			HeaderPopupComponent,
+        	ForbiddenHeaderNamesValidatorDirective,
+        	ForbiddenHeaderKeysValidatorDirective],
     entryComponents: [
-        HeaderComponent,
-        HeaderAllComponent,
-        HeaderDeleteDialogComponent,
-        HeaderDeletePopupComponent,
-    ],
-    providers: [
-    ],
+			HeaderComponent,
+			HeaderDialogComponent,
+			HeaderUpdateComponent,
+			 HeaderPopupComponent,
+			HeaderAllComponent,
+			HeaderDeleteDialogComponent,
+			HeaderDeletePopupComponent],
+		    providers: [
+		        HeaderService,
+		        HeaderPopupService,
+		],		
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayHeaderModule {}

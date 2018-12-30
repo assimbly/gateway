@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(WireTapEndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new WireTapEndpoint(0, EndpointType.SONICMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new WireTapEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

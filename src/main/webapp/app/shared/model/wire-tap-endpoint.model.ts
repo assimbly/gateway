@@ -1,18 +1,16 @@
-import { IService } from 'app/shared/model/service.model';
-import { IHeader } from 'app/shared/model/header.model';
-
 export const enum EndpointType {
+    ACTIVEMQ = 'ACTIVEMQ',
+    FILE = 'FILE',
+    HTTP4 = 'HTTP4',
+    KAFKA = 'KAFKA',
+    SFTP = 'SFTP',
+    SJMS = 'SJMS',
+    SMTP = 'SMTP',
     SONICMQ = 'SONICMQ',
-    ACTIVEMQ = ' ACTIVEMQ',
-    KAFKA = ' KAFKA',
-    SJMS = ' SJMS',
-    SQL = ' SQL',
-    HTTP4 = ' HTTP4',
-    SFTP = ' SFTP',
-    STREAM = ' STREAM',
-    WASTEBIN = ' WASTEBIN',
-    FILE = ' FILE',
-    VM = ' VM'
+    SQL = 'SQL',
+    STREAM = 'STREAM',
+    VM = 'VM',
+    WASTEBIN = 'WASTEBIN'
 }
 
 export interface IWireTapEndpoint {
@@ -20,8 +18,8 @@ export interface IWireTapEndpoint {
     type?: EndpointType;
     uri?: string;
     options?: string;
-    service?: IService;
-    header?: IHeader;
+    serviceId?: number;
+    headerId?: number;
 }
 
 export class WireTapEndpoint implements IWireTapEndpoint {
@@ -30,7 +28,7 @@ export class WireTapEndpoint implements IWireTapEndpoint {
         public type?: EndpointType,
         public uri?: string,
         public options?: string,
-        public service?: IService,
-        public header?: IHeader
+        public serviceId?: number,
+        public headerId?: number
     ) {}
 }

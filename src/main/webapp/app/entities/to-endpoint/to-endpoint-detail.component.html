@@ -1,53 +1,53 @@
 <div class="row justify-content-center">
     <div class="col-8">
-<div *ngIf="toEndpoint">
-    <h2><span>To Endpoint</span> {{toEndpoint.id}}</h2>
-    <hr>
-    <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Type</span></dt>
-        <dd>
-            <span>{{toEndpoint.type}}</span>
-        </dd>
-        <dt><span>Uri</span></dt>
-        <dd>
-            <span>{{toEndpoint.uri}}</span>
-        </dd>
-        <dt><span>Options</span></dt>
-        <dd>
-            <span>{{toEndpoint.options}}</span>
-        </dd>
-        <dt><span>Flow</span></dt>
-        <dd>
-            <div *ngIf="toEndpoint.flowId">
-                <a [routerLink]="['/flow', toEndpoint.flowId]">{{toEndpoint.flowId}}</a>
-            </div>
-        </dd>
-        <dt><span>Service</span></dt>
-        <dd>
-            <div *ngIf="toEndpoint.serviceId">
-                <a [routerLink]="['/service', toEndpoint.serviceId]">{{serviceName}}</a>
-            </div>
-        </dd>
-        <dt><span>Header</span></dt>
-        <dd>
-            <div *ngIf="toEndpoint.headerId">
-                <a [routerLink]="['/header', toEndpoint.headerId]">{{headerName}}</a>
-            </div>
-        </dd>
-    </dl>
+        <div *ngIf="toEndpoint">
+            <h2><span>To Endpoint</span> {{toEndpoint.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Type</span></dt>
+                <dd>
+                    <span>{{toEndpoint.type}}</span>
+                </dd>
+                <dt><span>Uri</span></dt>
+                <dd>
+                    <span>{{toEndpoint.uri}}</span>
+                </dd>
+                <dt><span>Options</span></dt>
+                <dd>
+                    <span>{{toEndpoint.options}}</span>
+                </dd>
+                <dt><span>Flow</span></dt>
+                <dd>
+                    <div *ngIf="toEndpoint.flowId">
+                        <a [routerLink]="['/flow', toEndpoint.flowId, 'view']">{{toEndpoint.flowId}}</a>
+                    </div>
+                </dd>
+                <dt><span>Service</span></dt>
+                <dd>
+                    <div *ngIf="toEndpoint.serviceId">
+                        <a [routerLink]="['/service', toEndpoint.serviceId, 'view']">{{toEndpoint.serviceId}}</a>
+                    </div>
+                </dd>
+                <dt><span>Header</span></dt>
+                <dd>
+                    <div *ngIf="toEndpoint.headerId">
+                        <a [routerLink]="['/header', toEndpoint.headerId, 'view']">{{toEndpoint.headerId}}</a>
+                    </div>
+                </dd>
+            </dl>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
 
-    <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
-            [routerLink]="['/', { outlets: { popup: 'to-endpoint/'+ toEndpoint.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+            <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/to-endpoint', toEndpoint.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
 </div>

@@ -14,17 +14,14 @@ import {
     GatewayImportPopupComponent,
     GatewayImportDialogComponent,
     gatewayRoute,
-    gatewayPopupRoute
+    gatewayPopupRoute,
+    GatewayPopupService
 } from './';
 
 const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES),
-        PopoverModule.forRoot(),
-    ],
+    imports: [GatewaySharedModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         GatewayComponent,
         GatewayDetailComponent,
@@ -36,6 +33,7 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
     ],
     entryComponents: [
         GatewayComponent,
+		GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
@@ -43,8 +41,9 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
     ],
     providers: [
         Components,
-        GatewayService
+        GatewayService,
+        GatewayPopupService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayGatewayModule { }
+export class GatewayGatewayModule {}

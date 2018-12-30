@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { Service } from 'app/shared/model/service.model';
 import { Observable } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core';
@@ -19,23 +19,23 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     @Input() service: Service;
 
     serviceKeysKeys: Array<string> = [];
-    currentAccount: any;
     isSaving: boolean;
     serviceKey: IServiceKeys;
+    currentAccount: any;
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
     listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
 
     constructor(
-        private serviceKeysService: ServiceKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager
-    ) {
-    }
+        protected serviceKeysService: ServiceKeysService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.serviceKeysService.query().subscribe(
-            (res: HttpResponse<ServiceKeys[]>) => {
+            (res: HttpResponse<IServiceKeys[]>) => {
                 this.serviceKeys = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
@@ -44,9 +44,12 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.registerChangeInServiceKeys();
     }
-
+    
     addRequiredServiceKeys() {
         this.requiredServiceKey.push(
             {
@@ -128,11 +131,11 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
-                (this.serviceKeys[0] as any).isDisabled = false;
-                (this.serviceKeys[0] as any).isRequired = false;
+                this.serviceKeys[0].isDisabled = false;
+                this.serviceKeys[0].isRequired = false;
             } else {
                 this.serviceKeys.forEach((serviceKey) => {
-                    (serviceKey as any).isDisabled = true;
+                    serviceKey.isDisabled = true;
                 });
             }
             const requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
@@ -145,9 +148,9 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
                 }
                 rsk.key = sk.serviceKeyName;
-                (rsk as any).valueType = sk.valueType;
-                (rsk as any).placeholder = sk.placeholder;
-                (rsk as any).isRequired = true;
+                rsk.valueType = sk.valueType;
+                rsk.placeholder = sk.placeholder;
+                rsk.isRequired = true;
                 requiredServiceKeys.push(rsk);
             });
             this.serviceKeys.unshift(...requiredServiceKeys);
@@ -159,14 +162,14 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.subscribeToSaveResponse(
                 this.serviceKeysService.update(serviceKey), false, i);
         } else {
-            serviceKey.serviceKeysId = this.service.id;
+            serviceKey.serviceId = this.service.id;
             this.subscribeToSaveResponse(
                 this.serviceKeysService.create(serviceKey), true, i);
         }
     }
     addServiceKeys() {
         const newServiceKeys = new ServiceKeys();
-        (newServiceKeys as any).isDisabled = false;
+        newServiceKeys.isDisabled = false;
         this.serviceKeys.push(newServiceKeys);
         this.mapServiceKeysKeys();
     }
@@ -193,8 +196,6 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         result.subscribe(data => {
             if(data.ok){
                 this.onSaveSuccess(data.body,isCreate,i);
-            }else{
-                this.onSaveError()
             }
             }    
         )
@@ -202,18 +203,23 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     
     cloneServiceKey(serviceKey: ServiceKeys) {
         const serviceKeyForClone = new ServiceKeys(
-            serviceKey.id,
+            null,
             serviceKey.key,
             serviceKey.value,
-            serviceKey.serviceKeysId,
+            null,
+            false,
+            true,
+            null,
+            null,                    
+            serviceKey.serviceId,
             );
         this.serviceKeys.push(serviceKeyForClone);
     }
     private onSaveSuccess(result: IServiceKeys, isCreate: boolean, i: number) {
-        (result as any).isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
+        result.isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
 
         if (isCreate) {
-            (result as any).isDisabled = true;
+            result.isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
         } else {
             //this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
@@ -224,6 +230,10 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     private onSaveError() {
         this.isSaving = false;
+    }
+
+    ngOnDestroy() {
+        this.eventManager.destroy(this.eventSubscriber);
     }
 
     trackId(index: number, item: IServiceKeys) {
@@ -237,7 +247,9 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
+
 }
+
 export interface RequiredServiceKey {
     name: string;
     serviceKeys: Array<ServiceKeyInformation>;

@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(ToEndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new ToEndpoint(0, EndpointType.SONICMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new ToEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

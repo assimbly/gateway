@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.repository.ServiceKeysRepository;
+import org.assimbly.gateway.service.ServiceKeysService;
 import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.service.mapper.ServiceKeysMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -48,11 +49,17 @@ public class ServiceKeysResourceIntTest {
     private static final String DEFAULT_VALUE = "AAAAAAAAAA";
     private static final String UPDATED_VALUE = "BBBBBBBBBB";
 
+    private static final String DEFAULT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_TYPE = "BBBBBBBBBB";
+
     @Autowired
     private ServiceKeysRepository serviceKeysRepository;
 
     @Autowired
     private ServiceKeysMapper serviceKeysMapper;
+
+    @Autowired
+    private ServiceKeysService serviceKeysService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -76,8 +83,8 @@ public class ServiceKeysResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ServiceKeysResource headerKeysResource = new ServiceKeysResource(serviceKeysRepository, serviceKeysMapper);
-        this.restServiceKeysMockMvc = MockMvcBuilders.standaloneSetup(headerKeysResource)
+        final ServiceKeysResource serviceKeysResource = new ServiceKeysResource(serviceKeysService);
+        this.restServiceKeysMockMvc = MockMvcBuilders.standaloneSetup(serviceKeysResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
@@ -94,7 +101,8 @@ public class ServiceKeysResourceIntTest {
     public static ServiceKeys createEntity(EntityManager em) {
         ServiceKeys serviceKeys = new ServiceKeys()
             .key(DEFAULT_KEY)
-            .value(DEFAULT_VALUE);
+            .value(DEFAULT_VALUE)
+            .type(DEFAULT_TYPE);
         return serviceKeys;
     }
 
@@ -121,6 +129,7 @@ public class ServiceKeysResourceIntTest {
         ServiceKeys testServiceKeys = serviceKeysList.get(serviceKeysList.size() - 1);
         assertThat(testServiceKeys.getKey()).isEqualTo(DEFAULT_KEY);
         assertThat(testServiceKeys.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testServiceKeys.getType()).isEqualTo(DEFAULT_TYPE);
     }
 
     @Test
@@ -155,7 +164,8 @@ public class ServiceKeysResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(serviceKeys.getId().intValue())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
-            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())));
+            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
     }
     
     @Test
@@ -170,7 +180,8 @@ public class ServiceKeysResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(serviceKeys.getId().intValue()))
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY.toString()))
-            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.toString()));
+            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.toString()))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()));
     }
 
     @Test
@@ -195,7 +206,8 @@ public class ServiceKeysResourceIntTest {
         em.detach(updatedServiceKeys);
         updatedServiceKeys
             .key(UPDATED_KEY)
-            .value(UPDATED_VALUE);
+            .value(UPDATED_VALUE)
+            .type(UPDATED_TYPE);
         ServiceKeysDTO serviceKeysDTO = serviceKeysMapper.toDto(updatedServiceKeys);
 
         restServiceKeysMockMvc.perform(put("/api/service-keys")
@@ -209,6 +221,7 @@ public class ServiceKeysResourceIntTest {
         ServiceKeys testServiceKeys = serviceKeysList.get(serviceKeysList.size() - 1);
         assertThat(testServiceKeys.getKey()).isEqualTo(UPDATED_KEY);
         assertThat(testServiceKeys.getValue()).isEqualTo(UPDATED_VALUE);
+        assertThat(testServiceKeys.getType()).isEqualTo(UPDATED_TYPE);
     }
 
     @Test

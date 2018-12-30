@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(ServiceKeysService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new ServiceKeys(0, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new ServiceKeys(0, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {
@@ -56,7 +56,8 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         key: 'BBBBBB',
-                        value: 'BBBBBB'
+                        value: 'BBBBBB',
+                        type: 'BBBBBB'
                     },
                     elemDefault
                 );
@@ -74,7 +75,8 @@ describe('Service Tests', () => {
                 const returnedFromService = Object.assign(
                     {
                         key: 'BBBBBB',
-                        value: 'BBBBBB'
+                        value: 'BBBBBB',
+                        type: 'BBBBBB'
                     },
                     elemDefault
                 );

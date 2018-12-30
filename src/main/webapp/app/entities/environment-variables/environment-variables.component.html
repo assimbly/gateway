@@ -1,16 +1,13 @@
 <div>
     <h2 id="page-heading">
         <span>Environment Variables</span>
-        <button class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/environment-variables/new']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-            <span class="fa fa-plus"></span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-environment-variables" [routerLink]="['/environment-variables/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
             <span >
-            Create Environment Variables
+            Create Environment Variable
             </span>
         </button>
     </h2>
-    <!-- <jhi-alert></jhi-alert> -->
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="environmentVariables">
         <table class="table table-striped">
@@ -25,7 +22,7 @@
             </thead>
             <tbody>
             <tr *ngFor="let environmentVariables of environmentVariables ;trackBy: trackId">
-                <td  id="environmentVariablesRowID" [hidden]="!environmentVariablesRowID"><a [routerLink]="['../environment-variables', environmentVariables.id ]">{{environmentVariables.id}}</a></td>
+                <td id="environmentVariablesRowID" [hidden]="!environmentVariablesRowID"><a [routerLink]="['/environment-variables', environmentVariables.id, 'view' ]">{{environmentVariables.id}}</a></td>
                 <td>{{environmentVariables.key}}</td>
                 <td>{{environmentVariables.value}}</td>
                 <td  id="environmentVariablesRowGatewayID" [hidden]="!environmentVariablesRowGatewayID">
@@ -42,7 +39,7 @@
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'environment-variables/'+ environmentVariables.id + '/edit'} }]"
+                                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
                                 fragment="clone" 
                                 replaceUrl="true"
                                 queryParamsHandling="merge"

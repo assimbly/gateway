@@ -9,11 +9,10 @@ import { FlowService } from './flow.service';
 import { FlowComponent } from './flow.component';
 import { FlowConfigurationComponent } from './flow-configuration.component';
 import { FlowDetailComponent } from './flow-detail.component';
+import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditAllComponent } from './flow-edit-all.component';
-import { FlowPopupComponent } from './flow-dialog.component';
 import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
 import { FlowEditorModeComponent } from './flow-editor-mode.component';
-import { FlowUpdateComponent } from './flow-update.component';
 
 @Injectable({ providedIn: 'root' })
 export class FlowResolve implements Resolve<IFlow> {
@@ -64,9 +63,22 @@ export const flowRoute: Routes = [
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
-    }, {
-        path: 'flow/:id',
-        component: FlowDetailComponent,
+    },
+    {
+        path: 'flow/new',
+        component: FlowUpdateComponent,
+        resolve: {
+            flow: FlowResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Flows'
+        },
+        canActivate: [UserRouteAccessService]
+    },
+    {
+        path: 'flow/:id/edit',
+        component: FlowUpdateComponent,
         resolve: {
             flow: FlowResolve
         },
@@ -86,3 +98,18 @@ export const flowRoute: Routes = [
     }
 ];
 
+export const flowPopupRoute: Routes = [
+    {
+        path: 'flow/:id/delete',
+        component: FlowDeletePopupComponent,
+        resolve: {
+            flow: FlowResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Flows'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    }
+];

@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.mapper.FlowMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -48,14 +49,17 @@ public class FlowResourceIntTest {
     private static final Boolean DEFAULT_AUTO_START = false;
     private static final Boolean UPDATED_AUTO_START = true;
 
-    private static final Boolean DEFAULT_OFFLOADING = false;
-    private static final Boolean UPDATED_OFFLOADING = true;
+    private static final Boolean DEFAULT_OFF_LOADING = false;
+    private static final Boolean UPDATED_OFF_LOADING = true;
 
     @Autowired
     private FlowRepository flowRepository;
 
     @Autowired
     private FlowMapper flowMapper;
+
+    @Autowired
+    private FlowService flowService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -79,7 +83,7 @@ public class FlowResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final FlowResource flowResource = new FlowResource(flowRepository, flowMapper);
+        final FlowResource flowResource = new FlowResource(flowService);
         this.restFlowMockMvc = MockMvcBuilders.standaloneSetup(flowResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -98,7 +102,7 @@ public class FlowResourceIntTest {
         Flow flow = new Flow()
             .name(DEFAULT_NAME)
             .autoStart(DEFAULT_AUTO_START)
-            .offloading(DEFAULT_OFFLOADING);
+            .offLoading(DEFAULT_OFF_LOADING);
         return flow;
     }
 
@@ -125,7 +129,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
-        assertThat(testFlow.isOffloading()).isEqualTo(DEFAULT_OFFLOADING);
+        assertThat(testFlow.isOffLoading()).isEqualTo(DEFAULT_OFF_LOADING);
     }
 
     @Test
@@ -161,7 +165,7 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
-            .andExpect(jsonPath("$.[*].offloading").value(hasItem(DEFAULT_OFFLOADING.booleanValue())));
+            .andExpect(jsonPath("$.[*].offLoading").value(hasItem(DEFAULT_OFF_LOADING.booleanValue())));
     }
     
     @Test
@@ -177,7 +181,7 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
-            .andExpect(jsonPath("$.offloading").value(DEFAULT_OFFLOADING.booleanValue()));
+            .andExpect(jsonPath("$.offLoading").value(DEFAULT_OFF_LOADING.booleanValue()));
     }
 
     @Test
@@ -203,7 +207,7 @@ public class FlowResourceIntTest {
         updatedFlow
             .name(UPDATED_NAME)
             .autoStart(UPDATED_AUTO_START)
-            .offloading(UPDATED_OFFLOADING);
+            .offLoading(UPDATED_OFF_LOADING);
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
@@ -217,7 +221,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
-        assertThat(testFlow.isOffloading()).isEqualTo(UPDATED_OFFLOADING);
+        assertThat(testFlow.isOffLoading()).isEqualTo(UPDATED_OFF_LOADING);
     }
 
     @Test

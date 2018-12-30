@@ -6,14 +6,14 @@
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <p>{{message}}</p>
+        <p id="jhi-delete-flow-heading">Are you sure you want to delete this Flow?</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-danger" [disabled]="disableDelete" (click)="confirmDelete(flow.id)">
-            <span class="fa fa-remove"></span>&nbsp;<span>Delete</span>
+        <button id="jhi-confirm-delete-flow" type="submit" class="btn btn-danger">
+            <fa-icon [icon]="'times'"></fa-icon>&nbsp;<span>Delete</span>
         </button>
     </div>
 </form>

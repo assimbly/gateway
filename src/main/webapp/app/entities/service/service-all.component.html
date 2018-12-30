@@ -1,13 +1,10 @@
 <div>
-    <button class="btn btn-primary float-right jh-create-entity create-service" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
-        <span class="fa fa-plus"></span>
-        <span>
-            Create Service
-        </span>
-    </button>
-    <br/>
-    <h2>
-        <span>Service</span>
+    <h2 id="page-heading">
+        <span>Services</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-service"  *ngIf="isAdmin" [routerLink]="['/service/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
+            <span >Create Service</span>
+        </button>
     </h2>
     <br/>
 
@@ -39,11 +36,11 @@
                             <button type="button" *ngIf="!isAdmin" [routerLink]="['./', service.id ]" class="btn btn-info btn-sm">
                                 <span class="fa fa-eye"></span> View details
                             </button>
-                            <button type="button" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary btn-sm">
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/service', service.id, 'edit']" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary btn-sm">
                                 <span class="fa fa-pencil"></span>&nbsp;
                                 <span> Edit</span>
                             </button>
-                            <button type="button" *ngIf="isAdmin" [routerLink]="['/', { outlets: { popup: 'service/'+ service.id + '/edit'} }]" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info btn-sm">
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/service', service.id, 'edit']" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info btn-sm">
                                 <span class="fa fa-clone"></span>&nbsp;
                                 <span> Clone</span>
                             </button>

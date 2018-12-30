@@ -7,7 +7,9 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A Maintenance.
@@ -124,6 +126,8 @@ public class Maintenance implements Serializable {
             "id=" + getId() +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +
+            ", duration='" + getDuration() + "'" +
+            ", frequency='" + getFrequency() + "'" +
             "}";
     }
 }

@@ -30,19 +30,18 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="duration" type="timestamp">
+            <column name="duration" type="datetime">
                 <constraints nullable="true" />
             </column>
 
             <column name="frequency" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-                        
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
         <dropDefaultValue tableName="maintenance" columnName="start_time" columnDataType="datetime"/>
         <dropDefaultValue tableName="maintenance" columnName="end_time" columnDataType="datetime"/>
-        <dropDefaultValue tableName="maintenance" columnName="duration" columnDataType="datetime"/>        
+        <dropDefaultValue tableName="maintenance" columnName="duration" columnDataType="datetime"/>
         
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->

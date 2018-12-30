@@ -36,18 +36,9 @@ export class ErrorEndpointUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ errorEndpoint }) => {
             this.errorEndpoint = errorEndpoint;
         });
-        this.serviceService.query({ filter: 'errorendpoint-is-null' }).subscribe(
+        this.serviceService.query().subscribe(
             (res: HttpResponse<IService[]>) => {
-                if (!this.errorEndpoint.serviceId) {
-                    this.services = res.body;
-                } else {
-                    this.serviceService.find(this.errorEndpoint.serviceId).subscribe(
-                        (subRes: HttpResponse<IService>) => {
-                            this.services = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
+                this.services = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );

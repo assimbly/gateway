@@ -1,24 +1,10 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipName": "service",
-            "otherEntityName": "service",
-            "relationshipType": "many-to-one",
-            "otherEntityField": "id"
-        },
-        {
-            "relationshipName": "header",
-            "otherEntityName": "header",
-            "relationshipType": "many-to-one",
-            "otherEntityField": "id"
-        }
-    ],
+    "name": "WireTapEndpoint",
     "fields": [
         {
             "fieldName": "type",
             "fieldType": "EndpointType",
-            "fieldValues": "SONICMQ, ACTIVEMQ, KAFKA, SJMS, SQL, HTTP4, SFTP, STREAM, WASTEBIN, FILE, VM"
+            "fieldValues": "ACTIVEMQ,FILE,HTTP4,KAFKA,SFTP,SJMS,SMTP,SONICMQ,SQL,STREAM,VM,WASTEBIN"
         },
         {
             "fieldName": "uri",
@@ -29,10 +15,27 @@
             "fieldType": "String"
         }
     ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "service",
+            "otherEntityName": "service",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "otherEntityField": "id"
+        }
+    ],
     "changelogDate": "20180704111405",
-    "dto": "no",
-    "service": "no",
     "entityTableName": "wire_tap_endpoint",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
-    "pagination": "no"
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

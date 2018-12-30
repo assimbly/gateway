@@ -17,10 +17,9 @@ import { Observable } from 'rxjs';
             ServiceKeysComponent
             ],
 })
-
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;
-    public services: Array<Service> = [];
+    services: IService[];
     currentAccount: any;
     eventSubscriber: Subscription;
     serviceKey: ServiceKeys;
@@ -47,13 +46,14 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
-                (this.serviceKeys[0] as any).isDisabled = false;
+                this.serviceKeys[0].isDisabled = false;
             } else {
                 this.serviceKeys.forEach(serviceKey => {
-                    (serviceKey as any).isDisabled = true;
+                    serviceKey.isDisabled = true;
                 });
             }
         }
@@ -88,10 +88,10 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             this.serviceKeysService.query().subscribe(
                 res => {
                     this.serviceKeys = res.json;
-                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceKeysId === this.selectedService.id);
+                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
                     if (this.serviceKeys.length === 0) {
                         const newServiceKeys = new ServiceKeys();
-                        (newServiceKeys as any).isDisabled = false;
+                        newServiceKeys.isDisabled = false;
                         this.serviceKeys.push(newServiceKeys);
                     }
                 },

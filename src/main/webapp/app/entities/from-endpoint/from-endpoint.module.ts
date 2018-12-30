@@ -50,4 +50,4 @@ const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayFromEndpointModule { }
+export class GatewayFromEndpointModule {}

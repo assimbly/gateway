@@ -19,10 +19,15 @@
                     <input type="text" class="form-control" name="value" id="field_value"
                         [(ngModel)]="serviceKeys.value" />
                 </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_type">Type</label>
+                    <input type="text" class="form-control" name="type" id="field_type"
+                        [(ngModel)]="serviceKeys.type" />
+                </div>
 
                 <div class="form-group">
-                    <label class="form-control-label" for="field_serviceKeys">Service Keys</label>
-                    <select class="form-control" id="field_serviceKeys" name="serviceKeys" [(ngModel)]="serviceKeys.serviceKeysId" >
+                    <label class="form-control-label" for="field_service">Service</label>
+                    <select class="form-control" id="field_service" name="service" [(ngModel)]="serviceKeys.serviceId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
                     </select>

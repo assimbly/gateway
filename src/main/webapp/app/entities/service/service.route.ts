@@ -10,10 +10,12 @@ import { ServiceComponent } from './service.component';
 import { ServiceDetailComponent } from './service-detail.component';
 import { ServiceUpdateComponent } from './service-update.component';
 import { ServiceDeletePopupComponent } from './service-delete-dialog.component';
+import { IService } from 'app/shared/model/service.model';
 import { ServiceAllComponent } from './service-all.component';
+import { ServicePopupComponent } from "app/entities/service";
 
 @Injectable({ providedIn: 'root' })
-export class ServiceResolve implements Resolve<Service> {
+export class ServiceResolve implements Resolve<IService> {
     constructor(private service: ServiceService) {}
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Service> {
@@ -37,17 +39,10 @@ export const serviceRoute: Routes = [
             pageTitle: 'Services'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'service',
         component: ServiceAllComponent,
-        data: {
-            authorities: ['ROLE_USER'],
-            pageTitle: 'Services'
-        },
-        canActivate: [UserRouteAccessService]
-    }, {
-        path: 'service/:id',
-        component: ServiceDetailComponent,
         data: {
             authorities: ['ROLE_USER'],
             pageTitle: 'Services'
@@ -77,7 +72,6 @@ export const serviceRoute: Routes = [
             pageTitle: 'Services'
         },
         canActivate: [UserRouteAccessService],
-        outlet: 'popup'
     },
     {
         path: 'service-all-new',
@@ -103,6 +97,36 @@ export const serviceRoute: Routes = [
 ];
 
 export const servicePopupRoute: Routes = [
+      {
+          path: 'service-new',
+          component: ServicePopupComponent,
+          data: {
+              authorities: ['ROLE_ADMIN'],
+              pageTitle: 'Services'
+          },
+          canActivate: [UserRouteAccessService],
+          outlet: 'popup'
+      },
+      {
+          path: 'service-all-new',
+          component: ServiceComponent,
+          data: {
+              authorities: ['ROLE_USER'],
+              pageTitle: 'Services'
+          },
+          canActivate: [UserRouteAccessService],
+          outlet: 'popup'
+      },
+      {
+          path: 'service/:id/edit',
+          component: ServicePopupComponent,
+          data: {
+              authorities: ['ROLE_ADMIN'],
+              pageTitle: 'Services'
+          },
+          canActivate: [UserRouteAccessService],
+          outlet: 'popup'
+  },
     {
         path: 'service/:id/delete',
         component: ServiceDeletePopupComponent,

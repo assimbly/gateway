@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 
 // add a new component here
 
-export const enum EndpointType {
+export enum EndpointType {
     ACTIVEMQ = 'ACTIVEMQ',
     DIRECT = 'DIRECT',
     FILE = 'FILE',

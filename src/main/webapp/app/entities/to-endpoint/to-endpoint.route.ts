@@ -4,28 +4,28 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@a
 import { UserRouteAccessService } from 'app/core';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-
-import { ToEndpoint, IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
 import { ToEndpointService } from './to-endpoint.service';
 import { ToEndpointComponent } from './to-endpoint.component';
 import { ToEndpointDetailComponent } from './to-endpoint-detail.component';
 import { ToEndpointUpdateComponent } from './to-endpoint-update.component';
 import { ToEndpointDeletePopupComponent } from './to-endpoint-delete-dialog.component';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
 
 @Injectable({ providedIn: 'root' })
 export class ToEndpointResolve implements Resolve<IToEndpoint> {
     constructor(private service: ToEndpointService) {}
-    
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IToEndpoint> {
+
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ToEndpoint> {
         const id = route.params['id'] ? route.params['id'] : null;
         if (id) {
             return this.service.find(id).pipe(
-                map((response: IToEndpoint) => response)
+                filter((response: HttpResponse<ToEndpoint>) => response.ok),
+                map((toEndpoint: HttpResponse<ToEndpoint>) => toEndpoint.body)
             );
         }
         return of(new ToEndpoint());
     }
-    
 }
 
 export const toEndpointRoute: Routes = [

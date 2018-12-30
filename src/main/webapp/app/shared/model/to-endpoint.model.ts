@@ -1,13 +1,16 @@
 export const enum EndpointType {
-    SONICMQ = 'SONICMQ',
     ACTIVEMQ = 'ACTIVEMQ',
-    SJMS = 'SJMS',
-    SQL = 'SQL',
+    FILE = 'FILE',
     HTTP4 = 'HTTP4',
+    KAFKA = 'KAFKA',
     SFTP = 'SFTP',
+    SJMS = 'SJMS',
+    SMTP = 'SMTP',
+    SONICMQ = 'SONICMQ',
+    SQL = 'SQL',
     STREAM = 'STREAM',
-    WASTEBIN = 'WASTEBIN',
-    FILE = 'FILE'
+    VM = 'VM',
+    WASTEBIN = 'WASTEBIN'
 }
 
 export interface IToEndpoint {

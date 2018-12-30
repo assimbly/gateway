@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
 import { HeaderService } from './header.service';
+import { IHeader } from 'app/shared/model/header.model';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
-
-import { Header } from 'app/shared/model/header.model';
 import { Subscription } from "rxjs";
 import { JhiEventManager } from "ng-jhipster";
 
@@ -14,33 +12,22 @@ import { JhiEventManager } from "ng-jhipster";
     templateUrl: './header-detail.component.html'
 })
 export class HeaderDetailComponent implements OnInit {
+    header: IHeader;
 
-    public header: Header;
+    constructor(protected eventManager: JhiEventManager,
+				protected activatedRoute: ActivatedRoute,
+				protected headerService: HeaderService,
+                protected headerKeysService: HeaderKeysService) {}
     public headerKeys: Array<HeaderKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
-    constructor(
-        private eventManager: JhiEventManager,
-        private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
-        private route: ActivatedRoute
-    ) {}
-  
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ header }) => {
+            this.header = header;
         });
-        this.registerChangeInHeaders();
     }
 
-    registerChangeInHeaders() {
-        this.eventSubscriber = this.eventManager.subscribe(
-            'flowListModification',
-            (response) => this.load(this.header.id)
-        );
-    }
-    
     private load(id) {
         this.headerService.find(id).subscribe((header) => {
             this.header = header.body;
@@ -53,4 +40,8 @@ export class HeaderDetailComponent implements OnInit {
             this.headerKeys = res.body.filter((hk) => hk.headerId === id);
         });
     }
-}    
+
+    previousState() {
+        window.history.back();
+    }
+}

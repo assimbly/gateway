@@ -1,49 +1,47 @@
 <div class="row justify-content-center">
     <div class="col-8">
-<div *ngIf="fromEndpoint">
-    <h2><span>From Endpoint</span> {{fromEndpoint.id}}</h2>
-    <hr>
-    <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Type</span></dt>
-        <dd>
-            <span>{{fromEndpoint.type}}</span>
-        </dd>
-        <dt><span>Uri</span></dt>
-        <dd>
-            <span>{{fromEndpoint.uri}}</span>
-        </dd>
-        <dt><span>Options</span></dt>
-        <dd>
-            <span>{{fromEndpoint.options}}</span>
-        </dd>
-        <dt><span>Service</span></dt>
-        <dd>
-            <div *ngIf="fromEndpoint.serviceId">
-                <a [routerLink]="['/service', fromEndpoint.serviceId]">{{serviceName}}</a>
-            </div>
-        </dd>
-        <dt><span>Header</span></dt>
-        <dd>
-            <div *ngIf="fromEndpoint.headerId">
-                <a [routerLink]="['/header', fromEndpoint.headerId]">{{headerName}}</a>
-            </div>
-        </dd>
-    </dl>
+        <div *ngIf="fromEndpoint">
+            <h2><span>From Endpoint</span> {{fromEndpoint.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Type</span></dt>
+                <dd>
+                    <span>{{fromEndpoint.type}}</span>
+                </dd>
+                <dt><span>Uri</span></dt>
+                <dd>
+                    <span>{{fromEndpoint.uri}}</span>
+                </dd>
+                <dt><span>Options</span></dt>
+                <dd>
+                    <span>{{fromEndpoint.options}}</span>
+                </dd>
+                <dt><span>Service</span></dt>
+                <dd>
+                    <div *ngIf="fromEndpoint.serviceId">
+                        <a [routerLink]="['/service', fromEndpoint.serviceId, 'view']">{{fromEndpoint.serviceId}}</a>
+                    </div>
+                </dd>
+                <dt><span>Header</span></dt>
+                <dd>
+                    <div *ngIf="fromEndpoint.headerId">
+                        <a [routerLink]="['/header', fromEndpoint.headerId, 'view']">{{fromEndpoint.headerId}}</a>
+                    </div>
+                </dd>
+            </dl>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
 
-    <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
-            [routerLink]="['/', { outlets: { popup: 'from-endpoint/'+ fromEndpoint.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
-</div>
-</div>
+            <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/from-endpoint', fromEndpoint.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
 </div>

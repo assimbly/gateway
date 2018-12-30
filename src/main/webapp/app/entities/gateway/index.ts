@@ -1,4 +1,5 @@
 export * from './gateway.service';
+export * from './gateway-popup.service';
 export * from './gateway-update.component';
 export * from './gateway-delete-dialog.component';
 export * from './gateway-import-dialog.component';

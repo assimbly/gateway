@@ -36,7 +36,7 @@ public class ToEndpoint implements Serializable {
     private String options;
 
     @ManyToOne
-    @JsonIgnoreProperties("")
+    @JsonIgnoreProperties("toEndpoints")
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)

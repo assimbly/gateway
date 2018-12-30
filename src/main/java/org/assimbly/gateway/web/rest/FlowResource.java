@@ -1,16 +1,11 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
-import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.FromEndpoint;
-import org.assimbly.gateway.domain.ToEndpoint;
-import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.FlowDTO;
-import org.assimbly.gateway.service.mapper.FlowMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,36 +38,27 @@ public class FlowResource {
     	
     private static final String ENTITY_NAME = "flow";
 
-    private final FlowRepository flowRepository;
-    
-    private final FlowMapper flowMapper;
+    private final FlowService flowService;
 
-	String flowID;
-
-    public FlowResource(FlowRepository flowRepository, FlowMapper flowMapper) {
-        this.flowRepository = flowRepository;
-        this.flowMapper = flowMapper;
+    public FlowResource(FlowService flowService) {
+        this.flowService = flowService;
     }
-	
-    
+
     /**
      * POST  /flows : Create a new flow.
      *
-     * @param FlowDTO the FlowDTO to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new FlowDTO, or with status 400 (Bad Request) if the flow has already an ID
+     * @param flowDTO the flowDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new flowDTO, or with status 400 (Bad Request) if the flow has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/flows")
     @Timed
-    public ResponseEntity<FlowDTO> createflow(@RequestBody FlowDTO FlowDTO) throws URISyntaxException {
-        log.debug("REST request to save flow : {}", FlowDTO);
-        if (FlowDTO.getId() != null) {
+    public ResponseEntity<FlowDTO> createFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
+        log.debug("REST request to save Flow : {}", flowDTO);
+        if (flowDTO.getId() != null) {
             throw new BadRequestAlertException("A new flow cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Flow flow = flowMapper.toEntity(FlowDTO);
-        
-        flow = flowRepository.save(flow);
-        FlowDTO result = flowMapper.toDto(flow);
+        FlowDTO result = flowService.save(flowDTO);
         return ResponseEntity.created(new URI("/api/flows/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -81,26 +67,22 @@ public class FlowResource {
     /**
      * PUT  /flows : Updates an existing flow.
      *
-     * @param FlowDTO the FlowDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated FlowDTO,
-     * or with status 400 (Bad Request) if the FlowDTO is not valid,
-     * or with status 500 (Internal Server Error) if the FlowDTO couldn't be updated
+     * @param flowDTO the flowDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated flowDTO,
+     * or with status 400 (Bad Request) if the flowDTO is not valid,
+     * or with status 500 (Internal Server Error) if the flowDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/flows")
     @Timed
-
     public ResponseEntity<FlowDTO> updateFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to update Flow : {}", flowDTO);
         if (flowDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
-        Flow flow = flowMapper.toEntity(flowDTO);
-        flow = flowRepository.save(flow);
-        FlowDTO result = flowMapper.toDto(flow);
+        FlowDTO result = flowService.save(flowDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, new FlowDTO().getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, flowDTO.getId().toString()))
             .body(result);
     }
 
@@ -114,7 +96,7 @@ public class FlowResource {
     @Timed
     public ResponseEntity<List<FlowDTO>> getAllFlows(Pageable pageable) {
         log.debug("REST request to get a page of Flows");
-        Page<FlowDTO> page = flowRepository.findAll(pageable).map(flowMapper::toDto);
+        Page<FlowDTO> page = flowService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -129,9 +111,9 @@ public class FlowResource {
     @Timed
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(@SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable, @PathVariable Long gatewayid) {
         log.debug("REST request to get a page of flows by gatewayid");
-        Page<Flow> page = flowRepository.findAllByGatewayId(pageable, gatewayid);
+        Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
-        return new ResponseEntity<>(flowMapper.toDto(page.getContent()), headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
     
     /*
@@ -153,31 +135,28 @@ public class FlowResource {
     /**
      * GET  /flows/:id : get the "id" flow.
      *
-     * @param id the id of the FlowDTO to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the FlowDTO, or with status 404 (Not Found)
+     * @param id the id of the flowDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
     @GetMapping("/flows/{id}")
     @Timed
     public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
         log.debug("REST request to get Flow : {}", id);
-        Optional<FlowDTO> flowDTO = flowRepository.findById(id)
-            .map(flowMapper::toDto);
+        Optional<FlowDTO> flowDTO = flowService.findOne(id);
         return ResponseUtil.wrapOrNotFound(flowDTO);
     }
 
     /**
      * DELETE  /flows/:id : delete the "id" flow.
      *
-     * @param id the id of the FlowDTO to delete
+     * @param id the id of the flowDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/flows/{id}")
     @Timed
     public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
         log.debug("REST request to delete Flow : {}", id);
-
-        flowRepository.deleteById(id);
+        flowService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-    
 }

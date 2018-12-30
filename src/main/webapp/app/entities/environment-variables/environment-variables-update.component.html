@@ -1,41 +1,56 @@
 <div class="row justify-content-center">
-    <div class="col-8">
-        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
-            <h2 id="jhi-environment-variables-heading">Create or edit a Environment Variables</h2>
-            <div>
-                <jhi-alert-error></jhi-alert-error>
-                <div class="form-group" [hidden]="!environmentVariables.id">
-                    <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id"
-                        [(ngModel)]="environmentVariables.id" readonly />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_key">Key</label>
-                    <input type="text" class="form-control" name="key" id="field_key"
-                        [(ngModel)]="environmentVariables.key" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_value">Value</label>
-                    <input type="text" class="form-control" name="value" id="field_value"
-                        [(ngModel)]="environmentVariables.value" />
-                </div>
+	<div class="col-8">
+		<form [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
+		    <div class="modal-header">
+		        <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit a Environment Variable</h4>
+		    </div>
+			<div class="modal-body">
+				<jhi-alert-error></jhi-alert-error>
+				<div class="form-group" [hidden]="!environmentVariables.id">
+					<label for="id">ID</label> <input [(ngModel)]="environmentVariables.id" type="text" class="form-control" id="id" formControlName="id" readonly />
+				</div>
+				<div class="form-group">
+					<label class="form-control-label" for="key">Key</label> <input [(ngModel)]="environmentVariables.key" type="text" class="form-control" id="key" formControlName="key" />
+					<div
+						*ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)"
+						class="invalid-field-message">
+						<span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span> 
+						<!-- <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>-->
+					</div>
+				</div>
 
-                <div class="form-group">
-                    <label class="form-control-label" for="field_gateway">Gateway</label>
-                    <select class="form-control" id="field_gateway" name="gateway" [(ngModel)]="environmentVariables.gatewayId" >
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
-                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
-                </button>
-                <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
-                </button>
-            </div>
-        </form>
-    </div>
+				<div class="form-group">
+					<label class="form-control-label" for="value">Value</label> 
+					<input  [(ngModel)]="environmentVariables.value"
+						type="text" class="form-control" id="value"
+						formControlName="value" />
+					<div *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)"
+						class="invalid-field-message">
+						<span *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="form-control-label" for="gateway">Gateway</label> 
+					<select *ngIf="gateways.length > 1; else oneGateway" class="form-control" id="gateway" formControlName="gatewayId">
+						<option [ngValue]="null"></option>
+						<option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
+					</select>
+					<ng-template #oneGateway> <input type="text"
+						class="form-control" id="gateway" readonly
+						formControlName="gatewayId" /> </ng-template>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+					<fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+				</button>
+				<button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving"
+					class="btn btn-primary">
+					<fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+				</button>
+			</div>
+		</form>
+	</div>
 </div>
+		

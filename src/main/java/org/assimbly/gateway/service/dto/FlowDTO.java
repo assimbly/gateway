@@ -17,8 +17,8 @@ public class FlowDTO implements Serializable {
 
     private Boolean autoStart;
 
-    private Boolean offloading;
-    
+    private Boolean offLoading;
+
     private Long gatewayId;
 
     private Long fromEndpointId;
@@ -53,13 +53,14 @@ public class FlowDTO implements Serializable {
         this.autoStart = autoStart;
     }
 
-    public Boolean isOffloading() {
-        return offloading;
+    public Boolean isOffLoading() {
+        return offLoading;
     }
 
-    public void setOffloading(Boolean offloading) {
-        this.offloading = offloading;
+    public void setOffLoading(Boolean offLoading) {
+        this.offLoading = offLoading;
     }
+
     public Long getGatewayId() {
         return gatewayId;
     }
@@ -128,7 +129,7 @@ public class FlowDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
-            ", offloading='" + isOffloading() + "'" +
+            ", offLoading='" + isOffLoading() + "'" +
             ", gateway=" + getGatewayId() +
             ", fromEndpoint=" + getFromEndpointId() +
             ", errorEndpoint=" + getErrorEndpointId() +

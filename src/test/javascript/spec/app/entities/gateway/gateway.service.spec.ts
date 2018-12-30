@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { IGateway, Gateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
+import { IGateway, Gateway, GatewayType, EnvironmentType, ConnectorType } from 'app/shared/model/gateway.model';
 
 describe('Service Tests', () => {
     describe('Gateway Service', () => {
@@ -27,6 +27,7 @@ describe('Service Tests', () => {
                 GatewayType.ADAPTER,
                 'AAAAAAA',
                 EnvironmentType.DEVELOPMENT,
+                ConnectorType.CAMEL,
                 'AAAAAAA',
                 'AAAAAAA',
                 'AAAAAAA'
@@ -68,6 +69,7 @@ describe('Service Tests', () => {
                         type: 'BBBBBB',
                         environmentName: 'BBBBBB',
                         stage: 'BBBBBB',
+                        connectorType: 'BBBBBB',
                         defaultFromEndpointType: 'BBBBBB',
                         defaultToEndpointType: 'BBBBBB',
                         defaultErrorEndpointType: 'BBBBBB'
@@ -91,6 +93,7 @@ describe('Service Tests', () => {
                         type: 'BBBBBB',
                         environmentName: 'BBBBBB',
                         stage: 'BBBBBB',
+                        connectorType: 'BBBBBB',
                         defaultFromEndpointType: 'BBBBBB',
                         defaultToEndpointType: 'BBBBBB',
                         defaultErrorEndpointType: 'BBBBBB'

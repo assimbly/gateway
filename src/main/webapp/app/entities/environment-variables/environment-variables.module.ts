@@ -1,9 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { ReactiveFormsModule } from '@angular/forms';
-
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared';
 import {
     EnvironmentVariablesComponent,
     EnvironmentVariablesDetailComponent,
@@ -17,11 +15,7 @@ import {
 const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        ReactiveFormsModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [ReactiveFormsModule, GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         EnvironmentVariablesComponent,
         EnvironmentVariablesDetailComponent,

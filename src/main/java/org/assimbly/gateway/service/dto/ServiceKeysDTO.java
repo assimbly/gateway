@@ -55,9 +55,10 @@ public class ServiceKeysDTO implements Serializable {
         return serviceId;
     }
 
-    public void setServiceId(Long headerId) {
-        this.serviceId = headerId;
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,6 +86,8 @@ public class ServiceKeysDTO implements Serializable {
             "id=" + getId() +
             ", key='" + getKey() + "'" +
             ", value='" + getValue() + "'" +
+            ", type='" + getType() + "'" +
+            ", service=" + getServiceId() +
             "}";
     }
 }

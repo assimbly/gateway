@@ -2,18 +2,17 @@ package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.assimbly.connector.service.Broker;
-import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
-import org.assimbly.gateway.service.mapper.GatewayMapper;
+
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,15 +37,11 @@ public class GatewayResource {
 
     private final GatewayRepository gatewayRepository;
 
-    private final GatewayMapper gatewayMapper;
+	private final GatewayService gatewayService;
 
-	@SuppressWarnings("unused")
-	@Autowired
-	private DBConfiguration assimblyDBConfiguration;
-
-    public GatewayResource(GatewayRepository gatewayRepository, GatewayMapper gatewayMapper) {
+    public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository) {
+        this.gatewayService = gatewayService;
         this.gatewayRepository = gatewayRepository;
-        this.gatewayMapper = gatewayMapper;
     }
 
     /**
@@ -63,10 +58,7 @@ public class GatewayResource {
         if (gatewayDTO.getId() != null) {
             throw new BadRequestAlertException("A new gateway cannot already have an ID", ENTITY_NAME, "idexists");
         }
-
-        Gateway gateway = gatewayMapper.toEntity(gatewayDTO);
-        gateway = gatewayRepository.save(gateway);
-        GatewayDTO result = gatewayMapper.toDto(gateway);
+        GatewayDTO result = gatewayService.save(gatewayDTO);
         return ResponseEntity.created(new URI("/api/gateways/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -105,9 +97,7 @@ public class GatewayResource {
 			}
         }
 
-        Gateway gateway = gatewayMapper.toEntity(gatewayDTO);
-        gateway = gatewayRepository.save(gateway);
-        GatewayDTO result = gatewayMapper.toDto(gateway);
+        GatewayDTO result = gatewayService.save(gatewayDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString()))
             .body(result);
@@ -122,8 +112,7 @@ public class GatewayResource {
     @Timed
     public List<GatewayDTO> getAllGateways() {
         log.debug("REST request to get all Gateways");
-        List<Gateway> gateways = gatewayRepository.findAll();
-        return gatewayMapper.toDto(gateways);
+        return gatewayService.findAll();
     }
 
     /**
@@ -136,8 +125,7 @@ public class GatewayResource {
     @Timed
     public ResponseEntity<GatewayDTO> getGateway(@PathVariable Long id) {
         log.debug("REST request to get Gateway : {}", id);
-        Optional<GatewayDTO> gatewayDTO = gatewayRepository.findById(id)
-            .map(gatewayMapper::toDto);
+        Optional<GatewayDTO> gatewayDTO = gatewayService.findOne(id);
         return ResponseUtil.wrapOrNotFound(gatewayDTO);
     }
 

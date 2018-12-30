@@ -28,23 +28,6 @@ describe('Component Tests', () => {
             service = fixture.debugElement.injector.get(MaintenanceService);
         });
 
-        describe('OnInit', () => {
-            it('Should call load all on init', () => {
-                // GIVEN
-                const headers = new Headers();
-                headers.append('link', 'link;link');
-                spyOn(service, 'query').and.returnValue(of({
-                    json: [new Maintenance(123)],
-                    headers
-                }));
-
-                // WHEN
-                comp.ngOnInit();
-
-                // THEN
-                expect(service.query).toHaveBeenCalled();
-                //expect(comp.maintenances[0]).toEqual(jasmine.objectContaining({id: 123}));
-            });
         it('Should call load all on init', () => {
             // GIVEN
             const headers = new HttpHeaders().append('link', 'link;link');
@@ -61,7 +44,8 @@ describe('Component Tests', () => {
             comp.ngOnInit();
 
             // THEN
-            expect(service.query).toHaveBeenCalled()});
+            expect(service.query).toHaveBeenCalled();
+            expect(comp.maintenances[0]).toEqual(jasmine.objectContaining({ id: 123 }));
         });
     });
 });

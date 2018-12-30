@@ -8,9 +8,9 @@ import {
     WireTapEndpointComponent,
     WireTapEndpointDetailComponent,
     WireTapEndpointUpdateComponent,
+    WireTapEndpointEditComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
-    WireTapEndpointEditComponent,
     wireTapEndpointRoute,
     wireTapEndpointPopupRoute
 } from './';
@@ -30,24 +30,26 @@ const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
     ],
     declarations: [
         WireTapEndpointComponent,
-        WireTapEndpointEditComponent,
         WireTapEndpointDetailComponent,
         WireTapEndpointUpdateComponent,
+        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],
     entryComponents: [
         WireTapEndpointComponent,
+        WireTapEndpointUpdateComponent,
         WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointDeletePopupComponent,
+        WireTapEndpointDeletePopupComponent
     ],
-    providers: [
+	providers: [
         Components,
         WireTapEndpointUpdateComponent,
+        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayWireTapEndpointModule { }
+export class GatewayWireTapEndpointModule {}
