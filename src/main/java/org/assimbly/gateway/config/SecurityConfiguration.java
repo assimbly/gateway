@@ -105,6 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/test/**")
             .antMatchers("/h2-console/**")
             .antMatchers("/management/jolokia/**")
+            .antMatchers("/management/hawtio/**")
             .antMatchers("/jolokia/**")
             .antMatchers("/test/**");
     }
@@ -151,6 +152,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/jolokia").permitAll()            
             .antMatchers("/management/jolokia/**").permitAll()            
+            .antMatchers("/management/hawtio").permitAll()            
+            .antMatchers("/management/hawtio/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/info").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);

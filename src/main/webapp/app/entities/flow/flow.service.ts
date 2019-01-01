@@ -14,6 +14,7 @@ import { IFlow, Flow } from 'app/shared/model/flow.model';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 import { tap } from "rxjs/operators";
+import { CSRFService } from "app/core";
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
@@ -38,6 +39,7 @@ export class FlowService {
     constructor(protected http: HttpClient,
 		 protected router: Router,
          protected $window: WindowRef,
+         protected csrfService: CSRFService 
      ) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
@@ -167,7 +169,6 @@ export class FlowService {
     }
 
     connect() {
-
         if (this.connectedPromise === null) {
             this.connection = this.createConnection();
         }
@@ -188,7 +189,7 @@ export class FlowService {
         this.stompClient = Stomp.over(socket);
 
         const headers = {};
-        // headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
+        headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
 
         this.stompClient.connect(headers, () => {
 
@@ -214,9 +215,19 @@ export class FlowService {
         return this.listener;
     }
 
-    subscribe() {
+    connectionStomp(){
+        return this.connection;
+     }
+    
+    client(){
+       return this.stompClient;
+    }
+
+    subscribe(id) {
+        const topic = '/topic/' + id + '/alert';
+        
         this.connection.then(() => {
-            this.subscriber = this.stompClient.subscribe('/topic/alert', data => {
+            this.subscriber = this.stompClient.subscribe(topic, data => {
                 this.listenerObserver.next(JSON.parse(data.body));
             });
         });

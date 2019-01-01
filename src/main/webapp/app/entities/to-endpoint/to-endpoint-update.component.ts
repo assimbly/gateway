@@ -88,16 +88,12 @@ export class ToEndpointUpdateComponent implements OnInit {
         if (this.toEndpoint.id !== undefined) {
             this.subscribeToSaveResponse(this.toEndpointService.update(this.toEndpoint));
         } else {
-            this.subscribeToSaveResponseOld(this.toEndpointService.create(this.toEndpoint));
+            this.subscribeToSaveResponse(this.toEndpointService.create(this.toEndpoint));
         }
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IToEndpoint>>) {
         result.subscribe((res: HttpResponse<IToEndpoint>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
-    }
-    
-    protected subscribeToSaveResponseOld(result: Observable<IToEndpoint>) {
-        result.subscribe((res) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
     
     protected onSaveSuccess() {

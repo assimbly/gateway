@@ -19,7 +19,7 @@ management:
         web:
             base-path: /management
             exposure:
-                include: ["configprops", "env", "health", "info", "threaddump", "logfile" ]
+                include: ["configprops", "env", "health", "info", "threaddump", "logfile", "hawtio", "jolokia"]
     endpoint:
         health:
             show-details: when-authorized
@@ -31,7 +31,7 @@ management:
             enabled: false # When using the MailService, configure an SMTP server and set this to true
     metrics:
         enabled: false # http://micrometer.io/ is disabled by default, as we use http://metrics.dropwizard.io/ instead
-
+    
 spring:
     application:
         name: gateway
@@ -117,9 +117,7 @@ jhipster:
 application:
   documentation:
     url: https://github.com/assimbly/gateway/wiki
-    camel-url: https://github.com/apache/camel/blob/master
+    camel-url: https://github.com/apache/camel/blob/master    
 
-endpoints:
-  jolokia:
-    enabled: true
-    sensitive: false
+hawtio:
+  authenticationEnabled:  false     

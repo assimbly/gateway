@@ -31,7 +31,7 @@ public class FailureListener extends EventNotifierSupport {
 	        String flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
 	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/alert", flowId);
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert", flowId);
 	        }else {
 	            log.warn("Can't send alert to websocket. messagingTemplate=null");
 	        }
@@ -42,7 +42,7 @@ public class FailureListener extends EventNotifierSupport {
 	        String flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
 	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/alert", flowId);
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert", flowId);
 	        }else {
 	            log.warn("Can't send alert to websocket. messagingTemplate=null");
 	        }
