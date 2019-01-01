@@ -30,7 +30,6 @@ public class Header implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "header", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<HeaderKeys> headerKeys = new HashSet<>();
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {

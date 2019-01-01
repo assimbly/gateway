@@ -36,13 +36,12 @@ export class HeaderUpdateComponent implements OnInit {
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ header }) => {
             this.header = header;
+            if(this.activatedRoute.fragment['value'] === 'clone'){
+                this.loadHeaderKeys(true);
+            }else{
+                this.loadHeaderKeys(false);    
+            }
         });
-        if(this.activatedRoute.fragment['value'] === 'clone'){
-            this.loadHeaderKeys(true);
-        }else{
-            this.loadHeaderKeys(false);    
-        }
-        
     }
 
     clear() {
@@ -130,9 +129,14 @@ export class HeaderUpdateComponent implements OnInit {
     }
 
     private loadHeaderKeys(cloneHeader: boolean) {
+        let criteria = {
+                'headerId.equals' : this.header.id
+             };
+        
+        
         if (this.header.id) {
-            this.headerKeysService.query().subscribe((res) => {
-                this.headerKeys = res.body;
+            this.headerKeysService.query({filter: 'headerid.equals=1'}).subscribe((res) => {
+                this.headerKeys = res.body.filter(headerkeys => headerkeys.headerId === this.header.id);
             });
             this.header.id = cloneHeader ? null : this.header.id;
         }else {

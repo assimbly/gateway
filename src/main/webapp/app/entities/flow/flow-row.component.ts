@@ -12,6 +12,7 @@ import { JhiEventManager } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 import { map } from "rxjs/operators";
+import { Observable, Observer, Subscription} from "rxjs";
 
 enum Status {
     active = 'active',
@@ -68,6 +69,18 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     intervalTime: any;
 
+    stompClient = null;
+    subscriber = null;
+    connection: Promise<any>;
+    connectedPromise: any;
+    listener: Observable<any>;
+    listenerObserver: Observer<any>;
+    
+    alreadyConnectedOnce = false;
+    private subscription: Subscription;
+
+    
+    
     constructor(
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
@@ -76,6 +89,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         private router: Router,
         private eventManager: JhiEventManager
     ) {
+        this.listener = this.createListener();
     }
 
     ngOnInit() {
@@ -87,12 +101,19 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.getFlowStatus(this.flow.id);
         this.getFlowNumberOfAlerts(this.flow.id);
         this.registerTriggeredAction();
-        this.flowService.subscribe();
-        this.flowService.receive().subscribe(data => {
+        this.connection = this.flowService.connectionStomp();
+        this.stompClient = this.flowService.client();
+        this.subscribe();
+        this.receive().subscribe(data => {
+            console.log('data');
+            console.log(data);
+            console.log(this.flow.id);
             if (this.flow.id === data) {
                 this.getFlowNumberOfAlerts(data);
             }
+        
         });
+        
     }
 
     ngOnDestroy() {
@@ -182,7 +203,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     getFlowAlerts(id: number) {
         this.clickButton = true;
         this.flowService.getFlowAlerts(id).subscribe((response) => {
-            this.setFlowAlerts(response);
+            this.setFlowAlerts(response.body);
         });
     }
 
@@ -218,8 +239,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     getFlowNumberOfAlerts(id: number) {
         this.clickButton = true;
-        this.flowService.getFlowNumberOfAlerts(id).subscribe((response) => {
-            this.setFlowNumberOfAlerts(response);
+        this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
+            this.setFlowNumberOfAlerts(response.body);
         });
     }
 
@@ -256,7 +277,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             this.statusFlow = Status.inactiveError;
         } else {
             this.flowService.getFlowLastError(id).subscribe((response) => {
-                this.lastError = response === '0' ? '' : response;
+                this.lastError = response === '0' ? '' : response.body;
                 this.flowStatusButton = `
                 Last action: ${action} <br/>
                 Status: Stopped after error <br/><br/>
@@ -508,4 +529,37 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             this.disableActionBtns = false;
         });
     }
+    
+    receive() {
+        return this.listener;
+    }
+
+    subscribe() {
+        const topic = '/topic/' + this.flow.id + '/alert';
+        
+        this.connection.then(() => {
+            this.subscriber = this.stompClient.subscribe(topic, data => {
+                if(!this.listenerObserver){
+                    this.listener = this.createListener();
+                }
+                this.listenerObserver.next(JSON.parse(data.body));
+            });
+        });
+    }
+
+    unsubscribe() {
+        if (this.subscriber !== null) {
+            this.subscriber.unsubscribe();
+        }
+        this.listener = this.createListener();
+    }
+
+    private createListener(): Observable<any> {
+        return new Observable(observer => {
+            this.listenerObserver = observer;
+        });
+    }
+
+    
+    
 }
