@@ -4,10 +4,16 @@ import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.HeaderDTO;
+import org.assimbly.gateway.service.dto.ServiceDTO;
+
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,9 +89,12 @@ public class HeaderResource {
      */
     @GetMapping("/headers")
     @Timed
-    public List<HeaderDTO> getAllHeaders() {
+    public ResponseEntity<List<HeaderDTO>> getAllHeaders(Pageable pageable) {
         log.debug("REST request to get all Headers");
-        return headerService.findAll();
+        Page<HeaderDTO> page = headerService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/headers");
+        return ResponseEntity.ok().headers(headers).body(page.getContent());        
+
     }
 
     /**

@@ -4,10 +4,15 @@ import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
+
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,11 +88,15 @@ public class EnvironmentVariablesResource {
      */
     @GetMapping("/environment-variables")
     @Timed
-    public List<EnvironmentVariablesDTO> getAllEnvironmentVariables() {
+    public ResponseEntity<List<EnvironmentVariablesDTO>> getAllEnvironmentVariables(Pageable pageable) {
         log.debug("REST request to get all EnvironmentVariables");
-        return environmentVariablesService.findAll();
-    }
+        Page<EnvironmentVariablesDTO> page = environmentVariablesService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/environment-variables");
+        return ResponseEntity.ok().headers(headers).body(page.getContent());        
 
+    }
+   
+    
     /**
      * GET  /environment-variables/:id : get the "id" environmentVariables.
      *

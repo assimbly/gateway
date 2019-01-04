@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { GatewayService } from './gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { GatewayPopupService } from "app/entities/gateway";
@@ -20,6 +20,7 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     importError = false;
 
     constructor(
+        private eventManager: JhiEventManager,    
         private gatewayService: GatewayService,
         public activeModal: NgbActiveModal
     ) {
@@ -48,6 +49,8 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     importConfiguration() {
         this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration).subscribe(
             r => {
+                this.importError = false;
+                this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
                 this.activeModal.dismiss(true);
             },
             err => {

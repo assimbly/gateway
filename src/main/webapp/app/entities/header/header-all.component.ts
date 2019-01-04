@@ -27,6 +27,9 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
     ) {
+        this.page = 0;
+        this.predicate = 'name';
+        this.reverse = true;
     }
 
     ngOnInit() {
@@ -34,6 +37,15 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         this.registerChangeInHeaders();
     }
 
+    
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'name') {
+            result.push('name');
+        }
+        return result;
+    }
+    
     reset() {
         this.page = 0;
         this.headers = [];
@@ -49,7 +61,10 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();
-        this.headerService.query().subscribe(
+        this.headerService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
             (res) => {
                 this.headers = res.body;
             },

@@ -8,6 +8,7 @@ import org.assimbly.gateway.event.FailureListener;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
@@ -44,7 +45,10 @@ public class ConnectorResource {
 
     @Autowired
     FailureListener failureListener;
-	
+
+    @Autowired	
+    private SimpMessageSendingOperations messagingTemplate;
+
     public ConnectorResource() {}
     
     //configure connector (by gatewayid)
@@ -224,16 +228,30 @@ public class ConnectorResource {
 
 		try {
 
+			//pass spring variable into new Thread (outside of Spring context)
+			final SimpMessageSendingOperations messagingTemplate2 = messagingTemplate;
+
 			Thread thread = new Thread(new Runnable()
-			{
-			   public void run()
+			{			
+				
+			SimpMessageSendingOperations messagingTemplate = messagingTemplate2;	
+			
+			public void run()
 			   {					
+				
 					try {
 						for(Long id : ids) {
 							flowId = id.toString();
 							status = connector.getFlowStatus(flowId);
 							if(status.equals("started")) {
-								connector.pauseFlow(flowId);
+								status = connector.pauseFlow(flowId);
+								if(status.equals("suspended") || status.equals("stopped")) {
+					    			if(this.messagingTemplate!=null) {
+					    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:suspended");
+					    	        }
+					    		}else {
+					    			throw new Exception(status);
+					    		}
 							}
 						}
 			        	
@@ -244,7 +262,11 @@ public class ConnectorResource {
 							flowId = id.toString();
 							status = connector.getFlowStatus(flowId);
 							if(status.equals("suspended")) {
-								connector.resumeFlow(flowId);
+								if(status.equals("started")) {
+					    			if(this.messagingTemplate!=null) {
+					    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:resumed");
+					    	        }
+					    		}
 							}
 						}
 
@@ -340,6 +362,9 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.startFlow(flowId);
     		if(status.equals("started")) {
+    	    	if(this.messagingTemplate!=null) {
+    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:started");
+    	        }    			
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/start/{id}","started flow " + flowId,"started flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
@@ -360,6 +385,9 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.stopFlow(flowId);
     		if(status.equals("stopped")) {
+    			if(this.messagingTemplate!=null) {
+    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:stopped");
+    	        }
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/stop/{id}","stopped flow " + flowId,"stopped flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
@@ -380,6 +408,9 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.restartFlow(flowId);
     		if(status.equals("started")) {
+    			if(this.messagingTemplate!=null) {
+    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:restarted");
+    	        }
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/restart/{id}","restarted","restarted flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
@@ -400,6 +431,9 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.pauseFlow(flowId);
     		if(status.equals("suspended") || status.equals("stopped")) {
+    			if(this.messagingTemplate!=null) {
+    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:suspended");
+    	        }
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/pause/{id}","paused","paused flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);
@@ -420,6 +454,9 @@ public class ConnectorResource {
         	flowId = id.toString();
     		status = connector.resumeFlow(flowId);
     		if(status.equals("started")) {
+    			if(this.messagingTemplate!=null) {
+    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:resumed");
+    	        }
     			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/resume/{id}","resumed","resumed flow " + flowId,flowId);
     		}else {
     			throw new Exception(status);

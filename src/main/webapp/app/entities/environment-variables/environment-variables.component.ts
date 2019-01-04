@@ -12,19 +12,32 @@ import { EnvironmentVariablesService } from './environment-variables.service';
     templateUrl: './environment-variables.component.html'
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
+    
     environmentVariables: IEnvironmentVariables[];
     currentAccount: any;
     eventSubscriber: Subscription;
+
+    //sorting
+    predicate: any;
+    reverse: any;
+    page: any;
 
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
-    ) {}
+    ) {
+        this.page = 0;
+        this.predicate = 'key';
+        this.reverse = true;
+    }
 
     loadAll() {
-        this.environmentVariablesService.query().subscribe(
+        this.environmentVariablesService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
             (res: HttpResponse<IEnvironmentVariables[]>) => {
                 this.environmentVariables = res.body;
             },
@@ -33,10 +46,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.loadAll();
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
+        this.loadAll();
         this.registerChangeInEnvironmentVariables();
     }
 
@@ -55,4 +68,19 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
+    
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'key') {
+            result.push('key');
+        }
+        return result;
+    }
+    
+    reset() {
+        this.page = 0;
+        this.environmentVariables = [];
+        this.loadAll();
+    }
+
 }

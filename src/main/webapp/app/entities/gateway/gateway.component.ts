@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
@@ -22,6 +23,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
         protected gatewayService: GatewayService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
+        private router: Router,        
         protected accountService: AccountService
     ) {}
 
@@ -57,8 +59,22 @@ export class GatewayComponent implements OnInit, OnDestroy {
     downloadConfiguration(gateway: IGateway) {
        this.flowService.exportGatewayConfiguration(gateway);
     }
+    
+    uploadConfiguration() {
+        this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
+        this.eventManager.subscribe(
+                'gatewayListModification',
+                (res) => this.reset()
+            );
+    }
 
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
+    
+    reset() {
+        this.gateways = [];
+        this.loadAll();
+    }
+    
 }

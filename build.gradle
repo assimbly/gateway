@@ -243,7 +243,7 @@ dependencies {
 	compile "org.jdom:jdom2:2.0.6"
 	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
-	// compile "io.hawt:hawtio-springboot:2.4.0"
+	compile "io.hawt:hawtio-springboot:2.4.0"
 	
 	// end custom dependencies
     

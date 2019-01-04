@@ -29,17 +29,29 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     maintenanceTimers: Array<string> = [];
     timeLeft: Array<number> = [];
     disableFlows: Array<boolean> = [];
-
+    
+    //sorting
+    page: any;
+    predicate: any;
+    reverse: any;
+    
     constructor(
         protected maintenanceService: MaintenanceService,
 		protected flowService: FlowService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
-    ) {}
+    ) {
+        this.page = 0;
+        this.predicate = 'name';
+        this.reverse = true;
+    }
 
     loadAll() {
-        this.flowService.query().subscribe(
+        this.flowService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
                 (res: HttpResponse<IFlow[]>) => {
                     this.flows = res.body
                 },
@@ -129,5 +141,19 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     select(e, i: number, flow: Flow) {
         e.currentTarget.checked ? this.selectedFlows[i] = flow : this.selectedFlows[i] = null;
         this.allSelected = JSON.stringify(this.selectedFlows) === JSON.stringify(this.flows);
+    }
+
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'name') {
+            result.push('name');
+        }
+        return result;
+    }
+    
+    reset() {
+        this.page = 0;
+        this.flows = [];
+        this.loadAll();
     }
 }

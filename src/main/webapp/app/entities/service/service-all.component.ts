@@ -21,22 +21,19 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     reverse: any;
 
     constructor(
-            protected serviceService: ServiceService,
+        protected serviceService: ServiceService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
     ) {
+        this.page = 0;
+        this.predicate = 'name';
+        this.reverse = true;
     }
 
     ngOnInit() {
         this.loadAllServices();
         this.registerChangeInServices();
-    }
-
-    reset() {
-        this.page = 0;
-        this.services = [];
-        this.loadAllServices();
     }
 
     ngOnDestroy() {
@@ -52,7 +49,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();
-        this.serviceService.query().subscribe(
+        this.serviceService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
             (res) => {
                 this.services = res.body;
             },
@@ -63,4 +63,20 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
+    
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'name') {
+            result.push('name');
+        }
+        return result;
+    }
+    
+    reset() {
+        this.page = 0;
+        this.services = [];
+        this.loadAllServices();
+    }
+
+    
 }

@@ -92,7 +92,7 @@ export const gatewayPopupRoute: Routes = [
         outlet: 'popup'
     },
     {
-        path: 'gateway/import',
+        path: 'import',
         component: GatewayImportPopupComponent,
         resolve: {
             gateway: GatewayResolve
