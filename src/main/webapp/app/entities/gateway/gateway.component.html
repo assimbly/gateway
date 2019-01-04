@@ -15,7 +15,7 @@
     </div>
     <hr>
     <div>
-        <button type="submit" [routerLink]="['/', { outlets: { popup: 'gateway/import'} }]" replaceUrl="true" queryParamsHandling="merge"
+        <button type="button" (click)="uploadConfiguration()"
             class="btn btn-info btn-sm float-right mb-3">
             <span class="fa fa-upload"></span>
             <span class="d-none d-md-inline">Import XML Configuration</span>

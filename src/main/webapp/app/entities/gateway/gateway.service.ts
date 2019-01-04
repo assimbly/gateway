@@ -39,9 +39,9 @@ export class GatewayService {
     }
     
     setGatewayConfiguration(gatewayid, configuration): Observable<any> {
-        const options = {
-                headers: new HttpHeaders({observe: 'response', responseType: 'text','Accept': 'application/xml'})
-        };
+       const options = {
+           headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', 'Accept': 'application/json'})
+       };
         return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
     }
     

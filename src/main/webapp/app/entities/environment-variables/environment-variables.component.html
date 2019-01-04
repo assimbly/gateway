@@ -12,12 +12,15 @@
     <div class="table-responsive" *ngIf="environmentVariables">
         <table class="table table-striped">
             <thead>
-            <tr>
-            <th id="environmentVariablesTitleID" [hidden]="!environmentVariablesTitleID"><span>ID</span></th>
-            <th><span>Key</span></th>
-            <th><span>Value</span></th>
-            <th id="environmentVariablesTitleGatewayID" [hidden]="!environmentVariablesTitleGatewayID"><span>Gateway</span></th>
-            <th></th>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+	            <th id="environmentVariablesTitleID" [hidden]="!environmentVariablesTitleID"><span>ID</span></th>
+	            <th jhiSortBy="key">                   
+	                  <span>Key</span>
+	                  <span class="fa fa-sort"></span>
+	            </th>
+	            <th><span>Value</span></th>
+	            <th id="environmentVariablesTitleGatewayID" [hidden]="!environmentVariablesTitleGatewayID"><span>Gateway</span></th>
+	            <th></th>
             </tr>
             </thead>
             <tbody>

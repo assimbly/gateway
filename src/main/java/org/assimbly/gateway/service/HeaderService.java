@@ -1,6 +1,9 @@
 package org.assimbly.gateway.service;
 
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.dto.HeaderDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +26,8 @@ public interface HeaderService {
      *
      * @return the list of entities
      */
-    List<HeaderDTO> findAll();
+    Page<HeaderDTO> findAll(Pageable pageable);
+    
 
 
     /**

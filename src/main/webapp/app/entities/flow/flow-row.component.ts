@@ -103,17 +103,18 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.registerTriggeredAction();
         this.connection = this.flowService.connectionStomp();
         this.stompClient = this.flowService.client();
-        this.subscribe();
+        this.subscribe('alert');
+        this.subscribe('event');
         this.receive().subscribe(data => {
-            console.log('data');
-            console.log(data);
-            console.log(this.flow.id);
-            if (this.flow.id === data) {
-                this.getFlowNumberOfAlerts(data);
+            const data2 = data.split(':');
+            if(data2[0]==='event'){
+                this.setFlowStatus(data2[1])
+            }else if(data2[0]==='alert'){
+                if (this.flow.id === data2[1]) {
+                    this.getFlowNumberOfAlerts(data[1]);
+                }    
             }
-        
         });
-        
     }
 
     ngOnDestroy() {
@@ -427,7 +428,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
                 this.flowService.start(this.flow.id).subscribe(response => {
                     if (response.status === 200) {
-                        this.setFlowStatus('started');
+                        //this.setFlowStatus('started');
                     }
                     this.disableActionBtns = false;
                 }, (err) => {
@@ -435,7 +436,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                     this.isFlowStatusOK = false;
                     this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
                     this.disableActionBtns = false;
-                });
+                }); 
             })
         }, (err) => {
             this.flowConfigurationNotObtained(this.flow.id);
@@ -450,7 +451,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.disableActionBtns = true;
         this.flowService.pause(this.flow.id).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('suspended');
+                // this.setFlowStatus('suspended');
             }
             this.disableActionBtns = false;
         }, (err) => {
@@ -470,7 +471,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
                 this.flowService.resume(this.flow.id).subscribe(response => {
                     if (response.status === 200) {
-                        this.setFlowStatus('resumed');
+                        // this.setFlowStatus('resumed');
                     }
                     this.disableActionBtns = false;
                 }, (err) => {
@@ -496,7 +497,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
                 this.flowService.restart(this.flow.id).subscribe(response => {
                     if (response.status === 200) {
-                        this.setFlowStatus('restarted');
+                        // this.setFlowStatus('restarted');
                     }
                     this.disableActionBtns = false;
                 }, (err) => {
@@ -519,7 +520,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         this.flowService.stop(this.flow.id).subscribe((response) => {
             if (response.status === 200) {
-                this.setFlowStatus('stopped');
+                // this.setFlowStatus('stopped');
             }
             this.disableActionBtns = false;
         }, (err) => {
@@ -534,15 +535,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         return this.listener;
     }
 
-    subscribe() {
-        const topic = '/topic/' + this.flow.id + '/alert';
+    subscribe(type) {
+        const topic = '/topic/' + this.flow.id + '/' + type;
         
         this.connection.then(() => {
             this.subscriber = this.stompClient.subscribe(topic, data => {
                 if(!this.listenerObserver){
                     this.listener = this.createListener();
                 }
-                this.listenerObserver.next(JSON.parse(data.body));
+                this.listenerObserver.next(data.body);
             });
         });
     }

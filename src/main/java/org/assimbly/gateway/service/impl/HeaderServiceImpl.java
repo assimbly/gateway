@@ -3,11 +3,13 @@ package org.assimbly.gateway.service.impl;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.repository.HeaderRepository;
+import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,21 +50,14 @@ public class HeaderServiceImpl implements HeaderService {
         header = headerRepository.save(header);
         return headerMapper.toDto(header);
     }
-
-    /**
-     * Get all the headers.
-     *
-     * @return the list of entities
-     */
+    
     @Override
     @Transactional(readOnly = true)
-    public List<HeaderDTO> findAll() {
+    public Page<HeaderDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Headers");
-        return headerRepository.findAll().stream()
-            .map(headerMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        return headerRepository.findAll(pageable)
+            .map(headerMapper::toDto);
     }
-
 
     /**
      * Get one header by id.

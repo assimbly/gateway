@@ -2,11 +2,13 @@ package org.assimbly.gateway.service.impl;
 
 import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.service.mapper.ServiceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,21 +49,14 @@ public class ServiceServiceImpl implements ServiceService {
         service = serviceRepository.save(service);
         return serviceMapper.toDto(service);
     }
-
-    /**
-     * Get all the services.
-     *
-     * @return the list of entities
-     */
+    
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceDTO> findAll() {
-        log.debug("Request to get all Services");
-        return serviceRepository.findAll().stream()
-            .map(serviceMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+    public Page<ServiceDTO> findAll(Pageable pageable) {
+        log.debug("Request to get all Headers");
+        return serviceRepository.findAll(pageable)
+            .map(serviceMapper::toDto);
     }
-
 
     /**
      * Get one service by id.
