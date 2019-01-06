@@ -1,49 +1,36 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { FlowService } from '../flow';
 import { CommonModule } from '@angular/common';
-
+import { FlowService } from "app/entities/flow";
+import { GatewaySharedModule } from 'app/shared';
 import {
     MaintenanceService,
-    MaintenancePopupService,
     MaintenanceComponent,
-    MaintenanceDialogComponent,
-    MaintenancePopupComponent,
-    MaintenanceDeleteDialogComponent,
-    MaintenanceDeletePopupComponent,
     MaintenanceDetailComponent,
-    maintenanceRoute
+    MaintenanceUpdateComponent,
+    MaintenanceDeletePopupComponent,
+    MaintenanceDeleteDialogComponent,
+    maintenanceRoute,
+    maintenancePopupRoute
 } from './';
 
+
+const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
+
 @NgModule({
-    imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        CommonModule,
-        RouterModule.forChild(maintenanceRoute)
-    ],
+    imports: [GatewaySharedModule, ReactiveFormsModule, CommonModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         MaintenanceComponent,
-        MaintenanceDialogComponent,
-        MaintenancePopupComponent,
-        MaintenancePopupComponent,
+        MaintenanceDetailComponent,
+        MaintenanceUpdateComponent,
         MaintenanceDeleteDialogComponent,
-        MaintenanceDeletePopupComponent,
-        MaintenanceDetailComponent
+        MaintenanceDeletePopupComponent
     ],
-    entryComponents: [
-        MaintenanceComponent,
-        MaintenanceDialogComponent,
-        MaintenancePopupComponent,
-        MaintenancePopupComponent,
-        MaintenanceDeleteDialogComponent,
-        MaintenanceDeletePopupComponent,
-        MaintenanceDetailComponent
-    ],
+    entryComponents: [MaintenanceComponent, MaintenanceUpdateComponent, MaintenanceDeleteDialogComponent, MaintenanceDeletePopupComponent],
     providers: [
-        FlowService
+        MaintenanceService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayMaintenanceModule { }
+export class GatewayMaintenanceModule {}

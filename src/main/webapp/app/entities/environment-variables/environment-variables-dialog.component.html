@@ -17,7 +17,7 @@
             <input type="text" class="form-control" id="key" formControlName="key"/>
             <div *ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)" class="invalid-field-message">
                 <span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span>
-                <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>
+                <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.!!!!!!!!</span>
             </div>
         </div>
 

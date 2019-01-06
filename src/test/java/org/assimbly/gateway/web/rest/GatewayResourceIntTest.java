@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.repository.GatewayRepository;
+import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
 import org.assimbly.gateway.service.mapper.GatewayMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -21,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
+import org.assimbly.gateway.domain.enumeration.ConnectorType;
 /**
  * Test class for the GatewayResource REST controller.
  *
@@ -54,6 +58,9 @@ public class GatewayResourceIntTest {
     private static final EnvironmentType DEFAULT_STAGE = EnvironmentType.DEVELOPMENT;
     private static final EnvironmentType UPDATED_STAGE = EnvironmentType.TEST;
 
+    private static final ConnectorType DEFAULT_CONNECTOR_TYPE = ConnectorType.CAMEL;
+    private static final ConnectorType UPDATED_CONNECTOR_TYPE = ConnectorType.SPRINGINTEGRATION;
+
     private static final String DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_DEFAULT_FROM_ENDPOINT_TYPE = "BBBBBBBBBB";
 
@@ -70,6 +77,9 @@ public class GatewayResourceIntTest {
     private GatewayMapper gatewayMapper;
 
     @Autowired
+    private GatewayService gatewayService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -81,6 +91,9 @@ public class GatewayResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restGatewayMockMvc;
 
     private Gateway gateway;
@@ -88,12 +101,13 @@ public class GatewayResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final GatewayResource gatewayResource = new GatewayResource(gatewayRepository, gatewayMapper);
+        final GatewayResource gatewayResource = new GatewayResource(gatewayService, gatewayRepository);
         this.restGatewayMockMvc = MockMvcBuilders.standaloneSetup(gatewayResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -108,6 +122,7 @@ public class GatewayResourceIntTest {
             .type(DEFAULT_TYPE)
             .environmentName(DEFAULT_ENVIRONMENT_NAME)
             .stage(DEFAULT_STAGE)
+            .connectorType(DEFAULT_CONNECTOR_TYPE)
             .defaultFromEndpointType(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE)
             .defaultToEndpointType(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE)
             .defaultErrorEndpointType(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE);
@@ -139,6 +154,7 @@ public class GatewayResourceIntTest {
         assertThat(testGateway.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testGateway.getEnvironmentName()).isEqualTo(DEFAULT_ENVIRONMENT_NAME);
         assertThat(testGateway.getStage()).isEqualTo(DEFAULT_STAGE);
+        assertThat(testGateway.getConnectorType()).isEqualTo(DEFAULT_CONNECTOR_TYPE);
         assertThat(testGateway.getDefaultFromEndpointType()).isEqualTo(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE);
         assertThat(testGateway.getDefaultToEndpointType()).isEqualTo(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE);
         assertThat(testGateway.getDefaultErrorEndpointType()).isEqualTo(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE);
@@ -179,11 +195,12 @@ public class GatewayResourceIntTest {
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].environmentName").value(hasItem(DEFAULT_ENVIRONMENT_NAME.toString())))
             .andExpect(jsonPath("$.[*].stage").value(hasItem(DEFAULT_STAGE.toString())))
+            .andExpect(jsonPath("$.[*].connectorType").value(hasItem(DEFAULT_CONNECTOR_TYPE.toString())))
             .andExpect(jsonPath("$.[*].defaultFromEndpointType").value(hasItem(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].defaultToEndpointType").value(hasItem(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].defaultErrorEndpointType").value(hasItem(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getGateway() throws Exception {
@@ -199,6 +216,7 @@ public class GatewayResourceIntTest {
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
             .andExpect(jsonPath("$.environmentName").value(DEFAULT_ENVIRONMENT_NAME.toString()))
             .andExpect(jsonPath("$.stage").value(DEFAULT_STAGE.toString()))
+            .andExpect(jsonPath("$.connectorType").value(DEFAULT_CONNECTOR_TYPE.toString()))
             .andExpect(jsonPath("$.defaultFromEndpointType").value(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE.toString()))
             .andExpect(jsonPath("$.defaultToEndpointType").value(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE.toString()))
             .andExpect(jsonPath("$.defaultErrorEndpointType").value(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE.toString()));
@@ -217,10 +235,11 @@ public class GatewayResourceIntTest {
     public void updateGateway() throws Exception {
         // Initialize the database
         gatewayRepository.saveAndFlush(gateway);
+
         int databaseSizeBeforeUpdate = gatewayRepository.findAll().size();
 
         // Update the gateway
-        Gateway updatedGateway = gatewayRepository.findOne(gateway.getId());
+        Gateway updatedGateway = gatewayRepository.findById(gateway.getId()).get();
         // Disconnect from session so that the updates on updatedGateway are not directly saved in db
         em.detach(updatedGateway);
         updatedGateway
@@ -228,6 +247,7 @@ public class GatewayResourceIntTest {
             .type(UPDATED_TYPE)
             .environmentName(UPDATED_ENVIRONMENT_NAME)
             .stage(UPDATED_STAGE)
+            .connectorType(UPDATED_CONNECTOR_TYPE)
             .defaultFromEndpointType(UPDATED_DEFAULT_FROM_ENDPOINT_TYPE)
             .defaultToEndpointType(UPDATED_DEFAULT_TO_ENDPOINT_TYPE)
             .defaultErrorEndpointType(UPDATED_DEFAULT_ERROR_ENDPOINT_TYPE);
@@ -246,6 +266,7 @@ public class GatewayResourceIntTest {
         assertThat(testGateway.getType()).isEqualTo(UPDATED_TYPE);
         assertThat(testGateway.getEnvironmentName()).isEqualTo(UPDATED_ENVIRONMENT_NAME);
         assertThat(testGateway.getStage()).isEqualTo(UPDATED_STAGE);
+        assertThat(testGateway.getConnectorType()).isEqualTo(UPDATED_CONNECTOR_TYPE);
         assertThat(testGateway.getDefaultFromEndpointType()).isEqualTo(UPDATED_DEFAULT_FROM_ENDPOINT_TYPE);
         assertThat(testGateway.getDefaultToEndpointType()).isEqualTo(UPDATED_DEFAULT_TO_ENDPOINT_TYPE);
         assertThat(testGateway.getDefaultErrorEndpointType()).isEqualTo(UPDATED_DEFAULT_ERROR_ENDPOINT_TYPE);
@@ -259,15 +280,15 @@ public class GatewayResourceIntTest {
         // Create the Gateway
         GatewayDTO gatewayDTO = gatewayMapper.toDto(gateway);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGatewayMockMvc.perform(put("/api/gateways")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(gatewayDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Gateway in the database
         List<Gateway> gatewayList = gatewayRepository.findAll();
-        assertThat(gatewayList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(gatewayList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -275,6 +296,7 @@ public class GatewayResourceIntTest {
     public void deleteGateway() throws Exception {
         // Initialize the database
         gatewayRepository.saveAndFlush(gateway);
+
         int databaseSizeBeforeDelete = gatewayRepository.findAll().size();
 
         // Get the gateway

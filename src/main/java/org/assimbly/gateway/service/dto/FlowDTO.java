@@ -1,12 +1,9 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.ToEndpoint;
 
 /**
@@ -20,8 +17,8 @@ public class FlowDTO implements Serializable {
 
     private Boolean autoStart;
 
-    private Boolean offloading;
-    
+    private Boolean offLoading;
+
     private Long gatewayId;
 
     private Long fromEndpointId;
@@ -56,13 +53,14 @@ public class FlowDTO implements Serializable {
         this.autoStart = autoStart;
     }
 
-    public Boolean isOffloading() {
-        return offloading;
+    public Boolean isOffLoading() {
+        return offLoading;
     }
 
-    public void setOffloading(Boolean offloading) {
-        this.offloading = offloading;
+    public void setOffLoading(Boolean offLoading) {
+        this.offLoading = offLoading;
     }
+
     public Long getGatewayId() {
         return gatewayId;
     }
@@ -114,7 +112,7 @@ public class FlowDTO implements Serializable {
         }
 
         FlowDTO flowDTO = (FlowDTO) o;
-        if(flowDTO.getId() == null || getId() == null) {
+        if (flowDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), flowDTO.getId());
@@ -131,6 +129,10 @@ public class FlowDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
+            ", offLoading='" + isOffLoading() + "'" +
+            ", gateway=" + getGatewayId() +
+            ", fromEndpoint=" + getFromEndpointId() +
+            ", errorEndpoint=" + getErrorEndpointId() +
             "}";
     }
 }

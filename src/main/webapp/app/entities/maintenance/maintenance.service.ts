@@ -1,83 +1,80 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import * as moment from 'moment';
+import { DATE_FORMAT } from 'app/shared/constants/input.constants';
+import { map } from 'rxjs/operators';
 
-import { JhiDateUtils } from 'ng-jhipster';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IMaintenance } from 'app/shared/model/maintenance.model';
 
-import { Maintenance } from './maintenance.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+type EntityResponseType = HttpResponse<IMaintenance>;
+type EntityArrayResponseType = HttpResponse<IMaintenance[]>;
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MaintenanceService {
+    public resourceUrl = SERVER_API_URL + 'api/maintenances';
 
-    private resourceUrl =  SERVER_API_URL + 'api/maintenances';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http, private dateUtils: JhiDateUtils) { }
-
-    create(maintenance: Maintenance): Observable<Maintenance> {
-        const copy = this.convert(maintenance);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(maintenance: IMaintenance): Observable<EntityResponseType> {
+        const copy = this.convertDateFromClient(maintenance);
+        return this.http
+            .post<IMaintenance>(this.resourceUrl, copy, { observe: 'response' })
+            .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
     }
 
-    update(maintenance: Maintenance): Observable<Maintenance> {
-        const copy = this.convert(maintenance);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(maintenance: IMaintenance): Observable<EntityResponseType> {
+        const copy = this.convertDateFromClient(maintenance);
+        return this.http
+            .put<IMaintenance>(this.resourceUrl, copy, { observe: 'response' })
+            .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
     }
 
-    find(id: number): Observable<Maintenance> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http
+            .get<IMaintenance>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+            .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http
+            .get<IMaintenance[]>(this.resourceUrl, { params: options, observe: 'response' })
+            .pipe(map((res: EntityArrayResponseType) => this.convertDateArrayFromServer(res)));
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to Maintenance.
-     */
-    private convertItemFromServer(json: any): Maintenance {
-        const entity: Maintenance = Object.assign(new Maintenance(), json);
-        entity.startTime = this.dateUtils
-            .convertDateTimeFromServer(json.startTime);
-        entity.endTime = this.dateUtils
-            .convertDateTimeFromServer(json.endTime);
-        return entity;
-    }
-
-    /**
-     * Convert a Maintenance to a JSON which can be sent to the server.
-     */
-    private convert(maintenance: Maintenance): Maintenance {
-        const copy: Maintenance = Object.assign({}, maintenance);
-
-        copy.startTime = this.dateUtils.toDate(maintenance.startTime);
-
-        copy.endTime = this.dateUtils.toDate(maintenance.endTime);
+    protected convertDateFromClient(maintenance: IMaintenance): IMaintenance {
+        const copy: IMaintenance = Object.assign({}, maintenance, {
+            startTime: maintenance.startTime != null && maintenance.startTime.isValid() ? maintenance.startTime.toJSON() : null,
+            endTime: maintenance.endTime != null && maintenance.endTime.isValid() ? maintenance.endTime.toJSON() : null,
+            duration: maintenance.duration != null && maintenance.duration.isValid() ? maintenance.duration.toJSON() : null
+        });
         return copy;
+    }
+
+    protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
+        if (res.body) {
+            res.body.startTime = res.body.startTime != null ? moment(res.body.startTime) : null;
+            res.body.endTime = res.body.endTime != null ? moment(res.body.endTime) : null;
+            res.body.duration = res.body.duration != null ? moment(res.body.duration) : null;
+        }
+        return res;
+    }
+
+    protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
+        if (res.body) {
+            res.body.forEach((maintenance: IMaintenance) => {
+                maintenance.startTime = maintenance.startTime != null ? moment(maintenance.startTime) : null;
+                maintenance.endTime = maintenance.endTime != null ? moment(maintenance.endTime) : null;
+                maintenance.duration = maintenance.duration != null ? moment(maintenance.duration) : null;
+            });
+        }
+        return res;
     }
 }

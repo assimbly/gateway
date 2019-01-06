@@ -1,82 +1,108 @@
 /* tslint:disable max-line-length */
-import { TestBed, async } from '@angular/core/testing';
-import { MockBackend } from '@angular/http/testing';
-import { ConnectionBackend, RequestOptions, BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
-import { JhiDateUtils } from 'ng-jhipster';
-
-import { FromEndpointService } from '../../../../../../main/webapp/app/entities/from-endpoint/from-endpoint.service';
-import { FromEndpoint } from '../../../../../../main/webapp/app/entities/from-endpoint/from-endpoint.model';
-import { SERVER_API_URL } from '../../../../../../main/webapp/app/app.constants';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { of } from 'rxjs';
+import { take, map } from 'rxjs/operators';
+import { FromEndpointService } from 'app/entities/from-endpoint/from-endpoint.service';
+import { IFromEndpoint, FromEndpoint, EndpointType } from 'app/shared/model/from-endpoint.model';
 
 describe('Service Tests', () => {
-
     describe('FromEndpoint Service', () => {
+        let injector: TestBed;
         let service: FromEndpointService;
-
-        beforeEach(async(() => {
+        let httpMock: HttpTestingController;
+        let elemDefault: IFromEndpoint;
+        beforeEach(() => {
             TestBed.configureTestingModule({
-                providers: [
+                imports: [HttpClientTestingModule]
+            });
+            injector = getTestBed();
+            service = injector.get(FromEndpointService);
+            httpMock = injector.get(HttpTestingController);
+
+            elemDefault = new FromEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+        });
+
+        describe('Service methods', async () => {
+            it('should find an element', async () => {
+                const returnedFromService = Object.assign({}, elemDefault);
+                service
+                    .find(123)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: elemDefault }));
+
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify(returnedFromService));
+            });
+
+            it('should create a FromEndpoint', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: ConnectionBackend,
-                        useClass: MockBackend
+                        id: 0
                     },
+                    elemDefault
+                );
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .create(new FromEndpoint(null))
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'POST' });
+                req.flush(JSON.stringify(returnedFromService));
+            });
+
+            it('should update a FromEndpoint', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: RequestOptions,
-                        useClass: BaseRequestOptions
+                        type: 'BBBBBB',
+                        uri: 'BBBBBB',
+                        options: 'BBBBBB'
                     },
-                    Http,
-                    JhiDateUtils,
-                    FromEndpointService
-                ]
+                    elemDefault
+                );
+
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .update(expected)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'PUT' });
+                req.flush(JSON.stringify(returnedFromService));
             });
 
-            service = TestBed.get(FromEndpointService);
-
-            this.backend = TestBed.get(ConnectionBackend) as MockBackend;
-            this.backend.connections.subscribe((connection: any) => {
-                this.lastConnection = connection;
-            });
-        }));
-
-        describe('Service methods', () => {
-            it('should call correct URL', () => {
-                service.find(123).subscribe(() => {});
-
-                expect(this.lastConnection).toBeDefined();
-
-                const resourceUrl = SERVER_API_URL + 'api/from-endpoints';
-                expect(this.lastConnection.request.url).toEqual(resourceUrl + '/' + 123);
-            });
-            it('should return FromEndpoint', () => {
-
-                let entity: FromEndpoint;
-                service.find(123).subscribe((_entity: FromEndpoint) => {
-                    entity = _entity;
-                });
-
-                this.lastConnection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify({id: 123}),
-                })));
-
-                expect(entity).toBeDefined();
-                expect(entity.id).toEqual(123);
+            it('should return a list of FromEndpoint', async () => {
+                const returnedFromService = Object.assign(
+                    {
+                        type: 'BBBBBB',
+                        uri: 'BBBBBB',
+                        options: 'BBBBBB'
+                    },
+                    elemDefault
+                );
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .query(expected)
+                    .pipe(
+                        take(1),
+                        map(resp => resp.body)
+                    )
+                    .subscribe(body => expect(body).toContainEqual(expected));
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify([returnedFromService]));
+                httpMock.verify();
             });
 
-            it('should propagate not found response', () => {
+            it('should delete a FromEndpoint', async () => {
+                const rxPromise = service.delete(123).subscribe(resp => expect(resp.ok));
 
-                let error: any;
-                service.find(123).subscribe(null, (_error: any) => {
-                    error = _error;
-                });
-
-                this.lastConnection.mockError(new Response(new ResponseOptions({
-                    status: 404,
-                })));
-
-                expect(error).toBeDefined();
-                expect(error.status).toEqual(404);
+                const req = httpMock.expectOne({ method: 'DELETE' });
+                req.flush({ status: 200 });
             });
         });
-    });
 
+        afterEach(() => {
+            httpMock.verify();
+        });
+    });
 });

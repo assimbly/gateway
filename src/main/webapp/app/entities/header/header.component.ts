@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
-import { Header } from './header.model';
+import { IHeader } from 'app/shared/model/header.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
+import { AccountService } from 'app/core';
 import { HeaderService } from './header.service';
-import { HeaderKeysComponent, HeaderKeysService, HeaderKeys } from '../../entities/header-keys';
-import { Principal, ResponseWrapper } from '../../shared';
+import { HeaderKeysComponent, HeaderKeysService } from '../../entities/header-keys';
 
 @Component({
     selector: 'jhi-header',
@@ -15,39 +17,38 @@ import { Principal, ResponseWrapper } from '../../shared';
             HeaderKeysComponent
             ],
 })
-
 export class HeaderComponent implements OnInit, OnDestroy {
-    public headers: Array<Header> = [];
+    headers: IHeader[];
     currentAccount: any;
     eventSubscriber: Subscription;
-    headerKeys: Array<HeaderKeys>
-    headerKey: HeaderKeys;
+    headerKeys: Array<IHeaderKeys>
+    headerKey: IHeaderKeys;
     selectedHeaderId: number;
 
     constructor(
-        private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected headerService: HeaderService,
+        protected headerKeysService: HeaderKeysService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            (res: HttpResponse<IHeader[]>) => {
+                this.headers = res.body;
                 if (this.headers.length > 0) {
                     this.selectedHeaderId = this.headers[this.headers.length - 1].id;
                     this.filterHeaderKeys(this.selectedHeaderId);
                 }
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         if (this.headerKey !== undefined ) {
@@ -70,8 +71,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     filterHeaderKeys(id) {
         this.headerKeysService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headerKeys = res.json;
+            (res) => {
+                this.headerKeys = res.body;
                 this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
                 if (this.headerKeys.length === 0) {
                     const newHeaderKeys = new HeaderKeys();
@@ -79,22 +80,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
                     this.headerKeys.push(newHeaderKeys);
                 }
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res.json)
         );
     }
 
-    trackId(index: number, item: Header) {
+    trackId(index: number, item: IHeader) {
         return item.id;
     }
+
     registerChangeInHeaders() {
-        this.eventSubscriber = this.eventManager.subscribe('headerListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('headerListModification', response => this.loadAll());
     }
 
     selectOption() {
       this.filterHeaderKeys(this.selectedHeaderId);
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

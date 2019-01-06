@@ -1,16 +1,18 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.EnvironmentVariables;
-
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
+import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
-import org.assimbly.gateway.service.mapper.EnvironmentVariablesMapper;
+
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +33,10 @@ public class EnvironmentVariablesResource {
 
     private static final String ENTITY_NAME = "environmentVariables";
 
-    private final EnvironmentVariablesRepository environmentVariablesRepository;
+    private final EnvironmentVariablesService environmentVariablesService;
 
-    private final EnvironmentVariablesMapper environmentVariablesMapper;
-
-    public EnvironmentVariablesResource(EnvironmentVariablesRepository environmentVariablesRepository, EnvironmentVariablesMapper environmentVariablesMapper) {
-        this.environmentVariablesRepository = environmentVariablesRepository;
-        this.environmentVariablesMapper = environmentVariablesMapper;
+    public EnvironmentVariablesResource(EnvironmentVariablesService environmentVariablesService) {
+        this.environmentVariablesService = environmentVariablesService;
     }
 
     /**
@@ -54,9 +53,7 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() != null) {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
-        environmentVariables = environmentVariablesRepository.save(environmentVariables);
-        EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
         return ResponseEntity.created(new URI("/api/environment-variables/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -76,11 +73,9 @@ public class EnvironmentVariablesResource {
     public ResponseEntity<EnvironmentVariablesDTO> updateEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
         log.debug("REST request to update EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() == null) {
-            return createEnvironmentVariables(environmentVariablesDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        EnvironmentVariables environmentVariables = environmentVariablesMapper.toEntity(environmentVariablesDTO);
-        environmentVariables = environmentVariablesRepository.save(environmentVariables);
-        EnvironmentVariablesDTO result = environmentVariablesMapper.toDto(environmentVariables);
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, environmentVariablesDTO.getId().toString()))
             .body(result);
@@ -93,12 +88,15 @@ public class EnvironmentVariablesResource {
      */
     @GetMapping("/environment-variables")
     @Timed
-    public List<EnvironmentVariablesDTO> getAllEnvironmentVariables() {
+    public ResponseEntity<List<EnvironmentVariablesDTO>> getAllEnvironmentVariables(Pageable pageable) {
         log.debug("REST request to get all EnvironmentVariables");
-        List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
-        return environmentVariablesMapper.toDto(environmentVariables);
-        }
+        Page<EnvironmentVariablesDTO> page = environmentVariablesService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/environment-variables");
+        return ResponseEntity.ok().headers(headers).body(page.getContent());        
 
+    }
+   
+    
     /**
      * GET  /environment-variables/:id : get the "id" environmentVariables.
      *
@@ -109,9 +107,8 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to get EnvironmentVariables : {}", id);
-        EnvironmentVariables environmentVariables = environmentVariablesRepository.findOne(id);
-        EnvironmentVariablesDTO environmentVariablesDTO = environmentVariablesMapper.toDto(environmentVariables);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(environmentVariablesDTO));
+        Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(environmentVariablesDTO);
     }
 
     /**
@@ -124,7 +121,7 @@ public class EnvironmentVariablesResource {
     @Timed
     public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
-        environmentVariablesRepository.delete(id);
+        environmentVariablesService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

@@ -1,61 +1,47 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
-
-import { Header } from './header.model';
 import { HeaderService } from './header.service';
+import { IHeader } from 'app/shared/model/header.model';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
-import { HeaderKeys } from '../header-keys';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
+import { Subscription } from "rxjs";
+import { JhiEventManager } from "ng-jhipster";
 
 @Component({
     selector: 'jhi-header-detail',
     templateUrl: './header-detail.component.html'
 })
-export class HeaderDetailComponent implements OnInit, OnDestroy {
+export class HeaderDetailComponent implements OnInit {
+    header: IHeader;
 
-    public header: Header;
+    constructor(protected eventManager: JhiEventManager,
+				protected activatedRoute: ActivatedRoute,
+				protected headerService: HeaderService,
+                protected headerKeysService: HeaderKeysService) {}
     public headerKeys: Array<HeaderKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
-    constructor(
-        private eventManager: JhiEventManager,
-        private headerService: HeaderService,
-        private headerKeysService: HeaderKeysService,
-        private route: ActivatedRoute
-    ) {
-    }
-
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ header }) => {
+            this.header = header;
         });
-        this.registerChangeInHeaders();
     }
 
     private load(id) {
         this.headerService.find(id).subscribe((header) => {
-            this.header = header;
+            this.header = header.body;
             this.loadHeaderKeys(this.header.id);
         });
     }
 
     private loadHeaderKeys(id: number) {
         this.headerKeysService.query().subscribe((res) => {
-            this.headerKeys = res.json.filter((hk) => hk.headerId === id);
+            this.headerKeys = res.body.filter((hk) => hk.headerId === id);
         });
     }
 
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-        this.eventManager.destroy(this.eventSubscriber);
-    }
-
-    registerChangeInHeaders() {
-        this.eventSubscriber = this.eventManager.subscribe(
-            'headerListModification',
-            (response) => this.load(this.header.id)
-        );
+    previousState() {
+        window.history.back();
     }
 }

@@ -2,7 +2,6 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { GatewayGatewayModule } from './gateway/gateway.module';
 import { GatewayEnvironmentVariablesModule } from './environment-variables/environment-variables.module';
-import { GatewayFlowModule } from './flow/flow.module';
 import { GatewayServiceModule } from './service/service.module';
 import { GatewayServiceKeysModule } from './service-keys/service-keys.module';
 import { GatewayHeaderModule } from './header/header.module';
@@ -13,9 +12,12 @@ import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.modu
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
+import { GatewayFlowModule } from './flow/flow.module';
+import { FlowService } from "app/entities/flow";
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
+    // prettier-ignore
     imports: [
         GatewayGatewayModule,
         GatewayEnvironmentVariablesModule,
@@ -28,7 +30,8 @@ import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpo
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
         GatewayMaintenanceModule,
-        GatewayGroupModule
+        GatewayGroupModule,
+        GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     exports: [
@@ -44,7 +47,7 @@ import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpo
         GatewayToEndpointModule,
         GatewayMaintenanceModule,
         GatewayGroupModule,
-        GatewayWireTapEndpointModule,
+        GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     declarations: [],

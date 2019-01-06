@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.repository.FromEndpointRepository;
+import org.assimbly.gateway.service.FromEndpointService;
 import org.assimbly.gateway.service.dto.FromEndpointDTO;
 import org.assimbly.gateway.service.mapper.FromEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -21,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class FromEndpointResourceIntTest {
 
-    private static final EndpointType DEFAULT_TYPE = EndpointType.SONICMQ;
-    private static final EndpointType UPDATED_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType DEFAULT_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType UPDATED_TYPE = EndpointType.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -57,6 +60,9 @@ public class FromEndpointResourceIntTest {
     private FromEndpointMapper fromEndpointMapper;
 
     @Autowired
+    private FromEndpointService fromEndpointService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -68,6 +74,9 @@ public class FromEndpointResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restFromEndpointMockMvc;
 
     private FromEndpoint fromEndpoint;
@@ -75,12 +84,13 @@ public class FromEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final FromEndpointResource fromEndpointResource = new FromEndpointResource(fromEndpointRepository, fromEndpointMapper);
+        final FromEndpointResource fromEndpointResource = new FromEndpointResource(fromEndpointService);
         this.restFromEndpointMockMvc = MockMvcBuilders.standaloneSetup(fromEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -158,7 +168,7 @@ public class FromEndpointResourceIntTest {
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getFromEndpoint() throws Exception {
@@ -188,10 +198,11 @@ public class FromEndpointResourceIntTest {
     public void updateFromEndpoint() throws Exception {
         // Initialize the database
         fromEndpointRepository.saveAndFlush(fromEndpoint);
+
         int databaseSizeBeforeUpdate = fromEndpointRepository.findAll().size();
 
         // Update the fromEndpoint
-        FromEndpoint updatedFromEndpoint = fromEndpointRepository.findOne(fromEndpoint.getId());
+        FromEndpoint updatedFromEndpoint = fromEndpointRepository.findById(fromEndpoint.getId()).get();
         // Disconnect from session so that the updates on updatedFromEndpoint are not directly saved in db
         em.detach(updatedFromEndpoint);
         updatedFromEndpoint
@@ -222,15 +233,15 @@ public class FromEndpointResourceIntTest {
         // Create the FromEndpoint
         FromEndpointDTO fromEndpointDTO = fromEndpointMapper.toDto(fromEndpoint);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restFromEndpointMockMvc.perform(put("/api/from-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(fromEndpointDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the FromEndpoint in the database
         List<FromEndpoint> fromEndpointList = fromEndpointRepository.findAll();
-        assertThat(fromEndpointList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(fromEndpointList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -238,6 +249,7 @@ public class FromEndpointResourceIntTest {
     public void deleteFromEndpoint() throws Exception {
         // Initialize the database
         fromEndpointRepository.saveAndFlush(fromEndpoint);
+
         int databaseSizeBeforeDelete = fromEndpointRepository.findAll().size();
 
         // Get the fromEndpoint

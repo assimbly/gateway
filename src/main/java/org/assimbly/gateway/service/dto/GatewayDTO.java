@@ -1,11 +1,9 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
+import org.assimbly.gateway.domain.enumeration.ConnectorType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 
 /**
@@ -28,6 +26,10 @@ public class GatewayDTO implements Serializable {
     private String defaultToEndpointType;
 
     private String defaultErrorEndpointType;
+
+    private Long wiretapEndpointId;
+
+	private ConnectorType connectorType;
 
     public Long getId() {
         return id;
@@ -69,6 +71,14 @@ public class GatewayDTO implements Serializable {
         this.stage = stage;
     }
 
+    public ConnectorType getConnectorType() {
+        return connectorType;
+    }
+
+    public void setConnectorType(ConnectorType connectorType) {
+        this.connectorType = connectorType;
+    }
+
     public String getDefaultFromEndpointType() {
         return defaultFromEndpointType;
     }
@@ -93,6 +103,14 @@ public class GatewayDTO implements Serializable {
         this.defaultErrorEndpointType = defaultErrorEndpointType;
     }
 
+    public Long getWiretapEndpointId() {
+        return wiretapEndpointId;
+    }
+
+    public void setWiretapEndpointId(Long wireTapEndpointId) {
+        this.wiretapEndpointId = wireTapEndpointId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -103,7 +121,7 @@ public class GatewayDTO implements Serializable {
         }
 
         GatewayDTO gatewayDTO = (GatewayDTO) o;
-        if(gatewayDTO.getId() == null || getId() == null) {
+        if (gatewayDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), gatewayDTO.getId());
@@ -122,9 +140,11 @@ public class GatewayDTO implements Serializable {
             ", type='" + getType() + "'" +
             ", environmentName='" + getEnvironmentName() + "'" +
             ", stage='" + getStage() + "'" +
+            ", connectorType='" + getConnectorType() + "'" +
             ", defaultFromEndpointType='" + getDefaultFromEndpointType() + "'" +
             ", defaultToEndpointType='" + getDefaultToEndpointType() + "'" +
             ", defaultErrorEndpointType='" + getDefaultErrorEndpointType() + "'" +
+            ", wiretapEndpoint=" + getWiretapEndpointId() +
             "}";
     }
 }

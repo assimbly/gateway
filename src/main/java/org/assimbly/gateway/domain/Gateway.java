@@ -15,6 +15,8 @@ import org.assimbly.gateway.domain.enumeration.GatewayType;
 
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 
+import org.assimbly.gateway.domain.enumeration.ConnectorType;
+
 /**
  * A Gateway.
  */
@@ -43,6 +45,10 @@ public class Gateway implements Serializable {
     @Column(name = "stage")
     private EnvironmentType stage;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "connector_type")
+    private ConnectorType connectorType;
+
     @Column(name = "default_from_endpoint_type")
     private String defaultFromEndpointType;
 
@@ -52,13 +58,14 @@ public class Gateway implements Serializable {
     @Column(name = "default_error_endpoint_type")
     private String defaultErrorEndpointType;
 
+    @OneToOne    @JoinColumn(unique = true)
+    private WireTapEndpoint wiretapEndpoint;
+
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Flow> flows = new HashSet<>();
 
     @OneToMany(mappedBy = "gateway")
-    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<EnvironmentVariables> environmentVariables = new HashSet<>();
 
@@ -126,6 +133,19 @@ public class Gateway implements Serializable {
         this.stage = stage;
     }
 
+    public ConnectorType getConnectorType() {
+        return connectorType;
+    }
+
+    public Gateway connectorType(ConnectorType connectorType) {
+        this.connectorType = connectorType;
+        return this;
+    }
+
+    public void setConnectorType(ConnectorType connectorType) {
+        this.connectorType = connectorType;
+    }
+
     public String getDefaultFromEndpointType() {
         return defaultFromEndpointType;
     }
@@ -163,6 +183,19 @@ public class Gateway implements Serializable {
 
     public void setDefaultErrorEndpointType(String defaultErrorEndpointType) {
         this.defaultErrorEndpointType = defaultErrorEndpointType;
+    }
+
+    public WireTapEndpoint getWiretapEndpoint() {
+        return wiretapEndpoint;
+    }
+
+    public Gateway wiretapEndpoint(WireTapEndpoint wireTapEndpoint) {
+        this.wiretapEndpoint = wireTapEndpoint;
+        return this;
+    }
+
+    public void setWiretapEndpoint(WireTapEndpoint wireTapEndpoint) {
+        this.wiretapEndpoint = wireTapEndpoint;
     }
 
     public Set<Flow> getFlows() {
@@ -272,6 +305,7 @@ public class Gateway implements Serializable {
             ", type='" + getType() + "'" +
             ", environmentName='" + getEnvironmentName() + "'" +
             ", stage='" + getStage() + "'" +
+            ", connectorType='" + getConnectorType() + "'" +
             ", defaultFromEndpointType='" + getDefaultFromEndpointType() + "'" +
             ", defaultToEndpointType='" + getDefaultToEndpointType() + "'" +
             ", defaultErrorEndpointType='" + getDefaultErrorEndpointType() + "'" +

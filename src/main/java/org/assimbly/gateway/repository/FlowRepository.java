@@ -5,15 +5,16 @@ import java.util.List;
 import javax.persistence.OrderBy;
 
 import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.service.dto.FlowDTO;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
-
 
 /**
- * Spring Data JPA repository for the Flow entity.
+ * Spring Data  repository for the Flow entity.
  */
+@SuppressWarnings("unused")
 @Repository
 public interface FlowRepository extends JpaRepository<Flow, Long> {
 
@@ -21,6 +22,6 @@ public interface FlowRepository extends JpaRepository<Flow, Long> {
 	List<Flow> findAllByGatewayId(Long gatewayid);
 
 	@OrderBy("name ASC")
-	Page<Flow> findAllByGatewayId(Pageable pageable, Long gatewayid);
+	Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid);
 
 }

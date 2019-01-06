@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
+import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
-import { Principal, ResponseWrapper } from '../../shared';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
+import { AccountService } from "app/core";
 
 @Component({
     selector: 'jhi-service-all',
@@ -21,26 +21,19 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     reverse: any;
 
     constructor(
-        private serviceService: ServiceService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        protected serviceService: ServiceService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
     ) {
+        this.page = 0;
+        this.predicate = 'name';
+        this.reverse = true;
     }
 
     ngOnInit() {
         this.loadAllServices();
-        this.isAdmin = this.principal.isAdmin();
-        this.principal.identity().then((account) => {
-            this.currentAccount = account;
-        });
         this.registerChangeInServices();
-    }
-
-    reset() {
-        this.page = 0;
-        this.services = [];
-        this.loadAllServices();
     }
 
     ngOnDestroy() {
@@ -52,15 +45,38 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     }
 
     private loadAllServices() {
-        this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.isAdmin = this.accountService.isAdmin();
+        this.serviceService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
+            (res) => {
+                this.services = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res)
         );
     }
 
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
+    
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'name') {
+            result.push('name');
+        }
+        return result;
+    }
+    
+    reset() {
+        this.page = 0;
+        this.services = [];
+        this.loadAllServices();
+    }
+
+    
 }

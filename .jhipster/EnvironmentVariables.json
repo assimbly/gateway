@@ -1,13 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipName": "gateway",
-            "otherEntityName": "gateway",
-            "relationshipType": "many-to-one",
-            "otherEntityField": "id"
-        }
-    ],
+    "name": "EnvironmentVariables",
     "fields": [
         {
             "fieldName": "key",
@@ -18,10 +10,21 @@
             "fieldType": "String"
         }
     ],
+    "relationships": [
+        {
+            "relationshipName": "gateway",
+            "otherEntityName": "gateway",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
     "changelogDate": "20180114132914",
     "entityTableName": "environment_variables",
     "dto": "mapstruct",
     "pagination": "no",
-    "service": "no",
-    "jpaMetamodelFiltering": false
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

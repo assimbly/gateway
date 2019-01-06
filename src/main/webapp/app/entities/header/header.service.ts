@@ -1,73 +1,38 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { Header } from './header.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { IHeader } from 'app/shared/model/header.model';
 
-@Injectable()
+type EntityResponseType = HttpResponse<IHeader>;
+type EntityArrayResponseType = HttpResponse<IHeader[]>;
+
+@Injectable({ providedIn: 'root' })
 export class HeaderService {
+    public resourceUrl = SERVER_API_URL + 'api/headers';
 
-    private resourceUrl =  SERVER_API_URL + 'api/headers';
+    constructor(protected http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(header: Header): Observable<Header> {
-        const copy = this.convert(header);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    create(header: IHeader): Observable<EntityResponseType> {
+        return this.http.post<IHeader>(this.resourceUrl, header, { observe: 'response' });
     }
 
-    update(header: Header): Observable<Header> {
-        const copy = this.convert(header);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    update(header: IHeader): Observable<EntityResponseType> {
+        return this.http.put<IHeader>(this.resourceUrl, header, { observe: 'response' });
     }
 
-    find(id: number): Observable<Header> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http.get<IHeader>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http.get<IHeader[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
-    }
-
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
-        for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
-        }
-        return new ResponseWrapper(res.headers, result, res.status);
-    }
-
-    /**
-     * Convert a returned JSON object to Header.
-     */
-    private convertItemFromServer(json: any): Header {
-        const entity: Header = Object.assign(new Header(), json);
-        return entity;
-    }
-
-    /**
-     * Convert a Header to a JSON which can be sent to the server.
-     */
-    private convert(header: Header): Header {
-        const copy: Header = Object.assign({}, header);
-        return copy;
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 }

@@ -1,39 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ErrorEndpoint } from './error-endpoint.model';
+import { IErrorEndpoint } from 'app/shared/model/error-endpoint.model';
+import { AccountService } from 'app/core';
 import { ErrorEndpointService } from './error-endpoint.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-error-endpoint',
     templateUrl: './error-endpoint.component.html'
 })
 export class ErrorEndpointComponent implements OnInit, OnDestroy {
-errorEndpoints: ErrorEndpoint[];
+    errorEndpoints: IErrorEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        private errorEndpointService: ErrorEndpointService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected errorEndpointService: ErrorEndpointService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.errorEndpointService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.errorEndpoints = res.json;
+            (res: HttpResponse<IErrorEndpoint[]>) => {
+                this.errorEndpoints = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         this.registerChangeInErrorEndpoints();
@@ -43,14 +44,15 @@ errorEndpoints: ErrorEndpoint[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: ErrorEndpoint) {
+    trackId(index: number, item: IErrorEndpoint) {
         return item.id;
     }
+
     registerChangeInErrorEndpoints() {
-        this.eventSubscriber = this.eventManager.subscribe('errorEndpointListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('errorEndpointListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

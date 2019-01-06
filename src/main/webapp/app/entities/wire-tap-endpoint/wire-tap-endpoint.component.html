@@ -1,7 +1,7 @@
 <div>
     <h2>
         <span>Offloading</span>
-        <button type="button" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0 && isAdmin" (click)="navigateToCreate()">
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0 && isAdmin" (click)="navigateToCreate()">
             <span class="fa fa-plus"></span>
             <span>
                 Create Wiretap Endpoint
@@ -76,13 +76,19 @@
                 <tr>
                     <td colspan="2">
                         <div class="d-block pull-right">
-                            <button type="button" [routerLink]="['/wire-tap-endpoint-edit', wireTapEndpoint.id]" class="btn btn-primary btn-sm">
-                                <span class="fa fa-pencil"></span>
-                                <span class="d-none d-md-inline">Edit</span>
+                            <button type="submit"
+                                [routerLink]="['/wire-tap-endpoint', wireTapEndpoint.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline">Edit</span>
                             </button>
-                            <button type="button"class="btn btn-danger btn-sm" (click)="delete(wireTapEndpoint.id)">
-                                <span class="fa fa-remove"></span>
-                                <span class="d-none d-md-inline">Delete</span>
+                            <button class="btn btn-danger btn-sm" type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'wire-tap-endpoint/' + wireTapEndpoint.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline">Delete</span>
                             </button>
                         </div>
                     </td>

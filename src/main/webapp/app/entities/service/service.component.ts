@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Service } from './service.model';
+import { IService, Service } from 'app/shared/model/service.model';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
+import { AccountService } from 'app/core';
 import { ServiceService } from './service.service';
-import { ServiceKeysComponent, ServiceKeysService, ServiceKeys } from '../../entities/service-keys';
-import { Principal, ResponseWrapper } from '../../shared';
-import { Observable } from 'rxjs/Observable';
+import { ServiceKeysComponent, ServiceKeysService } from '../../entities/service-keys';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'jhi-service',
@@ -15,9 +17,9 @@ import { Observable } from 'rxjs/Observable';
             ServiceKeysComponent
             ],
 })
-
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
-    public services: Array<Service> = [];
+    [x: string]: any;
+    services: IService[];
     currentAccount: any;
     eventSubscriber: Subscription;
     serviceKey: ServiceKeys;
@@ -30,51 +32,47 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
 
     constructor(
-        private serviceService: ServiceService,
-        private serviceKeysService: ServiceKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
+        protected serviceService: ServiceService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
 
     loadAll() {
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
-                if (this.services.length > 0) {
-                    this.selectedService = this.services[this.services.length - 1];
-                    this.filterServiceKeys();
-                }
+            (res: HttpResponse<IService[]>) => {
+                this.services = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
             if (this.serviceKeys.length === 1 && this.serviceKeys[0].id === undefined) {
                 this.serviceKeys[0].isDisabled = false;
             } else {
-                this.serviceKeys.forEach((serviceKey) => {
+                this.serviceKeys.forEach(serviceKey => {
                     serviceKey.isDisabled = true;
                 });
             }
         }
     }
+
     ngOnInit() {
         this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
         if (this.serviceKey !== undefined ) {
-            this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content))
+            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(res.content))
         }else {
-            this.eventManager.subscribe('serviceKeyDeleted', (res) => res.content)
+            this.eventManager.subscribe('serviceKeyDeleted', res => res.content)
         }
         this.registerChangeInServices();
     }
     updateServiceKeys(id: number) {
-        this.serviceKeys = this.serviceKeys.filter((x) => x.id === id);
+        this.serviceKeys = this.serviceKeys.filter(x => x.id === id);
         const newServiceKeys = new ServiceKeys();
         this.serviceKeys.push(newServiceKeys);
     }
@@ -88,7 +86,7 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             this.selectedService = new Service();
         } else {
             this.serviceKeysService.query().subscribe(
-                (res: ResponseWrapper) => {
+                res => {
                     this.serviceKeys = res.json;
                     this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
                     if (this.serviceKeys.length === 0) {
@@ -97,20 +95,29 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
                         this.serviceKeys.push(newServiceKeys);
                     }
                 },
-                (res: ResponseWrapper) => this.onError(res.json)
+                (res) => this.onError(res.json)
             );
         }
     }
+
     saveServiceType(service: Service) {
         this.isSaving = true;
             this.subscribeToSaveResponse(
                 this.serviceService.update(service));
                 this.disabledServiceType = true;
             }
-    private subscribeToSaveResponse(result: Observable<Service>) {
-        result.subscribe((res: Service) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IService>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
+    
     private onSaveSuccess(result: Service) {
         this.isSaving = false;
     }
@@ -124,11 +131,12 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     trackId(index: number, item: Service) {
         return item.id;
     }
+
     registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }

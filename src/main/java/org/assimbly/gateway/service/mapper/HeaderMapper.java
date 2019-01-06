@@ -11,7 +11,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface HeaderMapper extends EntityMapper<HeaderDTO, Header> {
 
-
     @Mapping(target = "headerKeys", ignore = true)
     Header toEntity(HeaderDTO headerDTO);
 

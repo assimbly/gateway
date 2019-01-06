@@ -11,13 +11,18 @@
         "suppressImplicitAnyIndexErrors": true,
         "skipLibCheck": true,
         "outDir": "build/www/app",
-        "lib": ["es2015", "dom"],
-        "typeRoots": [
-            "node_modules/@types"
-        ]
+        "lib": ["es7", "dom"],
+        "typeRoots": ["node_modules/@types"],
+        "baseUrl": "./",
+        "paths": {
+            "app/*": ["src/main/webapp/app/*"]
+        },
+        "importHelpers": true
     },
     "angularCompilerOptions": {
         "genDir": "build/aot",
-        "skipMetadataEmit" : true
+        "skipMetadataEmit": true,
+        "fullTemplateTypeCheck": true,
+        "preserveWhitespaces": true
     }
 }

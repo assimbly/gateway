@@ -28,5 +28,6 @@
     <include file="config/liquibase/changelog/20180330121320_added_entity_constraints_ServiceKeys.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180627083209_added_entity_constraints_Group.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180704111405_added_entity_constraints_WireTapEndpoint.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20180114132913_added_entity_constraints_Gateway.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

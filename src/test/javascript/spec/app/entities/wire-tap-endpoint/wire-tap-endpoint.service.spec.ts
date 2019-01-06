@@ -1,82 +1,108 @@
 /* tslint:disable max-line-length */
-import { TestBed, async } from '@angular/core/testing';
-import { MockBackend } from '@angular/http/testing';
-import { ConnectionBackend, RequestOptions, BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
-import { JhiDateUtils } from 'ng-jhipster';
-
-import { WireTapEndpointService } from '../../../../../../main/webapp/app/entities/wire-tap-endpoint/wire-tap-endpoint.service';
-import { WireTapEndpoint } from '../../../../../../main/webapp/app/entities/wire-tap-endpoint/wire-tap-endpoint.model';
-import { SERVER_API_URL } from '../../../../../../main/webapp/app/app.constants';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { of } from 'rxjs';
+import { take, map } from 'rxjs/operators';
+import { WireTapEndpointService } from 'app/entities/wire-tap-endpoint/wire-tap-endpoint.service';
+import { IWireTapEndpoint, WireTapEndpoint, EndpointType } from 'app/shared/model/wire-tap-endpoint.model';
 
 describe('Service Tests', () => {
-
     describe('WireTapEndpoint Service', () => {
+        let injector: TestBed;
         let service: WireTapEndpointService;
-
-        beforeEach(async(() => {
+        let httpMock: HttpTestingController;
+        let elemDefault: IWireTapEndpoint;
+        beforeEach(() => {
             TestBed.configureTestingModule({
-                providers: [
+                imports: [HttpClientTestingModule]
+            });
+            injector = getTestBed();
+            service = injector.get(WireTapEndpointService);
+            httpMock = injector.get(HttpTestingController);
+
+            elemDefault = new WireTapEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+        });
+
+        describe('Service methods', async () => {
+            it('should find an element', async () => {
+                const returnedFromService = Object.assign({}, elemDefault);
+                service
+                    .find(123)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: elemDefault }));
+
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify(returnedFromService));
+            });
+
+            it('should create a WireTapEndpoint', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: ConnectionBackend,
-                        useClass: MockBackend
+                        id: 0
                     },
+                    elemDefault
+                );
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .create(new WireTapEndpoint(null))
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'POST' });
+                req.flush(JSON.stringify(returnedFromService));
+            });
+
+            it('should update a WireTapEndpoint', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: RequestOptions,
-                        useClass: BaseRequestOptions
+                        type: 'BBBBBB',
+                        uri: 'BBBBBB',
+                        options: 'BBBBBB'
                     },
-                    Http,
-                    JhiDateUtils,
-                    WireTapEndpointService
-                ]
+                    elemDefault
+                );
+
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .update(expected)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'PUT' });
+                req.flush(JSON.stringify(returnedFromService));
             });
 
-            service = TestBed.get(WireTapEndpointService);
-
-            this.backend = TestBed.get(ConnectionBackend) as MockBackend;
-            this.backend.connections.subscribe((connection: any) => {
-                this.lastConnection = connection;
-            });
-        }));
-
-        describe('Service methods', () => {
-            it('should call correct URL', () => {
-                service.find(123).subscribe(() => {});
-
-                expect(this.lastConnection).toBeDefined();
-
-                const resourceUrl = SERVER_API_URL + 'api/wire-tap-endpoints';
-                expect(this.lastConnection.request.url).toEqual(resourceUrl + '/' + 123);
-            });
-            it('should return WireTapEndpoint', () => {
-
-                let entity: WireTapEndpoint;
-                service.find(123).subscribe((_entity: WireTapEndpoint) => {
-                    entity = _entity;
-                });
-
-                this.lastConnection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify({id: 123}),
-                })));
-
-                expect(entity).toBeDefined();
-                expect(entity.id).toEqual(123);
+            it('should return a list of WireTapEndpoint', async () => {
+                const returnedFromService = Object.assign(
+                    {
+                        type: 'BBBBBB',
+                        uri: 'BBBBBB',
+                        options: 'BBBBBB'
+                    },
+                    elemDefault
+                );
+                const expected = Object.assign({}, returnedFromService);
+                service
+                    .query(expected)
+                    .pipe(
+                        take(1),
+                        map(resp => resp.body)
+                    )
+                    .subscribe(body => expect(body).toContainEqual(expected));
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify([returnedFromService]));
+                httpMock.verify();
             });
 
-            it('should propagate not found response', () => {
+            it('should delete a WireTapEndpoint', async () => {
+                const rxPromise = service.delete(123).subscribe(resp => expect(resp.ok));
 
-                let error: any;
-                service.find(123).subscribe(null, (_error: any) => {
-                    error = _error;
-                });
-
-                this.lastConnection.mockError(new Response(new ResponseOptions({
-                    status: 404,
-                })));
-
-                expect(error).toBeDefined();
-                expect(error.status).toEqual(404);
+                const req = httpMock.expectOne({ method: 'DELETE' });
+                req.flush({ status: 200 });
             });
         });
-    });
 
+        afterEach(() => {
+            httpMock.verify();
+        });
+    });
 });

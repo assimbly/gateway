@@ -8,32 +8,28 @@ import { GatewaySharedModule } from '../../shared';
 import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-endpoint.module';
 import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
-
-import { Components } from '../../shared/camel/component-type';
+import { GatewayServiceModule } from '../../entities/service/service.module';
+import { GatewayHeaderModule } from '../../entities/header/header.module';
+import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 
 import {
-    FlowService,
-    FlowPopupService,
     FlowComponent,
+    FlowEditAllComponent,
     FlowConfigurationComponent,
     FlowDetailComponent,
-    FlowEditAllComponent,
-    FlowDialogComponent,
-    FlowPopupComponent,
+    FlowUpdateComponent,
     FlowDeletePopupComponent,
     FlowDeleteDialogComponent,
     flowRoute,
-    flowPopupRoute,
     FlowEditorModeComponent,
     FlowRowComponent
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FlowService } from "app/entities/flow/flow.service";
+import { Components } from "app/shared/camel/component-type";
 
-const ENTITY_STATES = [
-    ...flowRoute,
-    ...flowPopupRoute,
-];
+const ENTITY_STATES = [...flowRoute];
 
 @NgModule({
     imports: [
@@ -41,6 +37,9 @@ const ENTITY_STATES = [
         GatewayFromEndpointModule,
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
+        GatewayServiceModule,
+        GatewayHeaderModule,
+        GatewayMaintenanceModule,
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
         NgSelectModule,
@@ -54,31 +53,27 @@ const ENTITY_STATES = [
     ],
     declarations: [
         FlowComponent,
-        FlowConfigurationComponent,
-        FlowDetailComponent,
+        FlowUpdateComponent,
         FlowEditAllComponent,
-        FlowDialogComponent,
+        FlowConfigurationComponent,        
+        FlowDetailComponent,
         FlowDeleteDialogComponent,
-        FlowPopupComponent,
         FlowDeletePopupComponent,
+        FlowConfigurationComponent,
         FlowRowComponent,
         FlowEditorModeComponent
     ],
     entryComponents: [
-        FlowComponent,
-        FlowConfigurationComponent,
+		FlowComponent,
+		FlowUpdateComponent,
         FlowEditAllComponent,
-        FlowDialogComponent,
-        FlowPopupComponent,
-        FlowDeleteDialogComponent,
-        FlowDeletePopupComponent,
-        FlowEditorModeComponent
+		FlowDeleteDialogComponent,
+		FlowConfigurationComponent,		
+		FlowDeletePopupComponent,
+        FlowEditorModeComponent,
+        FlowConfigurationComponent
     ],
-    providers: [
-        Components,
-        FlowService,
-        FlowPopupService
-    ],
+    providers: [FlowService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayFlowModule { }
+export class GatewayFlowModule {}

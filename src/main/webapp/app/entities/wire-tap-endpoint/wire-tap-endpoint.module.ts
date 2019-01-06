@@ -5,25 +5,19 @@ import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 import {
-    WireTapEndpointService,
-    WireTapEndpointPopupService,
     WireTapEndpointComponent,
     WireTapEndpointDetailComponent,
-    WireTapEndpointDialogComponent,
-    WireTapEndpointPopupComponent,
+    WireTapEndpointUpdateComponent,
+    WireTapEndpointEditComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
-    WireTapEndpointEditComponent,
     wireTapEndpointRoute,
-    wireTapEndpointPopupRoute,
+    wireTapEndpointPopupRoute
 } from './';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 
-const ENTITY_STATES = [
-    ...wireTapEndpointRoute,
-    ...wireTapEndpointPopupRoute,
-];
+const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
 
 @NgModule({
     imports: [
@@ -36,26 +30,26 @@ const ENTITY_STATES = [
     ],
     declarations: [
         WireTapEndpointComponent,
-        WireTapEndpointEditComponent,
         WireTapEndpointDetailComponent,
-        WireTapEndpointDialogComponent,
+        WireTapEndpointUpdateComponent,
+        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointPopupComponent,
-        WireTapEndpointDeletePopupComponent,
+        WireTapEndpointDeletePopupComponent
     ],
     entryComponents: [
         WireTapEndpointComponent,
+        WireTapEndpointUpdateComponent,
         WireTapEndpointEditComponent,
-        WireTapEndpointDialogComponent,
-        WireTapEndpointPopupComponent,
         WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointDeletePopupComponent,
+        WireTapEndpointDeletePopupComponent
     ],
-    providers: [
+	providers: [
         Components,
-        WireTapEndpointService,
-        WireTapEndpointPopupService,
+        WireTapEndpointUpdateComponent,
+        WireTapEndpointEditComponent,
+        WireTapEndpointDeleteDialogComponent,
+        WireTapEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayWireTapEndpointModule { }
+export class GatewayWireTapEndpointModule {}

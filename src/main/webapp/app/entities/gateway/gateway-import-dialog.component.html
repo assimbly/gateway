@@ -4,7 +4,6 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
     </div>
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
         <div class="form-group">
             <label class="form-control-label font-weight-bold" for="field_id">Gateway id</label>
             <select class="form-control" name="id" [(ngModel)]="gatewayId" id="field_id" [disabled]="gateways.length === 1">

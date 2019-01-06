@@ -1,82 +1,145 @@
 /* tslint:disable max-line-length */
-import { TestBed, async } from '@angular/core/testing';
-import { MockBackend } from '@angular/http/testing';
-import { ConnectionBackend, RequestOptions, BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
-import { JhiDateUtils } from 'ng-jhipster';
-
-import { MaintenanceService } from '../../../../../../main/webapp/app/entities/maintenance/maintenance.service';
-import { Maintenance } from '../../../../../../main/webapp/app/entities/maintenance/maintenance.model';
-import { SERVER_API_URL } from '../../../../../../main/webapp/app/app.constants';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { of } from 'rxjs';
+import { take, map } from 'rxjs/operators';
+import * as moment from 'moment';
+import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
+import { MaintenanceService } from 'app/entities/maintenance/maintenance.service';
+import { IMaintenance, Maintenance } from 'app/shared/model/maintenance.model';
 
 describe('Service Tests', () => {
-
     describe('Maintenance Service', () => {
+        let injector: TestBed;
         let service: MaintenanceService;
-
-        beforeEach(async(() => {
+        let httpMock: HttpTestingController;
+        let elemDefault: IMaintenance;
+        let currentDate: moment.Moment;
+        beforeEach(() => {
             TestBed.configureTestingModule({
-                providers: [
+                imports: [HttpClientTestingModule]
+            });
+            injector = getTestBed();
+            service = injector.get(MaintenanceService);
+            httpMock = injector.get(HttpTestingController);
+            currentDate = moment();
+
+            elemDefault = new Maintenance(0, currentDate, currentDate, currentDate, 'AAAAAAA');
+        });
+
+        describe('Service methods', async () => {
+            it('should find an element', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: ConnectionBackend,
-                        useClass: MockBackend
+                        startTime: currentDate.format(DATE_TIME_FORMAT),
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT)
                     },
+                    elemDefault
+                );
+                service
+                    .find(123)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: elemDefault }));
+
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify(returnedFromService));
+            });
+
+            it('should create a Maintenance', async () => {
+                const returnedFromService = Object.assign(
                     {
-                        provide: RequestOptions,
-                        useClass: BaseRequestOptions
+                        id: 0,
+                        startTime: currentDate.format(DATE_TIME_FORMAT),
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT)
                     },
-                    Http,
-                    JhiDateUtils,
-                    MaintenanceService
-                ]
+                    elemDefault
+                );
+                const expected = Object.assign(
+                    {
+                        startTime: currentDate,
+                        endTime: currentDate,
+                        duration: currentDate
+                    },
+                    returnedFromService
+                );
+                service
+                    .create(new Maintenance(null))
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'POST' });
+                req.flush(JSON.stringify(returnedFromService));
             });
 
-            service = TestBed.get(MaintenanceService);
+            it('should update a Maintenance', async () => {
+                const returnedFromService = Object.assign(
+                    {
+                        startTime: currentDate.format(DATE_TIME_FORMAT),
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT),
+                        frequency: 'BBBBBB'
+                    },
+                    elemDefault
+                );
 
-            this.backend = TestBed.get(ConnectionBackend) as MockBackend;
-            this.backend.connections.subscribe((connection: any) => {
-                this.lastConnection = connection;
-            });
-        }));
-
-        describe('Service methods', () => {
-            it('should call correct URL', () => {
-                service.find(123).subscribe(() => {});
-
-                expect(this.lastConnection).toBeDefined();
-
-                const resourceUrl = SERVER_API_URL + 'api/maintenances';
-                expect(this.lastConnection.request.url).toEqual(resourceUrl + '/' + 123);
-            });
-            it('should return Maintenance', () => {
-
-                let entity: Maintenance;
-                service.find(123).subscribe((_entity: Maintenance) => {
-                    entity = _entity;
-                });
-
-                this.lastConnection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify({id: 123}),
-                })));
-
-                expect(entity).toBeDefined();
-                expect(entity.id).toEqual(123);
+                const expected = Object.assign(
+                    {
+                        startTime: currentDate,
+                        endTime: currentDate,
+                        duration: currentDate
+                    },
+                    returnedFromService
+                );
+                service
+                    .update(expected)
+                    .pipe(take(1))
+                    .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
+                const req = httpMock.expectOne({ method: 'PUT' });
+                req.flush(JSON.stringify(returnedFromService));
             });
 
-            it('should propagate not found response', () => {
+            it('should return a list of Maintenance', async () => {
+                const returnedFromService = Object.assign(
+                    {
+                        startTime: currentDate.format(DATE_TIME_FORMAT),
+                        endTime: currentDate.format(DATE_TIME_FORMAT),
+                        duration: currentDate.format(DATE_TIME_FORMAT),
+                        frequency: 'BBBBBB'
+                    },
+                    elemDefault
+                );
+                const expected = Object.assign(
+                    {
+                        startTime: currentDate,
+                        endTime: currentDate,
+                        duration: currentDate
+                    },
+                    returnedFromService
+                );
+                service
+                    .query(expected)
+                    .pipe(
+                        take(1),
+                        map(resp => resp.body)
+                    )
+                    .subscribe(body => expect(body).toContainEqual(expected));
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(JSON.stringify([returnedFromService]));
+                httpMock.verify();
+            });
 
-                let error: any;
-                service.find(123).subscribe(null, (_error: any) => {
-                    error = _error;
-                });
+            it('should delete a Maintenance', async () => {
+                const rxPromise = service.delete(123).subscribe(resp => expect(resp.ok));
 
-                this.lastConnection.mockError(new Response(new ResponseOptions({
-                    status: 404,
-                })));
-
-                expect(error).toBeDefined();
-                expect(error.status).toEqual(404);
+                const req = httpMock.expectOne({ method: 'DELETE' });
+                req.flush({ status: 200 });
             });
         });
-    });
 
+        afterEach(() => {
+            httpMock.verify();
+        });
+    });
 });

@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Group;
 import org.assimbly.gateway.repository.GroupRepository;
+import org.assimbly.gateway.service.GroupService;
 import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -11,6 +12,7 @@ import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,9 +23,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,8 +50,14 @@ public class GroupResourceIntTest {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Mock
+    private GroupRepository groupRepositoryMock;
+
     @Autowired
     private GroupMapper groupMapper;
+
+    @Mock
+    private GroupService groupServiceMock;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -61,6 +71,9 @@ public class GroupResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restGroupMockMvc;
 
     private Group group;
@@ -73,7 +86,8 @@ public class GroupResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -173,10 +187,11 @@ public class GroupResourceIntTest {
     public void updateGroup() throws Exception {
         // Initialize the database
         groupRepository.saveAndFlush(group);
+
         int databaseSizeBeforeUpdate = groupRepository.findAll().size();
 
         // Update the group
-        Group updatedGroup = groupRepository.findOne(group.getId());
+        Group updatedGroup = groupRepository.findById(group.getId()).get();
         // Disconnect from session so that the updates on updatedGroup are not directly saved in db
         em.detach(updatedGroup);
         updatedGroup
@@ -203,15 +218,15 @@ public class GroupResourceIntTest {
         // Create the Group
         GroupDTO groupDTO = groupMapper.toDto(group);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGroupMockMvc.perform(put("/api/groups")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(groupDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Group in the database
         List<Group> groupList = groupRepository.findAll();
-        assertThat(groupList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(groupList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -219,6 +234,7 @@ public class GroupResourceIntTest {
     public void deleteGroup() throws Exception {
         // Initialize the database
         groupRepository.saveAndFlush(group);
+
         int databaseSizeBeforeDelete = groupRepository.findAll().size();
 
         // Get the group

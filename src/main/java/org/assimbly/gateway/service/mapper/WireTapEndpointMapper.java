@@ -2,6 +2,7 @@ package org.assimbly.gateway.service.mapper;
 
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.service.dto.WireTapEndpointDTO;
+
 import org.mapstruct.*;
 
 /**
@@ -18,7 +19,7 @@ public interface WireTapEndpointMapper extends EntityMapper<WireTapEndpointDTO, 
     @Mapping(source = "headerId", target = "header")
     WireTapEndpoint toEntity(WireTapEndpointDTO wireTapEndpointDTO);
 
-    default WireTapEndpoint wireTapId(Long id) {
+    default WireTapEndpoint fromId(Long id) {
         if (id == null) {
             return null;
         }

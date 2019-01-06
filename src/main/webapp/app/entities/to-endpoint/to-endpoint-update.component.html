@@ -1,0 +1,72 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+            <h2 id="jhi-to-endpoint-heading">Create or edit a To Endpoint</h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+                <div class="form-group" [hidden]="!toEndpoint.id">
+                    <label for="id">ID</label>
+                    <input type="text" class="form-control" id="id" name="id"
+                        [(ngModel)]="toEndpoint.id" readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_type">Type</label>
+                    <select class="form-control" name="type" [(ngModel)]="toEndpoint.type" id="field_type" >
+                        <option value="ACTIVEMQ">ACTIVEMQ</option>
+                        <option value="FILE">FILE</option>
+                        <option value="HTTP4">HTTP4</option>
+                        <option value="KAFKA">KAFKA</option>
+                        <option value="SFTP">SFTP</option>
+                        <option value="SJMS">SJMS</option>
+                        <option value="SMTP">SMTP</option>
+                        <option value="SONICMQ">SONICMQ</option>
+                        <option value="SQL">SQL</option>
+                        <option value="STREAM">STREAM</option>
+                        <option value="VM">VM</option>
+                        <option value="WASTEBIN">WASTEBIN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_uri">Uri</label>
+                    <input type="text" class="form-control" name="uri" id="field_uri"
+                        [(ngModel)]="toEndpoint.uri" />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_options">Options</label>
+                    <input type="text" class="form-control" name="options" id="field_options"
+                        [(ngModel)]="toEndpoint.options" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" for="field_flow">Flow</label>
+                    <select class="form-control" id="field_flow" name="flow" [(ngModel)]="toEndpoint.flowId" >
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="flowOption.id" *ngFor="let flowOption of flows; trackBy: trackFlowById">{{flowOption.id}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_service">Service</label>
+                    <select class="form-control" id="field_service" name="service" [(ngModel)]="toEndpoint.serviceId" >
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="field_header">Header</label>
+                    <select class="form-control" id="field_header" name="header" [(ngModel)]="toEndpoint.headerId" >
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+                </button>
+                <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

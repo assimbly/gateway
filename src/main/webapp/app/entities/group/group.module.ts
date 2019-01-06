@@ -4,22 +4,16 @@ import { RouterModule } from '@angular/router';
 import { GatewaySharedModule } from '../../shared';
 // import { GatewayAdminModule } from '../../admin/admin.module';
 import {
-    GroupService,
-    GroupPopupService,
     GroupComponent,
     GroupDetailComponent,
-    GroupDialogComponent,
-    GroupPopupComponent,
+    GroupUpdateComponent,
     GroupDeletePopupComponent,
     GroupDeleteDialogComponent,
     groupRoute,
-    groupPopupRoute,
+    groupPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...groupRoute,
-    ...groupPopupRoute,
-];
+const ENTITY_STATES = [...groupRoute, ...groupPopupRoute];
 
 @NgModule({
     imports: [
@@ -29,22 +23,19 @@ const ENTITY_STATES = [
     ],
     declarations: [
         GroupComponent,
+        GroupUpdateComponent,
         GroupDetailComponent,
-        GroupDialogComponent,
         GroupDeleteDialogComponent,
-        GroupPopupComponent,
         GroupDeletePopupComponent,
     ],
     entryComponents: [
         GroupComponent,
-        GroupDialogComponent,
-        GroupPopupComponent,
+        GroupUpdateComponent,
+        GroupDetailComponent,
         GroupDeleteDialogComponent,
         GroupDeletePopupComponent,
     ],
     providers: [
-        GroupService,
-        GroupPopupService,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
