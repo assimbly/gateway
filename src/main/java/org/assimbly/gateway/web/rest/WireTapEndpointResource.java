@@ -1,13 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
-import org.assimbly.gateway.domain.WireTapEndpoint;
-import org.assimbly.gateway.repository.WireTapEndpointRepository;
-import org.assimbly.gateway.service.dto.WireTapEndpointDTO;
-import org.assimbly.gateway.service.mapper.WireTapEndpointMapper;
+import org.assimbly.gateway.service.WireTapEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.service.dto.WireTapEndpointDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,20 +28,17 @@ public class WireTapEndpointResource {
 
     private static final String ENTITY_NAME = "wireTapEndpoint";
 
-    private final WireTapEndpointRepository wireTapEndpointRepository;
+    private final WireTapEndpointService wireTapEndpointService;
 
-    private final WireTapEndpointMapper wireTapEndpointMapper;
-
-    public WireTapEndpointResource(WireTapEndpointRepository wireTapEndpointRepository, WireTapEndpointMapper wireTapEndpointMapper) {
-        this.wireTapEndpointRepository = wireTapEndpointRepository;
-        this.wireTapEndpointMapper = wireTapEndpointMapper;
+    public WireTapEndpointResource(WireTapEndpointService wireTapEndpointService) {
+        this.wireTapEndpointService = wireTapEndpointService;
     }
-    
+
     /**
      * POST  /wire-tap-endpoints : Create a new wireTapEndpoint.
      *
-     * @param wireTapEndpoint the wireTapEndpoint to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new wireTapEndpoint, or with status 400 (Bad Request) if the wireTapEndpoint has already an ID
+     * @param wireTapEndpointDTO the wireTapEndpointDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new wireTapEndpointDTO, or with status 400 (Bad Request) if the wireTapEndpoint has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/wire-tap-endpoints")
@@ -54,12 +48,7 @@ public class WireTapEndpointResource {
         if (wireTapEndpointDTO.getId() != null) {
             throw new BadRequestAlertException("A new wireTapEndpoint cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        
-        WireTapEndpoint wireTapEndpoint = wireTapEndpointMapper.toEntity(wireTapEndpointDTO);
-        wireTapEndpoint = wireTapEndpointRepository.save(wireTapEndpoint);
-        WireTapEndpointDTO result = wireTapEndpointMapper.toDto(wireTapEndpoint);
-
-        
+        WireTapEndpointDTO result = wireTapEndpointService.save(wireTapEndpointDTO);
         return ResponseEntity.created(new URI("/api/wire-tap-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -68,10 +57,10 @@ public class WireTapEndpointResource {
     /**
      * PUT  /wire-tap-endpoints : Updates an existing wireTapEndpoint.
      *
-     * @param wireTapEndpoint the wireTapEndpoint to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated wireTapEndpoint,
-     * or with status 400 (Bad Request) if the wireTapEndpoint is not valid,
-     * or with status 500 (Internal Server Error) if the wireTapEndpoint couldn't be updated
+     * @param wireTapEndpointDTO the wireTapEndpointDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated wireTapEndpointDTO,
+     * or with status 400 (Bad Request) if the wireTapEndpointDTO is not valid,
+     * or with status 500 (Internal Server Error) if the wireTapEndpointDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/wire-tap-endpoints")
@@ -79,14 +68,11 @@ public class WireTapEndpointResource {
     public ResponseEntity<WireTapEndpointDTO> updateWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpointDTO);
         if (wireTapEndpointDTO.getId() == null) {
-            return createWireTapEndpoint(wireTapEndpointDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        WireTapEndpoint wireTapEndpoint = wireTapEndpointMapper.toEntity(wireTapEndpointDTO);
-        wireTapEndpoint = wireTapEndpointRepository.save(wireTapEndpoint);
-        WireTapEndpointDTO result = wireTapEndpointMapper.toDto(wireTapEndpoint);
-        
+        WireTapEndpointDTO result = wireTapEndpointService.save(wireTapEndpointDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, wireTapEndpoint.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, wireTapEndpointDTO.getId().toString()))
             .body(result);
     }
 
@@ -97,36 +83,36 @@ public class WireTapEndpointResource {
      */
     @GetMapping("/wire-tap-endpoints")
     @Timed
-    public List<WireTapEndpoint> getAllWireTapEndpoints() {
+    public List<WireTapEndpointDTO> getAllWireTapEndpoints() {
         log.debug("REST request to get all WireTapEndpoints");
-        return wireTapEndpointRepository.findAll();
-        }
+        return wireTapEndpointService.findAll();
+    }
 
     /**
      * GET  /wire-tap-endpoints/:id : get the "id" wireTapEndpoint.
      *
-     * @param id the id of the wireTapEndpoint to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the wireTapEndpoint, or with status 404 (Not Found)
+     * @param id the id of the wireTapEndpointDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the wireTapEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/wire-tap-endpoints/{id}")
     @Timed
-    public ResponseEntity<WireTapEndpoint> getWireTapEndpoint(@PathVariable Long id) {
+    public ResponseEntity<WireTapEndpointDTO> getWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to get WireTapEndpoint : {}", id);
-        WireTapEndpoint wireTapEndpoint = wireTapEndpointRepository.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(wireTapEndpoint));
+        Optional<WireTapEndpointDTO> wireTapEndpointDTO = wireTapEndpointService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(wireTapEndpointDTO);
     }
 
     /**
      * DELETE  /wire-tap-endpoints/:id : delete the "id" wireTapEndpoint.
      *
-     * @param id the id of the wireTapEndpoint to delete
+     * @param id the id of the wireTapEndpointDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/wire-tap-endpoints/{id}")
     @Timed
     public ResponseEntity<Void> deleteWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete WireTapEndpoint : {}", id);
-        wireTapEndpointRepository.delete(id);
+        wireTapEndpointService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

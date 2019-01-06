@@ -21,27 +21,29 @@ public class FailureListener extends EventNotifierSupport {
    
    @Autowired	
    private SimpMessageSendingOperations messagingTemplate;
+
+private String flowId;
    
 	public void notify(EventObject eventObject) throws Exception {
 
 		if (eventObject instanceof ExchangeFailureHandledEvent) {
 
 	    	ExchangeFailureHandledEvent exchangeFailedEvent = (ExchangeFailureHandledEvent) eventObject;
-	        String flowId = exchangeFailedEvent.getExchange().getFromRouteId();
+	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
 	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/alert", flowId);
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" + flowId);
 	        }else {
 	            log.warn("Can't send alert to websocket. messagingTemplate=null");
 	        }
 
-		}if (eventObject instanceof ExchangeFailedEvent) {
+		}else if (eventObject instanceof ExchangeFailedEvent) {
 
 	    	ExchangeFailedEvent exchangeFailedEvent = (ExchangeFailedEvent) eventObject;
-	        String flowId = exchangeFailedEvent.getExchange().getFromRouteId();
+	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
 	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/alert", flowId);
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" +  flowId);
 	        }else {
 	            log.warn("Can't send alert to websocket. messagingTemplate=null");
 	        }

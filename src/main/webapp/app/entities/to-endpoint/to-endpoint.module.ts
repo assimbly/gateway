@@ -8,22 +8,16 @@ import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 
 import {
-    ToEndpointService,
-    ToEndpointPopupService,
     ToEndpointComponent,
     ToEndpointDetailComponent,
-    ToEndpointDialogComponent,
-    ToEndpointPopupComponent,
+    ToEndpointUpdateComponent,
     ToEndpointDeletePopupComponent,
     ToEndpointDeleteDialogComponent,
     toEndpointRoute,
-    toEndpointPopupRoute,
+    toEndpointPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...toEndpointRoute,
-    ...toEndpointPopupRoute,
-];
+const ENTITY_STATES = [...toEndpointRoute, ...toEndpointPopupRoute];
 
 @NgModule({
     imports: [
@@ -39,22 +33,14 @@ const ENTITY_STATES = [
     declarations: [
         ToEndpointComponent,
         ToEndpointDetailComponent,
-        ToEndpointDialogComponent,
+        ToEndpointUpdateComponent,
         ToEndpointDeleteDialogComponent,
-        ToEndpointPopupComponent,
-        ToEndpointDeletePopupComponent,
+        ToEndpointDeletePopupComponent
     ],
-    entryComponents: [
-        ToEndpointComponent,
-        ToEndpointDialogComponent,
-        ToEndpointPopupComponent,
-        ToEndpointDeleteDialogComponent,
-        ToEndpointDeletePopupComponent,
-    ],
+    entryComponents: [ToEndpointComponent, ToEndpointUpdateComponent, ToEndpointDeleteDialogComponent, ToEndpointDeletePopupComponent],
     providers: [
         Components,
-        ToEndpointService,
-        ToEndpointPopupService,
+        ToEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

@@ -10,7 +10,7 @@
         
         <addForeignKeyConstraint baseColumnNames="service_id"
                                  baseTableName="service_keys"
-                                 constraintName="fk_service_keys_header_id"
+                                 constraintName="fk_service_keys_service_id"
                                  referencedColumnNames="id"
                                  referencedTableName="service"/>
 

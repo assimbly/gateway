@@ -1,13 +1,12 @@
 package org.assimbly.gateway.repository;
 
 import org.assimbly.gateway.domain.Maintenance;
-import org.springframework.stereotype.Repository;
-
 import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.Repository;
 
 
 /**
- * Spring Data JPA repository for the Maintenance entity.
+ * Spring Data  repository for the Maintenance entity.
  */
 @SuppressWarnings("unused")
 @Repository

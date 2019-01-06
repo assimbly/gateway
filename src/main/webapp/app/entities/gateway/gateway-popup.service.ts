@@ -1,10 +1,10 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Gateway } from './gateway.model';
 import { GatewayService } from './gateway.service';
+import { Gateway } from "app/shared/model/gateway.model";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class GatewayPopupService {
     private ngbModalRef: NgbModalRef;
 
@@ -26,7 +26,7 @@ export class GatewayPopupService {
 
             if (id) {
                 this.gatewayService.find(id).subscribe((gateway) => {
-                    this.ngbModalRef = this.gatewayModalRef(component, gateway);
+                    this.ngbModalRef = this.gatewayModalRef(component, gateway.body);
                     resolve(this.ngbModalRef);
                 });
             } else {

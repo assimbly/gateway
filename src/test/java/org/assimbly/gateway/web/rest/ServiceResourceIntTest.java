@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Service;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.service.mapper.ServiceMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -21,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +56,9 @@ public class ServiceResourceIntTest {
     private ServiceMapper serviceMapper;
 
     @Autowired
+    private ServiceService serviceService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -64,6 +70,9 @@ public class ServiceResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restServiceMockMvc;
 
     private Service service;
@@ -71,12 +80,13 @@ public class ServiceResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ServiceResource serviceResource = new ServiceResource(serviceRepository, serviceMapper);
+        final ServiceResource serviceResource = new ServiceResource(serviceService);
         this.restServiceMockMvc = MockMvcBuilders.standaloneSetup(serviceResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -151,7 +161,7 @@ public class ServiceResourceIntTest {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getService() throws Exception {
@@ -180,18 +190,19 @@ public class ServiceResourceIntTest {
     public void updateService() throws Exception {
         // Initialize the database
         serviceRepository.saveAndFlush(service);
+
         int databaseSizeBeforeUpdate = serviceRepository.findAll().size();
 
         // Update the service
-        Service updatedService = serviceRepository.findOne(service.getId());
+        Service updatedService = serviceRepository.findById(service.getId()).get();
         // Disconnect from session so that the updates on updatedService are not directly saved in db
         em.detach(updatedService);
         updatedService
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE);
-        ServiceDTO serviceDTO = serviceMapper.toDto(service);
+        ServiceDTO serviceDTO = serviceMapper.toDto(updatedService);
 
-		restServiceMockMvc.perform(put("/api/services")
+        restServiceMockMvc.perform(put("/api/services")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceDTO)))
             .andExpect(status().isOk());
@@ -212,15 +223,15 @@ public class ServiceResourceIntTest {
         // Create the Service
         ServiceDTO serviceDTO = serviceMapper.toDto(service);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restServiceMockMvc.perform(put("/api/services")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(serviceDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Service in the database
         List<Service> serviceList = serviceRepository.findAll();
-        assertThat(serviceList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(serviceList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -228,6 +239,7 @@ public class ServiceResourceIntTest {
     public void deleteService() throws Exception {
         // Initialize the database
         serviceRepository.saveAndFlush(service);
+
         int databaseSizeBeforeDelete = serviceRepository.findAll().size();
 
         // Get the service

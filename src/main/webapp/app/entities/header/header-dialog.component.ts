@@ -1,17 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { Header } from './header.model';
-import { HeaderKeys } from '../header-keys/header-keys.model';
-import { HeaderPopupService } from './header-popup.service';
+import { IHeader, Header } from 'app/shared/model/header.model';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
-import { ResponseWrapper } from '../../shared';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
+import { filter } from "rxjs/operators";
+import { HeaderPopupService } from "app/entities/header";
 
 @Component({
     selector: 'jhi-header-dialog',
@@ -19,8 +19,8 @@ import { HeaderKeysService } from '../header-keys/header-keys.service';
 })
 export class HeaderDialogComponent implements OnInit {
 
-    header: Header;
-    headers: Header[];
+    header: IHeader;
+    headers: IHeader[];
     headerNames: Array<string> = [];
     headerKeys: Array<HeaderKeys> = [];
     headerKeysKeys: Array<String> = [];
@@ -41,11 +41,11 @@ export class HeaderDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            (res) => {
+                this.headers = res.body;
                 this.headerNames = this.headers.map((h) => h.name);
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res) => this.onError(res.body)
         );
         this.loadHeaderKeys(this.route.fragment['value'] === 'clone');
     }
@@ -111,16 +111,7 @@ export class HeaderDialogComponent implements OnInit {
     private loadHeaderKeys(cloneHeader: boolean) {
         if (this.header.id) {
             this.headerKeysService.query().subscribe((res) => {
-                this.headerKeys = res.json.filter((hk) => hk.headerId === this.header.id);
-                this.headerKeys.forEach((headerKey) => {
-                    headerKey.id = cloneHeader ? null : headerKey.id;
-                });
-                if (this.headerKeys.length === 0) {
-                    let hk = new HeaderKeys();
-                    hk.type = this.typeHeader[0];
-                    this.headerKeys.push(hk);
-                }
-                this.header.id = cloneHeader ? null : this.header.id;
+                this.headerKeys = res.body;
             });
         }else {
             let hk = new HeaderKeys();
@@ -129,13 +120,20 @@ export class HeaderDialogComponent implements OnInit {
             this.header.id = cloneHeader ? null : this.header.id;
         }
     }
-
-    private subscribeToSaveResponse(result: Observable<Header>, closePopup: boolean) {
-        result.subscribe((res: Header) =>
-            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
+    
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeader>>,closePopup) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,closePopup);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
+    
 
-    private onSaveSuccess(result: Header, closePopup: boolean) {
+    private onSaveSuccess(result: IHeader, closePopup: boolean) {
         this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
         this.eventManager.broadcast({ name: 'headerModified', content: result.id });
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
@@ -146,11 +144,11 @@ export class HeaderDialogComponent implements OnInit {
             headerKey.headerId = result.id;
             if (headerKey.id) {
                 this.headerKeysService.update(headerKey).subscribe((hk) => {
-                    headerKey = hk;
+                    headerKey = hk.body;
                 });
             } else {
                 this.headerKeysService.create(headerKey).subscribe((hk) => {
-                    headerKey = hk;
+                    headerKey = hk.body;
                 });
             }
         });

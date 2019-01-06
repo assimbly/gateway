@@ -3,7 +3,6 @@ package org.assimbly.gateway.config.environment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.docconverter.DocConverter;
@@ -20,6 +19,7 @@ import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +36,6 @@ import org.w3c.dom.Node;
 public class DBExportXMLConfiguration {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
-
-	private TreeMap<String, String> properties;
 
 	public String options;
 	public String componentType;
@@ -61,9 +59,6 @@ public class DBExportXMLConfiguration {
 
 	private Set<ToEndpoint> toEndpoints;
 
-	private org.assimbly.gateway.domain.Service service;
-
-	private Header header;
 	public String xmlConfiguration;
 	private Element rootElement;
 	private Document doc;
@@ -82,15 +77,11 @@ public class DBExportXMLConfiguration {
 
 	private Node environmentVariablesList;
 
-	private List<TreeMap<String, String>> propertiesList;
-
 	public String getXMLConfiguration(Long gatewayId) throws Exception {
-
-		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 
 		setXMLGeneralPropertiesFromDB(gatewayId);
 
-		System.out.println("x1");
+		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 
 		for (Flow flow : flows) {
 			if (flow != null) {
@@ -106,7 +97,7 @@ public class DBExportXMLConfiguration {
 
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
-		Flow flow = flowRepository.findOne(id);
+		Flow flow = flowRepository.findById(id).get();
 
 		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
 
@@ -152,7 +143,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
 
 		connectorId = gatewayId.toString();
-		Gateway gateway = gatewayRepository.findOne(gatewayId);
+		Gateway gateway = gatewayRepository.findById(gatewayId).get();
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -234,7 +225,7 @@ public class DBExportXMLConfiguration {
 		flow.appendChild(name);
 
 		// set name
-		String flowOffloading = flowDB.isOffloading().toString();
+		String flowOffloading = flowDB.isOffLoading().toString();
 		Element offloading = doc.createElement("offloading");
 		offloading.appendChild(doc.createTextNode(flowOffloading));
 		flow.appendChild(offloading);
@@ -638,6 +629,7 @@ public class DBExportXMLConfiguration {
 			Set<HeaderKeys> headerKeys = headerDB.getHeaderKeys();
 
 			for (HeaderKeys headerKey : headerKeys) {
+
 				String parameterName = headerKey.getKey();
 				String parameterValue = headerKey.getValue();
 				String parameterType = headerKey.getType();

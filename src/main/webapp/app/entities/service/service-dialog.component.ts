@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { Service } from './service.model';
-import { ServicePopupService } from './service-popup.service';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
+
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
-import { ServiceKeys, RequiredServiceKey } from '../service-keys';
-import { ResponseWrapper } from '../../shared';
+import { RequiredServiceKey } from '../service-keys';
+import { ServicePopupService } from "app/entities/service/service-popup.service";
 
 @Component({
     selector: 'jhi-service-dialog',
@@ -32,12 +33,12 @@ export class ServiceDialogComponent implements OnInit {
 
     constructor(
         public activeModal: NgbActiveModal,
-        private serviceService: ServiceService,
-        private serviceKeysService: ServiceKeysService,
-        private eventManager: JhiEventManager,
-        private jhiAlertService: JhiAlertService,
-        private route: ActivatedRoute,
-        private router: Router
+        protected serviceService: ServiceService,
+        protected serviceKeysService: ServiceKeysService,
+        protected eventManager: JhiEventManager,
+        protected jhiAlertService: JhiAlertService,
+        protected activatedRoute: ActivatedRoute,
+        protected router: Router
     ) {
     }
 
@@ -45,17 +46,22 @@ export class ServiceDialogComponent implements OnInit {
         this.isSaving = false;
         this.addRequiredServiceKeys();
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.servicesNames = res.json.map((s) => s.name)
-            },
-            (res: ResponseWrapper) => this.onError(res.json)
-        );
-        if (this.route.fragment['value'] && this.route.fragment['value'] !== 'clone') {
-            this.service.type = this.typeServices.find((st) => st === this.route.fragment['value']);
-            this.disableType = this.typeServices.some((st) => st === this.route.fragment['value']);
+                (res) => {
+                    this.servicesNames = res.body.map((s) => s.name)
+                },
+                (res) => this.onError(res.body)
+        );        
+        if (this.activatedRoute.fragment['value'] && this.activatedRoute.fragment['value'] !== 'clone') {
+            this.service.type = this.typeServices.find((st) => st === this.activatedRoute.fragment['value']);
+            this.disableType = this.typeServices.some((st) => st === this.activatedRoute.fragment['value']);
         }
 
-        this.loadServiceKeys(this.route.fragment['value'] === 'clone');
+        if (this.activatedRoute.fragment['value'] === 'clone') {
+            this.loadServiceKeys(true);
+        }else{
+            this.loadServiceKeys(false);
+        }
+        
     }
 
     changeType(cloneHeader: boolean) {
@@ -67,15 +73,18 @@ export class ServiceDialogComponent implements OnInit {
                 ), 1)[0])
             });
         }
-
-        this.requiredType = this.requiredServiceKey.find((x) => x.name === this.service.type);
+        
+        this.requiredType = this.requiredServiceKey.find(x => x.name === this.service.type);
+        
         const requiredServiceKeys =  new Array<ServiceKeys>();
         this.requiredType.serviceKeys.forEach((sk) => {
-            let ersk = this.serviceKeys.find((s) => s.key === sk.serviceKeyName);
+            let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
-            if (ersk instanceof ServiceKeys) {
-                rsk = ersk;
-                this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+            if(typeof ersk !== 'undefined'){
+                if (ersk.value !== '') {
+                    rsk = ersk;
+                    this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
+                }
             }
             rsk.id = cloneHeader ? null : rsk.id;
             rsk.key = sk.serviceKeyName;
@@ -102,18 +111,18 @@ export class ServiceDialogComponent implements OnInit {
         }
     }
 
-    clear() {
-        this.activeModal.dismiss('cancel');
+    previousState() {
+        window.history.back();
     }
 
     save(closePopup: boolean) {
         this.isSaving = true;
         if (this.service.id !== undefined) {
             this.subscribeToSaveResponse(
-                this.serviceService.update(this.service), closePopup);
+                this.serviceService.update(this.service));
         } else {
             this.subscribeToSaveResponse(
-                this.serviceService.create(this.service), closePopup);
+                this.serviceService.create(this.service));
         }
     }
 
@@ -121,6 +130,11 @@ export class ServiceDialogComponent implements OnInit {
         this.serviceKeysService.delete(serviceKey.id).subscribe(() => {
             this.removeServiceKeys(this.serviceKeys.indexOf(serviceKey));
         })
+    }
+    
+    clear() {
+        console.log("clear");
+        this.activeModal.dismiss('cancel');
     }
 
     navigateToService() {
@@ -140,7 +154,7 @@ export class ServiceDialogComponent implements OnInit {
     private loadServiceKeys(cloneHeader: boolean) {
         if (this.service.id) {
             this.serviceKeysService.query().subscribe((res) => {
-                this.serviceKeys = res.json.filter((sk) => sk.serviceId === this.service.id);
+                this.serviceKeys = res.body.filter((sk) => sk.serviceId === this.service.id);
                 this.changeType(cloneHeader);
                 this.service.id = cloneHeader ? null : this.service.id;
             });
@@ -157,9 +171,15 @@ export class ServiceDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<Service>, closePopup: boolean) {
-        result.subscribe((res: Service) =>
-            this.onSaveSuccess(res, closePopup), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IService>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,true);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: Service, closePopup: boolean) {
@@ -177,11 +197,11 @@ export class ServiceDialogComponent implements OnInit {
             serviceKey.serviceId = result.id;
             if (serviceKey.id) {
                 this.serviceKeysService.update(serviceKey).subscribe((sk) => {
-                    serviceKey = sk;
+                    serviceKey = sk.body;
                 });
             } else {
                 this.serviceKeysService.create(serviceKey).subscribe((sk) => {
-                    serviceKey = sk;
+                    serviceKey = sk.body;
                 })
             }
         });

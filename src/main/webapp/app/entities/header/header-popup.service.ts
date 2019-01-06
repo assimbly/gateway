@@ -1,8 +1,8 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Header } from './header.model';
 import { HeaderService } from './header.service';
+import { Header } from "app/shared/model/header.model";
 
 @Injectable()
 export class HeaderPopupService {
@@ -26,7 +26,7 @@ export class HeaderPopupService {
 
             if (id) {
                 this.headerService.find(id).subscribe((header) => {
-                    this.ngbModalRef = this.headerModalRef(component, header);
+                    this.ngbModalRef = this.headerModalRef(component, header.body);
                     resolve(this.ngbModalRef);
                 });
             } else {

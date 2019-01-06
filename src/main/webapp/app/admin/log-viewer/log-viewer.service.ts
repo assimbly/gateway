@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable } from '../../../../../../node_modules/rxjs';
-import { SERVER_API_URL } from '../../app.constants';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { SERVER_API_URL } from 'app/app.constants';
+import { Observable } from "rxjs";
 
 @Injectable()
 export class LogViewerService {
 
     private gatewayid = 1;
 
-    constructor(private http: Http) { }
+    constructor(protected http: HttpClient) { }
 
-    getLogs(lines: number): Observable<any> {
-        return this.http.get(`${SERVER_API_URL}/api/environment/${this.gatewayid}/log/${lines}`);
+    getLogs(lines: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${SERVER_API_URL}/api/environment/${this.gatewayid}/log/${lines}`, { observe: 'response', responseType: 'text'});
     }
 }

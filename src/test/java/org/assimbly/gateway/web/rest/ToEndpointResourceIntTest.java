@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.ToEndpointRepository;
+import org.assimbly.gateway.service.ToEndpointService;
 import org.assimbly.gateway.service.dto.ToEndpointDTO;
 import org.assimbly.gateway.service.mapper.ToEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -21,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class ToEndpointResourceIntTest {
 
-    private static final EndpointType DEFAULT_TYPE = EndpointType.SONICMQ;
-    private static final EndpointType UPDATED_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType DEFAULT_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType UPDATED_TYPE = EndpointType.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -57,6 +60,9 @@ public class ToEndpointResourceIntTest {
     private ToEndpointMapper toEndpointMapper;
 
     @Autowired
+    private ToEndpointService toEndpointService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -68,6 +74,9 @@ public class ToEndpointResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restToEndpointMockMvc;
 
     private ToEndpoint toEndpoint;
@@ -75,12 +84,13 @@ public class ToEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ToEndpointResource toEndpointResource = new ToEndpointResource(toEndpointRepository, toEndpointMapper);
+        final ToEndpointResource toEndpointResource = new ToEndpointResource(toEndpointService, toEndpointRepository, toEndpointMapper);
         this.restToEndpointMockMvc = MockMvcBuilders.standaloneSetup(toEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -109,7 +119,7 @@ public class ToEndpointResourceIntTest {
 
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
-        restToEndpointMockMvc.perform(post("/api/to-endpoint")
+        restToEndpointMockMvc.perform(post("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isCreated());
@@ -158,7 +168,7 @@ public class ToEndpointResourceIntTest {
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getToEndpoint() throws Exception {
@@ -166,7 +176,7 @@ public class ToEndpointResourceIntTest {
         toEndpointRepository.saveAndFlush(toEndpoint);
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(get("/api/to-endpoint/{id}", toEndpoint.getId()))
+        restToEndpointMockMvc.perform(get("/api/to-endpoints/{id}", toEndpoint.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(toEndpoint.getId().intValue()))
@@ -188,10 +198,11 @@ public class ToEndpointResourceIntTest {
     public void updateToEndpoint() throws Exception {
         // Initialize the database
         toEndpointRepository.saveAndFlush(toEndpoint);
+
         int databaseSizeBeforeUpdate = toEndpointRepository.findAll().size();
 
         // Update the toEndpoint
-        ToEndpoint updatedToEndpoint = toEndpointRepository.findOne(toEndpoint.getId());
+        ToEndpoint updatedToEndpoint = toEndpointRepository.findById(toEndpoint.getId()).get();
         // Disconnect from session so that the updates on updatedToEndpoint are not directly saved in db
         em.detach(updatedToEndpoint);
         updatedToEndpoint
@@ -200,7 +211,7 @@ public class ToEndpointResourceIntTest {
             .options(UPDATED_OPTIONS);
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(updatedToEndpoint);
 
-        restToEndpointMockMvc.perform(put("/api/to-endpoint")
+        restToEndpointMockMvc.perform(put("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
             .andExpect(status().isOk());
@@ -222,15 +233,15 @@ public class ToEndpointResourceIntTest {
         // Create the ToEndpoint
         ToEndpointDTO toEndpointDTO = toEndpointMapper.toDto(toEndpoint);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
-        restToEndpointMockMvc.perform(put("/api/to-endpoint")
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restToEndpointMockMvc.perform(put("/api/to-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(toEndpointDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the ToEndpoint in the database
         List<ToEndpoint> toEndpointList = toEndpointRepository.findAll();
-        assertThat(toEndpointList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(toEndpointList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -238,10 +249,11 @@ public class ToEndpointResourceIntTest {
     public void deleteToEndpoint() throws Exception {
         // Initialize the database
         toEndpointRepository.saveAndFlush(toEndpoint);
+
         int databaseSizeBeforeDelete = toEndpointRepository.findAll().size();
 
         // Get the toEndpoint
-        restToEndpointMockMvc.perform(delete("/api/to-endpoint/{id}", toEndpoint.getId())
+        restToEndpointMockMvc.perform(delete("/api/to-endpoints/{id}", toEndpoint.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 

@@ -1,13 +1,12 @@
 package org.assimbly.gateway.repository;
 
 import org.assimbly.gateway.domain.WireTapEndpoint;
-import org.springframework.stereotype.Repository;
-
 import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.Repository;
 
 
 /**
- * Spring Data JPA repository for the WireTapEndpoint entity.
+ * Spring Data  repository for the WireTapEndpoint entity.
  */
 @SuppressWarnings("unused")
 @Repository

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Account, Principal, AccountService, LoginService } from '../../shared';
 import { FlowService } from './flow.service';
 import { flowExamples } from '../../shared/camel/component-type';
+import { map } from "rxjs/operators";
 
 @Component({
     selector: 'jhi-flow-editor-mode',
@@ -47,21 +47,11 @@ export class FlowEditorModeComponent implements OnInit {
 
     constructor(
         private flowService: FlowService,
-        private accountService: AccountService,
-        private loginService: LoginService,
-        private router: Router,
-        private principal: Principal
+        private router: Router
     ) {
     }
 
     ngOnInit() {
-
-        this.principal.identity(true).then((account) => {
-            if (!this.principal.isAuthenticated()) {
-                this.logout();
-            }
-        });
-
         this.flowExampleListName = this.flowExamples.map((x) => x.name).filter((v, i, a) => a.indexOf(v) === i);
         this.flowExampleListType = this.flowExamples.map((x) => x.flowtypeFile).filter((v, i, a) => a.indexOf(v) === i);
         this.selectedFlowExample.flowtypeFile = 'XML';
@@ -167,9 +157,9 @@ export class FlowEditorModeComponent implements OnInit {
                 return;
         }
 
+        /*
         this.flowService.setConfiguration(this.flowId, this.xmlEditor, this.mediaType)
-            .map((response) => response.text())
-            .subscribe((config) => {
+            .pipe(map(config => {
                 this.configuration = config;
                 this.showInfoMessage(true);
 
@@ -186,22 +176,21 @@ export class FlowEditorModeComponent implements OnInit {
                 let obj = JSON.parse(convert.xml2json(err.text(), { compact: true, spaces: 4 }));
                 let errMessage = obj.response.message._text;
                 this.showInfoMessage(false, errMessage);
-            });
-
+            }));
+             */
     }
 
     saveFlows() {
         this.flowService.saveFlows(this.flowId, this.xmlEditor, 'application/xml')
-            .map((response) => response.text())
-            .subscribe((response) => {
+            .pipe(map(response =>  {
                 this.configuration = response;
                 this.showInfoMessage(true);
             }, (err) => {
                 let convert = require('xml-js');
-                let obj = JSON.parse(convert.xml2json(err.text(), { compact: true, spaces: 4 }));
+                let obj = JSON.parse(convert.xml2json(err, { compact: true, spaces: 4 }));
                 let errMessage = obj.response.message._text;
                 this.showInfoMessage(false, errMessage);
-            });
+            }));
     }
 
     showInfoMessage(isSuccess, errMessage?: string) {
@@ -290,7 +279,6 @@ export class FlowEditorModeComponent implements OnInit {
     }
 
     logout() {
-        this.loginService.logout();
         this.router.navigate(['']);
     }
 }

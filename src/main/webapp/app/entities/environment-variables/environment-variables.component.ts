@@ -1,41 +1,55 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { EnvironmentVariables } from './environment-variables.model';
+import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { AccountService } from 'app/core';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-environment-variables',
     templateUrl: './environment-variables.component.html'
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
-environmentVariables: EnvironmentVariables[];
+    
+    environmentVariables: IEnvironmentVariables[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
+    //sorting
+    predicate: any;
+    reverse: any;
+    page: any;
+
     constructor(
-        private environmentVariablesService: EnvironmentVariablesService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
+        protected environmentVariablesService: EnvironmentVariablesService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
     ) {
+        this.page = 0;
+        this.predicate = 'key';
+        this.reverse = true;
     }
 
     loadAll() {
-        this.environmentVariablesService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.environmentVariables = res.json;
+        this.environmentVariablesService.query({
+            page: this.page,
+            sort: this.sort()
+        }).subscribe(
+            (res: HttpResponse<IEnvironmentVariables[]>) => {
+                this.environmentVariables = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
+
     ngOnInit() {
-        this.loadAll();
-        this.principal.identity().then((account) => {
+        this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
+        this.loadAll();
         this.registerChangeInEnvironmentVariables();
     }
 
@@ -43,14 +57,30 @@ environmentVariables: EnvironmentVariables[];
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: EnvironmentVariables) {
+    trackId(index: number, item: IEnvironmentVariables) {
         return item.id;
     }
+
     registerChangeInEnvironmentVariables() {
-        this.eventSubscriber = this.eventManager.subscribe('environmentVariablesListModification', (response) => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('environmentVariablesListModification', response => this.loadAll());
     }
 
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
     }
+    
+    sort() {
+        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+        if (this.predicate !== 'key') {
+            result.push('key');
+        }
+        return result;
+    }
+    
+    reset() {
+        this.page = 0;
+        this.environmentVariables = [];
+        this.loadAll();
+    }
+
 }

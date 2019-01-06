@@ -4,6 +4,9 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.WireTapEndpoint;
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
+import org.assimbly.gateway.service.WireTapEndpointService;
+import org.assimbly.gateway.service.dto.WireTapEndpointDTO;
+import org.assimbly.gateway.service.mapper.WireTapEndpointMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -19,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class WireTapEndpointResourceIntTest {
 
-    private static final EndpointType DEFAULT_TYPE = EndpointType.SONICMQ;
-    private static final EndpointType UPDATED_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType DEFAULT_TYPE = EndpointType.ACTIVEMQ;
+    private static final EndpointType UPDATED_TYPE = EndpointType.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -50,6 +55,12 @@ public class WireTapEndpointResourceIntTest {
 
     @Autowired
     private WireTapEndpointRepository wireTapEndpointRepository;
+
+    @Autowired
+    private WireTapEndpointMapper wireTapEndpointMapper;
+
+    @Autowired
+    private WireTapEndpointService wireTapEndpointService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -63,6 +74,9 @@ public class WireTapEndpointResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restWireTapEndpointMockMvc;
 
     private WireTapEndpoint wireTapEndpoint;
@@ -70,12 +84,13 @@ public class WireTapEndpointResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final WireTapEndpointResource wireTapEndpointResource = new WireTapEndpointResource(wireTapEndpointRepository, null);
+        final WireTapEndpointResource wireTapEndpointResource = new WireTapEndpointResource(wireTapEndpointService);
         this.restWireTapEndpointMockMvc = MockMvcBuilders.standaloneSetup(wireTapEndpointResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -103,9 +118,10 @@ public class WireTapEndpointResourceIntTest {
         int databaseSizeBeforeCreate = wireTapEndpointRepository.findAll().size();
 
         // Create the WireTapEndpoint
+        WireTapEndpointDTO wireTapEndpointDTO = wireTapEndpointMapper.toDto(wireTapEndpoint);
         restWireTapEndpointMockMvc.perform(post("/api/wire-tap-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpoint)))
+            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpointDTO)))
             .andExpect(status().isCreated());
 
         // Validate the WireTapEndpoint in the database
@@ -124,11 +140,12 @@ public class WireTapEndpointResourceIntTest {
 
         // Create the WireTapEndpoint with an existing ID
         wireTapEndpoint.setId(1L);
+        WireTapEndpointDTO wireTapEndpointDTO = wireTapEndpointMapper.toDto(wireTapEndpoint);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restWireTapEndpointMockMvc.perform(post("/api/wire-tap-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpoint)))
+            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpointDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the WireTapEndpoint in the database
@@ -151,7 +168,7 @@ public class WireTapEndpointResourceIntTest {
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
     }
-
+    
     @Test
     @Transactional
     public void getWireTapEndpoint() throws Exception {
@@ -181,20 +198,22 @@ public class WireTapEndpointResourceIntTest {
     public void updateWireTapEndpoint() throws Exception {
         // Initialize the database
         wireTapEndpointRepository.saveAndFlush(wireTapEndpoint);
+
         int databaseSizeBeforeUpdate = wireTapEndpointRepository.findAll().size();
 
         // Update the wireTapEndpoint
-        WireTapEndpoint updatedWireTapEndpoint = wireTapEndpointRepository.findOne(wireTapEndpoint.getId());
+        WireTapEndpoint updatedWireTapEndpoint = wireTapEndpointRepository.findById(wireTapEndpoint.getId()).get();
         // Disconnect from session so that the updates on updatedWireTapEndpoint are not directly saved in db
         em.detach(updatedWireTapEndpoint);
         updatedWireTapEndpoint
             .type(UPDATED_TYPE)
             .uri(UPDATED_URI)
             .options(UPDATED_OPTIONS);
+        WireTapEndpointDTO wireTapEndpointDTO = wireTapEndpointMapper.toDto(updatedWireTapEndpoint);
 
         restWireTapEndpointMockMvc.perform(put("/api/wire-tap-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(updatedWireTapEndpoint)))
+            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpointDTO)))
             .andExpect(status().isOk());
 
         // Validate the WireTapEndpoint in the database
@@ -212,16 +231,17 @@ public class WireTapEndpointResourceIntTest {
         int databaseSizeBeforeUpdate = wireTapEndpointRepository.findAll().size();
 
         // Create the WireTapEndpoint
+        WireTapEndpointDTO wireTapEndpointDTO = wireTapEndpointMapper.toDto(wireTapEndpoint);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restWireTapEndpointMockMvc.perform(put("/api/wire-tap-endpoints")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpoint)))
-            .andExpect(status().isCreated());
+            .content(TestUtil.convertObjectToJsonBytes(wireTapEndpointDTO)))
+            .andExpect(status().isBadRequest());
 
         // Validate the WireTapEndpoint in the database
         List<WireTapEndpoint> wireTapEndpointList = wireTapEndpointRepository.findAll();
-        assertThat(wireTapEndpointList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(wireTapEndpointList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -229,6 +249,7 @@ public class WireTapEndpointResourceIntTest {
     public void deleteWireTapEndpoint() throws Exception {
         // Initialize the database
         wireTapEndpointRepository.saveAndFlush(wireTapEndpoint);
+
         int databaseSizeBeforeDelete = wireTapEndpointRepository.findAll().size();
 
         // Get the wireTapEndpoint
@@ -254,5 +275,28 @@ public class WireTapEndpointResourceIntTest {
         assertThat(wireTapEndpoint1).isNotEqualTo(wireTapEndpoint2);
         wireTapEndpoint1.setId(null);
         assertThat(wireTapEndpoint1).isNotEqualTo(wireTapEndpoint2);
+    }
+
+    @Test
+    @Transactional
+    public void dtoEqualsVerifier() throws Exception {
+        TestUtil.equalsVerifier(WireTapEndpointDTO.class);
+        WireTapEndpointDTO wireTapEndpointDTO1 = new WireTapEndpointDTO();
+        wireTapEndpointDTO1.setId(1L);
+        WireTapEndpointDTO wireTapEndpointDTO2 = new WireTapEndpointDTO();
+        assertThat(wireTapEndpointDTO1).isNotEqualTo(wireTapEndpointDTO2);
+        wireTapEndpointDTO2.setId(wireTapEndpointDTO1.getId());
+        assertThat(wireTapEndpointDTO1).isEqualTo(wireTapEndpointDTO2);
+        wireTapEndpointDTO2.setId(2L);
+        assertThat(wireTapEndpointDTO1).isNotEqualTo(wireTapEndpointDTO2);
+        wireTapEndpointDTO1.setId(null);
+        assertThat(wireTapEndpointDTO1).isNotEqualTo(wireTapEndpointDTO2);
+    }
+
+    @Test
+    @Transactional
+    public void testEntityFromId() {
+        assertThat(wireTapEndpointMapper.fromId(42L).getId()).isEqualTo(42);
+        assertThat(wireTapEndpointMapper.fromId(null)).isNull();
     }
 }

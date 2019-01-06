@@ -1,51 +1,39 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { PopoverModule } from 'ngx-bootstrap';
-
-import { GatewaySharedModule } from '../../shared';
-import { Components } from '../../shared/camel/component-type';
+import { Components } from 'app/shared/camel/component-type';
+import { GatewaySharedModule } from "app/shared";
 
 import {
-    GatewayService,
-    GatewayPopupService,
     GatewayComponent,
+    GatewayService,
     GatewayDetailComponent,
-    GatewayDialogComponent,
-    GatewayPopupComponent,
+    GatewayUpdateComponent,
     GatewayDeletePopupComponent,
     GatewayDeleteDialogComponent,
     GatewayImportPopupComponent,
     GatewayImportDialogComponent,
     gatewayRoute,
     gatewayPopupRoute,
+    GatewayPopupService
 } from './';
 
-const ENTITY_STATES = [
-    ...gatewayRoute,
-    ...gatewayPopupRoute,
-];
+const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES),
-        PopoverModule.forRoot(),
-    ],
+    imports: [GatewaySharedModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         GatewayComponent,
         GatewayDetailComponent,
-        GatewayDialogComponent,
+        GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
-        GatewayPopupComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
         GatewayImportDialogComponent
     ],
     entryComponents: [
         GatewayComponent,
-        GatewayDialogComponent,
-        GatewayPopupComponent,
+		GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
@@ -54,8 +42,8 @@ const ENTITY_STATES = [
     providers: [
         Components,
         GatewayService,
-        GatewayPopupService,
+        GatewayPopupService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayGatewayModule { }
+export class GatewayGatewayModule {}

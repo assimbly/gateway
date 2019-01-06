@@ -1,27 +1,31 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
 
-import { Flow } from './flow.model';
+import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { FromEndpoint } from 'app/shared/model/from-endpoint.model';
+import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
+import { Gateway } from 'app/shared/model/gateway.model';
+
 import { FlowService } from './flow.service';
-import { FromEndpoint, FromEndpointService } from '../from-endpoint';
-import { ToEndpoint, ToEndpointService } from '../to-endpoint';
-import { ErrorEndpoint, ErrorEndpointService } from '../error-endpoint';
-import { GatewayService, Gateway } from '../gateway';
+import { FromEndpointService } from '../from-endpoint';
+import { ToEndpointService } from '../to-endpoint';
+import { ErrorEndpointService } from '../error-endpoint';
+import { GatewayService} from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { forkJoin } from 'rxjs';
 
 import { EndpointType, typesLinks } from '../../shared/camel/component-type';
+import { JhiEventManager } from "ng-jhipster";
+import { Subscription } from "rxjs";
 
 @Component({
     selector: 'jhi-flow-detail',
     templateUrl: './flow-detail.component.html',
     providers: [NgbTabsetConfig]
 })
-export class FlowDetailComponent implements OnInit, OnDestroy {
-
-    flow: Flow;
+export class FlowDetailComponent implements OnInit {
+    flow: IFlow;
     gateway: Gateway;
     fromEndpoint: FromEndpoint;
     toEndpoints: Array<ToEndpoint>;
@@ -42,38 +46,37 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
     private camelDocUrl: string;
 
     constructor(
-        public tabsetConfig: NgbTabsetConfig,
-        private gatewayService: GatewayService,
-        private fromEndpointService: FromEndpointService,
-        private toEndpointService: ToEndpointService,
-        private errorEndpointService: ErrorEndpointService,
-        private eventManager: JhiEventManager,
-        private flowService: FlowService,
-        private route: ActivatedRoute
-    ) {
+		public tabsetConfig: NgbTabsetConfig,
+        protected gatewayService: GatewayService,
+        protected fromEndpointService: FromEndpointService,
+        protected toEndpointService: ToEndpointService,
+        protected errorEndpointService: ErrorEndpointService,
+        protected eventManager: JhiEventManager,
+        protected flowService: FlowService,
+		protected activatedRoute: ActivatedRoute
+	){
         tabsetConfig.justify = 'fill';
-    }
+	}
 
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ flow }) => {
+            this.flow = flow;
         });
-        this.registerChangeInFlows();
     }
-
+    
     load(id) {
         forkJoin([this.flowService.getWikiDocUrl(), this.flowService.getCamelDocUrl()])
             .subscribe((results) => {
-                this.wikiDocUrl = results[0].text();
-                this.camelDocUrl = results[1].text();
+                this.wikiDocUrl = results[0].url;
+                this.camelDocUrl = results[1].url;
             });
 
         this.flowService.find(id).subscribe((flow) => {
-            this.flow = flow;
-            this.getGateway(flow.gatewayId);
-            this.getFromEndpoint(flow.fromEndpointId);
-            this.getToEndpointByFlowId(flow.id);
-            this.getErrorEndpoint(flow.errorEndpointId);
+            this.flow = flow.body;
+            this.getGateway(flow.body.gatewayId);
+            this.getFromEndpoint(flow.body.fromEndpointId);
+            this.getToEndpointByFlowId(flow.body.id);
+            this.getErrorEndpoint(flow.body.errorEndpointId);
         });
     }
 
@@ -81,15 +84,15 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
         if (!id) { return; }
 
         this.gatewayService.find(id)
-            .subscribe((gateway) => this.gateway = gateway);
+            .subscribe(gateway => this.gateway = gateway.body);
     }
 
     getFromEndpoint(id) {
         if (!id) { return; }
 
         this.fromEndpointService.find(id)
-            .subscribe((fromEndpoint) => {
-                this.fromEndpoint = fromEndpoint;
+            .subscribe(fromEndpoint => {
+                this.fromEndpoint = fromEndpoint.body;
                 this.setTypeLinks(this.fromEndpoint);
             });
     }
@@ -98,8 +101,9 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
         if (!id) { return; }
 
         this.toEndpointService.findByFlowId(id)
-            .subscribe((toEndpoints) => {
-                this.toEndpoints = toEndpoints;
+            .subscribe(toEndpoints => {
+                
+                this.toEndpoints = toEndpoints.body;
                 this.toEndpoints.forEach((toEndpoint) => {
                     this.setTypeLinks(toEndpoint);
                 });
@@ -111,7 +115,7 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
 
         this.errorEndpointService.find(id)
             .subscribe((errorEndpoint) => {
-                this.errorEndpoint = errorEndpoint;
+                this.errorEndpoint = errorEndpoint.body;
                 this.setTypeLinks(this.errorEndpoint);
             });
     }

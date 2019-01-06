@@ -1,44 +1,55 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+
+import { Service } from 'app/shared/model/service.model';
+import { Observable } from 'rxjs';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ServiceKeys } from './service-keys.model';
-import { Service } from '../service/service.model';
+import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
+import { AccountService } from 'app/core';
 import { ServiceKeysService } from './service-keys.service';
-import { Principal } from '../../shared';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'jhi-service-keys',
     templateUrl: './service-keys.component.html'
 })
 export class ServiceKeysComponent implements OnInit, OnChanges {
-    @Input() serviceKeys: Array<ServiceKeys> = [];
+    @Input() serviceKeys: Array<IServiceKeys> = [];
     @Input() service: Service;
 
     serviceKeysKeys: Array<string> = [];
-    currentAccount: any;
     isSaving: boolean;
-    serviceKey: ServiceKeys;
+    serviceKey: IServiceKeys;
+    currentAccount: any;
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
     listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
 
     constructor(
-        private serviceKeysService: ServiceKeysService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
-        private principal: Principal
-    ) {
-    }
-    ngOnInit() {
-        this.addRequiredServiceKeys();
-        this.principal.identity().then((account) => {
-            this.currentAccount = account;
-        });
-        this.eventManager.subscribe('serviceKeyDeleted', (res) => this.updateServiceKeys(res.content));
+        protected serviceKeysService: ServiceKeysService,
+        protected jhiAlertService: JhiAlertService,
+        protected eventManager: JhiEventManager,
+        protected accountService: AccountService
+    ) {}
+
+    loadAll() {
+        this.serviceKeysService.query().subscribe(
+            (res: HttpResponse<IServiceKeys[]>) => {
+                this.serviceKeys = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
     }
 
+    ngOnInit() {
+        this.loadAll();
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+        });
+        this.registerChangeInServiceKeys();
+    }
+    
     addRequiredServiceKeys() {
         this.requiredServiceKey.push(
             {
@@ -181,10 +192,15 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<ServiceKeys>, isCreate: boolean, i: number) {
-        result.subscribe((res: ServiceKeys) =>
-            this.onSaveSuccess(res, isCreate, i), (res: Response) => this.onSaveError());
-    }
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IServiceKeys>>,isCreate: boolean, i: number) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body,isCreate,i);
+            }
+            }    
+        )
+    }    
+    
     cloneServiceKey(serviceKey: ServiceKeys) {
         const serviceKeyForClone = new ServiceKeys(
             null,
@@ -194,18 +210,19 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             false,
             true,
             null,
-            null,
-            serviceKey.serviceId);
+            null,                    
+            serviceKey.serviceId,
+            );
         this.serviceKeys.push(serviceKeyForClone);
     }
-    private onSaveSuccess(result: ServiceKeys, isCreate: boolean, i: number) {
+    private onSaveSuccess(result: IServiceKeys, isCreate: boolean, i: number) {
         result.isRequired = this.requiredServiceKey.find((rsk) => rsk.name === this.service.type).serviceKeys.some((sk) => sk.serviceKeyName === result.key);
 
         if (isCreate) {
             result.isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
         } else {
-            this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
+            //this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
         this.mapServiceKeysKeys();
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });
@@ -215,13 +232,24 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         this.isSaving = false;
     }
 
-    trackId(index: number, item: ServiceKeys) {
+    ngOnDestroy() {
+        this.eventManager.destroy(this.eventSubscriber);
+    }
+
+    trackId(index: number, item: IServiceKeys) {
         return item.id;
     }
-    private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+
+    registerChangeInServiceKeys() {
+        this.eventSubscriber = this.eventManager.subscribe('serviceKeysListModification', response => this.loadAll());
     }
+
+    protected onError(errorMessage: string) {
+        this.jhiAlertService.error(errorMessage, null, null);
+    }
+
 }
+
 export interface RequiredServiceKey {
     name: string;
     serviceKeys: Array<ServiceKeyInformation>;

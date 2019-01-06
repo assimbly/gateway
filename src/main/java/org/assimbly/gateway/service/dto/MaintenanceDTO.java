@@ -1,10 +1,7 @@
 package org.assimbly.gateway.service.dto;
 
-
 import java.time.Instant;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -19,8 +16,10 @@ public class MaintenanceDTO implements Serializable {
     private Instant endTime;
 
     private Instant duration;
-    
-    private String frequency;    
+
+    private String frequency;
+
+    private Long flowId;
 
     public Long getId() {
         return id;
@@ -61,7 +60,15 @@ public class MaintenanceDTO implements Serializable {
     public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
-    
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -72,7 +79,7 @@ public class MaintenanceDTO implements Serializable {
         }
 
         MaintenanceDTO maintenanceDTO = (MaintenanceDTO) o;
-        if(maintenanceDTO.getId() == null || getId() == null) {
+        if (maintenanceDTO.getId() == null || getId() == null) {
             return false;
         }
         return Objects.equals(getId(), maintenanceDTO.getId());
@@ -89,6 +96,9 @@ public class MaintenanceDTO implements Serializable {
             "id=" + getId() +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +
+            ", duration='" + getDuration() + "'" +
+            ", frequency='" + getFrequency() + "'" +
+            ", flow=" + getFlowId() +
             "}";
     }
 }

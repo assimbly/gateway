@@ -47,24 +47,24 @@
 	</ng-template>
 	<p>
 	<h4 class="float-left">
-		<span class="badge badge-success" *ngIf="statusFlow === 'active'"
+	  <span class="badge badge-success" *ngIf="statusFlow === 'active'"
 			(mouseenter)="p!=p" triggers="mouseenter"
 			placement="right" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Active</span>
+			[ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">Active</span>
 			 <span
 			class="badge badge-warning" *ngIf="statusFlow === 'paused'"
 			(mouseenter)="p!=p" placement="right"
 			triggers="mouseenter" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Paused</span> 
+			[ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">Paused</span> 
 			<span
 			class="badge badge-primary" *ngIf="statusFlow === 'inactive'"
 			(mouseenter)="p!=p" placement="right" popoverTitle="Status" triggers="mouseenter"
-			[popover]="statusFlowButtonTemplate">Inactive</span>
+			[ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">Inactive</span>
 			 <span
 			class="badge badge-danger" *ngIf="statusFlow === 'inactiveError'"
 			(mouseenter)="p!=p" placement="right"
 			triggers="mouseenter" popoverTitle="Status"
-			[popover]="statusFlowButtonTemplate">Inactive</span>
+			[ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">Inactive</span>
 	</h4>
 	<ng-template #alertsFlowButtonTemplate let-message="message">
 	<div [innerHtml]="flowAlertsButton"></div>
@@ -74,7 +74,7 @@
 			class="badge badge-warning" *ngIf="flowAlerts === 'true'"
 			(mouseenter)="p!=p" placement="right" on-mouseover='getFlowAlerts(flow.id)'
 			triggers="mouseenter" popoverTitle="Show last alerts"
-			[popover]="alertsFlowButtonTemplate">{{numberOfAlerts}} Alerts</span>
+			[ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">{{numberOfAlerts}} Alerts</span>
 	</h4>
 	</p>	
 	   </div>

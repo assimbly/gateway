@@ -8,19 +8,19 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Flow and its DTO FlowDTO.
  */
-@Mapper(componentModel = "spring", uses = {GatewayMapper.class, FromEndpointMapper.class, ErrorEndpointMapper.class, MaintenanceMapper.class})
+@Mapper(componentModel = "spring", uses = {GatewayMapper.class, FromEndpointMapper.class, ErrorEndpointMapper.class})
 public interface FlowMapper extends EntityMapper<FlowDTO, Flow> {
 
     @Mapping(source = "gateway.id", target = "gatewayId")
     @Mapping(source = "fromEndpoint.id", target = "fromEndpointId")
     @Mapping(source = "errorEndpoint.id", target = "errorEndpointId")
-    @Mapping(source = "maintenance.id", target = "maintenanceId")
+    //@Mapping(source = "maintenance.id", target = "maintenanceId")
     FlowDTO toDto(Flow flow);
 
     @Mapping(source = "gatewayId", target = "gateway")
     @Mapping(source = "fromEndpointId", target = "fromEndpoint")
     @Mapping(source = "errorEndpointId", target = "errorEndpoint")
-    @Mapping(source = "maintenanceId", target = "maintenance")    
+    //@Mapping(source = "maintenanceId", target = "maintenance")    
     @Mapping(target = "toEndpoints", ignore = true)
     Flow toEntity(FlowDTO flowDTO);
 

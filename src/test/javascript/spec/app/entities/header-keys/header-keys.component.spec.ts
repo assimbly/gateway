@@ -1,56 +1,51 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
-import { Headers } from '@angular/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Observable, of } from 'rxjs';
+import { HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysComponent } from '../../../../../../main/webapp/app/entities/header-keys/header-keys.component';
-import { HeaderKeysService } from '../../../../../../main/webapp/app/entities/header-keys/header-keys.service';
-import { HeaderKeys } from '../../../../../../main/webapp/app/entities/header-keys/header-keys.model';
+import { HeaderKeysComponent } from 'app/entities/header-keys/header-keys.component';
+import { HeaderKeysService } from 'app/entities/header-keys/header-keys.service';
+import { HeaderKeys } from 'app/shared/model/header-keys.model';
 
 describe('Component Tests', () => {
-
     describe('HeaderKeys Management Component', () => {
         let comp: HeaderKeysComponent;
         let fixture: ComponentFixture<HeaderKeysComponent>;
         let service: HeaderKeysService;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
                 declarations: [HeaderKeysComponent],
-                providers: [
-                    HeaderKeysService
-                ]
+                providers: []
             })
-            .overrideTemplate(HeaderKeysComponent, '')
-            .compileComponents();
-        }));
+                .overrideTemplate(HeaderKeysComponent, '')
+                .compileComponents();
 
-        beforeEach(() => {
             fixture = TestBed.createComponent(HeaderKeysComponent);
             comp = fixture.componentInstance;
             service = fixture.debugElement.injector.get(HeaderKeysService);
         });
 
-        describe('OnInit', () => {
-            it('Should call load all on init', () => {
-                // GIVEN
-                const headers = new Headers();
-                headers.append('link', 'link;link');
-                spyOn(service, 'query').and.returnValue(Observable.of({
-                    json: [new HeaderKeys(123)],
-                    headers
-                }));
+        it('Should call load all on init', () => {
+            // GIVEN
+            const headers = new HttpHeaders().append('link', 'link;link');
+            spyOn(service, 'query').and.returnValue(
+                of(
+                    new HttpResponse({
+                        body: [new HeaderKeys(123)],
+                        headers
+                    })
+                )
+            );
 
-                // WHEN
-                comp.ngOnInit();
+            // WHEN
+            comp.ngOnInit();
 
-                // THEN
-                expect(service.query).toHaveBeenCalled();
-                expect(comp.headerKeys[0]).toEqual(jasmine.objectContaining({id: 123}));
-            });
+            // THEN
+            expect(service.query).toHaveBeenCalled();
+            expect(comp.headerKeys[0]).toEqual(jasmine.objectContaining({ id: 123 }));
         });
     });
-
 });

@@ -13,22 +13,25 @@
     <div class="table-responsive" *ngIf="flows">
         <table class="table table-striped">
             <thead>
-                <tr>
-                    <th>
+                <tr class="d-flex" jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+                    <th class="col-1">
                         <button *ngIf="!allSelected" type="button" class="btn btn-primary btn-sm" (click)="selectAll()">Select all</button>
                         <button *ngIf="allSelected" type="button" class="btn btn-primary btn-sm" (click)="deselectAll()">Deselect all</button>
                     </th>
-                    <th>Flow name</th>
-                    <th></th>
+                    <th class="col-3" jhiSortBy="name">                   
+                         <span>Flow</span>
+                         <span class="fa fa-sort"></span>
+                    </th>
+                    <th class="col-8">Time</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let flow of flows; let i = index">
-                    <td>
+                <tr class="d-flex" *ngFor="let flow of flows; let i = index">
+                    <td class="col-sm-1">
                         <input [checked]="selectedFlows[i]" type="checkbox" name="flow.name" (change)="select($event, i, flow)" [disabled]="disableFlows[i]">
                     </td>
-                    <td>{{flow.name}}</td>
-                    <td>
+                    <td class="col-sm-3">{{flow.name}}</td>
+                    <td class="col-sm-8">
                         <div *ngIf="!!maintenanceTimers[i]" class="text-center">{{messageFlow}}
                             <strong>{{maintenanceTimers[i]}}</strong>
                         </div>

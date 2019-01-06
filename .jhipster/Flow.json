@@ -1,5 +1,19 @@
 {
-    "fluentMethods": true,
+    "name": "Flow",
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "autoStart",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "offLoading",
+            "fieldType": "Boolean"
+        }
+    ],
     "relationships": [
         {
             "relationshipName": "gateway",
@@ -13,7 +27,7 @@
             "otherEntityName": "fromEndpoint",
             "otherEntityField": "id",
             "ownerSide": true,
-            "otherEntityRelationshipName": "flowRoute"
+            "otherEntityRelationshipName": "flow"
         },
         {
             "relationshipType": "one-to-one",
@@ -21,33 +35,22 @@
             "otherEntityName": "errorEndpoint",
             "otherEntityField": "id",
             "ownerSide": true,
-            "otherEntityRelationshipName": "flowRoute"
+            "otherEntityRelationshipName": "flow"
         },
         {
             "relationshipType": "one-to-many",
             "relationshipName": "toEndpoint",
             "otherEntityName": "toEndpoint",
-            "otherEntityRelationshipName": "flowRoute"
-        }
-    ],
-    "fields": [
-        {
-            "fieldName": "name",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "autoStart",
-            "fieldType": "Boolean"
-        },
-        {
-            "fieldName": "offloading",
-            "fieldType": "Boolean"
+            "otherEntityRelationshipName": "flow"
         }
     ],
     "changelogDate": "20180114132915",
+    "entityTableName": "flow",
     "dto": "mapstruct",
-    "service": "no",
-    "entityTableName": "flow_route",
+    "pagination": "infinite-scroll",
+    "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
-    "pagination": "infinite-scroll"
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
 }

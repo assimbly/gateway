@@ -1,14 +1,10 @@
 <div>
-    <button class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/', { outlets: { popup: ['service-new'] } }]">
-        <span class="fa fa-plus"></span>
-        <span>
-            Create Service
-        </span>
-    </button>
-    <button class="btn btn-primary" [routerLink]="['/service', 'all']">All services</button>
-    <br/>
-    <h2>
+    <h2 id="page-heading">
         <span>Services</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/service/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
+            <span >Create Service</span>
+        </button>
     </h2>
     <br/>
     <div class="form-group">
@@ -31,8 +27,6 @@
             </div>
         </div>
     </div>
-    <!-- <jhi-alert></jhi-alert> -->
-    <br/>
 </div>
 
 <jhi-service-keys *ngIf="services.length > 0" [serviceKeys]="serviceKeys" [service]="selectedService">Loading routes...</jhi-service-keys>

@@ -8,22 +8,16 @@ import { GatewaySharedModule } from '../../shared';
 import { Components } from '../../shared/camel/component-type';
 
 import {
-    ErrorEndpointService,
-    ErrorEndpointPopupService,
     ErrorEndpointComponent,
     ErrorEndpointDetailComponent,
-    ErrorEndpointDialogComponent,
-    ErrorEndpointPopupComponent,
+    ErrorEndpointUpdateComponent,
     ErrorEndpointDeletePopupComponent,
     ErrorEndpointDeleteDialogComponent,
     errorEndpointRoute,
-    errorEndpointPopupRoute,
+    errorEndpointPopupRoute
 } from './';
 
-const ENTITY_STATES = [
-    ...errorEndpointRoute,
-    ...errorEndpointPopupRoute,
-];
+const ENTITY_STATES = [...errorEndpointRoute, ...errorEndpointPopupRoute];
 
 @NgModule({
     imports: [
@@ -39,23 +33,20 @@ const ENTITY_STATES = [
     declarations: [
         ErrorEndpointComponent,
         ErrorEndpointDetailComponent,
-        ErrorEndpointDialogComponent,
+        ErrorEndpointUpdateComponent,
         ErrorEndpointDeleteDialogComponent,
-        ErrorEndpointPopupComponent,
-        ErrorEndpointDeletePopupComponent,
+        ErrorEndpointDeletePopupComponent
     ],
     entryComponents: [
         ErrorEndpointComponent,
-        ErrorEndpointDialogComponent,
-        ErrorEndpointPopupComponent,
+        ErrorEndpointUpdateComponent,
         ErrorEndpointDeleteDialogComponent,
         ErrorEndpointDeletePopupComponent,
     ],
     providers: [
         Components,
-        ErrorEndpointService,
-        ErrorEndpointPopupService,
+        ErrorEndpointDeletePopupComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayErrorEndpointModule { }
+export class GatewayErrorEndpointModule {}

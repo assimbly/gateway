@@ -1,19 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
-import { FromEndpoint } from './from-endpoint.model';
-import { FromEndpointPopupService } from './from-endpoint-popup.service';
+import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
+import { IService } from 'app/shared/model/service.model';
+import { IHeader } from 'app/shared/model/header.model';
+
 import { FromEndpointService } from './from-endpoint.service';
-import { Service, ServiceService } from '../service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
+
+import { ServiceService } from '../service';
+import { HeaderService } from '../header';
 import { EndpointType, Components } from '../../shared/camel/component-type';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'jhi-from-endpoint-dialog',
@@ -21,12 +23,12 @@ import { EndpointType, Components } from '../../shared/camel/component-type';
 })
 export class FromEndpointDialogComponent implements OnInit {
 
-    fromEndpoint: FromEndpoint;
+    fromEndpoint: IFromEndpoint;
     isSaving: boolean;
 
-    services: Service[];
+    services: IService[];
 
-    headers: Header[];
+    headers: IHeader[];
 
     constructor(
         public activeModal: NgbActiveModal,
@@ -43,34 +45,34 @@ export class FromEndpointDialogComponent implements OnInit {
         this.isSaving = false;
         this.serviceService
             .query({filter: 'fromendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe((res) => {
                 if (!this.fromEndpoint.serviceId) {
-                    this.services = res.json;
+                    this.services = res.body;
                 } else {
                     this.serviceService
                         .find(this.fromEndpoint.serviceId)
-                        .subscribe((subRes: Service) => {
-                            res.json.some((s) => s.id === subRes.id) ?
-                                this.services = res.json :
-                                this.services = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe((subRes: HttpResponse<IService>) => {
+                            res.body.some((s) => s.id === subRes.body.id) ?
+                                this.services = res.body :
+                                this.services.push(subRes.body);
+                        }, (subRes) => this.onError(subRes.json));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, (res) => this.onError(res.json));
         this.headerService
             .query({filter: 'fromendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe((res) => {
                 if (!this.fromEndpoint.headerId) {
-                    this.headers = res.json;
+                    this.headers = res.body;
                 } else {
                     this.headerService
                         .find(this.fromEndpoint.headerId)
-                        .subscribe((subRes: Header) => {
-                            res.json.some((s) => s.id === subRes.id) ?
-                                this.headers = res.json :
-                                this.headers = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe((subRes: HttpResponse<IHeader>) => {
+                            res.body.some((s) => s.id === subRes.body.id) ?
+                                this.services = res.body :
+                                this.services.push(subRes.body);
+                        }, (subRes) => this.onError(subRes.json));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, (res) => this.onError(res.json));
     }
     clear() {
         this.activeModal.dismiss('cancel');
@@ -87,12 +89,18 @@ export class FromEndpointDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<FromEndpoint>) {
-        result.subscribe((res: FromEndpoint) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IFromEndpoint>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
-    private onSaveSuccess(result: FromEndpoint) {
+    private onSaveSuccess(result: IFromEndpoint) {
         this.eventManager.broadcast({ name: 'fromEndpointListModification', content: 'OK'});
         this.isSaving = false;
         this.activeModal.dismiss(result);
@@ -106,11 +114,11 @@ export class FromEndpointDialogComponent implements OnInit {
         this.jhiAlertService.error(error.message, null, null);
     }
 
-    trackServiceById(index: number, item: Service) {
+    trackServiceById(index: number, item: IService) {
         return item.id;
     }
 
-    trackHeaderById(index: number, item: Header) {
+    trackHeaderById(index: number, item: IHeader) {
         return item.id;
     }
 }
@@ -124,20 +132,11 @@ export class FromEndpointPopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(
-        private route: ActivatedRoute,
-        private fromEndpointPopupService: FromEndpointPopupService
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
-                this.fromEndpointPopupService
-                    .open(FromEndpointDialogComponent as Component, params['id']);
-            } else {
-                this.fromEndpointPopupService
-                    .open(FromEndpointDialogComponent as Component);
-            }
-        });
+        
     }
 
     ngOnDestroy() {

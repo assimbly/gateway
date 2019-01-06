@@ -11,9 +11,7 @@
 					</div>
 					<div class="card-block pt-4">
 						<blockquote class="card-blockquote">
-							<p class="tab">	Gateway <a
-									[routerLink]="['/', { outlets: { popup: 'gateway/'+ singleGatewayId + '/edit'} }]"
-									replaceUrl="true">default</a> has been created on first start.
+							<p class="tab">	Gateway <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">default</a> has been created on first start.
 								This message gateway can run one or more flows.
 							</p>
 							<br />
@@ -36,10 +34,10 @@
         </div>
         <ng-template #oneGateway>
             <div *ngIf="flows?.length > 0">
-                <span><h6>Showing flows on stage {{singleGatewayStage}} for gateway: <a [routerLink]="['/', { outlets: { popup: 'gateway/'+ singleGatewayId + '/edit'} }]" replaceUrl="true" >{{singleGatewayName}}</a></h6></span>
+                <span><h6>Showing flows on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a></h6></span>
             </div>
             <div *ngIf="flows?.length === 0">
-                <span><h6>No flows yet on stage {{singleGatewayStage}} for gateway: <a [routerLink]="['/', { outlets: { popup: 'gateway/'+ singleGatewayId + '/edit'} }]" replaceUrl="true" >{{singleGatewayName}}</a>.</h6></span>
+                <span><h6>No flows yet on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a>.</h6></span>
             </div>
         </ng-template>
     </ng-template>

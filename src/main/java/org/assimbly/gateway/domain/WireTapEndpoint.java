@@ -1,5 +1,6 @@
 package org.assimbly.gateway.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -35,9 +36,11 @@ public class WireTapEndpoint implements Serializable {
     private String options;
 
     @ManyToOne
+    @JsonIgnoreProperties("")
     private Service service;
 
     @ManyToOne
+    @JsonIgnoreProperties("")
     private Header header;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

@@ -1,13 +1,10 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.HeaderKeys;
-
-import org.assimbly.gateway.repository.HeaderKeysRepository;
+import org.assimbly.gateway.service.HeaderKeysService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.HeaderKeysDTO;
-import org.assimbly.gateway.service.mapper.HeaderKeysMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +28,10 @@ public class HeaderKeysResource {
 
     private static final String ENTITY_NAME = "headerKeys";
 
-    private final HeaderKeysRepository headerKeysRepository;
+    private final HeaderKeysService headerKeysService;
 
-    private final HeaderKeysMapper headerKeysMapper;
-
-    public HeaderKeysResource(HeaderKeysRepository headerKeysRepository, HeaderKeysMapper headerKeysMapper) {
-        this.headerKeysRepository = headerKeysRepository;
-        this.headerKeysMapper = headerKeysMapper;
+    public HeaderKeysResource(HeaderKeysService headerKeysService) {
+        this.headerKeysService = headerKeysService;
     }
 
     /**
@@ -54,9 +48,7 @@ public class HeaderKeysResource {
         if (headerKeysDTO.getId() != null) {
             throw new BadRequestAlertException("A new headerKeys cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        HeaderKeys headerKeys = headerKeysMapper.toEntity(headerKeysDTO);
-        headerKeys = headerKeysRepository.save(headerKeys);
-        HeaderKeysDTO result = headerKeysMapper.toDto(headerKeys);
+        HeaderKeysDTO result = headerKeysService.save(headerKeysDTO);
         return ResponseEntity.created(new URI("/api/header-keys/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -76,11 +68,9 @@ public class HeaderKeysResource {
     public ResponseEntity<HeaderKeysDTO> updateHeaderKeys(@RequestBody HeaderKeysDTO headerKeysDTO) throws URISyntaxException {
         log.debug("REST request to update HeaderKeys : {}", headerKeysDTO);
         if (headerKeysDTO.getId() == null) {
-            return createHeaderKeys(headerKeysDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        HeaderKeys headerKeys = headerKeysMapper.toEntity(headerKeysDTO);
-        headerKeys = headerKeysRepository.save(headerKeys);
-        HeaderKeysDTO result = headerKeysMapper.toDto(headerKeys);
+        HeaderKeysDTO result = headerKeysService.save(headerKeysDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, headerKeysDTO.getId().toString()))
             .body(result);
@@ -95,9 +85,8 @@ public class HeaderKeysResource {
     @Timed
     public List<HeaderKeysDTO> getAllHeaderKeys() {
         log.debug("REST request to get all HeaderKeys");
-        List<HeaderKeys> headerKeys = headerKeysRepository.findAll();
-        return headerKeysMapper.toDto(headerKeys);
-        }
+        return headerKeysService.findAll();
+    }
 
     /**
      * GET  /header-keys/:id : get the "id" headerKeys.
@@ -109,9 +98,8 @@ public class HeaderKeysResource {
     @Timed
     public ResponseEntity<HeaderKeysDTO> getHeaderKeys(@PathVariable Long id) {
         log.debug("REST request to get HeaderKeys : {}", id);
-        HeaderKeys headerKeys = headerKeysRepository.findOne(id);
-        HeaderKeysDTO headerKeysDTO = headerKeysMapper.toDto(headerKeys);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(headerKeysDTO));
+        Optional<HeaderKeysDTO> headerKeysDTO = headerKeysService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(headerKeysDTO);
     }
 
     /**
@@ -124,7 +112,7 @@ public class HeaderKeysResource {
     @Timed
     public ResponseEntity<Void> deleteHeaderKeys(@PathVariable Long id) {
         log.debug("REST request to delete HeaderKeys : {}", id);
-        headerKeysRepository.delete(id);
+        headerKeysService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

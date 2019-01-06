@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Response } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { ErrorEndpoint } from './error-endpoint.model';
-import { ErrorEndpointPopupService } from './error-endpoint-popup.service';
+import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 import { ErrorEndpointService } from './error-endpoint.service';
-import { Service, ServiceService } from '../service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
+import { ServiceService } from '../service';
+import { Service} from 'app/shared/model/service.model';
+import { Header} from 'app/shared/model/header.model';
+
+import { HeaderService } from '../header';
 import { EndpointType, Components } from '../../shared/camel/component-type';
 
 @Component({
@@ -42,30 +43,30 @@ export class ErrorEndpointDialogComponent implements OnInit {
         this.isSaving = false;
         this.serviceService
             .query({filter: 'errorendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe((res) => {
                 if (!this.errorEndpoint.serviceId) {
-                    this.services = res.json;
+                    this.services = res.body;
                 } else {
                     this.serviceService
                         .find(this.errorEndpoint.serviceId)
-                        .subscribe((subRes: Service) => {
-                            this.services = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe(subRes => {
+                            this.services.push(subRes.body);
+                        }, (subRes) => this.onError(subRes));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, (res) => this.onError(res.json));
         this.headerService
             .query({filter: 'errorendpoint-is-null'})
-            .subscribe((res: ResponseWrapper) => {
+            .subscribe((res) => {
                 if (!this.errorEndpoint.headerId) {
-                    this.headers = res.json;
+                    this.headers = res.body;
                 } else {
                     this.headerService
                         .find(this.errorEndpoint.headerId)
-                        .subscribe((subRes: Header) => {
-                            this.headers = [subRes].concat(res.json);
-                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
+                        .subscribe((subRes) => {
+                            this.headers.push(subRes.body);
+                        }, (subRes) => this.onError(subRes.json));
                 }
-            }, (res: ResponseWrapper) => this.onError(res.json));
+            }, (res) => this.onError(res.json));
     }
 
     clear() {
@@ -83,9 +84,15 @@ export class ErrorEndpointDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<ErrorEndpoint>) {
-        result.subscribe((res: ErrorEndpoint) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IErrorEndpoint>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: ErrorEndpoint) {
@@ -121,19 +128,9 @@ export class ErrorEndpointPopupComponent implements OnInit, OnDestroy {
 
     constructor(
         private route: ActivatedRoute,
-        private errorEndpointPopupService: ErrorEndpointPopupService
     ) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            if ( params['id'] ) {
-                this.errorEndpointPopupService
-                    .open(ErrorEndpointDialogComponent as Component, params['id']);
-            } else {
-                this.errorEndpointPopupService
-                    .open(ErrorEndpointDialogComponent as Component);
-            }
-        });
     }
 
     ngOnDestroy() {

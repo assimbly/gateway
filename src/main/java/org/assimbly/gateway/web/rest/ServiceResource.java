@@ -1,16 +1,18 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.gateway.domain.Service;
-
-import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.gateway.web.rest.util.PaginationUtil;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
-import org.assimbly.gateway.service.mapper.ServiceMapper;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +33,10 @@ public class ServiceResource {
 
     private static final String ENTITY_NAME = "service";
 
-    private final ServiceRepository serviceRepository;
+    private final ServiceService serviceService;
 
-    private final ServiceMapper serviceMapper;
-
-    public ServiceResource(ServiceRepository serviceRepository, ServiceMapper serviceMapper) {
-        this.serviceRepository = serviceRepository;
-        this.serviceMapper = serviceMapper;
+    public ServiceResource(ServiceService serviceService) {
+        this.serviceService = serviceService;
     }
 
     /**
@@ -54,9 +53,7 @@ public class ServiceResource {
         if (serviceDTO.getId() != null) {
             throw new BadRequestAlertException("A new service cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Service service = serviceMapper.toEntity(serviceDTO);
-        service = serviceRepository.save(service);
-        ServiceDTO result = serviceMapper.toDto(service);
+        ServiceDTO result = serviceService.save(serviceDTO);
         return ResponseEntity.created(new URI("/api/services/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -76,11 +73,9 @@ public class ServiceResource {
     public ResponseEntity<ServiceDTO> updateService(@RequestBody ServiceDTO serviceDTO) throws URISyntaxException {
         log.debug("REST request to update Service : {}", serviceDTO);
         if (serviceDTO.getId() == null) {
-            return createService(serviceDTO);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Service service = serviceMapper.toEntity(serviceDTO);
-        service = serviceRepository.save(service);
-        ServiceDTO result = serviceMapper.toDto(service);
+        ServiceDTO result = serviceService.save(serviceDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceDTO.getId().toString()))
             .body(result);
@@ -93,11 +88,12 @@ public class ServiceResource {
      */
     @GetMapping("/services")
     @Timed
-    public List<ServiceDTO> getAllServices() {
+    public ResponseEntity<List<ServiceDTO>> getAllServices(Pageable pageable) {
         log.debug("REST request to get all Services");
-        List<Service> services = serviceRepository.findAll();
-        return serviceMapper.toDto(services);
-        }
+        Page<ServiceDTO> page = serviceService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/services");
+        return ResponseEntity.ok().headers(headers).body(page.getContent());        
+    }
 
     /**
      * GET  /services/:id : get the "id" service.
@@ -109,9 +105,8 @@ public class ServiceResource {
     @Timed
     public ResponseEntity<ServiceDTO> getService(@PathVariable Long id) {
         log.debug("REST request to get Service : {}", id);
-        Service service = serviceRepository.findOne(id);
-        ServiceDTO serviceDTO = serviceMapper.toDto(service);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(serviceDTO));
+        Optional<ServiceDTO> serviceDTO = serviceService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(serviceDTO);
     }
 
     /**
@@ -124,7 +119,7 @@ public class ServiceResource {
     @Timed
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         log.debug("REST request to delete Service : {}", id);
-        serviceRepository.delete(id);
+        serviceService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

@@ -1,4 +1,4 @@
-entity MessageGateway {
+entity Gateway {
 	name String,
     type GatewayType,
 	environmentName String,
@@ -16,7 +16,8 @@ entity EnvironmentVariables {
 
 entity Flow {
 	name String,
-	autoStart Boolean	
+	autoStart Boolean,	
+	offLoading Boolean	
 }
 
 entity FromEndpoint {
@@ -71,16 +72,6 @@ entity Maintenance {
 	frequency String
 }
 
-entity Group {
-	name String,
-	createDate Instant
-}
-
-entity GroupMember {
-	userId Integer,
-	login String	
-}
-
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP
 }
@@ -98,15 +89,15 @@ enum EndpointType {
 }
 
 relationship OneToOne {
-	MessageGateway{wiretapEndpint} to WireTapEndpoint
+	Gateway{wiretapEndpoint} to WireTapEndpoint
 }
 
 relationship OneToMany {
-	MessageGateway{flow} to Flow
+	Gateway{flow} to Flow
 }
 
 relationship OneToMany {
-	MessageGateway{environmentVariables} to EnvironmentVariables
+	Gateway{environmentVariables} to EnvironmentVariables
 }
 
 relationship OneToOne {
@@ -147,15 +138,10 @@ relationship OneToOne {
 	Maintenance{flow} to Flow
 }
 
-relationship ManyToMany {
-	Group{groupMember} to GroupMember{group}
-}
-
-relationship ManyoMany {
-	Group{gateway} to Gateway{group}
-}
-
 // Set pagination options
 paginate Flow with infinite-scroll
 
 dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl

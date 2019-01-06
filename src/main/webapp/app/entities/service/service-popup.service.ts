@@ -1,8 +1,8 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Service } from './service.model';
 import { ServiceService } from './service.service';
+import { IService, Service } from "app/shared/model/service.model";
 
 @Injectable()
 export class ServicePopupService {
@@ -26,7 +26,7 @@ export class ServicePopupService {
 
             if (id) {
                 this.serviceService.find(id).subscribe((service) => {
-                    this.ngbModalRef = this.serviceModalRef(component, service);
+                    this.ngbModalRef = this.serviceModalRef(component, service.body);
                     resolve(this.ngbModalRef);
                 });
             } else {

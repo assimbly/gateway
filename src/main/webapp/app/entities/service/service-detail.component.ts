@@ -1,61 +1,58 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { JhiEventManager } from 'ng-jhipster';
 
-import { Service } from './service.model';
-import { ServiceService } from './service.service';
+import { IService } from 'app/shared/model/service.model';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
-import { ServiceKeys } from '../service-keys';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
+import { Service } from 'app/shared/model/service.model';
+import { Subscription } from "rxjs";
+import { JhiEventManager } from "ng-jhipster";
+import { ServiceService } from "app/entities/service";
 
 @Component({
     selector: 'jhi-service-detail',
     templateUrl: './service-detail.component.html'
 })
-export class ServiceDetailComponent implements OnInit, OnDestroy {
-
-    public service: Service;
-    public serviceKeys: Array<ServiceKeys>;
+export class ServiceDetailComponent implements OnInit {
+    service: IService;
+public serviceKeys: Array<ServiceKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
-        private eventManager: JhiEventManager,
-        private serviceService: ServiceService,
-        private serviceKeysService: ServiceKeysService,
-        private route: ActivatedRoute
-    ) {
-    }
+		protected eventManager: JhiEventManager,
+        protected serviceService: ServiceService,
+        protected serviceKeysService: ServiceKeysService,
+		protected activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
-        this.subscription = this.route.params.subscribe((params) => {
-            this.load(params['id']);
+        this.activatedRoute.data.subscribe(({ service }) => {
+            this.service = service;
         });
-        this.registerChangeInServices();
+    }
+
+    previousState() {
+        window.history.back();
     }
 
     private load(id) {
         this.serviceService.find(id).subscribe((service) => {
-            this.service = service;
+            this.service = service.body;
             this.loadServiceKeys(this.service.id);
         });
     }
 
     private loadServiceKeys(id: number) {
         this.serviceKeysService.query().subscribe((res) => {
-            this.serviceKeys = res.json.filter((sk) => sk.serviceId === id);
+            this.serviceKeys = res.body.filter((sk) => sk.serviceId === id);
         });
     }
-
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-        this.eventManager.destroy(this.eventSubscriber);
-    }
-
+    
     registerChangeInServices() {
         this.eventSubscriber = this.eventManager.subscribe(
             'serviceListModification',
             (response) => this.load(this.service.id)
         );
-    }
+    }     
+    
 }

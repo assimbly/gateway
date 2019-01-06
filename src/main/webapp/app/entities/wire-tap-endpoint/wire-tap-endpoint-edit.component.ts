@@ -1,28 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Response } from '@angular/http';
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { Observable, forkJoin } from 'rxjs';
 
-import { Observable } from 'rxjs/Observable';
+import {  } from 'rxjs/Observable';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { WireTapEndpoint } from './wire-tap-endpoint.model';
+import { IWireTapEndpoint, WireTapEndpoint, EndpointType } from 'app/shared/model/wire-tap-endpoint.model';
+import { IService, Service } from 'app/shared/model/service.model';
+import { IHeader, Header } from 'app/shared/model/header.model';
+
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
-import { Service, ServiceService } from '../service';
-import { Header, HeaderService } from '../header';
-import { ResponseWrapper } from '../../shared';
-import { Components, typesLinks, EndpointType } from '../../shared/camel/component-type';
+import { ServiceService } from '../service';
+import { HeaderService } from '../header';
+import { Components, typesLinks } from '../../shared/camel/component-type';
 import { FlowService } from '../flow/flow.service';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Option } from '../flow';
+import { HttpResponse } from "@angular/common/http";
 
 @Component({
     selector: 'jhi-wire-tap-endpoint-edit',
     templateUrl: './wire-tap-endpoint-edit.component.html'
 })
 export class WireTapEndpointEditComponent implements OnInit {
+    service: Service;
 
-    wireTapEndpoint: WireTapEndpoint;
+    wireTapEndpoint: IWireTapEndpoint;
     isSaving: boolean;
     typeCamelLink: string;
     wikiDocUrl: string;
@@ -54,8 +57,6 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     ngOnInit() {
         this.wireTapEndpoint = new WireTapEndpoint();
-        this.wireTapEndpoint.service = new Service();
-        this.wireTapEndpoint.header = new Header();
         this.isSaving = false;
         this.initializeEndpointData();
         this.route.params.subscribe((params) => {
@@ -72,13 +73,13 @@ export class WireTapEndpointEditComponent implements OnInit {
                 this.flowService.getWikiDocUrl(),
                 this.flowService.getCamelDocUrl()
             ).subscribe(([wireTapEndpoint, services, headers, wikiDocUrl, camelDocUrl]) => {
-                this.wireTapEndpoint = wireTapEndpoint;
-                this.services = services.json;
+                this.wireTapEndpoint = wireTapEndpoint.body;
+                this.services = services.body;
                 this.serviceCreated = this.services.length > 0;
-                this.headers = headers.json;
+                this.headers = headers.body;
                 this.headerCreated = this.headers.length > 0;
-                this.wikiDocUrl = wikiDocUrl.text();
-                this.camelDocUrl = camelDocUrl.text();
+                this.wikiDocUrl = wikiDocUrl.url;
+                this.camelDocUrl = camelDocUrl.url;
                 this.updateEndpointData();
                 this.setTypeLink();
                 this.getOptions();
@@ -91,12 +92,12 @@ export class WireTapEndpointEditComponent implements OnInit {
                 this.flowService.getCamelDocUrl()
             ).subscribe(([services, headers, wikiDocUrl, camelDocUrl]) => {
                 this.wireTapEndpoint.type = EndpointType.FILE;
-                this.services = services.json;
+                this.services = services.body;
                 this.serviceCreated = this.services.length > 0;
-                this.headers = headers.json;
+                this.headers = headers.body;
                 this.headerCreated = this.headers.length > 0;
-                this.wikiDocUrl = wikiDocUrl.text();
-                this.camelDocUrl = camelDocUrl.text();
+                this.wikiDocUrl = wikiDocUrl.url;
+                this.camelDocUrl = camelDocUrl.url;
                 this.updateEndpointData();
                 this.setTypeLink();
                 this.getOptions();
@@ -125,8 +126,8 @@ export class WireTapEndpointEditComponent implements OnInit {
         this.wireTapEndpoint.id = flowControls.id.value;
         this.wireTapEndpoint.type = flowControls.type.value;
         this.wireTapEndpoint.uri = flowControls.uri.value;
-        this.wireTapEndpoint.header.id = flowControls.header.value;
-        this.wireTapEndpoint.service.id = flowControls.service.value ? flowControls.service.value : null;
+        this.wireTapEndpoint.headerId = flowControls.header.value;
+        this.wireTapEndpoint.serviceId = flowControls.service.value ? flowControls.service.value : null;
     }
 
     setEndpointOptions() {
@@ -218,9 +219,9 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     createOrEditHeader() {
-        this.wireTapEndpoint.header.id = this.wireTapForm.controls.header.value;
-        (this.wireTapEndpoint.header.id) ?
-            this.router.navigate(['/', { outlets: { popup: 'header/' + this.wireTapEndpoint.header.id + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
+        this.wireTapEndpoint.headerId = this.wireTapForm.controls.header.value;
+        (this.wireTapEndpoint.headerId) ?
+            this.router.navigate(['/', { outlets: { popup: 'header/' + this.wireTapEndpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
             this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
 
         this.eventManager.subscribe(
@@ -231,20 +232,20 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     setHeader(id) {
         this.headerService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.headers = res.json;
+            res => {
+                this.headers = res.body;
                 this.headerCreated = this.headers.length > 0;
-                this.wireTapEndpoint.header.id = this.headers.find((h) => h.id === id.content).id;
-                this.wireTapForm.controls.header.patchValue(this.wireTapEndpoint.header.id);
+                this.wireTapEndpoint.headerId = this.headers.find((h) => h.id === id.content).id;
+                this.wireTapForm.controls.header.patchValue(this.wireTapEndpoint.headerId);
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            res => this.onError(res.body)
         );
     }
 
     createOrEditService() {
-        (typeof this.wireTapEndpoint.service.id === 'undefined' || this.wireTapEndpoint.service.id === null) ?
+        (typeof this.wireTapEndpoint.serviceId === 'undefined' || this.wireTapEndpoint.serviceId === null) ?
             this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: this.serviceType }) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + this.wireTapEndpoint.service.id + '/edit' } }], { fragment: this.serviceType });
+            this.router.navigate(['/', { outlets: { popup: 'service/' + this.wireTapEndpoint.serviceId + '/edit' } }], { fragment: this.serviceType });
         this.eventManager.subscribe(
             'serviceModified',
             (res) => this.setService(res)
@@ -253,22 +254,23 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     setService(id) {
         this.serviceService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.services = res.json;
+            res => {
+                this.services = res.body;
                 this.serviceCreated = this.services.length > 0;
-                this.wireTapEndpoint.service = this.services.find((s) => s.id === id.content);
-                this.wireTapForm.controls.service.patchValue(this.wireTapEndpoint.service);
+                this.service = this.services.find((s) => s.id === id.content);
+                this.wireTapEndpoint.serviceId = this.service.id;
+                this.wireTapForm.controls.service.patchValue(this.wireTapEndpoint.serviceId);
                 this.filterServices();
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            res => this.onError(res.json)
         );
     }
 
     filterServices() {
         this.serviceType = this.returnServiceType(this.wireTapEndpoint.type);
         this.filteredService = this.services.filter((f) => f.type === this.serviceType);
-        if (this.filteredService.length > 0 && this.wireTapEndpoint.service.id) {
-            this.wireTapForm.controls.service.setValue(this.filteredService.find((fs) => fs.id === this.wireTapEndpoint.service.id).id);
+        if (this.filteredService.length > 0 && this.wireTapEndpoint.serviceId) {
+            this.wireTapForm.controls.service.setValue(this.filteredService.find((fs) => fs.id === this.wireTapEndpoint.serviceId).id);
         }
     }
 
@@ -318,8 +320,8 @@ export class WireTapEndpointEditComponent implements OnInit {
             'options': new FormArray([
                 this.initializeOption()
             ]),
-            'service': new FormControl(this.wireTapEndpoint.service.id),
-            'header': new FormControl(this.wireTapEndpoint.header.id)
+            'service': new FormControl(this.wireTapEndpoint.serviceId),
+            'header': new FormControl(this.wireTapEndpoint.headerId)
         })
     }
 
@@ -340,22 +342,28 @@ export class WireTapEndpointEditComponent implements OnInit {
             });
         }
 
-        if (this.wireTapEndpoint.service !== null) {
+        if (this.wireTapEndpoint.serviceId !== null) {
             this.wireTapForm.patchValue({
-                'service': this.wireTapEndpoint.service.id,
+                'service': this.wireTapEndpoint.serviceId,
             });
         }
 
-        if (this.wireTapEndpoint.header !== null) {
+        if (this.wireTapEndpoint.headerId !== null) {
             this.wireTapForm.patchValue({
-                'header': this.wireTapEndpoint.header.id
+                'header': this.wireTapEndpoint.headerId
             });
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<WireTapEndpoint>) {
-        result.subscribe((res: WireTapEndpoint) =>
-            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IWireTapEndpoint>>) {
+        result.subscribe(data => {
+            if(data.ok){
+                this.onSaveSuccess(data.body);
+            }else{
+                this.onSaveError()
+            }
+            }    
+        )
     }
 
     private onSaveSuccess(result: WireTapEndpoint) {

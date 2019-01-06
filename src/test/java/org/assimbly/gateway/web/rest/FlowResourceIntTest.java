@@ -4,6 +4,7 @@ import org.assimbly.gateway.GatewayApp;
 
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.mapper.FlowMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
@@ -21,9 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static org.assimbly.gateway.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,14 +49,17 @@ public class FlowResourceIntTest {
     private static final Boolean DEFAULT_AUTO_START = false;
     private static final Boolean UPDATED_AUTO_START = true;
 
-    private static final Boolean DEFAULT_OFFLOADING = false;
-    private static final Boolean UPDATED_OFFLOADING = true;
+    private static final Boolean DEFAULT_OFF_LOADING = false;
+    private static final Boolean UPDATED_OFF_LOADING = true;
 
     @Autowired
     private FlowRepository flowRepository;
 
     @Autowired
     private FlowMapper flowMapper;
+
+    @Autowired
+    private FlowService flowService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -67,6 +73,9 @@ public class FlowResourceIntTest {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private Validator validator;
+
     private MockMvc restFlowMockMvc;
 
     private Flow flow;
@@ -74,12 +83,13 @@ public class FlowResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final FlowResource flowResource = new FlowResource(flowRepository, flowMapper);
+        final FlowResource flowResource = new FlowResource(flowService);
         this.restFlowMockMvc = MockMvcBuilders.standaloneSetup(flowResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+            .setMessageConverters(jacksonMessageConverter)
+            .setValidator(validator).build();
     }
 
     /**
@@ -92,7 +102,7 @@ public class FlowResourceIntTest {
         Flow flow = new Flow()
             .name(DEFAULT_NAME)
             .autoStart(DEFAULT_AUTO_START)
-            .offloading(DEFAULT_OFFLOADING);
+            .offLoading(DEFAULT_OFF_LOADING);
         return flow;
     }
 
@@ -119,7 +129,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
-        assertThat(testFlow.isOffloading()).isEqualTo(DEFAULT_OFFLOADING);
+        assertThat(testFlow.isOffLoading()).isEqualTo(DEFAULT_OFF_LOADING);
     }
 
     @Test
@@ -155,9 +165,9 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
-            .andExpect(jsonPath("$.[*].offloading").value(hasItem(DEFAULT_OFFLOADING.booleanValue())));
+            .andExpect(jsonPath("$.[*].offLoading").value(hasItem(DEFAULT_OFF_LOADING.booleanValue())));
     }
-
+    
     @Test
     @Transactional
     public void getFlow() throws Exception {
@@ -171,7 +181,7 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
-            .andExpect(jsonPath("$.offloading").value(DEFAULT_OFFLOADING.booleanValue()));
+            .andExpect(jsonPath("$.offLoading").value(DEFAULT_OFF_LOADING.booleanValue()));
     }
 
     @Test
@@ -187,16 +197,17 @@ public class FlowResourceIntTest {
     public void updateFlow() throws Exception {
         // Initialize the database
         flowRepository.saveAndFlush(flow);
+
         int databaseSizeBeforeUpdate = flowRepository.findAll().size();
 
         // Update the flow
-        Flow updatedFlow = flowRepository.findOne(flow.getId());
+        Flow updatedFlow = flowRepository.findById(flow.getId()).get();
         // Disconnect from session so that the updates on updatedFlow are not directly saved in db
         em.detach(updatedFlow);
         updatedFlow
             .name(UPDATED_NAME)
             .autoStart(UPDATED_AUTO_START)
-            .offloading(UPDATED_OFFLOADING);
+            .offLoading(UPDATED_OFF_LOADING);
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
@@ -210,7 +221,7 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
-        assertThat(testFlow.isOffloading()).isEqualTo(UPDATED_OFFLOADING);
+        assertThat(testFlow.isOffLoading()).isEqualTo(UPDATED_OFF_LOADING);
     }
 
     @Test
@@ -221,15 +232,15 @@ public class FlowResourceIntTest {
         // Create the Flow
         FlowDTO flowDTO = flowMapper.toDto(flow);
 
-        // If the entity doesn't have an ID, it will be created instead of just being updated
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restFlowMockMvc.perform(put("/api/flows")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Flow in the database
         List<Flow> flowList = flowRepository.findAll();
-        assertThat(flowList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(flowList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -237,6 +248,7 @@ public class FlowResourceIntTest {
     public void deleteFlow() throws Exception {
         // Initialize the database
         flowRepository.saveAndFlush(flow);
+
         int databaseSizeBeforeDelete = flowRepository.findAll().size();
 
         // Get the flow
