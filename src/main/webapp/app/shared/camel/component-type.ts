@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core'
 
 // add a new component here
+// 1) Add to the EndpointType list
+// 2) Add to typelinks for live documentation
+// 3) Add to differentEndpoint type (from/to/error)
 
 export enum EndpointType {
     ACTIVEMQ = 'ACTIVEMQ',
@@ -9,8 +12,10 @@ export enum EndpointType {
     FTP = 'FTP',
     FTPS = 'FTPS',
     HTTP4 = 'HTTP4',
+    HTTPS4 = 'HTTPS4',    
     IMAP = 'IMAP',
     IMAPS = 'IMAPS',
+    JETTY = 'JETTY',
     NETTY4 = 'NETTY4',
     KAFKA = 'KAFKA',
     REST = 'REST',
@@ -51,7 +56,7 @@ export const typesLinks = [
     {
         name: 'DIRECT',
         assimblyTypeLink: `/component-direct`,
-        camelTypeLink: `/camel-core/src/main/docs/direct-component.adoc`,
+        camelTypeLink: `/components/camel-direct/src/main/docs/direct-component.adoc`,
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
@@ -64,7 +69,7 @@ export const typesLinks = [
     {
         name: 'FILE',
         assimblyTypeLink: `/component-file`,
-        camelTypeLink: `/camel-core/src/main/docs/file-component.adoc`,
+        camelTypeLink: `/components/camel-file/src/main/docs/file-component.adoc`,
         uriPlaceholder: 'directoryName',
         uriPopoverMessage: `
         <b>Name</b>: directoryName<br/>
@@ -134,7 +139,20 @@ export const typesLinks = [
         <b>Description</b>: The url of the HTTP endpoint to call.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: http://servername:8080/orders<br/>
+        <b>Example</b>: servername:8080/orders<br/>
+    `
+    },
+    {
+        name: 'HTTPS4',
+        assimblyTypeLink: `/component-http4`,
+        camelTypeLink: `/components/camel-http4/src/main/docs/http4-component.adoc`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The url of the HTTPS endpoint to call.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/><br/>
+        <b>Example</b>: servername:443/orders<br/>
     `
     },
     {
@@ -171,6 +189,18 @@ export const typesLinks = [
         <b>Required</b>: no <br/>
         <b>Data Type</b>: Integer <br/><br/>
         <b>Example</b>: localhost:993<br/>
+    `
+    },
+    {
+        name: 'JETTY',
+        camelTypeLink: `/components/camel-jetty/src/main/docs/jetty-component.adoc`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The url of the HTTP(S) endpoint to call.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/><br/>
+        <b>Example</b>: http://servername:8080/orders<br/>
     `
     },
     {
@@ -212,7 +242,7 @@ export const typesLinks = [
     {
         name: 'REST',
         assimblyTypeLink: `/component-rest`,
-        camelTypeLink: `/camel-core/src/main/docs/rest-component.adoc`,
+        camelTypeLink: `/components/camel-rest/src/main/docs/rest-component.adoc`,
         uriPlaceholder: 'method:path:{uriTemplate}',
         uriPopoverMessage: `
         <b>Name</b>: method<br/>
@@ -375,7 +405,7 @@ export const typesLinks = [
     {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
-        camelTypeLink: `/components/camel-core/src/main/docs/vm-component.adoc`,
+        camelTypeLink: `/components/camel-vm/src/main/docs/vm-component.adoc`,
         uriPlaceholder: 'queueName',
         uriPopoverMessage: `
         <b>Name</b>: queueName<br/>
@@ -388,7 +418,7 @@ export const typesLinks = [
     {
         name: 'WASTEBIN',
         assimblyTypeLink: `/component-wastebin`,
-        camelTypeLink: `/camel-core/src/main/docs/mock-component.adoc`,
+        camelTypeLink: `/components//camel-mock/src/main/docs/mock-component.adoc`,
         uriPlaceholder: '',
         uriPopoverMessage: `
         <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
@@ -400,15 +430,15 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
+    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
         'SQL', 'STREAM', 'TELEGRAM', 'VM'];
 
-    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
+    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
         'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN'];
 
-    errorTypes = ['ACTIVEMQ', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
+    errorTypes = ['ACTIVEMQ', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
 
-    wireTapTypes = ['ACTIVEMQ', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
+    wireTapTypes = ['ACTIVEMQ', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'HTTPS4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
 
 }
 

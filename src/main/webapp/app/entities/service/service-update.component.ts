@@ -21,7 +21,7 @@ export class ServiceUpdateComponent implements OnInit {
     private serviceKeys: Array<ServiceKeys> = [];
     servicesNames: Array<String> = [];
     serviceKeysKeys: Array<String> = [];
-    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
+    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver','com.microsoft.sqlserver.jdbc.SQLServerDriver'];
     public disableType: boolean;
     public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
     private requiredServiceKey: Array<RequiredServiceKey> = [];

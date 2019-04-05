@@ -107,12 +107,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.subscribe('event');
         this.receive().subscribe(data => {
             const data2 = data.split(':');
-            if(data2[0]==='event'){
-                this.setFlowStatus(data2[1])
-            }else if(data2[0]==='alert'){
-                if (this.flow.id === data2[1]) {
-                    this.getFlowNumberOfAlerts(data[1]);
-                }    
+            if (Array.isArray(data2) || data2.length) {                
+                if(data2[0]==='event'){
+                    this.setFlowStatus(data2[1])
+                }else if(data2[0]==='alert'){
+                    const alertId = Number(data2[1])
+                    if (this.flow.id === alertId) {
+                        this.getFlowNumberOfAlerts(alertId);
+                    }    
+                }
             }
         });
     }
@@ -226,9 +229,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             let i;
             for (i = alertStartItem; i < flowAlertsList.length; i++) {
                 if (typeof alertItems !== 'undefined') {
-                    alertItems += `<a href="#" class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
+                    alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
                 } else {
-                    alertItems = `<a href="#" class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
+                    alertItems = `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
                 }
             }
 
@@ -307,6 +310,32 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     setFlowStatistic(res) {
+ 
+         /* Example Available stats
+          * 
+          * "maxProcessingTime": 1381,
+            "lastProcessingTime": 1146,
+            "meanProcessingTime": 1262,
+            "lastExchangeFailureExchangeId": "",
+            "firstExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
+            "firstExchangeCompletedExchangeId": "ID-win81-1553585873482-0-1",
+            "lastExchangeCompletedTimestamp": "2019-03-26T08:44:04.510+0100",
+            "exchangesCompleted": 3,
+            "deltaProcessingTime": -114,
+            "firstExchangeCompletedTimestamp": "2019-03-26T08:44:01.955+0100",
+            "externalRedeliveries": 0,
+            "firstExchangeFailureExchangeId": "",
+            "lastExchangeCompletedExchangeId": "ID-win81-1553585873482-0-9",
+            "lastExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
+            "exchangesFailed": 0,
+            "redeliveries": 0,
+            "minProcessingTime": 1146,
+            "resetTimestamp": "2019-03-26T08:43:59.201+0100",
+            "failuresHandled": 3,
+            "totalProcessingTime": 3787,
+            "startTimestamp": "2019-03-26T08:43:59.201+0100"
+         */       
+        
         if (res === 0) {
             this.flowStatistic = `Currently there are no statistics for this flow.`;
         } else {
@@ -315,25 +344,22 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             const flowRuningTime = moment.duration(now.diff(start));
             const hours = Math.floor(flowRuningTime.asHours());
             const minutes = flowRuningTime.minutes();
+            const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
+            const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
             this.flowStatistic = `
+                <b>Flow</b><br/>
                 Start time: ${this.checkDate(res.stats.startTimestamp)}<br/>
                 Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
+                First: ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
+                Last: ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/>
+                Completed: ${completed}<br/>
+                Failed: ${failures}<br/>
                 <br/>
                 <b>Processing time</b><br/>
                 Last: ${res.stats.lastProcessingTime} ms<br/>
                 Min: ${res.stats.minProcessingTime} ms<br/>
                 Max: ${res.stats.maxProcessingTime} ms<br/>
                 Avarage: ${res.stats.meanProcessingTime} ms<br/>
-                <br/>
-                <b>Completed</b><br/>
-                Number of messages: ${res.stats.exchangesCompleted}<br/>
-                First: ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
-                Last: ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/>
-                <br/>
-                <b>Failures</b><br/>
-                Number of messages: ${res.stats.exchangesFailed}<br/>
-                First: ${this.checkDate(res.stats.firstExchangeFailureTimestamp)}<br/>
-                Last: ${this.checkDate(res.stats.lastExchangeFailureTimestamp)}
             `;
         }
     }
@@ -439,6 +465,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 }); 
             })
         }, (err) => {
+            console.log('error');
+            console.log(err);
+            this.getFlowLastError(this.flow.id, 'Start', err.error);
+            this.isFlowStatusOK = false;
+            this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
             this.flowConfigurationNotObtained(this.flow.id);
             this.disableActionBtns = false;
         });
