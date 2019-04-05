@@ -65,7 +65,7 @@ export class FlowService {
     delete(id: number): Observable<HttpResponse<any>> {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
-
+    
     getFlowByGatewayId(gatewayid: Number): Observable<EntityResponseType> {
         return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { observe: 'response' });
     }
@@ -162,12 +162,25 @@ export class FlowService {
             'Content-Type': 'application/octet-stream',
             }), observe: 'response', responseType: 'blob'}).subscribe(data => {
                   const blob = new Blob([data.body], { type: 'application/xml' });
-                  saveAs(blob, `${gateway.name}.xml`);              
+                  saveAs(blob, `export_gateway_${gateway.name}.xml`);              
               },
               error => console.log(error)
             )
     }
 
+    exportFlowConfiguration(flow: IFlow) {
+        const url = `${this.environmentUrl}/1/flow/${flow.id}`;
+        this.http.get(url, { headers: new HttpHeaders({
+            'Accept': 'application/xml',
+            'Content-Type': 'application/octet-stream',
+            }), observe: 'response', responseType: 'blob'}).subscribe(data => {
+                  const blob = new Blob([data.body], { type: 'application/xml' });
+                  saveAs(blob, `export_flow_${flow.name}.xml`);              
+              },
+              error => console.log(error)
+            )
+    }
+    
     connect() {
         if (this.connectedPromise === null) {
             this.connection = this.createConnection();

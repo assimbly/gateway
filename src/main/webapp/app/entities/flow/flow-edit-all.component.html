@@ -151,7 +151,7 @@
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[0].controls.options.controls[idx])"/> -->
-												<ng-select [items]="fromComponentOptions" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[0].controls.options.controls[idx])"></ng-select>
+												<ng-select [items]="fromComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[0].controls.options.controls[idx])"></ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[0].controls.options.controls[idx])"/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions, '0')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption, '0')" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
@@ -264,7 +264,7 @@
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[toIndex+2].controls.options.controls[idx])" data-toggle="tooltip" title="Name of the option. Click the Camel component button for documentation on valid options."/> -->
-												<ng-select [items]="toComponentOptions[toIndex]" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[toIndex+2].controls.options.controls[idx])"></ng-select>
+												<ng-select [items]="toComponentOptions[toIndex]" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[toIndex+2].controls.options.controls[idx])"></ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[toIndex+2].controls.options.controls[idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex], toIndex+2)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption, toIndex+2)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN' || toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
@@ -386,7 +386,7 @@
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let errOption of errorEndpointOptions; let idx = index" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx])"  data-toggle="tooltip" title="Name of the option. Click the Camel component button for documentation on valid options."/>-->
-												<ng-select [items]="errorComponentOptions" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx])"></ng-select>
+												<ng-select [items]="errorComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx])"></ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm.controls.endpointsData.controls[1].controls.options.controls[idx])"  data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions, '1')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption, '1')" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
@@ -458,9 +458,13 @@
 					</button>
 					<button type="button" *ngIf="flow.id" (click)="load(flow.id, true)" class="btn btn-info">
 						<span class="fa fa-clone"></span>&nbsp;
-						<span> Clone</span>
+						<span>Clone</span>
 					</button>
-					<button type="button" *ngIf="flow.id" [routerLink]="['/', { outlets: { popup: 'flow/'+ flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger">
+					<button type="button" *ngIf="flow.id" (click)="export(flow)" class="btn btn-primary">
+						<span class="fa fa-download"></span>&nbsp;
+						<span>Export</span>
+					</button>
+					<button type="button" *ngIf="flow.id" [routerLink]="['/', { outlets: { popup: 'flow/' + flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-danger">
 						<span class="fa fa-remove"></span>
 						<span class="d-none d-md-inline">Delete</span>
 					</button>

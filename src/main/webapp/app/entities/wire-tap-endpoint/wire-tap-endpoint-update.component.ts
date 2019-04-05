@@ -10,6 +10,8 @@ import { IService } from 'app/shared/model/service.model';
 import { ServiceService } from 'app/entities/service';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from 'app/entities/header';
+import { FlowService } from "app/entities/flow";
+import { map } from "rxjs/operators";
 
 @Component({
     selector: 'jhi-wire-tap-endpoint-update',
@@ -26,6 +28,7 @@ export class WireTapEndpointUpdateComponent implements OnInit {
     constructor(
         protected jhiAlertService: JhiAlertService,
         protected wireTapEndpointService: WireTapEndpointService,
+        protected flowService: FlowService,
         protected serviceService: ServiceService,
         protected headerService: HeaderService,
         protected activatedRoute: ActivatedRoute
@@ -39,6 +42,7 @@ export class WireTapEndpointUpdateComponent implements OnInit {
         this.serviceService.query().subscribe(
             (res: HttpResponse<IService[]>) => {
                 this.services = res.body;
+                // get options keys
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -48,6 +52,7 @@ export class WireTapEndpointUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
+        
     }
 
     previousState() {

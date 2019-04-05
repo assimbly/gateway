@@ -77,6 +77,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     fromUriPlaceholder: string;
     fromUriPopoverMessage: string;
 
+    componentOptions: any;
     fromComponentOptions: any;
     toComponentOptions: Array<any> = [];
     errorComponentOptions: any;
@@ -331,7 +332,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // get options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.fromComponentOptions = Object.keys(data.properties);
+                this.fromComponentOptions = Object.keys(data.properties).sort();
             });
 
         } else if (endpoint instanceof ToEndpoint) {
@@ -344,7 +345,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties);
+                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties).sort();
             });
 
         } else if (endpoint instanceof ErrorEndpoint) {
@@ -357,7 +358,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.errorComponentOptions = Object.keys(data.properties);
+                this.errorComponentOptions = Object.keys(data.properties).sort();
             });
         }
 
@@ -476,7 +477,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
         if (!endpoint.options) { endpoint.options = '' }
         const options = endpoint.options.split('&');
-
+        
         options.forEach((option, index) => {
             const kv = option.split('=');
             const o = new Option();
@@ -518,6 +519,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
         let index = 0;
+        
         endpointOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
@@ -652,6 +654,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.isSaving = false;
     }
 
+    export(flow: IFlow) {
+        this.flowService.exportFlowConfiguration(flow);
+     }
+    
     save(goToOverview: boolean) {
         this.isSaving = true;
         this.setDataFromForm();
