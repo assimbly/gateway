@@ -155,7 +155,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowStarted;
                 this.flowStatusButton = `
                             Last action: Start <br/>
-                            Status: Started succesful
+                            Status: Started succesfullly
                         `;
                 this.statusFlow = Status.active;
                 break;
@@ -164,7 +164,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = !this.isFlowPaused;
                 this.flowStatusButton = `
                             Last action: Pause <br/>
-                            Status:  Paused succesful
+                            Status:  Paused succesfully
             `;
                 this.statusFlow = Status.paused;
                 break;
@@ -173,7 +173,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                 this.flowStatusButton = `
                             Last action: Restart <br/>
-                            Status:  Restarted succesful
+                            Status:  Restarted succesfully
             `;
                 this.statusFlow = Status.active;
                 break;
@@ -182,7 +182,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                 this.flowStatusButton = `
                             Last action: Resume <br/>
-                            Status:  Resumed succesful
+                            Status:  Resumed succesfully
             `;
                 this.statusFlow = Status.active;
                 break;
@@ -191,7 +191,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
                 this.flowStatusButton = `
                             Last action: Stop <br/>
-                            Status: Stopped succesful
+                            Status: Stopped succesfully
             `;
                 this.statusFlow = Status.inactive;
                 break;
@@ -304,6 +304,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 ID: ${this.flow.id}<br/>
                 Autostart: ${this.flow.autoStart}<br/>
                 Offloading: ${this.flow.offLoading}<br/>
+                Maximum Redeliveries: ${this.flow.maximumRedeliveries}<br/>
+                Redelivery Delay: ${this.flow.redeliveryDelay}<br/>
                 <br/>
                 Click to edit
         `;
@@ -359,7 +361,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 Last: ${res.stats.lastProcessingTime} ms<br/>
                 Min: ${res.stats.minProcessingTime} ms<br/>
                 Max: ${res.stats.maxProcessingTime} ms<br/>
-                Avarage: ${res.stats.meanProcessingTime} ms<br/>
+                Average: ${res.stats.meanProcessingTime} ms<br/>
             `;
         }
     }

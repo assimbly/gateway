@@ -15,6 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import com.codahale.metrics.annotation.Timed;
 
 import java.net.URISyntaxException;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -727,7 +728,7 @@ public class ConnectorResource {
     public ResponseEntity<String> setCertificates(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String url) throws Exception {
     	
        	try {
-       		connector.setCertificates(url);
+       		connector.setCertificates(url);       		
        		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}","Connector certificates set");			
    		} catch (Exception e) {
    			e.printStackTrace();
@@ -747,6 +748,11 @@ public class ConnectorResource {
 
     	return ResponseUtil.createFailureResponse(connectorId, mediaType,path,message);
     }
+    
+    public Connector getConnector() {
+		return connector;    	
+    }
+    
     
     //private methods    
      private void init() throws Exception {
