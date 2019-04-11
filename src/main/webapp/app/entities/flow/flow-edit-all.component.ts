@@ -65,6 +65,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     namePopoverMessage: string;
     autoStartPopoverMessage: string;
     offloadingPopoverMessage: string;
+    maximumRedeliveriesPopoverMessage: string;
+    redeliveryDelayPopoverMessage: string;
+    
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
     headerPopoverMessage: string;
@@ -238,6 +241,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow = new Flow();
                             this.flow.autoStart = false;
                             this.flow.offLoading = false;
+                            this.flow.maximumRedeliveries = 0;
+                            this.flow.redeliveryDelay = 30000;
                             if (this.singleGateway) {
                                 this.flow.gatewayId = this.gateways[0].id;
                             }
@@ -394,7 +399,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
-                                         This endpoint is configured at <i>Settings --> Offloading</i>.`;
+                                         This endpoint is configured at <i>Settings --> Offloading</i>.`;        
+        this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
+        this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
@@ -413,6 +420,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'name': new FormControl(flow.name, Validators.required),
             'autoStart': new FormControl(flow.autoStart),
             'offloading': new FormControl(flow.offLoading),
+            'maximumRedeliveries': new FormControl(flow.maximumRedeliveries),
+            'redeliveryDelay': new FormControl(flow.redeliveryDelay),
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
@@ -454,6 +463,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'name': flow.name,
             'autoStart': flow.autoStart,
             'offloading': flow.offLoading,
+            'maximumRedeliveries': flow.maximumRedeliveries,
+            'redeliveryDelay': flow.redeliveryDelay,
             'gateway': flow.gatewayId
         });
     }
@@ -764,6 +775,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.name = flowControls.name.value;
         this.flow.autoStart = flowControls.autoStart.value;
         this.flow.offLoading = flowControls.offloading.value;
+        this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
+        this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;
         this.flow.gatewayId = flowControls.gateway.value;
 
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {

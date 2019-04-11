@@ -35,6 +35,12 @@ public class Flow implements Serializable {
     @Column(name = "off_loading")
     private Boolean offLoading;
 
+    @Column(name = "maximum_redeliveries")
+    private int maximumRedeliveries;
+
+    @Column(name = "redelivery_delay")
+    private int redeliveryDelay;    
+    
     @ManyToOne
     @JsonIgnoreProperties("flows")
     private Gateway gateway;
@@ -108,7 +114,24 @@ public class Flow implements Serializable {
     public Gateway getGateway() {
         return gateway;
     }
+    
+    public Flow maximumRedeliveries(int maximumRedeliveries) {
+        this.maximumRedeliveries = maximumRedeliveries;
+        return this;
+    }
 
+    public void setMaximumRedeliveries(int maximumRedeliveries) {
+        this.maximumRedeliveries = maximumRedeliveries;
+    }
+
+    public Flow redeliveryDelay(int redeliveryDelay) {
+        this.redeliveryDelay = redeliveryDelay;
+        return this;
+    }
+
+    public void setRedeliveryDelay(int redeliveryDelay) {
+        this.redeliveryDelay = redeliveryDelay;
+    }    
     public Flow gateway(Gateway gateway) {
         this.gateway = gateway;
         return this;
