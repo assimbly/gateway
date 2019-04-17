@@ -114,16 +114,24 @@ public class Flow implements Serializable {
     public Gateway getGateway() {
         return gateway;
     }
+
+    public int getMaximumRedeliveries() {
+        return maximumRedeliveries;
+    }
     
     public Flow maximumRedeliveries(int maximumRedeliveries) {
         this.maximumRedeliveries = maximumRedeliveries;
         return this;
     }
-
+    
     public void setMaximumRedeliveries(int maximumRedeliveries) {
         this.maximumRedeliveries = maximumRedeliveries;
     }
 
+    public int getRedeliveryDelay() {
+        return redeliveryDelay;
+    }
+    
     public Flow redeliveryDelay(int redeliveryDelay) {
         this.redeliveryDelay = redeliveryDelay;
         return this;
