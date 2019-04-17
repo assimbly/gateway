@@ -1,10 +1,12 @@
 package org.assimbly.gateway.service;
 
+import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.service.dto.SecurityDTO;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,4 +45,8 @@ public interface SecurityService {
      * @param id the id of the entity
      */
     void delete(Long id);
+
+	List<Security> findAllByUrl(String url);
+
+	List<Security> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry);
 }

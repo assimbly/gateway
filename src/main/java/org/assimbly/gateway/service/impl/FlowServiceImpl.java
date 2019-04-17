@@ -87,10 +87,11 @@ public class FlowServiceImpl implements FlowService {
         log.debug("Request to delete Flow : {}", id);
         flowRepository.deleteById(id);
     }
-
+    
 	@Override
 	public Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid) {
 		// TODO Auto-generated method stub
 		return flowRepository.findAllByGatewayId(pageable, gatewayid);
 	}
+
 }

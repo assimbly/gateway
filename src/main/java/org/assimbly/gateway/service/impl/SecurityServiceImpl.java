@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -87,4 +89,14 @@ public class SecurityServiceImpl implements SecurityService {
         log.debug("Request to delete Security : {}", id);
         securityRepository.deleteById(id);
     }
+
+    
+    public List<Security> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry) {
+		return securityRepository.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
+	}
+
+    public List<Security> findAllByUrl(String url) {
+		return securityRepository.findAllByUrl(url);
+	}
+    
 }

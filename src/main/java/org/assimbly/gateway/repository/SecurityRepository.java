@@ -1,5 +1,12 @@
 package org.assimbly.gateway.repository;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.OrderBy;
+
+import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.Security;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -11,5 +18,9 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface SecurityRepository extends JpaRepository<Security, Long> {
-
+	
+	
+	List<Security> findAllByCertificateExpiryBetween(Instant now, Instant expiryDate);
+	
+	List<Security> findAllByUrl(String url);
 }

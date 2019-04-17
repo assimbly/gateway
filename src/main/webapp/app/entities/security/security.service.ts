@@ -49,6 +49,10 @@ export class SecurityService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
+    remove(url: String): Observable<HttpResponse<any>> {
+        return this.http.post<any>(`${this.resourceUrl}/remove`,url, { observe: 'response' });
+    }
+    
     getCertificateDetails(certificateName: string): Observable<HttpResponse<any>> {
         return this.http.get(`${this.resourceUrl}/details/${certificateName}`, { observe: 'response',responseType: 'text' });
     }    

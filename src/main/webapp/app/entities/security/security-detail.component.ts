@@ -23,16 +23,13 @@ export class SecurityDetailComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ security }) => {
             this.security = security;
         });
-        console.log("start get details");
         this.securityService.getCertificateDetails(this.security.certificateName).subscribe(data => {
             this.certificateDetails = data.body.split(";");
             this.certificatieType = this.certificateDetails[0];
             this.SigningAlgorithm = this.certificateDetails[1];
             this.IssuerDNPrincipal = this.certificateDetails[2];
             this.SubjectDNPrincipal = this.certificateDetails[3];            
-            console.log("data" + data.body);
         });
-        console.log("end get details");
 
     }
 

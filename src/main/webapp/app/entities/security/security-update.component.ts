@@ -8,6 +8,8 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityService } from './security.service';
 
+//import { faSync } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
     selector: 'jhi-security-update',
     templateUrl: './security-update.component.html'
@@ -32,20 +34,37 @@ export class SecurityUpdateComponent implements OnInit {
         window.history.back();
     }
 
-    save() {
+    add() {
         this.isSaving = true;
+        
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
         if (this.security.id !== undefined) {
-            this.subscribeToSaveResponse(this.securityService.update(this.security));
+            this.subscribeToAddResponse(this.securityService.update(this.security));
         } else {
-            this.subscribeToSaveResponse(this.securityService.create(this.security));
+            this.subscribeToAddResponse(this.securityService.create(this.security));
         }
     }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<ISecurity>>) {
+    remove() {
+        this.isSaving = true;        
+        this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
+        this.subscribeToRemoveResponse(this.securityService.remove(this.security.url));
+    }
+    
+    renew() {
+        this.isSaving = true;
+        this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
+        this.securityService.remove(this.security.url).subscribe((res: HttpResponse<ISecurity>) => this.subscribeToAddResponse(this.securityService.create(this.security)), (res: HttpErrorResponse) => this.onSaveError());
+    }    
+    
+    protected subscribeToAddResponse(result: Observable<HttpResponse<ISecurity>>) {
         result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
 
+    protected subscribeToRemoveResponse(result: Observable<HttpResponse<ISecurity>>) {
+        result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+    }
+    
     protected onSaveSuccess() {
         this.isSaving = false;
         this.previousState();
