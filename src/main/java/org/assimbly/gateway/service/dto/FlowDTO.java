@@ -64,13 +64,21 @@ public class FlowDTO implements Serializable {
     public void setOffLoading(Boolean offLoading) {
         this.offLoading = offLoading;
     }
-    
+
+    public int getMaximumRedeliveries() {
+        return maximumRedeliveries;
+    }
+
     public int maximumRedeliveries() {
         return maximumRedeliveries;
     }
 
     public void setMaximumRedeliveries(int maximumRedeliveries) {
         this.maximumRedeliveries = maximumRedeliveries;
+    }
+
+    public int getRedeliveryDelay() {
+        return redeliveryDelay;
     }
     
     public int redeliveryDelay() {

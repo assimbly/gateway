@@ -163,6 +163,9 @@ public class DBImportXMLConfiguration {
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
 
+		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
+		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
+		
 		if (!flowId.isEmpty()) {
 
 			flowOptional = flowRepository.findById(id);
@@ -206,6 +209,18 @@ public class DBImportXMLConfiguration {
 				flow.setOffLoading(true);
 			} else {
 				flow.setOffLoading(false);
+			}
+			
+			if (flowMaximumRedeliveries != null) {
+				flow.setMaximumRedeliveries(Integer.parseInt(flowMaximumRedeliveries));
+			} else {
+				flow.setMaximumRedeliveries(0);
+			}
+			
+			if (flowRedeliveryDelay != null) {
+				flow.setRedeliveryDelay(Integer.parseInt(flowRedeliveryDelay));
+			} else {
+				flow.setRedeliveryDelay(3000);
 			}
 
 			flow.setFromEndpoint(fromEndpoint);

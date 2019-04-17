@@ -227,8 +227,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             }
 
             let i;
-            for (i = alertStartItem; i < flowAlertsList.length; i++) {
-                if (typeof alertItems !== 'undefined') {
+            for (i = (flowAlertsList.length-1); i > 0; i--) {
+                if (typeof alertItems !== 'undefined') {                    
                     alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
                 } else {
                     alertItems = `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`

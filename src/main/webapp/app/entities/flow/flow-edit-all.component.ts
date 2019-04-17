@@ -425,6 +425,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
+       
     }
 
     initializeEndpointData(endpoint?: any): FormGroup {
@@ -778,7 +779,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
         this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;
         this.flow.gatewayId = flowControls.gateway.value;
-
+        
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
             if (index === 0) {
                 this.setDataFromFormOnEndpoint(this.fromEndpoint, (<FormGroup>endpoint).controls);
