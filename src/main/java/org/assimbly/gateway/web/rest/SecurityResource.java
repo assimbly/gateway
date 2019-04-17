@@ -1,11 +1,9 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.http.client.utils.DateUtils;
 import org.assimbly.connector.Connector;
-import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -18,11 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -190,4 +186,51 @@ public class SecurityResource {
         securityService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    
+    /**
+     * DELETE  /securities/:id : delete the "id" security.
+     *
+     * @param id the id of the securityDTO to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @PostMapping("/securities/remove")
+    @Timed
+    public ResponseEntity<Void> removeSecurity(@RequestBody String url) throws Exception {
+        log.debug("REST request to remove certificates for url ", url);
+        Connector connector = connectorResource.getConnector();
+        List<Security> certificates = securityService.findAllByUrl(url);
+        	
+        for (Security certificate : certificates) {
+        	String certificateName = certificate.getCertificateName();
+        	connector.deleteCertificates(certificateName);
+        	securityService.delete(certificate.getId());
+        }
+        
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, "delete")).build();
+    }
+    
+    
+    @GetMapping("/securities/isexpired/{withinNumberOfDays}")
+    @Timed
+    public ResponseEntity<Boolean> isExpired(@PathVariable int withinNumberOfDays) throws Exception{
+
+        log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
+        
+        Boolean isExpired;
+        Instant dateNow = Instant.now();
+        Instant dateOfExpiry = Instant.now().plusSeconds(withinNumberOfDays * 86400);
+
+        List<Security> listExpired = securityService.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
+
+        if(listExpired.size()>0) {
+        	isExpired = true;
+        }else {
+        	isExpired = false;
+        }
+                
+        return ResponseEntity.ok().body(isExpired);
+
+    }   
+    
 }

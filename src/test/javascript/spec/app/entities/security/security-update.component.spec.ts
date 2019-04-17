@@ -36,7 +36,7 @@ describe('Component Tests', () => {
                     spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
                     comp.security = entity;
                     // WHEN
-                    comp.save();
+                    comp.add();
                     tick(); // simulate async
 
                     // THEN
@@ -53,7 +53,7 @@ describe('Component Tests', () => {
                     spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
                     comp.security = entity;
                     // WHEN
-                    comp.save();
+                    comp.add();
                     tick(); // simulate async
 
                     // THEN
