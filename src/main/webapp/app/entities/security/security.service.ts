@@ -57,6 +57,10 @@ export class SecurityService {
         return this.http.get(`${this.resourceUrl}/details/${certificateName}`, { observe: 'response',responseType: 'text' });
     }    
     
+    uploadCertificate(certificate): Observable<HttpResponse<any>> {
+        return this.http.post(`${this.resourceUrl}/uploadcertificate`, certificate, { observe: 'response',responseType: 'text' });
+     }
+    
     protected convertDateFromClient(security: ISecurity): ISecurity {
         const copy: ISecurity = Object.assign({}, security, {
             certificateExpiry:

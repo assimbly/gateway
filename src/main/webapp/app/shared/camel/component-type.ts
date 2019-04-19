@@ -139,7 +139,7 @@ export const typesLinks = [
         <b>Description</b>: The url of the HTTP endpoint to call.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: servername:8080/orders<br/>
+        <b>Example</b>: servername:8080/orders (without http://)<br/>
     `
     },
     {
@@ -152,7 +152,7 @@ export const typesLinks = [
         <b>Description</b>: The url of the HTTPS endpoint to call.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: servername:443/orders<br/>
+        <b>Example</b>: servername:443/orders  (without https://)<br/>
     `
     },
     {

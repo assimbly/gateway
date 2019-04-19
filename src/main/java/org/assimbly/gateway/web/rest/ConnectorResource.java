@@ -15,7 +15,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import com.codahale.metrics.annotation.Timed;
 
 import java.net.URISyntaxException;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;

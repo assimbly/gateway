@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { Router } from '@angular/router';
 
 import { ISecurity } from 'app/shared/model/security.model';
 import { AccountService } from 'app/core';
@@ -30,7 +31,8 @@ export class SecurityComponent implements OnInit, OnDestroy {
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected parseLinks: JhiParseLinks,
-        protected accountService: AccountService
+        protected accountService: AccountService,
+        protected router: Router  
     ) {
         this.securities = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -94,6 +96,12 @@ export class SecurityComponent implements OnInit, OnDestroy {
         return result;
     }
 
+    uploadCertificate() {
+        console.log("upload certificate");
+        this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
+        this.eventManager.subscribe('securityListModification', response => this.reset());
+    }    
+    
     protected paginateSecurities(data: ISecurity[], headers: HttpHeaders) {
         this.links = this.parseLinks.parse(headers.get('link'));
         this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
