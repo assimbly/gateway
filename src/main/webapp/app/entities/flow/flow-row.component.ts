@@ -214,25 +214,25 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     setFlowAlerts(flowAlertsItems: string): void {
         if (flowAlertsItems !== null) {
 
-            let alertItems;
-            let alertStartItem;
 
+            let alertStartItem;
+            let alertEndItem;
+            
             let flowAlertsList = flowAlertsItems.split(',');
             if (flowAlertsList.length < 4) {
                 this.showNumberOfItems = flowAlertsList.length;
-                alertStartItem = 0;
+                alertStartItem = flowAlertsList.length - 1;
+                alertEndItem = 0;
             } else {
                 this.showNumberOfItems = 3;
-                alertStartItem = flowAlertsList.length - 3;
+                alertStartItem = flowAlertsList.length - 1;
+                alertEndItem = flowAlertsList.length - 3;
             }
 
             let i;
-            for (i = (flowAlertsList.length-1); i > 0; i--) {
-                if (typeof alertItems !== 'undefined') {                    
+            let alertItems='';
+            for (i = alertStartItem; i >= alertEndItem; i--) {
                     alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
-                } else {
-                    alertItems = `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`
-                }
             }
 
             this.flowAlertsButton = `<div class="list-group">` + alertItems + `</div>`

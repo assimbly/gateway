@@ -242,7 +242,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow.autoStart = false;
                             this.flow.offLoading = false;
                             this.flow.maximumRedeliveries = 0;
-                            this.flow.redeliveryDelay = 30000;
+                            this.flow.redeliveryDelay = 3000;
                             if (this.singleGateway) {
                                 this.flow.gatewayId = this.gateways[0].id;
                             }

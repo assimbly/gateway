@@ -1,11 +1,12 @@
 <div>
     <h2 id="page-heading">
         <span>Security (TLS whitelist)</span>
+        <button id="uploadCertificate" class="btn btn-primary float-right" style="margin-left: 20px;" type="button" (click)="uploadCertificate()">
+            <fa-icon [icon]="'save'"></fa-icon><span> Upload certificate</span>
+        </button>
+        
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-security" [routerLink]="['/security/new']">
-            <fa-icon [icon]="'plus'"></fa-icon>
-            <span >
-            Manage Whitelist
-            </span>
+            <fa-icon [icon]="'plus'"></fa-icon><span> Manage Whitelist</span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
