@@ -65,7 +65,7 @@ export class FlowService {
     delete(id: number): Observable<HttpResponse<any>> {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
-
+    
     getFlowByGatewayId(gatewayid: Number): Observable<EntityResponseType> {
         return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { observe: 'response' });
     }
@@ -157,17 +157,34 @@ export class FlowService {
 
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
+        const exportDate = this.getDate();
+
         this.http.get(url, { headers: new HttpHeaders({
             'Accept': 'application/xml',
             'Content-Type': 'application/octet-stream',
             }), observe: 'response', responseType: 'blob'}).subscribe(data => {
                   const blob = new Blob([data.body], { type: 'application/xml' });
-                  saveAs(blob, `${gateway.name}.xml`);              
+                  saveAs(blob, `export_gateway_${gateway.name}_${exportDate}.xml`);              
               },
               error => console.log(error)
             )
     }
 
+    exportFlowConfiguration(flow: IFlow) {
+        const url = `${this.environmentUrl}/1/flow/${flow.id}`;
+        const exportDate = this.getDate();
+
+        this.http.get(url, { headers: new HttpHeaders({
+            'Accept': 'application/xml',
+            'Content-Type': 'application/octet-stream',
+            }), observe: 'response', responseType: 'blob'}).subscribe(data => {
+                  const blob = new Blob([data.body], { type: 'application/xml' });
+                  saveAs(blob, `export_flow_${flow.name}_${exportDate}.xml`);              
+              },
+              error => console.log(error)
+            )
+    }
+    
     connect() {
         if (this.connectedPromise === null) {
             this.connection = this.createConnection();
@@ -256,6 +273,20 @@ export class FlowService {
     private convertItemFromServer(json: any): IFlow {
         const entity: IFlow = Object.assign(new Flow(), json);
         return entity;
+    }
+    
+    private getDate(){
+        
+        const date = new Date();
+        let year = date.getFullYear();
+
+        let month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+
+        let day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+        
+        return year + month + day;
     }
 
 }

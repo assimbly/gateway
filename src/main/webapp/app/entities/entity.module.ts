@@ -10,6 +10,8 @@ import { GatewayFromEndpointModule } from './from-endpoint/from-endpoint.module'
 import { GatewayToEndpointModule } from './to-endpoint/to-endpoint.module';
 import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
+import { GatewaySecurityModule } from './security/security.module';
+
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
@@ -30,6 +32,7 @@ import { FlowService } from "app/entities/flow";
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
         GatewayMaintenanceModule,
+        GatewaySecurityModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
@@ -46,6 +49,7 @@ import { FlowService } from "app/entities/flow";
         GatewayServiceKeysModule,
         GatewayToEndpointModule,
         GatewayMaintenanceModule,
+        GatewaySecurityModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */

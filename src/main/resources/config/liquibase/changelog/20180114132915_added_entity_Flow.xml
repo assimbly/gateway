@@ -34,6 +34,14 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="maximum_redeliveries" type="integer">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="redelivery_delay" type="integer">
+                <constraints nullable="true" />
+            </column>
+
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>
