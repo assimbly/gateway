@@ -418,7 +418,7 @@ export const typesLinks = [
     {
         name: 'WASTEBIN',
         assimblyTypeLink: `/component-wastebin`,
-        camelTypeLink: `/components//camel-mock/src/main/docs/mock-component.adoc`,
+        camelTypeLink: `/components/camel-mock/src/main/docs/mock-component.adoc`,
         uriPlaceholder: '',
         uriPopoverMessage: `
         <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
