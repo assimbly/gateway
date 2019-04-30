@@ -325,6 +325,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
+        } else if  (componentType === 'wastebin'){
+            componentType = 'mock';
         }
         
         if (endpoint instanceof FromEndpoint) {
