@@ -21,7 +21,9 @@ import {
     FlowDeletePopupComponent,
     FlowDeleteDialogComponent,
     flowRoute,
-    FlowEditorModeComponent,
+    flowPopupRoute,
+    FlowEditorModeComponent,    
+    FlowPopupService,
     FlowRowComponent
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -29,7 +31,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlowService } from "app/entities/flow/flow.service";
 import { Components } from "app/shared/camel/component-type";
 
-const ENTITY_STATES = [...flowRoute];
+const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
 
 @NgModule({
     imports: [
@@ -69,11 +71,12 @@ const ENTITY_STATES = [...flowRoute];
         FlowEditAllComponent,
 		FlowDeleteDialogComponent,
 		FlowConfigurationComponent,		
+		FlowDeleteDialogComponent,
 		FlowDeletePopupComponent,
         FlowEditorModeComponent,
         FlowConfigurationComponent
     ],
-    providers: [FlowService],
+    providers: [FlowService, FlowPopupService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayFlowModule {}

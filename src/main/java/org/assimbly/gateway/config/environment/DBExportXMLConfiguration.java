@@ -98,7 +98,6 @@ public class DBExportXMLConfiguration {
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
 		Flow flow = flowRepository.findById(id).get();
-
 		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
 
 		// check if endpoints are configured
@@ -224,12 +223,24 @@ public class DBExportXMLConfiguration {
 		name.appendChild(doc.createTextNode(flowName));
 		flow.appendChild(name);
 
-		// set name
+		// set offloading
 		String flowOffloading = flowDB.isOffLoading().toString();
 		Element offloading = doc.createElement("offloading");
 		offloading.appendChild(doc.createTextNode(flowOffloading));
 		flow.appendChild(offloading);
+		
+		// set maximumRedeliveries
+		String flowMaximumRedeliveries = Integer.toString(flowDB.getMaximumRedeliveries());
+		Element maximumRedeliveries = doc.createElement("maximumRedeliveries");
+		maximumRedeliveries.appendChild(doc.createTextNode(flowMaximumRedeliveries));
+		flow.appendChild(maximumRedeliveries);
 
+		// set redeliveryDelay
+		String flowRedeliveryDelay = Integer.toString(flowDB.getRedeliveryDelay());
+		Element redeliveryDelay = doc.createElement("redeliveryDelay");
+		redeliveryDelay.appendChild(doc.createTextNode(flowRedeliveryDelay));
+		flow.appendChild(redeliveryDelay);
+		
 		// set endpoints
 		setXMLFromEndpointFromDB(fromEndpoint);
 		setXMLToEndpointsFromDB(toEndpoints);

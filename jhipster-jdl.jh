@@ -17,7 +17,9 @@ entity EnvironmentVariables {
 entity Flow {
 	name String,
 	autoStart Boolean,	
-	offLoading Boolean	
+	offLoading Boolean,
+	maximumRedeliveries Integer,
+	redeliveryDelay Integer	
 }
 
 entity FromEndpoint {
@@ -70,6 +72,12 @@ entity Maintenance {
 	endTime Instant,
 	duration Instant,
 	frequency String
+}
+
+entity Security {
+	url String,
+	certificateName String,
+	certificateExpiry Instant,
 }
 
 enum GatewayType {

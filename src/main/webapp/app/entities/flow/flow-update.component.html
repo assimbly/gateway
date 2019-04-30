@@ -23,8 +23,16 @@
                     <label class="form-control-label" for="field_offLoading">Off Loading</label>
                     <input type="checkbox" class="form-control" name="offLoading" id="field_offLoading"
                         [(ngModel)]="flow.offLoading" />
+                </div>           <div class="form-group">
+                    <label class="form-control-label" for="field_maximumRedeliveries">Maximum Redeliveries</label>
+                    <input type="checkbox" class="form-control" name="maximumRedeliveries" id="field_maximumRedeliveries"
+                        [(ngModel)]="flow.maximumRedeliveries" />
                 </div>
-
+                <div class="form-group">
+                    <label class="form-control-label" for="field_redeliveryDelay">Redelivery Delay</label>
+                    <input type="checkbox" class="form-control" name="redeliveryDelay" id="field_redeliveryDelay"
+                        [(ngModel)]="flow.redeliveryDelay" />
+                </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_gateway">Gateway</label>
                     <select class="form-control" id="field_gateway" name="gateway" [(ngModel)]="flow.gatewayId" >

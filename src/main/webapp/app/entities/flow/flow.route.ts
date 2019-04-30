@@ -106,7 +106,7 @@ export const flowPopupRoute: Routes = [
             flow: FlowResolve
         },
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService],
