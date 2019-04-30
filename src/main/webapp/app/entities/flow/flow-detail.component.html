@@ -18,6 +18,14 @@
                     <td>{{flow.offLoading}}</td>
                 </tr>
                 <tr>
+                    <th>Maximum Redeliveries</th>
+                    <td>{{flow.maximumRedeliveries}}</td>
+                </tr>
+                <tr>
+                    <th>Redelivery Delay</th>
+                    <td>{{flow.redeliveryDelay}}</td>
+                </tr>
+                <tr>
                     <th class="lastItemBorder">Gateway name</th>
                     <td class="lastItemBorder"><a [routerLink]="['/gateway', flow.gatewayId, 'view']" *ngIf="!!gateway">{{gateway.name}}</a></td>
                 </tr>

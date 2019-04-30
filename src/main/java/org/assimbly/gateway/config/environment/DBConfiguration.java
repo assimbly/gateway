@@ -1,12 +1,12 @@
 package org.assimbly.gateway.config.environment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import org.w3c.dom.Document;
 
-@SuppressWarnings("deprecation")
 @Service
 public class DBConfiguration {
 
@@ -37,6 +36,8 @@ public class DBConfiguration {
 
 	@Autowired
 	private DBImportXMLConfiguration dbImportXML;
+
+	private String output;
 
 	// exports connector to object (List of treemaps)
 	public List<TreeMap<String, String>> convertDBToConfiguration(Long gatewayId) throws Exception {
@@ -149,16 +150,15 @@ public class DBConfiguration {
 	private String PlaceholdersReplacement(String input) {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
-
-		Map<String, String> values = new HashMap<String, String>();
-
-		for (EnvironmentVariables environmentVariable : environmentVariables) {
-			values.put(environmentVariable.getKey(), environmentVariable.getValue());
-		}
-
-		StrSubstitutor sub = new StrSubstitutor(values, "@{", "}");
-
-		String output = sub.replace(input);
+		
+		Map<String, String> values = environmentVariables.stream().collect(Collectors.toMap(EnvironmentVariables::getKey, EnvironmentVariables::getValue));
+		
+		if(values.containsValue("")) {
+			output = "Error: Environment variables contain empty values";
+		}else {
+			StringSubstitutor sub = new StringSubstitutor(values, "@{", "}");
+			output = sub.replace(input);
+		}	
 
 		return output;
 

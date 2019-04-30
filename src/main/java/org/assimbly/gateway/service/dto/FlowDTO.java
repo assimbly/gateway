@@ -19,6 +19,10 @@ public class FlowDTO implements Serializable {
 
     private Boolean offLoading;
 
+    private int maximumRedeliveries;
+
+    private int redeliveryDelay;
+    
     private Long gatewayId;
 
     private Long fromEndpointId;
@@ -61,6 +65,30 @@ public class FlowDTO implements Serializable {
         this.offLoading = offLoading;
     }
 
+    public int getMaximumRedeliveries() {
+        return maximumRedeliveries;
+    }
+
+    public int maximumRedeliveries() {
+        return maximumRedeliveries;
+    }
+
+    public void setMaximumRedeliveries(int maximumRedeliveries) {
+        this.maximumRedeliveries = maximumRedeliveries;
+    }
+
+    public int getRedeliveryDelay() {
+        return redeliveryDelay;
+    }
+    
+    public int redeliveryDelay() {
+        return redeliveryDelay;
+    }
+
+    public void setRedeliveryDelay(int redeliveryDelay) {
+        this.redeliveryDelay = redeliveryDelay;
+    }
+    
     public Long getGatewayId() {
         return gatewayId;
     }

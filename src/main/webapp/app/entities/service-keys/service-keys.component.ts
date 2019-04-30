@@ -24,7 +24,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     currentAccount: any;
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
-    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver'];
+    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'org.postgresql.Driver','com.microsoft.sqlserver.jdbc.SQLServerDriver'];
 
     constructor(
         protected serviceKeysService: ServiceKeysService,
