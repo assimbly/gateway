@@ -261,7 +261,8 @@ public class ConnectorResource {
 
 							flowId = id.toString();
 							status = connector.getFlowStatus(flowId);
-							if(status.equals("suspended")) {
+							if(status.equals("suspended")) {								
+								status = connector.startFlow(flowId);
 								if(status.equals("started")) {
 					    			if(this.messagingTemplate!=null) {
 					    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:resumed");
@@ -711,6 +712,29 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",e.getMessage());
 		}
     }
+
+    /**
+     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     *
+     * @param connectorid (gatewayId)
+     * @param id (FlowId)
+     * @param configuration as XML / if empty get from db (for the time being)
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/connector/{connectorId}/setcertificates", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
+    @Timed
+    public ResponseEntity<String> setCertificates(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String url) throws Exception {
+    	
+       	try {
+       		connector.setCertificates(url);       		
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}","Connector certificates set");			
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}",e.getMessage());
+   		}
+    }
+    
     
     // Generates a generic error response (exceptions outside try catch):
     @ExceptionHandler({Exception.class})
@@ -723,6 +747,11 @@ public class ConnectorResource {
 
     	return ResponseUtil.createFailureResponse(connectorId, mediaType,path,message);
     }
+    
+    public Connector getConnector() {
+		return connector;    	
+    }
+    
     
     //private methods    
      private void init() throws Exception {

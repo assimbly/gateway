@@ -17,6 +17,7 @@ import { FlowService } from '../flow/flow.service';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Option } from '../flow';
 import { HttpResponse } from "@angular/common/http";
+import { map } from "rxjs/operators";
 
 @Component({
     selector: 'jhi-wire-tap-endpoint-edit',
@@ -41,7 +42,8 @@ export class WireTapEndpointEditComponent implements OnInit {
     serviceType: string;
     uriPlaceholder: string;
     uriPopoverMessage: string;
-
+    wiretapComponentOptions: any;
+    
     constructor(
         private jhiAlertService: JhiAlertService,
         private wireTapEndpointService: WireTapEndpointService,
@@ -160,9 +162,22 @@ export class WireTapEndpointEditComponent implements OnInit {
         this.typeCamelLink = this.camelDocUrl + type.camelTypeLink;
         this.uriPlaceholder = type.uriPlaceholder;
         this.uriPopoverMessage = type.uriPopoverMessage;
-
+        
         this.wireTapForm.patchValue({ 'type': type.name });
 
+        let componentType = this.wireTapForm.controls.type.value
+        componentType = componentType.toLowerCase()
+        if (componentType === 'activemq') {
+            componentType = 'jms';
+        } else if (componentType === 'sonicmq') {
+            componentType = 'sjms';
+        }
+        
+        // get options keys
+        this.getComponentOptions(componentType).subscribe((data) => {
+            this.wiretapComponentOptions = Object.keys(data.properties);
+        });
+        
         switch (this.wireTapForm.controls.type.value) {
             case 'WASTEBIN': {
                 this.wireTapForm.controls.uri.disable();
@@ -216,6 +231,12 @@ export class WireTapEndpointEditComponent implements OnInit {
         } else {
             this.addOption();
         }
+    }
+    
+    getComponentOptions(componentType: String): any {
+        return this.flowService.getComponentOptions(1, componentType).pipe(map((options) => {
+            return options.body;
+        }));
     }
 
     createOrEditHeader() {

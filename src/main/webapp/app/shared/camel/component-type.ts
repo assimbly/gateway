@@ -1,21 +1,30 @@
-import { Injectable } from '@angular/core'
+import { Injectable } from '@angular/core';
 
 // add a new component here
+// 1) Add to the EndpointType list
+// 2) Add to typelinks for live documentation
+// 3) Add to differentEndpoint type (from/to/error)
 
 export enum EndpointType {
     ACTIVEMQ = 'ACTIVEMQ',
+    AS2 = 'AS2',
     DIRECT = 'DIRECT',
+    ELASTICSEARCH = 'ELASTICSEARCH',
     FILE = 'FILE',
     FTP = 'FTP',
     FTPS = 'FTPS',
     HTTP4 = 'HTTP4',
+    HTTPS4 = 'HTTPS4',    
     IMAP = 'IMAP',
     IMAPS = 'IMAPS',
+    JETTY = 'JETTY',
     NETTY4 = 'NETTY4',
     KAFKA = 'KAFKA',
+    RABBITMQ = 'RABBITMQ',
     REST = 'REST',
     SFTP = 'SFTP',
     SJMS = 'SJMS',
+    SLACK = 'SLACK',
     SMTP = 'SMTP',
     SMTPS = 'SMTP3',
     SONICMQ = 'SONICMQ',
@@ -24,6 +33,7 @@ export enum EndpointType {
     TELEGRAM = 'TELEGRAM',
     VM = 'VM',
     WASTEBIN = 'WASTEBIN',
+    WEBSOCKET = 'WEBSOCKET',
 }
 
 // add here the component documentation / links (basepaths are configured in the application.yml)
@@ -49,9 +59,29 @@ export const typesLinks = [
     `
     },
     {
+        name: 'AS2',
+        assimblyTypeLink: `/component-as2`,
+        camelTypeLink: `/camel-as2/camel-as2-component/src/main/docs/as2-component.adoc`,
+        uriPlaceholder: 'as2://apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: as2<br/>
+        <b>Description</b>:  The name of the endpoint<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>:  The name of the api [client, server]<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>:  The name of the api-call<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'DIRECT',
         assimblyTypeLink: `/component-direct`,
-        camelTypeLink: `/camel-core/src/main/docs/direct-component.adoc`,
+        camelTypeLink: `/components/camel-direct/src/main/docs/direct-component.adoc`,
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
@@ -62,9 +92,25 @@ export const typesLinks = [
     `
     },
     {
+        name: 'ELASTICSEARCH',
+        assimblyTypeLink: `/component-elasticseach`,
+        camelTypeLink: `/components/camel-elasticsearch-rest/src/main/docs/elasticsearch-rest-component.adoc`,
+        uriPlaceholder: 'elasticsearch-rest://clusterName',
+        uriPopoverMessage: `
+        <b>Name</b>: elasticsearch-rest<br/>
+        <b>Description</b>:  The name of the endpoint<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: clusterName<br/>
+        <b>Description</b>:  The name of the cluster<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'FILE',
         assimblyTypeLink: `/component-file`,
-        camelTypeLink: `/camel-core/src/main/docs/file-component.adoc`,
+        camelTypeLink: `/components/camel-core/src/main/docs/file-component.adoc`,
         uriPlaceholder: 'directoryName',
         uriPopoverMessage: `
         <b>Name</b>: directoryName<br/>
@@ -134,7 +180,20 @@ export const typesLinks = [
         <b>Description</b>: The url of the HTTP endpoint to call.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: http://servername:8080/orders<br/>
+        <b>Example</b>: servername:8080/orders (without http://)<br/>
+    `
+    },
+    {
+        name: 'HTTPS4',
+        assimblyTypeLink: `/component-http4`,
+        camelTypeLink: `/components/camel-http4/src/main/docs/http4-component.adoc`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The url of the HTTPS endpoint to call.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/><br/>
+        <b>Example</b>: servername:443/orders  (without https://)<br/>
     `
     },
     {
@@ -174,6 +233,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'JETTY',
+        camelTypeLink: `/components/camel-jetty/src/main/docs/jetty-component.adoc`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The url of the HTTP(S) endpoint to call.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/><br/>
+        <b>Example</b>: http://servername:8080/orders<br/>
+    `
+    },
+    {
         name: 'KAFKA',
         assimblyTypeLink: `/component-kafka`,
         camelTypeLink: `/components/camel-kafka/src/main/docs/kafka-component.adoc`,
@@ -210,9 +281,33 @@ export const typesLinks = [
     `
     },
     {
+        name: 'RABBITMQ',
+        assimblyTypeLink: `/component-rabbitmq`,
+        camelTypeLink: `/components/camel-elasticsearch-rest/src/main/docs/elasticsearch-rest-component.adoc`,
+        uriPlaceholder: 'rabbitmq://hostname[:port]/exchangeName',
+        uriPopoverMessage: `
+        <b>Name</b>: rabbitmq<br/>
+        <b>Description</b>:  The name of the endpoint<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>:  The hostname of the running rabbitmq instance or cluster.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>:  Port is optional and if not specified then defaults to the RabbitMQ client default (5672)<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Name</b>: exchangeName<br/>
+        <b>Description</b>:  The exchange name determines which exchange produced messages will sent to.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'REST',
         assimblyTypeLink: `/component-rest`,
-        camelTypeLink: `/camel-core/src/main/docs/rest-component.adoc`,
+        camelTypeLink: `/components/camel-rest/src/main/docs/rest-component.adoc`,
         uriPlaceholder: 'method:path:{uriTemplate}',
         uriPopoverMessage: `
         <b>Name</b>: method<br/>
@@ -272,6 +367,23 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
+    `
+    },
+    {
+        name: 'SLACK',
+        assimblyTypeLink: `/component-slack`,
+        camelTypeLink: `/components/camel-slack`,
+        uriPlaceholder: 'slack:#channel',
+        uriPopoverMessage: `
+        <b>Name</b>: slack<br/>
+        <b>Description</b>:  The name of the instance of slack<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: channell<br/>
+        <b>Description</b>: Channel is like a “room” for discussions (ex. topic, discussion, team)<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Example</b>: ?<br/>
     `
     },
     {
@@ -375,7 +487,7 @@ export const typesLinks = [
     {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
-        camelTypeLink: `/components/camel-core/src/main/docs/vm-component.adoc`,
+        camelTypeLink: `/components/camel-vm/src/main/docs/vm-component.adoc`,
         uriPlaceholder: 'queueName',
         uriPopoverMessage: `
         <b>Name</b>: queueName<br/>
@@ -388,10 +500,35 @@ export const typesLinks = [
     {
         name: 'WASTEBIN',
         assimblyTypeLink: `/component-wastebin`,
-        camelTypeLink: `/camel-core/src/main/docs/mock-component.adoc`,
+        camelTypeLink: `/components/camel-mock/src/main/docs/mock-component.adoc`,
         uriPlaceholder: '',
         uriPopoverMessage: `
         <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
+    `
+    },
+    {
+        name: 'WEBSOCKET',
+        assimblyTypeLink: `/component-websocket`,
+        camelTypeLink: `/components/camel-websocket/src/main/docs/websocket-component.adoc`,
+        uriPlaceholder: '',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: The hostname. The default value is 0.0.0.0. Setting this option on the component will use the component configured value as default.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The port number. The default value is 9292. Setting this option on the component will use the component configured value as default.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Integer<br/><br/>
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Required Name of the websocket channel to use<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: options<br/>
+        <b>Description</b>: The Jetty Websocket component supports 14 options<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Example</b>: //hostname[:port][/resourceUri][?options]<br/>
     `
     }
 ];
@@ -400,16 +537,15 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ',
-        'SQL', 'STREAM', 'TELEGRAM', 'VM'];
+    fromTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
+                 'SMTPS', 'SMTP', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WEBSOCKET'];
 
-    toTypes = ['ACTIVEMQ', 'DIRECT', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP',
-        'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN'];
+    toTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
+               'SMTPS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN', 'WEBSOCKET'];
 
-    errorTypes = ['ACTIVEMQ', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM'];
+    errorTypes = ['ACTIVEMQ', 'AS2', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM', 'WEBSOCKET'];
 
-    wireTapTypes = ['ACTIVEMQ', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'NETTY4', 'KAFKA', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM'];
-
+    wireTapTypes = ['ACTIVEMQ', 'ELASTICSEARCH', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WEBSOCKET'];
 }
 
 export const flowExamples = [

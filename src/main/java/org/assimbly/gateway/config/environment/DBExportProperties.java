@@ -12,8 +12,6 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.service.FlowService;
-import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +31,6 @@ public class DBExportProperties {
 
 	@Autowired
 	private FlowRepository flowRepository;
-
-	@Autowired
-	private FlowRepository flowMapper;
-
-	@Autowired
-	private FlowService flowService;
 
 	private FromEndpoint fromEndpoint;
 
