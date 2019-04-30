@@ -48,10 +48,10 @@ export class GatewayImportDialogComponent implements AfterContentInit {
 
     importConfiguration() {
         this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration).subscribe(
-            r => {
+            (data) => {
                 this.importError = false;
-                this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
                 this.activeModal.dismiss(true);
+                this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
             },
             err => {
                 this.importError = true;

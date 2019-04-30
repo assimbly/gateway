@@ -1,19 +1,6 @@
 {
-    "name": "Flow",
-    "fields": [
-        {
-            "fieldName": "name",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "autoStart",
-            "fieldType": "Boolean"
-        },
-        {
-            "fieldName": "offLoading",
-            "fieldType": "Boolean"
-        }
-    ],
+    "fluentMethods": true,
+    "clientRootFolder": "",
     "relationships": [
         {
             "relationshipName": "gateway",
@@ -44,13 +31,33 @@
             "otherEntityRelationshipName": "flow"
         }
     ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "autoStart",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "offLoading",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "maximumRedeliveries",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "redeliveryDelay",
+            "fieldType": "Integer"
+        }
+    ],
     "changelogDate": "20180114132915",
-    "entityTableName": "flow",
     "dto": "mapstruct",
-    "pagination": "infinite-scroll",
+    "searchEngine": false,
     "service": "serviceImpl",
+    "entityTableName": "flow",
     "jpaMetamodelFiltering": false,
-    "fluentMethods": true,
-    "clientRootFolder": "",
-    "applications": "*"
+    "pagination": "infinite-scroll"
 }

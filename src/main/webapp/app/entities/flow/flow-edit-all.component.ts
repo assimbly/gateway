@@ -65,6 +65,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     namePopoverMessage: string;
     autoStartPopoverMessage: string;
     offloadingPopoverMessage: string;
+    maximumRedeliveriesPopoverMessage: string;
+    redeliveryDelayPopoverMessage: string;
+    
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
     headerPopoverMessage: string;
@@ -77,6 +80,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     fromUriPlaceholder: string;
     fromUriPopoverMessage: string;
 
+    componentOptions: any;
     fromComponentOptions: any;
     toComponentOptions: Array<any> = [];
     errorComponentOptions: any;
@@ -237,6 +241,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow = new Flow();
                             this.flow.autoStart = false;
                             this.flow.offLoading = false;
+                            this.flow.maximumRedeliveries = 0;
+                            this.flow.redeliveryDelay = 3000;
                             if (this.singleGateway) {
                                 this.flow.gatewayId = this.gateways[0].id;
                             }
@@ -319,6 +325,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
+        } else if  (componentType === 'wastebin'){
+            componentType = 'mock';
         }
         
         if (endpoint instanceof FromEndpoint) {
@@ -331,7 +339,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // get options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.fromComponentOptions = Object.keys(data.properties);
+                this.fromComponentOptions = Object.keys(data.properties).sort();
             });
 
         } else if (endpoint instanceof ToEndpoint) {
@@ -344,7 +352,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties);
+                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties).sort();
             });
 
         } else if (endpoint instanceof ErrorEndpoint) {
@@ -357,7 +365,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe((data) => {
-                this.errorComponentOptions = Object.keys(data.properties);
+                this.errorComponentOptions = Object.keys(data.properties).sort();
             });
         }
 
@@ -393,7 +401,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
-                                         This endpoint is configured at <i>Settings --> Offloading</i>.`;
+                                         This endpoint is configured at <i>Settings --> Offloading</i>.`;        
+        this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
+        this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
@@ -412,9 +422,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'name': new FormControl(flow.name, Validators.required),
             'autoStart': new FormControl(flow.autoStart),
             'offloading': new FormControl(flow.offLoading),
+            'maximumRedeliveries': new FormControl(flow.maximumRedeliveries),
+            'redeliveryDelay': new FormControl(flow.redeliveryDelay),
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
+       
     }
 
     initializeEndpointData(endpoint?: any): FormGroup {
@@ -453,6 +466,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'name': flow.name,
             'autoStart': flow.autoStart,
             'offloading': flow.offLoading,
+            'maximumRedeliveries': flow.maximumRedeliveries,
+            'redeliveryDelay': flow.redeliveryDelay,
             'gateway': flow.gatewayId
         });
     }
@@ -476,7 +491,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
         if (!endpoint.options) { endpoint.options = '' }
         const options = endpoint.options.split('&');
-
+        
         options.forEach((option, index) => {
             const kv = option.split('=');
             const o = new Option();
@@ -518,6 +533,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
         let index = 0;
+        
         endpointOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
@@ -652,6 +668,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.isSaving = false;
     }
 
+    export(flow: IFlow) {
+        this.flowService.exportFlowConfiguration(flow);
+     }
+    
     save(goToOverview: boolean) {
         this.isSaving = true;
         this.setDataFromForm();
@@ -758,8 +778,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.name = flowControls.name.value;
         this.flow.autoStart = flowControls.autoStart.value;
         this.flow.offLoading = flowControls.offloading.value;
+        this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
+        this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;
         this.flow.gatewayId = flowControls.gateway.value;
-
+        
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
             if (index === 0) {
                 this.setDataFromFormOnEndpoint(this.fromEndpoint, (<FormGroup>endpoint).controls);

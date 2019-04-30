@@ -13,20 +13,26 @@ import { FlowService } from './flow.service';
 })
 export class FlowDeleteDialogComponent {
     flow: IFlow;
+    message = 'Are you sure you want to delete this Flow?';
+    disableDelete: boolean;
 
-    constructor(protected flowService: FlowService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected flowService: FlowService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected router: Router) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.flowService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'flowListModification',
-                content: 'Deleted an flow'
-            });
-            this.activeModal.dismiss(true);
+        this.flowService.getFlowStatus(id).subscribe((response) => {
+            if (response.body === 'started') {
+                this.message = 'Active flow can not be deleted. Please stop flow before first.';
+                this.disableDelete = true;
+            } else {
+                this.flowService.delete(id).subscribe((r) => {
+                    this.router.navigate(['/']);
+                    this.activeModal.dismiss(true);                    
+                });
+            }
         });
     }
 }
