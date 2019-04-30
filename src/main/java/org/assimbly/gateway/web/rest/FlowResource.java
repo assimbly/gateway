@@ -138,6 +138,7 @@ public class FlowResource {
     public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
         log.debug("REST request to get Flow : {}", id);
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
+        
         return ResponseUtil.wrapOrNotFound(flowDTO);
     }
 

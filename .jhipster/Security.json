@@ -1,0 +1,26 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "url",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "certificateName",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "certificateExpiry",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20190409092417",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceImpl",
+    "entityTableName": "security",
+    "jpaMetamodelFiltering": false,
+    "pagination": "infinite-scroll"
+}

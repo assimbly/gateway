@@ -63,6 +63,9 @@ public class EnvironmentResource {
 
        	try {
 			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType);
+			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
+				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
+			}
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
        		
    		} catch (Exception e) {
@@ -102,6 +105,9 @@ public class EnvironmentResource {
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {
             configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType);
+			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
+				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", configuration);
+			}
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", e.getMessage());
