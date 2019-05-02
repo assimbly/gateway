@@ -223,6 +223,12 @@ public class DBExportXMLConfiguration {
 		name.appendChild(doc.createTextNode(flowName));
 		flow.appendChild(name);
 
+		// set autostart
+		String flowAutostart = flowDB.isAutoStart().toString();
+		Element autostart = doc.createElement("autostart");
+		autostart.appendChild(doc.createTextNode(flowAutostart));
+		flow.appendChild(autostart);		
+		
 		// set offloading
 		String flowOffloading = flowDB.isOffLoading().toString();
 		Element offloading = doc.createElement("offloading");

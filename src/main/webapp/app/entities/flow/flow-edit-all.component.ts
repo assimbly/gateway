@@ -403,7 +403,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
                                          This endpoint is configured at <i>Settings --> Offloading</i>.`;        
         this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
-        this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries`;
+        this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
