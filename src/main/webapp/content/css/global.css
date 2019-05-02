@@ -366,7 +366,7 @@ only screen and (                min-resolution: 2dppx) {
 
 /* jhipster-needle-css-add-main JHipster will add new css style */
 .popover {
-    max-width: 21%;
+    max-width: 30%;
 }
 .border-bottom-none{
     border-bottom:none !important;

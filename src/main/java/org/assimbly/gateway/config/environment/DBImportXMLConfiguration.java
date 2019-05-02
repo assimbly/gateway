@@ -131,7 +131,7 @@ public class DBImportXMLConfiguration {
 
 			gatewayRepository.save(gateway);
 
-			// create flows
+			// create services and headers
 			setServicesAndHeadersFromXML(doc);
 
 			// create flows
@@ -290,7 +290,13 @@ public class DBImportXMLConfiguration {
 			if(fromServiceOptional.isPresent()) {
 				fromService = fromServiceOptional.get();
 			}else {
-				fromService = null;
+				String fromServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
+				fromServiceOptional = serviceRepository.findByName(fromServiceName);
+				if(fromServiceOptional.isPresent()) {
+					fromService = fromServiceOptional.get();
+				}else {
+					fromService = null;
+				}
 			}
 		} catch (NumberFormatException nfe) {
 			fromService = null;
@@ -304,7 +310,13 @@ public class DBImportXMLConfiguration {
 			if(fromHeaderOptional.isPresent()) {
 				fromHeader = fromHeaderOptional.get();
 			}else {
-				fromHeader = null;
+				String fromHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
+				fromHeaderOptional = headerRepository.findByName(fromHeaderName);
+				if(fromHeaderOptional.isPresent()) {
+					fromHeader = fromHeaderOptional.get();
+				}else {
+					fromHeader = null;
+				}
 			}
 		} catch (NumberFormatException nfe) {
 			fromHeader = null;
@@ -403,12 +415,17 @@ public class DBImportXMLConfiguration {
 		org.assimbly.gateway.domain.Service toService;
 		try {
 			Long serviceId = Long.parseLong(toServiceId, 10);
-			Optional<org.assimbly.gateway.domain.Service> fromServiceOptional = serviceRepository.findById(serviceId);
-			if(fromServiceOptional.isPresent()) {
-				toService = fromServiceOptional.get();
+			Optional<org.assimbly.gateway.domain.Service> toServiceOptional = serviceRepository.findById(serviceId);
+			if(toServiceOptional.isPresent()) {
+				toService = toServiceOptional.get();
 			}else {
-				toService = null;
-			}
+				String toServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
+				toServiceOptional = serviceRepository.findByName(toServiceName);
+				if(toServiceOptional.isPresent()) {
+					toService = toServiceOptional.get();
+				}else {
+					toService = null;
+				}			}
 		} catch (NumberFormatException nfe) {
 			toService = null;
 		}
@@ -417,12 +434,17 @@ public class DBImportXMLConfiguration {
 		Header toHeader;
 		try {
 			Long headerId = Long.parseLong(toHeaderId, 10);
-			Optional<Header> fromHeaderOptional = headerRepository.findById(headerId);
-			if(fromHeaderOptional.isPresent()) {
-				toHeader = fromHeaderOptional.get();
+			Optional<Header> toHeaderOptional = headerRepository.findById(headerId);
+			if(toHeaderOptional.isPresent()) {
+				toHeader = toHeaderOptional.get();
 			}else {
-				toHeader = null;
-			}
+				String toHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
+				toHeaderOptional = headerRepository.findByName(toHeaderName);
+				if(toHeaderOptional.isPresent()) {
+					toHeader = toHeaderOptional.get();
+				}else {
+					toHeader = null;
+				}			}
 		} catch (NumberFormatException nfe) {
 			toHeader = null;
 		}
@@ -488,12 +510,17 @@ public class DBImportXMLConfiguration {
 		org.assimbly.gateway.domain.Service errorService;
 		try {
 			Long serviceId = Long.parseLong(errorServiceId, 10);
-			Optional<org.assimbly.gateway.domain.Service> fromServiceOptional = serviceRepository.findById(serviceId);
-			if(fromServiceOptional.isPresent()) {
-				errorService = fromServiceOptional.get();
+			Optional<org.assimbly.gateway.domain.Service> errorServiceOptional = serviceRepository.findById(serviceId);
+			if(errorServiceOptional.isPresent()) {
+				errorService = errorServiceOptional.get();
 			}else {
-				errorService = null;
-			}
+				String errorServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
+				errorServiceOptional = serviceRepository.findByName(errorServiceName);
+				if(errorServiceOptional.isPresent()) {
+					errorService = errorServiceOptional.get();
+				}else {
+					errorService = null;
+				}			}
 		} catch (NumberFormatException nfe) {
 			errorService = null;
 		}
@@ -502,12 +529,17 @@ public class DBImportXMLConfiguration {
 		Header errorHeader;
 		try {
 			Long headerId = Long.parseLong(errorHeaderId, 10);
-			Optional<Header> fromHeaderOptional = headerRepository.findById(headerId);
-			if(fromHeaderOptional.isPresent()) {
-				errorHeader = fromHeaderOptional.get();
+			Optional<Header> errorHeaderOptional = headerRepository.findById(headerId);
+			if(errorHeaderOptional.isPresent()) {
+				errorHeader = errorHeaderOptional.get();
 			}else {
-				errorHeader = null;
-			}
+				String errorHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
+				errorHeaderOptional = headerRepository.findByName(errorHeaderName);
+				if(errorHeaderOptional.isPresent()) {
+					errorHeader = errorHeaderOptional.get();
+				}else {
+					errorHeader = null;
+				}			}
 		} catch (NumberFormatException nfe) {
 			errorHeader = null;
 		}

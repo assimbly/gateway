@@ -106,7 +106,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.subscribe('alert');
         this.subscribe('event');
         this.receive().subscribe(data => {
+
             const data2 = data.split(':');
+            
             if (Array.isArray(data2) || data2.length) {                
                 if(data2[0]==='event'){
                     this.setFlowStatus(data2[1])
@@ -117,6 +119,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                     }    
                 }
             }
+            
         });
     }
 
@@ -341,6 +344,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         if (res === 0) {
             this.flowStatistic = `Currently there are no statistics for this flow.`;
         } else {
+            
             const now = moment(new Date());
             const start = moment(res.stats.startTimestamp);
             const flowRuningTime = moment.duration(now.diff(start));
@@ -348,6 +352,16 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             const minutes = flowRuningTime.minutes();
             const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
             const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
+            let processingTime = ``;
+                     
+            if(res.stats.lastProcessingTime > 0){
+                processingTime = `<b>Processing time</b><br/>
+                Last: ${res.stats.lastProcessingTime} ms<br/>
+                Min: ${res.stats.minProcessingTime} ms<br/>
+                Max: ${res.stats.maxProcessingTime} ms<br/>
+                Average: ${res.stats.meanProcessingTime} ms<br/>`;
+            }              
+                
             this.flowStatistic = `
                 <b>Flow</b><br/>
                 Start time: ${this.checkDate(res.stats.startTimestamp)}<br/>
@@ -356,13 +370,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 Last: ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/>
                 Completed: ${completed}<br/>
                 Failed: ${failures}<br/>
-                <br/>
-                <b>Processing time</b><br/>
-                Last: ${res.stats.lastProcessingTime} ms<br/>
-                Min: ${res.stats.minProcessingTime} ms<br/>
-                Max: ${res.stats.maxProcessingTime} ms<br/>
-                Average: ${res.stats.meanProcessingTime} ms<br/>
-            `;
+                <br/>` + processingTime;
         }
     }
 

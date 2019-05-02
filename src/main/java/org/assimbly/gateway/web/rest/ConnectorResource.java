@@ -4,7 +4,10 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.config.environment.DBConfiguration;
+import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.event.FailureListener;
+import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -45,6 +49,12 @@ public class ConnectorResource {
 
     @Autowired
     FailureListener failureListener;
+
+    @Autowired
+    FlowRepository flowRepository;
+	
+    @Autowired
+    DBConfiguration assimblyDBConfiguration;
 
     @Autowired	
     private SimpMessageSendingOperations messagingTemplate;
@@ -778,19 +788,11 @@ public class ConnectorResource {
         }
 	}
 
-    /*
     //This method can be called on application startup
     @PostConstruct
     private void initConnector() throws Exception {
-    
-    	//start connector
-       	if(!connector.isStarted()){
-        	try {
-				connector.start();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
+
+    	init();
 
 		//start flows with autostart
        	List<Flow> flows = flowRepository.findAll();
@@ -802,5 +804,6 @@ public class ConnectorResource {
 				connector.startFlow(flow.getId().toString());
        		}
        	}
-	}*/
+		
+	}
 }
