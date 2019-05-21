@@ -22,7 +22,7 @@ export class HeaderUpdateComponent implements OnInit {
     headerKeys: Array<HeaderKeys> = [];
     headerKeysKeys: Array<String> = [];
     isSaving: boolean;
-    public typeHeader: string[] = ['constant', 'xpath'];
+    public typeHeader: string[] = ['constant','simple','xpath'];
 
     constructor(
 		protected headerService: HeaderService, 
@@ -44,17 +44,13 @@ export class HeaderUpdateComponent implements OnInit {
         });
     }
 
-    clear() {
-        window.history.back();
-    }
-
     previousState() {
         window.history.back();
     }
 
     save() {
         this.isSaving = true;
-        if (this.header.id !== undefined) {
+        if (this.header.id) {
             this.subscribeToSaveResponse(this.headerService.update(this.header));
         } else {
             this.subscribeToSaveResponse(this.headerService.create(this.header));
@@ -133,18 +129,18 @@ export class HeaderUpdateComponent implements OnInit {
                 'headerId.equals' : this.header.id
              };
         
-        
         if (this.header.id) {
             this.headerKeysService.query({filter: 'headerid.equals=1'}).subscribe((res) => {
                 this.headerKeys = res.body.filter(headerkeys => headerkeys.headerId === this.header.id);
+                this.header.id = cloneHeader ? null : this.header.id;
             });
-            this.header.id = cloneHeader ? null : this.header.id;
         }else {
             let hk = new HeaderKeys();
             hk.type = this.typeHeader[0];
             this.headerKeys.push(hk);
             this.header.id = cloneHeader ? null : this.header.id;
         }
+        
     }
-
+    
 }
