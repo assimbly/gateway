@@ -25,7 +25,7 @@ export class HeaderDialogComponent implements OnInit {
     headerKeys: Array<HeaderKeys> = [];
     headerKeysKeys: Array<String> = [];
     isSaving: boolean;
-    public typeHeader: string[] = ['constant', 'xpath'];
+    public typeHeader: string[] = ['constant','simple', 'xpath'];
 
     constructor(
         public activeModal: NgbActiveModal,

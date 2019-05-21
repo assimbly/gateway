@@ -133,43 +133,57 @@
 							<ng-template ngbPanelContent>
 								<jhi-alert-error></jhi-alert-error>
 									<div class="col-12" style="padding-left: 20px;" [formGroupName]="'0'">
-										<br/>
-										<div class="border-bottom my-3">
-											<h5>URI</h5>	
+										<div class="input-group">
+											<a class="col-8"></a>
+											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<img src="../../../content/images/apache-camel.png" />
+											</a>
+											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<img src="../../../content/images/assimbly_transparant_small.png" />
+											</a>
 										</div>
 										<div class="form-group" id="fromEndpointId" [hidden]="!fromEndpointId">
 											<label for="id">ID</label>
 											<input type="text" class="form-control" id="id" readonly formControlName="id" />
 										</div>		
-										<div class="form-group">
-											<label class="form-control-label" for="field_from_type">Scheme</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="componentPopover" container="body" placement="right" class="fa fa-info-circle"></i>											
-											<div class="input-group">
-												<ng-select [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)" style="margin-right: 200px;"></ng-select>
-												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-													<img src="../../../content/images/apache-camel.png" />
-												</a>
-												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_transparant_small.png" />
-												</a>
-											</div>
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.type.errors && (editFlowForm.controls.endpointsData.controls[0].controls.type.dirty || editFlowForm.controls.endpointsData.controls[0].controls.type.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
-											</div>
-										</div>
 										<ng-template #uriPopover let-message="message">
 													<div [innerHtml]="fromUriPopoverMessage"></div>
 										</ng-template>
+										<ng-template #uriFromEditor>
+												<div class="modal-header">
+											      <h4 class="modal-title">URI (context path)</h4>
+											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+											        <span aria-hidden="true">&times;</span>
+											      </button>
+											    </div>
+											    <div class="modal-body">
+											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" rows="5" [(ngModel)]="fromEndpoint.uri"></textarea>
+											    </div>
+											    <div class="modal-footer">
+											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
+											    </div>
+										</ng-template>
+										
 										<div class="form-group">
-											<label class="form-control-label" for="field_uri">Context path*</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" />												
+											<div class="input-group border-bottom my-3">
+												<h5>URI&ensp;</h5>
+												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>	
 											</div>
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[0].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[0].controls.uri.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
-											</div>
+											<div class="input-group" style="margin-left: -14px;">
+												<ng-select class="col-3" [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
+												<a>:</a><span style="display:inline-block; width: 14px;"></span>
+												<input type="text" class="form-control col-6.5" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" [(ngModel)]="fromEndpoint.uri"/>
+												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriFromEditor)">
+													<span class="fa fa-pencil padding-button"></span>&nbsp;
+												</button>
+											</div>	
 										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.type.errors && (editFlowForm.controls.endpointsData.controls[0].controls.type.dirty || editFlowForm.controls.endpointsData.controls[0].controls.type.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
+										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[0].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[0].controls.uri.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[0].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
+										</div>										
 										<div class="form-group" formArrayName="options">
 											<label class="form-control-label" for="field_options">Options</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
@@ -242,46 +256,57 @@
 							class="fa fa-info-circle"></i>
 						    </ng-template>
 							<ng-template ngbPanelContent>
-								<jhi-alert-error></jhi-alert-error>
+								<jhi-alert-error></jhi-alert-error>								
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
-										<br/>
-										<div class="border-bottom my-3"><h5>URI</h5></div>
-										<div class="form-group" id="toEndpointId" [hidden]="!toEndpointId">
-											<label for="id">ID</label>
-											<input type="text" class="form-control" id="id" formControlName="id" readonly />
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_to_type">Scheme</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="componentPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)" style="margin-right: 200px;"></ng-select>
+										<div class="input-group">
+											<a class="col-8"></a>
 												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
 													<img src="../../../content/images/apache-camel.png" />
 												</a>
 												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
 													<img src="../../../content/images/assimbly_transparant_small.png" />
 												</a>												
-											</div> 
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
-											</div>
+										</div>										
+										<div class="form-group" id="toEndpointId" [hidden]="!toEndpointId">
+											<label for="id">ID</label>
+											<input type="text" class="form-control" id="id" formControlName="id" readonly />
 										</div>
 										<ng-template #uriPopover let-message="message">
 											<div style="min-width:300px;" [innerHtml]="toUriPopoverMessages[toIndex]"></div>
 										</ng-template>
+										<ng-template #uriToEditor>
+												<div class="modal-header">
+											      <h4 class="modal-title">URI (context path)</h4>
+											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+											        <span aria-hidden="true">&times;</span>
+											      </button>
+											    </div>
+											    <div class="modal-body">
+											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" rows="5" [(ngModel)]="toEndpoint.uri"></textarea>
+											    </div>
+											    <div class="modal-footer">
+											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
+											    </div>
+										</ng-template>
 										<div class="form-group">
-											<label class="form-control-label" for="field_uri">Context path*</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" />
-												<ng-template #uriPopover let-message="message">
-													<div style="min-width:300px;" [innerHtml]="toUriPopoverMessages[toIndex]"></div>
-												</ng-template>
-
-											</div>
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
-											</div>
+											<div class="input-group border-bottom my-3">
+												<h5>URI&ensp;</h5>
+												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
+												</div>
+											<div class="input-group" style="margin-left: -14px;">
+												<ng-select class="col-3" [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
+												<a>:</a><span style="display:inline-block; width: 14px;"></span>
+												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}"  [(ngModel)]="toEndpoint.uri"/>
+												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriToEditor)">
+													<span class="fa fa-pencil padding-button"></span>&nbsp;
+												</button>
+											</div>	
+										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
+										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
 										</div>
 										<div class="form-group" formArrayName="options">
 											<label class="form-control-label" for="field_options">Options</label>
@@ -310,7 +335,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(toEndpoint, editFlowForm.controls.endpointsData.controls[toIndex+2].controls.header)" [disabled]="editFlowForm.controls.endpointsData.controls[toIndex+2].controls.type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil  padding-button"></span>&nbsp;
 												</button>
@@ -367,43 +392,56 @@
 						    </ng-template>
 							<ng-template ngbPanelContent>
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="'1'">
-										<br/>
-										<div class="border-bottom my-3"><h5>URI</h5></div>
+										<div class="input-group">
+											<a class="col-8"></a>
+											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errrEndpoint?.type}}.">
+												<img src="../../../content/images/apache-camel.png" />
+											</a>
+											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
+												<img src="../../../content/images/assimbly_transparant_small.png" />
+											</a>
+										</div>	
 										<div class="form-group" id="errorEndpointId" [hidden]="!errorEndpointId">
 											<label for="id">ID</label>
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />
 										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_error_type">Scheme</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="componentPopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)" style="margin-right: 200px;"></ng-select>
-												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errrEndpoint?.type}}.">
-													<img src="../../../content/images/apache-camel.png" />
-												</a>
-												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_transparant_small.png" />
-												</a>
-											</div>
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.type.errors && (editFlowForm.controls.endpointsData.controls[1].controls.type.dirty || editFlowForm.controls.endpointsData.controls[1].controls.type.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
-											</div>
-										</div>
 										<ng-template #uriPopover let-message="message">
-											<div style="min-width:300px;" [innerHtml]="toUriPopoverMessages[toIndex]"></div>
+											<div style="min-width:300px;" [innerHtml]="erorUriPopoverMessages"></div>
 										</ng-template>
+										<ng-template #uriErrorEditor>
+												<div class="modal-header">
+											      <h4 class="modal-title">URI (context path)</h4>
+											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+											        <span aria-hidden="true">&times;</span>
+											      </button>
+											    </div>
+											    <div class="modal-body">
+											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{erroUriPlaceholders}}" rows="5" [(ngModel)]="errorEndpoint.uri"></textarea>
+											    </div>
+											    <div class="modal-footer">
+											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
+											    </div>
+										</ng-template>
+
 										<div class="form-group">
-											<label class="form-control-label" for="field_uri">Context path*</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" />
-												<ng-template #uriPopover let-message="message">
-													<div style="min-width:300px;" [innerHtml]="errorUriPopoverMessage"></div>
-												</ng-template>
+											<div class="input-group border-bottom my-3">
+												<h5>URI&ensp;</h5>
+												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
 											</div>
-											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[1].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[1].controls.uri.touched)">
-												<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
-											</div>
+											<div class="input-group" style="margin-left: -14px;">
+												<ng-select class="col-3" [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
+												<a>:</a><span style="display:inline-block; width: 14px;"></span>
+												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{errorUriPlaceholders}}" [(ngModel)]="errorEndpoint.uri"/>
+												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriErrorEditor)">
+													<span class="fa fa-pencil padding-button"></span>&nbsp;
+												</button>
+											</div>	
+										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.type.errors && (editFlowForm.controls.endpointsData.controls[1].controls.type.dirty || editFlowForm.controls.endpointsData.controls[1].controls.type.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.type.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
+										</div>
+										<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors && (editFlowForm.controls.endpointsData.controls[1].controls.uri.dirty || editFlowForm.controls.endpointsData.controls[1].controls.uri.touched)">
+											<div *ngIf="editFlowForm.controls.endpointsData.controls[1].controls.uri.errors.required" class="invalid-field-message">Context path is required.</div>
 										</div>
 										<div class="form-group" formArrayName="options">
 											<label class="form-control-label" for="field_options">Options</label>
