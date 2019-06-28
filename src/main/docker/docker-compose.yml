@@ -1,0 +1,19 @@
+version: '3'
+services:
+  assimbly:
+    image: "assimbly/gateway:latest"
+    volumes:
+      - gateway:/opt/assimbly
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 1000M
+    ports:
+      - "8080:8080" 
+    networks:
+      - webnet
+networks:
+  webnet:      
+volumes:
+  gateway:  
