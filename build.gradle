@@ -237,13 +237,13 @@ dependencies {
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
 	// custom dependencies (non-jhipster)
-    compile "org.assimbly:connector:1.0.0"
+    compile group: "org.assimbly", name: "connector", version: "1.0.0", changing: true    
     compile "io.github.assimbly:docconverter:1.1.0"	
 	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.8"
 	compile "org.jdom:jdom2:2.0.6"
 	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
-	compile "io.hawt:hawtio-springboot:2.7.0"
+	//compile "io.hawt:hawtio-springboot:2.7.0"
 	
 	// end custom dependencies
     

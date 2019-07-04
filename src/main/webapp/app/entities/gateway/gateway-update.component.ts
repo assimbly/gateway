@@ -19,7 +19,7 @@ export class GatewayUpdateComponent implements OnInit {
     gateway: IGateway;
     isSaving: boolean;
 
-    public gatewayListType = [GatewayType.ADAPTER, GatewayType.BROKER];
+    public gatewayListType = [GatewayType.ADAPTER, GatewayType.BROKER, GatewayType.ARTEMIS];
     public gatewayListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION]
     
     generalPopoverMessage: string;
@@ -109,7 +109,15 @@ export class GatewayUpdateComponent implements OnInit {
             this.gateway.defaultFromEndpointType = EndpointType.ACTIVEMQ;
             this.gateway.defaultToEndpointType = EndpointType.ACTIVEMQ;
             this.gateway.defaultErrorEndpointType = EndpointType.ACTIVEMQ;
-        }
+        }else if(this.gateway.type.toString() === 'ARTEMIS') {
+            this.gateway.defaultFromEndpointType = EndpointType.SJMS;
+            this.gateway.defaultToEndpointType = EndpointType.SJMS;
+            this.gateway.defaultErrorEndpointType = EndpointType.SJMS;
+        }else{
+            this.gateway.defaultFromEndpointType = EndpointType.FILE;
+            this.gateway.defaultToEndpointType = EndpointType.FILE;
+            this.gateway.defaultErrorEndpointType = EndpointType.FILE;
+        } 
     }
     
     setPopoverMessages() {

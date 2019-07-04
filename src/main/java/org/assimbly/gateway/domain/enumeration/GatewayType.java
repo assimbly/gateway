@@ -4,7 +4,7 @@ package org.assimbly.gateway.domain.enumeration;
  * The GatewayType enumeration.
  */
 public enum GatewayType {
-	ADAPTER, BROKER
+	ADAPTER, BROKER, ARTEMIS
 	//Feature possible gateways
-    //ADAPTER, GUI, BROKER, SOAP, API, SFTP 
+    //GUI, SOAP, API, SFTP 
 }
