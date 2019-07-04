@@ -4,7 +4,7 @@ import { IEnvironmentVariables } from 'app/shared/model//environment-variables.m
 export const enum GatewayType {
     ADAPTER = 'ADAPTER',
     BROKER = 'BROKER',
-    API = 'API',
+    ARTEMIS = 'ARTEMIS',
     SOAP = 'SOAP'
 }
 
