@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { NgbTabset, NgbTabChangeEvent, NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTabset, NgbTabChangeEvent, NgbAccordion, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
@@ -23,13 +23,14 @@ import { GatewayService } from '../gateway';
 import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { EndpointType, typesLinks, Components } from '../../shared/camel/component-type';
 import { map } from "rxjs/operators";
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+
 
 @Component({
     selector: 'jhi-flow-edit-all',
     templateUrl: './flow-edit-all.component.html'
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
-
 
     flow: IFlow;
     fromEndpoint: IFromEndpoint;
@@ -112,6 +113,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private wikiDocUrl: string;
     private camelDocUrl: string;
 
+    modalRef: NgbModalRef | null;
+    
     @ViewChild('tabs')
     private ngbTabset: NgbTabset
 
@@ -127,7 +130,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
         private router: Router,
-        private components: Components
+        private components: Components,
+        private modalService: NgbModal
     ) {
         this.toEndpoints = [new ToEndpoint()];
     }
@@ -148,6 +152,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     load(id, isCloning?: boolean) {
         if (isCloning) {
             this.flow.id = null;
+            this.flow.name = null;
             this.flow.fromEndpointId = null;
             this.flow.errorEndpointId = null;
             this.flow.toEndpoints = null;
@@ -205,8 +210,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                             if (this.flow.errorEndpointId) {
                                 this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
-                                    // this.fromEndpoint = new FromEndpoint(fromEndpoint.body.id,fromEndpoint.body.type,fromEndpoint.body.uri,fromEndpoint.body.options,fromEndpoint.body.serviceId,fromEndpoint.body.headerId);
-                                    
                                     this.errorEndpoint = new ErrorEndpoint(errorEndpoint.body.id,errorEndpoint.body.type,errorEndpoint.body.uri,errorEndpoint.body.options,errorEndpoint.body.serviceId,errorEndpoint.body.headerId);
                                     (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
                                     setTimeout(() => {
@@ -577,7 +580,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpoints.push(new ToEndpoint());
         this.toEndpointsOptions.push([new Option()]);
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
-        toEndpoint.type = JSON.parse(EndpointType.FILE);
+        toEndpoint.type = EndpointType[this.gateways[0].defaultToEndpointType];
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
         this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
         setTimeout(() => {
@@ -596,6 +599,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     }
 
+    openModal(uriEditor: TemplateRef<any>) {
+       this.modalRef = this.modalService.open(uriEditor);
+    }
+    
+    cancelModal (): void {
+        
+        if ( this.modalRef ) {
+           this.modalRef.dismiss();
+           this.modalRef = null;
+        }
+    }
+    
     previousState() {
         window.history.back();
     }

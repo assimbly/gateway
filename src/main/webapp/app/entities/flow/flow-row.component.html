@@ -4,7 +4,7 @@
 	<div [innerHtml]="flowDetails"></div>
 	</ng-template> <ng-template #statsTemplate let-message="message">
 	<div [innerHtml]="flowStatistic"></div>
-	</ng-template> <span>{{flow.name}}</span>
+	</ng-template> <span><a (click)="navigateToFlow()">{{flow.name}}</a></span>
 	<p>
 		<a (click)="navigateToFlow()" class="fa fa-edit" aria-hidden="true"
 			(mouseenter)="getFlowDetails()" triggers="mouseenter:mouseleave"

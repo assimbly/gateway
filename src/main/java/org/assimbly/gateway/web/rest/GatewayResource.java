@@ -1,9 +1,8 @@
 package org.assimbly.gateway.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import org.assimbly.connector.service.Broker;
+import org.assimbly.gateway.config.environment.BrokerManager;
 import org.assimbly.gateway.domain.Gateway;
-import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -39,11 +38,15 @@ public class GatewayResource {
 
 	private final GatewayService gatewayService;
 
+	private BrokerManager brokermanager = new BrokerManager();
+
+	private String gatewayType;
+	
     public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository) {
         this.gatewayService = gatewayService;
         this.gatewayRepository = gatewayRepository;
     }
-
+    
     /**
      * POST  /gateways : Create a new gateway.
      *
@@ -76,28 +79,33 @@ public class GatewayResource {
     @PutMapping("/gateways")
     @Timed
     public ResponseEntity<GatewayDTO> updateGateway(@RequestBody GatewayDTO gatewayDTO) throws URISyntaxException {
-        log.debug("REST request to update Gateway : {}", gatewayDTO);
+
+    	log.debug("REST request to update Gateway : {}", gatewayDTO);
         if (gatewayDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-       
-        if (gatewayDTO.getType().name().equals("BROKER")) {
-            log.info("Starting embedded ActiveMQ broker");
-       		try {
-				new Broker().start();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }else {
-            log.info("Stopping embedded ActiveMQ broker");
-       		try {
-				new Broker().stop();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
-
+             
+        gatewayType = gatewayDTO.getType().name();
         GatewayDTO result = gatewayService.save(gatewayDTO);
+        
+        try {
+			
+	        if (gatewayType.equals("BROKER")) {	  
+       			brokermanager.stop("ARTEMIS");
+       			brokermanager.start(gatewayType);
+	        }else if (gatewayType.equals("ARTEMIS")) {
+	        	brokermanager.stop("BROKER");
+       			brokermanager.start(gatewayType);
+	        }else {
+	        	System.out.println("gateway=adapter");
+	        	brokermanager.stop("BROKER");
+       			brokermanager.stop("ARTEMIS");
+	        }
+        
+        } catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString()))
             .body(result);
@@ -151,14 +159,8 @@ public class GatewayResource {
         
         for(Gateway gateway : gateways) {
         	
-        	GatewayType gatewayType = gateway.getType();
-        	
-        	if(gatewayType == GatewayType.BROKER) {
-                log.info("Starting embedded ActiveMQ broker");
-           		new Broker().start();
-        	}
-
+        	gatewayType = gateway.getType().name();
+   			brokermanager.start(gatewayType);
         }
     }
-    
 }
