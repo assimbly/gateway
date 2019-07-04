@@ -59,7 +59,7 @@ spring:
 
 server:
     session:
-        timeout: 14400
+        timeout: 28800
         cookie:
             http-only: true
     servlet:

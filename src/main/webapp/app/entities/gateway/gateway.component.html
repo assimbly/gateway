@@ -27,14 +27,30 @@
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
                 <tr>
-                    <th class="bg-gray" colspan="2">
-                        <span class="text-center">
-                            <i>{{gateway.name}}</i>
+                    <th class="bg-secondary text-white font-weight-bold" colspan="2">
+                        <span>
+                            <h4>General</h4>
                         </span>
                     </th>
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td lass="w-25">
+                        <span class="font-weight-bold">ID:</span>
+                    </td>
+                    <td class="w-75">
+                        {{gateway.id}}
+                    </td>
+                </tr>
+                <tr>
+                    <td lass="w-25">
+                        <span class="font-weight-bold">Name:</span>
+                    </td>
+                    <td class="w-75">
+                        {{gateway.name}}
+                    </td>
+                </tr>
                 <tr>
                     <td lass="w-25">
                         <span class="font-weight-bold">Type:</span>
@@ -60,8 +76,13 @@
                     </td>
                 </tr>
                 <tr>
+                    <td class="bg-secondary text-white font-weight-bold" colspan="2">
+                        <span><h5>Endpoint defaults</h5></span>
+                    </td>
+                </tr>
+                <tr>
                     <td>
-                        <span class="font-weight-bold">Default From Endpoint:</span>
+                        <span class="font-weight-bold">From:</span>
                     </td>
                     <td>
                         {{gateway.defaultFromEndpointType}}
@@ -69,7 +90,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <span class="font-weight-bold">Default To Endpoint:</span>
+                        <span class="font-weight-bold">To:</span>
                     </td>
                     <td>
                         {{gateway.defaultToEndpointType}}
@@ -77,7 +98,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <span class="font-weight-bold">Default Error Endpoint:</span>
+                        <span class="font-weight-bold">Error:</span>
                     </td>
                     <td>
                         {{gateway.defaultErrorEndpointType}}

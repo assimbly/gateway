@@ -131,6 +131,23 @@ public class DBImportXMLConfiguration {
 
 			gatewayRepository.save(gateway);
 
+			//start broker
+			BrokerManager brokermanager = new BrokerManager();
+			
+			if (type.equals("BROKER")) {	            
+       			brokermanager.stop("ARTEMIS");
+       			brokermanager.start(type);
+	        }else if (type.equals("ARTEMIS")) {
+	        	brokermanager.stop("BROKER");
+       			brokermanager.start(type);
+	        }else {
+	        	brokermanager.stop("BROKER");
+       			brokermanager.stop("ARTEMIS");
+	        }
+			
+			
+			
+			
 			// create services and headers
 			setServicesAndHeadersFromXML(doc);
 

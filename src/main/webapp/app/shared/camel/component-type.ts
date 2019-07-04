@@ -61,7 +61,7 @@ export const typesLinks = [
     {
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
-        camelTypeLink: `/camel-as2/camel-as2-component/src/main/docs/as2-component.adoc`,
+        camelTypeLink: `/components/camel-as2/camel-as2-component/src/main/docs/as2-component.adoc`,
         uriPlaceholder: 'as2://apiName/methodName',
         uriPopoverMessage: `
         <b>Name</b>: as2<br/>
@@ -110,7 +110,7 @@ export const typesLinks = [
     {
         name: 'FILE',
         assimblyTypeLink: `/component-file`,
-        camelTypeLink: `/components/camel-core/src/main/docs/file-component.adoc`,
+        camelTypeLink: `/components/camel-file/src/main/docs/file-component.adoc`,
         uriPlaceholder: 'directoryName',
         uriPopoverMessage: `
         <b>Name</b>: directoryName<br/>
