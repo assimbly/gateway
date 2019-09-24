@@ -8,7 +8,7 @@
 
 	  <cluster-user>myUsername</cluster-user>
 	  <cluster-password>myPassword</cluster-password>
-	  
+
       <acceptors>
          <acceptor name="in-vm">vm://0</acceptor>
          <acceptor name="tcp">tcp://127.0.0.1:61616</acceptor>

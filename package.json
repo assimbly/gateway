@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A message gateway based on Apache camel",
   "private": true,
   "license": "Apache License 2.0",

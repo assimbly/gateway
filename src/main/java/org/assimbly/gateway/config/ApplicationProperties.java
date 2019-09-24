@@ -11,10 +11,30 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 	
+	public final Info info = new Info();
     public final Documentation documentation = new Documentation();
 
+    public Info getInfo() {
+        return info;
+    }
+    
     public Documentation getDocumentation() {
         return documentation;
+    }
+
+    public static class Info {
+
+    	private String version;
+
+    	
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+        
     }
 
     public static class Documentation {
