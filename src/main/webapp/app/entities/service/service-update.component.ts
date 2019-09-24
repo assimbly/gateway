@@ -92,7 +92,6 @@ private serviceKeysRemoveList: Array<ServiceKeys> = [];
             requiredServiceKeys.push(rsk);
         });
         this.serviceKeys.unshift(...requiredServiceKeys);
-        this.mapServiceKeysKeys();
     }
 
     addServiceKeys() {

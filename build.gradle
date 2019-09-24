@@ -16,7 +16,7 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
-    
+        
 }
 
 plugins {
@@ -44,6 +44,12 @@ apply plugin: 'com.moowork.node'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 
+configurations.all {
+  resolutionStrategy {  
+    force 'org.apache.activemq:artemis-core-client:2.10.0', 'org.apache.activemq:artemis-broker:2.10.0','org.apache.activemq:artemis-commons:2.10.0','org.apache.activemq:artemis-selector:2.10.0','org.apache.activemq:artemis-journal:2.10.0'
+  }
+}
+
 dependencyManagement {
   imports {
     mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
@@ -54,7 +60,7 @@ dependencyManagement {
 defaultTasks 'bootRun'
 
 group = 'org.assimbly.gateway'
-version = '1.6.0'
+version = '1.7.0'
 
 description = ''
 
@@ -159,6 +165,7 @@ liquibase {
 configurations {
     providedRuntime
     compile.exclude module: "spring-boot-starter-tomcat"
+    //compile.exclude module: "slf4j-log4j12"
 }
 
 
@@ -244,6 +251,18 @@ dependencies {
 	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
 	//compile "io.hawt:hawtio-springboot:2.7.0"
+	
+	compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.0'
+	compile group: 'org.apache.activemq', name: 'artemis-commons', version: '2.10.0'
+	compile group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.0'
+	compile group: 'org.apache.activemq', name: 'artemis-selector', version: '2.10.0'
+	compile group: 'org.apache.activemq', name: 'artemis-journal', version: '2.10.0'
+		
+	//java 9+
+	compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
+    compile group: 'javax.activation', name: 'activation', version: '1.1.1'
 	
 	// end custom dependencies
     

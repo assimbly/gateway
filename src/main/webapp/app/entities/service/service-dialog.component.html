@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate (ngSubmit)="save(false)" #editForm="ngForm" autocomplete="off">
 
     <div class="modal-header">
-        <h4 class="modal-title" id="myServiceLabel">Create or edit a Service</h4>
+        <h4 class="modal-title" id="myServiceLabel">Create or edit a ServiceY</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
     </div>
     <div class="modal-body">
@@ -87,7 +87,7 @@
                                         <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
                                             <span class="fa fa-plus"></span>
                                         </button>
-                                        <button type="submit" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" 
+                                        <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" 
                                             class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
                                             <span class="fa fa-trash"></span>
                                         </button>

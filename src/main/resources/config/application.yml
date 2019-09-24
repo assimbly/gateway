@@ -115,6 +115,8 @@ jhipster:
 # ===================================================================
 
 application:
+  info:
+    version: 1.7.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://github.com/apache/camel/blob/master    

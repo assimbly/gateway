@@ -94,7 +94,6 @@ export class ServiceDialogComponent implements OnInit {
             requiredServiceKeys.push(rsk);
         });
         this.serviceKeys.unshift(...requiredServiceKeys);
-        this.mapServiceKeysKeys();
     }
 
     addServiceKeys() {
