@@ -42,7 +42,7 @@ export const typesLinks = [
     {
         name: 'ACTIVEMQ',
         assimblyTypeLink: `/component-activemq`,
-        camelTypeLink: `/components/camel-jms/src/main/docs/jms-component.adoc`,
+        camelTypeLink: `/activemq-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
         <b>Name</b>: destinationType<br/>
@@ -61,7 +61,7 @@ export const typesLinks = [
     {
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
-        camelTypeLink: `/components/camel-as2/camel-as2-component/src/main/docs/as2-component.adoc`,
+        camelTypeLink: `/as2-component.html`,
         uriPlaceholder: 'as2://apiName/methodName',
         uriPopoverMessage: `
         <b>Name</b>: as2<br/>
@@ -81,7 +81,7 @@ export const typesLinks = [
     {
         name: 'DIRECT',
         assimblyTypeLink: `/component-direct`,
-        camelTypeLink: `/components/camel-direct/src/main/docs/direct-component.adoc`,
+        camelTypeLink: `/direct-component.html`,
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
@@ -93,8 +93,8 @@ export const typesLinks = [
     },
     {
         name: 'ELASTICSEARCH',
-        assimblyTypeLink: `/component-elasticseach`,
-        camelTypeLink: `/components/camel-elasticsearch-rest/src/main/docs/elasticsearch-rest-component.adoc`,
+        assimblyTypeLink: `/component-elasticsearch`,
+        camelTypeLink: `/elasticsearch-rest-component.html`,
         uriPlaceholder: 'elasticsearch-rest://clusterName',
         uriPopoverMessage: `
         <b>Name</b>: elasticsearch-rest<br/>
@@ -110,7 +110,7 @@ export const typesLinks = [
     {
         name: 'FILE',
         assimblyTypeLink: `/component-file`,
-        camelTypeLink: `/components/camel-file/src/main/docs/file-component.adoc`,
+        camelTypeLink: `/file-component.html`,
         uriPlaceholder: 'directoryName',
         uriPopoverMessage: `
         <b>Name</b>: directoryName<br/>
@@ -123,7 +123,7 @@ export const typesLinks = [
     {
         name: 'FTP',
         assimblyTypeLink: `/component-ftp`,
-        camelTypeLink: `/components/camel-ftp/src/main/docs/ftp-component.adoc`,
+        camelTypeLink: `/ftp-component.html`,
         uriPlaceholder: 'host:port/directoryName',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -148,7 +148,7 @@ export const typesLinks = [
     {
         name: 'FTPS',
         assimblyTypeLink: `/component-ftps`,
-        camelTypeLink: `/components/camel-ftp/src/main/docs/ftps-component.adoc`,
+        camelTypeLink: `/ftps-component.html`,
         uriPlaceholder: 'host:port/directoryName',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -173,7 +173,7 @@ export const typesLinks = [
     {
         name: 'HTTP4',
         assimblyTypeLink: `/component-http4`,
-        camelTypeLink: `/components/camel-http4/src/main/docs/http4-component.adoc`,
+        camelTypeLink: `/http-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `
         <b>Name</b>: httpUri<br/>
@@ -186,7 +186,7 @@ export const typesLinks = [
     {
         name: 'HTTPS4',
         assimblyTypeLink: `/component-http4`,
-        camelTypeLink: `/components/camel-http4/src/main/docs/http4-component.adoc`,
+        camelTypeLink: `/http-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `
         <b>Name</b>: httpUri<br/>
@@ -199,7 +199,7 @@ export const typesLinks = [
     {
         name: 'IMAP',
         assimblyTypeLink: `/component-imap`,
-        camelTypeLink: `/components/camel-mail/src/main/docs/mail-component.adoc`,
+        camelTypeLink: `/mail-component.html`,
         uriPlaceholder: 'host[:port]',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -217,7 +217,7 @@ export const typesLinks = [
     {
         name: 'IMAPS',
         assimblyTypeLink: `/component-imap`,
-        camelTypeLink: `/components/camel-mail/src/main/docs/mail-component.adoc`,
+        camelTypeLink: `/mail-component.html`,
         uriPlaceholder: 'host[:port]',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -234,7 +234,7 @@ export const typesLinks = [
     },
     {
         name: 'JETTY',
-        camelTypeLink: `/components/camel-jetty/src/main/docs/jetty-component.adoc`,
+        camelTypeLink: `/jetty-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `
         <b>Name</b>: httpUri<br/>
@@ -247,7 +247,7 @@ export const typesLinks = [
     {
         name: 'KAFKA',
         assimblyTypeLink: `/component-kafka`,
-        camelTypeLink: `/components/camel-kafka/src/main/docs/kafka-component.adoc`,
+        camelTypeLink: `/kafka-component.html`,
         uriPlaceholder: 'topic',
         uriPopoverMessage: `
         <b>Name</b>: topic<br/>
@@ -261,7 +261,7 @@ export const typesLinks = [
     {
         name: 'NETTY4',
         assimblyTypeLink: `/component-netty4`,
-        camelTypeLink: `/components/camel-netty4/src/main/docs/netty4-component.adoc`,
+        camelTypeLink: `/netty-component.html`,
         uriPlaceholder: 'transport://hostname:port',
         uriPopoverMessage: `
         <b>Name</b>: transport<br/>
@@ -283,7 +283,7 @@ export const typesLinks = [
     {
         name: 'RABBITMQ',
         assimblyTypeLink: `/component-rabbitmq`,
-        camelTypeLink: `/components/camel-elasticsearch-rest/src/main/docs/elasticsearch-rest-component.adoc`,
+        camelTypeLink: `/rabbitmq-component.html`,
         uriPlaceholder: 'rabbitmq://hostname[:port]/exchangeName',
         uriPopoverMessage: `
         <b>Name</b>: rabbitmq<br/>
@@ -307,7 +307,7 @@ export const typesLinks = [
     {
         name: 'REST',
         assimblyTypeLink: `/component-rest`,
-        camelTypeLink: `/components/camel-rest/src/main/docs/rest-component.adoc`,
+        camelTypeLink: `/rest-component.html`,
         uriPlaceholder: 'method:path:{uriTemplate}',
         uriPopoverMessage: `
         <b>Name</b>: method<br/>
@@ -328,7 +328,7 @@ export const typesLinks = [
     {
         name: 'SFTP',
         assimblyTypeLink: `/component-sftp`,
-        camelTypeLink: `/components/camel-ftp/src/main/docs/sftp-component.adoc`,
+        camelTypeLink: `/sftp-component.html`,
         uriPlaceholder: 'host:port/directoryName',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -353,7 +353,7 @@ export const typesLinks = [
     {
         name: 'SJMS',
         assimblyTypeLink: `/component-sjms`,
-        camelTypeLink: `/components/camel-sjms/src/main/docs/sjms-component.adoc`,
+        camelTypeLink: `/sjms-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
         <b>Name</b>: destinationType<br/>
@@ -372,7 +372,7 @@ export const typesLinks = [
     {
         name: 'SLACK',
         assimblyTypeLink: `/component-slack`,
-        camelTypeLink: `/components/camel-slack`,
+        camelTypeLink: `/slack-component.html`,
         uriPlaceholder: 'slack:#channel',
         uriPopoverMessage: `
         <b>Name</b>: slack<br/>
@@ -389,7 +389,7 @@ export const typesLinks = [
     {
         name: 'SMTP',
         assimblyTypeLink: `/component-smtp`,
-        camelTypeLink: `/components/camel-mail/src/main/docs/mail-component.adoc`,
+        camelTypeLink: `/mail-component.html`,
         uriPlaceholder: 'host[:port]',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -407,7 +407,7 @@ export const typesLinks = [
     {
         name: 'SMTPS',
         assimblyTypeLink: `/component-smtp`,
-        camelTypeLink: `/components/camel-mail/src/main/docs/mail-component.adoc`,
+        camelTypeLink: `/mail-component.html`,
         uriPlaceholder: 'host[:port]',
         uriPopoverMessage: `
         <b>Name</b>: host<br/>
@@ -425,7 +425,7 @@ export const typesLinks = [
     {
         name: 'SONICMQ',
         assimblyTypeLink: `/component-sonicmq`,
-        camelTypeLink: `/components/camel-sjms/src/main/docs/sjms-component.adoc`,
+        camelTypeLink: `/sjms-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
         <b>Name</b>: destinationType<br/>
@@ -444,7 +444,7 @@ export const typesLinks = [
     {
         name: 'SQL',
         assimblyTypeLink: `/component-sql`,
-        camelTypeLink: `/components/camel-sql/src/main/docs/sql-component.adoc`,
+        camelTypeLink: `/sql-component.html`,
         uriPlaceholder: 'query',
         uriPopoverMessage: `
         <b>Name</b>: query<br/>
@@ -457,7 +457,7 @@ export const typesLinks = [
     {
         name: 'STREAM',
         assimblyTypeLink: `/component-stream`,
-        camelTypeLink: `/components/camel-stream/src/main/docs/stream-component.adoc`,
+        camelTypeLink: `/stream-component.html`,
         uriPlaceholder: 'kind',
         uriPopoverMessage: `
         <b>Name</b>: kind<br/>
@@ -470,7 +470,7 @@ export const typesLinks = [
     {
         name: 'TELEGRAM',
         assimblyTypeLink: `/component-telegram`,
-        camelTypeLink: `/components/camel-telegram/src/main/docs/telegram-component.adoc`,
+        camelTypeLink: `/telegram-component.html`,
         uriPlaceholder: 'type/authorizationToken',
         uriPopoverMessage: `
         <b>Name</b>: type<br/>
@@ -487,7 +487,7 @@ export const typesLinks = [
     {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
-        camelTypeLink: `/components/camel-vm/src/main/docs/vm-component.adoc`,
+        camelTypeLink: `/vm-component.html`,
         uriPlaceholder: 'queueName',
         uriPopoverMessage: `
         <b>Name</b>: queueName<br/>
@@ -500,7 +500,7 @@ export const typesLinks = [
     {
         name: 'WASTEBIN',
         assimblyTypeLink: `/component-wastebin`,
-        camelTypeLink: `/components/camel-mock/src/main/docs/mock-component.adoc`,
+        camelTypeLink: `/mock-component.html`,
         uriPlaceholder: '',
         uriPopoverMessage: `
         <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
@@ -509,7 +509,7 @@ export const typesLinks = [
     {
         name: 'WEBSOCKET',
         assimblyTypeLink: `/component-websocket`,
-        camelTypeLink: `/components/camel-websocket/src/main/docs/websocket-component.adoc`,
+        camelTypeLink: `/websocket-component.html`,
         uriPlaceholder: '',
         uriPopoverMessage: `
         <b>Name</b>: hostname<br/>
