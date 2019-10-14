@@ -118,6 +118,7 @@ export class ErrorEndpointDialogComponent implements OnInit {
     }
 }
 
+/*
 @Component({
     selector: 'jhi-error-endpoint-popup',
     template: ''
@@ -137,3 +138,4 @@ export class ErrorEndpointPopupComponent implements OnInit, OnDestroy {
         this.routeSub.unsubscribe();
     }
 }
+*/

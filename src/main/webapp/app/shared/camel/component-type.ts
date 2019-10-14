@@ -234,6 +234,7 @@ export const typesLinks = [
     },
     {
         name: 'JETTY',
+        assimblyTypeLink: `/component-jetty`,
         camelTypeLink: `/jetty-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `

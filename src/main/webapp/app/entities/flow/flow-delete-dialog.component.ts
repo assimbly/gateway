@@ -29,8 +29,8 @@ export class FlowDeleteDialogComponent {
                 this.disableDelete = true;
             } else {
                 this.flowService.delete(id).subscribe((r) => {
-                    this.router.navigate(['/']);
-                    this.activeModal.dismiss(true);                    
+                    this.router.navigate(['/']); 
+                    this.activeModal.dismiss(true);
                 });
             }
         });

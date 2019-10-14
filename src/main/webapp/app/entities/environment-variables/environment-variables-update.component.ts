@@ -128,6 +128,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     }
 }
 
+/*
 @Component({
     selector: 'jhi-environment-variables-popup',
     template: ''
@@ -147,3 +148,4 @@ export class EnvironmentVariablesPopupComponent implements OnInit, OnDestroy {
         this.routeSub.unsubscribe();
     }
 }
+*/

@@ -15,8 +15,8 @@
 
 logging:
     level:
-        ROOT: INFO
-        io.github.jhipster: INFO
+        ROOT: DEBUG
+        io.github.jhipster: DEBUG
         org.assimbly.gateway: DEBUG
 
 spring:
@@ -109,7 +109,7 @@ jhipster:
             report-frequency: 60 # in seconds
     logging:
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
-            enabled: false
+            enabled: true
             host: localhost
             port: 5000
             queue-size: 512
