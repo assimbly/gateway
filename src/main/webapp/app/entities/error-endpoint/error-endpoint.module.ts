@@ -11,6 +11,7 @@ import {
     ErrorEndpointComponent,
     ErrorEndpointDetailComponent,
     ErrorEndpointUpdateComponent,
+    ErrorEndpointDialogComponent,
     ErrorEndpointDeletePopupComponent,
     ErrorEndpointDeleteDialogComponent,
     errorEndpointRoute,
@@ -34,12 +35,14 @@ const ENTITY_STATES = [...errorEndpointRoute, ...errorEndpointPopupRoute];
         ErrorEndpointComponent,
         ErrorEndpointDetailComponent,
         ErrorEndpointUpdateComponent,
+        ErrorEndpointDialogComponent,
         ErrorEndpointDeleteDialogComponent,
         ErrorEndpointDeletePopupComponent
     ],
     entryComponents: [
         ErrorEndpointComponent,
         ErrorEndpointUpdateComponent,
+        ErrorEndpointDialogComponent,
         ErrorEndpointDeleteDialogComponent,
         ErrorEndpointDeletePopupComponent,
     ],

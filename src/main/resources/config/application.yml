@@ -58,12 +58,9 @@ spring:
         mode: HTML
 
 server:
-    session:
-        timeout: 28800
-        cookie:
-            http-only: true
     servlet:
         session:
+            timeout: 28800
             cookie:
                 http-only: true
 

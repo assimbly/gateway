@@ -1,4 +1,4 @@
-<form [formGroup]="environmentVariablesForm" (ngSubmit)="save(false)" class="needs-validation">
+<form [formGroup]="environmentVariablesForm" (ngSubmit)="save()" class="needs-validation">
 
     <div class="modal-header">
         <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit a Environment Variables</h4>
@@ -7,7 +7,7 @@
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" [hidden]="!environmentVariables.id">
+        <div class="form-group" [style.display]="'none'">
             <label for="id">ID</label>
             <input type="text" class="form-control" id="id" formControlName="id" readonly />
         </div>
@@ -44,7 +44,7 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
         </button>
-        <button type="button" (click)="save(true)" [disabled]="environmentVariablesForm.invalid || isSaving" class="btn btn-primary">
+        <button type="button" (click)="save()" [disabled]="environmentVariablesForm.invalid || isSaving" class="btn btn-primary">
             <span class="fa fa-save"></span>&nbsp;<span>Save</span>
         </button>
     </div>

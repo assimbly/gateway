@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import * as moment from 'moment';
 import { map } from "rxjs/operators";
 import { Observable, Observer, Subscription} from "rxjs";
+import { NavigationEnd } from "@angular/router";
 
 enum Status {
     active = 'active',
@@ -26,6 +27,7 @@ enum Status {
 })
 
 export class FlowRowComponent implements OnInit, OnDestroy {
+    mySubscription: Subscription;
 
     @Input() flow: Flow;
     @Input() fromEndpoints: FromEndpoint[];
@@ -87,9 +89,21 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
         private router: Router,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
     ) {
         this.listener = this.createListener();
+        
+        this.router.routeReuseStrategy.shouldReuseRoute = function () {
+            return false;
+          };
+
+          this.mySubscription = this.router.events.subscribe((event) => {
+            if (event instanceof NavigationEnd) {
+              // Trick the Router into believing it's last link wasn't previously loaded
+              this.router.navigated = false;
+            }
+          });
+        
     }
 
     ngOnInit() {
@@ -125,6 +139,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.flowService.unsubscribe();
+        if (this.mySubscription) {
+            this.mySubscription.unsubscribe();
+        }
     }
 
     setFlowStatusDefaults() {
@@ -268,10 +285,29 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
     }
 
-    navigateToFlow() {
-        this.isAdmin ?
-            this.router.navigate(['../../flow/edit-all', this.flow.id]) :
-            this.router.navigate(['../flow', this.flow.id]);
+    navigateToFlow(action: string) {
+        
+        switch (action) {
+        case 'edit':
+            this.isAdmin ?
+                    this.router.navigate(['../../flow/edit-all', this.flow.id]) :
+                    this.router.navigate(['../flow', this.flow.id]);
+            break;
+        case 'clone':
+            this.isAdmin ?
+                    this.router.navigate(['../../flow/edit-all', this.flow.id,'clone']) :
+                    this.router.navigate(['../flow', this.flow.id]);
+            break;
+        case 'delete':
+            this.isAdmin ?
+                    this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :        
+                    this.router.navigate(['../flow', this.flow.id]);
+                    
+            break;    
+        default:
+            break;
+        }
+        
     }
 
     getFlowLastError(id: number, action: string, errMesage: string) {
@@ -309,8 +345,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 Offloading: ${this.flow.offLoading}<br/>
                 Maximum Redeliveries: ${this.flow.maximumRedeliveries}<br/>
                 Redelivery Delay: ${this.flow.redeliveryDelay}<br/>
-                <br/>
-                Click to edit
+
         `;
     }
 

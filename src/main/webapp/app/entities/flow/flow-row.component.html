@@ -4,12 +4,19 @@
 	<div [innerHtml]="flowDetails"></div>
 	</ng-template> <ng-template #statsTemplate let-message="message">
 	<div [innerHtml]="flowStatistic"></div>
-	</ng-template> <span><a (click)="navigateToFlow()">{{flow.name}}</a></span>
+	</ng-template> <span><a style="font-size:150%; color:#0069D9" (click)="navigateToFlow('edit')">{{flow.name}}</a></span>
 	<p>
-		<a (click)="navigateToFlow()" class="fa fa-edit" aria-hidden="true"
+		<i  class="fa fa-info" aria-hidden="true"
 			(mouseenter)="getFlowDetails()" triggers="mouseenter:mouseleave"
 			placement="right"
-			popoverTitle="Details" [popover]="detailsTemplate"></a> 
+			popoverTitle="Details" [popover]="detailsTemplate"></i>
+		<a style="padding-left: 1em" (click)="navigateToFlow('edit')" class="fa fa-edit" aria-hidden="true"
+			placement="right" title="Edit flow"></a> 
+		<a  style="padding-left: 1em" (click)="navigateToFlow('clone')"
+			placement="right" title="Clone flow" class="fa fa-clone"></a>
+		<!-- <a  style="padding-left: 1em" [routerLink]="['/', { outlets: { popup: 'flow/' + flow.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge"
+			placement="right" title="Delete flow" class="fa fa-trash"></a>			 -->
+		<a  style="padding-left: 1em" (click)="navigateToFlow('delete')" placement="right" title="Delete flow" class="fa fa-trash"></a>	
 		<i  style="padding-left: 1em" (mouseenter)="getFlowStatus(flow.id)"
 			[hidden]="!isFlowStatusOK" triggers="mouseenter:mouseleave"
 			placement="right" popoverTitle="Stats" [popover]="statsTemplate"

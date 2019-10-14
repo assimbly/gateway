@@ -18,15 +18,15 @@ import { HttpErrorResponse } from "@angular/common/http";
 export class ServiceUpdateComponent implements OnInit {
     service: IService;
     isSaving: boolean;
-    private serviceKeys: Array<ServiceKeys> = [];
+    serviceKeys: Array<ServiceKeys> = [];
     servicesNames: Array<String> = [];
     serviceKeysKeys: Array<String> = [];
     listVal: Array<String> = ['com.mysql.jdbc.Driver', 'oracle.jdbc.driver.OracleDriver', 'org.postgresql.Driver','com.microsoft.sqlserver.jdbc.SQLServerDriver'];
     public disableType: boolean;
     public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
-    private requiredServiceKey: Array<RequiredServiceKey> = [];
-    private requiredType: RequiredServiceKey;
-private serviceKeysRemoveList: Array<ServiceKeys> = [];
+    requiredServiceKey: Array<RequiredServiceKey> = [];
+    requiredType: RequiredServiceKey;
+    serviceKeysRemoveList: Array<ServiceKeys> = [];
 
     constructor(
 		protected serviceService: ServiceService,

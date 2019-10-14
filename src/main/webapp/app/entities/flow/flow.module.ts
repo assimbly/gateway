@@ -48,7 +48,7 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         FormsModule,
         ReactiveFormsModule,
         PopoverModule.forRoot(),
-        AceEditorModule
+        AceEditorModule,
     ],
     exports: [
         FlowComponent

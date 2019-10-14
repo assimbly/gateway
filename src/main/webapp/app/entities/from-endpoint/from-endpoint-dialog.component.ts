@@ -123,6 +123,7 @@ export class FromEndpointDialogComponent implements OnInit {
     }
 }
 
+/*
 @Component({
     selector: 'jhi-from-endpoint-popup',
     template: ''
@@ -143,3 +144,4 @@ export class FromEndpointPopupComponent implements OnInit, OnDestroy {
         this.routeSub.unsubscribe();
     }
 }
+*/

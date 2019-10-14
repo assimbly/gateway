@@ -90,10 +90,7 @@ module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
         {
             test: /(vendor\.css|global\.css)/,
             use: ['style-loader', 'css-loader']
-        }, {
-            test: /\.(jpe?g|png|gif||webp)(\?[a-z0-9=.]+)?$/,
-            loader: 'url-loader?limit=100000' }
-        ]
+        }]
     },
     stats: process.env.JHI_DISABLE_WEBPACK_LOGS ? 'none' : options.stats,
     plugins: [

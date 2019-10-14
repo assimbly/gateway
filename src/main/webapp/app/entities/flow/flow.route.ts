@@ -56,6 +56,14 @@ export const flowRoute: Routes = [
         },
         canActivate: [UserRouteAccessService]
     }, {
+        path: 'flow/edit-all/:id/:clone',
+        component: FlowEditAllComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Flows'
+        },
+        canActivate: [UserRouteAccessService]
+    }, {
         path: 'flow/configuration',
         component: FlowConfigurationComponent,
         data: {
