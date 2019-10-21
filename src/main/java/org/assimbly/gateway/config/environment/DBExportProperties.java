@@ -190,9 +190,6 @@ public class DBExportProperties {
 
 		componentType = setDefaultComponentType(componentType);
 
-		// note that following doesn't set datasource
-		confOptions = setDefaultOptions(componentType, confOptions);
-
 		if (confOptions == null) {
 			uri = componentType.toLowerCase() + uri;
 		} else {
@@ -285,19 +282,6 @@ public class DBExportProperties {
 		}
 
 		return componentType;
-	}
-
-	private String setDefaultOptions(String componentType, String confOptions) {
-
-		if (componentType.matches("(file|ftp|sftp|sjms|sonicmq).*")) {
-			if (confOptions.isEmpty() || confOptions == null) {
-				confOptions = "bridgeErrorHandler=true";
-			} else if (!confOptions.contains("bridgeErrorHandler")) {
-				confOptions = confOptions + "&bridgeErrorHandler=true";
-			}
-		}
-
-		return confOptions;
-	}
+	}	
 
 }

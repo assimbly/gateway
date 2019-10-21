@@ -12,6 +12,8 @@ import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 
+import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
+
 import {
     FlowComponent,
     FlowEditAllComponent,
@@ -63,7 +65,8 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         FlowDeletePopupComponent,
         FlowConfigurationComponent,
         FlowRowComponent,
-        FlowEditorModeComponent
+        FlowEditorModeComponent,
+        FlowSearchByNamePipe
     ],
     entryComponents: [
 		FlowComponent,
