@@ -45,7 +45,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     selectedAction: string;
     test: any;
-
+    searchText: string = '';
+    
     constructor(
         protected flowService: FlowService,
         protected jhiAlertService: JhiAlertService,

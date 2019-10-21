@@ -270,7 +270,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -361,7 +360,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -454,7 +452,6 @@ public class DBExportXMLConfiguration {
 				componentType = confComponentType.toLowerCase();
 
 				componentType = setDefaultComponentType(componentType);
-				confOptions = setDefaultOptions(componentType, confOptions);
 
 				if (componentType.equals("sql")) {
 					String confServiceId = confService.getId().toString();
@@ -532,7 +529,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -723,19 +719,6 @@ public class DBExportXMLConfiguration {
 		}
 
 		return componentType;
-	}
-
-	private String setDefaultOptions(String componentType, String confOptions) {
-
-		if (componentType.matches("(file|ftp|sftp|sjms|sonicmq).*")) {
-			if (confOptions.isEmpty() || confOptions == null) {
-				confOptions = "bridgeErrorHandler=true";
-			} else if (!confOptions.contains("bridgeErrorHandler")) {
-				confOptions = confOptions + "&bridgeErrorHandler=true";
-			}
-		}
-
-		return confOptions;
 	}
 
 }
