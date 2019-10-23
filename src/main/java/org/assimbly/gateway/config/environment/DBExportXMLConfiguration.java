@@ -1,6 +1,7 @@
 package org.assimbly.gateway.config.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -88,13 +89,37 @@ public class DBExportXMLConfiguration {
 				getXMLFlowConfiguration(flow);
 			}
 		}
-		System.out.println("x2");
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
 
 		return xmlConfiguration;
 	}
 
+	public String getXMLConfigurationByIds(Long gatewayId, String ids) throws Exception {
+		
+		setXMLGeneralPropertiesFromDB(gatewayId);
+
+		List<String> idsList = Arrays.asList(ids.split(","));
+		
+		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
+
+		for (Flow flow : flows) {
+			if (flow != null) {				
+				
+				String confId = Long.toString(flow.getId());
+				
+				if(idsList.contains(confId)) {
+					getXMLFlowConfiguration(flow);	
+				}
+			}
+		}
+
+		xmlConfiguration = DocConverter.convertDocToString(doc);
+
+		return xmlConfiguration;
+	}
+
+	
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
 		Flow flow = flowRepository.findById(id).get();
@@ -138,7 +163,6 @@ public class DBExportXMLConfiguration {
 	}
 
 	// set methods
-
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
 
 		connectorId = gatewayId.toString();
