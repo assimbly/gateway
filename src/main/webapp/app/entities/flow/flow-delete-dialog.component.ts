@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
@@ -16,7 +16,7 @@ export class FlowDeleteDialogComponent {
     message = 'Are you sure you want to delete this Flow?';
     disableDelete: boolean;
 
-    constructor(protected flowService: FlowService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected router: Router) {}
+    constructor(protected flowService: FlowService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected jhiAlertService: JhiAlertService, protected router: Router) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -25,16 +25,18 @@ export class FlowDeleteDialogComponent {
     confirmDelete(id: number) {
         this.flowService.getFlowStatus(id).subscribe((response) => {
             if (response.body === 'started') {
-                this.message = 'Active flow can not be deleted. Please stop flow before first.';
+                this.message = 'Active flow can not be deleted. Please stop flow before deleting.';
                 this.disableDelete = true;
             } else {
                 this.flowService.delete(id).subscribe((r) => {
                     this.router.navigate(['/']); 
                     this.activeModal.dismiss(true);
+                    
                 });
             }
         });
     }
+    
 }
 
 @Component({

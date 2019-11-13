@@ -170,7 +170,7 @@
 												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>	
 											</div>
 											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.fromTypes" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
+												<ng-select class="col-3" [items]="components.fromTypes" [clearable]="false" formControlName="type" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
 												<a>:</a><span style="display:inline-block; width: 14px;"></span>
 												<input type="text" class="form-control col-6.5" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" [(ngModel)]="fromEndpoint.uri"/>
 												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriFromEditor)">
@@ -189,7 +189,7 @@
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/> -->
-												<ng-select [items]="fromComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"></ng-select>
+												<ng-select [items]="fromComponentOptions" [clearable]="false" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"></ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions, '0')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption, '0')" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
@@ -294,7 +294,7 @@
 												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
 												</div>
 											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.toTypes" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
+												<ng-select class="col-3" [items]="components.toTypes" [clearable]="false" formControlName="type" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
 												<a>:</a><span style="display:inline-block; width: 14px;"></span>
 												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}"  [(ngModel)]="toEndpoint.uri"/>
 												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriToEditor)">
@@ -429,7 +429,7 @@
 												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
 											</div>
 											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.errorTypes" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
+												<ng-select class="col-3" [items]="components.errorTypes" [clearable]="false" formControlName="type" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
 												<a>:</a><span style="display:inline-block; width: 14px;"></span>
 												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{errorUriPlaceholder}}" [(ngModel)]="errorEndpoint.uri"/>
 												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriErrorEditor)">

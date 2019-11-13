@@ -4,15 +4,16 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
                 (click)="clear()">&times;</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body">        
+        <p id="jhi-delete-service-heading" *ngIf="!errorMessage">Are you sure you want to delete this service?</p>
+        <p id="jhi-delete-service-heading" *ngIf="errorMessage">Cannot delete service. The service is used by a flow</p>
         <jhi-alert-error></jhi-alert-error>
-        <p id="jhi-delete-service-heading">Are you sure you want to delete this Service?</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
-        <button id="jhi-confirm-delete-service" type="submit" class="btn btn-danger">
+        <button id="jhi-confirm-delete-service" type="submit" class="btn btn-danger" [disabled]="!deleteMode">
             <fa-icon [icon]="'times'"></fa-icon>&nbsp;<span>Delete</span>
         </button>
     </div>

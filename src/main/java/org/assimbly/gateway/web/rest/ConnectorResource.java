@@ -9,6 +9,8 @@ import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.event.FailureListener;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -33,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api")
 public class ConnectorResource {
 
+    private final Logger log = LoggerFactory.getLogger(ConnectorResource.class);
+    
 	private Connector connector = new CamelConnector();
 
 	private String flowId;
@@ -776,9 +780,9 @@ public class ConnectorResource {
 				int count = 1;
 				
         		do {
-		        	Thread.sleep(10);
+		        	Thread.sleep(100);
 		        	count++;
-		        } while (!connector.isStarted() || count < 3000);
+		        } while (!connector.isStarted() || count < 600);
 
         		connectorIsStarting = false;
         		
@@ -790,20 +794,32 @@ public class ConnectorResource {
 
     //This method can be called on application startup
     @PostConstruct
-    private void initConnector() throws Exception {
+    private void initConnector() {
 
-    	init();
+    	try {
+			init();
+		} catch (Exception e) {
+	        log.error("Initialization of connector failed");			
+			e.printStackTrace();
+		}
 
 		//start flows with autostart
        	List<Flow> flows = flowRepository.findAll();
 		
-		for(Flow flow : flows) {
-       		if(flow.isAutoStart()) {
-       			String configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application");
-       			connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
-				connector.startFlow(flow.getId().toString());
-       		}
-       	}
+       	try {
+			for(Flow flow : flows) {
+	       		if(flow.isAutoStart()) {
+	       			String configuration;
+	       			log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
+					configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application");
+					connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+					connector.startFlow(flow.getId().toString());
+	       		}
+	       	}
+    	} catch (Exception e) {
+    		log.error("Autostart of flow failed (check configuration)");
+			e.printStackTrace();
+		}
 		
 	}
 }
