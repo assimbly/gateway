@@ -72,6 +72,16 @@ public class ServiceServiceImpl implements ServiceService {
             .map(serviceMapper::toDto);
     }
 
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<ServiceDTO> getAll() {
+        log.debug("Request to get all Services");
+        return serviceRepository.findAll().stream()
+                .map(serviceMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }    
+    
     /**
      * Delete the service by id.
      *

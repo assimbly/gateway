@@ -32,7 +32,7 @@
 <td><span>{{fromEndpoint.type}}</span>
 	<p>
 		<i class="fa fa-info-circle" aria-hidden="true"
-			triggers="mouseenter:mouseleave" placement="right" popoverTitle="URI"
+			triggers="mouseenter:mouseleave" placement="right" popoverTitle="From Endpoint"
 			[popover]="fromEndpointTooltip"></i>
 	</p></td>
 <td><span *ngFor="let toEndpoint of toEndpoints; let i = index">
@@ -41,7 +41,7 @@
 		<p>
 			<i class="fa fa-info-circle" aria-hidden="true"
 				triggers="mouseenter:mouseleave" placement="right"
-				popoverTitle="URI" [popover]="toEndpointsTooltips[i]"></i>
+				popoverTitle="To Endpoint" [popover]="toEndpointsTooltips[i]"></i>
 		</p>
 </span></td>
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">

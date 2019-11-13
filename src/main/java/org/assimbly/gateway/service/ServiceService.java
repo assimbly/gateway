@@ -1,6 +1,7 @@
 package org.assimbly.gateway.service;
 
 import org.assimbly.gateway.service.dto.FlowDTO;
+import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,12 @@ public interface ServiceService {
      */
     Page<ServiceDTO> findAll(Pageable pageable);
 
+    /**
+     * Get all the services.
+     *
+     * @return the list of entities
+     */
+    List<ServiceDTO> getAll();
 
     /**
      * Get the "id" service.

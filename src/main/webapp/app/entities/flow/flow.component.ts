@@ -90,7 +90,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadPage(page) {
-        this.page = page;
+        this.page = 0 //page;
+        this.itemsPerPage = this.itemsPerPage + 5; 
         this.loadFlows();
     }
 
@@ -195,6 +196,11 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
     }
 
+    navigateToFlow() {
+        this.router.navigate(['../../flow/edit-all'])
+    }
+    
+    
     private onSuccess(data, headers) {
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));

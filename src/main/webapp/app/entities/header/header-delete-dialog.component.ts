@@ -13,6 +13,8 @@ import { HeaderService } from './header.service';
 })
 export class HeaderDeleteDialogComponent {
     header: IHeader;
+    errorMessage: boolean = false;
+    deleteMode: boolean = true;
 
     constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
@@ -27,8 +29,16 @@ export class HeaderDeleteDialogComponent {
                 content: 'Deleted an header'
             });
             this.activeModal.dismiss(true);
-        });
+            this.activeModal.dismiss(true);
+        }, (r) => this.onDeleteError(r));
     }
+    
+    private onDeleteError(error) {
+        this.errorMessage = true;
+        this.deleteMode = false;
+    }
+    
+    
 }
 
 @Component({

@@ -22,7 +22,8 @@
 				</div>
 			</div>
 		<div class="col-12 text-center">
-              <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['../flow', 'edit-all' ]">
+              <button class="btn btn-primary" type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'" (click)="navigateToFlow()">
+              <!-- [routerLink]="['/flow/edit-all' ]" replaceUrl="true" queryParamsHandling="merge"> -->
                   <span class="fa fa-plus"></span>
                   <span>Create flow</span>
               </button>
@@ -100,7 +101,8 @@
 						<th class="border-bottom-none"></th>
 					</tr>
                 </thead>
-                <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+				<tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
+                <!-- <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0"> -->
                     <tr jhi-flow-row *ngFor="let flow of  (flows | FlowSearchByName: searchText) ;trackBy: trackId" [flow]="flow" [fromEndpoints]="fromEndpoints" [isAdmin]="isAdmin"></tr>
                 </tbody>
             </table>

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
@@ -24,6 +25,10 @@ import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '
 import { EndpointType, typesLinks, Components } from '../../shared/camel/component-type';
 import { map } from "rxjs/operators";
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { NgSelectModule } from '@ng-select/ng-select';
+
+import { HeaderPopupService, HeaderDialogComponent } from "app/entities/header";
+import { ServicePopupService, ServiceDialogComponent } from "app/entities/service";
 
 
 @Component({
@@ -41,13 +46,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toEndpoints: IToEndpoint[] = new Array<ToEndpoint>();
     toEndpoint: IToEndpoint;
     services: Service[];
-    headers: Header[];
+    headers: IHeader[];
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
     savingFlowSuccess = false;
     savingFlowSuccessMessage = 'Flow successfully saved';
-    finished: boolean;
+    finished = false;
     gateways: Gateway[];
     singleGateway = false;
     createRoute: number;
@@ -108,6 +113,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     selectedService: Service = new Service();
     closeResult: string;
 
+    errorSetHeader = false;
+    
     private subscription: Subscription;
     private eventSubscriber: Subscription;
     private wikiDocUrl: string;
@@ -131,14 +138,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         public components: Components,
-        private modalService: NgbModal
+        private modalService: NgbModal,
+        private headerPopupService: HeaderPopupService,
+        private servicePopupService: ServicePopupService
     ) {
         this.toEndpoints = [new ToEndpoint()];
+
     }
 
     ngOnInit() {
         this.isSaving = false;
-        this.finished = false;
         this.createRoute = 0;
         this.setPopoverMessages();
 
@@ -148,7 +157,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             }else{                
                 this.load(params['id']);    
             } 
-        });                
+        });        
         
         this.registerChangeInFlows();
     }
@@ -158,8 +167,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         forkJoin(
                 this.flowService.getWikiDocUrl(),
                 this.flowService.getCamelDocUrl(),
-                this.serviceService.query(),
-                this.headerService.query(),
+                this.serviceService.getAllServices(),
+                this.headerService.getAllHeaders(),
                 this.gatewayService.query()
             )
                 .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
@@ -178,14 +187,21 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     if (id) {
                         this.flowService.find(id).subscribe((flow) => {
+                            
                             if (flow) {
                                 this.flow = flow.body;
                                 if (this.singleGateway) {
                                     this.flow.gatewayId = this.gateways[0].id;
                                 }
+
                                 this.initializeForm(this.flow);
-                                if (this.flow.fromEndpointId) {
-                                    this.fromEndpointService.find(this.flow.fromEndpointId).subscribe((fromEndpoint) => {
+                                
+                                forkJoin(
+                                        this.fromEndpointService.find(this.flow.fromEndpointId),
+                                        this.errorEndpointService.find(this.flow.errorEndpointId),
+                                        this.toEndpointService.findByFlowId(id)
+                                    ) .subscribe(([fromEndpoint, errorEndpoint, toEndpointsData]) => {
+                                        
                                         if (fromEndpoint) {
                                             this.fromEndpoint = new FromEndpoint(fromEndpoint.body.id,fromEndpoint.body.type,fromEndpoint.body.uri,fromEndpoint.body.options,fromEndpoint.body.serviceId,fromEndpoint.body.headerId);
                                             (<FormArray>this.editFlowForm.controls.endpointsData).insert(0, this.initializeEndpointData(this.fromEndpoint));
@@ -195,21 +211,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                                 this.finished = true;
                                             }, 100);
                                         }
-                                    });
-                                }
-                                
-                                if (this.flow.errorEndpointId) {
-                                    this.errorEndpointService.find(this.flow.errorEndpointId).subscribe((errorEndpoint) => {
+                                        
                                         this.errorEndpoint = new ErrorEndpoint(errorEndpoint.body.id,errorEndpoint.body.type,errorEndpoint.body.uri,errorEndpoint.body.options,errorEndpoint.body.serviceId,errorEndpoint.body.headerId);
                                         (<FormArray>this.editFlowForm.controls.endpointsData).insert(1, this.initializeEndpointData(this.errorEndpoint));
                                         setTimeout(() => {
                                             this.getOptions(this.errorEndpoint, this.editFlowForm.controls.endpointsData.get('1'), this.errorEndpointOptions);
                                             this.setTypeLinks(this.errorEndpoint, 1);
                                         }, 100);
-                                    });
-                                    
-                                    this.toEndpointService.findByFlowId(id).subscribe((data) => {
-                                        let toEndpoints = data.body;
+                                        
+                                        let toEndpoints = toEndpointsData.body;
                                         if(toEndpoints.length === 0){
                                             this.toEndpoints = [new ToEndpoint()];
                                         }
@@ -237,22 +247,21 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                             
                                             this.fromEndpoint.id = null;
                                             this.toEndpoints.forEach((toEndpoint) => {
-                                                toEndpoint.id = null;
+                                            toEndpoint.id = null;
                                             });
                                             this.errorEndpoint.id = null;
 
                                             this.updateForm();
-                                        }
+                                        } 
                                         
-                                    });
-                                    
-                                }
+                                    });       
                                 
                             }
-                            
+                                                        
                         });
                         
                     } else if (!this.finished) {
+                        
                         setTimeout(() => {
                             this.flow = new Flow();
                             this.flow.autoStart = false;
@@ -321,8 +330,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }, 16);
 
     }
-    
+ 
+    //this filters services not of the correct type
     filterServices(endpoint: any, formService: FormControl) {
+        
         if (endpoint instanceof ToEndpoint) {
             this.toServiceType[this.toEndpoints.indexOf(endpoint)] = this.returnServiceType(endpoint.type);
             this.toFilterService[this.toEndpoints.indexOf(endpoint)] = this.services.filter((f) => f.type === this.toServiceType[this.toEndpoints.indexOf(endpoint)]);
@@ -342,6 +353,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 formService.setValue(this.errorFilterService.find((fs) => fs.id === endpoint.serviceId).id);
             }
         }
+
     }
 
     returnServiceType(type: any) {
@@ -462,6 +474,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     initializeForm(flow: Flow) {
+        
         this.editFlowForm = new FormGroup({
             'id': new FormControl(flow.id),
             'name': new FormControl(flow.name, Validators.required),
@@ -472,7 +485,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             'gateway': new FormControl(flow.gatewayId),
             'endpointsData': new FormArray([])
         });
-       
+
     }
 
     initializeEndpointData(endpoint?: any): FormGroup {
@@ -662,54 +675,89 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+    
     registerChangeInFlows() {
         this.eventSubscriber = this.eventManager.subscribe(
             'flowListModification',
             (response) => this.load(this.flow.id)
         );
     }
+    
+    
 
     createOrEditHeader(endpoint, formHeader: FormControl) {
         endpoint.headerId = formHeader.value;
-        (endpoint.headerId) ?
-            this.router.navigate(['/', { outlets: { popup: 'header/' + endpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
 
-        this.eventManager.subscribe(
-            'headerModified',
-            (res) => this.setHeader(endpoint, res, formHeader)
-        );
+        (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null) ?
+                this.headerPopupService.open(HeaderDialogComponent as Component) :
+                this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId) ;  
+        
+                
+            this.eventManager.subscribe(
+                    'headerModified',
+                    (res) => this.setHeader(endpoint, res, formHeader)
+                );            
+        
     }
 
     createOrEditService(endpoint, serviceType: string, formService: FormControl) {
-        (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: serviceType }) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + endpoint.serviceId + '/edit' } }], { fragment: serviceType });
-         this.eventManager.subscribe(
+        endpoint.serviceId = formService.value;
+
+        if(typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId ){
+            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
+            modalRef.then(res => { // Success
+                res.componentInstance.serviceType = serviceType;
+              }  
+            );
+        }else{
+            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
+            modalRef.then(res => { 
+                res.componentInstance.serviceType = serviceType;
+              }  
+            );
+        }
+        
+        this.eventManager.subscribe(
             'serviceModified',
-            (res) => {this.setService(endpoint, res, formService)}
+            (res) => {
+                this.setService(endpoint, res, formService);                              
+            }
         );
     }
 
     setHeader(endpoint, id, formHeader: FormControl) {
-        this.headerService.query().subscribe(
-            res => {
-                this.headers = res.body;
-                this.headerCreated = this.headers.length > 0;
-                endpoint.headerId = this.headers.find((h) => h.id === id.content).id;
-                formHeader.patchValue(endpoint.headerId);
-            },
-            res => this.onError(res.body)
-        );
-    }
 
+        this.headerService.getAllHeaders().subscribe(
+                res => {
+                    this.headers = res.body;
+                    this.headerCreated = this.headers.length > 0;
+                    endpoint.headerId = id.content;
+                    if (endpoint instanceof ToEndpoint) {
+                        console.log("to");
+                        formHeader.patchValue(id.content)
+                    } else if (endpoint instanceof FromEndpoint) {
+                        console.log("from");
+                        formHeader.patchValue(id.content)
+
+                    } else if (endpoint instanceof ErrorEndpoint) {
+                        console.log("error");
+                        formHeader.patchValue(id.content)
+                    }
+                    
+                },
+                res => this.onError(res.body)
+            );
+        
+    }    
+    
     setService(endpoint, id, formService: FormControl) {
-        this.serviceService.query().subscribe(
+        
+        this.serviceService.getAllServices().subscribe(
             res => {
                 this.services = res.body;
                 this.serviceCreated = this.services.length > 0;
-                endpoint.serviceId = this.services.find((s) => s.id === id.content).id;
-                formService.patchValue(endpoint.serviceId);
+                endpoint.serviceId = id.content;
+                formService.patchValue(id.content)
                 this.filterServices(endpoint, formService);
             },
             res => this.onError(res.body)

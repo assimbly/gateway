@@ -5,6 +5,7 @@ import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +23,18 @@ public interface HeaderService {
     HeaderDTO save(HeaderDTO headerDTO);
 
     /**
-     * Get all the headers.
+     * Get all the headers (page).
      *
      * @return the list of entities
      */
     Page<HeaderDTO> findAll(Pageable pageable);
     
-
+    /**
+     * Get all the headers.
+     *
+     * @return the list of entities
+     */
+    List<HeaderDTO> getAll();
 
     /**
      * Get the "id" header.
@@ -44,4 +50,6 @@ public interface HeaderService {
      * @param id the id of the entity
      */
     void delete(Long id);
+
+
 }
