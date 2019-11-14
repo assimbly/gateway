@@ -339,12 +339,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     getFlowDetails() {
         this.flowDetails = `
-                Name: ${this.flow.name}<br/>
-                ID: ${this.flow.id}<br/>
-                Autostart: ${this.flow.autoStart}<br/>
-                Offloading: ${this.flow.offLoading}<br/>
-                Maximum Redeliveries: ${this.flow.maximumRedeliveries}<br/>
-                Redelivery Delay: ${this.flow.redeliveryDelay}<br/>
+        
+                <b>ID:</b> ${this.flow.id}<br/>
+                <b>Name:</b> ${this.flow.name}<br/><br/>
+                <b>Autostart:</b> ${this.flow.autoStart}<br/>
+                <b>Offloading:</b> ${this.flow.offLoading}<br/><br/>
+                <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
+                <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
 
         `;
     }
@@ -398,13 +399,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             }              
                 
             this.flowStatistic = `
-                <b>Flow</b><br/>
-                Start time: ${this.checkDate(res.stats.startTimestamp)}<br/>
-                Running: ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/>
-                First: ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
-                Last: ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/>
-                Completed: ${completed}<br/>
-                Failed: ${failures}<br/>
+                <br/>
+                <b>Start time:</b> ${this.checkDate(res.stats.startTimestamp)}<br/>
+                <b>Run time:</b> ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/><br/>
+                <b>First:</b> ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
+                <b>Last:</b> ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/><br/>
+                <b>Completed:</b> ${completed}<br/>
+                <b>Failed:</b> ${failures}<br/>
                 <br/>` + processingTime;
         }
     }
