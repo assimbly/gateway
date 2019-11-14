@@ -58,7 +58,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         protected router: Router,
     ) {
         this.flows = [];
-        this.itemsPerPage = ITEMS_PER_PAGE;
+        this.itemsPerPage = ITEMS_PER_PAGE + 5;
         this.page = 0;
         this.links = {
             last: 0
