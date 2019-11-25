@@ -736,8 +736,6 @@ public class DBExportXMLConfiguration {
 		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp")
 				|| componentType.equals("ftps")) {
 			componentType = componentType + "://";
-		} else if (componentType.equals("http") || componentType.equals("http4")) {
-			componentType = "http4://";
 		} else {
 			componentType = componentType + ":";
 		}

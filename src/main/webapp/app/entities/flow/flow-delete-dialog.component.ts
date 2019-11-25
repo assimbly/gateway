@@ -13,7 +13,7 @@ import { FlowService } from './flow.service';
 })
 export class FlowDeleteDialogComponent {
     flow: IFlow;
-    message = 'Are you sure you want to delete this Flow?';
+    message = 'Are you sure you want to delete this flow?';
     disableDelete: boolean;
 
     constructor(protected flowService: FlowService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected jhiAlertService: JhiAlertService, protected router: Router) {}
@@ -25,7 +25,7 @@ export class FlowDeleteDialogComponent {
     confirmDelete(id: number) {
         this.flowService.getFlowStatus(id).subscribe((response) => {
             if (response.body === 'started') {
-                this.message = 'Active flow can not be deleted. Please stop flow before deleting.';
+                this.message = 'Active flow can not be deleted. Please stop the flow before deleting.';
                 this.disableDelete = true;
             } else {
                 this.flowService.delete(id).subscribe((r) => {

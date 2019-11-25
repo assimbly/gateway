@@ -13,8 +13,8 @@ export enum EndpointType {
     FILE = 'FILE',
     FTP = 'FTP',
     FTPS = 'FTPS',
-    HTTP4 = 'HTTP4',
-    HTTPS4 = 'HTTPS4',    
+    HTTP = 'HTTP',
+    HTTPS = 'HTTPS',    
     IMAP = 'IMAP',
     IMAPS = 'IMAPS',
     JETTY = 'JETTY',
@@ -62,7 +62,7 @@ export const typesLinks = [
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
         camelTypeLink: `/as2-component.html`,
-        uriPlaceholder: 'as2://apiName/methodName',
+        uriPlaceholder: 'apiName/methodName',
         uriPopoverMessage: `
         <b>Name</b>: as2<br/>
         <b>Description</b>:  The name of the endpoint<br/>
@@ -95,9 +95,9 @@ export const typesLinks = [
         name: 'ELASTICSEARCH',
         assimblyTypeLink: `/component-elasticsearch`,
         camelTypeLink: `/elasticsearch-rest-component.html`,
-        uriPlaceholder: 'elasticsearch-rest://clusterName',
+        uriPlaceholder: 'clusterName',
         uriPopoverMessage: `
-        <b>Name</b>: elasticsearch-rest<br/>
+        <b>Name</b>: Elasticsearch-rest<br/>
         <b>Description</b>:  The name of the endpoint<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
@@ -171,8 +171,8 @@ export const typesLinks = [
     `
     },
     {
-        name: 'HTTP4',
-        assimblyTypeLink: `/component-http4`,
+        name: 'HTTP',
+        assimblyTypeLink: `/component-http`,
         camelTypeLink: `/http-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `
@@ -184,8 +184,8 @@ export const typesLinks = [
     `
     },
     {
-        name: 'HTTPS4',
-        assimblyTypeLink: `/component-http4`,
+        name: 'HTTPS',
+        assimblyTypeLink: `/component-http`,
         camelTypeLink: `/http-component.html`,
         uriPlaceholder: 'httpUri',
         uriPopoverMessage: `
@@ -285,7 +285,7 @@ export const typesLinks = [
         name: 'RABBITMQ',
         assimblyTypeLink: `/component-rabbitmq`,
         camelTypeLink: `/rabbitmq-component.html`,
-        uriPlaceholder: 'rabbitmq://hostname[:port]/exchangeName',
+        uriPlaceholder: 'hostname[:port]/exchangeName',
         uriPopoverMessage: `
         <b>Name</b>: rabbitmq<br/>
         <b>Description</b>:  The name of the endpoint<br/>
@@ -374,13 +374,13 @@ export const typesLinks = [
         name: 'SLACK',
         assimblyTypeLink: `/component-slack`,
         camelTypeLink: `/slack-component.html`,
-        uriPlaceholder: 'slack:#channel',
+        uriPlaceholder: '#channel',
         uriPopoverMessage: `
-        <b>Name</b>: slack<br/>
-        <b>Description</b>:  The name of the instance of slack<br/>
+        <b>Name</b>: Slack<br/>
+        <b>Description</b>:  The name of the instance of Slack<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: channell<br/>
+        <b>Name</b>: channel<br/>
         <b>Description</b>: Channel is like a “room” for discussions (ex. topic, discussion, team)<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: Integer <br/><br/>
@@ -511,7 +511,7 @@ export const typesLinks = [
         name: 'WEBSOCKET',
         assimblyTypeLink: `/component-websocket`,
         camelTypeLink: `/websocket-component.html`,
-        uriPlaceholder: '',
+        uriPlaceholder: 'host:port/resourceUri',
         uriPopoverMessage: `
         <b>Name</b>: hostname<br/>
         <b>Description</b>: The hostname. The default value is 0.0.0.0. Setting this option on the component will use the component configured value as default.<br/>
@@ -538,15 +538,15 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
+    fromTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
                  'SMTPS', 'SMTP', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WEBSOCKET'];
 
-    toTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
+    toTypes = ['ACTIVEMQ', 'AS2', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
                'SMTPS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN', 'WEBSOCKET'];
 
-    errorTypes = ['ACTIVEMQ', 'AS2', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM', 'WEBSOCKET'];
+    errorTypes = ['ACTIVEMQ', 'AS2', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM', 'WEBSOCKET'];
 
-    wireTapTypes = ['ACTIVEMQ', 'ELASTICSEARCH', 'FILE', 'FTPS', 'FTP', 'HTTP4', 'HTTPS4', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WEBSOCKET'];
+    wireTapTypes = ['ACTIVEMQ', 'ELASTICSEARCH', 'FILE', 'FTPS', 'FTP', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WEBSOCKET'];
 }
 
 export const flowExamples = [
@@ -960,7 +960,7 @@ export const flowExamples = [
     services: {}`
     },
     {
-        name: 'HTTP4',
+        name: 'HTTP',
         flowtypeFile: 'XML',
         fileExample: `<connectors>
     <connector>
@@ -969,12 +969,12 @@ export const flowExamples = [
             <!-- Send file to local url -->
             <flow>
                 <id>130</id>
-                <name>example.filetohttp4</name>
+                <name>example.filetohttp</name>
                 <from>
                     <uri>file://C:/from</uri>
                 </from>
                 <to>
-                    <uri>http4://localhost:8080/test</uri>
+                    <uri>http://localhost:8080/test</uri>
                 </to>
                 <error>
                     <uri>file://C:/error</uri>
@@ -985,7 +985,7 @@ export const flowExamples = [
 </connectors>`
     },
     {
-        name: 'HTTP4',
+        name: 'HTTP',
         flowtypeFile: 'JSON',
         fileExample: `{
   "connectors": {
@@ -1000,7 +1000,7 @@ export const flowExamples = [
           },
           "id": 131,
           "to": {
-            "uri": "http4://localhost:8080/test"
+            "uri": "http://localhost:8080/test"
           },
           "type": "default"
         }
@@ -1013,7 +1013,7 @@ export const flowExamples = [
 }`
     },
     {
-        name: 'HTTP4',
+        name: 'HTTP',
         flowtypeFile: 'YAML',
         fileExample: `connectors:
   connector:
@@ -1024,7 +1024,7 @@ export const flowExamples = [
           uri: "file://C:/from"
         id: 132
         to:
-          uri: "http4://localhost:8080/test"
+          uri: "http://localhost:8080/test"
         type: "default"
         error:
           uri: "file://C:/error"
@@ -1268,7 +1268,7 @@ export const flowExamples = [
             <!-- Send file to local url -->
             <flow>
                 <id>170</id>
-                <name>example.filetohttp4</name>
+                <name>example.filetohttp</name>
                 <from>
                     <uri>file://C:/from</uri>
                 </from>
@@ -1591,7 +1591,7 @@ export const flowExamples = [
             <!-- Send file to local url -->
             <flow>
                 <id>210</id>
-                <name>example.filetohttp4</name>
+                <name>example.filetohttp</name>
                 <from>
                     <uri>file://C:/from</uri>
                 </from>
