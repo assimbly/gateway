@@ -45,6 +45,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 
 configurations.all {
+  exclude module: 'log4j-slf4j-impl' 	
   resolutionStrategy {  
     force 'org.apache.activemq:artemis-core-client:2.10.0', 'org.apache.activemq:artemis-broker:2.10.0','org.apache.activemq:artemis-commons:2.10.0','org.apache.activemq:artemis-selector:2.10.0','org.apache.activemq:artemis-journal:2.10.0'
   }

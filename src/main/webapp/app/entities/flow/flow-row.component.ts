@@ -9,11 +9,16 @@ import { FromEndpointService } from '../from-endpoint';
 import { ToEndpointService } from '../to-endpoint';
 import { ErrorEndpointService } from '../error-endpoint';
 import { JhiEventManager } from 'ng-jhipster';
+import { LoginModalService, AccountService, Account } from 'app/core';
+
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 import { map } from "rxjs/operators";
-import { Observable, Observer, Subscription} from "rxjs";
+import { forkJoin, Observable, Observer, Subscription} from "rxjs";
 import { NavigationEnd } from "@angular/router";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { FlowDeleteDialogComponent } from "app/entities/flow";
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 enum Status {
     active = 'active',
@@ -81,13 +86,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     alreadyConnectedOnce = false;
     private subscription: Subscription;
 
-    
+    modalRef: NgbModalRef | null;
     
     constructor(
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
+        private loginModalService: LoginModalService,
+        private modalService: NgbModal,
         private router: Router,
         private eventManager: JhiEventManager,
     ) {
@@ -111,10 +118,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.toEndpoints = this.flow.toEndpoints;
         this.getToEndpoint();
-        // this.getErrorEndpoint(this.flow.errorEndpointId);
-        this.getFlowStatus(this.flow.id);
-        this.getFlowNumberOfAlerts(this.flow.id);
+        this.getStatus(this.flow.id);
+ 
         this.registerTriggeredAction();
+        
         this.connection = this.flowService.connectionStomp();
         this.stompClient = this.flowService.client();
         this.subscribe('alert');
@@ -135,8 +142,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             }
             
         });
+        
     }
 
+    
     ngOnDestroy() {
         this.flowService.unsubscribe();
         if (this.mySubscription) {
@@ -144,6 +153,21 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
     }
 
+    getStatus(id: number){
+        this.clickButton = true;
+        
+        forkJoin(
+                this.flowService.getFlowStatus(id),
+                this.flowService.getFlowNumberOfAlerts(id)
+            )
+                .subscribe(([flowStatus, flowAlertsNumber]) => {
+                    this.setFlowStatus(flowStatus.body);
+                    this.setFlowNumberOfAlerts(flowAlertsNumber.body);
+                }
+            );
+        
+    }
+    
     setFlowStatusDefaults() {
         this.isFlowStatusOK = true;
         this.flowStatus = 'Stopped';
@@ -159,7 +183,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     setFlowStatus(status: string): void {
-        this.getFlowStats(this.flow.id);
+        
+        //this.getFlowStats(this.flow.id);
+        
         switch (status) {
             case 'unconfigured':
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
@@ -232,8 +258,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     setFlowAlerts(flowAlertsItems: string): void {
+        
         if (flowAlertsItems !== null) {
-
 
             let alertStartItem;
             let alertEndItem;
@@ -299,10 +325,24 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                     this.router.navigate(['../flow', this.flow.id]);
             break;
         case 'delete':
-            this.isAdmin ?
-                    this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :        
-                    this.router.navigate(['../flow', this.flow.id]);
-                    
+            if(this.isAdmin){
+                let modalRef = this.modalService.open(FlowDeleteDialogComponent as Component);                      
+                modalRef.componentInstance.flow = this.flow;
+                modalRef.result.then(
+                        result => {
+                            this.eventManager.broadcast({name: 'flowDeleted', content: this.flow});
+                            modalRef = null;
+                        },
+                        reason => {
+                            this.eventManager.broadcast({name: 'flowDeleted', content: this.flow});
+                            modalRef = null;
+                        });
+            }else{
+                this.router.navigate(['../flow', this.flow.id]);
+            }    
+
+            //this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :        
+            //this.router.navigate(['../flow', this.flow.id]);
             break;    
         default:
             break;
@@ -310,14 +350,19 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         
     }
 
-    getFlowLastError(id: number, action: string, errMesage: string) {
-        if (errMesage) {
-            this.flowStatusButton = `
-            Last action: ${action} <br/>
-            Status: Stopped after error <br/><br/>
-            ${errMesage}
-            `;
-            this.statusFlow = Status.inactiveError;
+    getFlowLastError(id: number, action: string, errMessage: string) {
+        if (errMessage) {
+            if(errMessage.startsWith('Full authentication is required to access this resource', 0)){
+                this.loginModalService.open();
+            }else{
+                this.flowStatusButton = `
+                    Last action: ${action} <br/>
+                    Status: Stopped after error <br/><br/>
+                    ${errMessage}
+                    `;
+                    this.statusFlow = Status.inactiveError;
+                
+            }
         } else {
             this.flowService.getFlowLastError(id).subscribe((response) => {
                 this.lastError = response === '0' ? '' : response.body;

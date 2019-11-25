@@ -114,6 +114,16 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
+                        placeholder: 'tcp://localhost:61616'
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: '(Optional)'
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
                         placeholder: ''
                     }
                 ]

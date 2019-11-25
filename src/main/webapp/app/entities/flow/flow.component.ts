@@ -26,6 +26,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     gateways: IGateway[];
     gateway: IGateway;
     flows: IFlow[];
+    flow: IFlow;
     fromEndpoints: IFromEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -35,9 +36,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     predicate: any;
     queryCount: any;
     reverse: any;
-    totalItems: number;
+    totalItems: number = -1;
     gatewayExists = false;
     multipleGateways = false;
+    finished = false;
 
     singleGatewayName: string;
     singleGatewayId: number;
@@ -105,7 +107,12 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
+        this.registerDeletedFlows();
     }
+    
+    ngAfterViewInit() {
+        this.finished = true;
+      }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
@@ -192,6 +199,14 @@ export class FlowComponent implements OnInit, OnDestroy {
         });
     }
 
+    registerDeletedFlows() {
+
+    this.eventManager.subscribe('flowDeleted', (res) => {
+                this.loadFlows();
+            }
+        );        
+    }
+
     trigerAction(selectedAction: string) {
         this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
     }
@@ -205,11 +220,11 @@ export class FlowComponent implements OnInit, OnDestroy {
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }
-        this.totalItems = headers.get('X-Total-Count');
         this.flows = new Array<IFlow>();
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
+        this.totalItems = headers.get('X-Total-Count');
     }
 
     protected onError(errorMessage: string) {

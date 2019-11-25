@@ -381,6 +381,17 @@ only screen and (                min-resolution: 2dppx) {
   text-decoration: none !important
 }
 
+.btn-transparent {
+	background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:default;
+    overflow: hidden;
+    outline:none;
+}
+
 .btn-arrow-right,
 .btn-arrow-left {
    position: relative;
@@ -404,7 +415,7 @@ only screen and (                min-resolution: 2dppx) {
    
    content: "";
    position: absolute;
-   top: 4px;
+   top: 3.5px;
    /* move it down because of rounded corners */
    
    width: 22px;
@@ -458,14 +469,14 @@ only screen and (                min-resolution: 2dppx) {
 .btn-arrow-left:before {
    /* align the "before" square to the left */
    
-   left: -11px;
+   left: -10px;
 }
 
 .btn-arrow-right:after,
 .btn-arrow-left:after {
    /* align the "after" square to the right */
    
-   right: -11px;
+   right: -10px;
 }
 
 .btn-arrow-right:after,
