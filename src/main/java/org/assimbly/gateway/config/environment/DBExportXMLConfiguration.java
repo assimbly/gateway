@@ -281,7 +281,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
-		String confcomponentType = wireTapEndpointDB.getType().toString();
+		String confcomponentType = wireTapEndpointDB.getType().getEndpoint();
 		String confOptions = wireTapEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
 		Header confHeader = wireTapEndpointDB.getHeader();
@@ -365,7 +365,7 @@ public class DBExportXMLConfiguration {
 
 		String confId = Long.toString(fromEndpointDB.getId());
 		String confUri = fromEndpointDB.getUri();
-		String confcomponentType = fromEndpointDB.getType().toString();
+		String confcomponentType = fromEndpointDB.getType().getEndpoint();
 		String confOptions = fromEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = fromEndpointDB.getService();
 		Header confHeader = fromEndpointDB.getHeader();
@@ -457,7 +457,7 @@ public class DBExportXMLConfiguration {
 
 			String confId = Long.toString(toEndpointDB.getId());
 			String confUri = toEndpointDB.getUri();
-			String confComponentType = toEndpointDB.getType().toString();
+			String confComponentType = toEndpointDB.getType().getEndpoint();
 			String confOptions = toEndpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = toEndpointDB.getService();
 			Header confHeader = toEndpointDB.getHeader();
@@ -534,7 +534,7 @@ public class DBExportXMLConfiguration {
 
 		String confId = Long.toString(errorEndpointDB.getId());
 		String confUri = errorEndpointDB.getUri();
-		String confcomponentType = errorEndpointDB.getType().toString();
+		String confcomponentType = errorEndpointDB.getType().getEndpoint();
 		String confOptions = errorEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = errorEndpointDB.getService();
 		Header confHeader = errorEndpointDB.getHeader();

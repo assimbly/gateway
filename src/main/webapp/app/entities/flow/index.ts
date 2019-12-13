@@ -7,5 +7,4 @@ export * from './flow.component';
 export * from './flow.route';
 export * from './flow-configuration.component';
 export * from './flow-edit-all.component';
-export * from './flow-editor-mode.component';
 export * from './flow-row.component';

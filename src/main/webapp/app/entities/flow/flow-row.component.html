@@ -15,35 +15,35 @@
 	      	   		<span>{{fromEndpoint.type}}</span>
 				</button>
 			    </div> 	
-			  <div class="btn-group" role="group" style="margin-left: 0.5em;">	
-				<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }" 
-				type="button" (click)="start()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowStarted">
-					<span class="fa fa-play"></span>
-				</button>
-				<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }" 
-				type="button" (click)="restart()"
-					class="btn btn-primary btn-sm" [disabled]="disableActionBtns"
-					*ngIf="!isFlowRestarted">
-					<span class="fa fa-refresh"></span>
-				</button>
-				<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
-				   type="button" (click)="pause()" class="btn btn-sm" [disabled]="!isFlowPaused && isFlowStopped || disableActionBtns"
-					*ngIf="!isFlowPaused">
-					<span class="fa fa-pause"></span></span>
-				</button>
-				<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
-				    type="button" (click)="resume()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowResumed">
-					<span class="fa fa-step-forward"></span>
-				</button>
-				<button  [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
-				     type="button" (click)="stop()" class="btn btn-sm" [disabled]="isFlowStopped || disableActionBtns">
-					<span class="fa fa-stop"></span>
-				</button>
-	      		<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
-	      		 type="button" style="min-width: 20em;" data-container="body" class="btn btn-sm btn-block btn-arrow-right" placement="right" popoverTitle="Status" [ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">
-	      		       <span style="text-transform: uppercase;">{{flow.name}}</span>
-				</button>
-				  </div>
+			    <div class="btn-group" role="group" style="margin-left: 0.5em;">	
+			 		
+ 
+			 		<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }" 
+					type="button" (click)="start()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowStarted">
+						<span class="fa fa-play"></span>
+					</button>
+					<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }" 
+					type="button" (click)="restart()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowRestarted">
+						<span class="fa fa-refresh"></span>
+					</button>
+					<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
+					   type="button" (click)="pause()" class="btn btn-sm" [disabled]="!isFlowPaused && isFlowStopped || disableActionBtns" *ngIf="!isFlowPaused">
+						<span class="fa fa-pause"></span></span>
+					</button>
+					<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
+					    type="button" (click)="resume()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowResumed">
+						<span class="fa fa-step-forward"></span>
+					</button>
+					<button  [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
+					     type="button" (click)="stop()" class="btn btn-sm" [disabled]="isFlowStopped || disableActionBtns">
+						<span class="fa fa-stop"></span>
+					</button>
+		      		<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-warning':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
+		      		 type="button" style="min-width: 20em;" data-container="body" class="btn btn-sm btn-block btn-arrow-right" placement="right" popoverTitle="Status" [ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">
+		      		       <span style="text-transform: uppercase;">{{flow.name}}</span>
+					</button>
+			 		
+				 </div>
 				 <div class="btn-group" role="group" style="margin-left: 1em;" *ngFor="let toEndpoint of toEndpoints; let i = index">
 					   	<button  [ngClass]="{'btn-outline-primary': statusFlow === 'inactive', 'btn-outline-success':statusFlow === 'active', 'btn-outline-warning':statusFlow === 'paused', 'btn-outline-danger':statusFlow === 'inactiveError' }"
 					   	 type="button" style="min-width: 15em;" class="btn btn-sm btn-block" data-container="body" placement="right" popoverTitle="To Endpoint" [popover]="toEndpointsTooltips[i]">
@@ -90,7 +90,7 @@
 	<h4 class="float-left" style="margin-left: 10px;">
 		<span
 			class="badge badge-warning" *ngIf="flowAlerts === 'true'"
-			(mouseenter)="p!=p" placement="right" on-mouseover='getFlowAlerts(flow.id)'
+			(mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)'
 			triggers="mouseenter" popoverTitle="Show last alerts"
 			[ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">{{numberOfAlerts}} Alerts</span>
 	</h4>

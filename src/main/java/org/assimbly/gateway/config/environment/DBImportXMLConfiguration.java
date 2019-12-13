@@ -145,9 +145,6 @@ public class DBImportXMLConfiguration {
        			brokermanager.stop("ARTEMIS");
 	        }
 			
-			
-			
-			
 			// create services and headers
 			setServicesAndHeadersFromXML(doc);
 
@@ -275,6 +272,7 @@ public class DBImportXMLConfiguration {
 		// get type
 		String[] fromUriSplitted = fromUri.split(":", 2);
 		String fromTypeAsString = fromUriSplitted[0].toUpperCase();
+		fromTypeAsString = fromTypeAsString.replace("-", "");
 		EndpointType fromType = EndpointType.valueOf(fromTypeAsString);
 
 		// get uri
@@ -401,6 +399,7 @@ public class DBImportXMLConfiguration {
 		// get type
 		String[] toUriSplitted = toUri.split(":", 2);
 		String toTypeAsString = toUriSplitted[0].toUpperCase();
+		toTypeAsString = toTypeAsString.replace("-", "");
 
 		EndpointType toType = EndpointType.valueOf(toTypeAsString);
 
@@ -498,6 +497,8 @@ public class DBImportXMLConfiguration {
 		// get type
 		String[] errorUriSplitted = errorUri.split(":", 2);
 		String errorTypeAsString = errorUriSplitted[0].toUpperCase();
+		errorTypeAsString = errorTypeAsString.replace("-", "");
+	
 		EndpointType errorType = EndpointType.valueOf(errorTypeAsString);
 
 		// get uri
@@ -590,7 +591,7 @@ public class DBImportXMLConfiguration {
 
 			try {
 				serviceIdLong = Long.parseLong(serviceId, 10);
-				Optional<org.assimbly.gateway.domain.Service> serviceOptional = serviceRepository.findById(serviceIdLong);
+				Optional<org.assimbly.gateway.domain.Service> serviceOptional = serviceRepository.findByName(serviceName);
 				
 				if(!serviceOptional.isPresent()) {
 					service = new org.assimbly.gateway.domain.Service();
@@ -630,6 +631,7 @@ public class DBImportXMLConfiguration {
 
 				String key = entry.getKey();
 				String value = entry.getValue();
+				
 				ServiceKeys serviceKey;
 
 				if (key.equals("type")) {
@@ -652,7 +654,20 @@ public class DBImportXMLConfiguration {
 
 			if (service != null && serviceKeys != null) {
 				service.setServiceKeys(serviceKeys);
-				serviceRepository.save(service);
+				service = serviceRepository.save(service);
+				
+				String generatedServiceId = service.getId().toString();
+				
+				//update service_id to generated service_id
+				if(!serviceId.equals(generatedServiceId)) {
+					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+					
+					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
+						servicesIdNodes.item(i).setTextContent(generatedServiceId);
+					}
+
+				}
+				
 				service = null;
 				serviceKeys = null;
 			}
@@ -673,7 +688,7 @@ public class DBImportXMLConfiguration {
 
 			try {
 				headerIdLong = Long.parseLong(headerId, 10);
-				Optional<Header> headerOptional = headerRepository.findById(headerIdLong);
+				Optional<Header> headerOptional = headerRepository.findByName(headerName);
 
 				if (!headerOptional.isPresent()) {
 					header = new Header();
@@ -737,7 +752,20 @@ public class DBImportXMLConfiguration {
 
 			if (header != null && headerKeys != null) {
 				header.setHeaderKeys(headerKeys);
-				headerRepository.save(header);
+				header = headerRepository.save(header);
+
+				String generatedHeaderId = header.getId().toString();
+				
+				//update service_id to generated service_id
+				if(!headerId.equals(generatedHeaderId)) {
+					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + headerId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+					
+					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
+						servicesIdNodes.item(i).setTextContent(generatedHeaderId);
+					}
+
+				}
+				
 				header = null;
 				headerKeys = null;
 			}

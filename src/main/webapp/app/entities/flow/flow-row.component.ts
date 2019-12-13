@@ -42,11 +42,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     toEndpoints: Array<ToEndpoint> = [new ToEndpoint()];
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
-    public isFlowStarted = false;
-    public isFlowPaused = false;
-    public isFlowResumed = true;
-    public isFlowStopped = true;
-    public isFlowRestarted = true;
+    public isFlowStarted: boolean;
+    public isFlowRestarted: boolean;
+    
+    public isFlowPaused: boolean;
+    public isFlowResumed: boolean;
+    
+    public isFlowStopped: boolean;
     public disableActionBtns: boolean;
 
     public flowDetails: string;
@@ -114,14 +116,19 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        
         this.setFlowStatusDefaults();
-        this.getFromEndpoint(this.flow.fromEndpointId);
-        this.toEndpoints = this.flow.toEndpoints;
-        this.getToEndpoint();
         this.getStatus(this.flow.id);
+
+        this.toEndpoints = this.flow.toEndpoints;
+        this.getFromEndpoint(this.flow.fromEndpointId);
+        this.getToEndpoint();
  
         this.registerTriggeredAction();
         
+    }
+
+    ngAfterViewInit() {
         this.connection = this.flowService.connectionStomp();
         this.stompClient = this.flowService.client();
         this.subscribe('alert');
@@ -142,9 +149,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             }
             
         });
-        
-    }
-
+      }
     
     ngOnDestroy() {
         this.flowService.unsubscribe();
@@ -161,7 +166,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 this.flowService.getFlowNumberOfAlerts(id)
             )
                 .subscribe(([flowStatus, flowAlertsNumber]) => {
-                    this.setFlowStatus(flowStatus.body);
+                    if(flowStatus.body != 'unconfigured'){
+                        this.setFlowStatus(flowStatus.body);
+                    }
                     this.setFlowNumberOfAlerts(flowAlertsNumber.body);
                 }
             );
@@ -170,7 +177,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     
     setFlowStatusDefaults() {
         this.isFlowStatusOK = true;
-        this.flowStatus = 'Stopped';
+        this.flowStatus = 'unconfigured';
         this.lastError = '';
         this.setFlowStatus(this.flowStatus);
     }
@@ -183,63 +190,64 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     setFlowStatus(status: string): void {
-        
-        //this.getFlowStats(this.flow.id);
-        
+
         switch (status) {
             case 'unconfigured':
+                this.statusFlow = Status.inactive;
+                this.isFlowStarted = this.isFlowPaused = false;
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
                 this.flowStatusButton = `
                             Last action: - <br/>
                             Status: Flow is stopped<br/>
-            `;
-                this.statusFlow = Status.inactive;
+            `;  
+                
                 break;
             case 'started':
+                this.statusFlow = Status.active;
+                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
                 this.isFlowStarted = this.isFlowResumed = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowStarted;
                 this.flowStatusButton = `
                             Last action: Start <br/>
                             Status: Started succesfullly
                         `;
-                this.statusFlow = Status.active;
+
                 break;
             case 'suspended':
+                this.statusFlow = Status.paused;
+                this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
                 this.isFlowPaused = this.isFlowStarted = true;
-                this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = !this.isFlowPaused;
                 this.flowStatusButton = `
                             Last action: Pause <br/>
                             Status:  Paused succesfully
             `;
-                this.statusFlow = Status.paused;
+                
                 break;
             case 'restarted':
+                this.statusFlow = Status.active;
+                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
                 this.isFlowResumed = this.isFlowStarted = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                 this.flowStatusButton = `
                             Last action: Restart <br/>
                             Status:  Restarted succesfully
             `;
-                this.statusFlow = Status.active;
                 break;
             case 'resumed':
+                this.statusFlow = Status.active;
+                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
                 this.isFlowResumed = this.isFlowStarted = true;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = !this.isFlowResumed;
                 this.flowStatusButton = `
                             Last action: Resume <br/>
                             Status:  Resumed succesfully
             `;
-                this.statusFlow = Status.active;
                 break;
             case 'stopped':
+                this.statusFlow = Status.inactive;
+                this.isFlowStarted = this.isFlowPaused = false;
                 this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.isFlowStarted = this.isFlowPaused = !this.isFlowStopped;
                 this.flowStatusButton = `
                             Last action: Stop <br/>
                             Status: Stopped succesfully
             `;
-                this.statusFlow = Status.inactive;
                 break;
             default:
                 this.flowStatusButton = `
@@ -296,7 +304,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     setFlowNumberOfAlerts(numberOfAlerts: string): void {
         let numberOfAlerts2 = parseInt(numberOfAlerts, 10)
-        if (numberOfAlerts2 > 0) {
+        if (numberOfAlerts2 === 0) {
+            this.flowAlerts = `false`;
+            this.numberOfAlerts = `0`;
+            this.showNumberOfItems = 3;
+        } else {
             this.flowAlerts = `true`;
             this.numberOfAlerts = numberOfAlerts;
             if (numberOfAlerts2 < 4) {
@@ -304,10 +316,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             } else {
                 this.showNumberOfItems = 3;
             }
-        } else {
-            this.flowAlerts = `false`;
-            this.numberOfAlerts = `0`;
-            this.showNumberOfItems = 3;
         }
     }
 
