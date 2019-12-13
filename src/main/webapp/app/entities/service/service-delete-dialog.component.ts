@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IService } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
@@ -13,8 +13,10 @@ import { ServiceService } from './service.service';
 })
 export class ServiceDeleteDialogComponent {
     service: IService;
+    errorMessage: boolean = false;
+    deleteMode: boolean = true;
 
-    constructor(protected serviceService: ServiceService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected serviceService: ServiceService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected jhiAlertService: JhiAlertService) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -27,8 +29,14 @@ export class ServiceDeleteDialogComponent {
                 content: 'Deleted an service'
             });
             this.activeModal.dismiss(true);
-        });
+        }, (r) => this.onDeleteError(r));
     }
+    
+    private onDeleteError(error) {
+        this.errorMessage = true;
+        this.deleteMode = false;
+    }
+    
 }
 
 @Component({

@@ -111,7 +111,7 @@ export class HeaderDialogComponent implements OnInit {
     private loadHeaderKeys(cloneHeader: boolean) {
         if (this.header.id) {
             this.headerKeysService.query().subscribe((res) => {
-                this.headerKeys = res.body;
+                this.headerKeys = res.body.filter((hk) => hk.headerId === this.header.id);
             });
         }else {
             let hk = new HeaderKeys();

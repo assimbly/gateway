@@ -1,7 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { AceEditorModule } from 'ng2-ace-editor';
 
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
@@ -11,6 +10,8 @@ import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
+
+import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
 import {
     FlowComponent,
@@ -22,7 +23,6 @@ import {
     FlowDeleteDialogComponent,
     flowRoute,
     flowPopupRoute,
-    FlowEditorModeComponent,    
     FlowPopupService,
     FlowRowComponent
 } from './';
@@ -48,7 +48,6 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         FormsModule,
         ReactiveFormsModule,
         PopoverModule.forRoot(),
-        AceEditorModule
     ],
     exports: [
         FlowComponent
@@ -63,7 +62,7 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         FlowDeletePopupComponent,
         FlowConfigurationComponent,
         FlowRowComponent,
-        FlowEditorModeComponent
+        FlowSearchByNamePipe
     ],
     entryComponents: [
 		FlowComponent,
@@ -73,7 +72,6 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
 		FlowConfigurationComponent,		
 		FlowDeleteDialogComponent,
 		FlowDeletePopupComponent,
-        FlowEditorModeComponent,
         FlowConfigurationComponent
     ],
     providers: [FlowService, FlowPopupService],

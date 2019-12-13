@@ -12,7 +12,6 @@ import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditAllComponent } from './flow-edit-all.component';
 import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
-import { FlowEditorModeComponent } from './flow-editor-mode.component';
 
 @Injectable({ providedIn: 'root' })
 export class FlowResolve implements Resolve<IFlow> {
@@ -56,6 +55,14 @@ export const flowRoute: Routes = [
         },
         canActivate: [UserRouteAccessService]
     }, {
+        path: 'flow/edit-all/:id/:clone',
+        component: FlowEditAllComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Flows'
+        },
+        canActivate: [UserRouteAccessService]
+    }, {
         path: 'flow/configuration',
         component: FlowConfigurationComponent,
         data: {
@@ -84,14 +91,6 @@ export const flowRoute: Routes = [
         },
         data: {
             authorities: ['ROLE_USER'],
-            pageTitle: 'Flows'
-        },
-        canActivate: [UserRouteAccessService]
-    }, {
-        path: 'editor-mode',
-        component: FlowEditorModeComponent,
-        data: {
-            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]

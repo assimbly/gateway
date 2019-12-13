@@ -10,6 +10,9 @@ export class ForbiddenServiceKeysValidatorDirective implements Validator {
     @Input('jhiExistingServiceKeys') existingKeys: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
+        console.log('validating services');
+        console.log(this.existingKeys);
+        
         return this.existingKeys.some((k) => k === control.value) ? { 'existingServiceKey': true } : null;
     }
 }

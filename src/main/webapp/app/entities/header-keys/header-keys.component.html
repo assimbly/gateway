@@ -8,7 +8,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th id="headerKeysTitleID" [hidden]="!headerKeysRowTitleID">
+                    <th [style.display]="'none'">
                         <span>ID</span>
                     </th>
                     <th>
@@ -20,7 +20,7 @@
                     <th>
                         <span>Type</span>
                     </th>
-                    <th id="headerKeysTitleKeyID" [hidden]="!headerKeysRowTitleKeyID">
+                    <th [style.display]="'none'">
                         <span>Header</span>
                     </th>
                     <th></th>
@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index">
-                    <td id="headerKeysRowID" [hidden]="!headerKeysRowID">
+                    <td [style.display]="'none'">
                         <a [routerLink]="['../header-keys', headerKey.id ]">{{headerKey.id}}</a>
                     </td>
                     <td>
@@ -53,7 +53,7 @@
                             <option [ngValue]="type" *ngFor="let type of typeHeader">{{type}}</option>
                         </select>
                     </td>
-                    <td id="headerKeysRowKeyID" [hidden]="!headerKeysRowKeyID">
+                    <td [style.display]="'none'">
                         <div *ngIf="headerKey.headerId">
                             <a [routerLink]="['../header', headerKey.headerId  ]">{{headerKey.headerId}}</a>
                             <input type="text" class="form-control" id="id" name="id" [(ngModel)]="headerKey.headerId" readonly />

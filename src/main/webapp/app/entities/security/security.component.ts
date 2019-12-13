@@ -99,7 +99,6 @@ export class SecurityComponent implements OnInit, OnDestroy {
     uploadCertificate() {
         console.log("upload certificate");
         this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
-        this.eventManager.subscribe('securityListModification', response => this.reset());
     }    
     
     protected paginateSecurities(data: ISecurity[], headers: HttpHeaders) {

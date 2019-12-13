@@ -11,6 +11,7 @@ import {
     FromEndpointComponent,
     FromEndpointDetailComponent,
     FromEndpointUpdateComponent,
+    FromEndpointDialogComponent,
     FromEndpointDeletePopupComponent,
     FromEndpointDeleteDialogComponent,
     fromEndpointRoute,
@@ -35,12 +36,14 @@ const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
         FromEndpointComponent,
         FromEndpointDetailComponent,
         FromEndpointUpdateComponent,
+        FromEndpointDialogComponent,
         FromEndpointDeleteDialogComponent,
         FromEndpointDeletePopupComponent
     ],
     entryComponents: [
         FromEndpointComponent,
         FromEndpointUpdateComponent,
+        FromEndpointDialogComponent,
         FromEndpointDeleteDialogComponent,
         FromEndpointDeletePopupComponent,
     ],

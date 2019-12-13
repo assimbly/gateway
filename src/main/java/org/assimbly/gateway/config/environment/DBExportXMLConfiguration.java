@@ -1,6 +1,7 @@
 package org.assimbly.gateway.config.environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -88,13 +89,37 @@ public class DBExportXMLConfiguration {
 				getXMLFlowConfiguration(flow);
 			}
 		}
-		System.out.println("x2");
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
 
 		return xmlConfiguration;
 	}
 
+	public String getXMLConfigurationByIds(Long gatewayId, String ids) throws Exception {
+		
+		setXMLGeneralPropertiesFromDB(gatewayId);
+
+		List<String> idsList = Arrays.asList(ids.split(","));
+		
+		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
+
+		for (Flow flow : flows) {
+			if (flow != null) {				
+				
+				String confId = Long.toString(flow.getId());
+				
+				if(idsList.contains(confId)) {
+					getXMLFlowConfiguration(flow);	
+				}
+			}
+		}
+
+		xmlConfiguration = DocConverter.convertDocToString(doc);
+
+		return xmlConfiguration;
+	}
+
+	
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
 		Flow flow = flowRepository.findById(id).get();
@@ -138,7 +163,6 @@ public class DBExportXMLConfiguration {
 	}
 
 	// set methods
-
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
 
 		connectorId = gatewayId.toString();
@@ -257,7 +281,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
-		String confcomponentType = wireTapEndpointDB.getType().toString();
+		String confcomponentType = wireTapEndpointDB.getType().getEndpoint();
 		String confOptions = wireTapEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
 		Header confHeader = wireTapEndpointDB.getHeader();
@@ -270,7 +294,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -342,7 +365,7 @@ public class DBExportXMLConfiguration {
 
 		String confId = Long.toString(fromEndpointDB.getId());
 		String confUri = fromEndpointDB.getUri();
-		String confcomponentType = fromEndpointDB.getType().toString();
+		String confcomponentType = fromEndpointDB.getType().getEndpoint();
 		String confOptions = fromEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = fromEndpointDB.getService();
 		Header confHeader = fromEndpointDB.getHeader();
@@ -361,7 +384,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -435,7 +457,7 @@ public class DBExportXMLConfiguration {
 
 			String confId = Long.toString(toEndpointDB.getId());
 			String confUri = toEndpointDB.getUri();
-			String confComponentType = toEndpointDB.getType().toString();
+			String confComponentType = toEndpointDB.getType().getEndpoint();
 			String confOptions = toEndpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = toEndpointDB.getService();
 			Header confHeader = toEndpointDB.getHeader();
@@ -454,7 +476,6 @@ public class DBExportXMLConfiguration {
 				componentType = confComponentType.toLowerCase();
 
 				componentType = setDefaultComponentType(componentType);
-				confOptions = setDefaultOptions(componentType, confOptions);
 
 				if (componentType.equals("sql")) {
 					String confServiceId = confService.getId().toString();
@@ -513,7 +534,7 @@ public class DBExportXMLConfiguration {
 
 		String confId = Long.toString(errorEndpointDB.getId());
 		String confUri = errorEndpointDB.getUri();
-		String confcomponentType = errorEndpointDB.getType().toString();
+		String confcomponentType = errorEndpointDB.getType().getEndpoint();
 		String confOptions = errorEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = errorEndpointDB.getService();
 		Header confHeader = errorEndpointDB.getHeader();
@@ -532,7 +553,6 @@ public class DBExportXMLConfiguration {
 			componentType = confcomponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-			confOptions = setDefaultOptions(componentType, confOptions);
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -716,26 +736,11 @@ public class DBExportXMLConfiguration {
 		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp")
 				|| componentType.equals("ftps")) {
 			componentType = componentType + "://";
-		} else if (componentType.equals("http") || componentType.equals("http4")) {
-			componentType = "http4://";
 		} else {
 			componentType = componentType + ":";
 		}
 
 		return componentType;
-	}
-
-	private String setDefaultOptions(String componentType, String confOptions) {
-
-		if (componentType.matches("(file|ftp|sftp|sjms|sonicmq).*")) {
-			if (confOptions.isEmpty() || confOptions == null) {
-				confOptions = "bridgeErrorHandler=true";
-			} else if (!confOptions.contains("bridgeErrorHandler")) {
-				confOptions = confOptions + "&bridgeErrorHandler=true";
-			}
-		}
-
-		return confOptions;
 	}
 
 }

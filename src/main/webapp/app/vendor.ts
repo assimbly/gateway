@@ -3,7 +3,6 @@
 import '../content/css/vendor.css';
 
 // Imports all fontawesome core and solid icons
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
     faUser,

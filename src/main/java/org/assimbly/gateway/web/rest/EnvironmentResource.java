@@ -72,6 +72,30 @@ public class EnvironmentResource {
     }    
 
     /**
+     * Get  /getconfiguration : get XML configuration for gateway by list of flow ids.
+     *
+     * @param gatewayid (by gatewayid)
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/environment/{gatewayid}/byflowids", produces = {"text/plain","application/xml", "application/json"},consumes = {"text/plain"})
+    @Timed
+    public ResponseEntity<String> getConfigurationByFlowids(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @RequestBody String flowids) throws Exception {
+
+       	try {
+			configuration = DBConfiguration.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids);
+			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
+				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
+			}
+			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
+       		
+   		} catch (Exception e) {
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", e.getMessage());
+   		}
+
+    }
+    
+    /**
      * POST  /setflowconfiguration : Set configuration from XML.
      *
      * @param flowid (FlowId)

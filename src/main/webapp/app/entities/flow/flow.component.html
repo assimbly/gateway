@@ -21,85 +21,88 @@
 					</div>
 				</div>
 			</div>
+			<div class="col-12 text-center">
+	              <button class="btn btn-primary" type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'" (click)="navigateToFlow()">
+	              <!-- [routerLink]="['/flow/edit-all' ]" replaceUrl="true" queryParamsHandling="merge"> -->
+	                  <span class="fa fa-plus"></span>
+	                  <span>Create flow</span>
+	              </button>
+	        </div>
 		</div>
 	</div>
-	<ng-template #gatewayNotExists>
-	    <h2>Flows</h2>
-	    <hr>
-        <div class="row" *ngIf="multipleGateways; else oneGateway">
-            <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
-            <select class="col-xl-4 col-md-4 col-sm-12 form-control" (change)="getFlowsForSelectedGateway($event.target.value)">
-                <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
-            </select>
-        </div>
-        <ng-template #oneGateway>
-            <div *ngIf="flows?.length > 0">
-                <span><h6>Showing flows on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a></h6></span>
-            </div>
-            <div *ngIf="flows?.length === 0">
-                <span><h6>No flows yet on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a>.</h6></span>
-            </div>
-        </ng-template>
-    </ng-template>
-        <div class="row mt-3">
 
+<ng-template #gatewayNotExists>
+ <div>
+    <div class="row mt-3" style="margin-left:0.1em">
+    	  <h2>Flows</h2>
+    </div>
+    
+     <div *ngIf="multipleGateways; else oneGateway">
+           <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
+           <select class="col-xl-4 col-md-4 col-sm-12 form-control" (change)="getFlowsForSelectedGateway($event.target.value)">
+               <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
+           </select>
+       </div>
+       <ng-template #oneGateway>
+           <div *ngIf="flows?.length > 0">
+              <!--  <span><h6>Showing flows on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a></h6></span> -->
+           </div>
+           <div *ngIf="totalItems === 0">
+               <span><h6>No flows yet on stage {{singleGatewayStage}} for gateway: <a  *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', singleGatewayId, 'edit']" replaceUrl="true" queryParamsHandling="merge">{{singleGatewayName}}</a>.</h6></span>
+           </div>
+       </ng-template>
+    	      	
             <div class="col-12 text-right">
-            	<!-- 
-                 <button class="btn" type="button" [routerLink]="['../editor-mode']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-                    <span class="fa fa-code"></span>
-                    <span>Editor mode</span>
-                </button> -->
                 <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['../flow', 'edit-all' ]">
                     <span class="fa fa-plus"></span>
                     <span>Create flow</span>
-                </button>
+                </button>                
+       		 </div>
+       		 <div class="col-1.5">
+	            <input type="text" align="left" id="searchTextId" [(ngModel)]="searchText" name="searchText" placeholder="Filter By Flow Name"></input>
             </div>
-        </div>
         <br/>
-        <div class="table-responsive" *ngIf="flows?.length > 0">
+        <div class="table-responsive" *ngIf="flows?.length > 0" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
             <table class="table table-striped table-condensed">
-                <thead class="thead-dark">
+                <thead class="transparant">
                     <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-                        <th id="flowTitleID" [hidden]="!flowTitleID">
+                        <th [style.display]="'none'">
                             <span>ID</span>
                         </th>
                         <th jhiSortBy="name" class="border-bottom-none">
-                            <span>Name</span>
+                            <span></span>
                             <span class="fa fa-sort"></span>
                         </th>
-                        <th id="flowTitleGatewayID" [hidden]="!flowTitleGatewayID">
+                        <th [style.display]="'none'">
                             <span>Gateway</span>
                         </th>
-                        <th class="border-bottom-none">
-                            <span>From</span>
-                        </th>
-                        <th class="border-bottom-none">
+                        <!-- <th class="border-bottom-none">
                             <span>To</span>
-                        </th>
-                        <th id="flowTitleErrorEndpointID" [hidden]="!flowTitleErrorEndpointID">
+                        </th> -->
+                        <th [style.display]="'none'">
                             <span>Error</span>
                         </th>
-                        <th class="border-bottom-none">
-                            <span>Status</span>
-                        </th>
-                        <th class="row border-bottom-none">
+                        <th class="border-bottom-none">                        
+                        <!-- <th class="row border-bottom-none">                        
 		                   	<div class="col-7"> </div>
+		                   	
                         	<div  class="input-group float-right col-5">
-								<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
+							 	<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
 								<div class="input-group-append">
 									<button type="button" class="btn btn btn-sm"
 										(click)="trigerAction(selectedAction)">
 										<span>All</span>
 									</button>
-								</div>
-							</div>
+								</div> 
+							</div>-->
                         </th>
-						<th class="border-bottom-none"></th>
 					</tr>
                 </thead>
-                <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                    <tr jhi-flow-row *ngFor="let flow of flows ;trackBy: trackId" [flow]="flow" [fromEndpoints]="fromEndpoints" [isAdmin]="isAdmin"></tr>
+				<tbody *ngIf="fromEndpoints"  infinite-scroll (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
+                <!-- <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0"> -->
+                    <tr jhi-flow-row *ngFor="let flow of  (flows | FlowSearchByName: searchText) ;trackBy: trackId" [flow]="flow" [fromEndpoints]="fromEndpoints" [isAdmin]="isAdmin" ng-init="$last && finished()"></tr>
                 </tbody>
             </table>
         </div>
-</div>
+	</div>
+</ng-template>

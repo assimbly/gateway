@@ -276,11 +276,16 @@ public class SecurityResource {
                 Certificate certificateEntry = entry.getValue();
                 X509Certificate real = (X509Certificate) certificateEntry;
 
-                String certificateName = key;
+                String certificateKey = key;
                 Instant certificateExpiry = real.getNotAfter().toInstant();
                 
-                securityDTO.setUrl("Generic");
-                securityDTO.setCertificateName(certificateName);
+                //Gets certificate Name
+                String realCertificateName = real.getSubjectDN().getName();
+                realCertificateName = realCertificateName.substring(realCertificateName.indexOf("CN=") + 3);
+                realCertificateName = realCertificateName.substring(0, realCertificateName.indexOf(","));
+                
+                securityDTO.setUrl("Generic (" + realCertificateName + ")");
+                securityDTO.setCertificateName(certificateKey);
                 securityDTO.setCertificateExpiry(certificateExpiry);
                 securityService.save(securityDTO);
                 break;
