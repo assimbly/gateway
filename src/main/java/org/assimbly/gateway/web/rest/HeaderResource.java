@@ -5,6 +5,7 @@ import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
+import org.assimbly.gateway.service.dto.GatewayDTO;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 
@@ -15,13 +16,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Header.
@@ -94,9 +98,24 @@ public class HeaderResource {
         Page<HeaderDTO> page = headerService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/headers");
         return ResponseEntity.ok().headers(headers).body(page.getContent());        
-
     }
 
+    /**
+     * GET  /headers : get all the headers.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of headers in body
+     */
+        
+    
+    @GetMapping("/headers/getallheaders")
+    @Timed
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<HeaderDTO>> getAllHeaders() {
+        log.debug("REST request to get all Headers 2");
+        List<HeaderDTO> headersList = headerService.getAll();
+        return ResponseEntity.ok().body(headersList);
+    }
+    
     /**
      * GET  /headers/:id : get the "id" header.
      *

@@ -26,6 +26,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     gateways: IGateway[];
     gateway: IGateway;
     flows: IFlow[];
+    flow: IFlow;
     fromEndpoints: IFromEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -35,16 +36,19 @@ export class FlowComponent implements OnInit, OnDestroy {
     predicate: any;
     queryCount: any;
     reverse: any;
-    totalItems: number;
+    totalItems: number = -1;
     gatewayExists = false;
     multipleGateways = false;
+    finished = false;
 
     singleGatewayName: string;
     singleGatewayId: number;
     singleGatewayStage: string;
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
+    selectedAction: string;
     test: any;
-
+    searchText: string = '';
+    
     constructor(
         protected flowService: FlowService,
         protected jhiAlertService: JhiAlertService,
@@ -56,7 +60,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         protected router: Router,
     ) {
         this.flows = [];
-        this.itemsPerPage = ITEMS_PER_PAGE;
+        this.itemsPerPage = ITEMS_PER_PAGE + 5;
         this.page = 0;
         this.links = {
             last: 0
@@ -88,7 +92,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadPage(page) {
-        this.page = page;
+        this.page = 0 //page;
+        this.itemsPerPage = this.itemsPerPage + 5; 
         this.loadFlows();
     }
 
@@ -99,10 +104,16 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
             this.flowService.connect();
         });
+        this.finished = true;
         this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
+        this.registerDeletedFlows();
     }
+    
+    ngAfterViewInit() {
+        this.finished = true;
+      }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
@@ -189,19 +200,32 @@ export class FlowComponent implements OnInit, OnDestroy {
         });
     }
 
-    trigerAction(action: string) {
-        this.eventManager.broadcast({ name: 'trigerAction', content: action });
+    registerDeletedFlows() {
+
+    this.eventManager.subscribe('flowDeleted', (res) => {
+                this.loadFlows();
+            }
+        );        
     }
 
+    trigerAction(selectedAction: string) {
+        this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
+    }
+
+    navigateToFlow() {
+        this.router.navigate(['../../flow/edit-all'])
+    }
+    
+    
     private onSuccess(data, headers) {
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }
-        this.totalItems = headers.get('X-Total-Count');
         this.flows = new Array<IFlow>();
         for (let i = 0; i < data.length; i++) {
             this.flows.push(data[i]);
         }
+        this.totalItems = headers.get('X-Total-Count');
     }
 
     protected onError(errorMessage: string) {

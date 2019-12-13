@@ -6,6 +6,7 @@ import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.FlowDTO;
+import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -93,6 +95,15 @@ public class ServiceResource {
         Page<ServiceDTO> page = serviceService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/services");
         return ResponseEntity.ok().headers(headers).body(page.getContent());        
+    }
+    
+    @GetMapping("/services/getallservices")
+    @Timed
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ServiceDTO>> getAllServices() {
+        log.debug("REST request to get all Services 2");
+        List<ServiceDTO> servicesList = serviceService.getAll();
+        return ResponseEntity.ok().body(servicesList);
     }
 
     /**

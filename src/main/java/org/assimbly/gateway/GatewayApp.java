@@ -18,6 +18,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -82,12 +83,20 @@ public class GatewayApp {
         } catch (UnknownHostException e) {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
+        
+             
+        String javaVersion = Runtime.class.getPackage().getImplementationVersion();
+        String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+        
         log.info("\n----------------------------------------------------------\n\t" +
-                "Application '{}' is running! Access URLs:\n\t" +
-                "Local: \t\t{}://localhost:{}{}\n\t" +
-                "External: \t{}://{}:{}{}\n\t" +
-                "Profile(s): \t{}\n----------------------------------------------------------",
-            env.getProperty("spring.application.name"),
+                "Application 'Assimbly {}' is running! \n\n\t" +
+                "Local URL: \t\t{}://localhost:{}{}\n\t" +
+                "External URL: \t\t{}://{}:{}{}\n\t" +
+                "Application Version: \t{}\n\t" +
+                "Java Version: \t\t{}\n\t" +
+                "Java WorkingDir: \t{}\n\t" +
+                "Profile(s): \t\t{}\n----------------------------------------------------------",
+            env.getProperty("spring.application.name"),            
             protocol,
             serverPort,
             contextPath,
@@ -95,6 +104,9 @@ public class GatewayApp {
             hostAddress,
             serverPort,
             contextPath,
+            env.getProperty("application.info.version"),
+            javaVersion,
+            javaWorkingDirectory,
             env.getActiveProfiles());
         
     }

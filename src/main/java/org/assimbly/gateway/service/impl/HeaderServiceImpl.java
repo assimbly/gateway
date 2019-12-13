@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,17 @@ public class HeaderServiceImpl implements HeaderService {
         return headerRepository.findAll(pageable)
             .map(headerMapper::toDto);
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<HeaderDTO> getAll() {
+        log.debug("Request to get all Headers");
+        return headerRepository.findAll().stream()
+                .map(headerMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+    
+    
 
     /**
      * Get one header by id.

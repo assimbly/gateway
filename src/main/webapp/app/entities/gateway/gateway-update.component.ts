@@ -33,7 +33,7 @@ export class GatewayUpdateComponent implements OnInit {
         protected wireTapEndpointService: WireTapEndpointService,
         protected activatedRoute: ActivatedRoute,
         protected router: Router,
-        protected components: Components
+        public components: Components
     ) {}
 
     ngOnInit() {

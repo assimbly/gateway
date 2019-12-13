@@ -6,8 +6,9 @@ import {
     EnvironmentVariablesComponent,
     EnvironmentVariablesDetailComponent,
     EnvironmentVariablesUpdateComponent,
+    EnvironmentVariablesDialogComponent,
     EnvironmentVariablesDeletePopupComponent,
-    EnvironmentVariablesDeleteDialogComponent,
+    EnvironmentVariablesDeleteDialogComponent,    
     environmentVariablesRoute,
     environmentVariablesPopupRoute
 } from './';
@@ -20,12 +21,14 @@ const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopu
         EnvironmentVariablesComponent,
         EnvironmentVariablesDetailComponent,
         EnvironmentVariablesUpdateComponent,
+        EnvironmentVariablesDialogComponent,
         EnvironmentVariablesDeleteDialogComponent,
         EnvironmentVariablesDeletePopupComponent
     ],
     entryComponents: [
         EnvironmentVariablesComponent,
         EnvironmentVariablesUpdateComponent,
+        EnvironmentVariablesDialogComponent,
         EnvironmentVariablesDeleteDialogComponent,
         EnvironmentVariablesDeletePopupComponent
     ],

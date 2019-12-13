@@ -55,9 +55,9 @@
 		                            </td>
 		                            <ng-template #notRequired>
 		                                <td>
-		                                    <input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
+		                                	<input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
 		                                        required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" [disabled]="serviceKey.isRequired"
-		                                        id="serviceKey-key-{{idx}}" #key="ngModel" />
+		                                        id="serviceKey-key-{{idx}}" #key="ngModel" />		                                    
 		                                    <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
 		                                        <span *ngIf="key.errors.required">Key is required.</span>
 		                                        <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
@@ -88,8 +88,7 @@
 		                                        <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
 		                                            <span class="fa fa-plus"></span>
 		                                        </button>
-		                                        <button type="submit" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" 
-		                                            class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
+		                                        <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
 		                                            <span class="fa fa-trash"></span>
 		                                        </button>
 		                                        <button type="button" title="Remove" *ngIf="!serviceKey.id" [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="removeServiceKeys(idx)">

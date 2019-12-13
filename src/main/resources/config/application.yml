@@ -58,12 +58,9 @@ spring:
         mode: HTML
 
 server:
-    session:
-        timeout: 28800
-        cookie:
-            http-only: true
     servlet:
         session:
+            timeout: 28800
             cookie:
                 http-only: true
 
@@ -115,9 +112,11 @@ jhipster:
 # ===================================================================
 
 application:
+  info:
+    version: 1.7.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
-    camel-url: https://github.com/apache/camel/blob/master    
-
+    camel-url: https://camel.apache.org/components/latest
+    
 hawtio:
   authenticationEnabled:  false     

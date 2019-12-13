@@ -1,8 +1,52 @@
 package org.assimbly.gateway.domain.enumeration;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The EndpointType enumeration.
  */
 public enum EndpointType {
-    ACTIVEMQ, AMQP, AS2, DIRECT, ELASTICSEARCH, FILE, FTP, FTPS, HTTP4, HTTPS4, IMAP, IMAPS, JETTY, NETTY4, KAFKA, RABBITMQ, REST, SJMS, SLACK, SMTP, SMTPS3, SQL,  SFTP, SONICMQ, STREAM, TELEGRAM, VM, WASTEBIN, WEBSOCKET
+	ACTIVEMQ("ACTIVEMQ"),
+	AMQP("AMQP"),
+	AS2("AS2"),
+	@JsonProperty("AWS-S3")
+	AWSS3("AWS-S3"),
+	DIRECT("DIRECT"),
+	ELASTICSEARCH("ELASTICSEARCH"),
+	FILE("FILE"),
+	FTP("FTP"),
+	FTPS("FTPS"),
+	HTTP("HTTP"),
+	HTTPS("HTTPS"),
+	IMAP("IMAP"),
+	IMAPS("IMAPS"),
+	JETTY("JETTY"),
+	NETTY4("NETTY4"),
+	KAFKA("KAFKA"),
+	RABBITMQ("RABBITMQ"),
+	REST("REST"),
+	SJMS("SJMS"),
+	SLACK("SLACK"),
+	SMTP("SMTP"),
+	SMTPS3("SMTPS3"),
+	SQL("SQL"),
+	SFTP("SFTP"),
+	SONICMQ("SONICMQ"),
+	STREAM("STREAM"),
+	TELEGRAM("TELEGRAM"),
+	VM("VM"),
+	WASTEBIN("WASTEBIN"),
+	WEBSOCKET("WEBSOCKET");
+ 
+    private String endpoint;
+ 
+    EndpointType(String endpoint) {
+        this.endpoint = endpoint;
+    }
+ 
+    public String getEndpoint() {
+        return endpoint;
+    }
+	
+	
 }

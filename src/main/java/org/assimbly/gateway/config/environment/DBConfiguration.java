@@ -78,6 +78,25 @@ public class DBConfiguration {
 		return configuration;
 	}
 
+	// exports connector by flowids to XML, JSON or YAML format
+	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids) throws Exception {
+
+		xmlConfiguration = dbExportXML.getXMLConfigurationByIds(gatewayId, flowids);
+
+		if (mediaType.contains("json")) {
+			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
+		} else if (mediaType.contains("yaml") || mediaType.contains("text")) {
+			configuration = DocConverter.convertXmlToYaml(xmlConfiguration);
+		} else {
+			configuration = xmlConfiguration;
+		}
+
+		// replace environment variables
+		configuration = PlaceholdersReplacement(configuration);
+
+		return configuration;
+	}
+	
 	// exports flow to XML, JSON or YAML
 	public String convertDBToFlowConfiguration(Long id, String mediaType) throws Exception {
 
@@ -100,9 +119,6 @@ public class DBConfiguration {
 
 	// imports connector configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
-
-		System.out.println("Komt hier convertConfigurationToDB");
-		System.out.println("xml=" + configuration);
 
 		// get the configuration as XML Document
 		Document doc = getDocument(mediaType, configuration);

@@ -9,13 +9,12 @@
             <fa-icon [icon]="'plus'"></fa-icon><span> Manage Whitelist</span>
         </button>
     </h2>
-    <jhi-alert></jhi-alert>
     <br/>
     <div class="table-responsive" *ngIf="securities">
         <table class="table table-striped">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-            <th jhiSortBy="id" id="securityHeaderId" [hidden]="!securityHeaderId"><span>ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+            <th jhiSortBy="id" [style.display]="'none'"><span>ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="url"><span>Url</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="certificateName"><span>Certificate Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="certificateExpiry"><span>Certificate Expiry</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -24,7 +23,7 @@
             </thead>
             <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
             <tr *ngFor="let security of securities ;trackBy: trackId">
-                <td id="securityId" [hidden]="!securityId"><a [routerLink]="['/security', security.id, 'view' ]">{{security.id}}</a></td>
+                <td [style.display]="'none'"><a [routerLink]="['/security', security.id, 'view' ]">{{security.id}}</a></td>
                 <td>{{security.url}}</td>
                 <td>{{security.certificateName}}</td>
                 <td>{{security.certificateExpiry | date:'medium'}}</td>
