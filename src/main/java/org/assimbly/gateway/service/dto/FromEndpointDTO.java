@@ -30,11 +30,12 @@ public class FromEndpointDTO implements Serializable {
     }
 
     public EndpointType getType() {
+    	
         return type;
     }
 
     public void setType(EndpointType type) {
-        this.type = type;
+    	this.type = type;
     }
 
     public String getUri() {

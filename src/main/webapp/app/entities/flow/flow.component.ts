@@ -104,6 +104,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
             this.flowService.connect();
         });
+        this.finished = true;
         this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
