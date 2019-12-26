@@ -113,10 +113,12 @@ jhipster:
 
 application:
   info:
-    version: 1.7.0
+    version: 1.8.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
+  gateway:
+    name: cas
     
 hawtio:
   authenticationEnabled:  false     

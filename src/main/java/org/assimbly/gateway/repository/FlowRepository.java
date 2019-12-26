@@ -19,9 +19,9 @@ import org.springframework.data.domain.Pageable;
 public interface FlowRepository extends JpaRepository<Flow, Long> {
 
 	@OrderBy("name ASC")
-	List<Flow> findAllByGatewayId(Long gatewayid);
+	Page<Flow> findAllByGatewayId(Pageable pageable, Long gatewayid);
 
 	@OrderBy("name ASC")
-	Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid);
+	List<Flow> findAllByGatewayId(Long gatewayid);
 
 }

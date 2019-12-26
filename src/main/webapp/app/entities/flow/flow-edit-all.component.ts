@@ -53,21 +53,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     savingFlowSuccess = false;
     savingFlowSuccessMessage = 'Flow successfully saved';
     finished = false;
+    
     gateways: Gateway[];
+    configuredGateway: Gateway;
+    gatewayName: String;
     singleGateway = false;
+    indexGateway: number;
+
     embeddedBroker = false;
     createRoute: number;
     newId: number;
-    itemsPerPage: number;
-    links: any;
-    page: any;
     predicate: any;
     queryCount: any;
     reverse: any;
     totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
-    fromTypeAssimblyLink: string;
 
     namePopoverMessage: string;
     autoStartPopoverMessage: string;
@@ -83,6 +84,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toPopoverMessage: string;
     errorPopoverMessage: string;
 
+    fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
     fromUriPlaceholder: string;
     fromUriPopoverMessage: string;
@@ -96,10 +98,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toTypeCamelLinks: Array<string> = new Array<string>();
     toUriPlaceholders: Array<string> = new Array<string>();
     toUriPopoverMessages: Array<string> = new Array<string>();
+
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
     errorUriPlaceholder: string;
     errorUriPopoverMessage: string;
+    
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
     displayNextButton = false;
@@ -170,9 +174,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 this.flowService.getCamelDocUrl(),
                 this.serviceService.getAllServices(),
                 this.headerService.getAllHeaders(),
-                this.gatewayService.query()
+                this.gatewayService.query(),
+                this.flowService.getGatewayName()
             )
-                .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways]) => {
+                .subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways, gatewayName]) => {
                     this.wikiDocUrl = wikiDocUrl.body;
 
                     this.camelDocUrl = camelDocUrl.body;
@@ -185,9 +190,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     this.gateways = gateways.body;
                     this.singleGateway = this.gateways.length === 1;
+                    this.gatewayName = gatewayName.body;
+                    
                     
                     if(this.singleGateway){
-                        if(this.gateways[0].type.valueOf().toLocaleLowerCase() == "broker"){
+                        this.indexGateway = 0;
+                        if(this.gateways[this.indexGateway].type.valueOf().toLocaleLowerCase() == "broker"){
+                            this.embeddedBroker = true;
+                        }
+                    }else{
+                        this.indexGateway = this.gateways.findIndex(gateway => gateway.name === this.gatewayName);
+                        if(this.gateways[this.indexGateway].type.valueOf().toLocaleLowerCase() == "broker"){
                             this.embeddedBroker = true;
                         }
                     }
@@ -198,7 +211,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             if (flow) {
                                 this.flow = flow.body;
                                 if (this.singleGateway) {
-                                    this.flow.gatewayId = this.gateways[0].id;
+                                    this.flow.gatewayId = this.gateways[this.indexGateway].id;
                                 }
 
                                 this.initializeForm(this.flow);
@@ -276,26 +289,31 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow.maximumRedeliveries = 0;
                             this.flow.redeliveryDelay = 3000;
                             if (this.singleGateway) {
-                                this.flow.gatewayId = this.gateways[0].id;
+                                this.indexGateway = 0;
+                                this.flow.gatewayId = this.gateways[this.indexGateway].id;
+                            }else{
+                                this.configuredGateway = this.gateways.find(gateway => gateway.name === this.gatewayName);
+                                this.indexGateway = this.gateways.findIndex(gateway => gateway.name === this.gatewayName);
+                                this.flow.gatewayId = this.configuredGateway.id;
                             }
                             this.initializeForm(this.flow);
 
                             this.fromEndpoint = new FromEndpoint();
                             
-                            this.fromEndpoint.type = EndpointType[this.gateways[0].defaultFromEndpointType];
+                            this.fromEndpoint.type = EndpointType[this.gateways[this.indexGateway].defaultFromEndpointType];
                             (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.fromEndpoint));
                             this.fromEndpointOptions = [new Option()];
                             this.setTypeLinks(this.fromEndpoint, 0);
 
                             this.errorEndpoint = new ErrorEndpoint();
-                            this.errorEndpoint.type = EndpointType[this.gateways[0].defaultErrorEndpointType];
+                            this.errorEndpoint.type = EndpointType[this.gateways[this.indexGateway].defaultErrorEndpointType];
                             (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.errorEndpoint));
                             this.errorEndpointOptions = [new Option()];
                             this.setTypeLinks(this.errorEndpoint, 1);
 
                             this.toEndpoints = new Array<ToEndpoint>(new ToEndpoint());
                             this.toEndpoints.forEach((endpoint, i) => {
-                                endpoint.type = EndpointType[this.gateways[0].defaultToEndpointType];
+                                endpoint.type = EndpointType[this.gateways[this.indexGateway].defaultToEndpointType];
                             });
                             (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
                             this.toEndpointsOptions = [[new Option()]];
@@ -655,7 +673,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpoints.push(new ToEndpoint());
         this.toEndpointsOptions.push([new Option()]);
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
-        toEndpoint.type = EndpointType[this.gateways[0].defaultToEndpointType];
+        toEndpoint.type = EndpointType[this.gateways[this.indexGateway].defaultToEndpointType];
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
         this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
         setTimeout(() => {

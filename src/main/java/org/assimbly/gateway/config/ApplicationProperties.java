@@ -13,6 +13,7 @@ public class ApplicationProperties {
 	
 	public final Info info = new Info();
     public final Documentation documentation = new Documentation();
+    public final Gateway gateway = new Gateway();
 
     public Info getInfo() {
         return info;
@@ -22,6 +23,10 @@ public class ApplicationProperties {
         return documentation;
     }
 
+    public Gateway getGateway() {
+        return gateway;
+    }
+    
     public static class Info {
 
     	private String version;
@@ -60,4 +65,19 @@ public class ApplicationProperties {
         
     }
 
+    public static class Gateway {
+
+    	private String name;
+    	
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+    }
+    
+    
 }

@@ -66,8 +66,9 @@ export class FlowService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
     
-    getFlowByGatewayId(gatewayid: Number): Observable<EntityResponseType> {
-        return this.http.get(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { observe: 'response' });
+    getFlowByGatewayId(gatewayid: Number, req?: any): Observable<EntityArrayResponseType> {
+        const options = createRequestOption(req);
+        return this.http.get<IFlow[]>(`${this.resourceUrl}/bygatewayid/${gatewayid}`, {params: options, observe: 'response' });
     }
 
     getConfiguration(flowid: number): Observable<HttpResponse<any>> {
@@ -151,6 +152,10 @@ export class FlowService {
         return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response',responseType: 'text' });
     }
 
+    getGatewayName(): Observable<HttpResponse<any>> {
+        return this.http.get(`${SERVER_API_URL}/api/gateway-name`, { observe: 'response',responseType: 'text' });
+    }
+    
     setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
         return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, { observe: 'response', responseType: 'text' });
     }

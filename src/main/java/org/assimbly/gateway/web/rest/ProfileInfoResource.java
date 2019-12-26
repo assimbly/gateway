@@ -25,7 +25,6 @@ public class ProfileInfoResource {
 
     private final ApplicationProperties.Documentation documentation;
 
-    
     public ProfileInfoResource(Environment env, JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties) {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
@@ -43,7 +42,6 @@ public class ProfileInfoResource {
         String propertyUrl = documentation.getCamelUrl();
         return propertyUrl;
     }
-    
     
     private String getRibbonEnv(String[] activeProfiles) {
     	/*
