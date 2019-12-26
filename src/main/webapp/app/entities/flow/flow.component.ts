@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { EndpointType } from '../../shared/camel/component-type';
@@ -37,13 +37,17 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number = -1;
-    gatewayExists = false;
+    gatewayExists: boolean;
     multipleGateways = false;
     finished = false;
 
     singleGatewayName: string;
     singleGatewayId: number;
     singleGatewayStage: string;
+    
+    configuredGateway : IGateway;
+    indexGateway: number;
+    
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     selectedAction: string;
     test: any;
@@ -70,9 +74,12 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadFlows() {
+        console.log("loadflows");
         if (this.gateways.length > 1) {
-            this.getFlowsForSelectedGateway(this.gateways[0].id);
+            console.log("loadflows id=" + this.gateways[this.indexGateway].id);
+            this.getFlowsForSelectedGateway(this.gateways[this.indexGateway].id);
         } else {
+            console.log("waarom?");
             this.flowService.query({
                 page: this.page,
                 size: this.itemsPerPage,
@@ -85,6 +92,18 @@ export class FlowComponent implements OnInit, OnDestroy {
         }
     }    
 
+    getFlowsForSelectedGateway(id) {
+        this.flowService.getFlowByGatewayId(Number(id),{
+            page: this.page,
+            size: this.itemsPerPage,
+            sort: this.sort()
+        })
+            .subscribe(
+                    (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+                    (res: HttpErrorResponse) => this.onError(res.message)
+            );
+    }
+    
     reset() {
         this.page = 0;
         this.flows = [];
@@ -119,24 +138,21 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    getFlowsForSelectedGateway(id) {
-        this.flowService.getFlowByGatewayId(Number(id))
-            .subscribe(
-            res => this.onSuccess(res, res.headers),
-            res => this.onError(res.json)
-            );
-    }
-
     getGateways(): void {
-        this.gatewayService.query()
-            .subscribe(gateways => {
-                this.gateways = gateways.body;
-                this.isGatewayCreated(this.gateways);
+        forkJoin(
+                this.flowService.getGatewayName(),
+                this.gatewayService.query()
+            )
+                .subscribe(([gatewayName, gateways]) => {
 
-                if (this.gatewayExists) {
+                    console.log('name of gateway ' + gatewayName.body);
+                    this.gateways = gateways.body;
+                    this.checkGatewayType(this.gateways, gatewayName.body);
+
+                if (!this.gatewayExists) {
 
                     this.gateway = new Object();
-                    this.gateway.name = 'default';
+                    this.gateway.name = gatewayName.body;
                     this.gateway.type = GatewayType.ADAPTER;
                     this.gateway.environmentName = 'Dev1';
                     this.gateway.stage = EnvironmentType.DEVELOPMENT;
@@ -156,17 +172,36 @@ export class FlowComponent implements OnInit, OnDestroy {
                 } else {
                     this.loadFlows();
                     if (!this.multipleGateways) {
-                        this.singleGatewayName = this.gateways[0].name;
-                        this.singleGatewayId = this.gateways[0].id;
-                        this.singleGatewayStage = this.gateways[0].stage ? this.gateways[0].stage.toString().toLowerCase() : '';
+                        this.singleGatewayName = this.gateways[this.indexGateway].name;
+                        this.singleGatewayId = this.gateways[this.indexGateway].id;
+                        this.singleGatewayStage = this.gateways[this.indexGateway].stage ? this.gateways[this.indexGateway].stage.toString().toLowerCase() : '';
                     }
                 }
             });
     }
 
-    isGatewayCreated(gateways: IGateway[]): void {
-        this.gatewayExists = gateways.length === 0;
-        this.multipleGateways = gateways.length > 1;
+    checkGatewayType(gateways: IGateway[],gatewayName: String): void {
+        
+        if(gatewayName==='default'){
+            this.gatewayExists = gateways.length > 0;
+            this.indexGateway = 0;
+            this.multipleGateways = gateways.length > 1;
+        }else{
+            this.multipleGateways = false;
+            this.configuredGateway = gateways.find(gateway => gateway.name === gatewayName);
+            this.indexGateway = gateways.findIndex(gateway => gateway.name == gatewayName);
+            console.log("configurated gateway" + this.configuredGateway.name);
+            if(this.indexGateway>0){
+                console.log("komt hier");
+                this.gatewayExists = true;
+                console.log("komt hier" + this.indexGateway);
+
+            }else{
+                this.gatewayExists = false;
+                this.indexGateway = 0;
+            }    
+        }
+        
     }
 
     getFromEndpoints(): void {
@@ -218,6 +253,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     
     
     private onSuccess(data, headers) {
+        console.log("succes");
+        console.log("data" + data);
+        console.log("data" + data.length);
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }
@@ -229,6 +267,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
+        console.log("failed");
         this.jhiAlertService.error(errorMessage, null, null);
     }
 }
