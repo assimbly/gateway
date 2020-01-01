@@ -118,7 +118,7 @@ application:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
   gateway:
-    name: cas
+    name: default
     
 hawtio:
   authenticationEnabled:  false     

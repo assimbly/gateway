@@ -36,23 +36,32 @@ public class Flow implements Serializable {
     private Boolean offLoading;
 
     @Column(name = "maximum_redeliveries")
-    private int maximumRedeliveries;
+    private Integer maximumRedeliveries;
 
     @Column(name = "redelivery_delay")
-    private int redeliveryDelay;    
-    
+    private Integer redeliveryDelay;
+
+    @Column(name = "jhi_type")
+    private String type;
+
+    @Column(name = "load_balancing")
+    private Boolean loadBalancing;
+
+    @Column(name = "jhi_instances")
+    private Integer instances;
+
     @ManyToOne
     @JsonIgnoreProperties("flows")
     private Gateway gateway;
-
+ 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private FromEndpoint fromEndpoint;
-
+ 
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
     private ErrorEndpoint errorEndpoint;
-
+ 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<ToEndpoint> toEndpoints = new HashSet<>();
@@ -111,35 +120,75 @@ public class Flow implements Serializable {
         this.offLoading = offLoading;
     }
 
+    public Integer getMaximumRedeliveries() {
+        return maximumRedeliveries;
+    }
+
+    public Flow maximumRedeliveries(Integer maximumRedeliveries) {
+        this.maximumRedeliveries = maximumRedeliveries;
+        return this;
+    }
+
+    public void setMaximumRedeliveries(Integer maximumRedeliveries) {
+        this.maximumRedeliveries = maximumRedeliveries;
+    }
+
+    public Integer getRedeliveryDelay() {
+        return redeliveryDelay;
+    }
+
+    public Flow redeliveryDelay(Integer redeliveryDelay) {
+        this.redeliveryDelay = redeliveryDelay;
+        return this;
+    }
+
+    public void setRedeliveryDelay(Integer redeliveryDelay) {
+        this.redeliveryDelay = redeliveryDelay;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Flow type(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean isLoadBalancing() {
+        return loadBalancing;
+    }
+
+    public Flow loadBalancing(Boolean loadBalancing) {
+        this.loadBalancing = loadBalancing;
+        return this;
+    }
+
+    public void setLoadBalancing(Boolean loadBalancing) {
+        this.loadBalancing = loadBalancing;
+    }
+
+    public Integer getInstances() {
+        return instances;
+    }
+
+    public Flow instances(Integer instances) {
+        this.instances = instances;
+        return this;
+    }
+
+    public void setInstances(Integer instances) {
+        this.instances = instances;
+    }
+
     public Gateway getGateway() {
         return gateway;
     }
 
-    public int getMaximumRedeliveries() {
-        return maximumRedeliveries;
-    }
-    
-    public Flow maximumRedeliveries(int maximumRedeliveries) {
-        this.maximumRedeliveries = maximumRedeliveries;
-        return this;
-    }
-    
-    public void setMaximumRedeliveries(int maximumRedeliveries) {
-        this.maximumRedeliveries = maximumRedeliveries;
-    }
-
-    public int getRedeliveryDelay() {
-        return redeliveryDelay;
-    }
-    
-    public Flow redeliveryDelay(int redeliveryDelay) {
-        this.redeliveryDelay = redeliveryDelay;
-        return this;
-    }
-
-    public void setRedeliveryDelay(int redeliveryDelay) {
-        this.redeliveryDelay = redeliveryDelay;
-    }    
     public Flow gateway(Gateway gateway) {
         this.gateway = gateway;
         return this;
@@ -175,20 +224,6 @@ public class Flow implements Serializable {
         this.errorEndpoint = errorEndpoint;
     }
 
-    /*
-    public Maintenance getMaintenance() {
-        return maintenance;
-    }
-
-    public Flow maintenance(Maintenance maintenance) {
-        this.maintenance = maintenance;
-        return this;
-    }
-
-    public void setMaintenance(Maintenance maintenance) {
-        this.maintenance = maintenance;
-    }*/
-    
     public Set<ToEndpoint> getToEndpoints() {
         return toEndpoints;
     }
@@ -213,7 +248,6 @@ public class Flow implements Serializable {
     public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
         this.toEndpoints = toEndpoints;
     }
-
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -243,7 +277,11 @@ public class Flow implements Serializable {
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
             ", offLoading='" + isOffLoading() + "'" +
+            ", maximumRedeliveries=" + getMaximumRedeliveries() +
+            ", redeliveryDelay=" + getRedeliveryDelay() +
+            ", type='" + getType() + "'" +
+            ", loadBalancing='" + isLoadBalancing() + "'" +
+            ", instances=" + getInstances() +
             "}";
     }
-
 }
