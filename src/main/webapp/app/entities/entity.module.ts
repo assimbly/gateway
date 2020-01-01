@@ -15,7 +15,7 @@ import { GatewaySecurityModule } from './security/security.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
-import { FlowService } from "app/entities/flow";
+import { FlowService } from 'app/entities/flow';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({

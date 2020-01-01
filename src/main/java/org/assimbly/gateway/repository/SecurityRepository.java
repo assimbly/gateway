@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SecurityRepository extends JpaRepository<Security, Long> {
 	
-	
 	List<Security> findAllByCertificateExpiryBetween(Instant now, Instant expiryDate);
 	
 	List<Security> findAllByUrl(String url);

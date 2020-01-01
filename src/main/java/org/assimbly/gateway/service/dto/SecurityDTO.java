@@ -3,6 +3,7 @@ package org.assimbly.gateway.service.dto;
 import java.time.Instant;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 
 /**
  * A DTO for the Security entity.
@@ -16,6 +17,9 @@ public class SecurityDTO implements Serializable {
     private String certificateName;
 
     private Instant certificateExpiry;
+
+    @Lob
+    private String certificateFile;
 
     public Long getId() {
         return id;
@@ -49,6 +53,14 @@ public class SecurityDTO implements Serializable {
         this.certificateExpiry = certificateExpiry;
     }
 
+    public String getCertificateFile() {
+        return certificateFile;
+    }
+
+    public void setCertificateFile(String certificateFile) {
+        this.certificateFile = certificateFile;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -77,6 +89,7 @@ public class SecurityDTO implements Serializable {
             ", url='" + getUrl() + "'" +
             ", certificateName='" + getCertificateName() + "'" +
             ", certificateExpiry='" + getCertificateExpiry() + "'" +
+            ", certificateFile='" + getCertificateFile() + "'" +
             "}";
     }
 }
