@@ -19,10 +19,12 @@ export enum EndpointType {
     IMAP = 'IMAP',
     IMAPS = 'IMAPS',
     JETTY = 'JETTY',
-    NETTY4 = 'NETTY4',
     KAFKA = 'KAFKA',
+    LOG = 'LOG',
+    NETTY4 = 'NETTY4',
     RABBITMQ = 'RABBITMQ',
     REST = 'REST',
+    SCHEDULER = 'SCHEDULER',
     SFTP = 'SFTP',
     SJMS = 'SJMS',
     SLACK = 'SLACK',
@@ -32,6 +34,7 @@ export enum EndpointType {
     SQL = 'SQL',
     STREAM = 'STREAM',
     TELEGRAM = 'TELEGRAM',
+    TIMER = 'TIMER',
     VM = 'VM',
     WASTEBIN = 'WASTEBIN',
     WEBSOCKET = 'WEBSOCKET',
@@ -297,6 +300,20 @@ export const typesLinks = [
     `
     },
     {
+        name: 'LOG',
+        assimblyTypeLink: `/component-log`,
+        camelTypeLink: `/log-component.html`,
+        uriPlaceholder: 'loggingCategory',
+        uriPopoverMessage: `
+        <b>Name</b>: loggingName<br/>
+        <b>Description</b>: The name for the logging<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: foo<br/>
+    `
+    },
+    {
         name: 'RABBITMQ',
         assimblyTypeLink: `/component-rabbitmq`,
         camelTypeLink: `/rabbitmq-component.html`,
@@ -340,6 +357,20 @@ export const typesLinks = [
         <b>Data Type</b>: String (REST URI)<br/><br/>
         <b>Example</b>: get:test or post:test<br/>
         `
+    },
+    {
+        name: 'SCHEDULER',
+        assimblyTypeLink: `/component-scheduler`,
+        camelTypeLink: `/scheduler-component.html`,
+        uriPlaceholder: 'schedulerName',
+        uriPopoverMessage: `
+        <b>Name</b>: timerName<br/>
+        <b>Description</b>: The name for the timer<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: foo<br/>
+    `
     },
     {
         name: 'SFTP',
@@ -501,6 +532,20 @@ export const typesLinks = [
     `
     },
     {
+        name: 'TIMER',
+        assimblyTypeLink: `/component-timer`,
+        camelTypeLink: `/timer-component.html`,
+        uriPlaceholder: 'timerName',
+        uriPopoverMessage: `
+        <b>Name</b>: timerName<br/>
+        <b>Description</b>: The name for the timer<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: foo<br/>
+    `
+    },
+    {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
         camelTypeLink: `/vm-component.html`,
@@ -553,13 +598,13 @@ export const typesLinks = [
 @Injectable()
 export class Components {
 
-    fromTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
-                 'SMTPS', 'SMTP', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WEBSOCKET'];
+    fromTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'LOG', 'KAFKA', 'RABBITMQ', 'REST', 'SCHEDULER', 'SFTP', 'SJMS', 'SLACK',
+                 'SMTPS', 'SMTP', 'SONICMQ', 'SQL', 'STREAM', 'TIMER', 'TELEGRAM', 'VM', 'WEBSOCKET'];
 
-    toTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK',
-               'SMTPS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'VM', 'WASTEBIN', 'WEBSOCKET'];
+    toTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'DIRECT', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'LOG', 'KAFKA', 'RABBITMQ', 'REST', 'SCHEDULER', 'SFTP', 'SJMS', 'SLACK',
+               'SMTPS', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'STREAM', 'TELEGRAM', 'TIMER', 'VM', 'WASTEBIN', 'WEBSOCKET'];
 
-    errorTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM', 'WEBSOCKET'];
+    errorTypes = ['ACTIVEMQ', 'AS2','AWS-S3', 'ELASTICSEARCH', 'FILE', 'FTP', 'FTPS', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'JETTY', 'NETTY4', 'LOG', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SLACK', 'SMTP', 'SMTPS', 'SONICMQ', 'SQL', 'TELEGRAM', 'STREAM', 'WEBSOCKET'];
 
-    wireTapTypes = [,'ACTIVEMQ','AWS-S3', 'ELASTICSEARCH', 'FILE', 'FTPS', 'FTP', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'NETTY4', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WEBSOCKET'];
+    wireTapTypes = [,'ACTIVEMQ','AWS-S3', 'ELASTICSEARCH', 'FILE', 'FTPS', 'FTP', 'HTTP', 'HTTPS', 'IMAP', 'IMAPS', 'NETTY4', 'LOG', 'KAFKA', 'RABBITMQ', 'REST', 'SFTP', 'SJMS', 'SONICMQ', 'SQL', 'STREAM', 'WEBSOCKET'];
 }
