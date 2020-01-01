@@ -51,6 +51,18 @@
         {
             "fieldName": "redeliveryDelay",
             "fieldType": "Integer"
+        },
+        {
+            "fieldName": "type",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "loadBalancing",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "instances",
+            "fieldType": "Integer"
         }
     ],
     "changelogDate": "20180114132915",
