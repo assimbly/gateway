@@ -38,8 +38,6 @@ public class GatewayResource {
 
 	private final GatewayService gatewayService;
 
-	private BrokerManager brokermanager = new BrokerManager();
-
 	private String gatewayType;
 	
     public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository) {
@@ -87,24 +85,6 @@ public class GatewayResource {
              
         gatewayType = gatewayDTO.getType().name();
         GatewayDTO result = gatewayService.save(gatewayDTO);
-        
-        try {
-			
-	        if (gatewayType.equals("BROKER")) {	  
-       			brokermanager.stop("ARTEMIS");
-       			brokermanager.start(gatewayType);
-	        }else if (gatewayType.equals("ARTEMIS")) {
-	        	brokermanager.stop("BROKER");
-       			brokermanager.start(gatewayType);
-	        }else {
-	        	System.out.println("gateway=adapter");
-	        	brokermanager.stop("BROKER");
-       			brokermanager.stop("ARTEMIS");
-	        }
-        
-        } catch (Exception e1) {
-			e1.printStackTrace();
-		}
 
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString()))
@@ -152,15 +132,4 @@ public class GatewayResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
     
-    @PostConstruct
-    private void init() throws Exception {
-
-        List<Gateway> gateways = gatewayRepository.findAll();
-        
-        for(Gateway gateway : gateways) {
-        	
-        	gatewayType = gateway.getType().name();
-   			brokermanager.start(gatewayType);
-        }
-    }
 }

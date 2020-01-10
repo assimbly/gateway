@@ -74,12 +74,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadFlows() {
-        console.log("loadflows");
         if (this.gateways.length > 1) {
-            console.log("loadflows id=" + this.gateways[this.indexGateway].id);
             this.getFlowsForSelectedGateway(this.gateways[this.indexGateway].id);
         } else {
-            console.log("waarom?");
             this.flowService.query({
                 page: this.page,
                 size: this.itemsPerPage,
@@ -145,7 +142,6 @@ export class FlowComponent implements OnInit, OnDestroy {
             )
                 .subscribe(([gatewayName, gateways]) => {
 
-                    console.log('name of gateway ' + gatewayName.body);
                     this.gateways = gateways.body;
                     this.checkGatewayType(this.gateways, gatewayName.body);
 
@@ -190,12 +186,8 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.multipleGateways = false;
             this.configuredGateway = gateways.find(gateway => gateway.name === gatewayName);
             this.indexGateway = gateways.findIndex(gateway => gateway.name == gatewayName);
-            console.log("configurated gateway" + this.configuredGateway.name);
             if(this.indexGateway>0){
-                console.log("komt hier");
                 this.gatewayExists = true;
-                console.log("komt hier" + this.indexGateway);
-
             }else{
                 this.gatewayExists = false;
                 this.indexGateway = 0;
@@ -253,9 +245,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     
     
     private onSuccess(data, headers) {
-        console.log("succes");
-        console.log("data" + data);
-        console.log("data" + data.length);
+
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }
@@ -267,7 +257,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        console.log("failed");
         this.jhiAlertService.error(errorMessage, null, null);
     }
 }

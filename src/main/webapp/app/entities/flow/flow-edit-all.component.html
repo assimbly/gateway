@@ -20,15 +20,12 @@
 						<input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id" />
 					</div>
 					<ng-template #namePopover let-message="message">
-								<div [innerHtml]="namePopoverMessage"></div>
+						<div [innerHtml]="namePopoverMessage"></div>
 					</ng-template>
 					<div class="form-group w-50">
-						<label class="form-control-label" for="name">Name*</label>
-						<i triggers="mouseenter:mouseleave"
-							placement="right" triggers="mouseenter:mouseleave"
-							popoverTitle="Info"
-							 [popover]="namePopover" 
-							class="fa fa-info-circle"></i>
+						<label class="form-control-label" for="name">Name</label>
+						<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
+							popoverTitle="Info" [popover]="namePopover"></i>
 						<input type="text" class="form-control" id="name" *ngIf="flow" formControlName="name" />
 						
 						<div *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
@@ -50,7 +47,7 @@
 					<div class="form-group w-25">
 						<label class="form-control-label" for="field_autostart">Autostart</label>
 						<i triggers="mouseenter:mouseleave"
-							placement="right" triggers="mouseenter:mouseleave"
+							placement="right"
 							popoverTitle="Info"
 							 [popover]="autoStartPopover" 
 							class="fa fa-info-circle"></i>

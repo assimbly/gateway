@@ -1,0 +1,88 @@
+<div>
+    <h2 id="page-heading">
+        <span>Broker</span>
+    </h2>
+    <br/>
+    
+    <div class="mt-3" *ngIf="brokers?.length === 0">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<b>No broker is configured</b>
+					</div>
+					<div class="card-block pt-4">
+						<blockquote class="card-blockquote text-center">
+							<button id="jh-create-entity" class="btn btn-primary jh-create-entity create-broker" [routerLink]="['/broker/new']">
+		            <fa-icon [icon]="'plus'"></fa-icon>
+		            <span >
+		            Create Broker
+		            </span>
+		        </button>
+		        </p>
+						</blockquote>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 text-center">
+		        
+           </div>
+		</div>
+	</div>
+    
+    <div class="table-responsive" *ngIf="brokers?.length > 0">
+        <table class="table table-striped">
+            <thead>
+	            <tr>
+		            <th [style.display]="'none'"><span>ID</span></th>
+		            <th class="border-bottom-none"><span></span></th>
+	            </tr>
+            </thead>
+            <tbody>
+	            <tr *ngFor="let broker of brokers ;trackBy: trackId">
+	               <td [style.display]="'none'"><a [routerLink]="['/broker', broker.id, 'view' ]">{{broker.id}}</a></td>
+	               <td>
+
+              			<ng-template #detailsTemplate>
+              			    <b>something</b>
+							<!-- <div [innerHtml]="brokerDetails"></div> -->
+						</ng-template>
+
+						<div class="float-left">
+							<div class="btn-group-justified" role="group">
+							    <div class="btn-group" role="group" style="margin-left: 0.5em;">	
+							 		<button [ngClass]="{'btn-primary': brokerStatus === 'inactive', 'btn-success':brokerStatus === 'active', 'btn-warning':brokerStatus === 'paused', 'btn-danger':brokerStatus === 'inactiveError' }" 
+									type="button" (click)="start()" class="btn btn-lg" [disabled]="disableActionBtns" *ngIf="!isBrokerStarted">
+										<span class="fa fa-play"></span>
+									</button>
+									<button [ngClass]="{'btn-primary': brokerStatus === 'inactive', 'btn-success':brokerStatus === 'active', 'btn-warning':brokerStatus === 'paused', 'btn-danger':brokerStatus === 'inactiveError' }" 
+									type="button" (click)="restart()" class="btn btn-lg" [disabled]="disableActionBtns" *ngIf="!isBrokerRestarted">
+										<span class="fa fa-refresh"></span>
+									</button>
+									<button  [ngClass]="{'btn-primary': brokerStatus === 'inactive', 'btn-success':brokerStatus === 'active', 'btn-warning':brokerStatus === 'paused', 'btn-danger':brokerStatus === 'inactiveError' }"
+									     type="button" (click)="stop()" class="btn btn-lg" [disabled]="isBrokerStopped || disableActionBtns">
+										<span class="fa fa-stop"></span>
+									</button>
+									<ng-template #brokerStatusButtonTemplate><div [innerHtml]="brokerStatusButton"></div></ng-template>
+						      		<button [ngClass]="{'btn-primary': brokerStatus === 'inactive', 'btn-success':brokerStatus === 'active', 'btn-warning':brokerStatus === 'paused', 'btn-danger':brokerStatus === 'inactiveError' }"
+						      		 type="button" style="min-width: 20em;" data-container="body" class="btn btn-lg btn-block" placement="right" popoverTitle="Status" [ngbPopover]="brokerStatusButtonTemplate" [autoClose]="'outside'">
+						      		       <span style="text-transform: uppercase;">{{broker.name}}</span>
+									</button>
+							 </div>
+						  </div>
+						  
+						  <div class="col">
+						   	<ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
+							<i (mouseenter)="getBrokerDetails()" class="fa fa-info" aria-hidden="true" data-container="body" placement="right" [ngbPopover]="detailsTemplate" popoverTitle="Details"></i>
+							<a style="padding-left: 1em" type="submit" [routerLink]="['/broker', broker.id, 'edit']" class="fa fa-edit" aria-hidden="true" placement="right" title="Edit broker"></a> 
+							<a  style="padding-left: 1em" type="submit" [routerLink]="['/', { outlets: { popup: 'broker/'+ broker.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" placement="right" title="Delete broker" class="fa fa-trash"></a>
+						 </div>
+
+					 </div>	
+				</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</div>
