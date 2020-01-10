@@ -86,6 +86,7 @@ entity Security {
 
 entity Broker {
 	name String,
+	autoStart Boolean,
 	type String,
 	configuration String,
 }
