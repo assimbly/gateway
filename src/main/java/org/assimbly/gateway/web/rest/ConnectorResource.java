@@ -741,7 +741,7 @@ public class ConnectorResource {
     public ResponseEntity<String> setCertificates(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String url) throws Exception {
     	
        	try {
-       		connector.setCertificates(url);       		
+       		connector.setCertificatesInTruststore(url);       		
        		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}","Connector certificates set");			
    		} catch (Exception e) {
    			e.printStackTrace();

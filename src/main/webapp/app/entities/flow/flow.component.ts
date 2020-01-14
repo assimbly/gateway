@@ -14,6 +14,7 @@ import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway
 import { FromEndpointService } from '../from-endpoint';
 import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { GatewayService } from '../gateway';
+import { SecurityService } from "../security";
 
 @Component({
     selector: 'jhi-flow',
@@ -61,6 +62,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         protected accountService: AccountService,
 		protected gatewayService: GatewayService,
         protected fromEndpointService: FromEndpointService,
+        protected securityService: SecurityService,
         protected router: Router,
     ) {
         this.flows = [];
@@ -129,6 +131,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     
     ngAfterViewInit() {
         this.finished = true;
+        this.securityService.syncTrustore().subscribe(res => {
+            
+        });
       }
 
     ngOnDestroy() {

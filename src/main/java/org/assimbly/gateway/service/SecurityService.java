@@ -46,7 +46,14 @@ public interface SecurityService {
      */
     void delete(Long id);
 
+	List<Security> findAll();
+	
 	List<Security> findAllByUrl(String url);
 
 	List<Security> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry);
+	
+	Optional<Security> findByCertificateName(String certificateName);
+
+
+	
 }

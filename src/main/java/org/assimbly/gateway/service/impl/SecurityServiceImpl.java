@@ -89,14 +89,21 @@ public class SecurityServiceImpl implements SecurityService {
         log.debug("Request to delete Security : {}", id);
         securityRepository.deleteById(id);
     }
-
     
-    public List<Security> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry) {
-		return securityRepository.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
+    public List<Security> findAll() {
+		return securityRepository.findAll();
 	}
 
     public List<Security> findAllByUrl(String url) {
 		return securityRepository.findAllByUrl(url);
+	}
+
+    public List<Security> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry) {
+		return securityRepository.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
+	}
+    
+    public Optional<Security> findByCertificateName(String certificateName) {
+		return securityRepository.findByCertificateName(certificateName);
 	}
     
 }

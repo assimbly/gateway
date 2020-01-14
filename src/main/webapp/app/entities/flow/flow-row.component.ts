@@ -8,6 +8,7 @@ import { FlowService } from './flow.service';
 import { FromEndpointService } from '../from-endpoint';
 import { ToEndpointService } from '../to-endpoint';
 import { ErrorEndpointService } from '../error-endpoint';
+import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService, AccountService, Account } from 'app/core';
 
@@ -32,6 +33,7 @@ enum Status {
 })
 
 export class FlowRowComponent implements OnInit, OnDestroy {
+    sslUrl: any;
     mySubscription: Subscription;
 
     @Input() flow: Flow;
@@ -95,6 +97,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         private fromEndpointService: FromEndpointService,
         private toEndpointService: ToEndpointService,
         private errorEndpointService: ErrorEndpointService,
+        private securityService: SecurityService,
         private loginModalService: LoginModalService,
         private modalService: NgbModal,
         private router: Router,
@@ -499,6 +502,69 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             });
     }
 
+
+    getSSLUrl(type: String, uri: String, options: String) {
+
+        var hostname
+        
+        switch (type) {
+            case 'FTPS':
+                if(uri.includes('@')){
+                    uri = uri.substring(uri.indexOf('@') + 1);
+                }
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'HTTPS':
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'IMAPS':
+                if(uri.includes('@')){
+                    uri = uri.substring(uri.indexOf('@') + 1);
+                }
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'KAFKA':
+                if(options.includes(',')){
+                    options = options.substring(
+                            options.lastIndexOf("brokers=") + 1, 
+                            options.lastIndexOf(",")
+                        );
+                }else{
+                    options = options.substring(uri.indexOf(',') + 1);
+                }
+                hostname = (new URL('https://' + options)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'NETTY4':
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'SFTP':
+                if(uri.includes('@')){
+                    uri = uri.substring(uri.indexOf('@') + 1);
+                }
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            case 'SMTPS':
+                if(uri.includes('@')){
+                    uri = uri.substring(uri.indexOf('@') + 1);
+                }
+                hostname = (new URL('https://' + uri)).hostname;            
+                this.sslUrl = 'https://' + hostname
+                break;
+            default:
+                this.sslUrl = `0`;
+                break;
+        }
+    
+       return this.sslUrl;    
+    }
+
+    
     endpointTooltip(type, uri, options): string {
         if (type === null) { return };
         const opt = options === '' ? '' : `?${options}`;
@@ -564,8 +630,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 }); 
             })
         }, (err) => {
-            console.log('error');
-            console.log(err);
             this.getFlowLastError(this.flow.id, 'Start', err.error);
             this.isFlowStatusOK = false;
             this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
