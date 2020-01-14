@@ -56,6 +56,14 @@ export class SecurityService {
     getCertificateDetails(certificateName: string): Observable<HttpResponse<any>> {
         return this.http.get(`${this.resourceUrl}/details/${certificateName}`, { observe: 'response',responseType: 'text' });
     }    
+
+    syncTrustore(): Observable<HttpResponse<any>> {
+        return this.http.post(`${this.resourceUrl}/syncTrustore`,'', { observe: 'response',responseType: 'text' });
+    }   
+    
+    updateTrustore(url: string): Observable<HttpResponse<any>> {
+        return this.http.post(`${this.resourceUrl}/updateTrustore`, url,{ observe: 'response',responseType: 'text' });
+    }    
     
     uploadCertificate(certificate): Observable<HttpResponse<any>> {
         return this.http.post(`${this.resourceUrl}/uploadcertificate`, certificate, { observe: 'response',responseType: 'text' });

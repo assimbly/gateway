@@ -252,6 +252,7 @@ dependencies {
 	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
 	//compile "io.hawt:hawtio-springboot:2.7.0"
+	compile group: 'commons-codec', name: 'commons-codec', version: '1.13'
 	
 	compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.1'
 	compile group: 'org.apache.activemq', name: 'artemis-commons', version: '2.10.1'
