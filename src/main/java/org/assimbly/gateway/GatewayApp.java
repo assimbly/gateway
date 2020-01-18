@@ -2,6 +2,7 @@ package org.assimbly.gateway;
 
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
+import org.assimbly.gateway.config.ApplicationProperties.Gateway;
 
 import io.github.jhipster.config.JHipsterConstants;
 
@@ -29,6 +30,8 @@ public class GatewayApp {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayApp.class);
 
+    private final static String userHomeDir = System.getProperty("user.home");
+    
     private final Environment env;
 
     public GatewayApp(Environment env) {
@@ -84,19 +87,32 @@ public class GatewayApp {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
         
-             
+        String applicationName = "Assimbly " + env.getProperty("spring.application.name");
+        String applicationVersion = env.getProperty("application.info.version");
+        String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
         String javaVersion = Runtime.class.getPackage().getImplementationVersion();
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+
+        if(applicationBaseDirectory.equals("default")) {
+        	if(isWindows()) {
+        		applicationBaseDirectory = userHomeDir + "\\build";
+        	}else {
+        		applicationBaseDirectory = userHomeDir + "/build";
+        	}
+        }
         
         log.info("\n----------------------------------------------------------\n\t" +
-                "Application 'Assimbly {}' is running! \n\n\t" +
+                "Application '{}' is running! \n\n\t" +
+                "Application Version: \t{}\n\t" +
+                "Application BaseDir: \t{}\n\t" +
                 "Local URL: \t\t{}://localhost:{}{}\n\t" +
                 "External URL: \t\t{}://{}:{}{}\n\t" +
-                "Application Version: \t{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
-                "Java WorkingDir: \t{}\n\t" +
+                "Java WorkingDir: \t{}\n\t" +                
                 "Profile(s): \t\t{}\n----------------------------------------------------------",
-            env.getProperty("spring.application.name"),            
+            applicationName,            
+            applicationVersion,
+            applicationBaseDirectory,
             protocol,
             serverPort,
             contextPath,
@@ -104,10 +120,16 @@ public class GatewayApp {
             hostAddress,
             serverPort,
             contextPath,
-            env.getProperty("application.info.version"),
             javaVersion,
             javaWorkingDirectory,
             env.getActiveProfiles());
         
     }
+    
+     public static boolean isWindows()
+     {
+    	String OS = System.getProperty("os.name");
+        return OS.startsWith("Windows");
+     }
+    
 }

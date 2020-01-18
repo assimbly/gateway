@@ -68,6 +68,7 @@ public class ApplicationProperties {
     public static class Gateway {
 
     	private String name;
+    	private String baseDirectory;
     	
         public String getName() {
             return name;
@@ -76,7 +77,14 @@ public class ApplicationProperties {
         public void setName(String name) {
             this.name = name;
         }
-        
+
+        public String getBaseDirectory() {
+            return baseDirectory;
+        }
+
+        public void setBaseDirectory(String baseDirectory) {
+            this.baseDirectory = baseDirectory;
+        }
     }
     
     
