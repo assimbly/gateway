@@ -34,7 +34,15 @@ public class ApplicationInfoResource {
 
     @GetMapping("/gateway-name")
     public String getGatewayName() {
-        Gateway gatway = applicationProperties.getGateway();
-        return gatway.getName();
+        Gateway gateway = applicationProperties.getGateway();
+        return gateway.getName();
     }
+    
+    @GetMapping("/gateway-base-directory")
+    public String getGatewayBaseDirectory() {
+        Gateway gateway = applicationProperties.getGateway();
+        return gateway.getBaseDirectory();
+    }
+    
+    
 }

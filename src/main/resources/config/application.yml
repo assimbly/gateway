@@ -119,6 +119,7 @@ application:
     camel-url: https://camel.apache.org/components/latest
   gateway:
     name: default
+    base-directory: default
     
 hawtio:
   authenticationEnabled:  false     

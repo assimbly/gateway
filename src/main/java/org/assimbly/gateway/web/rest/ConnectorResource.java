@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiParam;
 
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.ApplicationProperties.Gateway;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.event.FailureListener;
@@ -12,6 +14,7 @@ import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import com.codahale.metrics.annotation.Timed;
 
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -36,6 +40,8 @@ import javax.servlet.http.HttpServletRequest;
 public class ConnectorResource {
 
     private final Logger log = LoggerFactory.getLogger(ConnectorResource.class);
+
+    private final ApplicationProperties applicationProperties;
     
 	private Connector connector = new CamelConnector();
 
@@ -63,7 +69,9 @@ public class ConnectorResource {
     @Autowired	
     private SimpMessageSendingOperations messagingTemplate;
 
-    public ConnectorResource() {}
+    public ConnectorResource(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
     
     //configure connector (by gatewayid)
     
@@ -773,8 +781,16 @@ public class ConnectorResource {
        	if(!connector.isStarted() && !connectorIsStarting){
         	try {
         		
+                Gateway gateway = applicationProperties.getGateway();
+	            String applicationBaseDirectory = gateway.getBaseDirectory();                
+
+	            if(!applicationBaseDirectory.equals("default")) {
+	            	connector.setBaseDirectory(applicationBaseDirectory);
+	            }
+
         		connectorIsStarting = true;
 				connector.addEventNotifier(failureListener);
+
         		connector.start();
 		        
 				int count = 1;
@@ -822,4 +838,12 @@ public class ConnectorResource {
 		}
 		
 	}
+    
+    public static boolean isWindows()
+    {
+   	String OS = System.getProperty("os.name");
+       return OS.startsWith("Windows");
+    }
+
+    
 }
