@@ -29,7 +29,14 @@
                	<ng-template #brokerConfigurationPopover let-message="message">
 					<div [innerHtml]="brokerConfigurationPopoverMessage"></div>
 				</ng-template>
-
+               	<ng-template #brokerErrorConfigurationPopover let-message="message">
+               		<div class="row">
+               			<div class="col-12 alert alert-secondary" role="alert">		
+							<div [innerHtml]="brokerConfigurationFailed"></div>
+						</div>
+					</div>
+				</ng-template>
+				
                 <div class="form-group" [style.display]="'none'" [hidden]="!broker.id">
                     <label for="id">ID</label>
                     <input type="text" class="form-control" id="id" name="id"
@@ -56,7 +63,7 @@
                     <label class="form-control-label" for="field_type">Type</label>
 					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
 							popoverTitle="Info" [ngbPopover]="typePopover" #p="ngbPopover"></i>
-               		<select type="text" class="form-control" id="field_type" name="type" [(ngModel)]="broker.type">
+               		<select type="text" class="form-control" id="field_type" name="type" [(ngModel)]="broker.type" (ngModelChange)="onTypeChange($event)">
 						<option value="classic">ActiveMQ Classic</option>
 						<option value="artemis">ActiveMQ Artemis</option>
 					</select>
@@ -65,16 +72,21 @@
                     <label class="form-control-label" for="field_type">Configuration Type</label>
 					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
 							popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"></i>                    
-               		<select type="text" class="form-control" id="field_configuration_type" name="configurationType" id="field_configuration_type" [(ngModel)]="broker.configurationType">
+               		<select type="text" class="form-control" id="field_configuration_type" name="configurationType" [(ngModel)]="broker.configurationType" >
 						<option value="embedded">Embedded</option>
 						<option value="file">File</option>
 					</select>
                 </div> 
        			<div class="form-group" *ngIf="broker.configurationType == 'file' ">
        				<label class="form-control-label" for="field_type">Configuration</label>
+       				<!-- <div *ngIf="brokerConfigurationFailed" class="alert alert-secondary" role="alert">{{brokerConfigurationFailed}}</div> -->
 					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
-							popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"></i>       				
-					<div ace-editor [(text)]="brokerConfiguration" [mode]="'XML'" [theme]="'xcode'" [options]="{maxLines: 'Infinity'}" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></div>
+							popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"></i>
+					<span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
+					<i class="fa fa-exclamation-circle" popoverClass="increase-popover-width" triggers="mouseenter:mouseleave" placement="right" 
+							popoverTitle="Error" [ngbPopover]="brokerErrorConfigurationPopover" #p="ngbPopover"></i>
+					</span>
+					<ace-editor #editor [(text)]="brokerConfiguration" [mode]="'xml'" [theme]="'eclipse'" [options]="options" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
 				</div>
 	
 			</div>

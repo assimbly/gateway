@@ -542,13 +542,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 hostname = (new URL('https://' + uri)).hostname;            
                 this.sslUrl = 'https://' + hostname
                 break;
-            case 'SFTP':
-                if(uri.includes('@')){
-                    uri = uri.substring(uri.indexOf('@') + 1);
-                }
-                hostname = (new URL('https://' + uri)).hostname;            
-                this.sslUrl = 'https://' + hostname
-                break;
             case 'SMTPS':
                 if(uri.includes('@')){
                     uri = uri.substring(uri.indexOf('@') + 1);

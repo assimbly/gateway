@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared';
 import { IBroker } from 'app/shared/model/broker.model';
+import { HttpHeaders } from "@angular/common/http";
 
 type EntityResponseType = HttpResponse<IBroker>;
 type EntityArrayResponseType = HttpResponse<IBroker[]>;
@@ -59,7 +60,10 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, { observe: 'response', responseType: 'text' });
     }
 
-    setBrokerConfiguration(id: number, brokerConfiguration: String): Observable<any> {
+    setBrokerConfiguration(id: number, brokerConfiguration: String): Observable<HttpResponse<any>> {
+        const options = {
+                headers: new HttpHeaders({observe: 'response', responseType: 'text','Accept': 'text/plain'})
+        };
         return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, { observe: 'response', responseType: 'text' });
     }
     

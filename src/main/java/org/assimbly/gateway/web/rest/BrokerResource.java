@@ -141,7 +141,7 @@ public class BrokerResource {
     @GetMapping("/brokers/{id}/getconfiguration")
     @Timed
     public String getConfigurationBroker(@PathVariable Long id) {
-        log.debug("REST request to get configuration of Broker : {}", id);
+        log.debug("REST request to get configuration of Broker : {}");
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
         String brokerType = brokerDTO.get().getType();
 
@@ -160,18 +160,24 @@ public class BrokerResource {
      */
     @PostMapping(path = "/brokers/{id}/setconfiguration")
     @Timed
-    public ResponseEntity<String> setConfigurationBroker(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @PathVariable Long id, @RequestBody String brokerConfiguration) throws Exception {
+    public ResponseEntity<String> setConfigurationBroker(@PathVariable Long id, @RequestBody(required = false) String brokerConfiguration) throws Exception {
         log.debug("REST request to set configuration of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
         String brokerType = brokerDTO.get().getType();
         String brokerConfigurationType = brokerDTO.get().getConfigurationType();
         
        	try {        	
-       		System.out.println("new Config file="+brokerConfiguration);
-            String result = brokermanager.setConfiguration(brokerType,brokerConfigurationType, brokerConfiguration);
-        	return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(id, mediaType, "setConfigurationBroker", result);
+       		String result = brokermanager.setConfiguration(brokerType,brokerConfigurationType, brokerConfiguration);
+            if(result.equals("configuration set")) {
+            	System.out.println("result succes: " + result);
+            	return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(id, "text", "setConfiguration", result);	
+            }else {
+            	System.out.println("result failed: " + result);
+            	return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(id, "text", "setConfiguration", result);
+            }
    		} catch (Exception e) {
-   			return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(id, mediaType, "setConfigurationBroker", e.getMessage());
+   			System.out.println("result failed 2: " + e.getMessage());
+   			return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(id, "text", "setConfiguration", e.getMessage());
    		}
         
     }
