@@ -1,8 +1,10 @@
 package org.assimbly.gateway.config.environment;
 
-import org.assimbly.connector.service.Broker;
-import org.assimbly.connector.service.BrokerArtemis;
 
+
+import org.assimbly.connector.Broker;
+import org.assimbly.connector.service.ActiveMQArtemis;
+import org.assimbly.connector.service.ActiveMQClassic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +12,17 @@ public class BrokerManager {
 	
     private final Logger log = LoggerFactory.getLogger(BrokerManager.class);
 	
-    private Broker broker = new Broker();
+    private Broker broker = new ActiveMQClassic();
 	
-	private BrokerArtemis artemis = new BrokerArtemis();
+	private Broker artemis = new ActiveMQArtemis();
 	
 	private String status;
 
 	private String configuration;
 
 	private String result;
+
+	private String info;
 
 	
 	public String getStatus(String brokerType) {
@@ -42,6 +46,26 @@ public class BrokerManager {
 	}
 
 
+	public String getInfo(String brokerType) {
+		
+		   info = "no info";
+
+		   try {
+
+				if (brokerType.equals("classic")) {	            
+					info = broker.info();
+		        }else if (brokerType.equals("artemis")) {
+					info = artemis.info();
+		        }
+
+	      } catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		      
+		      return info;     
+			
+		}
+	
 	public String getConfiguration(String brokerType) {
 		
 		   try {
@@ -83,23 +107,23 @@ public class BrokerManager {
 		
 		  try {
 	    	
-			status = getStatus(brokerType);
-
 			log.info("Current ActiveMQ broker status: " + status + " (type=" + brokerType + ",configurationtype=" + brokerConfigurationType + ")");
-			
+
+			status = getStatus(brokerType);  
+					
 			if(status.equals("stopped")) {
 				if (brokerType.equals("classic") && brokerConfigurationType.equals("file")) {	            
 	   				log.info("Starting ActiveMQ broker");
-	   				broker.start();
+	   				status = broker.start();
 		        }else if (brokerType.equals("classic") && brokerConfigurationType.equals("embedded")) {
 		        	log.info("Starting ActiveMQ broker");
-	   				broker.startEmbedded();
+		        	status = broker.startEmbedded();
 		        }else if (brokerType.equals("artemis") && brokerConfigurationType.equals("file")) {
 		        	log.info("Starting ActiveMQ Artemis broker");
-	 				artemis.start();
+		        	status = artemis.start();
 		        }else if (brokerType.equals("artemis") && brokerConfigurationType.equals("embedded")) {
 		        	log.info("Starting ActiveMQ Artemis broker");
-	 				artemis.startEmbedded();
+		        	status = artemis.startEmbedded();
 		        }
 			}
 
@@ -117,21 +141,21 @@ public class BrokerManager {
 			
 			  try {
 
-			    	status = getStatus(brokerType);
-
+					status = getStatus(brokerType);
+					
 					if(status.equals("stopped")) {
 						if (brokerType.equals("classic") && brokerConfigurationType.equals("file")) {	            
 			   				log.info("Starting ActiveMQ broker");
-			   				broker.restart();
+			   				status = broker.restart();
 				        }else if (brokerType.equals("classic") && brokerConfigurationType.equals("embedded")) {
 				        	log.info("Starting ActiveMQ broker");
-			   				broker.restartEmbedded();
+				        	status = broker.restartEmbedded();
 				        }else if (brokerType.equals("artemis") && brokerConfigurationType.equals("file")) {
 				        	log.info("Starting ActiveMQ Artemis broker");
-			 				artemis.start();
+				        	status = artemis.start();
 				        }else if (brokerType.equals("artemis") && brokerConfigurationType.equals("embedded")) {
 				        	log.info("Starting ActiveMQ Artemis broker");
-			 				artemis.restartEmbedded();
+				        	status = artemis.restartEmbedded();
 				        }
 					}
 
@@ -147,15 +171,16 @@ public class BrokerManager {
 	public String stop(String brokerType) {
 		
 	      try {
-			status = getStatus(brokerType);
 
+			status = getStatus(brokerType);
+				
 			if(status.equals("started")) {
 				if (brokerType.equals("classic")) {	            
 	   				log.info("Stopping ActiveMQ broker");
-	   				broker.stop();
+	   				status = broker.stop();
 		        }else if (brokerType.equals("artemis")) {
     	            log.info("Stopping ActiveMQ Artemis broker");
-       				artemis.stop();
+    	            status = artemis.stop();
 		        }
 
    			}

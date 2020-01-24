@@ -9,7 +9,6 @@ import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import io.swagger.annotations.ApiParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +115,7 @@ public class BrokerResource {
     /**
      * GET  /brokers/:id : get the broker status by "id".
      *
-     * @param id the id of the brokerDTO to retrieve
+     * @param id, the id of the to retrieve
      * @return the status (stopped or started) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/status")
@@ -131,6 +130,24 @@ public class BrokerResource {
         return status;
     }
 
+    
+    /**
+     * GET  /brokers/:id : get the broker info by "id".
+     *
+     * @param id, the id of the broker to retrieve
+     * @return the status (stopped or started) with status 200 (OK) or with status 404 (Not Found)
+     */
+    @GetMapping("/brokers/{id}/info")
+    @Timed
+    public String infoBroker(@PathVariable Long id) {
+        log.debug("REST request to get status of Broker : {}", id);
+        Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
+        String brokerType = brokerDTO.get().getType();
+
+        String info = brokermanager.getInfo(brokerType);
+        
+        return info;
+    }
 
     /**
      * GET  /brokers/:id : get the broker status by "id".

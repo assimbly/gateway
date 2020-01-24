@@ -47,6 +47,9 @@
               			    <b>something</b>
 							<!-- <div [innerHtml]="brokerDetails"></div> -->
 						</ng-template>
+							<ng-template #statsTemplate let-message="message">
+							<div [innerHtml]="brokerInfo"></div>
+						</ng-template> 
 
 						<div class="float-left">
 							<div class="btn-group-justified" role="group">
@@ -74,6 +77,7 @@
 						  <div class="col">
 						   	<ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
 							<i (mouseenter)="getBrokerDetails()" class="fa fa-info" aria-hidden="true" data-container="body" placement="right" [ngbPopover]="detailsTemplate" popoverTitle="Details"></i>
+							<i  style="padding-left: 1em" (mouseenter)="getBrokerInfo(broker.id)" data-container="body" triggers="mouseenter:mouseleave" placement="right" popoverTitle="Stats & Info" [ngbPopover]="statsTemplate"	class="fa fa-bar-chart"></i> 
 							<a style="padding-left: 1em" type="submit" [routerLink]="['/broker', broker.id, 'edit']" class="fa fa-edit" aria-hidden="true" placement="right" title="Edit broker"></a> 
 							<a  style="padding-left: 1em" type="submit" [routerLink]="['/', { outlets: { popup: 'broker/'+ broker.id + '/delete'} }]" replaceUrl="true" queryParamsHandling="merge" placement="right" title="Delete broker" class="fa fa-trash"></a>
 						 </div>
