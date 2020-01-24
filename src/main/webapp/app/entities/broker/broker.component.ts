@@ -36,6 +36,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
     public disableActionBtns: boolean;
     
     public brokerDetails: string;
+    public brokerInfo: string;
     public brokerStatus: string;
     public brokerStatusError: string;
     public isBrokerStatusOK: boolean;
@@ -150,8 +151,45 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.lastError = '';        
         this.setbrokerStatus('unconfigured');
     }
+
     
-    start() {
+    getBrokerInfo(id: number) {
+        this.brokerService.getBrokerInfo(id).subscribe(res => {
+                this.setBrokerInfo(res.body);
+            });
+    }
+    
+    setBrokerInfo(info: String) {
+        
+       if (info.startsWith('no info')) {
+           this.brokerInfo = `Currently there are no statistics for this flow.`;
+       } else {
+           
+           var infoSplitted = info.split(',');
+      
+           const uptime = infoSplitted[0].split('=').pop();
+           const totalConnections = infoSplitted[1].split('=').pop();
+           const totalConsumers = infoSplitted[2].split('=').pop();
+           const totalMessages = infoSplitted[3].split('=').pop();
+           const nodeId = infoSplitted[4].split('=').pop();
+           const state =  infoSplitted[5].split('=').pop();
+           const version =  infoSplitted[6].split('=')[1];
+
+           this.brokerInfo = `
+               <br/>
+               <b>Broker Node ID:</b> ${nodeId}<br/>
+               <b>Broker version:</b> ${version}<br/>
+               <b>Broker state:</b> ${state}<br/>
+               <b>Broker uptime:</b> ${uptime}<br/>
+               <br/>
+               <b>Total Connections:</b> ${totalConnections}<br/>
+               <b>Total Consumers:</b> ${totalConsumers}<br/>
+               <b>Total Messages:</b> ${totalMessages}<br/>`;
+       }
+   }
+
+    
+   start() {
         this.brokerStatus = 'Starting';
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;

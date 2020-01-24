@@ -56,6 +56,10 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/status`, { observe: 'response', responseType: 'text' });
     }
 
+    getBrokerInfo(id: number): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${id}/info`, { observe: 'response', responseType: 'text' });
+    }
+    
     getBrokerConfiguration(id: number): Observable<any> {
         return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, { observe: 'response', responseType: 'text' });
     }

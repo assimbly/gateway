@@ -8,6 +8,7 @@ import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
+import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.service.dto.SecurityDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
@@ -33,6 +34,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 
 /**
@@ -406,5 +409,24 @@ public class SecurityResource {
         }
         return certificate;
     }
+    
+    @PostConstruct
+    private void init() throws Exception {
+
+    	log.debug("REST request to sync all certificates with truststore");
+        Connector connector = connectorResource.getConnector();
+        List<Security> certificates = securityService.findAll();
+        	
+        if(certificates.size()>0) {
+        	for (Security certificate : certificates) {
+            	String certificateName = certificate.getCertificateName();
+            	String certificateFile = certificate.getCertificateFile();
+            	X509Certificate real = convertPemToX509Certificate(certificateFile);
+            	connector.importCertificateInTruststore(certificateName,real);        	
+            }
+        }
+        
+    }
+
     
 }
