@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+
 
 import org.assimbly.gateway.config.environment.BrokerManager;
 import org.assimbly.gateway.service.BrokerService;
@@ -50,7 +50,7 @@ public class BrokerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/brokers")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> createBroker(@RequestBody BrokerDTO brokerDTO) throws URISyntaxException {
         log.debug("REST request to save Broker : {}", brokerDTO);
         if (brokerDTO.getId() != null) {
@@ -72,7 +72,7 @@ public class BrokerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/brokers")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> updateBroker(@RequestBody BrokerDTO brokerDTO) throws URISyntaxException {
         log.debug("REST request to update Broker : {}", brokerDTO);
         if (brokerDTO.getId() == null) {
@@ -90,7 +90,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and the list of brokers in body
      */
     @GetMapping("/brokers")
-    @Timed
+    
     public List<BrokerDTO> getAllBrokers() {
         log.debug("REST request to get all Brokers");
         return brokerService.findAll();
@@ -103,7 +103,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> getBroker(@PathVariable Long id) {
         log.debug("REST request to get Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -119,7 +119,7 @@ public class BrokerResource {
      * @return the status (stopped or started) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/status")
-    @Timed
+    
     public String statusBroker(@PathVariable Long id) {
         log.debug("REST request to get status of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -138,7 +138,7 @@ public class BrokerResource {
      * @return the status (stopped or started) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/info")
-    @Timed
+    
     public String infoBroker(@PathVariable Long id) {
         log.debug("REST request to get status of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -156,7 +156,7 @@ public class BrokerResource {
      * @return the status (stopped or started) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/getconfiguration")
-    @Timed
+    
     public String getConfigurationBroker(@PathVariable Long id) {
         log.debug("REST request to get configuration of Broker : {}");
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -176,7 +176,7 @@ public class BrokerResource {
      * @throws Exception 
      */
     @PostMapping(path = "/brokers/{id}/setconfiguration")
-    @Timed
+    
     public ResponseEntity<String> setConfigurationBroker(@PathVariable Long id, @RequestBody(required = false) String brokerConfiguration) throws Exception {
         log.debug("REST request to set configuration of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -207,7 +207,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/start")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> startBroker(@PathVariable Long id) {
         log.debug("REST request to start Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -234,7 +234,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/restart")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> restartBroker(@PathVariable Long id) {
         log.debug("REST request to restart Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -259,7 +259,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/stop")
-    @Timed
+    
     public ResponseEntity<BrokerDTO> stopBroker(@PathVariable Long id) {
         log.debug("REST request to stop Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
@@ -288,7 +288,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/brokers/{id}")
-    @Timed
+    
     public ResponseEntity<Void> deleteBroker(@PathVariable Long id) {
         log.debug("REST request to delete Broker : {}", id);
         brokerService.delete(id);

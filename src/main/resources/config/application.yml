@@ -120,6 +120,5 @@ application:
   gateway:
     name: default
     base-directory: default
-    
 hawtio:
   authenticationEnabled:  false     

@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+
 import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -49,7 +49,7 @@ public class ServiceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/services")
-    @Timed
+    
     public ResponseEntity<ServiceDTO> createService(@RequestBody ServiceDTO serviceDTO) throws URISyntaxException {
         log.debug("REST request to save Service : {}", serviceDTO);
         if (serviceDTO.getId() != null) {
@@ -71,7 +71,7 @@ public class ServiceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/services")
-    @Timed
+    
     public ResponseEntity<ServiceDTO> updateService(@RequestBody ServiceDTO serviceDTO) throws URISyntaxException {
         log.debug("REST request to update Service : {}", serviceDTO);
         if (serviceDTO.getId() == null) {
@@ -89,7 +89,7 @@ public class ServiceResource {
      * @return the ResponseEntity with status 200 (OK) and the list of services in body
      */
     @GetMapping("/services")
-    @Timed
+    
     public ResponseEntity<List<ServiceDTO>> getAllServices(Pageable pageable) {
         log.debug("REST request to get all Services");
         Page<ServiceDTO> page = serviceService.findAll(pageable);
@@ -98,7 +98,7 @@ public class ServiceResource {
     }
     
     @GetMapping("/services/getallservices")
-    @Timed
+    
     @Transactional(readOnly = true)
     public ResponseEntity<List<ServiceDTO>> getAllServices() {
         log.debug("REST request to get all Services 2");
@@ -113,7 +113,7 @@ public class ServiceResource {
      * @return the ResponseEntity with status 200 (OK) and with body the serviceDTO, or with status 404 (Not Found)
      */
     @GetMapping("/services/{id}")
-    @Timed
+    
     public ResponseEntity<ServiceDTO> getService(@PathVariable Long id) {
         log.debug("REST request to get Service : {}", id);
         Optional<ServiceDTO> serviceDTO = serviceService.findOne(id);
@@ -127,7 +127,7 @@ public class ServiceResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/services/{id}")
-    @Timed
+    
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         log.debug("REST request to delete Service : {}", id);
         serviceService.delete(id);
