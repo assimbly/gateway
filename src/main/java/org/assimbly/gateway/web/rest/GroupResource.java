@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+
 
 import org.assimbly.gateway.domain.Group;
 import org.assimbly.gateway.repository.GroupRepository;
@@ -53,7 +53,7 @@ public class GroupResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/groups")
-    @Timed
+    
     public ResponseEntity<GroupDTO> createGroup(@RequestBody GroupDTO groupDTO) throws URISyntaxException {
         log.debug("REST request to save Group : {}", groupDTO);
         if (groupDTO.getId() != null) {
@@ -77,7 +77,7 @@ public class GroupResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/groups")
-    @Timed
+    
     public ResponseEntity<GroupDTO> updateGroup(@RequestBody GroupDTO groupDTO) throws URISyntaxException {
         log.debug("REST request to update Group : {}", groupDTO);
         if (groupDTO.getId() == null) {
@@ -100,7 +100,7 @@ public class GroupResource {
      * @return the ResponseEntity with status 200 (OK) and the list of groups in body
      */
     @GetMapping("/groups")
-    @Timed
+    
     public List<Group> getAllGroups(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Groups");
         return groupService.findAll();
@@ -113,7 +113,7 @@ public class GroupResource {
      * @return the ResponseEntity with status 200 (OK) and with body the groupDTO, or with status 404 (Not Found)
      */
     @GetMapping("/groups/{id}")
-    @Timed
+    
     public ResponseEntity<Group> getGroup(@PathVariable Long id) {
         log.debug("REST request to get Group : {}", id);
         Optional<Group> groupDTO = groupService.findById(id);
@@ -127,7 +127,7 @@ public class GroupResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/groups/{id}")
-    @Timed
+    
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         log.debug("REST request to delete Group : {}", id);
         groupRepository.deleteById(id);
