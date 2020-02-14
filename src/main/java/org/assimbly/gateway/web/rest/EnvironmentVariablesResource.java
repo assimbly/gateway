@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-
 import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -47,7 +46,6 @@ public class EnvironmentVariablesResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/environment-variables")
-    
     public ResponseEntity<EnvironmentVariablesDTO> createEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
         log.debug("REST request to save EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() != null) {
@@ -69,7 +67,6 @@ public class EnvironmentVariablesResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/environment-variables")
-    
     public ResponseEntity<EnvironmentVariablesDTO> updateEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
         log.debug("REST request to update EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() == null) {
@@ -87,7 +84,6 @@ public class EnvironmentVariablesResource {
      * @return the ResponseEntity with status 200 (OK) and the list of environmentVariables in body
      */
     @GetMapping("/environment-variables")
-    
     public ResponseEntity<List<EnvironmentVariablesDTO>> getAllEnvironmentVariables(Pageable pageable) {
         log.debug("REST request to get all EnvironmentVariables");
         Page<EnvironmentVariablesDTO> page = environmentVariablesService.findAll(pageable);
@@ -104,7 +100,6 @@ public class EnvironmentVariablesResource {
      * @return the ResponseEntity with status 200 (OK) and with body the environmentVariablesDTO, or with status 404 (Not Found)
      */
     @GetMapping("/environment-variables/{id}")
-    
     public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to get EnvironmentVariables : {}", id);
         Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesService.findOne(id);
@@ -118,7 +113,6 @@ public class EnvironmentVariablesResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/environment-variables/{id}")
-    
     public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable Long id) {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
         environmentVariablesService.delete(id);

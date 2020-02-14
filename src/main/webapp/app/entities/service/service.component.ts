@@ -13,9 +13,7 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'jhi-service',
     templateUrl: './service.component.html',
-        entryComponents: [
-            ServiceKeysComponent
-            ],
+    entryComponents: [ServiceKeysComponent]
 })
 export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;
@@ -27,7 +25,7 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     service: Service;
     type: any;
     isSaving: boolean;
-    disabledServiceType= true;
+    disabledServiceType = true;
     selectedService: Service = new Service();
     typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
 
@@ -64,10 +62,10 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
-        if (this.serviceKey !== undefined ) {
-            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(res.content))
-        }else {
-            this.eventManager.subscribe('serviceKeyDeleted', res => res.content)
+        if (this.serviceKey !== undefined) {
+            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(res.content));
+        } else {
+            this.eventManager.subscribe('serviceKeyDeleted', res => res.content);
         }
         this.registerChangeInServices();
     }
@@ -88,36 +86,34 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
             this.serviceKeysService.query().subscribe(
                 res => {
                     this.serviceKeys = res.json;
-                    this.serviceKeys = this.serviceKeys.filter((k) => k.serviceId === this.selectedService.id);
+                    this.serviceKeys = this.serviceKeys.filter(k => k.serviceId === this.selectedService.id);
                     if (this.serviceKeys.length === 0) {
                         const newServiceKeys = new ServiceKeys();
                         newServiceKeys.isDisabled = false;
                         this.serviceKeys.push(newServiceKeys);
                     }
                 },
-                (res) => this.onError(res.json)
+                res => this.onError(res.json)
             );
         }
     }
 
     saveServiceType(service: Service) {
         this.isSaving = true;
-            this.subscribeToSaveResponse(
-                this.serviceService.update(service));
-                this.disabledServiceType = true;
-            }
-    
+        this.subscribeToSaveResponse(this.serviceService.update(service));
+        this.disabledServiceType = true;
+    }
+
     private subscribeToSaveResponse(result: Observable<HttpResponse<IService>>) {
         result.subscribe(data => {
-            if(data.ok){
+            if (data.ok) {
                 this.onSaveSuccess(data.body);
-            }else{
-                this.onSaveError()
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
-    
+
     private onSaveSuccess(result: Service) {
         this.isSaving = false;
     }

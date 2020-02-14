@@ -25,7 +25,7 @@ public class ErrorEndpoint implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private EndpointType type;
 
     @Column(name = "uri")

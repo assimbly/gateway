@@ -6,7 +6,7 @@ export interface IFlow {
     autoStart?: boolean;
     offLoading?: boolean;
     maximumRedeliveries?: number;
-    redeliveryDelay?: number;    
+    redeliveryDelay?: number;
     gatewayId?: number;
     fromEndpointId?: number;
     errorEndpointId?: number;
@@ -20,7 +20,7 @@ export class Flow implements IFlow {
         public autoStart?: boolean,
         public offLoading?: boolean,
         public maximumRedeliveries?: number,
-        public redeliveryDelay?: number,                
+        public redeliveryDelay?: number,
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,
@@ -29,6 +29,6 @@ export class Flow implements IFlow {
         this.autoStart = this.autoStart || false;
         this.offLoading = this.offLoading || false;
         this.maximumRedeliveries = this.maximumRedeliveries || 0;
-        this.redeliveryDelay = this.redeliveryDelay || 30000;        
+        this.redeliveryDelay = this.redeliveryDelay || 30000;
     }
 }

@@ -11,14 +11,13 @@ import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broke
 import 'brace';
 import 'brace/mode/xml';
 import 'brace/theme/eclipse';
-import { AceConfigInterface } from "ngx-ace-wrapper/dist";
+import { AceConfigInterface } from 'ngx-ace-wrapper/dist';
 
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html'
 })
 export class BrokerUpdateComponent implements OnInit {
-
     broker: IBroker;
     brokerConfiguration: String;
     artemisConfiguration: String;
@@ -32,10 +31,10 @@ export class BrokerUpdateComponent implements OnInit {
     configurationTypePopoverMessage: string;
     brokerConfigurationPopoverMessage: string;
 
-public config: AceConfigInterface = {
+    public config: AceConfigInterface = {
         mode: 'xml',
         theme: 'eclipse'
-      };
+    };
 
     constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {}
 
@@ -45,18 +44,17 @@ public config: AceConfigInterface = {
         this.setDefaultConfiguration();
         this.activatedRoute.data.subscribe(({ broker }) => {
             this.broker = broker;
-            if (this.broker.id !== undefined){
+            if (this.broker.id !== undefined) {
                 this.brokerService.getBrokerConfiguration(this.broker.id).subscribe(brokerConfiguration => {
-                    if(this.broker.type==='artemis'){
+                    if (this.broker.type === 'artemis') {
                         this.artemisConfiguration = brokerConfiguration.body;
                         this.brokerConfiguration = brokerConfiguration.body;
-                    }else{
+                    } else {
                         this.activemqConfiguration = brokerConfiguration.body;
                         this.brokerConfiguration = brokerConfiguration.body;
                     }
-                    
                 });
-            }else{
+            } else {
                 this.broker.autoStart = true;
                 this.broker.type = 'artemis';
                 this.broker.configurationType = 'file';
@@ -65,7 +63,7 @@ public config: AceConfigInterface = {
         });
     }
 
-    setDefaultConfiguration(){
+    setDefaultConfiguration() {
         //vkbeautify.xml(text [,indent_pattern]);
 
         /*
@@ -73,33 +71,32 @@ public config: AceConfigInterface = {
         '<security-setting match="#"><permission type="createAddress" roles="user"/><permission type="createDurableQueue" roles="user"/><permission type="deleteDurableQueue" roles="user"/><permission type="createNonDurableQueue" roles="user"/><permission type="deleteNonDurableQueue" roles="user"/><permission type="consume" roles="user"/> <permission type="send" roles="user"/></security-setting></security-settings></core></configuration>');
         */
 
-        
         this.artemisConfiguration = artemisBrokerConfiguration;
         this.activemqConfiguration = activemqBrokerConfiguration;
-        
     }
 
-    
     previousState() {
         window.history.back();
     }
 
     save() {
-
         this.brokerConfigurationFailed = '';
-        
+
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
-            this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(response => {
-                this.isSaving = true;
-                this.subscribeToSaveResponse(this.brokerService.update(this.broker));
-            },err => {
-                this.isSaving = false;
-                this.brokerConfigurationFailed = err.error;
-            });
-        }else if(this.broker.configurationType === 'file'){
+            this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(
+                response => {
+                    this.isSaving = true;
+                    this.subscribeToSaveResponse(this.brokerService.update(this.broker));
+                },
+                err => {
+                    this.isSaving = false;
+                    this.brokerConfigurationFailed = err.error;
+                }
+            );
+        } else if (this.broker.configurationType === 'file') {
             this.isSaving = true;
             this.subscribeToCreateResponse(this.brokerService.create(this.broker));
-        }else{     
+        } else {
             this.isSaving = true;
             if (this.broker.id !== undefined) {
                 this.subscribeToSaveResponse(this.brokerService.update(this.broker));
@@ -107,32 +104,27 @@ public config: AceConfigInterface = {
                 this.subscribeToSaveResponse(this.brokerService.create(this.broker));
             }
         }
+    }
 
-    }
-    
     onTypeChange(brokerType) {
-        
         console.log('brokerType=' + brokerType);
-        if(brokerType==='classic'){
+        if (brokerType === 'classic') {
             this.artemisConfiguration = this.brokerConfiguration;
-            this.brokerConfiguration = this.activemqConfiguration; 
-        }else{
+            this.brokerConfiguration = this.activemqConfiguration;
+        } else {
             this.activemqConfiguration = this.brokerConfiguration;
-            this.brokerConfiguration = this.artemisConfiguration;            
+            this.brokerConfiguration = this.artemisConfiguration;
         }
-        
     }
-    
 
     setPopoverMessages() {
         this.namePopoverMessage = `Name of the broker. Usually the same as the gateway name.`;
         this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
-        this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic (5.x) or ActiveMQ Artemis. Artemis is default`;        
+        this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic (5.x) or ActiveMQ Artemis. Artemis is default`;
         this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
         this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ documentation how to configure the brokers.`;
     }
-    
-    
+
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {
         result.subscribe((res: HttpResponse<IBroker>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
@@ -145,26 +137,25 @@ public config: AceConfigInterface = {
     protected onSaveError() {
         this.isSaving = false;
     }
-    
+
     protected subscribeToCreateResponse(result: Observable<HttpResponse<IBroker>>) {
         result.subscribe((res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body), (res: HttpErrorResponse) => this.onCreateError());
     }
 
     protected onCreateSuccess(createdBroker) {
-        this.brokerService.setBrokerConfiguration(createdBroker.id, this.brokerConfiguration).subscribe(response => {
-            this.isSaving = false;
-            this.previousState();
-        }
-        ,
-        (err) => {
-            this.isSaving = false;
-            this.brokerConfigurationFailed = err.error;
-        });
-     }
+        this.brokerService.setBrokerConfiguration(createdBroker.id, this.brokerConfiguration).subscribe(
+            response => {
+                this.isSaving = false;
+                this.previousState();
+            },
+            err => {
+                this.isSaving = false;
+                this.brokerConfigurationFailed = err.error;
+            }
+        );
+    }
 
     protected onCreateError() {
         this.isSaving = false;
     }
-    
-    
 }

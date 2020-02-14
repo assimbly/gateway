@@ -5,9 +5,9 @@ import { IService } from 'app/shared/model/service.model';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { Service } from 'app/shared/model/service.model';
-import { Subscription } from "rxjs";
-import { JhiEventManager } from "ng-jhipster";
-import { ServiceService } from "app/entities/service";
+import { Subscription } from 'rxjs';
+import { JhiEventManager } from 'ng-jhipster';
+import { ServiceService } from 'app/entities/service';
 
 @Component({
     selector: 'jhi-service-detail',
@@ -15,15 +15,16 @@ import { ServiceService } from "app/entities/service";
 })
 export class ServiceDetailComponent implements OnInit {
     service: IService;
-public serviceKeys: Array<ServiceKeys>;
+    public serviceKeys: Array<ServiceKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
 
     constructor(
-		protected eventManager: JhiEventManager,
+        protected eventManager: JhiEventManager,
         protected serviceService: ServiceService,
         protected serviceKeysService: ServiceKeysService,
-		protected activatedRoute: ActivatedRoute) {}
+        protected activatedRoute: ActivatedRoute
+    ) {}
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ service }) => {
@@ -36,23 +37,19 @@ public serviceKeys: Array<ServiceKeys>;
     }
 
     private load(id) {
-        this.serviceService.find(id).subscribe((service) => {
+        this.serviceService.find(id).subscribe(service => {
             this.service = service.body;
             this.loadServiceKeys(this.service.id);
         });
     }
 
     private loadServiceKeys(id: number) {
-        this.serviceKeysService.query().subscribe((res) => {
-            this.serviceKeys = res.body.filter((sk) => sk.serviceId === id);
+        this.serviceKeysService.query().subscribe(res => {
+            this.serviceKeys = res.body.filter(sk => sk.serviceId === id);
         });
     }
-    
+
     registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe(
-            'serviceListModification',
-            (response) => this.load(this.service.id)
-        );
-    }     
-    
+        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.load(this.service.id));
+    }
 }

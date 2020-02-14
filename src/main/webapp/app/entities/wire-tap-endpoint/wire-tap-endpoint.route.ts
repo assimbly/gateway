@@ -11,7 +11,7 @@ import { WireTapEndpointDetailComponent } from './wire-tap-endpoint-detail.compo
 import { WireTapEndpointUpdateComponent } from './wire-tap-endpoint-update.component';
 import { WireTapEndpointDeletePopupComponent } from './wire-tap-endpoint-delete-dialog.component';
 import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
-import { WireTapEndpointEditComponent } from "app/entities/wire-tap-endpoint";
+import { WireTapEndpointEditComponent } from 'app/entities/wire-tap-endpoint';
 
 @Injectable({ providedIn: 'root' })
 export class WireTapEndpointResolve implements Resolve<IWireTapEndpoint> {
@@ -74,7 +74,8 @@ export const wireTapEndpointRoute: Routes = [
             pageTitle: 'WireTapEndpoints'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'wire-tap-endpoint-create',
         component: WireTapEndpointEditComponent,
         data: {
@@ -99,5 +100,4 @@ export const wireTapEndpointPopupRoute: Routes = [
         canActivate: [UserRouteAccessService],
         outlet: 'popup'
     }
-
 ];

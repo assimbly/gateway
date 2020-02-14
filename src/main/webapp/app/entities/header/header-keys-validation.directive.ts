@@ -13,6 +13,6 @@ export class ForbiddenHeaderKeysValidatorDirective implements Validator {
         console.log('validating headers');
         console.log(this.existingKeys);
 
-        return this.existingKeys.some((k) => k === control.value) ? { 'existingHeaderKeys': true } : null;
+        return this.existingKeys.some(k => k === control.value) ? { existingHeaderKeys: true } : null;
     }
 }

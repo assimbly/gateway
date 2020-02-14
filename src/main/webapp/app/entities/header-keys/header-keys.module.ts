@@ -16,13 +16,8 @@ import {
 const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
-    exports: [
-        HeaderKeysComponent
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
+    exports: [HeaderKeysComponent],
     declarations: [
         HeaderKeysComponent,
         HeaderKeysDetailComponent,
@@ -32,9 +27,7 @@ const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
         ForbiddenHeaderKeysValidatorDirective
     ],
     entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
-    providers: [
-        HeaderKeysDeletePopupComponent
-    ],
+    providers: [HeaderKeysDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayHeaderKeysModule {}

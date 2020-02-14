@@ -36,7 +36,7 @@ export class SecurityUpdateComponent implements OnInit {
 
     add() {
         this.isSaving = true;
-        
+
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
         if (this.security.id !== undefined) {
             this.subscribeToAddResponse(this.securityService.update(this.security));
@@ -46,17 +46,22 @@ export class SecurityUpdateComponent implements OnInit {
     }
 
     remove() {
-        this.isSaving = true;        
+        this.isSaving = true;
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
         this.subscribeToRemoveResponse(this.securityService.remove(this.security.url));
     }
-    
+
     renew() {
         this.isSaving = true;
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-        this.securityService.remove(this.security.url).subscribe((res: HttpResponse<ISecurity>) => this.subscribeToAddResponse(this.securityService.create(this.security)), (res: HttpErrorResponse) => this.onSaveError());
-    }    
-    
+        this.securityService
+            .remove(this.security.url)
+            .subscribe(
+                (res: HttpResponse<ISecurity>) => this.subscribeToAddResponse(this.securityService.create(this.security)),
+                (res: HttpErrorResponse) => this.onSaveError()
+            );
+    }
+
     protected subscribeToAddResponse(result: Observable<HttpResponse<ISecurity>>) {
         result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
@@ -64,7 +69,7 @@ export class SecurityUpdateComponent implements OnInit {
     protected subscribeToRemoveResponse(result: Observable<HttpResponse<ISecurity>>) {
         result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
-    
+
     protected onSaveSuccess() {
         this.isSaving = false;
         this.previousState();

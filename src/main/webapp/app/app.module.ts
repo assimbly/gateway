@@ -47,7 +47,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
     ],
     declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],
     providers: [
-        HttpClientModule,  
+        HttpClientModule,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthExpiredInterceptor,

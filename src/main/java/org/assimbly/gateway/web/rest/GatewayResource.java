@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-
 import org.assimbly.gateway.config.environment.BrokerManager;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -53,7 +52,6 @@ public class GatewayResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/gateways")
-    
     public ResponseEntity<GatewayDTO> createGateway(@RequestBody GatewayDTO gatewayDTO) throws URISyntaxException {
         log.debug("REST request to save Gateway : {}", gatewayDTO);
         if (gatewayDTO.getId() != null) {
@@ -75,7 +73,6 @@ public class GatewayResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/gateways")
-    
     public ResponseEntity<GatewayDTO> updateGateway(@RequestBody GatewayDTO gatewayDTO) throws URISyntaxException {
 
     	log.debug("REST request to update Gateway : {}", gatewayDTO);
@@ -97,7 +94,6 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (OK) and the list of gateways in body
      */
     @GetMapping("/gateways")
-    
     public List<GatewayDTO> getAllGateways() {
         log.debug("REST request to get all Gateways");
         return gatewayService.findAll();
@@ -110,7 +106,6 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (OK) and with body the gatewayDTO, or with status 404 (Not Found)
      */
     @GetMapping("/gateways/{id}")
-    
     public ResponseEntity<GatewayDTO> getGateway(@PathVariable Long id) {
         log.debug("REST request to get Gateway : {}", id);
         Optional<GatewayDTO> gatewayDTO = gatewayService.findOne(id);
@@ -124,7 +119,6 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/gateways/{id}")
-    
     public ResponseEntity<Void> deleteGateway(@PathVariable Long id) {
         log.debug("REST request to delete Gateway : {}", id);
 

@@ -18,14 +18,11 @@ import {
     ForbiddenServiceKeysValidatorDirective
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { ServiceService } from "app/entities/service/service.service";
-import { ServicePopupService } from "app/entities/service/service-popup.service";
-import { ServicePopupComponent } from "app/entities/service/service-dialog.component";
+import { ServiceService } from 'app/entities/service/service.service';
+import { ServicePopupService } from 'app/entities/service/service-popup.service';
+import { ServicePopupComponent } from 'app/entities/service/service-dialog.component';
 
-const ENTITY_STATES = [
-    ...serviceRoute,
-    ...servicePopupRoute,
-];
+const ENTITY_STATES = [...serviceRoute, ...servicePopupRoute];
 
 @NgModule({
     imports: [
@@ -41,18 +38,23 @@ const ENTITY_STATES = [
         ServiceAllComponent,
         ServiceDetailComponent,
         ServiceUpdateComponent,
-        ServiceDialogComponent,        
+        ServiceDialogComponent,
         ServiceDeleteDialogComponent,
         ServiceDeletePopupComponent,
         ServicePopupComponent,
         ForbiddenServiceNamesValidatorDirective,
         ForbiddenServiceKeysValidatorDirective
     ],
-    entryComponents: [ServiceComponent,  ServiceAllComponent, ServiceUpdateComponent, ServiceDeleteDialogComponent,  ServiceDialogComponent, ServiceDeletePopupComponent,  ServicePopupComponent],
-    providers: [
-                ServiceService,
-                ServicePopupService
-        ],
+    entryComponents: [
+        ServiceComponent,
+        ServiceAllComponent,
+        ServiceUpdateComponent,
+        ServiceDeleteDialogComponent,
+        ServiceDialogComponent,
+        ServiceDeletePopupComponent,
+        ServicePopupComponent
+    ],
+    providers: [ServiceService, ServicePopupService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayServiceModule {}

@@ -21,7 +21,7 @@ export * from './log-viewer/log-viewer.service';
 export * from './log-viewer/log-viewer.route';
 export * from './log-viewer/log-viewer-line-validation.directive';
 export * from './metrics/metrics.component';
-export * from './metrics/metrics-modal.component';
+// export * from './metrics/metrics-modal.component';
 export * from './metrics/metrics.service';
 export * from './metrics/metrics.route';
 export * from './user-management/user-management-update.component';
