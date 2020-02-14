@@ -121,7 +121,7 @@
     "scripts": {
         "prettier:format": "prettier --write \"{,src/**/}*.{md,json,ts,css,scss}\"",
         "lint": "tslint --project tsconfig.json -e 'node_modules/**'",
-        "lint:fix": "yarn run lint --fix",
+        "lint:fix": "npm run lint --fix",
         "ngc": "ngc -p tsconfig-aot.json",
         "cleanup": "rimraf build/{aot,www}",
         "clean-www": "rimraf build//www/app/{src,build/}",
