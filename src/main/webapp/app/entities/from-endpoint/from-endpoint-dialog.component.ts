@@ -22,7 +22,6 @@ import { HttpResponse } from '@angular/common/http';
     templateUrl: './from-endpoint-dialog.component.html'
 })
 export class FromEndpointDialogComponent implements OnInit {
-
     fromEndpoint: IFromEndpoint;
     isSaving: boolean;
 
@@ -38,41 +37,40 @@ export class FromEndpointDialogComponent implements OnInit {
         private headerService: HeaderService,
         private eventManager: JhiEventManager,
         public components: Components
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.isSaving = false;
-        this.serviceService
-            .query({filter: 'fromendpoint-is-null'})
-            .subscribe((res) => {
+        this.serviceService.query({ filter: 'fromendpoint-is-null' }).subscribe(
+            res => {
                 if (!this.fromEndpoint.serviceId) {
                     this.services = res.body;
                 } else {
-                    this.serviceService
-                        .find(this.fromEndpoint.serviceId)
-                        .subscribe((subRes: HttpResponse<IService>) => {
-                            res.body.some((s) => s.id === subRes.body.id) ?
-                                this.services = res.body :
-                                this.services.push(subRes.body);
-                        }, (subRes) => this.onError(subRes.json));
+                    this.serviceService.find(this.fromEndpoint.serviceId).subscribe(
+                        (subRes: HttpResponse<IService>) => {
+                            res.body.some(s => s.id === subRes.body.id) ? (this.services = res.body) : this.services.push(subRes.body);
+                        },
+                        subRes => this.onError(subRes.json)
+                    );
                 }
-            }, (res) => this.onError(res.json));
-        this.headerService
-            .query({filter: 'fromendpoint-is-null'})
-            .subscribe((res) => {
+            },
+            res => this.onError(res.json)
+        );
+        this.headerService.query({ filter: 'fromendpoint-is-null' }).subscribe(
+            res => {
                 if (!this.fromEndpoint.headerId) {
                     this.headers = res.body;
                 } else {
-                    this.headerService
-                        .find(this.fromEndpoint.headerId)
-                        .subscribe((subRes: HttpResponse<IHeader>) => {
-                            res.body.some((s) => s.id === subRes.body.id) ?
-                                this.services = res.body :
-                                this.services.push(subRes.body);
-                        }, (subRes) => this.onError(subRes.json));
+                    this.headerService.find(this.fromEndpoint.headerId).subscribe(
+                        (subRes: HttpResponse<IHeader>) => {
+                            res.body.some(s => s.id === subRes.body.id) ? (this.services = res.body) : this.services.push(subRes.body);
+                        },
+                        subRes => this.onError(subRes.json)
+                    );
                 }
-            }, (res) => this.onError(res.json));
+            },
+            res => this.onError(res.json)
+        );
     }
     clear() {
         this.activeModal.dismiss('cancel');
@@ -81,27 +79,24 @@ export class FromEndpointDialogComponent implements OnInit {
     save() {
         this.isSaving = true;
         if (this.fromEndpoint.id !== undefined) {
-            this.subscribeToSaveResponse(
-                this.fromEndpointService.update(this.fromEndpoint));
+            this.subscribeToSaveResponse(this.fromEndpointService.update(this.fromEndpoint));
         } else {
-            this.subscribeToSaveResponse(
-                this.fromEndpointService.create(this.fromEndpoint));
+            this.subscribeToSaveResponse(this.fromEndpointService.create(this.fromEndpoint));
         }
     }
 
     private subscribeToSaveResponse(result: Observable<HttpResponse<IFromEndpoint>>) {
         result.subscribe(data => {
-            if(data.ok){
+            if (data.ok) {
                 this.onSaveSuccess(data.body);
-            }else{
-                this.onSaveError()
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
 
     private onSaveSuccess(result: IFromEndpoint) {
-        this.eventManager.broadcast({ name: 'fromEndpointListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'fromEndpointListModification', content: 'OK' });
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }

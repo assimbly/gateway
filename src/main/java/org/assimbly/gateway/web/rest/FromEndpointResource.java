@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.FromEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +41,6 @@ public class FromEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/from-endpoints")
-    @Timed
     public ResponseEntity<FromEndpointDTO> createFromEndpoint(@RequestBody FromEndpointDTO fromEndpointDTO) throws URISyntaxException {
         log.debug("REST request to save FromEndpoint : {}", fromEndpointDTO);
         if (fromEndpointDTO.getId() != null) {
@@ -64,7 +62,6 @@ public class FromEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/from-endpoints")
-    @Timed
     public ResponseEntity<FromEndpointDTO> updateFromEndpoint(@RequestBody FromEndpointDTO fromEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update FromEndpoint : {}", fromEndpointDTO);
         if (fromEndpointDTO.getId() == null) {
@@ -82,7 +79,6 @@ public class FromEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and the list of fromEndpoints in body
      */
     @GetMapping("/from-endpoints")
-    @Timed
     public List<FromEndpointDTO> getAllFromEndpoints() {
         log.debug("REST request to get all FromEndpoints");
         return fromEndpointService.findAll();
@@ -95,7 +91,6 @@ public class FromEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and with body the fromEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/from-endpoints/{id}")
-    @Timed
     public ResponseEntity<FromEndpointDTO> getFromEndpoint(@PathVariable Long id) {
         log.debug("REST request to get FromEndpoint : {}", id);
         Optional<FromEndpointDTO> fromEndpointDTO = fromEndpointService.findOne(id);
@@ -109,7 +104,6 @@ public class FromEndpointResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/from-endpoints/{id}")
-    @Timed
     public ResponseEntity<Void> deleteFromEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete FromEndpoint : {}", id);
         fromEndpointService.delete(id);

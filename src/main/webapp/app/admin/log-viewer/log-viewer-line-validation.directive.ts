@@ -10,6 +10,6 @@ export class LogViewerLineValidationDirective implements Validator {
     @Input('jhiLogViewerLineValidation') line: number;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.line < 1 || this.line > 10000 ? { 'lineOutScope': true } : null;
+        return this.line < 1 || this.line > 10000 ? { lineOutScope: true } : null;
     }
 }

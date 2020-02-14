@@ -11,7 +11,7 @@ import { GatewayDetailComponent } from './gateway-detail.component';
 import { GatewayUpdateComponent } from './gateway-update.component';
 import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayImportPopupComponent } from "app/entities/gateway";
+import { GatewayImportPopupComponent } from 'app/entities/gateway';
 
 @Injectable({ providedIn: 'root' })
 export class GatewayResolve implements Resolve<IGateway> {

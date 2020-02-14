@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.HeaderKeysService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +41,6 @@ public class HeaderKeysResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/header-keys")
-    @Timed
     public ResponseEntity<HeaderKeysDTO> createHeaderKeys(@RequestBody HeaderKeysDTO headerKeysDTO) throws URISyntaxException {
         log.debug("REST request to save HeaderKeys : {}", headerKeysDTO);
         if (headerKeysDTO.getId() != null) {
@@ -64,7 +62,6 @@ public class HeaderKeysResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/header-keys")
-    @Timed
     public ResponseEntity<HeaderKeysDTO> updateHeaderKeys(@RequestBody HeaderKeysDTO headerKeysDTO) throws URISyntaxException {
         log.debug("REST request to update HeaderKeys : {}", headerKeysDTO);
         if (headerKeysDTO.getId() == null) {
@@ -82,7 +79,6 @@ public class HeaderKeysResource {
      * @return the ResponseEntity with status 200 (OK) and the list of headerKeys in body
      */
     @GetMapping("/header-keys")
-    @Timed
     public List<HeaderKeysDTO> getAllHeaderKeys() {
         log.debug("REST request to get all HeaderKeys");
         return headerKeysService.findAll();
@@ -95,7 +91,6 @@ public class HeaderKeysResource {
      * @return the ResponseEntity with status 200 (OK) and with body the headerKeysDTO, or with status 404 (Not Found)
      */
     @GetMapping("/header-keys/{id}")
-    @Timed
     public ResponseEntity<HeaderKeysDTO> getHeaderKeys(@PathVariable Long id) {
         log.debug("REST request to get HeaderKeys : {}", id);
         Optional<HeaderKeysDTO> headerKeysDTO = headerKeysService.findOne(id);
@@ -109,7 +104,6 @@ public class HeaderKeysResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/header-keys/{id}")
-    @Timed
     public ResponseEntity<Void> deleteHeaderKeys(@PathVariable Long id) {
         log.debug("REST request to delete HeaderKeys : {}", id);
         headerKeysService.delete(id);

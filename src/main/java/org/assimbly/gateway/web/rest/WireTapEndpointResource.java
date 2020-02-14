@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.WireTapEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +41,6 @@ public class WireTapEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/wire-tap-endpoints")
-    @Timed
     public ResponseEntity<WireTapEndpointDTO> createWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
         log.debug("REST request to save WireTapEndpoint : {}", wireTapEndpointDTO);
         if (wireTapEndpointDTO.getId() != null) {
@@ -64,7 +62,6 @@ public class WireTapEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/wire-tap-endpoints")
-    @Timed
     public ResponseEntity<WireTapEndpointDTO> updateWireTapEndpoint(@RequestBody WireTapEndpointDTO wireTapEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update WireTapEndpoint : {}", wireTapEndpointDTO);
         if (wireTapEndpointDTO.getId() == null) {
@@ -82,7 +79,6 @@ public class WireTapEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and the list of wireTapEndpoints in body
      */
     @GetMapping("/wire-tap-endpoints")
-    @Timed
     public List<WireTapEndpointDTO> getAllWireTapEndpoints() {
         log.debug("REST request to get all WireTapEndpoints");
         return wireTapEndpointService.findAll();
@@ -95,7 +91,6 @@ public class WireTapEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and with body the wireTapEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/wire-tap-endpoints/{id}")
-    @Timed
     public ResponseEntity<WireTapEndpointDTO> getWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to get WireTapEndpoint : {}", id);
         Optional<WireTapEndpointDTO> wireTapEndpointDTO = wireTapEndpointService.findOne(id);
@@ -109,7 +104,6 @@ public class WireTapEndpointResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/wire-tap-endpoints/{id}")
-    @Timed
     public ResponseEntity<Void> deleteWireTapEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete WireTapEndpoint : {}", id);
         wireTapEndpointService.delete(id);

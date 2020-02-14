@@ -32,7 +32,7 @@ export class SecurityComponent implements OnInit, OnDestroy {
         protected eventManager: JhiEventManager,
         protected parseLinks: JhiParseLinks,
         protected accountService: AccountService,
-        protected router: Router  
+        protected router: Router
     ) {
         this.securities = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -97,10 +97,10 @@ export class SecurityComponent implements OnInit, OnDestroy {
     }
 
     uploadCertificate() {
-        console.log("upload certificate");
+        console.log('upload certificate');
         this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
-    }    
-    
+    }
+
     protected paginateSecurities(data: ISecurity[], headers: HttpHeaders) {
         this.links = this.parseLinks.parse(headers.get('link'));
         this.totalItems = parseInt(headers.get('X-Total-Count'), 10);

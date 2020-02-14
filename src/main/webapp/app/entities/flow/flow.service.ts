@@ -13,8 +13,8 @@ import { IFlow, Flow } from 'app/shared/model/flow.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
-import { tap } from "rxjs/operators";
-import { CSRFService } from "app/core";
+import { tap } from 'rxjs/operators';
+import { CSRFService } from 'app/core';
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
@@ -24,7 +24,7 @@ export class FlowService {
     public resourceUrl = SERVER_API_URL + 'api/flows';
     public connectorUrl = SERVER_API_URL + 'api/connector';
     public environmentUrl = SERVER_API_URL + 'api/environment';
-    
+
     stompClient = null;
     subscriber = null;
     connection: Promise<any>;
@@ -36,11 +36,7 @@ export class FlowService {
 
     private gatewayid = 1;
 
-    constructor(protected http: HttpClient,
-		 protected router: Router,
-         protected $window: WindowRef,
-         protected csrfService: CSRFService 
-     ) {
+    constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected csrfService: CSRFService) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
     }
@@ -65,10 +61,10 @@ export class FlowService {
     delete(id: number): Observable<HttpResponse<any>> {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
-    
+
     getFlowByGatewayId(gatewayid: Number, req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get<IFlow[]>(`${this.resourceUrl}/bygatewayid/${gatewayid}`, {params: options, observe: 'response' });
+        return this.http.get<IFlow[]>(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { params: options, observe: 'response' });
     }
 
     getConfiguration(flowid: number): Observable<HttpResponse<any>> {
@@ -78,46 +74,49 @@ export class FlowService {
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
         if (!!header) {
             const options = {
-                    headers: new HttpHeaders({observe: 'response', responseType: 'text','Accept': 'application/xml'})
+                headers: new HttpHeaders({ observe: 'response', responseType: 'text', Accept: 'application/xml' })
             };
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
         } else {
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {observe: 'response', responseType: 'text' });
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+                observe: 'response',
+                responseType: 'text'
+            });
         }
     }
 
     saveFlows(id: number, xmlconfiguration: string, header: string): Observable<EntityResponseType> {
         const options = {
-                headers: new HttpHeaders({'Accept': 'application/xml'})
+            headers: new HttpHeaders({ Accept: 'application/xml' })
         };
         return this.http.post<any>(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
     }
 
     validateFlowsUri(connectorId: number, uri: string): Observable<EntityResponseType> {
         const options = {
-                headers: new HttpHeaders({'Accept': 'application/xml'})
+            headers: new HttpHeaders({ Accept: 'application/xml' })
         };
         return this.http.get<any>(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     pause(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     resume(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     restart(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowStatus(id: number): Observable<any> {
@@ -129,7 +128,10 @@ export class FlowService {
     }
 
     getFlowNumberOfAlerts(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, {
+            observe: 'response',
+            responseType: 'text'
+        });
     }
 
     getFlowLastError(id: number): Observable<any> {
@@ -145,51 +147,68 @@ export class FlowService {
     }
 
     getWikiDocUrl(): Observable<HttpResponse<any>> {
-        return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response',responseType: 'text' });
+        return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response', responseType: 'text' });
     }
 
     getCamelDocUrl(): Observable<HttpResponse<any>> {
-        return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response',responseType: 'text' });
+        return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response', responseType: 'text' });
     }
 
     getGatewayName(): Observable<HttpResponse<any>> {
-        return this.http.get(`${SERVER_API_URL}/api/gateway-name`, { observe: 'response',responseType: 'text' });
+        return this.http.get(`${SERVER_API_URL}/api/gateway-name`, { observe: 'response', responseType: 'text' });
     }
-    
+
     setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, { observe: 'response', responseType: 'text' });
+        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, {
+            observe: 'response',
+            responseType: 'text'
+        });
     }
 
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
         const exportDate = this.getDate();
 
-        this.http.get(url, { headers: new HttpHeaders({
-            'Accept': 'application/xml',
-            'Content-Type': 'application/octet-stream',
-            }), observe: 'response', responseType: 'blob'}).subscribe(data => {
-                  const blob = new Blob([data.body], { type: 'application/xml' });
-                  saveAs(blob, `export_gateway_${gateway.name}_${exportDate}.xml`);              
-              },
-              error => console.log(error)
-            )
+        this.http
+            .get(url, {
+                headers: new HttpHeaders({
+                    Accept: 'application/xml',
+                    'Content-Type': 'application/octet-stream'
+                }),
+                observe: 'response',
+                responseType: 'blob'
+            })
+            .subscribe(
+                data => {
+                    const blob = new Blob([data.body], { type: 'application/xml' });
+                    saveAs(blob, `export_gateway_${gateway.name}_${exportDate}.xml`);
+                },
+                error => console.log(error)
+            );
     }
 
     exportFlowConfiguration(flow: IFlow) {
         const url = `${this.environmentUrl}/1/flow/${flow.id}`;
         const exportDate = this.getDate();
 
-        this.http.get(url, { headers: new HttpHeaders({
-            'Accept': 'application/xml',
-            'Content-Type': 'application/octet-stream',
-            }), observe: 'response', responseType: 'blob'}).subscribe(data => {
-                  const blob = new Blob([data.body], { type: 'application/xml' });
-                  saveAs(blob, `export_flow_${flow.name}_${exportDate}.xml`);              
-              },
-              error => console.log(error)
-            )
+        this.http
+            .get(url, {
+                headers: new HttpHeaders({
+                    Accept: 'application/xml',
+                    'Content-Type': 'application/octet-stream'
+                }),
+                observe: 'response',
+                responseType: 'blob'
+            })
+            .subscribe(
+                data => {
+                    const blob = new Blob([data.body], { type: 'application/xml' });
+                    saveAs(blob, `export_flow_${flow.name}_${exportDate}.xml`);
+                },
+                error => console.log(error)
+            );
     }
-    
+
     connect() {
         if (this.connectedPromise === null) {
             this.connection = this.createConnection();
@@ -213,12 +232,13 @@ export class FlowService {
         const headers = {};
         headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
 
-        this.stompClient.connect(headers, () => {
-
-            this.connectedPromise('success');
-            this.connectedPromise = null;
-
-        });
+        this.stompClient.connect(
+            headers,
+            () => {
+                this.connectedPromise('success');
+                this.connectedPromise = null;
+            }
+        );
     }
 
     disconnect() {
@@ -237,17 +257,17 @@ export class FlowService {
         return this.listener;
     }
 
-    connectionStomp(){
+    connectionStomp() {
         return this.connection;
-     }
-    
-    client(){
-       return this.stompClient;
+    }
+
+    client() {
+        return this.stompClient;
     }
 
     subscribe(id) {
         const topic = '/topic/' + id + '/alert';
-        
+
         this.connection.then(() => {
             this.subscriber = this.stompClient.subscribe(topic, data => {
                 this.listenerObserver.next(JSON.parse(data.body));
@@ -279,9 +299,8 @@ export class FlowService {
         const entity: IFlow = Object.assign(new Flow(), json);
         return entity;
     }
-    
-    private getDate(){
-        
+
+    private getDate() {
         const date = new Date();
         let year = date.getFullYear();
 
@@ -290,8 +309,7 @@ export class FlowService {
 
         let day = date.getDate().toString();
         day = day.length > 1 ? day : '0' + day;
-        
+
         return year + month + day;
     }
-
 }

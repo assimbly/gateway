@@ -9,7 +9,7 @@ import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { RequiredServiceKey } from '../service-keys';
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'jhi-service-update',
@@ -21,7 +21,12 @@ export class ServiceUpdateComponent implements OnInit {
     serviceKeys: Array<ServiceKeys> = [];
     servicesNames: Array<String> = [];
     serviceKeysKeys: Array<String> = [];
-    listVal: Array<String> = ['com.mysql.jdbc.Driver', 'oracle.jdbc.driver.OracleDriver', 'org.postgresql.Driver','com.microsoft.sqlserver.jdbc.SQLServerDriver'];
+    listVal: Array<String> = [
+        'com.mysql.jdbc.Driver',
+        'oracle.jdbc.driver.OracleDriver',
+        'org.postgresql.Driver',
+        'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+    ];
     public disableType: boolean;
     public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'MQ Connection'];
     requiredServiceKey: Array<RequiredServiceKey> = [];
@@ -29,12 +34,13 @@ export class ServiceUpdateComponent implements OnInit {
     serviceKeysRemoveList: Array<ServiceKeys> = [];
 
     constructor(
-		protected serviceService: ServiceService,
-        protected serviceKeysService: ServiceKeysService, 
+        protected serviceService: ServiceService,
+        protected serviceKeysService: ServiceKeysService,
         protected eventManager: JhiEventManager,
         protected jhiAlertService: JhiAlertService,
         protected activatedRoute: ActivatedRoute,
-        protected router: Router) {}
+        protected router: Router
+    ) {}
 
     ngOnInit() {
         this.isSaving = false;
@@ -43,42 +49,43 @@ export class ServiceUpdateComponent implements OnInit {
             this.service = service;
         });
         this.serviceService.query().subscribe(
-                (res) => {
-                    this.servicesNames = res.body.map((s) => s.name)
-                },
-                (res) => this.onError(res.body)
-        );        
+            res => {
+                this.servicesNames = res.body.map(s => s.name);
+            },
+            res => this.onError(res.body)
+        );
         if (this.activatedRoute.fragment['value'] && this.activatedRoute.fragment['value'] !== 'clone') {
-            this.service.type = this.typeServices.find((st) => st === this.activatedRoute.fragment['value']);
-            this.disableType = this.typeServices.some((st) => st === this.activatedRoute.fragment['value']);
+            this.service.type = this.typeServices.find(st => st === this.activatedRoute.fragment['value']);
+            this.disableType = this.typeServices.some(st => st === this.activatedRoute.fragment['value']);
         }
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.loadServiceKeys(true);
-        }else{
+        } else {
             this.loadServiceKeys(false);
         }
-        
     }
 
     changeType(cloneHeader: boolean) {
- 
         if (typeof this.requiredType !== 'undefined') {
             this.serviceKeysRemoveList = [];
-            this.requiredType.serviceKeys.forEach((rsk) => {
-                this.serviceKeysRemoveList.push(this.serviceKeys.splice(this.serviceKeys.indexOf(
-                    this.serviceKeys.find((sk) => (rsk.serviceKeyName === sk.key && sk.id !== undefined))
-                ), 1)[0])
+            this.requiredType.serviceKeys.forEach(rsk => {
+                this.serviceKeysRemoveList.push(
+                    this.serviceKeys.splice(
+                        this.serviceKeys.indexOf(this.serviceKeys.find(sk => rsk.serviceKeyName === sk.key && sk.id !== undefined)),
+                        1
+                    )[0]
+                );
             });
         }
-        
+
         this.requiredType = this.requiredServiceKey.find(x => x.name === this.service.type);
-        
-        const requiredServiceKeys =  new Array<ServiceKeys>();
-        this.requiredType.serviceKeys.forEach((sk) => {
+
+        const requiredServiceKeys = new Array<ServiceKeys>();
+        this.requiredType.serviceKeys.forEach(sk => {
             let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
-            if(typeof ersk !== 'undefined'){
+            if (typeof ersk !== 'undefined') {
                 if (ersk.value !== '') {
                     rsk = ersk;
                     this.serviceKeys.splice(this.serviceKeys.indexOf(ersk), 1);
@@ -114,7 +121,7 @@ export class ServiceUpdateComponent implements OnInit {
 
     save() {
         this.isSaving = true;
-        if (this.service.id) {            
+        if (this.service.id) {
             this.subscribeToSaveResponse(this.serviceService.update(this.service));
         } else {
             this.subscribeToSaveResponse(this.serviceService.create(this.service));
@@ -126,32 +133,32 @@ export class ServiceUpdateComponent implements OnInit {
     }
 
     protected onSaveSuccess(result: IService) {
-        this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK' });
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
-        this.eventManager.broadcast({name: 'serviceModified', content: result.id});
+        this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
         this.isSaving = false;
 
-        this.serviceKeysRemoveList.forEach((skrl) => {
+        this.serviceKeysRemoveList.forEach(skrl => {
             this.serviceKeysService.delete(skrl.id).subscribe();
         });
 
-        this.serviceKeys.forEach((serviceKey) => {
+        this.serviceKeys.forEach(serviceKey => {
             serviceKey.serviceId = result.id;
             if (serviceKey.id) {
-                this.serviceKeysService.update(serviceKey).subscribe((sk) => {
+                this.serviceKeysService.update(serviceKey).subscribe(sk => {
                     serviceKey = sk.body;
                 });
             } else {
-                this.serviceKeysService.create(serviceKey).subscribe((sk) => {
+                this.serviceKeysService.create(serviceKey).subscribe(sk => {
                     serviceKey = sk.body;
-                })
+                });
             }
         });
-        this.serviceKeysService.update(this.serviceKeys[0])
+        this.serviceKeysService.update(this.serviceKeys[0]);
 
         this.navigateToService();
     }
-    
+
     private onError(error: any) {
         this.jhiAlertService.error(error.message, null, null);
     }
@@ -163,11 +170,11 @@ export class ServiceUpdateComponent implements OnInit {
     deleteServiceKeys(serviceKey) {
         this.serviceKeysService.delete(serviceKey.id).subscribe(() => {
             this.removeServiceKeys(this.serviceKeys.indexOf(serviceKey));
-        })
+        });
     }
 
     navigateToService() {
-        this.router.navigate(['/service']);        
+        this.router.navigate(['/service']);
     }
 
     navigateToServiceDetail(serviceId: number) {
@@ -179,12 +186,12 @@ export class ServiceUpdateComponent implements OnInit {
 
     private loadServiceKeys(cloneHeader: boolean) {
         if (this.service.id) {
-            this.serviceKeysService.query().subscribe((res) => {
-                this.serviceKeys = res.body.filter((sk) => sk.serviceId === this.service.id);
+            this.serviceKeysService.query().subscribe(res => {
+                this.serviceKeys = res.body.filter(sk => sk.serviceId === this.service.id);
                 this.changeType(cloneHeader);
                 this.service.id = cloneHeader ? null : this.service.id;
             });
-        }else if (this.service.type) {
+        } else if (this.service.type) {
             this.changeType(cloneHeader);
             this.service.id = cloneHeader ? null : this.service.id;
         }
@@ -192,8 +199,8 @@ export class ServiceUpdateComponent implements OnInit {
 
     private mapServiceKeysKeys() {
         if (typeof this.serviceKeys !== 'undefined') {
-            this.serviceKeysKeys = this.serviceKeys.map((sk) => sk.key);
-            this.serviceKeysKeys = this.serviceKeysKeys.filter((k) => k !== undefined);
+            this.serviceKeysKeys = this.serviceKeys.map(sk => sk.key);
+            this.serviceKeysKeys = this.serviceKeysKeys.filter(k => k !== undefined);
         }
     }
 
@@ -231,8 +238,7 @@ export class ServiceUpdateComponent implements OnInit {
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'Optional' },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '' }
                 ]
-            },
-        )
+            }
+        );
     }
-
 }

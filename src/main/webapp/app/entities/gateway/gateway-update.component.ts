@@ -9,7 +9,7 @@ import { GatewayService } from './gateway.service';
 import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { WireTapEndpointService } from 'app/entities/wire-tap-endpoint';
 import { EndpointType, Components } from '../../shared/camel/component-type';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'jhi-gateway-update',
@@ -20,8 +20,8 @@ export class GatewayUpdateComponent implements OnInit {
     isSaving: boolean;
 
     public gatewayListType = [GatewayType.ADAPTER, GatewayType.BROKER, GatewayType.ARTEMIS];
-    public gatewayListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION]
-    
+    public gatewayListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
+
     generalPopoverMessage: string;
     environmentPopoverMessage: string;
     defaultPopoverMessage: string;
@@ -49,7 +49,7 @@ export class GatewayUpdateComponent implements OnInit {
             this.gateway.defaultToEndpointType = EndpointType.FILE;
             this.gateway.defaultErrorEndpointType = EndpointType.FILE;
         }
-        
+
         this.wireTapEndpointService.query({ filter: 'gateway-is-null' }).subscribe(
             (res: HttpResponse<IWireTapEndpoint[]>) => {
                 if (!this.gateway.wiretapEndpointId) {
@@ -103,25 +103,24 @@ export class GatewayUpdateComponent implements OnInit {
     trackWireTapEndpointById(index: number, item: IWireTapEndpoint) {
         return item.id;
     }
-    
+
     setTypeGateway() {
         if (this.gateway.type.toString() === 'BROKER') {
             this.gateway.defaultFromEndpointType = EndpointType.ACTIVEMQ;
             this.gateway.defaultToEndpointType = EndpointType.ACTIVEMQ;
             this.gateway.defaultErrorEndpointType = EndpointType.ACTIVEMQ;
-        }else if(this.gateway.type.toString() === 'ARTEMIS') {
+        } else if (this.gateway.type.toString() === 'ARTEMIS') {
             this.gateway.defaultFromEndpointType = EndpointType.SJMS;
             this.gateway.defaultToEndpointType = EndpointType.SJMS;
             this.gateway.defaultErrorEndpointType = EndpointType.SJMS;
-        }else{
+        } else {
             this.gateway.defaultFromEndpointType = EndpointType.FILE;
             this.gateway.defaultToEndpointType = EndpointType.FILE;
             this.gateway.defaultErrorEndpointType = EndpointType.FILE;
-        } 
+        }
     }
-    
+
     setPopoverMessages() {
-        
         this.generalPopoverMessage = `General settings of the gateway<br></br><b>Name: </b>
                     Name of the gateway. Usually this is the name of the default source or destination,
                         like an application or system.<br/><br/>
@@ -133,5 +132,4 @@ export class GatewayUpdateComponent implements OnInit {
                         Sets the default selected components when creating a flow. <br/><br/>
                         The component can always be changed when creating or editing a flow. <br/><br/> Default=FILE.`;
     }
-    
 }

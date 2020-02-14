@@ -10,7 +10,7 @@ import {
     SecurityDeletePopupComponent,
     SecurityDeleteDialogComponent,
     SecurityUploadPopupComponent,
-    SecurityUploadDialogComponent,    
+    SecurityUploadDialogComponent,
     securityRoute,
     securityPopupRoute,
     SecurityPopupService
@@ -27,9 +27,16 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
         SecurityDeleteDialogComponent,
         SecurityDeletePopupComponent,
         SecurityUploadPopupComponent,
-        SecurityUploadDialogComponent          
+        SecurityUploadDialogComponent
     ],
-    entryComponents: [SecurityComponent, SecurityUpdateComponent, SecurityDeleteDialogComponent, SecurityDeletePopupComponent,    SecurityUploadPopupComponent, SecurityUploadDialogComponent],
+    entryComponents: [
+        SecurityComponent,
+        SecurityUpdateComponent,
+        SecurityDeleteDialogComponent,
+        SecurityDeletePopupComponent,
+        SecurityUploadPopupComponent,
+        SecurityUploadDialogComponent
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewaySecurityModule {}

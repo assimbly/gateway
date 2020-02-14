@@ -48,28 +48,28 @@
         </addColumn>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-6">
-        <addUniqueConstraint columnNames="error_endpoint_id" constraintName="UC_flowERROR_ENDPOINT_ID_COL" tableName="flow"/>
+        <addUniqueConstraint columnNames="error_endpoint_id" constraintName="uc_flowerror_endpoint_id_col" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-7">
-        <addUniqueConstraint columnNames="from_endpoint_id" constraintName="UC_flowFROM_ENDPOINT_ID_COL" tableName="flow"/>
+        <addUniqueConstraint columnNames="from_endpoint_id" constraintName="uc_flowfrom_endpoint_id_col" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-8">
-        <addUniqueConstraint columnNames="header_id" constraintName="UC_ERROR_ENDPOINTHEADER_ID_COL" tableName="error_endpoint"/>
+        <addUniqueConstraint columnNames="header_id" constraintName="uc_error_endpointheader_id_col" tableName="error_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-9">
-        <addUniqueConstraint columnNames="service_id" constraintName="UC_ERROR_ENDPOINTSERVICE_ID_COL" tableName="error_endpoint"/>
+        <addUniqueConstraint columnNames="service_id" constraintName="uc_error_endpointservice_id_col" tableName="error_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-10">
-        <addUniqueConstraint columnNames="header_id" constraintName="UC_FROM_ENDPOINTHEADER_ID_COL" tableName="from_endpoint"/>
+        <addUniqueConstraint columnNames="header_id" constraintName="uc_from_endpointheader_id_col" tableName="from_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-11">
-        <addUniqueConstraint columnNames="service_id" constraintName="UC_FROM_ENDPOINTSERVICE_ID_COL" tableName="from_endpoint"/>
+        <addUniqueConstraint columnNames="service_id" constraintName="uc_from_endpointservice_id_col" tableName="from_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-12">
-        <addUniqueConstraint columnNames="header_id" constraintName="UC_TO_ENDPOINTHEADER_ID_COL" tableName="to_endpoint"/>
+        <addUniqueConstraint columnNames="header_id" constraintName="uc_to_endpointheader_id_col" tableName="to_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-13">
-        <addUniqueConstraint columnNames="service_id" constraintName="UC_TO_ENDPOINTSERVICE_ID_COL" tableName="to_endpoint"/>
+        <addUniqueConstraint columnNames="service_id" constraintName="uc_to_endpointservice_id_col" tableName="to_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-14">
         <addForeignKeyConstraint baseColumnNames="error_endpoint_id" baseTableName="flow" constraintName="FK1wap6lu05flpkv96rksobi9kr" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="error_endpoint"/>
@@ -99,69 +99,69 @@
         <addForeignKeyConstraint baseColumnNames="header_id" baseTableName="from_endpoint" constraintName="FKsx2b3e8c58hwhx3a3bjigkbga" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="header"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-23">
-        <dropForeignKeyConstraint baseTableName="flow" constraintName="FK_flow_ENDPOINT_ERROR_ID"/>
+        <dropForeignKeyConstraint baseTableName="flow" constraintName="fk_flow_endpoint_error_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-24">
-        <dropForeignKeyConstraint baseTableName="flow" constraintName="FK_flow_ENDPOINT_FROM_ID"/>
+        <dropForeignKeyConstraint baseTableName="flow" constraintName="fk_flow_endpoint_from_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-25">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_ERROR" constraintName="FK_ENDPOINT_ERROR_HEADER_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_error" constraintName="fk_endpoint_error_header_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-26">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_ERROR" constraintName="FK_ENDPOINT_ERROR_SERVICE_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_error" constraintName="fk_endpoint_error_service_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-27">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_FROM" constraintName="FK_ENDPOINT_FROM_HEADER_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_from" constraintName="fk_endpoint_from_header_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-28">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_FROM" constraintName="FK_ENDPOINT_FROM_SERVICE_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_from" constraintName="fk_endpoint_from_service_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-29">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_flow_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_to" constraintName="fk_endpoint_to_flow_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-30">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_HEADER_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_to" constraintName="fk_endpoint_to_header_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-31">
-        <dropForeignKeyConstraint baseTableName="ENDPOINT_TO" constraintName="FK_ENDPOINT_TO_SERVICE_ID"/>
+        <dropForeignKeyConstraint baseTableName="endpoint_to" constraintName="fk_endpoint_to_service_id"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-32">
-        <dropUniqueConstraint constraintName="CONSTRAINT_3" tableName="ENDPOINT_TO"/>
+        <dropUniqueConstraint constraintName="constraint_3" tableName="endpoint_to"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-33">
-        <dropUniqueConstraint constraintName="CONSTRAINT_3C" tableName="ENDPOINT_TO"/>
+        <dropUniqueConstraint constraintName="constraint_3C" tableName="endpoint_to"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-34">
-        <dropUniqueConstraint constraintName="CONSTRAINT_7" tableName="ENDPOINT_ERROR"/>
+        <dropUniqueConstraint constraintName="constraint_7" tableName="endpoint_error"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-35">
-        <dropUniqueConstraint constraintName="CONSTRAINT_71" tableName="ENDPOINT_ERROR"/>
+        <dropUniqueConstraint constraintName="constraint_71" tableName="endpoint_error"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-36">
-        <dropUniqueConstraint constraintName="CONSTRAINT_9" tableName="ENDPOINT_FROM"/>
+        <dropUniqueConstraint constraintName="constraint_9" tableName="endpoint_from"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-37">
-        <dropUniqueConstraint constraintName="CONSTRAINT_98" tableName="ENDPOINT_FROM"/>
+        <dropUniqueConstraint constraintName="constraint_98" tableName="endpoint_from"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-38">
-        <dropUniqueConstraint constraintName="CONSTRAINT_F1" tableName="flow"/>
+        <dropUniqueConstraint constraintName="constraint_F1" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-39">
-        <dropUniqueConstraint constraintName="CONSTRAINT_F1E" tableName="flow"/>
+        <dropUniqueConstraint constraintName="constraint_F1E" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-40">
-        <dropTable tableName="ENDPOINT_ERROR"/>
+        <dropTable tableName="endpoint_error"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-41">
-        <dropTable tableName="ENDPOINT_FROM"/>
+        <dropTable tableName="endpoint_from"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-42">
-        <dropTable tableName="ENDPOINT_TO"/>
+        <dropTable tableName="endpoint_to"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-43">
-        <dropColumn columnName="ENDPOINT_ERROR_ID" tableName="flow"/>
+        <dropColumn columnName="endpoint_error_id" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516043639936-44">
-        <dropColumn columnName="ENDPOINT_FROM_ID" tableName="flow"/>
+        <dropColumn columnName="endpoint_from_id" tableName="flow"/>
     </changeSet>
 </databaseChangeLog>

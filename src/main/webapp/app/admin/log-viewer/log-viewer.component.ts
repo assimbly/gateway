@@ -3,18 +3,14 @@ import { LogViewerService } from './log-viewer.service';
 
 @Component({
     selector: 'jhi-log-viewer',
-    templateUrl: './log-viewer.component.html',
+    templateUrl: './log-viewer.component.html'
 })
 export class LogViewerComponent implements OnInit {
-
-    @ViewChild('logArea')private logArea: ElementRef;
+    @ViewChild('logArea', { static: false }) private logArea: ElementRef;
     public log: string;
     public lines: number;
 
-    constructor(
-        private logViewerService: LogViewerService
-    ) {
-    }
+    constructor(private logViewerService: LogViewerService) {}
 
     ngOnInit() {
         this.lines = 250;
@@ -23,12 +19,12 @@ export class LogViewerComponent implements OnInit {
 
     getLogs() {
         let tt = this.lines;
-        this.logViewerService.getLogs(this.lines).subscribe((res) => {
+        this.logViewerService.getLogs(this.lines).subscribe(res => {
             this.log = res.body;
             setTimeout(() => {
                 try {
                     this.logArea.nativeElement.scrollTop = this.logArea.nativeElement.scrollHeight;
-                } catch (error) { }
+                } catch (error) {}
             }, 0);
         });
     }

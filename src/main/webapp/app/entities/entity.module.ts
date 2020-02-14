@@ -52,7 +52,7 @@ import { FlowService } from 'app/entities/flow';
         GatewayToEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
-        GatewayBrokerModule,        
+        GatewayBrokerModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */

@@ -11,15 +11,13 @@ import { GatewayService } from '../gateway';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
-import { IEnvironmentVariables, EnvironmentVariables } from "app/shared/model/environment-variables.model";
+import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 @Component({
     selector: 'jhi-environment-variables-dialog',
     templateUrl: './environment-variables-dialog.component.html'
 })
-
 export class EnvironmentVariablesDialogComponent implements OnInit {
-
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
     isSaving: boolean;
 
@@ -34,37 +32,38 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         private gatewayService: GatewayService,
         private eventManager: JhiEventManager,
         private route: ActivatedRoute
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.initializeForm();
         if (this.route.fragment['value'] === 'clone') {
             this.environmentVariables.id = null;
             this.environmentVariablesForm.patchValue({
-                'id': null
+                id: null
             });
         }
         this.isSaving = false;
-        this.gatewayService.query()
-            .subscribe((res) => {
+        this.gatewayService.query().subscribe(
+            res => {
                 this.gateways = res.body;
                 this.environmentVariables.gatewayId = this.gateways[0].id;
                 if (!this.environmentVariablesForm.controls.gatewayId.value) {
                     this.environmentVariablesForm.patchValue({
-                        'gatewayId': this.environmentVariables.gatewayId
+                        gatewayId: this.environmentVariables.gatewayId
                     });
                 }
-            }, (res) => this.onError(res));
+            },
+            res => this.onError(res)
+        );
         this.getAllEnvironmentVariablesKeys();
     }
 
     initializeForm() {
         this.environmentVariablesForm = new FormGroup({
-            'id': new FormControl(this.environmentVariables.id),
-            'key': new FormControl(this.environmentVariables.key, Validators.required),
-            'value': new FormControl(this.environmentVariables.value, Validators.required),
-            'gatewayId': new FormControl(this.environmentVariables.gatewayId)
+            id: new FormControl(this.environmentVariables.id),
+            key: new FormControl(this.environmentVariables.key, Validators.required),
+            value: new FormControl(this.environmentVariables.value, Validators.required),
+            gatewayId: new FormControl(this.environmentVariables.gatewayId)
         });
     }
 
@@ -75,17 +74,18 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     save() {
         //validate keys and values
         this.environmentVariablesForm.controls.key.updateValueAndValidity();
-        if(this.environmentVariables.id===null){
+        if (this.environmentVariables.id === null) {
             this.environmentVariablesForm.controls.key.markAsTouched();
         }
         this.environmentVariablesForm.updateValueAndValidity();
         if (this.environmentVariablesForm.invalid) {
             this.isSaving = false;
-            return; }
-        
+            return;
+        }
+
         this.isSaving = true;
         this.environmentVariables = this.environmentVariablesForm.value;
-        
+
         //save environment variable
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(this.environmentVariablesService.update(this.environmentVariables));
@@ -93,34 +93,35 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
             this.subscribeToSaveResponse(this.environmentVariablesService.create(this.environmentVariables));
         }
     }
-    
+
     private getAllEnvironmentVariablesKeys() {
-        this.environmentVariablesService.query().subscribe((res) => {
+        this.environmentVariablesService.query().subscribe(res => {
             this.allEnvironmentVariablesKeys = res.body.map(res => res.key);
-            this.environmentVariablesForm.controls.key.setValidators([Validators.required, forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)]);
+            this.environmentVariablesForm.controls.key.setValidators([
+                Validators.required,
+                forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)
+            ]);
         });
     }
 
- 
     private subscribeToSaveResponse(result: Observable<HttpResponse<IEnvironmentVariables>>) {
         result.subscribe(data => {
-            if(data.ok){
+            if (data.ok) {
                 this.onSaveSuccess(data.body);
-            }else{
-                this.onSaveError()
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
 
     private onSaveSuccess(result: EnvironmentVariables) {
         this.eventManager.broadcast({ name: 'environmentVariablesListModification', content: 'OK' });
         this.isSaving = false;
         this.environmentVariablesForm.patchValue({
-            'id': result.id,
-            'key': result.key,
-            'value': result.value,
-            'gatewayId': result.gatewayId
+            id: result.id,
+            key: result.key,
+            value: result.value,
+            gatewayId: result.gatewayId
         });
         this.getAllEnvironmentVariablesKeys();
     }

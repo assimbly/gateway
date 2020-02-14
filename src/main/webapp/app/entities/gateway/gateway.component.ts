@@ -23,7 +23,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
         protected gatewayService: GatewayService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
-        private router: Router,        
+        private router: Router,
         protected accountService: AccountService
     ) {}
 
@@ -57,24 +57,20 @@ export class GatewayComponent implements OnInit, OnDestroy {
     }
 
     downloadConfiguration(gateway: IGateway) {
-       this.flowService.exportGatewayConfiguration(gateway);
+        this.flowService.exportGatewayConfiguration(gateway);
     }
-    
+
     uploadConfiguration() {
         this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
-        this.eventManager.subscribe(
-                'gatewayListModification',
-                (res) => this.reset()
-            );
+        this.eventManager.subscribe('gatewayListModification', res => this.reset());
     }
 
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
-    
+
     reset() {
         this.gateways = [];
         this.loadAll();
     }
-    
 }

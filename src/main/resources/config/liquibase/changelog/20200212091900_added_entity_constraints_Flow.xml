@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity Flow.
+    -->
+    <changeSet id="20200212091900-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="from_endpoint_id"
+                                 baseTableName="flow"
+                                 constraintName="fk_flow_from_endpoint_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="from_endpoint"/>
+
+        <addForeignKeyConstraint baseColumnNames="error_endpoint_id"
+                                 baseTableName="flow"
+                                 constraintName="fk_flow_error_endpoint_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="error_endpoint"/>
+
+        <addForeignKeyConstraint baseColumnNames="gateway_id"
+                                 baseTableName="flow"
+                                 constraintName="fk_flow_gateway_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="gateway"/>
+
+    </changeSet>
+</databaseChangeLog>

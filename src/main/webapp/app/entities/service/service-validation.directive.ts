@@ -10,6 +10,6 @@ export class ForbiddenServiceNamesValidatorDirective implements Validator {
     @Input('jhiExistingServiceNames') existingNames: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.existingNames.some((k) => k === control.value) ? { 'existingServiceName': true } : null;
+        return this.existingNames.some(k => k === control.value) ? { existingServiceName: true } : null;
     }
 }
