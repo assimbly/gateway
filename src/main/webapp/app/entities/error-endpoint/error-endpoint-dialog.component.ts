@@ -9,8 +9,8 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 import { ErrorEndpointService } from './error-endpoint.service';
 import { ServiceService } from '../service';
-import { Service} from 'app/shared/model/service.model';
-import { Header} from 'app/shared/model/header.model';
+import { Service } from 'app/shared/model/service.model';
+import { Header } from 'app/shared/model/header.model';
 
 import { HeaderService } from '../header';
 import { EndpointType, Components } from '../../shared/camel/component-type';
@@ -20,7 +20,6 @@ import { EndpointType, Components } from '../../shared/camel/component-type';
     templateUrl: './error-endpoint-dialog.component.html'
 })
 export class ErrorEndpointDialogComponent implements OnInit {
-
     errorEndpoint: ErrorEndpoint;
     isSaving: boolean;
 
@@ -36,37 +35,40 @@ export class ErrorEndpointDialogComponent implements OnInit {
         private headerService: HeaderService,
         private eventManager: JhiEventManager,
         public components: Components
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.isSaving = false;
-        this.serviceService
-            .query({filter: 'errorendpoint-is-null'})
-            .subscribe((res) => {
+        this.serviceService.query({ filter: 'errorendpoint-is-null' }).subscribe(
+            res => {
                 if (!this.errorEndpoint.serviceId) {
                     this.services = res.body;
                 } else {
-                    this.serviceService
-                        .find(this.errorEndpoint.serviceId)
-                        .subscribe(subRes => {
+                    this.serviceService.find(this.errorEndpoint.serviceId).subscribe(
+                        subRes => {
                             this.services.push(subRes.body);
-                        }, (subRes) => this.onError(subRes));
+                        },
+                        subRes => this.onError(subRes)
+                    );
                 }
-            }, (res) => this.onError(res.json));
-        this.headerService
-            .query({filter: 'errorendpoint-is-null'})
-            .subscribe((res) => {
+            },
+            res => this.onError(res.json)
+        );
+        this.headerService.query({ filter: 'errorendpoint-is-null' }).subscribe(
+            res => {
                 if (!this.errorEndpoint.headerId) {
                     this.headers = res.body;
                 } else {
-                    this.headerService
-                        .find(this.errorEndpoint.headerId)
-                        .subscribe((subRes) => {
+                    this.headerService.find(this.errorEndpoint.headerId).subscribe(
+                        subRes => {
                             this.headers.push(subRes.body);
-                        }, (subRes) => this.onError(subRes.json));
+                        },
+                        subRes => this.onError(subRes.json)
+                    );
                 }
-            }, (res) => this.onError(res.json));
+            },
+            res => this.onError(res.json)
+        );
     }
 
     clear() {
@@ -76,27 +78,24 @@ export class ErrorEndpointDialogComponent implements OnInit {
     save() {
         this.isSaving = true;
         if (this.errorEndpoint.id !== undefined) {
-            this.subscribeToSaveResponse(
-                this.errorEndpointService.update(this.errorEndpoint));
+            this.subscribeToSaveResponse(this.errorEndpointService.update(this.errorEndpoint));
         } else {
-            this.subscribeToSaveResponse(
-                this.errorEndpointService.create(this.errorEndpoint));
+            this.subscribeToSaveResponse(this.errorEndpointService.create(this.errorEndpoint));
         }
     }
 
     private subscribeToSaveResponse(result: Observable<HttpResponse<IErrorEndpoint>>) {
         result.subscribe(data => {
-            if(data.ok){
+            if (data.ok) {
                 this.onSaveSuccess(data.body);
-            }else{
-                this.onSaveError()
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
 
     private onSaveSuccess(result: ErrorEndpoint) {
-        this.eventManager.broadcast({ name: 'errorEndpointListModification', content: 'OK'});
+        this.eventManager.broadcast({ name: 'errorEndpointListModification', content: 'OK' });
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }

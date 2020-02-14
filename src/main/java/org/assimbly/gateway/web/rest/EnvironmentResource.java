@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.codahale.metrics.annotation.Timed;
-
 import java.io.File;
 import java.net.URISyntaxException;
 
@@ -35,7 +33,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping(path = "/environment/{gatewayid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml", "application/json"})
-    @Timed
     public ResponseEntity<String> setGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @PathVariable Long gatewayid, @RequestBody String configuration) throws Exception {
 
        	try {        	
@@ -55,7 +52,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/environment/{gatewayid}", produces = {"text/plain","application/xml", "application/json"})
-    @Timed
     public ResponseEntity<String> getGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid) throws Exception {
 
        	try {
@@ -79,7 +75,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping(path = "/environment/{gatewayid}/byflowids", produces = {"text/plain","application/xml", "application/json"},consumes = {"text/plain"})
-    @Timed
     public ResponseEntity<String> getConfigurationByFlowids(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @RequestBody String flowids) throws Exception {
 
        	try {
@@ -104,7 +99,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */ 
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
-    @Timed
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
         try {
        		DBConfiguration.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
@@ -122,7 +116,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/environment/{gatewayid}/flow/{flowid}", produces = {"text/plain","application/xml","application/json"})
-    @Timed
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {
             configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType);
@@ -143,7 +136,6 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/environment/{gatewayid}/log/{lines}", produces = {"text/plain"})
-    @Timed
     public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
     	
        	try {

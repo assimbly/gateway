@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FlowService } from "app/entities/flow";
+import { FlowService } from 'app/entities/flow';
 import { GatewaySharedModule } from 'app/shared';
 import {
     MaintenanceService,
@@ -14,7 +14,6 @@ import {
     maintenanceRoute,
     maintenancePopupRoute
 } from './';
-
 
 const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
 
@@ -28,9 +27,7 @@ const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
         MaintenanceDeletePopupComponent
     ],
     entryComponents: [MaintenanceComponent, MaintenanceUpdateComponent, MaintenanceDeleteDialogComponent, MaintenanceDeletePopupComponent],
-    providers: [
-        MaintenanceService
-    ],
+    providers: [MaintenanceService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayMaintenanceModule {}

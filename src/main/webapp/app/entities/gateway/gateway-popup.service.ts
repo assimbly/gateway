@@ -2,18 +2,13 @@ import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GatewayService } from './gateway.service';
-import { Gateway } from "app/shared/model/gateway.model";
+import { Gateway } from 'app/shared/model/gateway.model';
 
 @Injectable({ providedIn: 'root' })
 export class GatewayPopupService {
     private ngbModalRef: NgbModalRef;
 
-    constructor(
-        private modalService: NgbModal,
-        private router: Router,
-        private gatewayService: GatewayService
-
-    ) {
+    constructor(private modalService: NgbModal, private router: Router, private gatewayService: GatewayService) {
         this.ngbModalRef = null;
     }
 
@@ -25,7 +20,7 @@ export class GatewayPopupService {
             }
 
             if (id) {
-                this.gatewayService.find(id).subscribe((gateway) => {
+                this.gatewayService.find(id).subscribe(gateway => {
                     this.ngbModalRef = this.gatewayModalRef(component, gateway.body);
                     resolve(this.ngbModalRef);
                 });
@@ -40,15 +35,18 @@ export class GatewayPopupService {
     }
 
     gatewayModalRef(component: Component, gateway: Gateway): NgbModalRef {
-        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
+        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.gateway = gateway;
-        modalRef.result.then((result) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        }, (reason) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        });
+        modalRef.result.then(
+            result => {
+                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                this.ngbModalRef = null;
+            },
+            reason => {
+                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                this.ngbModalRef = null;
+            }
+        );
         return modalRef;
     }
 }

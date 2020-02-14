@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.ServiceKeysService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +41,6 @@ public class ServiceKeysResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/service-keys")
-    @Timed
     public ResponseEntity<ServiceKeysDTO> createServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
         log.debug("REST request to save ServiceKeys : {}", serviceKeysDTO);
         if (serviceKeysDTO.getId() != null) {
@@ -64,7 +62,6 @@ public class ServiceKeysResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/service-keys")
-    @Timed
     public ResponseEntity<ServiceKeysDTO> updateServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
         log.debug("REST request to update ServiceKeys : {}", serviceKeysDTO);
         if (serviceKeysDTO.getId() == null) {
@@ -82,7 +79,6 @@ public class ServiceKeysResource {
      * @return the ResponseEntity with status 200 (OK) and the list of serviceKeys in body
      */
     @GetMapping("/service-keys")
-    @Timed
     public List<ServiceKeysDTO> getAllServiceKeys() {
         log.debug("REST request to get all ServiceKeys");
         return serviceKeysService.findAll();
@@ -95,7 +91,6 @@ public class ServiceKeysResource {
      * @return the ResponseEntity with status 200 (OK) and with body the serviceKeysDTO, or with status 404 (Not Found)
      */
     @GetMapping("/service-keys/{id}")
-    @Timed
     public ResponseEntity<ServiceKeysDTO> getServiceKeys(@PathVariable Long id) {
         log.debug("REST request to get ServiceKeys : {}", id);
         Optional<ServiceKeysDTO> serviceKeysDTO = serviceKeysService.findOne(id);
@@ -109,7 +104,6 @@ public class ServiceKeysResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/service-keys/{id}")
-    @Timed
     public ResponseEntity<Void> deleteServiceKeys(@PathVariable Long id) {
         log.debug("REST request to delete ServiceKeys : {}", id);
         serviceKeysService.delete(id);

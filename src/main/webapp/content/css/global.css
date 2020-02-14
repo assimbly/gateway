@@ -50,23 +50,23 @@ Generic styles
     border-left: 5px solid red;
 }
 
-.invalid-field-message{
+.invalid-field-message {
     display: block;
     width: 100%;
-    margin-top: .25rem;
+    margin-top: 0.25rem;
     font-size: 80%;
     color: #dc3545;
 }
 
-.ng-select-disabled>.ng-select-container{
+.ng-select-disabled > .ng-select-container {
     background-color: #e9ecef !important;
 }
 
 /* other generic styles */
 .jh-card {
     background-color: white;
-	padding: 1.5%;
-   	min-height: 700px;
+    padding: 1.5%;
+    min-height: 700px;
     height: 100%;
     margin-top: 20px;
     border: none;
@@ -246,9 +246,9 @@ custom assimbly css
 #toTab1.active,
 #toTab2.active,
 #errorTab.active {
-  background-color: crimson;
-  border-color: white;
-  color: white;
+    background-color: crimson;
+    border-color: white;
+    color: white;
 }
 
 #fromTab,
@@ -257,24 +257,24 @@ custom assimbly css
 #toTab1,
 #toTab2,
 #errorTab {
-  background-color: grey;
-  border-color: white;
-  color: white;
+    background-color: grey;
+    border-color: white;
+    color: white;
 }
 
 #tabBackground {
-  background-color: whitesmoke;
-  border-color: black;
-  margin-top: 10px;  
-  margin-bottom: 10px;
-  border-bottom: 3px solid whitesmoke;
+    background-color: whitesmoke;
+    border-color: black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 3px solid whitesmoke;
 }
 
 .detailsTable {
     width: 50%;
 }
 
-.lastItemBorder{
+.lastItemBorder {
     border-bottom: 1px solid #e9ecef;
 }
 
@@ -290,7 +290,7 @@ custom assimbly css
     border-bottom-left-radius: 0;
 }
 
-.input-group ng-select{
+.input-group ng-select {
     flex: 1 1 auto;
 }
 
@@ -300,59 +300,59 @@ custom assimbly css
     border-bottom-right-radius: 0;
 }
 
-.ng-select.ng-select-single .ng-select-container { 
+.ng-select.ng-select-single .ng-select-container {
     height: 38px;
 }
 
-.activemq-link{
-    align: right; 
+.activemq-link {
+    align: right;
 }
 
-.activemq-link img{
+.activemq-link img {
     width: 50px;
-	height: 50px;
+    height: 50px;
     vertical-align: text-bottom;
 }
 
-.camel-link{
-    margin-left: -1px; 
+.camel-link {
+    margin-left: -1px;
 }
 
-.camel-link img{
+.camel-link img {
     height: 20px;
     vertical-align: text-bottom;
 }
 
 .popover {
-  min-width: 200px;
-  max-width: 500px;
-  padding: 1px;
-  text-align: left;
-  white-space: normal;
-  background-color: #ffffff;
+    min-width: 200px;
+    max-width: 500px;
+    padding: 1px;
+    text-align: left;
+    white-space: normal;
+    background-color: #ffffff;
 }
 
-@media (min-width: 768px){
-    .flow-btns .btn{
-        width: 80px
+@media (min-width: 768px) {
+    .flow-btns .btn {
+        width: 80px;
     }
 }
 
-.bg-gray{
-    background-color: #dee2e6
+.bg-gray {
+    background-color: #dee2e6;
 }
 
-.h-20{
+.h-20 {
     height: 20px;
 }
-.padding-button{
+.padding-button {
     padding-left: 11px;
     padding-right: 10px;
 }
-.p-button-camel{
+.p-button-camel {
     padding: 5px 7px !important;
 }
-.p-question-button{
+.p-question-button {
     padding-left: 25px;
     padding-right: 28px;
 }
@@ -361,20 +361,19 @@ custom assimbly css
     display: inline-block;
     width: 347px;
     height: 497px;
-    background: url("../../content/images/assimbly.png") no-repeat center top;
+    background: url('../../content/images/assimbly.png') no-repeat center top;
     background-size: contain;
 }
 
 /* wait autoprefixer update to allow simple generation of high pixel density media query */
-@media
-only screen and (-webkit-min-device-pixel-ratio: 2),
-only screen and (   min--moz-device-pixel-ratio: 2),
-only screen and (     -o-min-device-pixel-ratio: 2/1),
-only screen and (        min-device-pixel-ratio: 2),
-only screen and (                min-resolution: 192dpi),
-only screen and (                min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+    only screen and (min--moz-device-pixel-ratio: 2),
+    only screen and (-o-min-device-pixel-ratio: 2/1),
+    only screen and (min-device-pixel-ratio: 2),
+    only screen and (min-resolution: 192dpi),
+    only screen and (min-resolution: 2dppx) {
     .assimbly {
-        background: url("../../content/images/assimbly.png") no-repeat center top;
+        background: url('../../content/images/assimbly.png') no-repeat center top;
         background-size: contain;
     }
 }
@@ -383,127 +382,127 @@ only screen and (                min-resolution: 2dppx) {
 .popover {
     max-width: 30%;
 }
-.border-bottom-none{
-    border-bottom:none !important;
+.border-bottom-none {
+    border-bottom: none !important;
 }
 
 .nounderline {
-  text-decoration: none !important
+    text-decoration: none !important;
 }
 
 .btn-transparent {
-	background-color: transparent !important;
+    background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none;
-    background-repeat:no-repeat;
+    background-repeat: no-repeat;
     border: none;
-    cursor:default;
+    cursor: default;
     overflow: hidden;
-    outline:none;
+    outline: none;
 }
 
 .btn-arrow-right,
 .btn-arrow-left {
-   position: relative;
-   padding-left: 18px;
-   padding-right: 18px;
+    position: relative;
+    padding-left: 18px;
+    padding-right: 18px;
 }
 
 .btn-arrow-right {
-   padding-left: 36px;
+    padding-left: 36px;
 }
 
 .btn-arrow-left {
-   padding-right: 36px;
+    padding-right: 36px;
 }
 
 .btn-arrow-right:before,
 .btn-arrow-right:after,
 .btn-arrow-left:before,
 .btn-arrow-left:after {
-   /* make two squares (before and after), looking similar to the button */
-   
-   content: "";
-   position: absolute;
-   top: 3.5px;
-   /* move it down because of rounded corners */
-   
-   width: 22px;
-   /* same as height */
-   
-   height: 22px;
-   /* button_outer_height / sqrt(2) */
-   
-   background: inherit;
-   /* use parent background */
-   
-   border: inherit;
-   /* use parent border */
-   
-   border-left-color: transparent;
-   /* hide left border */
-   
-   border-bottom-color: transparent;
-   /* hide bottom border */
-   
-   border-radius: 0px 4px 0px 0px;
-   /* round arrow corner, the shorthand property doesn't accept "inherit" so it is set to 4px */
-   
-   -webkit-border-radius: 0px 4px 0px 0px;
-   -moz-border-radius: 0px 4px 0px 0px;
+    /* make two squares (before and after), looking similar to the button */
+
+    content: '';
+    position: absolute;
+    top: 3.5px;
+    /* move it down because of rounded corners */
+
+    width: 22px;
+    /* same as height */
+
+    height: 22px;
+    /* button_outer_height / sqrt(2) */
+
+    background: inherit;
+    /* use parent background */
+
+    border: inherit;
+    /* use parent border */
+
+    border-left-color: transparent;
+    /* hide left border */
+
+    border-bottom-color: transparent;
+    /* hide bottom border */
+
+    border-radius: 0px 4px 0px 0px;
+    /* round arrow corner, the shorthand property doesn't accept "inherit" so it is set to 4px */
+
+    -webkit-border-radius: 0px 4px 0px 0px;
+    -moz-border-radius: 0px 4px 0px 0px;
 }
 
 .btn-arrow-right:before,
 .btn-arrow-right:after {
-   transform: rotate(45deg);
-   /* rotate right arrow squares 45 deg to point right */
-   
-   -webkit-transform: rotate(45deg);
-   -moz-transform: rotate(45deg);
-   -o-transform: rotate(45deg);
-   -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    /* rotate right arrow squares 45 deg to point right */
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
 }
 
 .btn-arrow-left:before,
 .btn-arrow-left:after {
-   transform: rotate(225deg);
-   /* rotate left arrow squares 225 deg to point left */
-   
-   -webkit-transform: rotate(225deg);
-   -moz-transform: rotate(225deg);
-   -o-transform: rotate(225deg);
-   -ms-transform: rotate(225deg);
+    transform: rotate(225deg);
+    /* rotate left arrow squares 225 deg to point left */
+
+    -webkit-transform: rotate(225deg);
+    -moz-transform: rotate(225deg);
+    -o-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
 }
 
 .btn-arrow-right:before,
 .btn-arrow-left:before {
-   /* align the "before" square to the left */
-   
-   left: -10px;
+    /* align the "before" square to the left */
+
+    left: -10px;
 }
 
 .btn-arrow-right:after,
 .btn-arrow-left:after {
-   /* align the "after" square to the right */
-   
-   right: -10px;
+    /* align the "after" square to the right */
+
+    right: -10px;
 }
 
 .btn-arrow-right:after,
 .btn-arrow-left:before {
-   /* bring arrow pointers to front */
-   
-   z-index: 1;
+    /* bring arrow pointers to front */
+
+    z-index: 1;
 }
 
 .btn-arrow-right:before,
 .btn-arrow-left:after {
-   /* hide arrow tails background */
-   
-   background-color: transparent;
+    /* hide arrow tails background */
+
+    background-color: transparent;
 }
 
 .increase-popover-width {
     width: 1200px;
-	max-width: 1200px;
+    max-width: 1200px;
 }

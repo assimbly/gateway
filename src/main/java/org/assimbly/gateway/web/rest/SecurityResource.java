@@ -1,7 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-
 import org.assimbly.connector.Connector;
 import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.service.SecurityService;
@@ -67,7 +65,6 @@ public class SecurityResource {
      * @throws Exception 
      */
     @PostMapping("/securities")
-    @Timed
     public ResponseEntity<SecurityDTO[]> createSecurity(@RequestBody SecurityDTO securityDTO) throws Exception {
         log.debug("REST request to save Security : {}", securityDTO);
         
@@ -124,7 +121,6 @@ public class SecurityResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/securities")
-    @Timed
     public ResponseEntity<SecurityDTO> updateSecurity(@RequestBody SecurityDTO securityDTO) throws URISyntaxException {
         log.debug("REST request to update Security : {}", securityDTO);
         if (securityDTO.getId() == null) {
@@ -143,7 +139,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK) and the list of securities in body
      */
     @GetMapping("/securities")
-    @Timed
     public ResponseEntity<List<SecurityDTO>> getAllSecurities(Pageable pageable) {
         log.debug("REST request to get a page of Securities");
         Page<SecurityDTO> page = securityService.findAll(pageable);
@@ -158,7 +153,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK) and with body the securityDTO, or with status 404 (Not Found)
      */
     @GetMapping("/securities/{id}")
-    @Timed
     public ResponseEntity<SecurityDTO> getSecurity(@PathVariable Long id){
         log.debug("REST request to get Security : {}", id);        
         Optional<SecurityDTO> securityDTO = securityService.findOne(id);
@@ -166,7 +160,6 @@ public class SecurityResource {
     }
     
     @GetMapping("/securities/details/{certificateName}")
-    @Timed
     public ResponseEntity<String> getSecurityDetails(@PathVariable String certificateName) throws Exception{
 
         log.debug("REST request to get certificate details for certificate: " + certificateName);        
@@ -192,7 +185,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/securities/{id}")
-    @Timed
     public ResponseEntity<Void> deleteSecurity(@PathVariable Long id) throws Exception {
         log.debug("REST request to delete Security : {}", id);
         Connector connector = connectorResource.getConnector();
@@ -221,7 +213,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @PostMapping("/securities/remove")
-    @Timed
     public ResponseEntity<Void> removeSecurityInTruststore(@RequestBody String url) throws Exception {
         log.debug("REST request to remove certificates in truststore for url ", url);
         Connector connector = connectorResource.getConnector();
@@ -244,7 +235,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @PostMapping("/securities/syncTrustore")
-    @Timed
     public ResponseEntity<String> syncSecurityInTruststore() throws Exception {
         log.debug("REST request to sync all certificates with truststore");
         Connector connector = connectorResource.getConnector();
@@ -271,7 +261,6 @@ public class SecurityResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @PostMapping("/securities/updateTrustore")
-    @Timed
     public ResponseEntity<String> upateSecurityInTruststore(@RequestBody String url) throws Exception {
         log.debug("REST request to updates certificates in truststore for url ", url);
         Connector connector = connectorResource.getConnector();
@@ -302,7 +291,6 @@ public class SecurityResource {
     }
     
     @GetMapping("/securities/isexpired/{withinNumberOfDays}")
-    @Timed
     public ResponseEntity<Boolean> isExpired(@PathVariable int withinNumberOfDays) throws Exception{
 
         log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
@@ -324,7 +312,6 @@ public class SecurityResource {
     }   
 
     @PostMapping(path = "/securities/uploadcertificate", consumes = {"text/plain"}, produces = {"text/plain","application/xml", "application/json"})
-    @Timed
     public ResponseEntity<String> uploadCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestBody String certificate) throws Exception {
         
        	try {

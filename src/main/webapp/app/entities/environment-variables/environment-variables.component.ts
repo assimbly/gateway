@@ -12,7 +12,6 @@ import { EnvironmentVariablesService } from './environment-variables.service';
     templateUrl: './environment-variables.component.html'
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
-    
     environmentVariables: IEnvironmentVariables[];
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -34,15 +33,17 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     loadAll() {
-        this.environmentVariablesService.query({
-            page: this.page,
-            sort: this.sort()
-        }).subscribe(
-            (res: HttpResponse<IEnvironmentVariables[]>) => {
-                this.environmentVariables = res.body;
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
+        this.environmentVariablesService
+            .query({
+                page: this.page,
+                sort: this.sort()
+            })
+            .subscribe(
+                (res: HttpResponse<IEnvironmentVariables[]>) => {
+                    this.environmentVariables = res.body;
+                },
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
     }
 
     ngOnInit() {
@@ -68,7 +69,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
-    
+
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'key') {
@@ -76,11 +77,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         }
         return result;
     }
-    
+
     reset() {
         this.page = 0;
         this.environmentVariables = [];
         this.loadAll();
     }
-
 }

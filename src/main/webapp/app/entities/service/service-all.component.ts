@@ -4,13 +4,12 @@ import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 import { Subscription } from 'rxjs';
-import { AccountService } from "app/core";
+import { AccountService } from 'app/core';
 
 @Component({
     selector: 'jhi-service-all',
     templateUrl: './service-all.component.html'
 })
-
 export class ServiceAllComponent implements OnInit, OnDestroy {
     public services: Array<Service> = [];
     public page: any;
@@ -41,7 +40,7 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     }
 
     private registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', (response) => this.loadAllServices());
+        this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.loadAllServices());
     }
 
     private loadAllServices() {
@@ -49,21 +48,23 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();
-        this.serviceService.query({
-            page: this.page,
-            sort: this.sort()
-        }).subscribe(
-            (res) => {
-                this.services = res.body;
-            },
-            (res) => this.onError(res)
-        );
+        this.serviceService
+            .query({
+                page: this.page,
+                sort: this.sort()
+            })
+            .subscribe(
+                res => {
+                    this.services = res.body;
+                },
+                res => this.onError(res)
+            );
     }
 
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
     }
-    
+
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'name') {
@@ -71,12 +72,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
         }
         return result;
     }
-    
+
     reset() {
         this.page = 0;
         this.services = [];
         this.loadAllServices();
     }
-
-    
 }

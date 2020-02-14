@@ -37,21 +37,21 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ environmentVariables }) => {
             this.environmentVariables = environmentVariables;
         });
-        
+
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.environmentVariables.id = null;
             this.environmentVariablesForm.patchValue({
-                'id': null
+                id: null
             });
         }
-        
+
         this.gatewayService.query().subscribe(
             (res: HttpResponse<IGateway[]>) => {
                 this.gateways = res.body;
                 this.environmentVariables.gatewayId = this.gateways[0].id;
                 if (!this.environmentVariablesForm.controls.gatewayId.value) {
                     this.environmentVariablesForm.patchValue({
-                        'gatewayId': this.environmentVariables.gatewayId
+                        gatewayId: this.environmentVariables.gatewayId
                     });
                 }
             },
@@ -66,24 +66,24 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     initializeForm() {
         this.environmentVariablesForm = new FormGroup({
-            'id': new FormControl(this.environmentVariables.id),
-            'key': new FormControl(this.environmentVariables.key, Validators.required),
-            'value': new FormControl(this.environmentVariables.value, Validators.required),
-            'gatewayId': new FormControl(this.environmentVariables.gatewayId)
+            id: new FormControl(this.environmentVariables.id),
+            key: new FormControl(this.environmentVariables.key, Validators.required),
+            value: new FormControl(this.environmentVariables.value, Validators.required),
+            gatewayId: new FormControl(this.environmentVariables.gatewayId)
         });
-    }    
+    }
 
     clear() {
         window.history.back();
     }
-    
+
     save() {
         if (this.environmentVariables.id === undefined && this.environmentVariables.id === null) {
             this.environmentVariablesForm.controls.key.updateValueAndValidity();
             this.environmentVariablesForm.controls.key.markAsTouched();
         }
         this.environmentVariablesForm.updateValueAndValidity();
-        if (this.environmentVariablesForm.invalid) { 
+        if (this.environmentVariablesForm.invalid) {
             this.isSaving = false;
             return;
         }
@@ -95,11 +95,14 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             this.subscribeToSaveResponse(this.environmentVariablesService.create(this.environmentVariables));
         }
     }
-    
+
     private getAllEnvironmentVariablesKeys() {
-        this.environmentVariablesService.query().subscribe((res) => {
+        this.environmentVariablesService.query().subscribe(res => {
             this.allEnvironmentVariablesKeys = res.body.map(res => res.key);
-            this.environmentVariablesForm.controls.key.setValidators([Validators.required, forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)]);
+            this.environmentVariablesForm.controls.key.setValidators([
+                Validators.required,
+                forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)
+            ]);
         });
     }
 

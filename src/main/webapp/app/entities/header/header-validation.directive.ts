@@ -10,6 +10,6 @@ export class ForbiddenHeaderNamesValidatorDirective implements Validator {
     @Input('jhiExistingHeaderNames') existingNames: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.existingNames.some((k) => k === control.value) ? { 'existingHeaderName': true } : null;
+        return this.existingNames.some(k => k === control.value) ? { existingHeaderName: true } : null;
     }
 }

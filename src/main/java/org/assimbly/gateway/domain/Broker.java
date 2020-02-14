@@ -25,10 +25,10 @@ public class Broker implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private String type;
 
-    @Column(name = "configuration_type")
+    @Column(name = "configuration")
     private String configurationType;
 
     @Column(name = "auto_start")

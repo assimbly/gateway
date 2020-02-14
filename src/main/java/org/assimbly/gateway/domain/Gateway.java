@@ -35,7 +35,7 @@ public class Gateway implements Serializable {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private GatewayType type;
 
     @Column(name = "environment_name")

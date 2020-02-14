@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
 import org.assimbly.gateway.service.ErrorEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +41,6 @@ public class ErrorEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/error-endpoints")
-    @Timed
     public ResponseEntity<ErrorEndpointDTO> createErrorEndpoint(@RequestBody ErrorEndpointDTO errorEndpointDTO) throws URISyntaxException {
         log.debug("REST request to save ErrorEndpoint : {}", errorEndpointDTO);
         if (errorEndpointDTO.getId() != null) {
@@ -64,7 +62,6 @@ public class ErrorEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/error-endpoints")
-    @Timed
     public ResponseEntity<ErrorEndpointDTO> updateErrorEndpoint(@RequestBody ErrorEndpointDTO errorEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update ErrorEndpoint : {}", errorEndpointDTO);
         if (errorEndpointDTO.getId() == null) {
@@ -82,7 +79,6 @@ public class ErrorEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and the list of errorEndpoints in body
      */
     @GetMapping("/error-endpoints")
-    @Timed
     public List<ErrorEndpointDTO> getAllErrorEndpoints() {
         log.debug("REST request to get all ErrorEndpoints");
         return errorEndpointService.findAll();
@@ -95,7 +91,6 @@ public class ErrorEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and with body the errorEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/error-endpoints/{id}")
-    @Timed
     public ResponseEntity<ErrorEndpointDTO> getErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to get ErrorEndpoint : {}", id);
         Optional<ErrorEndpointDTO> errorEndpointDTO = errorEndpointService.findOne(id);
@@ -109,7 +104,6 @@ public class ErrorEndpointResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/error-endpoints/{id}")
-    @Timed
     public ResponseEntity<Void> deleteErrorEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ErrorEndpoint : {}", id);
         errorEndpointService.delete(id);

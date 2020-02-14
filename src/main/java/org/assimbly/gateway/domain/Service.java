@@ -28,7 +28,7 @@ public class Service implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private String type;
     
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "service", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
