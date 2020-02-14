@@ -183,14 +183,15 @@ dependencies {
     compile group: "io.github.jhipster", name: "jhipster-framework"
     compile "org.springframework.boot:spring-boot-starter-cache"
     compile "io.dropwizard.metrics:metrics-core"
-    compile "io.dropwizard.metrics:metrics-jcache"
+    implementation "io.micrometer:micrometer-registry-prometheus"
+    // compile "io.dropwizard.metrics:metrics-jcache"
     compile "io.dropwizard.metrics:metrics-json"
     compile "io.dropwizard.metrics:metrics-jvm"
     compile "io.dropwizard.metrics:metrics-servlet"
     compile "io.dropwizard.metrics:metrics-servlets"
     compile "io.prometheus:simpleclient"
-    compile "io.prometheus:simpleclient_dropwizard"
-    compile "io.prometheus:simpleclient_servlet"
+    // compile "io.prometheus:simpleclient_dropwizard"
+    // compile "io.prometheus:simpleclient_servlet"
     compile "net.logstash.logback:logstash-logback-encoder"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
@@ -198,7 +199,8 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations"
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
-    compile "com.ryantenney.metrics:metrics-spring"
+    compile group: 'io.dropwizard.metrics', name: 'metrics-annotation', version: '4.1.2'
+    // compile "com.ryantenney.metrics:metrics-spring"
     compile "javax.cache:cache-api"
     compile "org.hibernate:hibernate-core"
     compile "com.zaxxer:HikariCP"
@@ -211,7 +213,7 @@ dependencies {
     compile "org.hibernate:hibernate-envers"
     compile "org.hibernate.validator:hibernate-validator"
     compile "org.liquibase:liquibase-core"
-    compile "com.mattbertolini:liquibase-slf4j"
+    // compile "com.mattbertolini:liquibase-slf4j"
     liquibaseRuntime "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
     liquibaseRuntime sourceSets.main.compileClasspath
@@ -226,6 +228,7 @@ dependencies {
         exclude module: 'spring-boot-starter-tomcat'
     }
     compile "org.springframework.boot:spring-boot-starter-undertow"
+    compile "org.springframework.boot:spring-boot-starter-websocket"
     compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     compile "org.zalando:problem-spring-web:0.24.0-RC.0"
     compile "org.springframework.boot:spring-boot-starter-cloud-connectors"
@@ -235,6 +238,7 @@ dependencies {
     compile "org.springframework.security:spring-security-config"
     compile "org.springframework.security:spring-security-data"
     compile "org.springframework.security:spring-security-web"
+    compile "org.springframework.security:spring-security-messaging"
     compile "io.jsonwebtoken:jjwt:0.9.1"
     compile ("io.springfox:springfox-swagger2") {
         exclude module: 'mapstruct'
@@ -249,8 +253,8 @@ dependencies {
     compile "io.github.assimbly:docconverter:1.1.0"	
 	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.8"
 	compile "org.jdom:jdom2:2.0.6"
-	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
-	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
+	//compile "org.springframework:spring-websocket:5.0.7.RELEASE"
+	//compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
 	//compile "io.hawt:hawtio-springboot:2.7.0"
 	compile group: 'commons-codec', name: 'commons-codec', version: '1.13'
 	
@@ -269,7 +273,7 @@ dependencies {
 	// end custom dependencies
     
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen"
+    annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
@@ -294,7 +298,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = '4.10.2'
+    gradleVersion = "6.1"
 }
 
 task stage(dependsOn: 'bootWar') {

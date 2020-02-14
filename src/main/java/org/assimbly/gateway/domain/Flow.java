@@ -41,13 +41,13 @@ public class Flow implements Serializable {
     @Column(name = "redelivery_delay")
     private Integer redeliveryDelay;
 
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private String type;
 
     @Column(name = "load_balancing")
     private Boolean loadBalancing;
 
-    @Column(name = "jhi_instances")
+    @Column(name = "instances")
     private Integer instances;
 
     @ManyToOne

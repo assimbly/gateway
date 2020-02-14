@@ -14,15 +14,13 @@ import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway
 import { FromEndpointService } from '../from-endpoint';
 import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { GatewayService } from '../gateway';
-import { SecurityService } from "../security";
+import { SecurityService } from '../security';
 
 @Component({
     selector: 'jhi-flow',
     templateUrl: './flow.component.html'
 })
-
 export class FlowComponent implements OnInit, OnDestroy {
-
     public isAdmin: boolean;
     gateways: IGateway[];
     gateway: IGateway;
@@ -45,25 +43,25 @@ export class FlowComponent implements OnInit, OnDestroy {
     singleGatewayName: string;
     singleGatewayId: number;
     singleGatewayStage: string;
-    
-    configuredGateway : IGateway;
+
+    configuredGateway: IGateway;
     indexGateway: number;
-    
+
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     selectedAction: string;
     test: any;
     searchText: string = '';
-    
+
     constructor(
         protected flowService: FlowService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected parseLinks: JhiParseLinks,
         protected accountService: AccountService,
-		protected gatewayService: GatewayService,
+        protected gatewayService: GatewayService,
         protected fromEndpointService: FromEndpointService,
         protected securityService: SecurityService,
-        protected router: Router,
+        protected router: Router
     ) {
         this.flows = [];
         this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -79,7 +77,22 @@ export class FlowComponent implements OnInit, OnDestroy {
         if (this.gateways.length > 1) {
             this.getFlowsForSelectedGateway(this.gateways[this.indexGateway].id);
         } else {
-            this.flowService.query({
+            this.flowService
+                .query({
+                    page: this.page,
+                    size: this.itemsPerPage,
+                    sort: this.sort()
+                })
+                .subscribe(
+                    (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+                    (res: HttpErrorResponse) => this.onError(res.message)
+                );
+        }
+    }
+
+    getFlowsForSelectedGateway(id) {
+        this.flowService
+            .getFlowByGatewayId(Number(id), {
                 page: this.page,
                 size: this.itemsPerPage,
                 sort: this.sort()
@@ -88,21 +101,8 @@ export class FlowComponent implements OnInit, OnDestroy {
                 (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
-        }
-    }    
-
-    getFlowsForSelectedGateway(id) {
-        this.flowService.getFlowByGatewayId(Number(id),{
-            page: this.page,
-            size: this.itemsPerPage,
-            sort: this.sort()
-        })
-            .subscribe(
-                    (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
-                    (res: HttpErrorResponse) => this.onError(res.message)
-            );
     }
-    
+
     reset() {
         this.page = 0;
         this.flows = [];
@@ -110,8 +110,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadPage(page) {
-        this.page = 0 //page;
-        this.itemsPerPage = this.itemsPerPage + 5; 
+        this.page = 0; //page;
+        this.itemsPerPage = this.itemsPerPage + 5;
         this.loadFlows();
     }
 
@@ -123,90 +123,79 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.flowService.connect();
         });
         this.finished = true;
-        this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
+        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
         this.registerDeletedFlows();
     }
-    
+
     ngAfterViewInit() {
         this.finished = true;
-        this.securityService.syncTrustore().subscribe(res => {
-            
-        });
-      }
+        this.securityService.syncTrustore().subscribe(res => {});
+    }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
     getGateways(): void {
-        forkJoin(
-                this.flowService.getGatewayName(),
-                this.gatewayService.query()
-            )
-                .subscribe(([gatewayName, gateways]) => {
+        forkJoin(this.flowService.getGatewayName(), this.gatewayService.query()).subscribe(([gatewayName, gateways]) => {
+            this.gateways = gateways.body;
+            this.checkGatewayType(this.gateways, gatewayName.body);
 
-                    this.gateways = gateways.body;
-                    this.checkGatewayType(this.gateways, gatewayName.body);
+            if (!this.gatewayExists) {
+                this.gateway = new Object();
+                this.gateway.name = gatewayName.body;
+                this.gateway.type = GatewayType.ADAPTER;
+                this.gateway.environmentName = 'Dev1';
+                this.gateway.stage = EnvironmentType.DEVELOPMENT;
+                this.gateway.defaultFromEndpointType = EndpointType.FILE;
+                this.gateway.defaultToEndpointType = EndpointType.FILE;
+                this.gateway.defaultErrorEndpointType = EndpointType.FILE;
 
-                if (!this.gatewayExists) {
-
-                    this.gateway = new Object();
-                    this.gateway.name = gatewayName.body;
-                    this.gateway.type = GatewayType.ADAPTER;
-                    this.gateway.environmentName = 'Dev1';
-                    this.gateway.stage = EnvironmentType.DEVELOPMENT;
-                    this.gateway.defaultFromEndpointType = EndpointType.FILE;
-                    this.gateway.defaultToEndpointType = EndpointType.FILE;
-                    this.gateway.defaultErrorEndpointType = EndpointType.FILE;
-
-                    this.gatewayService.create(this.gateway)
-                        .subscribe(gateway => {
-                            this.gateway = gateway.body;
-                            this.gateways.push(this.gateway);
-                            this.gatewayExists = true;
-                            this.singleGatewayName = gateway.body.name;
-                            this.singleGatewayId = gateway.body.id;
-                            this.singleGatewayStage = gateway.body.stage ? gateway.body.stage.toString().toLowerCase() : '';
-                        });
-                } else {
-                    this.loadFlows();
-                    if (!this.multipleGateways) {
-                        this.singleGatewayName = this.gateways[this.indexGateway].name;
-                        this.singleGatewayId = this.gateways[this.indexGateway].id;
-                        this.singleGatewayStage = this.gateways[this.indexGateway].stage ? this.gateways[this.indexGateway].stage.toString().toLowerCase() : '';
-                    }
+                this.gatewayService.create(this.gateway).subscribe(gateway => {
+                    this.gateway = gateway.body;
+                    this.gateways.push(this.gateway);
+                    this.gatewayExists = true;
+                    this.singleGatewayName = gateway.body.name;
+                    this.singleGatewayId = gateway.body.id;
+                    this.singleGatewayStage = gateway.body.stage ? gateway.body.stage.toString().toLowerCase() : '';
+                });
+            } else {
+                this.loadFlows();
+                if (!this.multipleGateways) {
+                    this.singleGatewayName = this.gateways[this.indexGateway].name;
+                    this.singleGatewayId = this.gateways[this.indexGateway].id;
+                    this.singleGatewayStage = this.gateways[this.indexGateway].stage
+                        ? this.gateways[this.indexGateway].stage.toString().toLowerCase()
+                        : '';
                 }
-            });
+            }
+        });
     }
 
-    checkGatewayType(gateways: IGateway[],gatewayName: String): void {
-        
-        if(gatewayName==='default'){
+    checkGatewayType(gateways: IGateway[], gatewayName: String): void {
+        if (gatewayName === 'default') {
             this.gatewayExists = gateways.length > 0;
             this.indexGateway = 0;
             this.multipleGateways = gateways.length > 1;
-        }else{
+        } else {
             this.multipleGateways = false;
             this.configuredGateway = gateways.find(gateway => gateway.name === gatewayName);
             this.indexGateway = gateways.findIndex(gateway => gateway.name == gatewayName);
-            if(this.indexGateway>0){
+            if (this.indexGateway > 0) {
                 this.gatewayExists = true;
-            }else{
+            } else {
                 this.gatewayExists = false;
                 this.indexGateway = 0;
-            }    
+            }
         }
-        
     }
 
     getFromEndpoints(): void {
-
-        this.fromEndpointService.query()
-            .subscribe(data => {
-                this.fromEndpoints = data.body;
-            });
+        this.fromEndpointService.query().subscribe(data => {
+            this.fromEndpoints = data.body;
+        });
     }
 
     trackId(index: number, item: IFlow) {
@@ -233,11 +222,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     registerDeletedFlows() {
-
-    this.eventManager.subscribe('flowDeleted', (res) => {
-                this.loadFlows();
-            }
-        );        
+        this.eventManager.subscribe('flowDeleted', res => {
+            this.loadFlows();
+        });
     }
 
     trigerAction(selectedAction: string) {
@@ -245,12 +232,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     navigateToFlow() {
-        this.router.navigate(['../../flow/edit-all'])
+        this.router.navigate(['../../flow/edit-all']);
     }
-    
-    
-    private onSuccess(data, headers) {
 
+    private onSuccess(data, headers) {
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }

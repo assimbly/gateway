@@ -38,7 +38,8 @@ export const flowRoute: Routes = [
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'flow/edit-all',
         component: FlowEditAllComponent,
         data: {
@@ -46,7 +47,8 @@ export const flowRoute: Routes = [
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'flow/edit-all/:id',
         component: FlowEditAllComponent,
         data: {
@@ -54,7 +56,8 @@ export const flowRoute: Routes = [
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'flow/edit-all/:id/:clone',
         component: FlowEditAllComponent,
         data: {
@@ -62,7 +65,8 @@ export const flowRoute: Routes = [
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
-    }, {
+    },
+    {
         path: 'flow/configuration',
         component: FlowConfigurationComponent,
         data: {

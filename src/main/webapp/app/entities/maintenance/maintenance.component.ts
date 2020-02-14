@@ -8,7 +8,7 @@ import { WindowRef } from '../../shared/auth/window.service';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { AccountService } from 'app/core';
 import { MaintenanceService } from './maintenance.service';
-import { FlowService } from "app/entities/flow";
+import { FlowService } from 'app/entities/flow';
 
 @Component({
     selector: 'jhi-maintenance',
@@ -29,15 +29,15 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     maintenanceTimers: Array<string> = [];
     timeLeft: Array<number> = [];
     disableFlows: Array<boolean> = [];
-    
+
     //sorting
     page: any;
     predicate: any;
     reverse: any;
-    
+
     constructor(
         protected maintenanceService: MaintenanceService,
-		protected flowService: FlowService,
+        protected flowService: FlowService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
@@ -48,17 +48,19 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     }
 
     loadAll() {
-        this.flowService.query({
-            page: this.page,
-            sort: this.sort()
-        }).subscribe(
+        this.flowService
+            .query({
+                page: this.page,
+                sort: this.sort()
+            })
+            .subscribe(
                 (res: HttpResponse<IFlow[]>) => {
-                    this.flows = res.body
+                    this.flows = res.body;
                 },
-                (err) => {
-                    (res: HttpErrorResponse) => this.onError(res.message)
+                err => {
+                    (res: HttpErrorResponse) => this.onError(res.message);
                 }
-        );
+            );
         this.maintenanceService.query().subscribe(
             (res: HttpResponse<IMaintenance[]>) => {
                 this.maintenances = res.body;
@@ -90,12 +92,16 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
-    
+
     setMaintenance() {
-        if (this.hours === undefined) { this.hours = 0; }
-        if (this.minutes === undefined) { this.minutes = 0; }
+        if (this.hours === undefined) {
+            this.hours = 0;
+        }
+        if (this.minutes === undefined) {
+            this.minutes = 0;
+        }
         let time = this.hours * 3600 * 1000 + this.minutes * 60000;
-        const ids = this.selectedFlows.filter((sf) => sf !== null).map((f) => f.id);
+        const ids = this.selectedFlows.filter(sf => sf !== null).map(f => f.id);
         if (ids.length > 0) {
             this.flowService.setMaintenance(time, ids).subscribe(() => {
                 this.messageFlow = `Set flows into maintenance mode for:`;
@@ -107,7 +113,9 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
 
     displayMaintenanceTimer(flows: Array<Flow>, time: number) {
         flows.forEach((flow, i) => {
-            if (flow === null) { return; }
+            if (flow === null) {
+                return;
+            }
             this.timeLeft[i] = time;
             this.intervals[i] = setInterval(() => {
                 this.disableFlows[i] = true;
@@ -117,7 +125,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
                 } else {
                     this.maintenanceTimers[i] = moment.utc(this.timeLeft[i]).format('HH[h] mm[min] ss[sec]');
                 }
-            }, 1000)
+            }, 1000);
         });
     }
     clearInterval(id: number) {
@@ -139,7 +147,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     }
 
     select(e, i: number, flow: Flow) {
-        e.currentTarget.checked ? this.selectedFlows[i] = flow : this.selectedFlows[i] = null;
+        e.currentTarget.checked ? (this.selectedFlows[i] = flow) : (this.selectedFlows[i] = null);
         this.allSelected = JSON.stringify(this.selectedFlows) === JSON.stringify(this.flows);
     }
 
@@ -150,7 +158,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
         }
         return result;
     }
-    
+
     reset() {
         this.page = 0;
         this.flows = [];

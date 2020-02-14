@@ -26,10 +26,10 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
     entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     providers: [
-      {
-        provide: ACE_CONFIG,
-        useValue: DEFAULT_ACE_CONFIG
-      }
+        {
+            provide: ACE_CONFIG,
+            useValue: DEFAULT_ACE_CONFIG
+        }
     ]
 })
 export class GatewayBrokerModule {}

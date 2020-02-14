@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -52,7 +51,6 @@ public class HeaderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/headers")
-    
     public ResponseEntity<HeaderDTO> createHeader(@RequestBody HeaderDTO headerDTO) throws URISyntaxException {
         log.debug("REST request to save Header : {}", headerDTO);
         if (headerDTO.getId() != null) {
@@ -74,7 +72,6 @@ public class HeaderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/headers")
-    
     public ResponseEntity<HeaderDTO> updateHeader(@RequestBody HeaderDTO headerDTO) throws URISyntaxException {
         log.debug("REST request to update Header : {}", headerDTO);
         if (headerDTO.getId() == null) {
@@ -92,7 +89,6 @@ public class HeaderResource {
      * @return the ResponseEntity with status 200 (OK) and the list of headers in body
      */
     @GetMapping("/headers")
-    
     public ResponseEntity<List<HeaderDTO>> getAllHeaders(Pageable pageable) {
         log.debug("REST request to get all Headers");
         Page<HeaderDTO> page = headerService.findAll(pageable);
@@ -108,7 +104,6 @@ public class HeaderResource {
         
     
     @GetMapping("/headers/getallheaders")
-    
     @Transactional(readOnly = true)
     public ResponseEntity<List<HeaderDTO>> getAllHeaders() {
         log.debug("REST request to get all Headers 2");
@@ -123,7 +118,6 @@ public class HeaderResource {
      * @return the ResponseEntity with status 200 (OK) and with body the headerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/headers/{id}")
-    
     public ResponseEntity<HeaderDTO> getHeader(@PathVariable Long id) {
         log.debug("REST request to get Header : {}", id);
         Optional<HeaderDTO> headerDTO = headerService.findOne(id);
@@ -137,7 +131,6 @@ public class HeaderResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/headers/{id}")
-    
     public ResponseEntity<Void> deleteHeader(@PathVariable Long id) {
         log.debug("REST request to delete Header : {}", id);
         headerService.delete(id);

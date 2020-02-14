@@ -16,13 +16,8 @@ import {
 const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
-    exports: [
-        ServiceKeysComponent
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
+    exports: [ServiceKeysComponent],
     declarations: [
         ServiceKeysComponent,
         ServiceKeysDetailComponent,
@@ -32,9 +27,7 @@ const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
         ForbiddenServiceKeysValidatorDirective
     ],
     entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
-    providers: [
-        ServiceKeysDeletePopupComponent
-    ],
+    providers: [ServiceKeysDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayServiceKeysModule {}

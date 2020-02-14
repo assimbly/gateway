@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared';
 import { IBroker } from 'app/shared/model/broker.model';
-import { HttpHeaders } from "@angular/common/http";
+import { HttpHeaders } from '@angular/common/http';
 
 type EntityResponseType = HttpResponse<IBroker>;
 type EntityArrayResponseType = HttpResponse<IBroker[]>;
@@ -16,7 +16,7 @@ export class BrokerService {
     public connectorUrl = SERVER_API_URL + 'api/connector';
 
     private gatewayid = 1;
-    
+
     constructor(protected http: HttpClient) {}
 
     create(broker: IBroker): Observable<EntityResponseType> {
@@ -41,15 +41,15 @@ export class BrokerService {
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/start`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.resourceUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
     }
 
     restart(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/restart`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.resourceUrl}/${id}/restart`, { observe: 'response', responseType: 'text' });
     }
 
     stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/stop`, {observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.resourceUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
     }
 
     getBrokerStatus(id: number): Observable<any> {
@@ -59,16 +59,18 @@ export class BrokerService {
     getBrokerInfo(id: number): Observable<any> {
         return this.http.get(`${this.resourceUrl}/${id}/info`, { observe: 'response', responseType: 'text' });
     }
-    
+
     getBrokerConfiguration(id: number): Observable<any> {
         return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, { observe: 'response', responseType: 'text' });
     }
 
     setBrokerConfiguration(id: number, brokerConfiguration: String): Observable<HttpResponse<any>> {
         const options = {
-                headers: new HttpHeaders({observe: 'response', responseType: 'text','Accept': 'text/plain'})
+            headers: new HttpHeaders({ observe: 'response', responseType: 'text', Accept: 'text/plain' })
         };
-        return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, { observe: 'response', responseType: 'text' });
+        return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
+            observe: 'response',
+            responseType: 'text'
+        });
     }
-    
 }

@@ -1,7 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-
-
 import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.repository.ToEndpointRepository;
 import org.assimbly.gateway.service.ToEndpointService;
@@ -54,7 +52,6 @@ public class ToEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/to-endpoint")
-    
     public ResponseEntity<ToEndpointDTO> createToEndpoint(@RequestBody ToEndpointDTO toEndpointDTO) throws URISyntaxException {
         log.debug("REST request to save ToEndpoint : {}", toEndpointDTO);
         if (toEndpointDTO.getId() != null) {
@@ -75,7 +72,6 @@ public class ToEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/to-endpoints")
-    
     public ResponseEntity<List<ToEndpointDTO>> createToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to save List<ToEndpoint> : {}", toEndpointsDTO);
         
@@ -96,7 +92,6 @@ public class ToEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/to-endpoint")
-    
     public ResponseEntity<ToEndpointDTO> updateToEndpoint(@RequestBody ToEndpointDTO toEndpointDTO) throws URISyntaxException {
         log.debug("REST request to update ToEndpoint : {}", toEndpointDTO);
         if (toEndpointDTO.getId() == null) {
@@ -118,7 +113,6 @@ public class ToEndpointResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/to-endpoints")
-    
     public ResponseEntity<List<ToEndpointDTO>> updateToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to update ToEndpoints : {}", toEndpointsDTO);
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);
@@ -134,7 +128,6 @@ public class ToEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and the list of toEndpoints in body
      */
     @GetMapping("/to-endpoints")
-    
     public List<ToEndpointDTO> getAllToEndpoints() {
         log.debug("REST request to get all ToEndpoints");
         return toEndpointService.findAll();
@@ -147,7 +140,6 @@ public class ToEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/to-endpoints/byflowid/{id}")
-    
     public List<ToEndpointDTO> getToEndpointByFlowID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoints by flowId " + id);
         List<ToEndpoint> toEndpoints = toEndpointRepository.findByFlowId(id);
@@ -161,7 +153,6 @@ public class ToEndpointResource {
      * @return the ResponseEntity with status 200 (OK) and with body the toEndpointDTO, or with status 404 (Not Found)
      */
     @GetMapping("/to-endpoint/{id}")
-    
     public ResponseEntity<ToEndpointDTO> getToEndpointID(@PathVariable Long id) {
         log.debug("REST request to get ToEndpoint : {}", id);
         Optional<ToEndpointDTO> toEndpointDTO = toEndpointService.findOne(id);
@@ -175,7 +166,6 @@ public class ToEndpointResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/to-endpoints/{id}")
-    
     public ResponseEntity<Void> deleteToEndpoint(@PathVariable Long id) {
         log.debug("REST request to delete ToEndpoint : {}", id);
         toEndpointService.delete(id);
@@ -189,7 +179,6 @@ public class ToEndpointResource {
       * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/to-endpoints")
-    
     public ResponseEntity<Void> deleteToEndpoints(@RequestBody List<ToEndpointDTO> toEndpointsDTO) throws URISyntaxException {
         log.debug("REST request to delete List<ToEndpoint> : {}", toEndpointsDTO);
         List<ToEndpoint> toEndpoints = toEndpointMapper.toEntity(toEndpointsDTO);

@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -47,7 +46,6 @@ public class FlowResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/flows")
-    
     public ResponseEntity<FlowDTO> createFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to save Flow : {}", flowDTO);
         if (flowDTO.getId() != null) {
@@ -69,7 +67,6 @@ public class FlowResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/flows")
-    
     public ResponseEntity<FlowDTO> updateFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to update Flow : {}", flowDTO);
         if (flowDTO.getId() == null) {
@@ -88,7 +85,6 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
     @GetMapping("/flows")
-    
     public ResponseEntity<List<FlowDTO>> getAllFlows(Pageable pageable) {
         log.debug("REST request to get a page of Flows");
         Page<FlowDTO> page = flowService.findAll(pageable);
@@ -103,7 +99,6 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
     @GetMapping("/flows/bygatewayid/{gatewayid}")
-    
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(@SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable, @PathVariable Long gatewayid) {
         log.debug("REST request to get a page of flows by gatewayid");
         Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
@@ -113,7 +108,6 @@ public class FlowResource {
     
     /*
     @GetMapping("/flows/bygatewayid/{gatewayid}")
-    
     public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
     	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
         List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
@@ -134,7 +128,6 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
     @GetMapping("/flows/{id}")
-    
     public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
         log.debug("REST request to get Flow : {}", id);
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
@@ -149,7 +142,6 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/flows/{id}")
-    
     public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
         log.debug("REST request to delete Flow : {}", id);
         flowService.delete(id);

@@ -3,12 +3,10 @@ import { RouterModule } from '@angular/router';
 
 import { GatewaySharedModule } from 'app/shared';
 import { HOME_ROUTE, HomeComponent } from './';
-import { GatewayEntityModule } from "app/entities/entity.module";
+import { GatewayEntityModule } from 'app/entities/entity.module';
 
 @NgModule({
-    imports: [GatewaySharedModule, 
-              GatewayEntityModule,
-              RouterModule.forChild([HOME_ROUTE])],
+    imports: [GatewaySharedModule, GatewayEntityModule, RouterModule.forChild([HOME_ROUTE])],
     declarations: [HomeComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

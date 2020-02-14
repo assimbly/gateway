@@ -1,21 +1,21 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <changeSet author="user (generated)" id="1528900586813-1">
-        <dropUniqueConstraint constraintName="CONSTRAINT_8" tableName="ERROR_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_8" tableName="error_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1528900586813-2">
-        <dropUniqueConstraint constraintName="CONSTRAINT_8B" tableName="ERROR_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_8B" tableName="error_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1528900586813-3">
-        <dropUniqueConstraint constraintName="CONSTRAINT_B" tableName="FROM_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_B" tableName="from_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1528900586813-4">
-        <dropUniqueConstraint constraintName="CONSTRAINT_B7" tableName="FROM_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_B7" tableName="from_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1528900586813-5">
-        <dropUniqueConstraint constraintName="CONSTRAINT_D" tableName="TO_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_D" tableName="to_endpoint"/>
     </changeSet>
     <changeSet author="user (generated)" id="1528900586813-6">
-        <dropUniqueConstraint constraintName="CONSTRAINT_D9" tableName="TO_ENDPOINT"/>
+        <dropUniqueConstraint constraintName="constraint_D9" tableName="to_endpoint"/>
     </changeSet>
 </databaseChangeLog>

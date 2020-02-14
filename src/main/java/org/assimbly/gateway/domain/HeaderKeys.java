@@ -26,10 +26,10 @@ public class HeaderKeys implements Serializable {
     @Column(name = "jhi_key")
     private String key;
 
-    @Column(name = "jhi_value")
+    @Column(name = "value")
     private String value;
 
-    @Column(name = "jhi_type")
+    @Column(name = "type")
     private String type;
 
     @ManyToOne

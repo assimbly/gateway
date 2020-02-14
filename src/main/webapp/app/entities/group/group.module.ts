@@ -21,22 +21,9 @@ const ENTITY_STATES = [...groupRoute, ...groupPopupRoute];
         // GatewayAdminModule,
         RouterModule.forChild(ENTITY_STATES)
     ],
-    declarations: [
-        GroupComponent,
-        GroupUpdateComponent,
-        GroupDetailComponent,
-        GroupDeleteDialogComponent,
-        GroupDeletePopupComponent,
-    ],
-    entryComponents: [
-        GroupComponent,
-        GroupUpdateComponent,
-        GroupDetailComponent,
-        GroupDeleteDialogComponent,
-        GroupDeletePopupComponent,
-    ],
-    providers: [
-    ],
+    declarations: [GroupComponent, GroupUpdateComponent, GroupDetailComponent, GroupDeleteDialogComponent, GroupDeletePopupComponent],
+    entryComponents: [GroupComponent, GroupUpdateComponent, GroupDetailComponent, GroupDeleteDialogComponent, GroupDeletePopupComponent],
+    providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GatewayGroupModule { }
+export class GatewayGroupModule {}

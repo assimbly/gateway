@@ -109,5 +109,4 @@ export class AccountService {
     isAdmin(): boolean {
         return this.userIdentity.authorities.includes('ROLE_ADMIN');
     }
-
 }

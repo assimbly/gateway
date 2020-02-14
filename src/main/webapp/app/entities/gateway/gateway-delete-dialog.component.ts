@@ -14,7 +14,12 @@ import { GatewayService } from './gateway.service';
 export class GatewayDeleteDialogComponent {
     gateway: IGateway;
 
-    constructor(protected gatewayService: GatewayService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected router: Router) {}
+    constructor(
+        protected gatewayService: GatewayService,
+        public activeModal: NgbActiveModal,
+        protected eventManager: JhiEventManager,
+        protected router: Router
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -29,7 +34,6 @@ export class GatewayDeleteDialogComponent {
             this.activeModal.dismiss(true);
         });
     }
-    
 }
 
 @Component({

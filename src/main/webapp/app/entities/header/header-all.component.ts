@@ -4,14 +4,13 @@ import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
 import { Subscription } from 'rxjs';
-import { IHeader } from "app/shared/model/header.model";
-import { AccountService } from "app/core";
+import { IHeader } from 'app/shared/model/header.model';
+import { AccountService } from 'app/core';
 
 @Component({
     selector: 'jhi-header-all',
     templateUrl: './header-all.component.html'
 })
-
 export class HeaderAllComponent implements OnInit, OnDestroy {
     public headers: IHeader[] = [];
     public page: any;
@@ -37,7 +36,6 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         this.registerChangeInHeaders();
     }
 
-    
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'name') {
@@ -45,7 +43,7 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         }
         return result;
     }
-    
+
     reset() {
         this.page = 0;
         this.headers = [];
@@ -61,15 +59,17 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();
-        this.headerService.query({
-            page: this.page,
-            sort: this.sort()
-        }).subscribe(
-            (res) => {
-                this.headers = res.body;
-            },
-            (res) => this.onError(res.body)
-        );
+        this.headerService
+            .query({
+                page: this.page,
+                sort: this.sort()
+            })
+            .subscribe(
+                res => {
+                    this.headers = res.body;
+                },
+                res => this.onError(res.body)
+            );
     }
 
     private registerChangeInHeaders() {

@@ -13,15 +13,13 @@ import { HeaderKeysComponent, HeaderKeysService } from '../../entities/header-ke
 @Component({
     selector: 'jhi-header',
     templateUrl: './header.component.html',
-        entryComponents: [
-            HeaderKeysComponent
-            ],
+    entryComponents: [HeaderKeysComponent]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
     headers: IHeader[];
     currentAccount: any;
     eventSubscriber: Subscription;
-    headerKeys: Array<IHeaderKeys>
+    headerKeys: Array<IHeaderKeys>;
     headerKey: IHeaderKeys;
     selectedHeaderId: number;
 
@@ -51,17 +49,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
-        if (this.headerKey !== undefined ) {
-            this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
-        }else {
-            this.eventManager.subscribe('headerKeyDeleted', (res) => res.content)
+        if (this.headerKey !== undefined) {
+            this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(res.content));
+        } else {
+            this.eventManager.subscribe('headerKeyDeleted', res => res.content);
         }
         this.registerChangeInHeaders();
         this.selectOption();
     }
 
     updateHeaderKeys(id: number) {
-        this.headerKeys = this.headerKeys.filter((x) => x.id === id);
+        this.headerKeys = this.headerKeys.filter(x => x.id === id);
         const newHeaderKeys = new HeaderKeys();
         this.headerKeys.push(newHeaderKeys);
     }
@@ -71,16 +69,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     filterHeaderKeys(id) {
         this.headerKeysService.query().subscribe(
-            (res) => {
+            res => {
                 this.headerKeys = res.body;
-                this.headerKeys = this.headerKeys.filter((k) => k.headerId === id);
+                this.headerKeys = this.headerKeys.filter(k => k.headerId === id);
                 if (this.headerKeys.length === 0) {
                     const newHeaderKeys = new HeaderKeys();
                     newHeaderKeys.isDisabled = false;
                     this.headerKeys.push(newHeaderKeys);
                 }
             },
-            (res) => this.onError(res.json)
+            res => this.onError(res.json)
         );
     }
 
@@ -93,7 +91,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     selectOption() {
-      this.filterHeaderKeys(this.selectedHeaderId);
+        this.filterHeaderKeys(this.selectedHeaderId);
     }
 
     protected onError(errorMessage: string) {

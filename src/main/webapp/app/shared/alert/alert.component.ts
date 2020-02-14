@@ -10,7 +10,8 @@ import { JhiAlertService } from 'ng-jhipster';
                     <pre [innerHTML]="alert.msg"></pre>
                 </ngb-alert>
             </div>
-        </div>`
+        </div>
+    `
 })
 export class JhiAlertComponent implements OnInit, OnDestroy, AfterContentChecked {
     alerts: any[];
@@ -20,11 +21,11 @@ export class JhiAlertComponent implements OnInit, OnDestroy, AfterContentChecked
 
     ngOnInit() {}
     ngAfterContentChecked() {
-        this.alertService.get().forEach((x) => {
+        this.alertService.get().forEach(x => {
             if (x.msg !== 'unconfigured') {
                 this.alerts = this.alertService.get();
             }
-        })
+        });
     }
 
     setClasses(alert) {
@@ -35,6 +36,6 @@ export class JhiAlertComponent implements OnInit, OnDestroy, AfterContentChecked
     }
 
     ngOnDestroy() {
-       this.alerts = [];
+        this.alerts = [];
     }
 }

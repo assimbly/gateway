@@ -9,5 +9,11 @@ export interface ISecurity {
 }
 
 export class Security implements ISecurity {
-    constructor(public id?: number, public url?: string, public certificateName?: string, public certificateExpiry?: Moment, public certificateFile?: string) {}
+    constructor(
+        public id?: number,
+        public url?: string,
+        public certificateName?: string,
+        public certificateExpiry?: Moment,
+        public certificateFile?: string
+    ) {}
 }

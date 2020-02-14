@@ -16,27 +16,34 @@ export class ServiceDeleteDialogComponent {
     errorMessage: boolean = false;
     deleteMode: boolean = true;
 
-    constructor(protected serviceService: ServiceService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager, protected jhiAlertService: JhiAlertService) {}
+    constructor(
+        protected serviceService: ServiceService,
+        public activeModal: NgbActiveModal,
+        protected eventManager: JhiEventManager,
+        protected jhiAlertService: JhiAlertService
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.serviceService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'serviceListModification',
-                content: 'Deleted an service'
-            });
-            this.activeModal.dismiss(true);
-        }, (r) => this.onDeleteError(r));
+        this.serviceService.delete(id).subscribe(
+            response => {
+                this.eventManager.broadcast({
+                    name: 'serviceListModification',
+                    content: 'Deleted an service'
+                });
+                this.activeModal.dismiss(true);
+            },
+            r => this.onDeleteError(r)
+        );
     }
-    
+
     private onDeleteError(error) {
         this.errorMessage = true;
         this.deleteMode = false;
     }
-    
 }
 
 @Component({

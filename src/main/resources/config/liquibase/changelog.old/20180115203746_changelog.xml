@@ -48,7 +48,7 @@
         </addColumn>
     </changeSet>
     <changeSet author="user (generated)" id="1516045070844-6">
-        <addUniqueConstraint columnNames="error_endpoint_id" constraintName="UC_flowERROR_ENDPOINT_ID_COL" tableName="flow"/>
+        <addUniqueConstraint columnNames="error_endpoint_id" constraintName="uc_flowerror_endpoint_id_col" tableName="flow"/>
     </changeSet>
     <changeSet author="user (generated)" id="1516045070844-7">
         <addUniqueConstraint columnNames="from_endpoint_id" constraintName="UC_flowFROM_ENDPOINT_ID_COL" tableName="flow"/>

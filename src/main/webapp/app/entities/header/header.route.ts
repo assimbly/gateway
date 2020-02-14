@@ -12,7 +12,7 @@ import { HeaderUpdateComponent } from './header-update.component';
 import { HeaderDeletePopupComponent } from './header-delete-dialog.component';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderAllComponent } from './header-all.component';
-import { HeaderPopupComponent } from "app/entities/header/header-dialog.component";
+import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class HeaderResolve implements Resolve<IHeader> {
@@ -88,26 +88,26 @@ export const headerRoute: Routes = [
 ];
 
 export const headerPopupRoute: Routes = [
-         {
-             path: 'header-new',
-             component: HeaderPopupComponent,
-             data: {
-                 authorities: ['ROLE_ADMIN'],
-                 pageTitle: 'Headers'
-             },
-             canActivate: [UserRouteAccessService],
-             outlet: 'popup'
-         },
-         {
-             path: 'header/:id/edit',
-             component: HeaderPopupComponent,
-             data: {
-                 authorities: ['ROLE_ADMIN'],
-                 pageTitle: 'Headers'
-             },
-             canActivate: [UserRouteAccessService],
-             outlet: 'popup'
-     },
+    {
+        path: 'header-new',
+        component: HeaderPopupComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Headers'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'header/:id/edit',
+        component: HeaderPopupComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Headers'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
     {
         path: 'header/:id/delete',
         component: HeaderDeletePopupComponent,
