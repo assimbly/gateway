@@ -4,7 +4,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "http://repo.spring.io/plugins-release" }
+        maven { url "https://repo.spring.io/plugins-release" }
         maven { url "https://plugins.gradle.org/m2/" }
         flatDir {
        		dirs 'libs'
@@ -47,7 +47,7 @@ apply plugin: 'eclipse'
 configurations.all {
   exclude module: 'log4j-slf4j-impl' 	
   resolutionStrategy {  
-    force 'org.apache.activemq:artemis-core-client:2.10.0', 'org.apache.activemq:artemis-broker:2.10.0','org.apache.activemq:artemis-commons:2.10.0','org.apache.activemq:artemis-selector:2.10.0','org.apache.activemq:artemis-journal:2.10.0'
+    force 'org.apache.activemq:artemis-core-client:2.11.0', 'org.apache.activemq:artemis-broker:2.11.0','org.apache.activemq:artemis-commons:2.11.0','org.apache.activemq:artemis-selector:2.11.0','org.apache.activemq:artemis-journal:2.11.0'
   }
 }
 
@@ -61,7 +61,7 @@ dependencyManagement {
 defaultTasks 'bootRun'
 
 group = 'org.assimbly.gateway'
-version = '1.7.0'
+version = '1.8.0'
 
 description = ''
 
@@ -252,12 +252,13 @@ dependencies {
 	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
 	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
 	//compile "io.hawt:hawtio-springboot:2.7.0"
+	compile group: 'commons-codec', name: 'commons-codec', version: '1.13'
 	
-	compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.0'
-	compile group: 'org.apache.activemq', name: 'artemis-commons', version: '2.10.0'
-	compile group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.0'
-	compile group: 'org.apache.activemq', name: 'artemis-selector', version: '2.10.0'
-	compile group: 'org.apache.activemq', name: 'artemis-journal', version: '2.10.0'
+	compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.1'
+	compile group: 'org.apache.activemq', name: 'artemis-commons', version: '2.10.1'
+	compile group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.1'
+	compile group: 'org.apache.activemq', name: 'artemis-selector', version: '2.10.1'
+	compile group: 'org.apache.activemq', name: 'artemis-journal', version: '2.10.1'
 		
 	//java 9+
 	compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'

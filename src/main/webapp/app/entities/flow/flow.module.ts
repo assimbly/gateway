@@ -10,6 +10,7 @@ import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
+import { GatewaySecurityModule } from "../../entities/security/security.module";
 
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
@@ -40,6 +41,7 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         GatewayToEndpointModule,
         GatewayErrorEndpointModule,
         GatewayServiceModule,
+        GatewaySecurityModule,
         GatewayHeaderModule,
         GatewayMaintenanceModule,
         RouterModule.forChild(ENTITY_STATES),

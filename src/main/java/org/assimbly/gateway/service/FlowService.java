@@ -27,7 +27,14 @@ public interface FlowService {
      */
     Page<FlowDTO> findAll(Pageable pageable);
 
-
+    /**
+     * Get all the flows by gateway ID.
+     *
+     * @param pageable the pagination information
+     * @return the list of entities
+     */
+	Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid);
+    
     /**
      * Get the "id" flow.
      *
@@ -43,5 +50,5 @@ public interface FlowService {
      */
     void delete(Long id);
 
-	Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid);
+
 }

@@ -16,10 +16,13 @@ entity EnvironmentVariables {
 
 entity Flow {
 	name String,
+	type String,
 	autoStart Boolean,	
 	offLoading Boolean,
 	maximumRedeliveries Integer,
-	redeliveryDelay Integer	
+	redeliveryDelay Integer,
+	loadBalancing Boolean,
+	instances Integer		
 }
 
 entity FromEndpoint {
@@ -77,8 +80,17 @@ entity Maintenance {
 entity Security {
 	url String,
 	certificateName String,
+	certificateFile Blob,
 	certificateExpiry Instant,
 }
+
+entity Broker {
+	name String,
+	autoStart Boolean,
+	type String,
+	configuration String,
+}
+
 
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP

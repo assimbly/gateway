@@ -15,6 +15,16 @@ to any supported Camel component by the [Assimbly Connector](https://github.com/
 ![alt text](src/main/webapp/content/images/assimbly_screenshot.jpg?raw=true "Flows page")
 
 
+## Download
+
+Download it [here](https://github.com/assimbly/gateway/releases)
+
+
+## Quick Start
+
+Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
+
+
 ## Design
 
 The main design goals are:
@@ -23,7 +33,8 @@ The main design goals are:
 * Ease of use: Configure and manage flows with ease
 * Separate-of-concerns: Seperate message gateway (interoperability) from message bus (business logic)
 
-More on the [rationale](https://github.com/assimbly/gateway/wiki/Rationale-&-Advantages)
+More on the [Design](https://github.com/assimbly/gateway/wiki/design) and the [rationale](https://github.com/assimbly/gateway/wiki/Rationale-&-Advantages)
+ 
 
 ## Documentation
 
@@ -31,11 +42,7 @@ You find documentation on the [wiki](https://github.com/assimbly/gateway/wiki) l
 
 * The [User guide](https://github.com/assimbly/gateway/wiki/user-guide)
 * Supported [components](https://github.com/assimbly/gateway/wiki/components) 
-
-
-## Download
-
-Download it [here](https://github.com/assimbly/gateway/releases)
+* Supported [services](https://github.com/assimbly/gateway/wiki/services) 
  
 	
 ## Contribute

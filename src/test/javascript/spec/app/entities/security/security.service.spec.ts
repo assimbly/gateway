@@ -25,7 +25,7 @@ describe('Service Tests', () => {
             httpMock = injector.get(HttpTestingController);
             currentDate = moment();
 
-            elemDefault = new Security(0, 'AAAAAAA', 'AAAAAAA', currentDate);
+            elemDefault = new Security(0, 'AAAAAAA', 'AAAAAAA', currentDate, 'AAAAAAA');
         });
 
         describe('Service methods', async () => {
@@ -72,7 +72,8 @@ describe('Service Tests', () => {
                     {
                         url: 'BBBBBB',
                         certificateName: 'BBBBBB',
-                        certificateExpiry: currentDate.format(DATE_TIME_FORMAT)
+                        certificateExpiry: currentDate.format(DATE_TIME_FORMAT),
+                        certificateFile: 'BBBBBB'
                     },
                     elemDefault
                 );
@@ -96,7 +97,8 @@ describe('Service Tests', () => {
                     {
                         url: 'BBBBBB',
                         certificateName: 'BBBBBB',
-                        certificateExpiry: currentDate.format(DATE_TIME_FORMAT)
+                        certificateExpiry: currentDate.format(DATE_TIME_FORMAT),
+                        certificateFile: 'BBBBBB'
                     },
                     elemDefault
                 );

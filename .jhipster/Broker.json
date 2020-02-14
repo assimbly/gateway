@@ -1,0 +1,30 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "type",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "configurationType",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "autoStart",
+            "fieldType": "Boolean"
+        }
+    ],
+    "changelogDate": "20200101185343",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceImpl",
+    "entityTableName": "broker",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

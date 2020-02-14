@@ -6,7 +6,7 @@ import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.repository.SecurityRepository;
 import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.service.dto.SecurityDTO;
-import org.assimbly.gateway.service.mapper.SecurityTLSMapper;
+import org.assimbly.gateway.service.mapper.SecurityMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -54,11 +55,14 @@ public class SecurityResourceIntTest {
     private static final Instant DEFAULT_CERTIFICATE_EXPIRY = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_CERTIFICATE_EXPIRY = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final String DEFAULT_CERTIFICATE_FILE = "AAAAAAAAAA";
+    private static final String UPDATED_CERTIFICATE_FILE = "BBBBBBBBBB";
+
     @Autowired
     private SecurityRepository securityRepository;
 
     @Autowired
-    private SecurityTLSMapper securityMapper;
+    private SecurityMapper securityMapper;
 
     @Autowired
     private SecurityService securityService;
@@ -104,7 +108,8 @@ public class SecurityResourceIntTest {
         Security security = new Security()
             .url(DEFAULT_URL)
             .certificateName(DEFAULT_CERTIFICATE_NAME)
-            .certificateExpiry(DEFAULT_CERTIFICATE_EXPIRY);
+            .certificateExpiry(DEFAULT_CERTIFICATE_EXPIRY)
+            .certificateFile(DEFAULT_CERTIFICATE_FILE);
         return security;
     }
 
@@ -132,6 +137,7 @@ public class SecurityResourceIntTest {
         assertThat(testSecurity.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testSecurity.getCertificateName()).isEqualTo(DEFAULT_CERTIFICATE_NAME);
         assertThat(testSecurity.getCertificateExpiry()).isEqualTo(DEFAULT_CERTIFICATE_EXPIRY);
+        assertThat(testSecurity.getCertificateFile()).isEqualTo(DEFAULT_CERTIFICATE_FILE);
     }
 
     @Test
@@ -167,7 +173,8 @@ public class SecurityResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(security.getId().intValue())))
             .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
             .andExpect(jsonPath("$.[*].certificateName").value(hasItem(DEFAULT_CERTIFICATE_NAME.toString())))
-            .andExpect(jsonPath("$.[*].certificateExpiry").value(hasItem(DEFAULT_CERTIFICATE_EXPIRY.toString())));
+            .andExpect(jsonPath("$.[*].certificateExpiry").value(hasItem(DEFAULT_CERTIFICATE_EXPIRY.toString())))
+            .andExpect(jsonPath("$.[*].certificateFile").value(hasItem(DEFAULT_CERTIFICATE_FILE.toString())));
     }
     
     @Test
@@ -183,7 +190,8 @@ public class SecurityResourceIntTest {
             .andExpect(jsonPath("$.id").value(security.getId().intValue()))
             .andExpect(jsonPath("$.url").value(DEFAULT_URL.toString()))
             .andExpect(jsonPath("$.certificateName").value(DEFAULT_CERTIFICATE_NAME.toString()))
-            .andExpect(jsonPath("$.certificateExpiry").value(DEFAULT_CERTIFICATE_EXPIRY.toString()));
+            .andExpect(jsonPath("$.certificateExpiry").value(DEFAULT_CERTIFICATE_EXPIRY.toString()))
+            .andExpect(jsonPath("$.certificateFile").value(DEFAULT_CERTIFICATE_FILE.toString()));
     }
 
     @Test
@@ -209,7 +217,8 @@ public class SecurityResourceIntTest {
         updatedSecurity
             .url(UPDATED_URL)
             .certificateName(UPDATED_CERTIFICATE_NAME)
-            .certificateExpiry(UPDATED_CERTIFICATE_EXPIRY);
+            .certificateExpiry(UPDATED_CERTIFICATE_EXPIRY)
+            .certificateFile(UPDATED_CERTIFICATE_FILE);
         SecurityDTO securityDTO = securityMapper.toDto(updatedSecurity);
 
         restSecurityMockMvc.perform(put("/api/securities")
@@ -224,6 +233,7 @@ public class SecurityResourceIntTest {
         assertThat(testSecurity.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testSecurity.getCertificateName()).isEqualTo(UPDATED_CERTIFICATE_NAME);
         assertThat(testSecurity.getCertificateExpiry()).isEqualTo(UPDATED_CERTIFICATE_EXPIRY);
+        assertThat(testSecurity.getCertificateFile()).isEqualTo(UPDATED_CERTIFICATE_FILE);
     }
 
     @Test

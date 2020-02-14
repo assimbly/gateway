@@ -32,6 +32,10 @@ public class Security implements Serializable {
     @Column(name = "certificate_expiry")
     private Instant certificateExpiry;
 
+    @Lob
+    @Column(name = "certificate_file")
+    private String certificateFile;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -79,6 +83,19 @@ public class Security implements Serializable {
     public void setCertificateExpiry(Instant certificateExpiry) {
         this.certificateExpiry = certificateExpiry;
     }
+
+    public String getCertificateFile() {
+        return certificateFile;
+    }
+
+    public Security certificateFile(String certificateFile) {
+        this.certificateFile = certificateFile;
+        return this;
+    }
+
+    public void setCertificateFile(String certificateFile) {
+        this.certificateFile = certificateFile;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -108,6 +125,7 @@ public class Security implements Serializable {
             ", url='" + getUrl() + "'" +
             ", certificateName='" + getCertificateName() + "'" +
             ", certificateExpiry='" + getCertificateExpiry() + "'" +
+            ", certificateFile='" + getCertificateFile() + "'" +
             "}";
     }
 }

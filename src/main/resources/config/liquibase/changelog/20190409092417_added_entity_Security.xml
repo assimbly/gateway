@@ -34,6 +34,10 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="certificate_file" type="clob">
+                <constraints nullable="true" />
+            </column>
+
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
         <dropDefaultValue tableName="security" columnName="certificate_expiry" columnDataType="datetime"/>
