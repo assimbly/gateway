@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+
 import org.assimbly.gateway.service.MaintenanceService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -42,7 +42,7 @@ public class MaintenanceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/maintenances")
-    @Timed
+    
     public ResponseEntity<MaintenanceDTO> createMaintenance(@RequestBody MaintenanceDTO maintenanceDTO) throws URISyntaxException {
         log.debug("REST request to save Maintenance : {}", maintenanceDTO);
         if (maintenanceDTO.getId() != null) {
@@ -64,7 +64,7 @@ public class MaintenanceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/maintenances")
-    @Timed
+    
     public ResponseEntity<MaintenanceDTO> updateMaintenance(@RequestBody MaintenanceDTO maintenanceDTO) throws URISyntaxException {
         log.debug("REST request to update Maintenance : {}", maintenanceDTO);
         if (maintenanceDTO.getId() == null) {
@@ -82,7 +82,7 @@ public class MaintenanceResource {
      * @return the ResponseEntity with status 200 (OK) and the list of maintenances in body
      */
     @GetMapping("/maintenances")
-    @Timed
+    
     public List<MaintenanceDTO> getAllMaintenances() {
         log.debug("REST request to get all Maintenances");
         return maintenanceService.findAll();
@@ -95,7 +95,7 @@ public class MaintenanceResource {
      * @return the ResponseEntity with status 200 (OK) and with body the maintenanceDTO, or with status 404 (Not Found)
      */
     @GetMapping("/maintenances/{id}")
-    @Timed
+    
     public ResponseEntity<MaintenanceDTO> getMaintenance(@PathVariable Long id) {
         log.debug("REST request to get Maintenance : {}", id);
         Optional<MaintenanceDTO> maintenanceDTO = maintenanceService.findOne(id);
@@ -109,7 +109,7 @@ public class MaintenanceResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/maintenances/{id}")
-    @Timed
+    
     public ResponseEntity<Void> deleteMaintenance(@PathVariable Long id) {
         log.debug("REST request to delete Maintenance : {}", id);
         maintenanceService.delete(id);

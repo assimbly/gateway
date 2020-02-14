@@ -304,6 +304,16 @@ custom assimbly css
     height: 38px;
 }
 
+.activemq-link{
+    align: right; 
+}
+
+.activemq-link img{
+    width: 50px;
+	height: 50px;
+    vertical-align: text-bottom;
+}
+
 .camel-link{
     margin-left: -1px; 
 }
@@ -491,4 +501,9 @@ only screen and (                min-resolution: 2dppx) {
    /* hide arrow tails background */
    
    background-color: transparent;
+}
+
+.increase-popover-width {
+    width: 1200px;
+	max-width: 1200px;
 }

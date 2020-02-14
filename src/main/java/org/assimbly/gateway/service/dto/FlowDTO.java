@@ -2,6 +2,7 @@ package org.assimbly.gateway.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import java.util.Set;
 
 import org.assimbly.gateway.domain.ToEndpoint;
@@ -19,20 +20,24 @@ public class FlowDTO implements Serializable {
 
     private Boolean offLoading;
 
-    private int maximumRedeliveries;
+    private Integer maximumRedeliveries;
 
-    private int redeliveryDelay;
-    
+    private Integer redeliveryDelay;
+
+    private String type;
+
+    private Boolean loadBalancing;
+
+    private Integer instances;
+
     private Long gatewayId;
 
     private Long fromEndpointId;
 
     private Long errorEndpointId;
-
-    private Long maintenanceId;
-
-    private Set<ToEndpoint> toEndpoints;
     
+    private Set<ToEndpoint> toEndpoints;
+
     public Long getId() {
         return id;
     }
@@ -65,30 +70,46 @@ public class FlowDTO implements Serializable {
         this.offLoading = offLoading;
     }
 
-    public int getMaximumRedeliveries() {
+    public Integer getMaximumRedeliveries() {
         return maximumRedeliveries;
     }
 
-    public int maximumRedeliveries() {
-        return maximumRedeliveries;
-    }
-
-    public void setMaximumRedeliveries(int maximumRedeliveries) {
+    public void setMaximumRedeliveries(Integer maximumRedeliveries) {
         this.maximumRedeliveries = maximumRedeliveries;
     }
 
-    public int getRedeliveryDelay() {
-        return redeliveryDelay;
-    }
-    
-    public int redeliveryDelay() {
+    public Integer getRedeliveryDelay() {
         return redeliveryDelay;
     }
 
-    public void setRedeliveryDelay(int redeliveryDelay) {
+    public void setRedeliveryDelay(Integer redeliveryDelay) {
         this.redeliveryDelay = redeliveryDelay;
     }
-    
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean isLoadBalancing() {
+        return loadBalancing;
+    }
+
+    public void setLoadBalancing(Boolean loadBalancing) {
+        this.loadBalancing = loadBalancing;
+    }
+
+    public Integer getInstances() {
+        return instances;
+    }
+
+    public void setInstances(Integer instances) {
+        this.instances = instances;
+    }
+
     public Long getGatewayId() {
         return gatewayId;
     }
@@ -113,22 +134,13 @@ public class FlowDTO implements Serializable {
         this.errorEndpointId = errorEndpointId;
     }
 
-    public Long getMaintenanceId() {
-        return maintenanceId;
-    }
-
-    public void setMaintenanceId(Long maintenanceId) {
-        this.maintenanceId = maintenanceId;
-    }
-    
     public Set<ToEndpoint> getToEndpoints() {
         return toEndpoints;
     }
-
+ 
     public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
         this.toEndpoints = toEndpoints;
     }   
-    
     
     @Override
     public boolean equals(Object o) {
@@ -158,6 +170,11 @@ public class FlowDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
             ", offLoading='" + isOffLoading() + "'" +
+            ", maximumRedeliveries=" + getMaximumRedeliveries() +
+            ", redeliveryDelay=" + getRedeliveryDelay() +
+            ", type='" + getType() + "'" +
+            ", loadBalancing='" + isLoadBalancing() + "'" +
+            ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
             ", fromEndpoint=" + getFromEndpointId() +
             ", errorEndpoint=" + getErrorEndpointId() +

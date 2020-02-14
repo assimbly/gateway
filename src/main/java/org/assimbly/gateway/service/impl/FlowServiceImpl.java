@@ -62,6 +62,20 @@ public class FlowServiceImpl implements FlowService {
             .map(flowMapper::toDto);
     }
 
+    
+    /**
+     * Get all the flows.
+     *
+     * @param pageable the pagination information
+     * @return the list of entities
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid) {
+        log.debug("Request to get all Flows");
+        return flowRepository.findAllByGatewayId(pageable, gatewayid).map(flowMapper::toDto);
+    }    
+    
 
     /**
      * Get one flow by id.
@@ -88,10 +102,5 @@ public class FlowServiceImpl implements FlowService {
         flowRepository.deleteById(id);
     }
     
-	@Override
-	public Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid) {
-		// TODO Auto-generated method stub
-		return flowRepository.findAllByGatewayId(pageable, gatewayid);
-	}
 
 }

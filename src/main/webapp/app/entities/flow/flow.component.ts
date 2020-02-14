@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { EndpointType } from '../../shared/camel/component-type';
@@ -14,6 +14,7 @@ import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway
 import { FromEndpointService } from '../from-endpoint';
 import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { GatewayService } from '../gateway';
+import { SecurityService } from "../security";
 
 @Component({
     selector: 'jhi-flow',
@@ -37,13 +38,17 @@ export class FlowComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number = -1;
-    gatewayExists = false;
+    gatewayExists: boolean;
     multipleGateways = false;
     finished = false;
 
     singleGatewayName: string;
     singleGatewayId: number;
     singleGatewayStage: string;
+    
+    configuredGateway : IGateway;
+    indexGateway: number;
+    
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     selectedAction: string;
     test: any;
@@ -57,6 +62,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         protected accountService: AccountService,
 		protected gatewayService: GatewayService,
         protected fromEndpointService: FromEndpointService,
+        protected securityService: SecurityService,
         protected router: Router,
     ) {
         this.flows = [];
@@ -71,7 +77,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     loadFlows() {
         if (this.gateways.length > 1) {
-            this.getFlowsForSelectedGateway(this.gateways[0].id);
+            this.getFlowsForSelectedGateway(this.gateways[this.indexGateway].id);
         } else {
             this.flowService.query({
                 page: this.page,
@@ -85,6 +91,18 @@ export class FlowComponent implements OnInit, OnDestroy {
         }
     }    
 
+    getFlowsForSelectedGateway(id) {
+        this.flowService.getFlowByGatewayId(Number(id),{
+            page: this.page,
+            size: this.itemsPerPage,
+            sort: this.sort()
+        })
+            .subscribe(
+                    (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+                    (res: HttpErrorResponse) => this.onError(res.message)
+            );
+    }
+    
     reset() {
         this.page = 0;
         this.flows = [];
@@ -113,30 +131,29 @@ export class FlowComponent implements OnInit, OnDestroy {
     
     ngAfterViewInit() {
         this.finished = true;
+        this.securityService.syncTrustore().subscribe(res => {
+            
+        });
       }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    getFlowsForSelectedGateway(id) {
-        this.flowService.getFlowByGatewayId(Number(id))
-            .subscribe(
-            res => this.onSuccess(res, res.headers),
-            res => this.onError(res.json)
-            );
-    }
-
     getGateways(): void {
-        this.gatewayService.query()
-            .subscribe(gateways => {
-                this.gateways = gateways.body;
-                this.isGatewayCreated(this.gateways);
+        forkJoin(
+                this.flowService.getGatewayName(),
+                this.gatewayService.query()
+            )
+                .subscribe(([gatewayName, gateways]) => {
 
-                if (this.gatewayExists) {
+                    this.gateways = gateways.body;
+                    this.checkGatewayType(this.gateways, gatewayName.body);
+
+                if (!this.gatewayExists) {
 
                     this.gateway = new Object();
-                    this.gateway.name = 'default';
+                    this.gateway.name = gatewayName.body;
                     this.gateway.type = GatewayType.ADAPTER;
                     this.gateway.environmentName = 'Dev1';
                     this.gateway.stage = EnvironmentType.DEVELOPMENT;
@@ -156,17 +173,32 @@ export class FlowComponent implements OnInit, OnDestroy {
                 } else {
                     this.loadFlows();
                     if (!this.multipleGateways) {
-                        this.singleGatewayName = this.gateways[0].name;
-                        this.singleGatewayId = this.gateways[0].id;
-                        this.singleGatewayStage = this.gateways[0].stage ? this.gateways[0].stage.toString().toLowerCase() : '';
+                        this.singleGatewayName = this.gateways[this.indexGateway].name;
+                        this.singleGatewayId = this.gateways[this.indexGateway].id;
+                        this.singleGatewayStage = this.gateways[this.indexGateway].stage ? this.gateways[this.indexGateway].stage.toString().toLowerCase() : '';
                     }
                 }
             });
     }
 
-    isGatewayCreated(gateways: IGateway[]): void {
-        this.gatewayExists = gateways.length === 0;
-        this.multipleGateways = gateways.length > 1;
+    checkGatewayType(gateways: IGateway[],gatewayName: String): void {
+        
+        if(gatewayName==='default'){
+            this.gatewayExists = gateways.length > 0;
+            this.indexGateway = 0;
+            this.multipleGateways = gateways.length > 1;
+        }else{
+            this.multipleGateways = false;
+            this.configuredGateway = gateways.find(gateway => gateway.name === gatewayName);
+            this.indexGateway = gateways.findIndex(gateway => gateway.name == gatewayName);
+            if(this.indexGateway>0){
+                this.gatewayExists = true;
+            }else{
+                this.gatewayExists = false;
+                this.indexGateway = 0;
+            }    
+        }
+        
     }
 
     getFromEndpoints(): void {
@@ -218,6 +250,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     
     
     private onSuccess(data, headers) {
+
         if (this.gateways.length === 1) {
             this.links = this.parseLinks.parse(headers.get('link'));
         }

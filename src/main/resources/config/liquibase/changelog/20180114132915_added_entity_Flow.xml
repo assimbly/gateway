@@ -42,6 +42,18 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="jhi_type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="load_balancing" type="boolean">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="jhi_instances" type="integer">
+                <constraints nullable="true" />
+            </column>
+
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>

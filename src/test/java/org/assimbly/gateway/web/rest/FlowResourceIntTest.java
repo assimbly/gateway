@@ -52,6 +52,21 @@ public class FlowResourceIntTest {
     private static final Boolean DEFAULT_OFF_LOADING = false;
     private static final Boolean UPDATED_OFF_LOADING = true;
 
+    private static final Integer DEFAULT_MAXIMUM_REDELIVERIES = 1;
+    private static final Integer UPDATED_MAXIMUM_REDELIVERIES = 2;
+
+    private static final Integer DEFAULT_REDELIVERY_DELAY = 1;
+    private static final Integer UPDATED_REDELIVERY_DELAY = 2;
+
+    private static final String DEFAULT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_TYPE = "BBBBBBBBBB";
+
+    private static final Boolean DEFAULT_LOAD_BALANCING = false;
+    private static final Boolean UPDATED_LOAD_BALANCING = true;
+
+    private static final Integer DEFAULT_INSTANCES = 1;
+    private static final Integer UPDATED_INSTANCES = 2;
+
     @Autowired
     private FlowRepository flowRepository;
 
@@ -102,7 +117,12 @@ public class FlowResourceIntTest {
         Flow flow = new Flow()
             .name(DEFAULT_NAME)
             .autoStart(DEFAULT_AUTO_START)
-            .offLoading(DEFAULT_OFF_LOADING);
+            .offLoading(DEFAULT_OFF_LOADING)
+            .maximumRedeliveries(DEFAULT_MAXIMUM_REDELIVERIES)
+            .redeliveryDelay(DEFAULT_REDELIVERY_DELAY)
+            .type(DEFAULT_TYPE)
+            .loadBalancing(DEFAULT_LOAD_BALANCING)
+            .instances(DEFAULT_INSTANCES);
         return flow;
     }
 
@@ -130,6 +150,11 @@ public class FlowResourceIntTest {
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
         assertThat(testFlow.isOffLoading()).isEqualTo(DEFAULT_OFF_LOADING);
+        assertThat(testFlow.getMaximumRedeliveries()).isEqualTo(DEFAULT_MAXIMUM_REDELIVERIES);
+        assertThat(testFlow.getRedeliveryDelay()).isEqualTo(DEFAULT_REDELIVERY_DELAY);
+        assertThat(testFlow.getType()).isEqualTo(DEFAULT_TYPE);
+        assertThat(testFlow.isLoadBalancing()).isEqualTo(DEFAULT_LOAD_BALANCING);
+        assertThat(testFlow.getInstances()).isEqualTo(DEFAULT_INSTANCES);
     }
 
     @Test
@@ -165,7 +190,12 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
-            .andExpect(jsonPath("$.[*].offLoading").value(hasItem(DEFAULT_OFF_LOADING.booleanValue())));
+            .andExpect(jsonPath("$.[*].offLoading").value(hasItem(DEFAULT_OFF_LOADING.booleanValue())))
+            .andExpect(jsonPath("$.[*].maximumRedeliveries").value(hasItem(DEFAULT_MAXIMUM_REDELIVERIES)))
+            .andExpect(jsonPath("$.[*].redeliveryDelay").value(hasItem(DEFAULT_REDELIVERY_DELAY)))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].loadBalancing").value(hasItem(DEFAULT_LOAD_BALANCING.booleanValue())))
+            .andExpect(jsonPath("$.[*].instances").value(hasItem(DEFAULT_INSTANCES)));
     }
     
     @Test
@@ -181,7 +211,12 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
-            .andExpect(jsonPath("$.offLoading").value(DEFAULT_OFF_LOADING.booleanValue()));
+            .andExpect(jsonPath("$.offLoading").value(DEFAULT_OFF_LOADING.booleanValue()))
+            .andExpect(jsonPath("$.maximumRedeliveries").value(DEFAULT_MAXIMUM_REDELIVERIES))
+            .andExpect(jsonPath("$.redeliveryDelay").value(DEFAULT_REDELIVERY_DELAY))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
+            .andExpect(jsonPath("$.loadBalancing").value(DEFAULT_LOAD_BALANCING.booleanValue()))
+            .andExpect(jsonPath("$.instances").value(DEFAULT_INSTANCES));
     }
 
     @Test
@@ -207,7 +242,12 @@ public class FlowResourceIntTest {
         updatedFlow
             .name(UPDATED_NAME)
             .autoStart(UPDATED_AUTO_START)
-            .offLoading(UPDATED_OFF_LOADING);
+            .offLoading(UPDATED_OFF_LOADING)
+            .maximumRedeliveries(UPDATED_MAXIMUM_REDELIVERIES)
+            .redeliveryDelay(UPDATED_REDELIVERY_DELAY)
+            .type(UPDATED_TYPE)
+            .loadBalancing(UPDATED_LOAD_BALANCING)
+            .instances(UPDATED_INSTANCES);
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
@@ -222,6 +262,11 @@ public class FlowResourceIntTest {
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
         assertThat(testFlow.isOffLoading()).isEqualTo(UPDATED_OFF_LOADING);
+        assertThat(testFlow.getMaximumRedeliveries()).isEqualTo(UPDATED_MAXIMUM_REDELIVERIES);
+        assertThat(testFlow.getRedeliveryDelay()).isEqualTo(UPDATED_REDELIVERY_DELAY);
+        assertThat(testFlow.getType()).isEqualTo(UPDATED_TYPE);
+        assertThat(testFlow.isLoadBalancing()).isEqualTo(UPDATED_LOAD_BALANCING);
+        assertThat(testFlow.getInstances()).isEqualTo(UPDATED_INSTANCES);
     }
 
     @Test
