@@ -4,11 +4,8 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        gradlePluginPortal()
         maven { url "https://repo.spring.io/plugins-release" }
-        maven { url "https://plugins.gradle.org/m2/" }
-        flatDir {
-       		dirs 'libs'
-   		}
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
@@ -16,33 +13,44 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
-        
 }
 
 plugins {
-    id "org.sonarqube" version "2.6.2"
-    id "net.ltgt.apt-eclipse" version "0.19"
-    id "net.ltgt.apt-idea" version "0.19"
-    id "net.ltgt.apt" version "0.19"
-    id "io.spring.dependency-management" version "1.0.6.RELEASE"
-    id "com.moowork.node" version "1.2.0"
-    id 'org.liquibase.gradle' version '2.0.1'
+    id "java"
+    id "maven-publish"
+    id "idea"
+    id "jacoco"
+    id "org.springframework.boot"
+    id "com.google.cloud.tools.jib"
+    id "com.gorylenko.gradle-git-properties"
+    id "com.github.node-gradle.node"
+    id "net.ltgt.apt-eclipse"
+    id "net.ltgt.apt-idea"
+    id "net.ltgt.apt"
+    id "org.liquibase.gradle"
+    id "org.sonarqube"
+    id "io.spring.nohttp"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
-apply plugin: 'java'
+group = "org.assimbly.gateway"
+version = '1.8.0'
+
+description = ""
+
 sourceCompatibility=1.8
 targetCompatibility=1.8
-// Until JHipster supports JDK 9
-assert System.properties['java.specification.version'] == '1.8'
+assert System.properties["java.specification.version"] == "1.8" || "11" || "12" || "13"
 
+apply from: "gradle/docker.gradle"
+apply from: "gradle/sonar.gradle"
 apply plugin: 'maven'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
 apply plugin: 'propdeps'
-apply plugin: 'com.moowork.node'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
+//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 
 configurations.all {
   exclude module: 'log4j-slf4j-impl' 	
@@ -51,111 +59,118 @@ configurations.all {
   }
 }
 
-dependencyManagement {
-  imports {
-    mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
-    //jhipster-needle-gradle-dependency-management - JHipster will add additional dependencies management here
-  }
+if (project.hasProperty("prod") || project.hasProperty("gae")) {
+    apply from: "gradle/profile_prod.gradle"
+} else {
+    apply from: "gradle/profile_dev.gradle"
 }
 
-defaultTasks 'bootRun'
-
-group = 'org.assimbly.gateway'
-version = '1.8.0'
-
-description = ''
-
-bootWar {
-   mainClassName = 'org.assimbly.gateway.GatewayApp'
+if (project.hasProperty("war")) {
+    apply from: "gradle/war.gradle"
 }
 
-war {
-    webAppDirName = 'build/www/'
-    enabled = true
-    classifier = 'original'
+if (project.hasProperty("gae")) {
+    apply plugin: 'maven'
+    apply plugin: 'org.springframework.boot.experimental.thin-launcher'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom 'io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}'
+        }
+    }
+    appengineStage.dependsOn thinResolve
 }
 
-springBoot {
-    mainClassName = 'org.assimbly.gateway.GatewayApp'
-    buildInfo()
+
+idea {
+    module {
+        excludeDirs += files("node_modules")
+    }
 }
 
-if (OperatingSystem.current().isWindows()) {
-    // https://stackoverflow.com/questions/40037487/the-filename-or-extension-is-too-long-error-using-gradle
-    task classpathJar(type: Jar) {
-        dependsOn configurations.runtime
-        appendix = 'classpath'
-
-        doFirst {
-            manifest {
-                attributes 'Class-Path': configurations.runtime.files.collect {
-                    it.toURI().toURL().toString().replaceFirst(/file:\/+/, '/').replaceAll(' ', '%20')
-                }.join(' ')
+eclipse {
+    sourceSets {
+        main {
+            java {
+                srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
             }
         }
     }
+}
 
-    bootRun {
-        dependsOn classpathJar
-        doFirst {
-            classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", classpathJar.archivePath)
-        }
-    }
+defaultTasks "bootRun"
+
+springBoot {
+    mainClassName = 'org.assimbly.gateway.GatewayApp'
 }
 
 test {
-    exclude '**/CucumberTest*'
+    useJUnitPlatform()
+    exclude "**/*IT*", "**/*IntTest*"
 
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
     reports.html.enabled = false
 }
 
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    description = "Execute integration tests."
+    group = "verification"
+    include "**/*IT*", "**/*IntTest*"
+
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
+    // uncomment if the tests reports are not generated
+    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
+    // ignoreFailures true
+    reports.html.enabled = false
+}
+
+check.dependsOn integrationTest
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests")
     reportOn test
 }
 
-
-apply from: 'gradle/docker.gradle'
-apply from: 'gradle/sonar.gradle'
-//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
-
-if (project.hasProperty('prod')) {
-    apply from: 'gradle/profile_prod.gradle'
-} else {
-    apply from: 'gradle/profile_dev.gradle'
+task integrationTestReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/tests")
+    reportOn integrationTest
 }
 
-
-if (!project.hasProperty('runList')) {
-    project.ext.runList = 'main'
+if (!project.hasProperty("runList")) {
+    project.ext.runList = "main"
 }
 
-project.ext.diffChangelogFile = 'src/main/resources/config/liquibase/changelog/' + new Date().format('yyyyMMddHHmmss') + '_changelog.xml'
+project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
 
 liquibase {
     activities {
         main {
-            driver 'org.h2.Driver'
-            url 'jdbc:h2:file:./target/h2db/db/gateway'
-            username 'gateway'
-            password ''
-            changeLogFile 'src/main/resources/config/liquibase/master.xml'
-            defaultSchemaName ''
-            logLevel 'debug'
-            classpath 'src/main/resources/'
+            driver "org.h2.Driver"
+            url "jdbc:h2:file:./target/h2db/db/gateway"
+            username "gateway"
+            password ""
+            changeLogFile "src/main/resources/config/liquibase/master.xml"
+            defaultSchemaName ""
+            logLevel "debug"
+            classpath "src/main/resources/"
         }
         diffLog {
-            driver 'org.h2.Driver'
-            url 'jdbc:h2:file:./target/h2db/db/gateway'
-            username 'gateway'
-            password ''
+            driver "org.h2.Driver"
+            url "jdbc:h2:file:./target/h2db/db/gateway"
+            username "gateway"
+            password ""
             changeLogFile project.ext.diffChangelogFile
-            referenceUrl 'hibernate:spring:org.assimbly.gateway.domain?dialect=org.hibernate.dialect.H2Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy'
-            defaultSchemaName ''
-            logLevel 'debug'
+            referenceUrl "hibernate:spring:org.assimbly.gateway.domain?dialect=org.hibernate.dialect.H2Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+            defaultSchemaName ""
+            logLevel "debug"
             classpath "$buildDir/classes/java/main"
         }
     }
@@ -163,12 +178,31 @@ liquibase {
     runList = project.ext.runList
 }
 
-configurations {
-    providedRuntime
-    compile.exclude module: "spring-boot-starter-tomcat"
-    //compile.exclude module: "slf4j-log4j12"
+gitProperties {
+    failOnNoGitDirectory = false
+    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
 }
 
+checkstyle {
+    toolVersion '${checkstyle_version}'
+    configFile file("checkstyle.xml")
+    checkstyleTest.enabled = false
+}
+nohttp {
+    source.include "build.gradle", "README.md"
+}
+
+configurations {
+    providedRuntime
+    implementation.exclude module: "spring-boot-starter-tomcat"
+    all {
+        resolutionStrategy {
+            // Inherited version from Spring Boot can't be used because of regressions:
+            // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
+            force 'org.liquibase:liquibase-core:3.6.3'
+        }
+    }
+}
 
 repositories {
     mavenLocal()
@@ -178,6 +212,11 @@ repositories {
 }
 
 dependencies {
+    // import JHipster dependencies BOM
+    if (!project.hasProperty("gae")) {
+        implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
+    }
+
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
     compile group: "io.github.jhipster", name: "jhipster-framework"
@@ -293,18 +332,28 @@ dependencies {
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
 }
 
+if (project.hasProperty("gae")) {
+    task createPom {
+        def basePath = 'build/resources/main/META-INF/maven'
+        doLast {
+            pom {
+                withXml(dependencyManagement.pomConfigurer)
+            }.writeTo("${basePath}/${project.group}/${project.name}/pom.xml")
+        }
+    }
+    bootJar.dependsOn = [createPom]
+}
+
 task cleanResources(type: Delete) {
-    delete 'build/resources'
+    delete "build/resources"
 }
 
 wrapper {
     gradleVersion = "6.1"
 }
 
-task stage(dependsOn: 'bootWar') {
-}
 
-if (project.hasProperty('nodeInstall')) {
+if (project.hasProperty("nodeInstall")) {
     node {
         version = "${node_version}"
         npmVersion = "${npm_version}"
@@ -312,8 +361,6 @@ if (project.hasProperty('nodeInstall')) {
         download = true
     }
 }
-
-bootWar.dependsOn war
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources
