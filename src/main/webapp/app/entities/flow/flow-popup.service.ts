@@ -34,7 +34,7 @@ export class FlowPopupService {
         });
     }
 
-    flowModalRef(component: Component, flow: Flow): NgbModalRef {
+    flowModalRef(component: any, flow: Flow): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.flow = flow;
         modalRef.result.then(

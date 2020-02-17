@@ -34,7 +34,7 @@ export class HeaderPopupService {
         });
     }
 
-    headerModalRef(component: Component, header: Header): NgbModalRef {
+    headerModalRef(component: any, header: Header): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.header = header;
         modalRef.result.then(

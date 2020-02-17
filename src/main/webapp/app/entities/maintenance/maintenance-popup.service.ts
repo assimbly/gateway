@@ -43,7 +43,7 @@ export class MaintenancePopupService {
         });
     }
 
-    maintenanceModalRef(component: Component, maintenance: Maintenance): NgbModalRef {
+    maintenanceModalRef(component: any, maintenance: Maintenance): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.maintenance = maintenance;
         modalRef.result.then(

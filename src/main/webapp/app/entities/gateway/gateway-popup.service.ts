@@ -34,7 +34,7 @@ export class GatewayPopupService {
         });
     }
 
-    gatewayModalRef(component: Component, gateway: Gateway): NgbModalRef {
+    gatewayModalRef(component: any, gateway: Gateway): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.gateway = gateway;
         modalRef.result.then(

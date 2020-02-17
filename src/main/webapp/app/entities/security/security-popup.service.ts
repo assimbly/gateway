@@ -34,7 +34,7 @@ export class SecurityPopupService {
         });
     }
 
-    gatewayModalRef(component: Component, security: Security): NgbModalRef {
+    gatewayModalRef(component: any, security: Security): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.security = security;
         modalRef.result.then(
