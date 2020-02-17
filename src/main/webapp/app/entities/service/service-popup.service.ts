@@ -34,7 +34,7 @@ export class ServicePopupService {
         });
     }
 
-    serviceModalRef(component: Component, service: Service): NgbModalRef {
+    serviceModalRef(component: any, service: Service): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.service = service;
         modalRef.result.then(
