@@ -1,6 +1,6 @@
 /* after changing this file run 'yarn run webpack:build' */
 /* tslint:disable */
-import '../content/css/vendor.css';
+import '../content/scss/vendor.scss';
 
 // Imports all fontawesome core and solid icons
 import { library } from '@fortawesome/fontawesome-svg-core';
