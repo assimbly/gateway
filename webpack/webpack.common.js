@@ -10,7 +10,7 @@ module.exports = (options) => ({
     resolve: {
         extensions: ['.ts', '.js'],
         modules: ['node_modules'],
-		mainFields: [ 'es2015', 'browser', 'module', 'main'],
+        mainFields: [ 'es2015', 'browser', 'module', 'main'],
         alias: {
             app: utils.root('src/main/webapp/app/'),
             ...rxPaths()
