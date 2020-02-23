@@ -980,7 +980,6 @@ export class Components {
     ];
 
     wireTapTypes = [
-        ,
         'ACTIVEMQ',
         'AWS-S3',
         'ELASTICSEARCH',
