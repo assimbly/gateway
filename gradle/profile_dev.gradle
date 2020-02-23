@@ -30,17 +30,20 @@ bootRun {
     args = []
 }
 
-task webpackBuildDev(type: YarnTask, dependsOn: 'yarn_install') {
+task webpack(type: YarnTask) {
+	inputs.files("yarn.lock")
+	inputs.files("build.gradle")
     inputs.dir("src/main/webapp/")
-    inputs.files(fileTree('src/main/webapp/'))
-    outputs.dir("build/www/")
-    outputs.file("build/www/app/main.bundle.js")
-    args = ["run", "webpack:build"]
-}
 
-task copyIntoStatic (type: Copy) {
-    from 'build/www/'
-    into 'build/resources/main/static'
+    def webpackDevFiles = fileTree("webpack//")
+    webpackDevFiles.exclude("webpack.prod.js")
+    inputs.files(webpackDevFiles)
+
+    outputs.dir("build/resources/main/static/")
+
+	dependsOn yarn_install
+    args = ["run", "webpack:build"]
+    environment = [APP_VERSION: project.version]
 }
 
 processResources {
@@ -56,5 +59,5 @@ processResources {
     }
 }
 
-processResources.dependsOn webpackBuildDev
+processResources.dependsOn webpack
 bootJar.dependsOn processResources

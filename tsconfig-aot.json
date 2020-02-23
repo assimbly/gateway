@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "module": "es2015",
+        "target": "es6",
+        "module": "commonjs",
         "moduleResolution": "node",
         "sourceMap": false,
         "emitDecoratorMetadata": true,
@@ -10,7 +10,7 @@
         "noImplicitAny": false,
         "suppressImplicitAnyIndexErrors": true,
         "skipLibCheck": true,
-        "outDir": "build/www/app",
+        "outDir": "build/resources/main/static/app",
         "lib": ["es7", "dom"],
         "typeRoots": ["node_modules/@types"],
         "baseUrl": "./",

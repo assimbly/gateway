@@ -52,7 +52,7 @@ module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
         main: './src/main/webapp/app/app.main'
     },
     output: {
-        path: utils.root('build/www'),
+        path: utils.root('build/resources/main/static/'),
         filename: 'app/[name].bundle.js',
         chunkFilename: 'app/[id].chunk.js'
     },
@@ -60,41 +60,6 @@ module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
         rules: [{
             test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
             loader: '@ngtools/webpack'
-        },
-		{
-            test: /\.(j|t)s$/,
-            enforce: 'pre',
-            loader: 'eslint-loader',
-            exclude: /node_modules/
-        },
-        {
-            test: /\.ts$/,
-            use: [
-                'angular2-template-loader',
-                {
-                    loader: 'cache-loader',
-                    options: {
-                        cacheDirectory: path.resolve('build/cache-loader')
-                    }
-                },
-                {
-                    loader: 'thread-loader',
-                    options: {
-                        // There should be 1 cpu for the fork-ts-checker-webpack-plugin.
-                        // The value may need to be adjusted (e.g. to 1) in some CI environments,
-                        // as cpus() may report more cores than what are available to the build.
-                        workers: require('os').cpus().length - 1
-                    }
-                },
-                {
-                    loader: 'ts-loader',
-                    options: {
-                        transpileOnly: true,
-                        happyPackMode: true
-                    }
-                }
-            ],
-            exclude: /(node_modules)/
         },
         {
             test: /\.scss$/,
