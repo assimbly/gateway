@@ -4,15 +4,15 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
-import { Ng2Webstorage } from 'ngx-webstorage';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 import { PopoverModule } from 'ngx-bootstrap';
 import { NgJhipsterModule } from 'ng-jhipster';
 
 import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
 import { ErrorHandlerInterceptor } from './blocks/interceptor/errorhandler.interceptor';
 import { NotificationInterceptor } from './blocks/interceptor/notification.interceptor';
-import { GatewaySharedModule } from 'app/shared';
-import { GatewayCoreModule } from 'app/core';
+import { GatewaySharedModule } from '../app/shared';
+import { GatewayCoreModule } from '../app/core';
 import { GatewayAppRoutingModule } from './app-routing.module';
 import { GatewayHomeModule } from './home/home.module';
 import { GatewayAccountModule } from './account/account.module';
@@ -29,7 +29,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
         BrowserModule,
         GatewayAppRoutingModule,
         HttpClientModule,
-        Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-' }),
+        NgxWebstorageModule.forRoot({ prefix: 'jhi', separator: '-' }),
         NgJhipsterModule.forRoot({
             // set below to true to make alerts look like toast
             alertAsToast: false,

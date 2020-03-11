@@ -34,19 +34,21 @@ export class FlowPopupService {
         });
     }
 
-    flowModalRef(component: Component, flow: Flow): NgbModalRef {
+    flowModalRef(component: any, flow: Flow): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
-        modalRef.componentInstance.flow = flow;
-        modalRef.result.then(
-            result => {
-                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
-            },
-            reason => {
-                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
-            }
-        );
+        if (typeof component as Component) {
+            modalRef.componentInstance.flow = flow;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

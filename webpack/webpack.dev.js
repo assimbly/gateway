@@ -1,32 +1,60 @@
 const webpack = require('webpack');
+const writeFilePlugin = require('write-file-webpack-plugin');
 const webpackMerge = require('webpack-merge');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const Visualizer = require('webpack-visualizer-plugin');
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const WorkboxPlugin = require('workbox-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const SimpleProgressWebpackPlugin = require('simple-progress-webpack-plugin');
+const WebpackNotifierPlugin = require('webpack-notifier');
 const AngularCompilerPlugin = require('@ngtools/webpack').AngularCompilerPlugin;
 const path = require('path');
+const sass = require('sass');
 
 const utils = require('./utils.js');
 const commonConfig = require('./webpack.common.js');
 
-const ENV = 'production';
+const ENV = 'development';
 
-module.exports = webpackMerge(commonConfig({ env: ENV }), {
-    // Enable source maps. Please note that this will slow down the build.
-    // You have to enable it in UglifyJSPlugin config below and in tsconfig-aot.json as well
-    // devtool: 'source-map',
+module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
+    devtool: 'eval-source-map',
+    devServer: {
+        contentBase: './build/resources/main/static/',
+        proxy: [{
+            context: [
+                '/api',
+                '/services',
+                '/management',
+                '/swagger-resources',
+                '/v2/api-docs',
+                '/h2-console',
+                '/auth'
+            ],
+            target: `http${options.tls ? 's' : ''}://localhost:8080`,
+            secure: false,
+            changeOrigin: options.tls
+        },{
+            context: [
+                '/websocket'
+            ],
+            target: 'ws://127.0.0.1:8080',
+            ws: true
+        }],
+        stats: options.stats,
+        watchOptions: {
+            ignored: /node_modules/
+        },
+        https: options.tls,
+        historyApiFallback: true
+    },
     entry: {
         polyfills: './src/main/webapp/app/polyfills',
-        global: './src/main/webapp/content/css/global.css',
+        global: './src/main/webapp/content/scss/global.scss',
         main: './src/main/webapp/app/app.main'
     },
     output: {
-        path: utils.root('build/www'),
-        filename: 'app/[name].[hash].bundle.js',
-        chunkFilename: 'app/[id].[hash].chunk.js'
+        path: utils.root('build/resources/main/static/'),
+        filename: 'app/[name].bundle.js',
+        chunkFilename: 'app/[id].chunk.js'
     },
     module: {
         rules: [{
@@ -34,79 +62,48 @@ module.exports = webpackMerge(commonConfig({ env: ENV }), {
             loader: '@ngtools/webpack'
         },
         {
-            test: /\.css$/,
-            use: ['to-string-loader', 'css-loader'],
-            exclude: /(vendor\.css|global\.css)/
+            test: /\.scss$/,
+            use: ['to-string-loader', 'css-loader', 'postcss-loader', {
+                loader: 'sass-loader',
+                options: { implementation: sass }
+            }],
+            exclude: /(vendor\.scss|global\.scss)/
         },
         {
-            test: /(vendor\.css|global\.css)/,
-            use: [
-                MiniCssExtractPlugin.loader,
-                'css-loader',
-                'postcss-loader'
-            ]
-        }, {
-            test: /\.(webp)(\?[a-z0-9=.]+)?$/,
-            loader: 'url-loader?limit=100000' }
-        ,]
+            test: /(vendor\.scss|global\.scss)/,
+            use: ['style-loader', 'css-loader', 'postcss-loader', {
+                loader: 'sass-loader',
+                options: { implementation: sass }
+            }]
+        }]
     },
-    optimization: {
-        runtimeChunk: false,
-        splitChunks: {
-            cacheGroups: {
-                commons: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all'
+    stats: process.env.JHI_DISABLE_WEBPACK_LOGS ? 'none' : options.stats,
+    plugins: [
+        process.env.JHI_DISABLE_WEBPACK_LOGS
+            ? null
+            : new SimpleProgressWebpackPlugin({
+                format: options.stats === 'minimal' ? 'compact' : 'expanded'
+              }),
+        new FriendlyErrorsWebpackPlugin(),
+        new ForkTsCheckerWebpackPlugin(),
+        new BrowserSyncPlugin({
+            https: options.tls,
+            host: 'localhost',
+            port: 9000,
+            proxy: {
+                target: `http${options.tls ? 's' : ''}://localhost:9060`,
+                ws: true,
+                proxyOptions: {
+                    changeOrigin: false  //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
+                }
+            },
+            socket: {
+                clients: {
+                    heartbeatTimeout: 60000
                 }
             }
-        },
-        minimizer: [
-            new TerserPlugin({
-                parallel: true,
-                cache: true,
-                terserOptions: {
-                    ie8: false,
-                    // sourceMap: true, // Enable source maps. Please note that this will slow down the build
-                    compress: {
-                        dead_code: true,
-                        warnings: false,
-                        properties: true,
-                        drop_debugger: true,
-                        conditionals: true,
-                        booleans: true,
-                        loops: true,
-                        unused: true,
-                        toplevel: true,
-                        if_return: true,
-                        inline: true,
-                        join_vars: true
-                    },
-                    output: {
-                        comments: false,
-                        beautify: false,
-                        indent_level: 2
-                    }
-                }
-            }),
-            new OptimizeCSSAssetsPlugin({})
-        ]
-    },
-    plugins: [
-        new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // both options are optional
-            filename: '[name].[contenthash].css',
-            chunkFilename: '[id].css'
-        }),
-        new MomentLocalesPlugin({
-            localesToKeep: [
-                // jhipster-needle-i18n-language-moment-webpack - JHipster will add/remove languages in this array
-            ]
-        }),
-        new Visualizer({
-            // Webpack statistics in target folder
-            filename: '../stats.html'
+        }, {
+            reload: false
         }),
         new AngularCompilerPlugin({
             mainPath: utils.root('src/main/webapp/app/app.main.ts'),
@@ -117,10 +114,18 @@ module.exports = webpackMerge(commonConfig({ env: ENV }), {
             minimize: true,
             debug: false
         }),
-        new WorkboxPlugin.GenerateSW({
-          clientsClaim: true,
-          skipWaiting: true,
+        new webpack.ContextReplacementPlugin(
+            /angular(\\|\/)core(\\|\/)/,
+            path.resolve(__dirname, './src/main/webapp/')
+        ),
+        new writeFilePlugin(),
+        new webpack.WatchIgnorePlugin([
+            utils.root('src/test'),
+        ]),
+        new WebpackNotifierPlugin({
+            title: 'JHipster',
+            contentImage: path.join(__dirname, 'logo-jhipster.png')
         })
-    ],
-    mode: 'production'
+    ].filter(Boolean),
+    mode: 'development'
 });

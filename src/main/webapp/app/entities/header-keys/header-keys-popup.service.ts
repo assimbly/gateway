@@ -33,19 +33,21 @@ export class HeaderKeysPopupService {
         });
     }
 
-    headerKeysModalRef(component: Component, headerKeys: IHeaderKeys): NgbModalRef {
+    headerKeysModalRef(component: any, headerKeys: IHeaderKeys): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
-        modalRef.componentInstance.headerKeys = headerKeys;
-        modalRef.result.then(
-            result => {
-                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
-            },
-            reason => {
-                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
-            }
-        );
+        if (typeof component as Component) {
+            modalRef.componentInstance.headerKeys = headerKeys;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

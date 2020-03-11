@@ -3,8 +3,8 @@ import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 
 import { NgbDateMomentAdapter } from './util/datepicker-adapter';
 import { GatewaySharedLibsModule, GatewaySharedCommonModule, JhiLoginModalComponent, HasAnyAuthorityDirective } from './';
-import { WindowRef } from 'app/shared/auth/window.service';
-import { CSRFService } from 'app/core';
+import { WindowRef } from '../../app/shared/auth/window.service';
+import { CSRFService } from '../../app/core';
 
 @NgModule({
     imports: [GatewaySharedLibsModule, GatewaySharedCommonModule],
