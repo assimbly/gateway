@@ -323,18 +323,20 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 break;
             case 'delete':
                 if (this.isAdmin) {
-                    let modalRef = this.modalService.open(FlowDeleteDialogComponent as Component);
-                    modalRef.componentInstance.flow = this.flow;
-                    modalRef.result.then(
-                        result => {
-                            this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                            modalRef = null;
-                        },
-                        reason => {
-                            this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                            modalRef = null;
-                        }
-                    );
+                    let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
+                    if (typeof FlowDeleteDialogComponent as Component) {
+                        modalRef.componentInstance.flow = this.flow;
+                        modalRef.result.then(
+                            result => {
+                                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                                modalRef = null;
+                            },
+                            reason => {
+                                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                                modalRef = null;
+                            }
+                        );
+                    }
                 } else {
                     this.router.navigate(['../flow', this.flow.id]);
                 }

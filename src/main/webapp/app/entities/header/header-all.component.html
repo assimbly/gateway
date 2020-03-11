@@ -27,16 +27,14 @@
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
-                            <button type="button" *ngIf="!isAdmin" [routerLink]="['./', header.id ]" class="btn btn-info btn-sm">
+                            <button type="button" *ngIf="!isAdmin" [routerLink]="['/header', header.id, 'view' ]" replaceUrl="true" queryParamsHandling="merge" class="btn btn-info btn-sm">
                                 <span class="fa fa-eye"></span> View details
                             </button>
-                            <button type="button" *ngIf="isAdmin" [routerLink]="['/header', header.id, 'edit']" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/header', header.id, 'edit']" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary btn-sm">
                                 <span class="fa fa-pencil"></span>&nbsp;
                                 <span> Edit</span>
                             </button>
-                            <button type="button" *ngIf="isAdmin" [routerLink]="['/header', header.id, 'edit']" replaceUrl="true" queryParamsHandling="merge"
-                                fragment="clone" class="btn btn-info btn-sm">
+                            <button type="button" *ngIf="isAdmin" [routerLink]="['/header', header.id, 'edit']" replaceUrl="true" queryParamsHandling="merge" fragment="clone" class="btn btn-info btn-sm">
                                 <span class="fa fa-clone"></span>&nbsp;
                                 <span> Clone</span>
                             </button>

@@ -116,7 +116,7 @@
 						<div [innerHtml]="errorPopoverMessage"></div>
 					</ng-template>
 					
-					<!-- styling of tabset is in global.css -->
+					<!-- styling of tabset is in global.scss -->
 					<ngb-accordion [closeOthers]="true" activeIds="From" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
 						<ngb-panel ngbPanelTitle id="fromTab">
 							 <ng-template ngbPanelTitle>
@@ -132,11 +132,9 @@
 									<div class="col-12" style="padding-left: 20px;" [formGroupName]="'0'">
 										<div class="input-group">
 											<a class="col-8"></a>
-											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-												<img src="../../../content/images/apache-camel.png" />
+											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
 											</a>
-											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-												<img src="../../../content/images/assimbly_transparant_small.png" />
+											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
 											</a>
 										</div>
 										<div class="form-group" [style.display]="'none'">
@@ -212,8 +210,7 @@
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="New header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
 												</button>
 												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
@@ -228,8 +225,7 @@
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="New service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
 												</button>
 												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
@@ -257,11 +253,9 @@
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
 										<div class="input-group">
 											<a class="col-8"></a>
-												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-													<img src="../../../content/images/apache-camel.png" />
+												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
 												</a>
-												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-													<img src="../../../content/images/assimbly_transparant_small.png" />
+												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
 												</a>												
 										</div>										
 										<div class="form-group" [style.display]="'none'">
@@ -336,8 +330,7 @@
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil  padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="New header" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 												</button>
 												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
@@ -353,8 +346,7 @@
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="New service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.disabled">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.disabled">
 												</button>
 												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
@@ -391,11 +383,9 @@
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="'1'">
 										<div class="input-group">
 											<a class="col-8"></a>
-											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-												<img src="../../../content/images/apache-camel.png" />
+											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
 											</a>
-											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-												<img src="../../../content/images/assimbly_transparant_small.png" />
+											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
 											</a>
 										</div>	
 										<div class="form-group" [style.display]="'none'">
@@ -471,8 +461,7 @@
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="New header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
 												</button>
 												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
@@ -487,8 +476,7 @@
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="New service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.disabled">
-													<img class="h-20 padding-button" src="../../../content/images/new_page.png" />
+												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.disabled">
 												</button>
 												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.disabled">
 													<span class="fa fa-plus padding-button"></span>&nbsp;

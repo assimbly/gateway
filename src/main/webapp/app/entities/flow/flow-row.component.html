@@ -65,11 +65,11 @@
 					triggers="mouseenter:mouseleave"
 					 popoverTitle="Stats"
 					[popover]="statsTemplate" class="fa fa-bar-chart"></i>						
-				<a style="padding-left: 1em" (click)="navigateToFlow('edit')" class="fa fa-edit" aria-hidden="true"
+				<a style="padding-left: 1em" *ngIf="isAdmin" (click)="navigateToFlow('edit')" class="fa fa-edit" aria-hidden="true"
 					placement="right" title="Edit flow"></a> 
-				<a  style="padding-left: 1em" (click)="navigateToFlow('clone')"
+				<a  style="padding-left: 1em" *ngIf="isAdmin" (click)="navigateToFlow('clone')"
 					placement="right" title="Clone flow" class="fa fa-clone"></a>
-				<a  style="padding-left: 1em" (click)="navigateToFlow('delete')" placement="right" title="Delete flow" class="fa fa-trash"></a>
+				<a  style="padding-left: 1em" *ngIf="isAdmin" (click)="navigateToFlow('delete')" placement="right" title="Delete flow" class="fa fa-trash"></a>
 			 </div>
 	 </div>	
 </td>

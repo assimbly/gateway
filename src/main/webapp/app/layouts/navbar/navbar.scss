@@ -9,45 +9,48 @@ Navbar
 .jh-navbar {
     background-color: #353d47;
     padding: 0.2em 1em;
-}
 
-.jh-navbar .profile-image {
-    margin: -10px 0px;
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-}
+    .profile-image {
+        margin: -10px 0px;
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
 
-.jh-navbar .dropdown-item.active,
-.jh-navbar .dropdown-item.active:focus,
-.jh-navbar .dropdown-item.active:hover {
-    background-color: #353d47;
-}
+    .dropdown-item.active {
+        background-color: #353d47;
 
-.jh-navbar .dropdown-toggle::after {
-    margin-left: 0.15em;
-}
+        &:focus,
+        &:hover {
+            background-color: #353d47;
+        }
+    }
 
-.jh-navbar ul.navbar-nav {
-    padding: 0.5em;
-}
+    .dropdown-toggle::after {
+        margin-left: 0.15em;
+    }
 
-.jh-navbar .navbar-nav .nav-item {
-    margin-left: 1.5rem;
-}
+    ul.navbar-nav {
+        padding: 0.5em;
+    }
 
-.jh-navbar a.nav-link {
-    font-weight: 400;
-}
+    .navbar-nav .nav-item {
+        margin-left: 1.5rem;
+    }
 
-.jh-navbar .jh-navbar-toggler {
-    color: #ccc;
-    font-size: 1.5em;
-    padding: 10px;
-}
+    a.nav-link {
+        font-weight: 400;
+    }
 
-.jh-navbar .jh-navbar-toggler:hover {
-    color: #fff;
+    .jh-navbar-toggler {
+        color: #ccc;
+        font-size: 1.5em;
+        padding: 10px;
+
+        &:hover {
+            color: #fff;
+        }
+    }
 }
 
 @media screen and (min-width: 768px) {

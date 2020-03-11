@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const { BaseHrefWebpackPlugin } = require('base-href-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const rxPaths = require('rxjs/_esm5/path-mapping');
@@ -9,6 +10,7 @@ module.exports = (options) => ({
     resolve: {
         extensions: ['.ts', '.js'],
         modules: ['node_modules'],
+        mainFields: [ 'es2015', 'browser', 'module', 'main'],
         alias: {
             app: utils.root('src/main/webapp/app/'),
             ...rxPaths()
@@ -66,9 +68,8 @@ module.exports = (options) => ({
             }
         }),
         new CopyWebpackPlugin([
-            { from: './node_modules/swagger-ui/dist/css', to: 'swagger-ui/dist/css' },
-            { from: './node_modules/swagger-ui/dist/lib', to: 'swagger-ui/dist/lib' },
-            { from: './node_modules/swagger-ui/dist/swagger-ui.min.js', to: 'swagger-ui/dist/swagger-ui.min.js' },
+            { from: './node_modules/swagger-ui-dist/*.{js,css,html,png}', to: 'swagger-ui', flatten: true, ignore: ['index.html'] },
+            { from: './node_modules/axios/dist/axios.min.js', to: 'swagger-ui' },
             { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui' },
             { from: './src/main/webapp/content/', to: 'content' },
             { from: './src/main/webapp/favicon.ico', to: 'favicon.ico' },
@@ -81,6 +82,7 @@ module.exports = (options) => ({
             chunks: ['vendors', 'polyfills', 'main', 'global'],
             chunksSortMode: 'manual',
             inject: 'body'
-        })
+        }),
+        new BaseHrefWebpackPlugin({ baseHref: '/' })
     ]
 });
