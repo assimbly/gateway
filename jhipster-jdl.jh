@@ -22,6 +22,7 @@ entity Flow {
 	maximumRedeliveries Integer,
 	redeliveryDelay Integer,
 	loadBalancing Boolean,
+	logLevel LogLevelType
 	instances Integer		
 }
 
@@ -106,6 +107,10 @@ enum ConnectorType {
 
 enum EndpointType {
    ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
+}
+
+enum LogLevelType {
+   ERROR, WARN, INFO, DEBUG, TRACE, OFF 
 }
 
 relationship OneToOne {

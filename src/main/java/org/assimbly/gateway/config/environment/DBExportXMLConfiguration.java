@@ -270,6 +270,13 @@ public class DBExportXMLConfiguration {
 		Element redeliveryDelay = doc.createElement("redeliveryDelay");
 		redeliveryDelay.appendChild(doc.createTextNode(flowRedeliveryDelay));
 		flow.appendChild(redeliveryDelay);
+
+		// set logLevel
+		String flowLogLevel = flowDB.getLogLevel().toString();
+		Element logLevel = doc.createElement("logLevel");
+		logLevel.appendChild(doc.createTextNode(flowLogLevel));
+		flow.appendChild(logLevel);
+		
 		
 		// set endpoints
 		setXMLFromEndpointFromDB(fromEndpoint);

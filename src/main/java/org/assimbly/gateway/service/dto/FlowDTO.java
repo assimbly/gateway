@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 /**
  * A DTO for the Flow entity.
@@ -27,6 +28,8 @@ public class FlowDTO implements Serializable {
     private String type;
 
     private Boolean loadBalancing;
+
+    private LogLevelType logLevel;
 
     private Integer instances;
 
@@ -102,6 +105,15 @@ public class FlowDTO implements Serializable {
         this.loadBalancing = loadBalancing;
     }
 
+    public LogLevelType getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel(LogLevelType logLevel) {
+        this.logLevel = logLevel;
+    }
+
+    
     public Integer getInstances() {
         return instances;
     }
@@ -174,6 +186,7 @@ public class FlowDTO implements Serializable {
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
+            ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
             ", fromEndpoint=" + getFromEndpointId() +

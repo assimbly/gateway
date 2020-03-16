@@ -44,6 +44,9 @@
 					<ng-template #redeliveryDelayPopover let-message="message">
 						<div [innerHtml]="redeliveryDelayPopoverMessage"></div>
 					</ng-template>
+					<ng-template #logLevelPopover let-message="message">
+						<div [innerHtml]="logLevelPopoverMessage"></div>
+					</ng-template>					
 					<div class="form-group w-25">
 						<label class="form-control-label" for="field_autostart">Autostart</label>
 						<i triggers="mouseenter:mouseleave"
@@ -86,6 +89,25 @@
 								class="fa fa-info-circle"></i>
 							<input min="0" max="1000" size="0" maxlength="4" type="number" name="redeliveryDelay" class="form-control" id="redeliveryDelay" *ngIf="flow" formControlName="redeliveryDelay" required>
 						</div>
+						<div class="form-group w-25">
+							<label class="form-control-label" for="field_logLevel">Log Level</label>
+							<i  triggers="mouseenter:mouseleave"
+								placement="right" triggers="mouseenter:mouseleave"
+								popoverTitle="Info"
+								 [popover]="logLevelPopover" 
+								class="fa fa-info-circle"></i>
+								<select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel" >
+								
+								<option *ngFor="let logLevel of logLevelListType" [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+								    {{logLevel}}
+								</option>
+								
+			            </select>
+			            <!-- 
+							<select class="form-control" id="field_logLevel" formControlName="logLevel">
+									<option *ngFor="let id of logLevelListType" [ngValue]="logLevel[id]">{{logLevel[id]}}</option>
+							</select>-->	
+						</div> 					
 						<div class="form-group" *ngIf="!singleGateway">
 							<label class="form-control-label" for="field_gateway">Gateway</label>
 							<select class="form-control" id="field_gateway" *ngIf="flow" formControlName="gateway">

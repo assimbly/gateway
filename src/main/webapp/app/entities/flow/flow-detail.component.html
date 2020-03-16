@@ -26,6 +26,10 @@
                     <td>{{flow.redeliveryDelay}}</td>
                 </tr>
                 <tr>
+                    <th>Log Level</th>
+                    <td>{{flow.logLevel}}</td>
+                </tr>
+                <tr>
                     <th class="lastItemBorder">Gateway name</th>
                     <td class="lastItemBorder"><a [routerLink]="['/gateway', flow.gatewayId, 'view']" *ngIf="!!gateway">{{gateway.name}}</a></td>
                 </tr>

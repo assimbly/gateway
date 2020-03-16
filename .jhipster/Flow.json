@@ -6,7 +6,8 @@
             "relationshipName": "gateway",
             "otherEntityName": "gateway",
             "relationshipType": "many-to-one",
-            "otherEntityField": "id"
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "flow"
         },
         {
             "relationshipType": "one-to-one",
@@ -63,6 +64,11 @@
         {
             "fieldName": "instances",
             "fieldType": "Integer"
+        },
+        {
+            "fieldName": "logLevel",
+            "fieldType": "LogLevelType",
+            "fieldValues": "ERROR,WARN,INFO,DEBUG,TRACE,OFF"
         }
     ],
     "changelogDate": "20180114132915",
@@ -71,5 +77,7 @@
     "service": "serviceImpl",
     "entityTableName": "flow",
     "jpaMetamodelFiltering": false,
-    "pagination": "infinite-scroll"
+    "pagination": "infinite-scroll",
+    "databaseType": "sql",
+    "readOnly": false
 }

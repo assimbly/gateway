@@ -31,7 +31,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '1.8.0'
+version = '1.9.0'
 
 description = ""
 
@@ -346,7 +346,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "6.1"
+    gradleVersion = "6.2.2"
 }
 
 
