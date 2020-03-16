@@ -1,4 +1,4 @@
-import { IToEndpoint } from 'app/shared/model//to-endpoint.model';
+import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
 
 export interface IFlow {
     id?: number;
@@ -7,6 +7,10 @@ export interface IFlow {
     offLoading?: boolean;
     maximumRedeliveries?: number;
     redeliveryDelay?: number;
+    type?: string;
+    loadBalancing?: boolean;
+    instances?: number;
+    logLevel?: LogLevelType;
     gatewayId?: number;
     fromEndpointId?: number;
     errorEndpointId?: number;
@@ -21,6 +25,10 @@ export class Flow implements IFlow {
         public offLoading?: boolean,
         public maximumRedeliveries?: number,
         public redeliveryDelay?: number,
+        public type?: string,
+        public loadBalancing?: boolean,
+        public instances?: number,
+        public logLevel?: LogLevelType,
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,
@@ -28,7 +36,15 @@ export class Flow implements IFlow {
     ) {
         this.autoStart = this.autoStart || false;
         this.offLoading = this.offLoading || false;
-        this.maximumRedeliveries = this.maximumRedeliveries || 0;
-        this.redeliveryDelay = this.redeliveryDelay || 30000;
+        this.loadBalancing = this.loadBalancing || false;
     }
+}
+
+export const enum LogLevelType {
+    OFF = 'OFF',
+    INFO = 'INFO',
+    WARN = 'WARN',
+    ERROR = 'ERROR',
+    DEBUG = 'DEBUG',
+    TRACE = 'TRACE'
 }

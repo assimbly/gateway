@@ -389,6 +389,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 <b>Offloading:</b> ${this.flow.offLoading}<br/><br/>
                 <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
                 <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
+                <b>Log Level:</b> ${this.flow.logLevel}<br/>
 
         `;
     }

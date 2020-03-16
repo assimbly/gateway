@@ -6,7 +6,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbTabset, NgbTabChangeEvent, NgbAccordion, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IGateway, Gateway } from 'app/shared/model/gateway.model';
-import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { IToEndpoint, ToEndpoint } from 'app/shared/model/to-endpoint.model';
@@ -35,6 +35,7 @@ import { ServicePopupService, ServiceDialogComponent } from 'app/entities/servic
     templateUrl: './flow-edit-all.component.html'
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
+    
     flow: IFlow;
     fromEndpoint: IFromEndpoint;
     fromEndpointOptions: Array<Option> = [];
@@ -45,6 +46,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toEndpoint: IToEndpoint;
     services: Service[];
     headers: IHeader[];
+    
+    public logLevelListType = [LogLevelType.OFF, LogLevelType.INFO, LogLevelType.ERROR, LogLevelType.TRACE,LogLevelType.WARN,LogLevelType.DEBUG];
+       
+    
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
@@ -73,6 +78,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     offloadingPopoverMessage: string;
     maximumRedeliveriesPopoverMessage: string;
     redeliveryDelayPopoverMessage: string;
+    logLevelPopoverMessage: string
 
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
@@ -318,6 +324,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.flow.offLoading = false;
                     this.flow.maximumRedeliveries = 0;
                     this.flow.redeliveryDelay = 3000;
+                    this.flow.logLevel = LogLevelType.OFF;
                     if (this.singleGateway) {
                         this.indexGateway = 0;
                         this.flow.gatewayId = this.gateways[this.indexGateway].id;
@@ -524,6 +531,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                          This endpoint is configured at <i>Settings --> Offloading</i>.`;
         this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
         this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
+        this.logLevelPopoverMessage = `Sets the log level of flow (default=OFF). This logs incoming and outgoing messages in the flow`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
@@ -543,6 +551,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             offloading: new FormControl(flow.offLoading),
             maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
             redeliveryDelay: new FormControl(flow.redeliveryDelay),
+            logLevel: new FormControl(flow.logLevel),
             gateway: new FormControl(flow.gatewayId),
             endpointsData: new FormArray([])
         });
@@ -584,6 +593,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             offloading: flow.offLoading,
             maximumRedeliveries: flow.maximumRedeliveries,
             redeliveryDelay: flow.redeliveryDelay,
+            logLevel: flow.logLevel,
             gateway: flow.gatewayId
         });
     }
@@ -982,6 +992,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.flow.offLoading = flowControls.offloading.value;
         this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
         this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;
+        this.flow.logLevel = flowControls.logLevel.value;
         this.flow.gatewayId = flowControls.gateway.value;
 
         (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {

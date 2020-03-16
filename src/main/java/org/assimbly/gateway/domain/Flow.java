@@ -2,6 +2,8 @@ package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.assimbly.gateway.domain.enumeration.LogLevelType;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -47,6 +49,9 @@ public class Flow implements Serializable {
     @Column(name = "load_balancing")
     private Boolean loadBalancing;
 
+    @Column(name = "log_level")
+    private LogLevelType logLevel;
+    
     @Column(name = "instances")
     private Integer instances;
 
@@ -172,6 +177,19 @@ public class Flow implements Serializable {
         this.loadBalancing = loadBalancing;
     }
 
+    public LogLevelType getLogLevel() {
+        return logLevel;
+    }
+
+    public Flow logLevel(LogLevelType logLevel) {
+        this.logLevel = logLevel;
+        return this;
+    }
+
+    public void setLogLevel(LogLevelType logLevel) {
+        this.logLevel = logLevel;
+    }
+    
     public Integer getInstances() {
         return instances;
     }

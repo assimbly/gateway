@@ -20,6 +20,7 @@ import org.assimbly.gateway.domain.ToEndpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
+import org.assimbly.gateway.domain.enumeration.LogLevelType;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -165,6 +166,7 @@ public class DBImportXMLConfiguration {
 
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
+		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/logLevel", doc);
 		
 		if (!flowId.isEmpty()) {
 
@@ -221,6 +223,12 @@ public class DBImportXMLConfiguration {
 				flow.setRedeliveryDelay(Integer.parseInt(flowRedeliveryDelay));
 			} else {
 				flow.setRedeliveryDelay(3000);
+			}
+			
+			if (flowLogLevel != null) {
+				flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
+			} else {
+				flow.setLogLevel(LogLevelType.OFF);
 			}
 
 			flow.setFromEndpoint(fromEndpoint);
