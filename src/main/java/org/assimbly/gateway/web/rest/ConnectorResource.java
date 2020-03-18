@@ -699,7 +699,20 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",e.getMessage());
 		}
     }
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/route/{id}", produces = {"application/xml","application/json"})
+    public ResponseEntity<String> getCamelRoute(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
+		try {
+        	flowId = id.toString();
+    		String camelRoute = connector.getCamelRouteConfiguration(flowId, mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/route/{id}",camelRoute,true);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/route/{id}",e.getMessage());
+		}
+    }
+    
     /**
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
      *
@@ -741,12 +754,13 @@ public class ConnectorResource {
     
     //private methods    
      private void init() throws Exception {
-    
+
        	if(!connector.isStarted() && !connectorIsStarting){
         	try {
-        		
+               
                 Gateway gateway = applicationProperties.getGateway();
-	            String applicationBaseDirectory = gateway.getBaseDirectory();                
+
+                String applicationBaseDirectory = gateway.getBaseDirectory();                
 
 	            if(!applicationBaseDirectory.equals("default")) {
 	            	connector.setBaseDirectory(applicationBaseDirectory);
@@ -758,11 +772,12 @@ public class ConnectorResource {
         		connector.start();
 		        
 				int count = 1;
-				
-        		do {
+
+                while (!connector.isStarted() && count < 300)
+                {
 		        	Thread.sleep(100);
 		        	count++;
-		        } while (!connector.isStarted() || count < 600);
+                }
 
         		connectorIsStarting = false;
         		
@@ -800,7 +815,7 @@ public class ConnectorResource {
     		log.error("Autostart of flow failed (check configuration)");
 			e.printStackTrace();
 		}
-		
+	
 	}
     
     public static boolean isWindows()
