@@ -17,11 +17,14 @@ import org.springframework.core.env.Environment;
 
 
 import javax.annotation.PostConstruct;
+
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 // @SpringBootApplication
 @SpringBootApplication(scanBasePackages = {"org.assimbly.gateway"})
@@ -31,6 +34,8 @@ public class GatewayApp {
     private static final Logger log = LoggerFactory.getLogger(GatewayApp.class);
 
     private final static String userHomeDir = System.getProperty("user.home");
+
+	private static long vmStartTime;
     
     private final Environment env;
 
@@ -64,17 +69,24 @@ public class GatewayApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
         SpringApplication app = new SpringApplication(GatewayApp.class);
+        
         DefaultProfileUtil.addDefaultProfile(app);
+
         Environment env = app.run(args).getEnvironment();
+        
         logApplicationStartup(env);
     }
 
     private static void logApplicationStartup(Environment env) {
-        String protocol = "http";
+
+    	String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
+        
+        
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
         if (StringUtils.isBlank(contextPath)) {
@@ -87,9 +99,14 @@ public class GatewayApp {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
         
+        vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
+        
+        long startupTime = ((System.currentTimeMillis() - vmStartTime)/1000);
+        
         String applicationName = "Assimbly " + env.getProperty("spring.application.name");
         String applicationVersion = env.getProperty("application.info.version");
         String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
+        String applicationStartupTime = Long.toString(startupTime); 
         String javaVersion = Runtime.class.getPackage().getImplementationVersion();
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
@@ -105,6 +122,7 @@ public class GatewayApp {
                 "Application '{}' is running! \n\n\t" +
                 "Application Version: \t{}\n\t" +
                 "Application BaseDir: \t{}\n\t" +
+                "Application Startup: \t{} Seconds\n\t" +
                 "Local URL: \t\t{}://localhost:{}{}\n\t" +
                 "External URL: \t\t{}://{}:{}{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
@@ -113,6 +131,7 @@ public class GatewayApp {
             applicationName,            
             applicationVersion,
             applicationBaseDirectory,
+            applicationStartupTime,
             protocol,
             serverPort,
             contextPath,
@@ -123,6 +142,7 @@ public class GatewayApp {
             javaVersion,
             javaWorkingDirectory,
             env.getActiveProfiles());
+
         
     }
     
