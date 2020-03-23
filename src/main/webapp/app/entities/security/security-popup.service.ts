@@ -2,18 +2,13 @@ import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SecurityService } from './security.service';
-import { Security } from "app/shared/model/security.model";
+import { Security } from 'app/shared/model/security.model';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityPopupService {
     private ngbModalRef: NgbModalRef;
 
-    constructor(
-        private modalService: NgbModal,
-        private router: Router,
-        private securityService: SecurityService
-
-    ) {
+    constructor(private modalService: NgbModal, private router: Router, private securityService: SecurityService) {
         this.ngbModalRef = null;
     }
 
@@ -25,7 +20,7 @@ export class SecurityPopupService {
             }
 
             if (id) {
-                this.securityService.find(id).subscribe((gateway) => {
+                this.securityService.find(id).subscribe(gateway => {
                     this.ngbModalRef = this.gatewayModalRef(component, gateway.body);
                     resolve(this.ngbModalRef);
                 });
@@ -39,16 +34,21 @@ export class SecurityPopupService {
         });
     }
 
-    gatewayModalRef(component: Component, security: Security): NgbModalRef {
-        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.security = security;
-        modalRef.result.then((result) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        }, (reason) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        });
+    gatewayModalRef(component: any, security: Security): NgbModalRef {
+        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
+        if (typeof component as Component) {
+            modalRef.componentInstance.security = security;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

@@ -31,7 +31,7 @@ export class HeaderService {
         const options = createRequestOption(req);
         return this.http.get<IHeader[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
-    
+
     getAllHeaders(): Observable<EntityArrayResponseType> {
         return this.http.get<IHeader[]>(`${this.resourceUrl}/getallheaders`, { observe: 'response' });
     }

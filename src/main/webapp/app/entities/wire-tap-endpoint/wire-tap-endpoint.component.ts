@@ -6,14 +6,14 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { AccountService } from 'app/core';
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'jhi-wire-tap-endpoint',
     templateUrl: './wire-tap-endpoint.component.html'
 })
 export class WireTapEndpointComponent implements OnInit, OnDestroy {
-    wireTapEndpoints: IWireTapEndpoint[] = [];   
+    wireTapEndpoints: IWireTapEndpoint[] = [];
     currentAccount: any;
     eventSubscriber: Subscription;
     public isAdmin: boolean;
@@ -40,7 +40,7 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
-        this.accountService.hasAuthority('ROLE_ADMIN').then((r) => this.isAdmin = r);
+        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
         this.registerChangeInWireTapEndpoints();
     }
 
@@ -55,19 +55,18 @@ export class WireTapEndpointComponent implements OnInit, OnDestroy {
     registerChangeInWireTapEndpoints() {
         this.eventSubscriber = this.eventManager.subscribe('wireTapEndpointListModification', response => this.loadAll());
     }
-    
+
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
-    
+
     navigateToCreate() {
         this.router.navigate(['/wire-tap-endpoint-create']);
     }
-    
+
     delete(id) {
-        this.wireTapEndpointService.delete(id).subscribe((r) => {
-            this.wireTapEndpoints.splice(this.wireTapEndpoints.indexOf(this.wireTapEndpoints.find((w) => w.id === id)), 1)
+        this.wireTapEndpointService.delete(id).subscribe(r => {
+            this.wireTapEndpoints.splice(this.wireTapEndpoints.indexOf(this.wireTapEndpoints.find(w => w.id === id)), 1);
         });
     }
- 
 }

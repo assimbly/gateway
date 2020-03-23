@@ -21,17 +21,8 @@ import {
 const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        RouterModule.forChild(ENTITY_STATES),
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-
-    ],
-    exports: [
-        FromEndpointComponent
-    ],
+    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES), NgSelectModule, FormsModule, ReactiveFormsModule],
+    exports: [FromEndpointComponent],
     declarations: [
         FromEndpointComponent,
         FromEndpointDetailComponent,
@@ -45,12 +36,9 @@ const ENTITY_STATES = [...fromEndpointRoute, ...fromEndpointPopupRoute];
         FromEndpointUpdateComponent,
         FromEndpointDialogComponent,
         FromEndpointDeleteDialogComponent,
-        FromEndpointDeletePopupComponent,
-    ],
-    providers: [
-        Components,
         FromEndpointDeletePopupComponent
     ],
+    providers: [Components, FromEndpointDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayFromEndpointModule {}

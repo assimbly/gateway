@@ -2,7 +2,7 @@ export enum EndpointType {
     ACTIVEMQ = 'ACTIVEMQ',
     FILE = 'FILE',
     HTTP = 'HTTP',
-    HTTPS = 'HTTPS',    
+    HTTPS = 'HTTPS',
     KAFKA = 'KAFKA',
     SFTP = 'SFTP',
     SJMS = 'SJMS',

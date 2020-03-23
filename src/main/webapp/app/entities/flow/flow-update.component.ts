@@ -4,7 +4,7 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { JhiAlertService } from 'ng-jhipster';
 
-import { IFlow } from 'app/shared/model/flow.model';
+import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway';
@@ -20,6 +20,8 @@ import { ErrorEndpointService } from 'app/entities/error-endpoint';
 export class FlowUpdateComponent implements OnInit {
     flow: IFlow;
     isSaving: boolean;
+
+    public logLevelListType = [LogLevelType.OFF, LogLevelType.INFO, LogLevelType.ERROR, LogLevelType.TRACE,LogLevelType.WARN,LogLevelType.DEBUG];
 
     gateways: IGateway[];
 

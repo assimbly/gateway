@@ -16,9 +16,8 @@
                 <div class="input-group">
                     <ng-select [items]="components.wireTapTypes" formControlName="type" id="field_type" (change)="setTypeLink($event)"></ng-select>
                     <div class="input-group-append d-flex">
-                        <a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel" href="{{typeCamelLink}}"
+                        <a role="button" class="btn btn-outline-secondary left-border-radius-0 camel-link p-button-camel wiretap-camel-button padding-button" href="{{typeCamelLink}}"
                             [ngClass]="{'disabled': !typeCamelLink}" target="_blank" title="Camel {{wireTapEndpoint.type}} component documentation">
-                            <img src="../../../content/images/apache-camel.png" />
                         </a>
                     </div>
                 </div>
@@ -81,9 +80,8 @@
                             (click)="createOrEditHeader()">
                             <span class="fa fa-pencil padding-button"></span>&nbsp;
                         </button>
-                        <button type="button" *ngIf="headerCreated && !wireTapForm['controls'].header.value" class="btn btn-primary" title="New header"
+                        <button type="button" *ngIf="headerCreated && !wireTapForm['controls'].header.value" class="btn btn-primary wiretap-header-button" title="New header"
                             (click)="createOrEditHeader()">
-                            <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
                         </button>
                         <button type="button" *ngIf="!headerCreated" class="btn btn-primary" title="Create header" (click)="createOrEditHeader()">
                             <span class="fa fa-plus padding-button"></span>&nbsp;
@@ -100,9 +98,8 @@
                             (click)="createOrEditService()">
                             <span class="fa fa-pencil padding-button"></span>&nbsp;
                         </button>
-                        <button type="button" *ngIf="serviceCreated && !wireTapForm['controls'].service.value" class="btn btn-primary" title="New service"
+                        <button type="button" *ngIf="serviceCreated && !wireTapForm['controls'].service.value" class="btn btn-primary wiretap-header-button" title="New service"
                             (click)="createOrEditService()" [disabled]="wireTapForm['controls'].service.disabled">
-                            <img class="h-20 padding-button" src="../../../content/images/new_page.png" />
                         </button>
                         <button type="button" *ngIf="!serviceCreated" class="btn btn-primary" title="Create service" (click)="createOrEditService()">
                             <span class="fa fa-plus padding-button"></span>&nbsp;

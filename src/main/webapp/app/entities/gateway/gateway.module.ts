@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap';
 import { Components } from 'app/shared/camel/component-type';
-import { GatewaySharedModule } from "app/shared";
+import { GatewaySharedModule } from 'app/shared';
 
 import {
     GatewayComponent,
@@ -33,17 +33,13 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
     ],
     entryComponents: [
         GatewayComponent,
-		GatewayUpdateComponent,
+        GatewayUpdateComponent,
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
         GatewayImportDialogComponent
     ],
-    providers: [
-        Components,
-        GatewayService,
-        GatewayPopupService
-    ],
+    providers: [Components, GatewayService, GatewayPopupService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayGatewayModule {}

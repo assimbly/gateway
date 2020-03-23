@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { auditsRoute, configurationRoute, docsRoute, healthRoute, logsRoute, logViewerRoute, metricsRoute, userMgmtRoute } from './';
 
-import { UserRouteAccessService } from 'app/core';
+import { UserRouteAccessService } from '../../app/core';
 
 const ADMIN_ROUTES = [auditsRoute, configurationRoute, docsRoute, healthRoute, logsRoute, logViewerRoute, ...userMgmtRoute, metricsRoute];
 

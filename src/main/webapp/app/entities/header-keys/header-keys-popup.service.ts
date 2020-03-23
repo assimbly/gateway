@@ -8,12 +8,7 @@ import { HeaderKeysService } from './header-keys.service';
 export class HeaderKeysPopupService {
     private ngbModalRef: NgbModalRef;
 
-    constructor(
-        private modalService: NgbModal,
-        private router: Router,
-        private headerKeysService: HeaderKeysService
-
-    ) {
+    constructor(private modalService: NgbModal, private router: Router, private headerKeysService: HeaderKeysService) {
         this.ngbModalRef = null;
     }
 
@@ -24,7 +19,7 @@ export class HeaderKeysPopupService {
                 resolve(this.ngbModalRef);
             }
             if (id) {
-                this.headerKeysService.find(id).subscribe((headerKeys) => {
+                this.headerKeysService.find(id).subscribe(headerKeys => {
                     this.ngbModalRef = this.headerKeysModalRef(component, headerKeys.body);
                     resolve(this.ngbModalRef);
                 });
@@ -38,16 +33,21 @@ export class HeaderKeysPopupService {
         });
     }
 
-    headerKeysModalRef(component: Component, headerKeys: IHeaderKeys): NgbModalRef {
-        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.headerKeys = headerKeys;
-        modalRef.result.then((result) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        }, (reason) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        });
+    headerKeysModalRef(component: any, headerKeys: IHeaderKeys): NgbModalRef {
+        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
+        if (typeof component as Component) {
+            modalRef.componentInstance.headerKeys = headerKeys;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

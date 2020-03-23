@@ -10,7 +10,7 @@ import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
-import { GatewaySecurityModule } from "../../entities/security/security.module";
+import { GatewaySecurityModule } from '../../entities/security/security.module';
 
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
@@ -29,10 +29,10 @@ import {
 } from './';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlowService } from "app/entities/flow/flow.service";
-import { Components } from "app/shared/camel/component-type";
+import { FlowService } from 'app/entities/flow/flow.service';
+import { Components } from 'app/shared/camel/component-type';
 
-const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
+const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 
 @NgModule({
     imports: [
@@ -49,16 +49,14 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
-        PopoverModule.forRoot(),
+        PopoverModule.forRoot()
     ],
-    exports: [
-        FlowComponent
-    ],
+    exports: [FlowComponent],
     declarations: [
         FlowComponent,
         FlowUpdateComponent,
         FlowEditAllComponent,
-        FlowConfigurationComponent,        
+        FlowConfigurationComponent,
         FlowDetailComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
@@ -67,13 +65,13 @@ const ENTITY_STATES = [...flowRoute,...flowPopupRoute,];
         FlowSearchByNamePipe
     ],
     entryComponents: [
-		FlowComponent,
-		FlowUpdateComponent,
+        FlowComponent,
+        FlowUpdateComponent,
         FlowEditAllComponent,
-		FlowDeleteDialogComponent,
-		FlowConfigurationComponent,		
-		FlowDeleteDialogComponent,
-		FlowDeletePopupComponent,
+        FlowDeleteDialogComponent,
+        FlowConfigurationComponent,
+        FlowDeleteDialogComponent,
+        FlowDeletePopupComponent,
         FlowConfigurationComponent
     ],
     providers: [FlowService, FlowPopupService],

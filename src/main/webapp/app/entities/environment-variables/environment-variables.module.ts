@@ -8,7 +8,7 @@ import {
     EnvironmentVariablesUpdateComponent,
     EnvironmentVariablesDialogComponent,
     EnvironmentVariablesDeletePopupComponent,
-    EnvironmentVariablesDeleteDialogComponent,    
+    EnvironmentVariablesDeleteDialogComponent,
     environmentVariablesRoute,
     environmentVariablesPopupRoute
 } from './';
