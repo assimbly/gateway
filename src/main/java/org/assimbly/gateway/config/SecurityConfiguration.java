@@ -34,44 +34,30 @@ import javax.annotation.PostConstruct;
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-    private final UserDetailsService userDetailsService;
-
     private final JHipsterProperties jHipsterProperties;
 
     private final RememberMeServices rememberMeServices;
 
     private final CorsFilter corsFilter;
-
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder, UserDetailsService userDetailsService, 
-        JHipsterProperties jHipsterProperties, RememberMeServices rememberMeServices, CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.userDetailsService = userDetailsService;
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, RememberMeServices rememberMeServices, CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
         this.jHipsterProperties = jHipsterProperties;
         this.rememberMeServices = rememberMeServices;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
     }
 
-    @PostConstruct
-    public void init() {
-        try {
-            authenticationManagerBuilder
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-        } catch (Exception e) {
-            throw new BeanInitializationException("Security configuration failed", e);
-        }
-    }
-
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @PostConstruct
+//    public void init() {
+//        try {
+//            authenticationManagerBuilder
+//                .userDetailsService(userDetailsService)
+//                .passwordEncoder(passwordEncoder());
+//        } catch (Exception e) {
+//            throw new BeanInitializationException("Security configuration failed", e);
+//        }
+//    }
 
     @Bean
     public AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
@@ -102,8 +88,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/content/**")
             .antMatchers("/h2-console/**")
             .antMatchers("/swagger-ui/index.html")
-            .antMatchers("/test/**")
-            .antMatchers("/h2-console/**")
             .antMatchers("/management/jolokia/**")
             .antMatchers("/management/hawtio/**")
             .antMatchers("/jolokia/**")

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 
-import {  } from 'rxjs/Observable';
+import {} from 'rxjs/Observable';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IWireTapEndpoint, WireTapEndpoint, EndpointType } from 'app/shared/model/wire-tap-endpoint.model';
@@ -16,8 +16,8 @@ import { Components, typesLinks } from '../../shared/camel/component-type';
 import { FlowService } from '../flow/flow.service';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Option } from '../flow';
-import { HttpResponse } from "@angular/common/http";
-import { map } from "rxjs/operators";
+import { HttpResponse } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-wire-tap-endpoint-edit',
@@ -43,7 +43,7 @@ export class WireTapEndpointEditComponent implements OnInit {
     uriPlaceholder: string;
     uriPopoverMessage: string;
     wiretapComponentOptions: any;
-    
+
     constructor(
         private jhiAlertService: JhiAlertService,
         private wireTapEndpointService: WireTapEndpointService,
@@ -54,14 +54,13 @@ export class WireTapEndpointEditComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         public components: Components
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.wireTapEndpoint = new WireTapEndpoint();
         this.isSaving = false;
         this.initializeEndpointData();
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe(params => {
             this.load(params['id']);
         });
     }
@@ -108,18 +107,15 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     save() {
-
         this.isSaving = true;
         this.setDataFromForm();
         this.setEndpointOptions();
         this.isSaving = false;
 
         if (this.wireTapEndpoint.id) {
-            this.subscribeToSaveResponse(
-                this.wireTapEndpointService.update(this.wireTapEndpoint));
+            this.subscribeToSaveResponse(this.wireTapEndpointService.update(this.wireTapEndpoint));
         } else {
-            this.subscribeToSaveResponse(
-                this.wireTapEndpointService.create(this.wireTapEndpoint));
+            this.subscribeToSaveResponse(this.wireTapEndpointService.create(this.wireTapEndpoint));
         }
     }
 
@@ -155,29 +151,29 @@ export class WireTapEndpointEditComponent implements OnInit {
             this.wireTapEndpoint.type = e;
         }
 
-        let type = typesLinks.find((x) => x.name === this.wireTapEndpoint.type.toString());
+        let type = typesLinks.find(x => x.name === this.wireTapEndpoint.type.toString());
         this.wireTapForm.controls.service.setValue('');
         this.filterServices();
         this.typeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
         this.typeCamelLink = this.camelDocUrl + type.camelTypeLink;
         this.uriPlaceholder = type.uriPlaceholder;
         this.uriPopoverMessage = type.uriPopoverMessage;
-        
-        this.wireTapForm.patchValue({ 'type': type.name });
 
-        let componentType = this.wireTapForm.controls.type.value
-        componentType = componentType.toLowerCase()
+        this.wireTapForm.patchValue({ type: type.name });
+
+        let componentType = this.wireTapForm.controls.type.value;
+        componentType = componentType.toLowerCase();
         if (componentType === 'activemq') {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
         }
-        
+
         // get options keys
-        this.getComponentOptions(componentType).subscribe((data) => {
+        this.getComponentOptions(componentType).subscribe(data => {
             this.wiretapComponentOptions = Object.keys(data.properties);
         });
-        
+
         switch (this.wireTapForm.controls.type.value) {
             case 'WASTEBIN': {
                 this.wireTapForm.controls.uri.disable();
@@ -186,7 +182,10 @@ export class WireTapEndpointEditComponent implements OnInit {
                 this.wireTapForm.controls.header.disable();
                 break;
             }
-            case 'ACTIVEMQ': case 'SJMS': case 'SONICMQ': case 'SQL': {
+            case 'ACTIVEMQ':
+            case 'SJMS':
+            case 'SONICMQ':
+            case 'SQL': {
                 this.wireTapForm.controls.uri.enable();
                 this.wireTapForm.controls.options.enable();
                 this.wireTapForm.controls.header.enable();
@@ -205,8 +204,9 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     getOptions() {
         if (this.wireTapEndpoint.id) {
-
-            if (!this.wireTapEndpoint.options) { this.wireTapEndpoint.options = '' }
+            if (!this.wireTapEndpoint.options) {
+                this.wireTapEndpoint.options = '';
+            }
             const options = this.wireTapEndpoint.options.split('&');
 
             options.forEach((option, index) => {
@@ -216,15 +216,13 @@ export class WireTapEndpointEditComponent implements OnInit {
                 o.value = kv[1];
                 let formOptions = <FormArray>this.wireTapForm.controls.options;
                 if (typeof formOptions.controls[index] === 'undefined') {
-                    formOptions.push(
-                        this.initializeOption()
-                    )
+                    formOptions.push(this.initializeOption());
                 }
 
                 formOptions.controls[index].patchValue({
-                    'key': o.key,
-                    'value': o.value
-                })
+                    key: o.key,
+                    value: o.value
+                });
 
                 this.endpointOptions.push(o);
             });
@@ -232,23 +230,24 @@ export class WireTapEndpointEditComponent implements OnInit {
             this.addOption();
         }
     }
-    
+
     getComponentOptions(componentType: String): any {
-        return this.flowService.getComponentOptions(1, componentType).pipe(map((options) => {
-            return options.body;
-        }));
+        return this.flowService.getComponentOptions(1, componentType).pipe(
+            map(options => {
+                return options.body;
+            })
+        );
     }
 
     createOrEditHeader() {
         this.wireTapEndpoint.headerId = this.wireTapForm.controls.header.value;
-        (this.wireTapEndpoint.headerId) ?
-            this.router.navigate(['/', { outlets: { popup: 'header/' + this.wireTapEndpoint.headerId + '/edit' } }], { fragment: 'showEditHeaderButton' }) :
-            this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
+        this.wireTapEndpoint.headerId
+            ? this.router.navigate(['/', { outlets: { popup: 'header/' + this.wireTapEndpoint.headerId + '/edit' } }], {
+                  fragment: 'showEditHeaderButton'
+              })
+            : this.router.navigate(['/', { outlets: { popup: ['header-new'] } }], { fragment: 'showEditHeaderButton' });
 
-        this.eventManager.subscribe(
-            'headerModified',
-            (res) => this.setHeader(res)
-        );
+        this.eventManager.subscribe('headerModified', res => this.setHeader(res));
     }
 
     setHeader(id) {
@@ -256,7 +255,7 @@ export class WireTapEndpointEditComponent implements OnInit {
             res => {
                 this.headers = res.body;
                 this.headerCreated = this.headers.length > 0;
-                this.wireTapEndpoint.headerId = this.headers.find((h) => h.id === id.content).id;
+                this.wireTapEndpoint.headerId = this.headers.find(h => h.id === id.content).id;
                 this.wireTapForm.controls.header.patchValue(this.wireTapEndpoint.headerId);
             },
             res => this.onError(res.body)
@@ -264,13 +263,12 @@ export class WireTapEndpointEditComponent implements OnInit {
     }
 
     createOrEditService() {
-        (typeof this.wireTapEndpoint.serviceId === 'undefined' || this.wireTapEndpoint.serviceId === null) ?
-            this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: this.serviceType }) :
-            this.router.navigate(['/', { outlets: { popup: 'service/' + this.wireTapEndpoint.serviceId + '/edit' } }], { fragment: this.serviceType });
-        this.eventManager.subscribe(
-            'serviceModified',
-            (res) => this.setService(res)
-        );
+        typeof this.wireTapEndpoint.serviceId === 'undefined' || this.wireTapEndpoint.serviceId === null
+            ? this.router.navigate(['/', { outlets: { popup: ['service-new'] } }], { fragment: this.serviceType })
+            : this.router.navigate(['/', { outlets: { popup: 'service/' + this.wireTapEndpoint.serviceId + '/edit' } }], {
+                  fragment: this.serviceType
+              });
+        this.eventManager.subscribe('serviceModified', res => this.setService(res));
     }
 
     setService(id) {
@@ -278,7 +276,7 @@ export class WireTapEndpointEditComponent implements OnInit {
             res => {
                 this.services = res.body;
                 this.serviceCreated = this.services.length > 0;
-                this.service = this.services.find((s) => s.id === id.content);
+                this.service = this.services.find(s => s.id === id.content);
                 this.wireTapEndpoint.serviceId = this.service.id;
                 this.wireTapForm.controls.service.patchValue(this.wireTapEndpoint.serviceId);
                 this.filterServices();
@@ -289,9 +287,9 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     filterServices() {
         this.serviceType = this.returnServiceType(this.wireTapEndpoint.type);
-        this.filteredService = this.services.filter((f) => f.type === this.serviceType);
+        this.filteredService = this.services.filter(f => f.type === this.serviceType);
         if (this.filteredService.length > 0 && this.wireTapEndpoint.serviceId) {
-            this.wireTapForm.controls.service.setValue(this.filteredService.find((fs) => fs.id === this.wireTapEndpoint.serviceId).id);
+            this.wireTapForm.controls.service.setValue(this.filteredService.find(fs => fs.id === this.wireTapEndpoint.serviceId).id);
         }
     }
 
@@ -335,56 +333,52 @@ export class WireTapEndpointEditComponent implements OnInit {
 
     private initializeEndpointData() {
         this.wireTapForm = new FormGroup({
-            'id': new FormControl(this.wireTapEndpoint.id),
-            'type': new FormControl(this.wireTapEndpoint.type, Validators.required),
-            'uri': new FormControl(this.wireTapEndpoint.uri, Validators.required),
-            'options': new FormArray([
-                this.initializeOption()
-            ]),
-            'service': new FormControl(this.wireTapEndpoint.serviceId),
-            'header': new FormControl(this.wireTapEndpoint.headerId)
-        })
+            id: new FormControl(this.wireTapEndpoint.id),
+            type: new FormControl(this.wireTapEndpoint.type, Validators.required),
+            uri: new FormControl(this.wireTapEndpoint.uri, Validators.required),
+            options: new FormArray([this.initializeOption()]),
+            service: new FormControl(this.wireTapEndpoint.serviceId),
+            header: new FormControl(this.wireTapEndpoint.headerId)
+        });
     }
 
     private initializeOption(): FormGroup {
         return new FormGroup({
-            'key': new FormControl(null),
-            'value': new FormControl(null)
-        })
+            key: new FormControl(null),
+            value: new FormControl(null)
+        });
     }
 
     private updateEndpointData() {
-
         if (this.wireTapEndpoint !== null) {
             this.wireTapForm.patchValue({
-                'id': this.wireTapEndpoint.id,
-                'type': this.wireTapEndpoint.type,
-                'uri': this.wireTapEndpoint.uri,
+                id: this.wireTapEndpoint.id,
+                type: this.wireTapEndpoint.type,
+                uri: this.wireTapEndpoint.uri
             });
         }
 
         if (this.wireTapEndpoint.serviceId !== null) {
             this.wireTapForm.patchValue({
-                'service': this.wireTapEndpoint.serviceId,
+                service: this.wireTapEndpoint.serviceId
             });
         }
 
         if (this.wireTapEndpoint.headerId !== null) {
             this.wireTapForm.patchValue({
-                'header': this.wireTapEndpoint.headerId
+                header: this.wireTapEndpoint.headerId
             });
         }
     }
 
     private subscribeToSaveResponse(result: Observable<HttpResponse<IWireTapEndpoint>>) {
         result.subscribe(data => {
-            if(data.ok){
+            if (data.ok) {
                 this.onSaveSuccess(data.body);
-            }else{
-                this.onSaveError()
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
 
     private onSaveSuccess(result: WireTapEndpoint) {

@@ -23,22 +23,23 @@ export class HeaderDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.headerService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'headerListModification',
-                content: 'Deleted an header'
-            });
-            this.activeModal.dismiss(true);
-            this.activeModal.dismiss(true);
-        }, (r) => this.onDeleteError(r));
+        this.headerService.delete(id).subscribe(
+            response => {
+                this.eventManager.broadcast({
+                    name: 'headerListModification',
+                    content: 'Deleted an header'
+                });
+                this.activeModal.dismiss(true);
+                this.activeModal.dismiss(true);
+            },
+            r => this.onDeleteError(r)
+        );
     }
-    
+
     private onDeleteError(error) {
         this.errorMessage = true;
         this.deleteMode = false;
     }
-    
-    
 }
 
 @Component({

@@ -22,9 +22,8 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     isSaving: boolean;
     headerKey: IHeaderKeys;
     headerKeyId: number;
-    typeHeader: string[] = ['constant','simple','xpath'];
+    typeHeader: string[] = ['constant', 'simple', 'xpath'];
     eventSubscriber: Subscription;
-
 
     constructor(
         protected headerKeysService: HeaderKeysService,
@@ -44,11 +43,11 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('headerKeyDeleted', (res) => this.updateHeaderKeys(res.content))
+        this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(res.content));
     }
 
     updateHeaderKeys(id: number) {
-        this.headerKeys = this.headerKeys.filter((x) => x.id !== id);
+        this.headerKeys = this.headerKeys.filter(x => x.id !== id);
         this.mapHeaderKeysKeys();
         if (this.headerKeys.length === 0) {
             this.addHeaderKeys();
@@ -62,7 +61,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
                 this.headerKeys[0].isDisabled = false;
                 this.headerKeys[0].type = this.typeHeader[0];
             } else {
-                this.headerKeys.forEach((headerKey) => {
+                this.headerKeys.forEach(headerKey => {
                     headerKey.isDisabled = true;
                 });
             }
@@ -71,31 +70,28 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     save(headerKey: IHeaderKeys, i: number) {
         this.isSaving = true;
         if (!!headerKey.id) {
-            this.subscribeToSaveResponse(
-                this.headerKeysService.update(headerKey), false, i);
+            this.subscribeToSaveResponse(this.headerKeysService.update(headerKey), false, i);
         } else {
             headerKey.headerId = this.headerId;
-            this.subscribeToSaveResponse(
-                this.headerKeysService.create(headerKey), true, i);
+            this.subscribeToSaveResponse(this.headerKeysService.create(headerKey), true, i);
         }
     }
 
     private mapHeaderKeysKeys() {
         if (typeof this.headerKeys !== 'undefined') {
-            this.headerKeysKeys = this.headerKeys.map((sk) => sk.key);
-            this.headerKeysKeys = this.headerKeysKeys.filter((k) => k !== undefined);
+            this.headerKeysKeys = this.headerKeys.map(sk => sk.key);
+            this.headerKeysKeys = this.headerKeysKeys.filter(k => k !== undefined);
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeaderKeys>>,closePopup, i: number) {
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeaderKeys>>, closePopup, i: number) {
         result.subscribe(data => {
-            if(data.ok){
-                this.onSaveSuccess(data.body,closePopup,i);
-            }else{
-                this.onSaveError()
+            if (data.ok) {
+                this.onSaveSuccess(data.body, closePopup, i);
+            } else {
+                this.onSaveError();
             }
-            }    
-        )
+        });
     }
 
     private onSaveSuccess(result: IHeaderKeys, isCreate: boolean, i: number) {
@@ -117,12 +113,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
 
     cloneHeaderKey(headerKey: IHeaderKeys) {
-        const headerKeyForClone = new HeaderKeys(
-            headerKey.headerId,
-            headerKey.key,
-            headerKey.value,
-            headerKey.type,
-            headerKey.headerId);
+        const headerKeyForClone = new HeaderKeys(headerKey.headerId, headerKey.key, headerKey.value, headerKey.type, headerKey.headerId);
         this.headerKeys.push(headerKeyForClone);
     }
 

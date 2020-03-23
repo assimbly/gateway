@@ -2,18 +2,13 @@ import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderService } from './header.service';
-import { Header } from "app/shared/model/header.model";
+import { Header } from 'app/shared/model/header.model';
 
 @Injectable()
 export class HeaderPopupService {
     private ngbModalRef: NgbModalRef;
 
-    constructor(
-        private modalService: NgbModal,
-        private router: Router,
-        private headerService: HeaderService
-
-    ) {
+    constructor(private modalService: NgbModal, private router: Router, private headerService: HeaderService) {
         this.ngbModalRef = null;
     }
 
@@ -25,7 +20,7 @@ export class HeaderPopupService {
             }
 
             if (id) {
-                this.headerService.find(id).subscribe((header) => {
+                this.headerService.find(id).subscribe(header => {
                     this.ngbModalRef = this.headerModalRef(component, header.body);
                     resolve(this.ngbModalRef);
                 });
@@ -39,16 +34,21 @@ export class HeaderPopupService {
         });
     }
 
-    headerModalRef(component: Component, header: Header): NgbModalRef {
-        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.header = header;
-        modalRef.result.then((result) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        }, (reason) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        });
+    headerModalRef(component: any, header: Header): NgbModalRef {
+        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
+        if (typeof component as Component) {
+            modalRef.componentInstance.header = header;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

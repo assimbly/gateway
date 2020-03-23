@@ -90,7 +90,6 @@ export enum EndpointType {
     DRILL = 'DRILL',
     DROPBOX = 'DROPBOX',
     EHCACHE = 'EHCACHE',
-    ELASTICSEARCH = 'ELASTICSEARCH',
     ELASTICSEARCHREST = 'ELASTICSEARCH-REST',
     ELSQL = 'ELSQL',
     ELYTRON = 'ELYTRON',
@@ -394,6 +393,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'DIRECT-VM',
+        assimblyTypeLink: `/component-direct-vm`,
+        camelTypeLink: `/direct-vm-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>:  The name of the endpoint<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: test<br/>
+    `
+    },
+    {
         name: 'ELASTICSEARCH',
         assimblyTypeLink: `/component-elasticsearch`,
         camelTypeLink: `/elasticsearch-rest-component.html`,
@@ -584,6 +596,23 @@ export const typesLinks = [
     `
     },
     {
+        name: 'LANGUAGE',
+        assimblyTypeLink: `/component-language`,
+        camelTypeLink: `/language-component.html`,
+        uriPlaceholder: 'language://languageName[:script]',
+        uriPopoverMessage: `
+        <b>Name</b>: languageName<br/>
+        <b>Description</b>: Sets the name of the language to use. The value can be one of: bean, constant, exchangeProperty, file, groovy, header, javascript, jsonpath, mvel, ognl, 
+        ref, simple, spel, sql, terser, tokenize, xpath, xquery, xtokenize<br/>
+        <b>Required</b>: yes <br/>
+        <b>ResourceUri</b>: String<br/>
+        <b>Description</b>: Path to the source<br/>
+        <b>Required</b>: yes <br/>
+        <br/>
+        <b>Example</b>: simple:" + script or simple:file:target/script/myscript.txt<br/>
+    `
+    },
+    {
         name: 'LOG',
         assimblyTypeLink: `/component-log`,
         camelTypeLink: `/log-component.html`,
@@ -591,6 +620,20 @@ export const typesLinks = [
         uriPopoverMessage: `
         <b>Name</b>: loggingName<br/>
         <b>Description</b>: The name for the logging<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: foo<br/>
+    `
+    },
+    {
+        name: 'MOCK',
+        assimblyTypeLink: `/component-mock`,
+        camelTypeLink: `/mock-component.html`,
+        uriPlaceholder: 'someName',
+        uriPopoverMessage: `
+        <b>Name</b>: mockName<br/>
+        <b>Description</b>: Any name for the mock<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <br/>
@@ -648,12 +691,25 @@ export const typesLinks = [
         camelTypeLink: `/scheduler-component.html`,
         uriPlaceholder: 'schedulerName',
         uriPopoverMessage: `
-        <b>Name</b>: timerName<br/>
-        <b>Description</b>: The name for the timer<br/>
+        <b>Name</b>: schedulerName<br/>
+        <b>Description</b>: The name for the scheduler<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: foo<br/>
+    `
+    },
+    {
+        name: 'SEDA',
+        assimblyTypeLink: `/component-seda`,
+        camelTypeLink: `/seda-component.html`,
+        uriPlaceholder: 'queueName',
+        uriPopoverMessage: `
+        <b>Name</b>: queueName<br/>
+        <b>Description</b>: Internal (asynchhonous) queue between two flows<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Example</b>: test<br/>
     `
     },
     {
@@ -799,6 +855,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'STUB',
+        assimblyTypeLink: `/component-stub`,
+        camelTypeLink: `/stub-component.html`,
+        uriPlaceholder: 'someUri',
+        uriPopoverMessage: `
+        <b>Name</b>: uri<br/>
+        <b>Description</b>: Any endpoint URI to stub out the endpoint. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Example</b>: smtp://somehost.foo.com?user=whatnot&something=else<br/>
+    `
+    },
+    {
         name: 'TELEGRAM',
         assimblyTypeLink: `/component-telegram`,
         camelTypeLink: `/telegram-component.html`,
@@ -886,7 +955,7 @@ export class Components {
         'AS2',
         'AWS-S3',
         'DIRECT',
-        'ELASTICSEARCH',
+        'DIRECT-VM',
         'FILE',
         'FTP',
         'FTPS',
@@ -894,11 +963,13 @@ export class Components {
         'IMAPS',
         'JETTY',
         'NETTY4',
+        'LANGUAGE',
         'LOG',
         'KAFKA',
         'RABBITMQ',
         'REST',
         'SCHEDULER',
+        'SEDA',
         'SFTP',
         'SJMS',
         'SLACK',
@@ -906,6 +977,7 @@ export class Components {
         'SMTP',
         'SONICMQ',
         'SQL',
+        'STUB',
         'STREAM',
         'TIMER',
         'TELEGRAM',
@@ -918,7 +990,8 @@ export class Components {
         'AS2',
         'AWS-S3',
         'DIRECT',
-        'ELASTICSEARCH',
+        'DIRECT-VM',
+        'ELASTICSEARCH-REST',
         'FILE',
         'FTP',
         'FTPS',
@@ -927,12 +1000,14 @@ export class Components {
         'IMAP',
         'IMAPS',
         'JETTY',
+        'MOCK',
         'NETTY4',
         'LOG',
         'KAFKA',
         'RABBITMQ',
         'REST',
         'SCHEDULER',
+        'SEDA',
         'SFTP',
         'SJMS',
         'SLACK',
@@ -941,6 +1016,7 @@ export class Components {
         'SMTPS',
         'SONICMQ',
         'SQL',
+        'STUB',
         'STREAM',
         'TELEGRAM',
         'TIMER',
@@ -953,7 +1029,10 @@ export class Components {
         'ACTIVEMQ',
         'AS2',
         'AWS-S3',
-        'ELASTICSEARCH',
+        'ELASTICSEARCH-REST',
+        'DIRECT',
+        'DIRECT-VM',
+        'SEDA',
         'FILE',
         'FTP',
         'FTPS',
@@ -976,14 +1055,14 @@ export class Components {
         'SQL',
         'TELEGRAM',
         'STREAM',
+        'VM',
         'WEBSOCKET'
     ];
 
     wireTapTypes = [
-        ,
         'ACTIVEMQ',
         'AWS-S3',
-        'ELASTICSEARCH',
+        'ELASTICSEARCH-REST',
         'FILE',
         'FTPS',
         'FTP',

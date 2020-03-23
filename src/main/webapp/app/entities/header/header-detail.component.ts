@@ -4,8 +4,8 @@ import { HeaderService } from './header.service';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
-import { Subscription } from "rxjs";
-import { JhiEventManager } from "ng-jhipster";
+import { Subscription } from 'rxjs';
+import { JhiEventManager } from 'ng-jhipster';
 
 @Component({
     selector: 'jhi-header-detail',
@@ -14,10 +14,12 @@ import { JhiEventManager } from "ng-jhipster";
 export class HeaderDetailComponent implements OnInit {
     header: IHeader;
 
-    constructor(protected eventManager: JhiEventManager,
-				protected activatedRoute: ActivatedRoute,
-				protected headerService: HeaderService,
-                protected headerKeysService: HeaderKeysService) {}
+    constructor(
+        protected eventManager: JhiEventManager,
+        protected activatedRoute: ActivatedRoute,
+        protected headerService: HeaderService,
+        protected headerKeysService: HeaderKeysService
+    ) {}
     public headerKeys: Array<HeaderKeys>;
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -29,15 +31,15 @@ export class HeaderDetailComponent implements OnInit {
     }
 
     private load(id) {
-        this.headerService.find(id).subscribe((header) => {
+        this.headerService.find(id).subscribe(header => {
             this.header = header.body;
             this.loadHeaderKeys(this.header.id);
         });
     }
 
     private loadHeaderKeys(id: number) {
-        this.headerKeysService.query().subscribe((res) => {
-            this.headerKeys = res.body.filter((hk) => hk.headerId === id);
+        this.headerKeysService.query().subscribe(res => {
+            this.headerKeys = res.body.filter(hk => hk.headerId === id);
         });
     }
 

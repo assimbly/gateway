@@ -4,45 +4,50 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        gradlePluginPortal()
         maven { url "https://repo.spring.io/plugins-release" }
-        maven { url "https://plugins.gradle.org/m2/" }
-        flatDir {
-       		dirs 'libs'
-   		}
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
         classpath "io.spring.gradle:propdeps-plugin:0.0.10.RELEASE"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
+        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.1"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
-        
 }
 
 plugins {
-    id "org.sonarqube" version "2.6.2"
-    id "net.ltgt.apt-eclipse" version "0.19"
-    id "net.ltgt.apt-idea" version "0.19"
-    id "net.ltgt.apt" version "0.19"
-    id "io.spring.dependency-management" version "1.0.6.RELEASE"
-    id "com.moowork.node" version "1.2.0"
-    id 'org.liquibase.gradle' version '2.0.1'
+    id "java"
+    id "maven-publish"
+    id "idea"
+    id "jacoco"
+    id "org.springframework.boot"
+    id "com.google.cloud.tools.jib"
+    id "com.gorylenko.gradle-git-properties"
+    id "com.github.node-gradle.node"
+    id "org.liquibase.gradle"
+    id "org.sonarqube"
+    id "io.spring.nohttp"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
-apply plugin: 'java'
+group = "org.assimbly.gateway"
+version = '1.9.0'
+
+description = ""
+
 sourceCompatibility=1.8
 targetCompatibility=1.8
-// Until JHipster supports JDK 9
-assert System.properties['java.specification.version'] == '1.8'
+assert System.properties["java.specification.version"] == "1.8" || "11" || "12" || "13"
 
-apply plugin: 'maven'
+apply from: "gradle/docker.gradle"
+apply from: "gradle/sonar.gradle"
+apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
 apply plugin: 'propdeps'
-apply plugin: 'com.moowork.node'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
+//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 
 configurations.all {
   exclude module: 'log4j-slf4j-impl' 	
@@ -51,111 +56,118 @@ configurations.all {
   }
 }
 
-dependencyManagement {
-  imports {
-    mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
-    //jhipster-needle-gradle-dependency-management - JHipster will add additional dependencies management here
-  }
+if (project.hasProperty("prod") || project.hasProperty("gae")) {
+    apply from: "gradle/profile_prod.gradle"
+} else {
+    apply from: "gradle/profile_dev.gradle"
 }
 
-defaultTasks 'bootRun'
-
-group = 'org.assimbly.gateway'
-version = '1.8.0'
-
-description = ''
-
-bootWar {
-   mainClassName = 'org.assimbly.gateway.GatewayApp'
+if (project.hasProperty("war")) {
+    apply from: "gradle/war.gradle"
 }
 
-war {
-    webAppDirName = 'build/www/'
-    enabled = true
-    classifier = 'original'
+if (project.hasProperty("gae")) {
+    apply plugin: 'maven'
+    apply plugin: 'org.springframework.boot.experimental.thin-launcher'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom 'io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}'
+        }
+    }
+    appengineStage.dependsOn thinResolve
 }
 
-springBoot {
-    mainClassName = 'org.assimbly.gateway.GatewayApp'
-    buildInfo()
+
+idea {
+    module {
+        excludeDirs += files("node_modules")
+    }
 }
 
-if (OperatingSystem.current().isWindows()) {
-    // https://stackoverflow.com/questions/40037487/the-filename-or-extension-is-too-long-error-using-gradle
-    task classpathJar(type: Jar) {
-        dependsOn configurations.runtime
-        appendix = 'classpath'
-
-        doFirst {
-            manifest {
-                attributes 'Class-Path': configurations.runtime.files.collect {
-                    it.toURI().toURL().toString().replaceFirst(/file:\/+/, '/').replaceAll(' ', '%20')
-                }.join(' ')
+eclipse {
+    sourceSets {
+        main {
+            java {
+                srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
             }
         }
     }
+}
 
-    bootRun {
-        dependsOn classpathJar
-        doFirst {
-            classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", classpathJar.archivePath)
-        }
-    }
+defaultTasks "bootRun"
+
+springBoot {
+    mainClassName = 'org.assimbly.gateway.GatewayApp'
 }
 
 test {
-    exclude '**/CucumberTest*'
+    useJUnitPlatform()
+    exclude "**/*IT*", "**/*IntTest*"
 
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
     reports.html.enabled = false
 }
 
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    description = "Execute integration tests."
+    group = "verification"
+    include "**/*IT*", "**/*IntTest*"
+
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
+    // uncomment if the tests reports are not generated
+    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
+    // ignoreFailures true
+    reports.html.enabled = false
+}
+
+check.dependsOn integrationTest
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests")
     reportOn test
 }
 
-
-apply from: 'gradle/docker.gradle'
-apply from: 'gradle/sonar.gradle'
-//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
-
-if (project.hasProperty('prod')) {
-    apply from: 'gradle/profile_prod.gradle'
-} else {
-    apply from: 'gradle/profile_dev.gradle'
+task integrationTestReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/tests")
+    reportOn integrationTest
 }
 
-
-if (!project.hasProperty('runList')) {
-    project.ext.runList = 'main'
+if (!project.hasProperty("runList")) {
+    project.ext.runList = "main"
 }
 
-project.ext.diffChangelogFile = 'src/main/resources/config/liquibase/changelog/' + new Date().format('yyyyMMddHHmmss') + '_changelog.xml'
+project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
 
 liquibase {
     activities {
         main {
-            driver 'org.h2.Driver'
-            url 'jdbc:h2:file:./target/h2db/db/gateway'
-            username 'gateway'
-            password ''
-            changeLogFile 'src/main/resources/config/liquibase/master.xml'
-            defaultSchemaName ''
-            logLevel 'debug'
-            classpath 'src/main/resources/'
+            driver "org.h2.Driver"
+            url "jdbc:h2:file:./target/h2db/db/gateway"
+            username "gateway"
+            password ""
+            changeLogFile "src/main/resources/config/liquibase/master.xml"
+            defaultSchemaName ""
+            logLevel "debug"
+            classpath "src/main/resources/"
         }
         diffLog {
-            driver 'org.h2.Driver'
-            url 'jdbc:h2:file:./target/h2db/db/gateway'
-            username 'gateway'
-            password ''
+            driver "org.h2.Driver"
+            url "jdbc:h2:file:./target/h2db/db/gateway"
+            username "gateway"
+            password ""
             changeLogFile project.ext.diffChangelogFile
-            referenceUrl 'hibernate:spring:org.assimbly.gateway.domain?dialect=org.hibernate.dialect.H2Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy'
-            defaultSchemaName ''
-            logLevel 'debug'
+            referenceUrl "hibernate:spring:org.assimbly.gateway.domain?dialect=org.hibernate.dialect.H2Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+            defaultSchemaName ""
+            logLevel "debug"
             classpath "$buildDir/classes/java/main"
         }
     }
@@ -163,12 +175,31 @@ liquibase {
     runList = project.ext.runList
 }
 
-configurations {
-    providedRuntime
-    compile.exclude module: "spring-boot-starter-tomcat"
-    //compile.exclude module: "slf4j-log4j12"
+gitProperties {
+    failOnNoGitDirectory = false
+    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
 }
 
+checkstyle {
+    toolVersion '${checkstyle_version}'
+    configFile file("checkstyle.xml")
+    checkstyleTest.enabled = false
+}
+nohttp {
+    source.include "build.gradle", "README.md"
+}
+
+configurations {
+    providedRuntime
+    implementation.exclude module: "spring-boot-starter-tomcat"
+    all {
+        resolutionStrategy {
+            // Inherited version from Spring Boot can't be used because of regressions:
+            // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
+            force 'org.liquibase:liquibase-core:3.6.3'
+        }
+    }
+}
 
 repositories {
     mavenLocal()
@@ -178,129 +209,145 @@ repositories {
 }
 
 dependencies {
+    // import JHipster dependencies BOM
+    if (!project.hasProperty("gae")) {
+        implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
+    }
+
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
-    compile group: "io.github.jhipster", name: "jhipster-framework"
-    compile "org.springframework.boot:spring-boot-starter-cache"
-    compile "io.dropwizard.metrics:metrics-core"
-    compile "io.dropwizard.metrics:metrics-jcache"
-    compile "io.dropwizard.metrics:metrics-json"
-    compile "io.dropwizard.metrics:metrics-jvm"
-    compile "io.dropwizard.metrics:metrics-servlet"
-    compile "io.dropwizard.metrics:metrics-servlets"
-    compile "io.prometheus:simpleclient"
-    compile "io.prometheus:simpleclient_dropwizard"
-    compile "io.prometheus:simpleclient_servlet"
-    compile "net.logstash.logback:logstash-logback-encoder"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
-    compile "com.fasterxml.jackson.core:jackson-annotations"
-    compile "com.fasterxml.jackson.core:jackson-databind"
-    compile "com.fasterxml.jackson.module:jackson-module-afterburner"
-    compile "com.ryantenney.metrics:metrics-spring"
-    compile "javax.cache:cache-api"
-    compile "org.hibernate:hibernate-core"
-    compile "com.zaxxer:HikariCP"
-    compile "org.apache.commons:commons-lang3"
-    compile "commons-io:commons-io"
-    compile "javax.transaction:javax.transaction-api"
-    compile "org.ehcache:ehcache"
-    compile "org.hibernate:hibernate-jcache"
-    compile "org.hibernate:hibernate-entitymanager"
-    compile "org.hibernate:hibernate-envers"
-    compile "org.hibernate.validator:hibernate-validator"
-    compile "org.liquibase:liquibase-core"
-    compile "com.mattbertolini:liquibase-slf4j"
+    implementation group: "io.github.jhipster", name: "jhipster-framework"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation "io.dropwizard.metrics:metrics-core"
+    implementation "io.micrometer:micrometer-registry-prometheus"
+    // compile "io.dropwizard.metrics:metrics-jcache"
+    implementation "io.dropwizard.metrics:metrics-json"
+    implementation "io.dropwizard.metrics:metrics-jvm"
+    implementation "io.dropwizard.metrics:metrics-servlet"
+    implementation "io.dropwizard.metrics:metrics-servlets"
+    implementation "io.prometheus:simpleclient"
+    // compile "io.prometheus:simpleclient_dropwizard"
+    // compile "io.prometheus:simpleclient_servlet"
+    implementation "net.logstash.logback:logstash-logback-encoder"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
+    implementation "com.fasterxml.jackson.core:jackson-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
+    implementation group: 'io.dropwizard.metrics', name: 'metrics-annotation', version: '4.1.2'
+    // compile "com.ryantenney.metrics:metrics-spring"
+    implementation "javax.cache:cache-api"
+    implementation "org.hibernate:hibernate-core"
+    implementation "com.zaxxer:HikariCP"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "commons-io:commons-io"
+    implementation "javax.transaction:javax.transaction-api"
+    implementation "org.ehcache:ehcache"
+    implementation "org.hibernate:hibernate-jcache"
+    implementation "org.hibernate:hibernate-entitymanager"
+    implementation "org.hibernate:hibernate-envers"
+    implementation "org.hibernate.validator:hibernate-validator"
+    implementation "org.liquibase:liquibase-core"
+    // compile "com.mattbertolini:liquibase-slf4j"
     liquibaseRuntime "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
     liquibaseRuntime sourceSets.main.compileClasspath
-    compile "org.springframework.boot:spring-boot-loader-tools"
-    compile "org.springframework.boot:spring-boot-starter-mail"
-    compile "org.springframework.boot:spring-boot-starter-logging"
-    compile "org.springframework.boot:spring-boot-starter-actuator"
-    compile "org.springframework.boot:spring-boot-starter-aop"
-    compile "org.springframework.boot:spring-boot-starter-data-jpa"
-    compile "org.springframework.boot:spring-boot-starter-security"
-    compile ("org.springframework.boot:spring-boot-starter-web") {
+    implementation "org.springframework.boot:spring-boot-loader-tools"
+    implementation "org.springframework.boot:spring-boot-starter-mail"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: 'spring-boot-starter-tomcat'
     }
-    compile "org.springframework.boot:spring-boot-starter-undertow"
-    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
-    compile "org.zalando:problem-spring-web:0.24.0-RC.0"
-    compile "org.springframework.boot:spring-boot-starter-cloud-connectors"
-    compile "org.springframework.cloud:spring-cloud-spring-service-connector"
-    compile "org.springframework:spring-context-support"
-    compile "org.springframework:spring-messaging"   
-    compile "org.springframework.security:spring-security-config"
-    compile "org.springframework.security:spring-security-data"
-    compile "org.springframework.security:spring-security-web"
-    compile "io.jsonwebtoken:jjwt:0.9.1"
-    compile ("io.springfox:springfox-swagger2") {
+    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-websocket"
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation "org.zalando:problem-spring-web:0.24.0-RC.0"
+    implementation "org.springframework.boot:spring-boot-starter-cloud-connectors"
+    implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
+    implementation "org.springframework:spring-context-support"
+    implementation "org.springframework:spring-messaging"   
+    implementation "org.springframework.security:spring-security-config"
+    implementation "org.springframework.security:spring-security-data"
+    implementation "org.springframework.security:spring-security-web"
+    implementation "org.springframework.security:spring-security-messaging"
+    implementation "io.jsonwebtoken:jjwt:0.9.1"
+    implementation ("io.springfox:springfox-swagger2") {
         exclude module: 'mapstruct'
     }
-    compile "io.springfox:springfox-bean-validators"
-    compile "mysql:mysql-connector-java"
+    implementation "io.springfox:springfox-bean-validators"
+    implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
-    compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+    implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
 	// custom dependencies (non-jhipster)
-    compile group: "org.assimbly", name: "connector", version: "1.0.0", changing: true    
-    compile "io.github.assimbly:docconverter:1.1.0"	
-	compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.8"
-	compile "org.jdom:jdom2:2.0.6"
-	compile "org.springframework:spring-websocket:5.0.7.RELEASE"
-	compile "org.springframework.security:spring-security-messaging:5.0.7.RELEASE"
-	//compile "io.hawt:hawtio-springboot:2.7.0"
-	compile group: 'commons-codec', name: 'commons-codec', version: '1.13'
+    implementation group: "org.assimbly", name: "connector", version: "1.0.0", changing: true    
+	implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
+	implementation "org.jdom:jdom2:2.0.6"
+	implementation "io.hawt:hawtio-springboot:2.9.1"
+	implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
 	
-	compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.1'
-	compile group: 'org.apache.activemq', name: 'artemis-commons', version: '2.10.1'
-	compile group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.1'
-	compile group: 'org.apache.activemq', name: 'artemis-selector', version: '2.10.1'
-	compile group: 'org.apache.activemq', name: 'artemis-journal', version: '2.10.1'
+	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.11.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.11.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.11.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.11.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.11.0'
 		
 	//java 9+
-	compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-    compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
-    compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
+    implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
 	
 	// end custom dependencies
     
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen"
+    annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
-    testCompile "com.jayway.jsonpath:json-path"
-    testCompile ("org.springframework.boot:spring-boot-starter-test") {
+    testImplementation "com.jayway.jsonpath:json-path"
+    testImplementation ("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
-    testCompile "org.springframework.security:spring-security-test"
-    testCompile "org.springframework.boot:spring-boot-test"
-    testCompile "org.assertj:assertj-core"
-    testCompile "junit:junit"
-    testCompile "org.mockito:mockito-core"
-    testCompile "com.mattbertolini:liquibase-slf4j"
-    testCompile "org.hamcrest:hamcrest-library"
-    testCompile "com.h2database:h2"
+    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation "org.springframework.boot:spring-boot-test"
+    testImplementation "org.assertj:assertj-core"
+    testImplementation "junit:junit"
+    testImplementation "org.mockito:mockito-core"
+    testImplementation "com.mattbertolini:liquibase-slf4j"
+    testImplementation "org.hamcrest:hamcrest-library"
+    testImplementation "com.h2database:h2"
     liquibaseRuntime "com.h2database:h2"
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
 }
 
+if (project.hasProperty("gae")) {
+    task createPom {
+        def basePath = 'build/resources/main/META-INF/maven'
+        doLast {
+            pom {
+                withXml(dependencyManagement.pomConfigurer)
+            }.writeTo("${basePath}/${project.group}/${project.name}/pom.xml")
+        }
+    }
+    bootJar.dependsOn = [createPom]
+}
+
 task cleanResources(type: Delete) {
-    delete 'build/resources'
+    delete "build/resources"
 }
 
 wrapper {
-    gradleVersion = '4.10.2'
+    gradleVersion = "6.2.2"
 }
 
-task stage(dependsOn: 'bootWar') {
-}
 
-if (project.hasProperty('nodeInstall')) {
+if (project.hasProperty("nodeInstall")) {
     node {
         version = "${node_version}"
         npmVersion = "${npm_version}"
@@ -308,8 +355,6 @@ if (project.hasProperty('nodeInstall')) {
         download = true
     }
 }
-
-bootWar.dependsOn war
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources

@@ -9,7 +9,7 @@ import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
-import { filter } from "rxjs/operators";
+import { filter } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-header-update',
@@ -22,24 +22,25 @@ export class HeaderUpdateComponent implements OnInit {
     headerKeys: Array<HeaderKeys> = [];
     headerKeysKeys: Array<String> = [];
     isSaving: boolean;
-    public typeHeader: string[] = ['constant','simple','xpath'];
+    public typeHeader: string[] = ['constant', 'simple', 'xpath'];
 
     constructor(
-		protected headerService: HeaderService, 
+        protected headerService: HeaderService,
         protected headerKeysService: HeaderKeysService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
-		protected activatedRoute: ActivatedRoute,
-        protected router: Router) {}
+        protected activatedRoute: ActivatedRoute,
+        protected router: Router
+    ) {}
 
     ngOnInit() {
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ header }) => {
             this.header = header;
-            if(this.activatedRoute.fragment['value'] === 'clone'){
+            if (this.activatedRoute.fragment['value'] === 'clone') {
                 this.loadHeaderKeys(true);
-            }else{
-                this.loadHeaderKeys(false);    
+            } else {
+                this.loadHeaderKeys(false);
             }
         });
     }
@@ -67,14 +68,14 @@ export class HeaderUpdateComponent implements OnInit {
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
         this.isSaving = false;
 
-        this.headerKeys.forEach((headerKey) => {
+        this.headerKeys.forEach(headerKey => {
             headerKey.headerId = result.id;
             if (headerKey.id) {
-                this.headerKeysService.update(headerKey).subscribe((hk) => {
+                this.headerKeysService.update(headerKey).subscribe(hk => {
                     headerKey = hk.body;
                 });
             } else {
-                this.headerKeysService.create(headerKey).subscribe((hk) => {
+                this.headerKeysService.create(headerKey).subscribe(hk => {
                     headerKey = hk.body;
                 });
             }
@@ -88,7 +89,7 @@ export class HeaderUpdateComponent implements OnInit {
     }
 
     deleteHeaderKeys(headerKey) {
-        this.headerKeysService.delete(headerKey.id).subscribe((res) => {
+        this.headerKeysService.delete(headerKey.id).subscribe(res => {
             this.removeHeaderKeys(this.headerKeys.indexOf(headerKey));
         });
     }
@@ -119,28 +120,26 @@ export class HeaderUpdateComponent implements OnInit {
 
     private mapHeaderKeysKeys() {
         if (typeof this.headerKeys !== 'undefined') {
-            this.headerKeysKeys = this.headerKeys.map((hk) => hk.key);
-            this.headerKeysKeys = this.headerKeysKeys.filter((k) => k !== undefined);
+            this.headerKeysKeys = this.headerKeys.map(hk => hk.key);
+            this.headerKeysKeys = this.headerKeysKeys.filter(k => k !== undefined);
         }
     }
 
     private loadHeaderKeys(cloneHeader: boolean) {
         let criteria = {
-                'headerId.equals' : this.header.id
-             };
-        
+            'headerId.equals': this.header.id
+        };
+
         if (this.header.id) {
-            this.headerKeysService.query({filter: 'headerid.equals=1'}).subscribe((res) => {
+            this.headerKeysService.query({ filter: 'headerid.equals=1' }).subscribe(res => {
                 this.headerKeys = res.body.filter(headerkeys => headerkeys.headerId === this.header.id);
                 this.header.id = cloneHeader ? null : this.header.id;
             });
-        }else {
+        } else {
             let hk = new HeaderKeys();
             hk.type = this.typeHeader[0];
             this.headerKeys.push(hk);
             this.header.id = cloneHeader ? null : this.header.id;
         }
-        
     }
-    
 }

@@ -112,16 +112,16 @@ public class WebConfigurerTest {
         assertThat(serverOptions.getMap().get(UndertowOptions.ENABLE_HTTP2)).isNull();
     }
 
-    @Test
-    public void testUndertowHttp2Enabled() {
-        props.getHttp().setVersion(JHipsterProperties.Http.Version.V_2_0);
-        UndertowServletWebServerFactory container = new UndertowServletWebServerFactory();
-        webConfigurer.customize(container);
-        Builder builder = Undertow.builder();
-        container.getBuilderCustomizers().forEach(c -> c.customize(builder));
-        OptionMap.Builder serverOptions = (OptionMap.Builder) ReflectionTestUtils.getField(builder, "serverOptions");
-        assertThat(serverOptions.getMap().get(UndertowOptions.ENABLE_HTTP2)).isTrue();
-    }
+//    @Test
+//    public void testUndertowHttp2Enabled() {
+//        props.getHttp().setVersion(JHipsterProperties.Http.Version.V_2_0);
+//        UndertowServletWebServerFactory container = new UndertowServletWebServerFactory();
+//        webConfigurer.customize(container);
+//        Builder builder = Undertow.builder();
+//        container.getBuilderCustomizers().forEach(c -> c.customize(builder));
+//        OptionMap.Builder serverOptions = (OptionMap.Builder) ReflectionTestUtils.getField(builder, "serverOptions");
+//        assertThat(serverOptions.getMap().get(UndertowOptions.ENABLE_HTTP2)).isTrue();
+//    }
 
     @Test
     public void testCorsFilterOnApiPath() throws Exception {

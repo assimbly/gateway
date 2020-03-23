@@ -2,18 +2,13 @@ import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ServiceService } from './service.service';
-import { IService, Service } from "app/shared/model/service.model";
+import { IService, Service } from 'app/shared/model/service.model';
 
 @Injectable()
 export class ServicePopupService {
     private ngbModalRef: NgbModalRef;
 
-    constructor(
-        private modalService: NgbModal,
-        private router: Router,
-        private serviceService: ServiceService
-
-    ) {
+    constructor(private modalService: NgbModal, private router: Router, private serviceService: ServiceService) {
         this.ngbModalRef = null;
     }
 
@@ -25,7 +20,7 @@ export class ServicePopupService {
             }
 
             if (id) {
-                this.serviceService.find(id).subscribe((service) => {
+                this.serviceService.find(id).subscribe(service => {
                     this.ngbModalRef = this.serviceModalRef(component, service.body);
                     resolve(this.ngbModalRef);
                 });
@@ -39,16 +34,21 @@ export class ServicePopupService {
         });
     }
 
-    serviceModalRef(component: Component, service: Service): NgbModalRef {
-        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.service = service;
-        modalRef.result.then((result) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        }, (reason) => {
-            this.router.navigate([{ outlets: { popup: null }}], { replaceUrl: true, queryParamsHandling: 'merge' });
-            this.ngbModalRef = null;
-        });
+    serviceModalRef(component: any, service: Service): NgbModalRef {
+        const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
+        if (typeof component as Component) {
+            modalRef.componentInstance.service = service;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
+        }
         return modalRef;
     }
 }

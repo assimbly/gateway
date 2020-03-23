@@ -5,15 +5,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { SecurityService } from './security.service';
 import { ISecurity } from 'app/shared/model/security.model';
-import { SecurityPopupService } from "app/entities/security";
-
+import { SecurityPopupService } from 'app/entities/security';
 
 @Component({
     selector: 'jhi-security-upload-dialog',
     templateUrl: './security-upload-dialog.component.html'
 })
 export class SecurityUploadDialogComponent implements AfterContentInit {
-
     securityId: number;
     securities: Array<ISecurity> = [];
     certificateFile: any;
@@ -21,12 +19,7 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     uploadError = false;
     uploadErrorMessage: String;
 
-    constructor(
-        private eventManager: JhiEventManager,    
-        private securityService: SecurityService,
-        public activeModal: NgbActiveModal
-    ) {
-    }
+    constructor(private eventManager: JhiEventManager, private securityService: SecurityService, public activeModal: NgbActiveModal) {}
 
     ngAfterContentInit() {
         this.securityService.query().subscribe(res => {
@@ -49,7 +42,8 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     }
 
     uploadCertificate() {
-        this.securityService.uploadCertificate(this.certificateFile).subscribe((data) => {
+        this.securityService.uploadCertificate(this.certificateFile).subscribe(
+            data => {
                 this.uploadError = false;
                 this.activeModal.dismiss(true);
                 this.eventManager.broadcast({ name: 'securityListModification', content: 'OK' });
@@ -68,18 +62,13 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     template: ''
 })
 export class SecurityUploadPopupComponent implements OnInit, OnDestroy {
-
     routeSub: any;
 
-    constructor(
-        protected route: ActivatedRoute,
-        protected securityPopupService: SecurityPopupService
-    ) { }
+    constructor(protected route: ActivatedRoute, protected securityPopupService: SecurityPopupService) {}
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(() => {
-            this.securityPopupService
-                .open(SecurityUploadDialogComponent as Component);
+            this.securityPopupService.open(SecurityUploadDialogComponent as Component);
         });
     }
 

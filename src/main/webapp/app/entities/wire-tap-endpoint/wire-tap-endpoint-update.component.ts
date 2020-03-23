@@ -10,8 +10,8 @@ import { IService } from 'app/shared/model/service.model';
 import { ServiceService } from 'app/entities/service';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from 'app/entities/header';
-import { FlowService } from "app/entities/flow";
-import { map } from "rxjs/operators";
+import { FlowService } from 'app/entities/flow';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-wire-tap-endpoint-update',
@@ -52,7 +52,6 @@ export class WireTapEndpointUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        
     }
 
     previousState() {

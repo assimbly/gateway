@@ -6,7 +6,7 @@ import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.repository.SecurityRepository;
 import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.service.dto.SecurityDTO;
-import org.assimbly.gateway.service.mapper.SecurityMapper;
+import org.assimbly.gateway.service.mapper.SecurityTLSMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class SecurityResourceIntTest {
     private SecurityRepository securityRepository;
 
     @Autowired
-    private SecurityMapper securityMapper;
+    private SecurityTLSMapper securityMapper;
 
     @Autowired
     private SecurityService securityService;
