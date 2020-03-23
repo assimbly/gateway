@@ -242,7 +242,7 @@ export enum EndpointType {
     LPR = 'LPR',
     PUBNUB = 'PUBNUB',
     PULSAR = 'PULSAR',
-    QUARTZ = 'QUARTZ',
+    QUARTZ2 = 'QUARTZ2',
     QUICKFIX = 'QUICKFIX',
     RABBITMQ = 'RABBITMQ',
     REACTIVESTREAMS = 'REACTIVE-STREAMS',

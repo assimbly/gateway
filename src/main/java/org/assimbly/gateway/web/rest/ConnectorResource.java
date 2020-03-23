@@ -14,14 +14,12 @@ import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -66,6 +64,10 @@ public class ConnectorResource {
 
     @Autowired	
     private SimpMessageSendingOperations messagingTemplate;
+
+	public Connector conncector;
+
+	//private CamelConnector conncector;
 
     public ConnectorResource(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -712,6 +714,19 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/route/{id}",e.getMessage());
 		}
     }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/routes", produces = {"application/xml","application/json"})
+    public ResponseEntity<String> getAllCamelRoutes(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+    		String camelRoutes = connector.getAllCamelRoutesConfiguration(mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/routes",camelRoutes,true);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/routes",e.getMessage());
+		}
+		
+    }
     
     /**
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
@@ -770,7 +785,7 @@ public class ConnectorResource {
 				connector.addEventNotifier(failureListener);
 
         		connector.start();
-		        
+
 				int count = 1;
 
                 while (!connector.isStarted() && count < 300)
@@ -780,7 +795,7 @@ public class ConnectorResource {
                 }
 
         		connectorIsStarting = false;
-        		
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

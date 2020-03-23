@@ -100,7 +100,7 @@ info:
 
 jhipster:
     async:
-        core-pool-size: 2
+        core-pool-size: 4
         max-pool-size: 50
         queue-capacity: 10000
     # By default CORS is disabled. Uncomment to enable.
@@ -136,7 +136,7 @@ jhipster:
 
 application:
   info:
-    version: 1.9.0
+    version: 3.0.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
