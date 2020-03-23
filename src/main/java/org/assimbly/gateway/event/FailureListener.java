@@ -2,8 +2,9 @@ package org.assimbly.gateway.event;
 
 import java.util.EventObject;
 
-import org.apache.camel.management.event.ExchangeFailedEvent;
-import org.apache.camel.management.event.ExchangeFailureHandledEvent;
+import org.apache.camel.impl.event.ExchangeFailedEvent;
+import org.apache.camel.impl.event.ExchangeFailureHandledEvent;
+import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,5 +62,11 @@ private String flowId;
     protected void doStop() throws Exception {
         // noop
     }
+
+	@Override
+	public void notify(CamelEvent event) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
