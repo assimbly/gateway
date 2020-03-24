@@ -11,6 +11,10 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface MaintenanceMapper extends EntityMapper<MaintenanceDTO, Maintenance> {
 
+    MaintenanceDTO toDto(Maintenance maintenance);
+
+    Maintenance toEntity(MaintenanceDTO maintenanceDTO);
+
     default Maintenance fromId(Long id) {
         if (id == null) {
             return null;
