@@ -65,10 +65,6 @@ public class ConnectorResource {
     @Autowired	
     private SimpMessageSendingOperations messagingTemplate;
 
-	public Connector conncector;
-
-	//private CamelConnector conncector;
-
     public ConnectorResource(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
