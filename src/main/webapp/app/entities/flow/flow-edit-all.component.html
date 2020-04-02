@@ -155,8 +155,16 @@
 										<div class="input-group">
 											<a class="col-8"></a>
 											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/apache-camel.webp">
+													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
+												</picture>
 											</a>
 											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/assimbly_transparant.webp">
+													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
+												</picture>
 											</a>
 										</div>
 										<div class="form-group" [style.display]="'none'">
