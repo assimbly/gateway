@@ -11,7 +11,7 @@ Main page styles
 .background-parent {
     position: relative;
     overflow: hidden;
-    margin: -20px;
+    margin: -1.6%;
     width: 104%;
     padding-bottom: 150px;
 }
@@ -20,8 +20,6 @@ Main page styles
     pointer-events: none;
     position: absolute;
     z-index: 0;
-    left: -1900px;
-    top: -800px;
 }
 
 .jumbotron {
