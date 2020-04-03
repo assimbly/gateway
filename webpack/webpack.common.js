@@ -34,7 +34,7 @@ module.exports = (options) => ({
                 exclude: /(src\/main\/webapp\/index.html)/
             },
             {
-                test: /\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/i,
+                test: /\.(jpe?g|png|webp|gif|svg|woff2?|ttf|eot)$/i,
                 loader: 'file-loader',
                 options: {
                     digest: 'hex',
