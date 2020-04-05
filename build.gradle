@@ -16,6 +16,7 @@ buildscript {
 }
 
 plugins {
+    id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
     id "java"
     id "maven-publish"
     id "idea"
@@ -27,7 +28,8 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
-    id "com.palantir.graal" version "0.6.0-112-gca0b727"
+    //id "com.palantir.graal" version "0.6.0-114-gfe95739"
+    //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
@@ -48,7 +50,7 @@ apply plugin: 'war'
 apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
-apply plugin: 'com.palantir.graal'
+//apply plugin: 'com.palantir.graal'
 //jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 
 
@@ -106,10 +108,24 @@ springBoot {
     mainClassName = 'org.assimbly.gateway.GatewayApp'
 }
 
+/*
+
+//https://github.com/palantir/gradle-graal (com.palantir.graal)
+nativeImage {
+    setGraalVmHome("C:\\graalvm8")
+    setMainClass("org.assimbly.gateway.GatewayApp")
+    setExecutableName("assimbly")
+}
+*/
+
+
+/*
+//https://github.com/mike-neck/graalvm-native-image-plugin
 graal {
       mainClass 'org.assimbly.gateway.GatewayApp'
       outputName 'assimbly'
 }
+*/
 
 test {
     useJUnitPlatform()
