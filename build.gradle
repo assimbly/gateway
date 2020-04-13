@@ -310,7 +310,7 @@ dependencies {
     implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
 	// custom dependencies (non-jhipster)
-    implementation group: "org.assimbly", name: "connector", version: "1.1.0", changing: true    
+    implementation group: "org.assimbly", name: "connector", version: "3.0.0", changing: true    
 	implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
 	implementation "org.jdom:jdom2:2.0.6"
 	//implementation "io.hawt:hawtio-springboot:2.9.1"
