@@ -10,6 +10,7 @@ export enum EndpointType {
     AHC = 'AHC',
     AHCWS = 'AHC-WS',
     AHCWSS = 'AHC-WSS',
+    AMAZONMQ = 'AMAZONMQ',
     AMQP = 'AMQP',
     APNS = 'APNS',
     AS2 = 'AS2',
@@ -329,6 +330,25 @@ export enum EndpointType {
 export const typesLinks = [
     {
         name: 'ACTIVEMQ',
+        assimblyTypeLink: `/component-activemq`,
+        camelTypeLink: `/activemq-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType<br/>
+        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
+        <b>Default</b>: queue<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
+        <br/>
+        <b>Name</b>: destinationName<br/>
+        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
+    `
+    },
+    {
+        name: 'AMAZONMQ',
         assimblyTypeLink: `/component-activemq`,
         camelTypeLink: `/activemq-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
@@ -855,6 +875,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SQL-STORED',
+        assimblyTypeLink: `/component-sql-stored`,
+        camelTypeLink: `/sql-stored-component.html`,
+        uriPlaceholder: 'template',
+        uriPopoverMessage: `
+        <b>Name</b>: template<br/>
+        <b>Description</b>: Template is the stored procedure template, where you declare the name of the stored procedure and the IN, INOUT, and OUT arguments. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: STOREDSAMPLE(INTEGER 1,OUT INTEGER result2)<br/>
+    `
+    },
+    {
         name: 'STREAM',
         assimblyTypeLink: `/component-stream`,
         camelTypeLink: `/stream-component.html`,
@@ -965,6 +998,7 @@ export const typesLinks = [
 export class Components {
     fromTypes = [
         'ACTIVEMQ',
+        'AMAZONMQ',
         'AS2',
         'AWS-S3',
         'DIRECT',
@@ -1000,6 +1034,7 @@ export class Components {
 
     toTypes = [
         'ACTIVEMQ',
+        'AMAZONMQ',
         'LDAP',
         'AS2',
         'AWS-S3',
@@ -1041,6 +1076,7 @@ export class Components {
 
     errorTypes = [
         'ACTIVEMQ',
+        'AMAZONMQ',
         'AS2',
         'AWS-S3',
         'ELASTICSEARCH-REST',
@@ -1067,6 +1103,7 @@ export class Components {
         'SMTPS',
         'SONICMQ',
         'SQL',
+        'SQL-STORED',
         'TELEGRAM',
         'STREAM',
         'VM',
@@ -1075,6 +1112,7 @@ export class Components {
 
     wireTapTypes = [
         'ACTIVEMQ',
+        'AMAZONMQ',
         'AWS-S3',
         'ELASTICSEARCH-REST',
         'FILE',

@@ -1,16 +1,19 @@
 apply plugin: "war"
 
 bootWar {
-    mainClassName = "com.mycompany.myapp.GatewayApp"
+    mainClassName = "org.assimbly.gateway.GatewayApp"
     includes = ["WEB-INF/**", "META-INF/**"]
     webXml = file("${project.rootDir}/src/main/webapp/WEB-INF/web.xml")
+    webInf { from 'src/main/jboss' } 
 }
 
 war {
     webAppDirName = "build/resources/main/static/"
     webXml = file("${project.rootDir}/src/main/webapp/WEB-INF/web.xml")
+    webInf { from 'src/main/jboss' }
     enabled = true
     archiveExtension = "war.original"
     includes = ["WEB-INF/**", "META-INF/**"]
+    
 
 }

@@ -417,7 +417,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     returnServiceType(type: any) {
         if (type === 'ACTIVEMQ') {
             return 'ActiveMQ Connection';
-        } else if (type === 'SONICMQ') {
+        }else if (type === 'AMAZONMQ') {
+            return 'AmazonMQ Connection';
+        }else if (type === 'SONICMQ') {
             return 'SonicMQ Connection';
         } else if (type === 'SQL') {
             return 'JDBC Connection';
@@ -439,6 +441,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let type = typesLinks.find(x => x.name === endpoint.type.toString());
         let componentType = endpoint.type.toString().toLowerCase();
         if (componentType === 'activemq') {
+            componentType = 'jms';
+        } else if (componentType === 'amazonmq') {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
@@ -503,6 +507,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 } else {
                     endpointForm.controls.service.enable();
                 }
+                break;
+            }
+            case 'AMAZONMQ': {
+                endpointForm.controls.uri.enable();
+                endpointForm.controls.options.enable();
+                endpointForm.controls.header.enable();
+                endpointForm.controls.service.enable();
                 break;
             }
             case 'SJMS':
