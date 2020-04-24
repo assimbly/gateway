@@ -19,6 +19,8 @@ public enum EndpointType {
 	
 	AHCWSS("AHC-WSS"),
 	
+	AMAZONMQ("AMAZONMQ"),
+	
 	AMQP("AMQP"),
 	
 	APNS("APNS"),
