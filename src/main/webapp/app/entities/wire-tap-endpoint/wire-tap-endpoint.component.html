@@ -1,17 +1,57 @@
 <div>
-    <h2>
-        <span>Offloading</span>
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0 && isAdmin" (click)="navigateToCreate()">
-            <span class="fa fa-plus"></span>
-            <span>
-                Create Wiretap Endpoint
-            </span>
-        </button>
-    </h2>
-
+	<div class="row">
+		<div class="col-10">
+			<h2>
+				<span>Offloading</span>
+			</h2>
+		</div>
+		<div class="col-2">
+			<a role="button"
+				class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
+				href="https://github.com/assimbly/gateway/wiki/Offloading"
+				placement="right" title="Assimbly Documentation" target="_blank">
+				<picture>
+				<source srcset="../../../content/images/assimbly_transparant.webp">
+				<img src="../../../content/images/assimbly_transparant.png"
+					alt="assibmly-logo"> </picture>
+			</a>
+		</div>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col-10"></div>
+		<div class="col-2">
+	        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-wire-tap-endpoint" *ngIf="wireTapEndpoints.length === 0 && isAdmin" (click)="navigateToCreate()">
+	            <span class="fa fa-plus"></span>
+	            <span>
+	                Create Wiretap Endpoint
+	            </span>
+	        </button>
+        </div>
+	</div>
+	<br />
     <div *ngIf="wireTapEndpoints?.length === 0">
-    	<p>Offloading is a default destination where a copy of the source message is send. This copy can used as backup or for data analytics.</p>
-    	<p>This destination is called a wiretap, because its tapping messaging from the main flow</p>
+    			<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<b>No offloading is configured</b>
+					</div>
+					<div class="card-block pt-4">
+						<blockquote class="card-blockquote text-left">
+					    	<p> Offloading is a default destination where a copy of the source message is send. This copy can be used for example as backup or for data analytics.</p>
+					    	<p> This destination is called a wiretap, because its tapping messaging from a flow</p>
+						</blockquote>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 text-center">
+		        
+           </div>
+		</div>
+    	
+    
+    
     </div>
     <!-- <jhi-alert></jhi-alert> -->
 
