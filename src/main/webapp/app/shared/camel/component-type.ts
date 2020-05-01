@@ -347,6 +347,59 @@ export const typesLinks = [
     `
     },
     {
+        name: 'AHC',
+        assimblyTypeLink: `/component-ahc`,
+        camelTypeLink: `/ahc-component.html`,
+        uriPlaceholder: 'http://hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname <br/>
+        <b>Description</b>: The hostname <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Name</b>: port <br/>
+        <b>Description</b>: The port to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: http://hostname:port/path <br/>
+    `
+    },
+    {
+        name: 'AHC-WS',
+        assimblyTypeLink: `/component-ahc-ws`,
+        camelTypeLink: `/ahc-ws-component.html`,
+        uriPlaceholder: ' http://hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname <br/>
+        <b>Description</b>: The hostname <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Name</b>: port <br/>
+        <b>Description</b>: The port to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: http://hostname:port/path <br/>
+    `
+    },
+    {
+        name: 'AMQP',
+        assimblyTypeLink: `/component-amqp`,
+        camelTypeLink: `/amqp-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType <br/>
+        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: destinationName <br/>
+        <b>Description</b>: Name of the queue or topic to use as destination. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: queue:foo <br/>
+    `
+    },
+    {
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
         camelTypeLink: `/as2-component.html`,
@@ -380,6 +433,70 @@ export const typesLinks = [
     `
     },
     {
+        name: 'ASTERISK',
+        assimblyTypeLink: `/component-asterisk`,
+        camelTypeLink: `/asterisk-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name <br/>
+        <b>Description</b>: Name of component <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: foo <br/>
+    `
+    },
+    {
+        name: 'COAP',
+        assimblyTypeLink: `/component-coap`,
+        camelTypeLink: `/coap-component.html`,
+        uriPlaceholder: 'uri',
+        uriPopoverMessage: `
+        <b>Name</b>: uri<br/>
+        <b>Description</b>: The URI for the CoAP endpoint <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI<br/>
+    `
+    },
+    {
+        name: 'COUCHDB',
+        assimblyTypeLink: `/component-couchdb`,
+        camelTypeLink: `/couchdb-component.html`,
+        uriPlaceholder: 'protocol:hostname:port/database',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: The protocol to use for communicating with the database. The value can be one of: http, https. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Hostname of the running couchdb instance <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number for the running couchdb instance <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: database<br/>
+        <b>Description</b>: Name of the database to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: http://localhost:5984/database <br/>
+    `
+    },
+    {
+        name: 'CRON',
+        assimblyTypeLink: `/component-cron`,
+        camelTypeLink: `/cron-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The name of the cron trigger. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: foo <br/>
+    `
+    },
+    {
         name: 'DIRECT',
         assimblyTypeLink: `/component-direct`,
         camelTypeLink: `/direct-component.html`,
@@ -403,6 +520,31 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Example</b>: test<br/>
+    `
+    },
+    {
+        name: 'DOCKER',
+        assimblyTypeLink: `/component-docker`,
+        camelTypeLink: `/docker-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Which operation to use (see docs).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: DockerOperation <br/><br/>
+    `
+    },
+    {
+        name: 'DROPBOX',
+        assimblyTypeLink: `/component-dropbox`,
+        camelTypeLink: `/dropbox-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation <br/>
+        <b>Description</b>: The specific action (typically a CRUD action) to perform on Dropbox remote folder.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: move <br/>
     `
     },
     {
@@ -485,6 +627,162 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GIT',
+        assimblyTypeLink: `/component-git`,
+        camelTypeLink: `/git-component.html`,
+        uriPlaceholder: 'localPath',
+        uriPopoverMessage: `
+        <b>Name</b>: localPath<br/>
+        <b>Description</b>: Local repository path.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GOOGLE-BIG-QUERY',
+        assimblyTypeLink: `/component-google-bigquery`,
+        camelTypeLink: `/google-bigquery-component.html`,
+        uriPlaceholder: 'project-id:datasetId',
+        uriPopoverMessage: `
+        <b>Name</b>: project-id<br/>
+        <b>Description</b>: Google Cloud Project Id.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+        <b>Name</b>: datasetId <br/>
+        <b>Description</b>: BigQuery Dataset Id.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+        <b>Example</b>: sample-project193402:example-project-193402_dataset<br/>
+    `
+    },
+    {
+        name: 'GOOGLE-CALENDAR',
+        assimblyTypeLink: `/component-google-calendar`,
+        camelTypeLink: `/google-calendar-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform (see docs).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GoogleCalendarApiName <br/>
+        <br/>
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What sub operation to use for the selected operation.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: LIST/GET <br/>
+    `
+    },
+    {
+        name: 'GOOGLE-DRIVE',
+        assimblyTypeLink: `/component-google-drive`,
+        camelTypeLink: `/google-drive-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GoogleDriveApiName <br/>
+        <br/>
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What sub operation to use for the selected operation.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: drive-about/get<br/>
+    `
+    },
+    {
+        name: 'GOOGLE-MAIL',
+        assimblyTypeLink: `/component-google-mail`,
+        camelTypeLink: `/google-mail-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GoogleDriveApiName <br/>
+        <br/>
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What sub operation to use for the selected operation.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: messages/get<br/>
+    `
+    },
+    {
+        name: 'GOOGLE-SHEETS',
+        assimblyTypeLink: `/component-google-sheets`,
+        camelTypeLink: `/google-sheets-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform (see docs).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GoogleSheetsApiName <br/>
+        <br/>
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What sub operation to use for the selected operation.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: DATA/GET <br/>
+    `
+    },
+    {
+        name: 'GRAPHQL',
+        assimblyTypeLink: `/component-graphql`,
+        camelTypeLink: `/graphql-component.html`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The GraphQL server URI.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/>
+        <br/>
+        <b>Example</b>: http://myapi/graphql<br/>
+    `
+    },
+    {
+        name: 'HBASE',
+        assimblyTypeLink: `/component-hbase`,
+        camelTypeLink: `/hbase-component.html`,
+        uriPlaceholder: 'table',
+        uriPopoverMessage: `
+        <b>Name</b>: table<br/>
+        <b>Description</b>: The table name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: users<br/>
+    `
+    },
+    {
+        name: 'HDFS',
+        assimblyTypeLink: `/component-hdfs`,
+        camelTypeLink: `/hdfs-component.html`,
+        uriPlaceholder: 'hostname:port/path',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: HDFS host to use<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: HDFS port to use<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int <br/><br/>
+        <b>Name</b>: path<br/>
+        <b>Description</b>: HDFS host to use<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: localhost:8020/user <br/>
+    `
+    },
+    {
         name: 'HTTP',
         assimblyTypeLink: `/component-http`,
         camelTypeLink: `/http-component.html`,
@@ -544,6 +842,19 @@ export const typesLinks = [
         <b>Required</b>: no <br/>
         <b>Data Type</b>: Integer <br/><br/>
         <b>Example</b>: localhost:993<br/>
+    `
+    },
+    {
+        name: 'JOLT',
+        assimblyTypeLink: `/component-jolt`,
+        camelTypeLink: `/jolt-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: bean:myBean.myMethod <br/>
     `
     },
     {
@@ -651,6 +962,46 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: foo<br/>
+    `
+    },
+    {
+        name: 'MONGODB',
+        assimblyTypeLink: `/component-mongodb`,
+        camelTypeLink: `/mongodb-component.html`,
+        uriPlaceholder: 'connectionBean',
+        uriPopoverMessage: `
+        <b>Name</b>: connectionBean<br/>
+        <b>Description</b>: Sets the connection bean reference used to lookup a client for connecting to a database. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NSQ',
+        assimblyTypeLink: `/component-nsq`,
+        camelTypeLink: `/nsq-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The NSQ topic. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PDF',
+        assimblyTypeLink: `/component-pdf`,
+        camelTypeLink: `/pdf-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation type. The value can be one of: create, append, extractText.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: PdfOperation<br/>
+        <br/>
+        <b>Example</b>: create<br/>
     `
     },
     {
@@ -842,6 +1193,23 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SSH',
+        assimblyTypeLink: `/component-ssh`,
+        camelTypeLink: `/ssh-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Sets the hostname of the remote SSH server. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Sets the port number for the remote SSH server. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/><br/>
+        <b>Example</b>: localhost:22 <br/>
+    `
+    },
+    {
         name: 'SQL',
         assimblyTypeLink: `/component-sql`,
         camelTypeLink: `/sql-component.html`,
@@ -957,6 +1325,22 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/><br/>
         <b>Example</b>: //hostname[:port][/resourceUri][?options]<br/>
     `
+    },
+    {
+        name: 'WORDPRESS',
+        assimblyTypeLink: `/component-wordpress`,
+        camelTypeLink: `/wordpress-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: The endpoint operation. The value can be one of: post, user.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: operationDetail<br/>
+        <b>Description</b>: The second part of an endpoint operation. Needed only when endpoint semantic is not enough, like wordpress:post:delete. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
     }
 ];
 
@@ -965,25 +1349,42 @@ export const typesLinks = [
 export class Components {
     fromTypes = [
         'ACTIVEMQ',
+        'AHC-WS',
+        'AMQP',
         'AS2',
         'AWS-S3',
+        'ASTERISK',
+        'COAP',
+        'COUCHDB',
         'DIRECT',
         'DIRECT-VM',
+        'DROPBOX',
+        'DOCKER',
         'FILE',
         'FTP',
         'FTPS',
+        'GIT',
+        'GOOGLE-CALENDAR',
+        'GOOGLE-DRIVE',
+        'GOOGLE-MAIL',
+        'GOOGLE-SHEETS',
+        'HBASE',
+        'HDFS',
         'IMAP',
         'IMAPS',
         'JETTY',
         'NETTY4',
         'LANGUAGE',
         'LOG',
+        'MONGODB',
+        'NSQ',
         'KAFKA',
         'RABBITMQ',
         'REST',
         'SCHEDULER',
         'SEDA',
         'SFTP',
+        'SSH',
         'SJMS',
         'SLACK',
         'SMTPS',
@@ -995,34 +1396,57 @@ export class Components {
         'TIMER',
         'TELEGRAM',
         'VM',
-        'WEBSOCKET'
+        'WEBSOCKET',
+        'WORDPRESS'
     ];
 
     toTypes = [
         'ACTIVEMQ',
-        'LDAP',
+        'AHC',
+        'AHC-WS',
+        'AMQP',
         'AS2',
         'AWS-S3',
+        'ASTERISK',
+        'COAP',
+        'COUCHDB',
         'DIRECT',
         'DIRECT-VM',
+        'DROPBOX',
+        'DOCKER',
         'ELASTICSEARCH-REST',
         'FILE',
         'FTP',
         'FTPS',
+        'GIT',
+        'GOOGLE-BIG-QUERY',
+        'GOOGLE-CALENDAR',
+        'GOOGLE-DRIVE',
+        'GOOGLE-MAIL',
+        'GOOGLE-SHEETS',
+        'GRAPHQL',
+        'HBASE',
+        'HDFS',
         'HTTP',
         'HTTPS',
         'IMAP',
         'IMAPS',
         'JETTY',
+        'JOLT',
+        'LDAP',
         'MOCK',
         'NETTY4',
+        'PDF',
         'LOG',
+        'MONGODB',
+        'NSQ',
         'KAFKA',
         'RABBITMQ',
         'REST',
         'SCHEDULER',
         'SEDA',
         'SFTP',
+        'SSH',
         'SJMS',
         'SLACK',
         'SMTPS',
@@ -1036,13 +1460,15 @@ export class Components {
         'TIMER',
         'VM',
         'WASTEBIN',
-        'WEBSOCKET'
+        'WEBSOCKET',
+        'WORDPRESS'
     ];
 
     errorTypes = [
         'ACTIVEMQ',
         'AS2',
         'AWS-S3',
+        'CRON',
         'ELASTICSEARCH-REST',
         'DIRECT',
         'DIRECT-VM',
