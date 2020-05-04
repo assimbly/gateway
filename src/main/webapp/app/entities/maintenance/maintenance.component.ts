@@ -104,7 +104,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
         const ids = this.selectedFlows.filter(sf => sf !== null).map(f => f.id);
         if (ids.length > 0) {
             this.flowService.setMaintenance(time, ids).subscribe(() => {
-                this.messageFlow = `Set flows into maintenance mode for:`;
+                this.messageFlow = `Flow is into maintenance mode for:`;
                 this.displayMaintenanceTimer(this.selectedFlows, time);
                 this.deselectAll();
             });

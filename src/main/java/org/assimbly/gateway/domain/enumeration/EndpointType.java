@@ -34,7 +34,6 @@ public enum EndpointType {
 	@JsonProperty("ATMOSPHERE-WEBSOCKET")
 	ATMOSPHEREWEBSOCKET("ATMOSPHERE-WEBSOCKET"),
 	
-	@JsonProperty("AWS-S3")
 	ATOM("ATOM"),
 	
 	@JsonProperty("ATOMIX-MAP")
@@ -659,7 +658,7 @@ public enum EndpointType {
 
 	SMTP("SMTP"),
 
-	SMTPS3("SMTPS3"),
+	SMTPS("SMTPS"),
 	
 	SOLR("SOLR"),
 	

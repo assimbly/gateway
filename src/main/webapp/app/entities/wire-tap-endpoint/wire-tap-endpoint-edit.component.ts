@@ -97,8 +97,8 @@ export class WireTapEndpointEditComponent implements OnInit {
                 this.serviceCreated = this.services.length > 0;
                 this.headers = headers.body;
                 this.headerCreated = this.headers.length > 0;
-                this.wikiDocUrl = wikiDocUrl.url;
-                this.camelDocUrl = camelDocUrl.url;
+                this.wikiDocUrl = wikiDocUrl.body;
+                this.camelDocUrl = camelDocUrl.body;
                 this.updateEndpointData();
                 this.setTypeLink();
                 this.getOptions();

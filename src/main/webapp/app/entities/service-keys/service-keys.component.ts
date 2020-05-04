@@ -118,7 +118,8 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         valueType: 'text',
                         placeholder: 'Example tcp://localhost:61616',
                         isRequired: true    
-                    },
+                    }
+                    /*,
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
@@ -130,7 +131,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         valueType: 'password',
                         placeholder: '',
                         isRequired: false    
-                    }
+                    }*/
                 ]
             },
             {
@@ -169,13 +170,13 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         serviceKeyName: 'username',
                         valueType: 'text',
                         placeholder: 'user',
-                        isRequired: false
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'password',
                         valueType: 'password',
                         placeholder: '',
-                        isRequired: false
+                        isRequired: true
                     }
                 ]
             }

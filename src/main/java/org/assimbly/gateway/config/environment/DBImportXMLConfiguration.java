@@ -225,8 +225,13 @@ public class DBImportXMLConfiguration {
 				flow.setRedeliveryDelay(3000);
 			}
 			
-			if (flowLogLevel != null) {
-				flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
+			if (flowLogLevel != null) {				
+				flowLogLevel = flowLogLevel.toUpperCase();
+				if(flowLogLevel.equals("ERROR")||flowLogLevel.equals("WARN")||flowLogLevel.equals("INFO")||flowLogLevel.equals("DEBUG")||flowLogLevel.equals("TRACE")) {
+					flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));					
+				}else {
+					flow.setLogLevel(LogLevelType.OFF);
+				}
 			} else {
 				flow.setLogLevel(LogLevelType.OFF);
 			}
