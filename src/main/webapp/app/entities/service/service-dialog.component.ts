@@ -239,9 +239,10 @@ export class ServiceDialogComponent implements OnInit {
             {
                 name: 'ActiveMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:61616', isRequired: true },
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:61616', isRequired: true }
+                    /*,
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '',isRequired: false }
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '',isRequired: false }*/
                 ]
             },
             {
