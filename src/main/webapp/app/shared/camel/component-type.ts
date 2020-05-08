@@ -400,6 +400,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'APNS',
+        assimblyTypeLink: `/component-amqp`,
+        camelTypeLink: `/amqp-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name <br/>
+        <b>Description</b>: Name of the endpoint. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: foo <br/>
+    `
+    },
+    {
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
         camelTypeLink: `/as2-component.html`,
@@ -444,6 +457,126 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: foo <br/>
+    `
+    },
+    {
+        name: 'ATMOS',
+        assimblyTypeLink: `/component-atmos`,
+        camelTypeLink: `/atmos-component.html`,
+        uriPlaceholder: 'name/operation',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Atmos name. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: URI<br/>
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation to perform. The value can be one of: put, del, search, get, move. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: AtmosOperation<br/>
+    `
+    },
+    {
+        name: 'ATMOSPHERE-WEBSOCKET',
+        assimblyTypeLink: `/component-atmosphere-websocket`,
+        camelTypeLink: `/atmosphere-websocket-component.html`,
+        uriPlaceholder: 'servicePath',
+        uriPopoverMessage: `
+        <b>Name</b>: servicePath<br/>
+        <b>Description</b>: Name of websocket endpoint. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BEAN',
+        assimblyTypeLink: `/component-bean`,
+        camelTypeLink: `/bean-component.html`,
+        uriPlaceholder: 'beanName',
+        uriPopoverMessage: `
+        <b>Name</b>: beanName<br/>
+        <b>Description</b>: Sets the name of the bean to invoke. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BEAN-VALIDATOR',
+        assimblyTypeLink: `/component-bean-validator`,
+        camelTypeLink: `/bean-validator-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Where label is an arbitrary text value describing the endpoint. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BEANSTALK',
+        assimblyTypeLink: `/component-beanstalk`,
+        camelTypeLink: `/beanstalk-component.html`,
+        uriPlaceholder: 'connectionSettings',
+        uriPopoverMessage: `
+        <b>Name</b>: connectionSettings<br/>
+        <b>Description</b>: Connection settings host:port/tube. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BONITA',
+        assimblyTypeLink: `/component-bonita`,
+        camelTypeLink: `/bonita-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation to use. The value can be one of: startCase. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: BonitaOperation<br/>
+    `
+    },
+    {
+        name: 'BOX',
+        assimblyTypeLink: `/component-box`,
+        camelTypeLink: `/box-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: BoxApiName<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What sub operation to use for the selected operation. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BRAINTREE',
+        assimblyTypeLink: `/component-braintree`,
+        camelTypeLink: `/braintree-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: BraintreeApiName<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What sub operation to use for the selected operation. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'BROWSE',
+        assimblyTypeLink: `/component-browse`,
+        camelTypeLink: `/browse-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: A name which can be any string to uniquely identify the endpoint. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
     `
     },
     {
@@ -640,6 +773,24 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GEOCODER',
+        assimblyTypeLink: `/component-geocoder`,
+        camelTypeLink: `/geocoder-component.html`,
+        uriPlaceholder: 'address:latlng',
+        uriPopoverMessage: `
+        <b>Name</b>: address-id<br/>
+        <b>Description</b>: The geo address which should be prefixed with address.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+        <b>Name</b>: latlng <br/>
+        <b>Description</b>: The geo latitude and longitude which should be prefixed with latlng.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+    `
+    },
+    {
         name: 'GOOGLE-BIG-QUERY',
         assimblyTypeLink: `/component-google-bigquery`,
         camelTypeLink: `/google-bigquery-component.html`,
@@ -783,6 +934,27 @@ export const typesLinks = [
     `
     },
     {
+        name: 'HIPCHAT',
+        assimblyTypeLink: `/component-hipchat`,
+        camelTypeLink: `/hipchat-component.html`,
+        uriPlaceholder: 'protocol:host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: The protocol for the hipchat server, such as http.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The host for the hipchat server, such as api.hipchat.com.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The port for the hipchat server. Is by default 80.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int <br/><br/>
+        <b>Example</b>: http:example.com:80 <br/>
+    `
+    },
+    {
         name: 'HTTP',
         assimblyTypeLink: `/component-http`,
         camelTypeLink: `/http-component.html`,
@@ -842,6 +1014,19 @@ export const typesLinks = [
         <b>Required</b>: no <br/>
         <b>Data Type</b>: Integer <br/><br/>
         <b>Example</b>: localhost:993<br/>
+    `
+    },
+    {
+        name: 'IRONMQ',
+        assimblyTypeLink: `/component-ironmq`,
+        camelTypeLink: `/ironmq-component.html`,
+        uriPlaceholder: 'queueName',
+        uriPopoverMessage: `
+        <b>Name</b>: queueName<br/>
+        <b>Description</b>:  The name of the IronMQ queue.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: foo<br/>
     `
     },
     {
@@ -985,6 +1170,54 @@ export const typesLinks = [
         uriPopoverMessage: `
         <b>Name</b>: topic<br/>
         <b>Description</b>: The NSQ topic. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MUSTACHE',
+        assimblyTypeLink: `/component-mustache`,
+        camelTypeLink: `/mustache-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: bean:myBean.myMethod<br/>
+    `
+    },
+    {
+        name: 'OLINGO2',
+        assimblyTypeLink: `/component-olingo2`,
+        camelTypeLink: `/olingo2-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Olingo2ApiName<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What sub operation to use for the selected operation<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OLINGO4',
+        assimblyTypeLink: `/component-olingo4`,
+        camelTypeLink: `/olingo4-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Olingo4ApiName<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What sub operation to use for the selected operation<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <br/>
@@ -1193,6 +1426,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SPARK',
+        assimblyTypeLink: `/component-spark`,
+        camelTypeLink: `/spark-component.html`,
+        uriPlaceholder: 'endpointType',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointType<br/>
+        <b>Description</b>: Type of the endpoint (rdd, dataframe, hive). The value can be one of: rdd, dataframe, hive.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/><br/>
+        <b>Example</b>: dataframe<br/>
+    `
+    },
+    {
         name: 'SSH',
         assimblyTypeLink: `/component-ssh`,
         camelTypeLink: `/ssh-component.html`,
@@ -1280,6 +1526,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'VALIDATOR',
+        assimblyTypeLink: `/component-validator`,
+        camelTypeLink: `/validator-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: URL to a local resource on the classpath, or a reference to lookup a bean in the Registry, or a full URL to a remote resource or resource on the file system which contains the XSD to validate against.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Example</b>: http://acme.com/cheese.xsd | file:../foo/bar.xsd <br/>
+    `
+    },
+    {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
         camelTypeLink: `/vm-component.html`,
@@ -1341,6 +1600,22 @@ export const typesLinks = [
         <b>Required</b>: no <br/>
         <b>Data Type</b>: String<br/><br/>
     `
+    },
+    {
+        name: 'ZOOKEEPER',
+        assimblyTypeLink: `/component-zookeeper`,
+        camelTypeLink: `/zookeeper-component.html`,
+        uriPlaceholder: 'serverUrls/path',
+        uriPopoverMessage: `
+        <b>Name</b>: serverUrls<br/>
+        <b>Description</b>: The zookeeper server hosts (multiple servers can be separated by comma).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: path<br/>
+        <b>Description</b>: The node in the ZooKeeper server (aka znode). <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
     }
 ];
 
@@ -1351,9 +1626,16 @@ export class Components {
         'ACTIVEMQ',
         'AHC-WS',
         'AMQP',
+        'APNS',
         'AS2',
         'AWS-S3',
         'ASTERISK',
+        'ATMOS',
+        'ATMOSPHERE-WEBSOCKET',
+        'BEANSTALK',
+        'BOX',
+        'BRAINTREE',
+        'BROWSE',
         'COAP',
         'COUCHDB',
         'DIRECT',
@@ -1370,6 +1652,7 @@ export class Components {
         'GOOGLE-SHEETS',
         'HBASE',
         'HDFS',
+        'HIPCHAT',
         'IMAP',
         'IMAPS',
         'JETTY',
@@ -1378,6 +1661,8 @@ export class Components {
         'LOG',
         'MONGODB',
         'NSQ',
+        'OLINGO2',
+        'OLINGO4',
         'KAFKA',
         'RABBITMQ',
         'REST',
@@ -1397,7 +1682,8 @@ export class Components {
         'TELEGRAM',
         'VM',
         'WEBSOCKET',
-        'WORDPRESS'
+        'WORDPRESS',
+        'ZOOKEEPER'
     ];
 
     toTypes = [
@@ -1405,9 +1691,19 @@ export class Components {
         'AHC',
         'AHC-WS',
         'AMQP',
+        'APNS',
         'AS2',
         'AWS-S3',
         'ASTERISK',
+        'ATMOS',
+        'ATMOSPHERE-WEBSOCKET',
+        'BEAN',
+        'BEAN-VALIDATOR',
+        'BEANSTALK',
+        'BONITA',
+        'BOX',
+        'BRAINTREE',
+        'BROWSE',
         'COAP',
         'COUCHDB',
         'DIRECT',
@@ -1419,6 +1715,7 @@ export class Components {
         'FTP',
         'FTPS',
         'GIT',
+        'GEOCODER',
         'GOOGLE-BIG-QUERY',
         'GOOGLE-CALENDAR',
         'GOOGLE-DRIVE',
@@ -1427,10 +1724,12 @@ export class Components {
         'GRAPHQL',
         'HBASE',
         'HDFS',
+        'HIPCHAT',
         'HTTP',
         'HTTPS',
         'IMAP',
         'IMAPS',
+        'IRONMQ',
         'JETTY',
         'JOLT',
         'LDAP',
@@ -1439,6 +1738,9 @@ export class Components {
         'PDF',
         'LOG',
         'MONGODB',
+        'MUSTACHE',
+        'OLINGO2',
+        'OLINGO4',
         'NSQ',
         'KAFKA',
         'RABBITMQ',
@@ -1453,15 +1755,18 @@ export class Components {
         'SMTP',
         'SMTPS',
         'SONICMQ',
+        'SPARK',
         'SQL',
         'STUB',
         'STREAM',
         'TELEGRAM',
         'TIMER',
+        'VALIDATOR',
         'VM',
         'WASTEBIN',
         'WEBSOCKET',
-        'WORDPRESS'
+        'WORDPRESS',
+        'ZOOKEEPER'
     ];
 
     errorTypes = [
@@ -1480,6 +1785,7 @@ export class Components {
         'HTTPS',
         'IMAP',
         'IMAPS',
+        'IRONMQ',
         'JETTY',
         'NETTY4',
         'LOG',
