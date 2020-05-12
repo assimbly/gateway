@@ -69,7 +69,7 @@ export enum EndpointType {
     COUCHDB = 'COUCHDB',
     CRON = 'CRON',
     CRYPTO = 'CRYPTO',
-    CRYPTOSMS = 'CRYPTO-SMS',
+    CRYPTOCMS = 'CRYPTO-CMS',
     CXF = 'CXF',
     CXFRS = 'CXFRS',
     DATAFORMAT = 'DATAFORMAT',
@@ -479,10 +479,118 @@ export const typesLinks = [
         name: 'ATMOSPHERE-WEBSOCKET',
         assimblyTypeLink: `/component-atmosphere-websocket`,
         camelTypeLink: `/atmosphere-websocket-component.html`,
-        uriPlaceholder: 'servicePath',
+        uriPlaceholder: 'feedUri',
+        uriPopoverMessage: `
+        <b>Name</b>: feedUri<br/>
+        <b>Description</b>: The URI to the feed to poll. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOM',
+        assimblyTypeLink: `/component-atom`,
+        camelTypeLink: `/atom-component.html`,
+        uriPlaceholder: 'feedUri',
         uriPopoverMessage: `
         <b>Name</b>: servicePath<br/>
-        <b>Description</b>: Name of websocket endpoint. <br/>
+        <b>Description</b>: The URI to the feed to poll. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-MAP',
+        assimblyTypeLink: `/component-atomix-map`,
+        camelTypeLink: `/atomix-map-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-MESSAGING',
+        assimblyTypeLink: `/component-atomix-messaging`,
+        camelTypeLink: `/atomix-messaging-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-MULTIMAP',
+        assimblyTypeLink: `/component-atomix-multimap`,
+        camelTypeLink: `/atomix-multimap-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-QUEUE',
+        assimblyTypeLink: `/component-atomix-queue`,
+        camelTypeLink: `/atomix-queue-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-SET',
+        assimblyTypeLink: `/component-atomix-set`,
+        camelTypeLink: `/atomix-set-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'ATOMIX-VALUE',
+        assimblyTypeLink: `/component-atomix-value`,
+        camelTypeLink: `/atomix-value-component.html`,
+        uriPlaceholder: 'resourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceName<br/>
+        <b>Description</b>: The distributed resource name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'AVRO',
+        assimblyTypeLink: `/component-avro`,
+        camelTypeLink: `/atomix-avro.html`,
+        uriPlaceholder: 'transport:host:port/messageName',
+        uriPopoverMessage: `
+        <b>Name</b>: transport<br/>
+        <b>Description</b>: Transport to use, can be either http or netty. The value can be one of: http, netty. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: AvroTransport<br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port <br/>
+        <b>Description</b>: Port number to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: messageName<br/>
+        <b>Description</b>: The name of the message to send. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
     `
@@ -580,6 +688,122 @@ export const typesLinks = [
     `
     },
     {
+        name: 'CAFFEINECACHE',
+        assimblyTypeLink: `/component-caffeine-cache`,
+        camelTypeLink: `/caffeine-cache-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The cache name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CAFFEINELOADCACHE',
+        assimblyTypeLink: `/component-caffeine-loadcache`,
+        camelTypeLink: `/caffeine-loadcache-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The cache name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CQL',
+        assimblyTypeLink: `/component-cql`,
+        camelTypeLink: `/cql-component.html`,
+        uriPlaceholder: 'beanRef:hosts:port/keyspace',
+        uriPopoverMessage: `
+        <b>Name</b>: beanRef<br/>
+        <b>Description</b>: beanRef is defined using bean:id. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: hosts<br/>
+        <b>Description</b>: Hostname(s) cassansdra server(s). Multiple hosts can be separated by comma. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number of cassansdra server(s). <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: keyspace<br/>
+        <b>Description</b>: Keyspace to use. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CHATSCRIPT',
+        assimblyTypeLink: `/component-chatscript`,
+        camelTypeLink: `/chatscript-component.html`,
+        uriPlaceholder: 'host:port/botName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname or IP of the server on which CS server is running. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port on which ChatScript is listening to. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: botName<br/>
+        <b>Description</b>:  Name of the Bot in CS to converse with. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CHUNK',
+        assimblyTypeLink: `/component-chunk`,
+        camelTypeLink: `/chunk-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CLASS',
+        assimblyTypeLink: `/component-class`,
+        camelTypeLink: `/class-component.html`,
+        uriPlaceholder: 'beanName',
+        uriPopoverMessage: `
+        <b>Name</b>: beanName<br/>
+        <b>Description</b>: Sets the name of the bean to invoke. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CMSMS',
+        assimblyTypeLink: `/component-cm-sms`,
+        camelTypeLink: `/cm-sms-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: SMS Provider HOST with scheme <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CMIS',
+        assimblyTypeLink: `/component-cmis`,
+        camelTypeLink: `/cmis-component.html`,
+        uriPlaceholder: 'cmsUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: URL to the cmis repository. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
         name: 'COAP',
         assimblyTypeLink: `/component-coap`,
         camelTypeLink: `/coap-component.html`,
@@ -589,6 +813,70 @@ export const typesLinks = [
         <b>Description</b>: The URI for the CoAP endpoint <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI<br/>
+    `
+    },
+    {
+        name: 'COMETD',
+        assimblyTypeLink: `/component-cometd`,
+        camelTypeLink: `/cometd-component.html`,
+        uriPlaceholder: 'host:port/channelName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: hostname <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port <br/>
+        <b>Description</b>: Host port number <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: channelname <br/>
+        <b>Description</b>: The channelName represents a topic that can be subscribed to by the Camel endpoints. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CONSUL',
+        assimblyTypeLink: `/component-consul`,
+        camelTypeLink: `/consul-component.html`,
+        uriPlaceholder: 'apiEndpoint',
+        uriPopoverMessage: `
+        <b>Name</b>: apiEndpoint<br/>
+        <b>Description</b>: The API endpoint <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CORDA',
+        assimblyTypeLink: `/component-corda`,
+        camelTypeLink: `/corda-component.html`,
+        uriPlaceholder: 'node',
+        uriPopoverMessage: `
+        <b>Name</b>: node<br/>
+        <b>Description</b>: The url for the corda node <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'COUCHBASE',
+        assimblyTypeLink: `/component-couchbase`,
+        camelTypeLink: `/couchbase-component.html`,
+        uriPlaceholder: 'protocol:hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: The protocol to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: The hostname to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The port number to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
     `
     },
     {
@@ -627,6 +915,38 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <b>Example</b>: foo <br/>
+    `
+    },
+    {
+        name: 'CRYPTO',
+        assimblyTypeLink: `/component-crypto`,
+        camelTypeLink: `/crypto-component.html`,
+        uriPlaceholder: 'cryptoOperation:name',
+        uriPopoverMessage: `
+        <b>Name</b>: cryptoOperation<br/>
+        <b>Description</b>:  Set the Crypto operation from that supplied after the crypto scheme in the endpoint uri e.g. crypto:sign sets sign as the operation. The value can be one of: sign, verify. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: CryptoOperation<br/>
+        <b>Name</b>: name<br/>
+        <b>Description</b>:  The logical name of this operation. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CRYPTOCMS',
+        assimblyTypeLink: `/component-crypto-cms`,
+        camelTypeLink: `/crypto-cms-component.html`,
+        uriPlaceholder: 'cryptoOperation:name',
+        uriPopoverMessage: `
+        <b>Name</b>: cryptoOperation<br/>
+        <b>Description</b>:  Set the Crypto operation from that supplied after the crypto scheme in the endpoint uri e.g. crypto:sign sets sign as the operation. The value can be one of: sign, verify. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: CryptoOperation<br/>
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The name part in the URI can be chosen by the user to distinguish between different signer/verifier/encryptor/decryptor endpoints within the camel context. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
     `
     },
     {
@@ -1632,11 +1952,24 @@ export class Components {
         'ASTERISK',
         'ATMOS',
         'ATMOSPHERE-WEBSOCKET',
+        'ATOM',
+        'ATOMIX-MAP',
+        'ATOMIX-MESSAGING',
+        'ATOMIX-QUEUE',
+        'ATOMIX-SET',
+        'ATOMIX-VALUE',
+        'AVRO',
         'BEANSTALK',
         'BOX',
         'BRAINTREE',
         'BROWSE',
+        'CQL',
+        'CMIS',
         'COAP',
+        'COMETD',
+        'CONSUL',
+        'CORDA',
+        'COUCHBASE',
         'COUCHDB',
         'DIRECT',
         'DIRECT-VM',
@@ -1697,6 +2030,13 @@ export class Components {
         'ASTERISK',
         'ATMOS',
         'ATMOSPHERE-WEBSOCKET',
+        'ATOMIX-MAP',
+        'ATOMIX-MESSAGING',
+        'ATOMIX-MULTIMAP',
+        'ATOMIX-QUEUE',
+        'ATOMIX-SET',
+        'ATOMIX-VALUE',
+        'AVRO',
         'BEAN',
         'BEAN-VALIDATOR',
         'BEANSTALK',
@@ -1704,8 +2044,22 @@ export class Components {
         'BOX',
         'BRAINTREE',
         'BROWSE',
+        'CAFFEINECACHE',
+        'CAFFEINELOADCACHE',
+        'CQL',
+        'CHATSCRIPT',
+        'CHUNK',
+        'CLASS',
+        'CMSMS',
+        'CMIS',
         'COAP',
+        'COMETD',
+        'CONSUL',
+        'CORDA',
+        'COUCHBASE',
         'COUCHDB',
+        'CRYPTO',
+        'CRYPTOCMS',
         'DIRECT',
         'DIRECT-VM',
         'DROPBOX',
