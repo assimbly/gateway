@@ -15,11 +15,11 @@ Create your first flow with the [Quick start guide](https://github.com/assimbly/
 
 ## Download
 
-Download it [here](https://github.com/assimbly/gateway/releases)
+Download it [here](https://github.com/assimbly/gateway/releases).
 
 ## Design
 
-The main design goals are:
+The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 
 -   Web based: Access flows from any browser.
 -   Ease of use: Configure and manage flows with ease.
@@ -42,4 +42,4 @@ If you like to contribute, please check the [contributing](https://github.com/as
 
 ## License
 
-This project is licensed under the Apache License - see the [LICENSE.md](https://github.com/assimbly/gateway/blob/master/LICENSE) file for details
+This project is licensed under the Apache License - see the [LICENSE.md](https://github.com/assimbly/gateway/blob/master/LICENSE) file for details.
