@@ -93,7 +93,9 @@ export enum EndpointType {
     ELASTICSEARCHREST = 'ELASTICSEARCH-REST',
     ELSQL = 'ELSQL',
     ELYTRON = 'ELYTRON',
-    ETCD = 'ETCD',
+    ETCDKEYS = 'ETCD-KEYS',
+    ETCDSTATS = 'ETCD-STATS',
+    ETCDWATCH = 'ETCD-WATCH',
     EVENTADMIN = 'EVENTADMIN',
     EXEC = 'EXEC',
     FACEBOOK = 'FACEBOOK',
@@ -688,7 +690,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'CAFFEINECACHE',
+        name: 'CAFFEINE-CACHE',
         assimblyTypeLink: `/component-caffeine-cache`,
         camelTypeLink: `/caffeine-cache-component.html`,
         uriPlaceholder: 'cacheName',
@@ -700,7 +702,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'CAFFEINELOADCACHE',
+        name: 'CAFFEINE-LOADCACHE',
         assimblyTypeLink: `/component-caffeine-loadcache`,
         camelTypeLink: `/caffeine-loadcache-component.html`,
         uriPlaceholder: 'cacheName',
@@ -780,7 +782,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'CMSMS',
+        name: 'CM-SMS',
         assimblyTypeLink: `/component-cm-sms`,
         camelTypeLink: `/cm-sms-component.html`,
         uriPlaceholder: 'host',
@@ -934,7 +936,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'CRYPTOCMS',
+        name: 'CRYPTO-CMS',
         assimblyTypeLink: `/component-crypto-cms`,
         camelTypeLink: `/crypto-cms-component.html`,
         uriPlaceholder: 'cryptoOperation:name',
@@ -947,6 +949,138 @@ export const typesLinks = [
         <b>Description</b>: The name part in the URI can be chosen by the user to distinguish between different signer/verifier/encryptor/decryptor endpoints within the camel context. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CXF',
+        assimblyTypeLink: `/component-cxf`,
+        camelTypeLink: `/cxf-component.html`,
+        uriPlaceholder: 'beanId:address',
+        uriPopoverMessage: `
+        <b>Name</b>: beanId<br/>
+        <b>Description</b>: To lookup an existing configured CxfEndpoint. Must used bean: as prefix. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: address<br/>
+        <b>Description</b>: The service publish address. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'CXFRS',
+        assimblyTypeLink: `/component-cxfrs`,
+        camelTypeLink: `/cxfrs-component.html`,
+        uriPlaceholder: 'beanId:address',
+        uriPopoverMessage: `
+        <b>Name</b>: beanId<br/>
+        <b>Description</b>: To lookup an existing configured CxfEndpoint. Must used bean: as prefix. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: address<br/>
+        <b>Description</b>: The service publish address. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'DATAFORMAT',
+        assimblyTypeLink: `/component-dataformat`,
+        camelTypeLink: `/dataformat-component.html`,
+        uriPlaceholder: 'name:operation',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>:  Name of data format.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: operation<br/>
+        <b>Description</b>:  Operation to use either marshal or unmarshal. The value can be one of: marshal, unmarshal.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DATASET',
+        assimblyTypeLink: `/component-dataset`,
+        camelTypeLink: `/dataset-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name of DataSet to lookup in the registry<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: DataSet <br/><br/>
+    `
+    },
+    {
+        name: 'DATASET-TEST',
+        assimblyTypeLink: `/component-dataset-test`,
+        camelTypeLink: `/dataset-test-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name of DataSet to lookup in the registry<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: DataSet <br/><br/>
+    `
+    },
+    {
+        name: 'DEBEZIUM-MONGODB',
+        assimblyTypeLink: `/component-debezium-mongodb`,
+        camelTypeLink: `/debezium-mongodb-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DEBEZIUM-MYSQL',
+        assimblyTypeLink: `/component-debezium-mysql`,
+        camelTypeLink: `/debezium-mysql-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DEBEZIUM-POSTGRESQL',
+        assimblyTypeLink: `/component-debezium-postgres`,
+        camelTypeLink: `/debezium-postgres-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DEBEZIUM-SQLSERVER',
+        assimblyTypeLink: `/component-debezium-sqlserver`,
+        camelTypeLink: `/debezium-sqlserver-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DIGITALOCEAN',
+        assimblyTypeLink: `/component-digitalocean`,
+        camelTypeLink: `/digitalocean-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: The operation to perform to the given resource.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: DigitalOceanOperations <br/><br/>
     `
     },
     {
@@ -976,6 +1110,30 @@ export const typesLinks = [
     `
     },
     {
+        name: 'DISRUPTOR',
+        assimblyTypeLink: `/component-disruptor`,
+        camelTypeLink: `/disruptor-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name of queue.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DNS',
+        assimblyTypeLink: `/component-dns`,
+        camelTypeLink: `/dns-component.html`,
+        uriPlaceholder: 'dnsType',
+        uriPopoverMessage: `
+        <b>Name</b>: dnsType<br/>
+        <b>Description</b>: The type of the lookup. The value can be one of: dig, ip, lookup, wikipedia.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: DnsType <br/><br/>
+    `
+    },
+    {
         name: 'DOCKER',
         assimblyTypeLink: `/component-docker`,
         camelTypeLink: `/docker-component.html`,
@@ -985,6 +1143,30 @@ export const typesLinks = [
         <b>Description</b>: Which operation to use (see docs).<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: DockerOperation <br/><br/>
+    `
+    },
+    {
+        name: 'DOZER',
+        assimblyTypeLink: `/component-dozer`,
+        camelTypeLink: `/dozer-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>:A human readable name of the mapping.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DRILL',
+        assimblyTypeLink: `/component-drill`,
+        camelTypeLink: `/drill-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Host name or IP address.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -998,6 +1180,18 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Example</b>: move <br/>
+    `
+    },
+    {
+        name: 'EHCACHE',
+        assimblyTypeLink: `/component-ehcache`,
+        camelTypeLink: `/ehcache-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName <br/>
+        <b>Description</b>: The cache name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -1017,6 +1211,94 @@ export const typesLinks = [
     `
     },
     {
+        name: 'ELSQL',
+        assimblyTypeLink: `/component-elsql`,
+        camelTypeLink: `/elsql-component.html`,
+        uriPlaceholder: 'elsqlName:resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: elsqlName <br/>
+        <b>Description</b>: The name of the elsql to use (is NAMED in the elsql file).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'ETCD-KEYS',
+        assimblyTypeLink: `/component-etcd-keys`,
+        camelTypeLink: `/etcd-keys-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path <br/>
+        <b>Description</b>: The path the endpoint refers to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'ETCD-STATS',
+        assimblyTypeLink: `/component-etcd-stats`,
+        camelTypeLink: `/etcd-stats-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path <br/>
+        <b>Description</b>: The path the endpoint refers to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'ETCD-WATCH',
+        assimblyTypeLink: `/component-etcd-watch`,
+        camelTypeLink: `/etcd-watch-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path <br/>
+        <b>Description</b>: The path the endpoint refers to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'EXEC',
+        assimblyTypeLink: `/component-exec`,
+        camelTypeLink: `/exec-component.html`,
+        uriPlaceholder: 'executable',
+        uriPopoverMessage: `
+        <b>Name</b>: executable <br/>
+        <b>Description</b>: Sets the executable to be executed. The executable must not be empty or null.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'FACEBOOK',
+        assimblyTypeLink: `/component-facebook`,
+        camelTypeLink: `/facebook-component.html`,
+        uriPlaceholder: 'methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What operation to perform.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'FHIR',
+        assimblyTypeLink: `/component-fhir`,
+        camelTypeLink: `/fhir-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName <br/>
+        <b>Description</b>: What kind of operation to perform. The value can be one of: capabilities, create, delete, history, load-page, meta, patch, read, search, transaction, update, validate.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: FhirApiName <br/><br/>
+        <b>Name</b>: methodName <br/>
+        <b>Description</b>: What sub operation to use for the selected operation.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'FILE',
         assimblyTypeLink: `/component-file`,
         camelTypeLink: `/file-component.html`,
@@ -1027,6 +1309,70 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: File <br/><br/>
         <b>Example</b>: /home/user/order or C:\\order<br/>
+    `
+    },
+    {
+        name: 'FILEWATCH',
+        assimblyTypeLink: `/component-filewatch`,
+        camelTypeLink: `/filewatch-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path<br/>
+        <b>Description</b>: Path of directory to consume events from.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'FLATPACK',
+        assimblyTypeLink: `/component-flatpack`,
+        camelTypeLink: `/flatpack-component.html`,
+        uriPlaceholder: 'type:resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: type<br/>
+        <b>Description</b>: Whether to use fixed or delimiter. The value can be one of: fixed, delim.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: FlatpackType <br/><br/>
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: URL for loading the flatpack mapping file from classpath or file system.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'FLINK',
+        assimblyTypeLink: `/component-flink`,
+        camelTypeLink: `/flink-component.html`,
+        uriPlaceholder: 'endpointType',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointType<br/>
+        <b>Description</b>: Type of the endpoint (dataset, datastream). The value can be one of: dataset, datastream.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: EndpointType <br/><br/>
+    `
+    },
+    {
+        name: 'FOP',
+        assimblyTypeLink: `/component-fop`,
+        camelTypeLink: `/fop-component.html`,
+        uriPlaceholder: 'outputType',
+        uriPopoverMessage: `
+        <b>Name</b>: outputType<br/>
+        <b>Description</b>: The primary output format is PDF but other output formats are also supported. The value can be one of: pdf, ps, pcl, png, jpeg, svg, xml, mif, rtf, txt.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: FopOutputType <br/><br/>
+    `
+    },
+    {
+        name: 'FREEMARKER',
+        assimblyTypeLink: `/component-freemarker`,
+        camelTypeLink: `/freemarker-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -1080,6 +1426,25 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GANGLIA',
+        assimblyTypeLink: `/component-ganglia`,
+        camelTypeLink: `/ganglia-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Host name for Ganglia server.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: 239.2.11.71<br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>:  Port for Ganglia server.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: 8649<br/>
+        <b>Data Type</b>: int <br/>
+        <br/>
+    `
+    },
+    {
         name: 'GIT',
         assimblyTypeLink: `/component-git`,
         camelTypeLink: `/git-component.html`,
@@ -1088,6 +1453,23 @@ export const typesLinks = [
         <b>Name</b>: localPath<br/>
         <b>Description</b>: Local repository path.<br/>
         <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GITHUB',
+        assimblyTypeLink: `/component-github`,
+        camelTypeLink: `/github-component.html`,
+        uriPlaceholder: 'type/branchName',
+        uriPopoverMessage: `
+        <b>Name</b>: type<br/>
+        <b>Description</b>: What git operation to execute. The value can be one of: CLOSEPULLREQUEST, PULLREQUESTCOMMENT, COMMIT, PULLREQUEST, TAG, PULLREQUESTSTATE, PULLREQUESTFILES, GETCOMMITFILE, CREATEISSUE.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GitHubType <br/>
+        <b>Name</b>: branchName<br/>
+        <b>Description</b>: Name of branch.<br/>
+        <b>Required</b>: no <br/>
         <b>Data Type</b>: String <br/>
         <br/>
     `
@@ -1130,6 +1512,24 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GOOGLE-BIG-QUERY-SQL',
+        assimblyTypeLink: `/component-google-bigquery-sql`,
+        camelTypeLink: `/google-bigquery-sql-component.html`,
+        uriPlaceholder: 'project-id:query',
+        uriPopoverMessage: `
+        <b>Name</b>: project-id<br/>
+        <b>Description</b>: Google Cloud Project Id.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+        <b>Name</b>: query <br/>
+        <b>Description</b>: BigQuery standard SQL query.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
         name: 'GOOGLE-CALENDAR',
         assimblyTypeLink: `/component-google-calendar`,
         camelTypeLink: `/google-calendar-component.html`,
@@ -1146,6 +1546,19 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: LIST/GET <br/>
+    `
+    },
+    {
+        name: 'GOOGLE-CALENDAR-STREAM',
+        assimblyTypeLink: `/component-google-calendar-stream`,
+        camelTypeLink: `/google-calendar-stream-component.html`,
+        uriPlaceholder: 'index',
+        uriPopoverMessage: `
+        <b>Name</b>: index<br/>
+        <b>Description</b>: Specifies an index for the endpoint.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
     `
     },
     {
@@ -1187,6 +1600,36 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GOOGLE-MAIL-STREAM',
+        assimblyTypeLink: `/component-google-mail-stream`,
+        camelTypeLink: `/google-mail-stream-component.html`,
+        uriPlaceholder: 'index',
+        uriPopoverMessage: `
+        <b>Name</b>: index<br/>
+        <b>Description</b>: Specifies an index for the endpoint.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GOOGLE-PUBSUB',
+        assimblyTypeLink: `/component-google-pubsub`,
+        camelTypeLink: `/google-pubsub-component.html`,
+        uriPlaceholder: 'index',
+        uriPopoverMessage: `
+        <b>Name</b>: projectId<br/>
+        <b>Description</b>:  Project Id.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: DestinationName <br/>
+        <b>Description</b>: Destination Name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
         name: 'GOOGLE-SHEETS',
         assimblyTypeLink: `/component-google-sheets`,
         camelTypeLink: `/google-sheets-component.html`,
@@ -1206,6 +1649,45 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GOOGLE-SHEETS-STREAM',
+        assimblyTypeLink: `/component-google-sheets-stream`,
+        camelTypeLink: `/google-sheets-stream-component.html`,
+        uriPlaceholder: 'apiName',
+        uriPopoverMessage: `
+        <b>Name</b>: index<br/>
+        <b>Description</b>: Sets the apiName.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GORA',
+        assimblyTypeLink: `/component-gora`,
+        camelTypeLink: `/gora-component.html`,
+        uriPlaceholder: 'apiName',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Instance name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GRAPE',
+        assimblyTypeLink: `/component-grape`,
+        camelTypeLink: `/grape-component.html`,
+        uriPlaceholder: 'defaultCoordinates',
+        uriPopoverMessage: `
+        <b>Name</b>: defaultCoordinates<br/>
+        <b>Description</b>: Maven coordinates to use as default to grab if the message body is empty.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
         name: 'GRAPHQL',
         assimblyTypeLink: `/component-graphql`,
         camelTypeLink: `/graphql-component.html`,
@@ -1217,6 +1699,172 @@ export const typesLinks = [
         <b>Data Type</b>: URI <br/>
         <br/>
         <b>Example</b>: http://myapi/graphql<br/>
+    `
+    },
+    {
+        name: 'GRPC',
+        assimblyTypeLink: `/component-grpc`,
+        camelTypeLink: `/grpc-component.html`,
+        uriPlaceholder: 'host:port/service',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The gRPC server host name. This is localhost or 0.0.0.0 when being a consumer or remote server host name when using producer.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The gRPC local or remote server port.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int <br/>
+        <b>Name</b>: service<br/>
+        <b>Description</b>: Fully qualified service name from the protocol buffer descriptor file (package dot service definition name).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'GUAVA-EVENTBUS',
+        assimblyTypeLink: `/component-guava-eventbus`,
+        camelTypeLink: `/guava-eventbus-component.html`,
+        uriPlaceholder: 'eventBusRef',
+        uriPopoverMessage: `
+        <b>Name</b>: eventBusRef<br/>
+        <b>Description</b>: To lookup the Guava EventBus from the registry with the given name.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-ATOMICVALUE',
+        assimblyTypeLink: `/component-hazelcast-atomicvalue`,
+        camelTypeLink: `/hazelcast-atomicvalue-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-INSTANCE',
+        assimblyTypeLink: `/component-hazelcast-instance`,
+        camelTypeLink: `/hazelcast-instance-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-LIST',
+        assimblyTypeLink: `/component-hazelcast-list`,
+        camelTypeLink: `/hazelcast-list-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-MAP',
+        assimblyTypeLink: `/component-hazelcast-map`,
+        camelTypeLink: `/hazelcast-map-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-MULTIMAP',
+        assimblyTypeLink: `/component-hazelcast-multimap`,
+        camelTypeLink: `/hazelcast-multimap-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-QUEUE',
+        assimblyTypeLink: `/component-hazelcast-queue`,
+        camelTypeLink: `/hazelcast-queue-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-REPLICATEDMAP',
+        assimblyTypeLink: `/component-hazelcast-replicatedmap`,
+        camelTypeLink: `/hazelcast-replicatedmap-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-RINGBUFFER',
+        assimblyTypeLink: `/component-hazelcast-ringbuffer`,
+        camelTypeLink: `/hazelcast-ringbuffer-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-SEDA',
+        assimblyTypeLink: `/component-hazelcast-seda`,
+        camelTypeLink: `/hazelcast-seda-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-SET',
+        assimblyTypeLink: `/component-hazelcast-set`,
+        camelTypeLink: `/hazelcast-set-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HAZELCAST-TOPIC',
+        assimblyTypeLink: `/component-hazelcast-topic`,
+        camelTypeLink: `/hazelcast-topic-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -1301,6 +1949,114 @@ export const typesLinks = [
     `
     },
     {
+        name: 'IEC60870-CLIENT',
+        assimblyTypeLink: `/component-iec60870-client`,
+        camelTypeLink: `/iec60870-client-component.html`,
+        uriPlaceholder: 'uriPath',
+        uriPopoverMessage: `
+        <b>Name</b>: uriPath<br/>
+        <b>Description</b>: The object information address.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: ObjectAddress <br/><br/>
+    `
+    },
+    {
+        name: 'IEC60870-SERVER',
+        assimblyTypeLink: `/component-iec60870-server`,
+        camelTypeLink: `/iec60870-server-component.html`,
+        uriPlaceholder: 'uriPath',
+        uriPopoverMessage: `
+        <b>Name</b>: uriPath<br/>
+        <b>Description</b>: The object information address.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: ObjectAddress <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-CACHE',
+        assimblyTypeLink: `/component-ignite-cache`,
+        camelTypeLink: `/ignite-cache-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The cache name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-COMPUTE',
+        assimblyTypeLink: `/component-ignite-compute`,
+        camelTypeLink: `/ignite-compute-component.html`,
+        uriPlaceholder: 'endpointId',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointId<br/>
+        <b>Description</b>: The endpoint ID (not used).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-EVENTS',
+        assimblyTypeLink: `/component-ignite-events`,
+        camelTypeLink: `/ignite-events-component.html`,
+        uriPlaceholder: 'endpointId',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointId<br/>
+        <b>Description</b>: The endpoint ID (not used).<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-IDGEN',
+        assimblyTypeLink: `/component-ignite-idgen`,
+        camelTypeLink: `/ignite-idgen-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The sequence name.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-MESSAGING',
+        assimblyTypeLink: `/component-ignite-messaging`,
+        camelTypeLink: `/ignite-messaging-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The topic name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-QUEUE',
+        assimblyTypeLink: `/component-ignite-queue`,
+        camelTypeLink: `/ignite-queue-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The queue name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IGNITE-SETS',
+        assimblyTypeLink: `/component-ignite-sets`,
+        camelTypeLink: `/ignite-sets-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The set name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'IMAP',
         assimblyTypeLink: `/component-imap`,
         camelTypeLink: `/mail-component.html`,
@@ -1337,6 +2093,70 @@ export const typesLinks = [
     `
     },
     {
+        name: 'INFINISPAN',
+        assimblyTypeLink: `/component-infinispan`,
+        camelTypeLink: `/infinispan-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>:  The name of the cache to use. Use current to use the existing cache name from the currently configured cached manager. Or use default for the default cache manager name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'INFLUXDB',
+        assimblyTypeLink: `/component-influxdb`,
+        camelTypeLink: `/influxdb-component.html`,
+        uriPlaceholder: 'connectionBean',
+        uriPopoverMessage: `
+        <b>Name</b>: connectionBean<br/>
+        <b>Description</b>: Connection to the influx database, of class InfluxDB.class.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IOTA',
+        assimblyTypeLink: `/component-iota`,
+        camelTypeLink: `/iota-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Component name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IPFS',
+        assimblyTypeLink: `/component-ipfs`,
+        camelTypeLink: `/ipfs-component.html`,
+        uriPlaceholder: 'ipfsCmd',
+        uriPopoverMessage: `
+        <b>Name</b>: ipfsCmd<br/>
+        <b>Description</b>: The ipfs command. The value can be one of: add, cat, get, version.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'IRC',
+        assimblyTypeLink: `/component-irc`,
+        camelTypeLink: `/irc-component.html`,
+        uriPlaceholder: 'hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Hostname for the IRC chat server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number for the IRC chat server. If no port is configured then a default port of either 6667, 6668 or 6669 is used.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int <br/><br/>
+    `
+    },
+    {
         name: 'IRONMQ',
         assimblyTypeLink: `/component-ironmq`,
         camelTypeLink: `/ironmq-component.html`,
@@ -1350,16 +2170,75 @@ export const typesLinks = [
     `
     },
     {
-        name: 'JOLT',
-        assimblyTypeLink: `/component-jolt`,
-        camelTypeLink: `/jolt-component.html`,
-        uriPlaceholder: 'resourceUri',
+        name: 'JBPM',
+        assimblyTypeLink: `/component-jbpm`,
+        camelTypeLink: `/jbpm-component.html`,
+        uriPlaceholder: 'connectionURL',
         uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource.<br/>
+        <b>Name</b>: connectionURL<br/>
+        <b>Description</b>: The URL to the jBPM server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URL <br/><br/>
+        <b>Name</b>: eventListenerType<br/>
+        <b>Description</b>: Sets the event listener type to attach to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JCACHE',
+        assimblyTypeLink: `/component-jcache`,
+        camelTypeLink: `/jcache-component.html`,
+        uriPlaceholder: 'cacheName',
+        uriPopoverMessage: `
+        <b>Name</b>: cacheName<br/>
+        <b>Description</b>: The name of the cache.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: bean:myBean.myMethod <br/>
+    `
+    },
+    {
+        name: 'JCLOUDS',
+        assimblyTypeLink: `/component-jclouds`,
+        camelTypeLink: `/jclouds-component.html`,
+        uriPlaceholder: 'command:providerId',
+        uriPopoverMessage: `
+        <b>Name</b>: command<br/>
+        <b>Description</b>: What command to execute such as blobstore or compute. The value can be one of: blobstore, compute.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: JcloudsCommand <br/><br/>
+        <b>Name</b>: providerId<br/>
+        <b>Description</b>: The name of the cloud provider that provides the target service (e.g. aws-s3 or aws_ec2).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JCR',
+        assimblyTypeLink: `/component-jcr`,
+        camelTypeLink: `/jcr-component.html`,
+        uriPlaceholder: 'host/base',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Name of the javax.jcr.Repository to lookup from the Camel registry to be used.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: base<br/>
+        <b>Description</b>: Get the base node when accessing the repository.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JDBC',
+        assimblyTypeLink: `/component-jdbc`,
+        camelTypeLink: `/jdbc-component.html`,
+        uriPlaceholder: 'dataSourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: dataSourceName<br/>
+        <b>Description</b>: Name of DataSource to lookup in the Registry. If the name is dataSource or default, then Camel will attempt to lookup a default DataSource from the registry, meaning if there is a only one instance of DataSource found, then this DataSource will be used.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -1376,6 +2255,171 @@ export const typesLinks = [
     `
     },
     {
+        name: 'JGROEPS',
+        assimblyTypeLink: `/component-jgroups`,
+        camelTypeLink: `/jgroups-component.html`,
+        uriPlaceholder: 'clusterName',
+        uriPopoverMessage: `
+        <b>Name</b>: clusterName<br/>
+        <b>Description</b>: The name of the JGroups cluster the component should connect to.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JGROEPSRAFT',
+        assimblyTypeLink: `/component-jgroups-raft`,
+        camelTypeLink: `/jgroups-raft-component.html`,
+        uriPlaceholder: 'clusterName',
+        uriPopoverMessage: `
+        <b>Name</b>: clusterName<br/>
+        <b>Description</b>: The name of the JGroupsraft cluster the component should connect to.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JING',
+        assimblyTypeLink: `/component-jing`,
+        camelTypeLink: `/jing-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: URL to a local resource on the classpath or a full URL to a remote resource or resource on the file system which contains the schema to validate against.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JIRA',
+        assimblyTypeLink: `/component-jira`,
+        camelTypeLink: `/jira-component.html`,
+        uriPlaceholder: 'type',
+        uriPopoverMessage: `
+        <b>Name</b>: type<br/>
+        <b>Description</b>: Operation to perform.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: JiraType <br/><br/>
+    `
+    },
+    {
+        name: 'JMS',
+        assimblyTypeLink: `/component-jms`,
+        camelTypeLink: `/jms-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType<br/>
+        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: destinationName<br/>
+        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JMX',
+        assimblyTypeLink: `/component-jmx`,
+        camelTypeLink: `/jmx-component.html`,
+        uriPlaceholder: 'serverURL',
+        uriPopoverMessage: `
+        <b>Name</b>: serverURL<br/>
+        <b>Description</b>: Server url comes from the remaining endpoint. Use platform to connect to local JVM.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JOLT',
+        assimblyTypeLink: `/component-jolt`,
+        camelTypeLink: `/jolt-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: bean:myBean.myMethod <br/>
+    `
+    },
+    {
+        name: 'JOOQ',
+        assimblyTypeLink: `/component-jooq`,
+        camelTypeLink: `/jooq-component.html`,
+        uriPlaceholder: 'entityType',
+        uriPopoverMessage: `
+        <b>Name</b>: entityType<br/>
+        <b>Description</b>: JOOQ entity class.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Class <br/><br/>
+    `
+    },
+    {
+        name: 'JPA',
+        assimblyTypeLink: `/component-jpa`,
+        camelTypeLink: `/jpa-component.html`,
+        uriPlaceholder: 'entityType',
+        uriPopoverMessage: `
+        <b>Name</b>: entityType<br/>
+        <b>Description</b>: Entity class name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JSLT',
+        assimblyTypeLink: `/component-jslt`,
+        camelTypeLink: `/jslt-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JSON-VALIDATOR',
+        assimblyTypeLink: `/component-json-validator`,
+        camelTypeLink: `/json-validator-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'JT400',
+        assimblyTypeLink: `/component-jt400`,
+        camelTypeLink: `/jt400-component.html`,
+        uriPlaceholder: 'userID:password/systemName/objectPath.type',
+        uriPopoverMessage: `
+        <b>Name</b>: userID<br/>
+        <b>Description</b>: Returns the ID of the AS/400 user.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: password<br/>
+        <b>Description</b>: Returns the password of the AS/400 user.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: systemName<br/>
+        <b>Description</b>: Returns the name of the AS/400 system.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: objectPath<br/>
+        <b>Description</b>: Returns the fully qualified integrated file system path name of the target object of this endpoint.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: type<br/>
+        <b>Description</b>: Whether to work with data queues or remote program call. The value can be one of: DTAQ, PGM, SRVPGM.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Jt400Type <br/><br/>
+    `
+    },
+    {
         name: 'KAFKA',
         assimblyTypeLink: `/component-kafka`,
         camelTypeLink: `/kafka-component.html`,
@@ -1387,6 +2431,194 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Example</b>: test or test1,test2,test3<br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-CONFIG-MAPS',
+        assimblyTypeLink: `/component-kubernetes-config-maps`,
+        camelTypeLink: `/kubernetes-config-maps-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-DEPLOYMENTS',
+        assimblyTypeLink: `/component-kubernetes-deployments`,
+        camelTypeLink: `/kubernetes-deployments-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-HPA',
+        assimblyTypeLink: `/component-kubernetes-hpa`,
+        camelTypeLink: `/kubernetes-hpa-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-JOB',
+        assimblyTypeLink: `/component-kubernetes-job`,
+        camelTypeLink: `/kubernetes-job-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-NAMESPACES',
+        assimblyTypeLink: `/component-kubernetes-namespaces`,
+        camelTypeLink: `/kubernetes-namespaces-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-NODES',
+        assimblyTypeLink: `/component-kubernetes-nodes`,
+        camelTypeLink: `/kubernetes-nodes-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-PERSISTENT-VOLUMES',
+        assimblyTypeLink: `/component-kubernetes-persistent-volumes`,
+        camelTypeLink: `/kubernetes-persistent-volumes-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-PERSISTENT-VOLUMES-CLAIM',
+        assimblyTypeLink: `/component-kubernetes-persistent-volumes-claim`,
+        camelTypeLink: `/kubernetes-persistent-volumes-claim-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-PODS',
+        assimblyTypeLink: `/component-kubernetes-pods`,
+        camelTypeLink: `/kubernetes-pods-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-REPLICATION-CONTROLLERS',
+        assimblyTypeLink: `/component-kubernetes-replication-controllers`,
+        camelTypeLink: `/kubernetes-replication-controllers-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-RESOURCES-QUOTA',
+        assimblyTypeLink: `/component-kubernetes-resources-quota`,
+        camelTypeLink: `/kubernetes-resources-quota-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-SECRETS',
+        assimblyTypeLink: `/component-kubernetes-secrets`,
+        camelTypeLink: `/kubernetes-secrets-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-SERVICE-ACCOUNTS',
+        assimblyTypeLink: `/component-kubernetes-service-accounts`,
+        camelTypeLink: `/kubernetes-service-accounts-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUBERNETES-SERVICES',
+        assimblyTypeLink: `/component-kubernetes-services`,
+        camelTypeLink: `/kubernetes-services-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'KUDU',
+        assimblyTypeLink: `/component-kudu`,
+        camelTypeLink: `/kudu-component.html`,
+        uriPlaceholder: 'host:port/tableName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Host of the server to connect to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port of the server to connect to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: tableName<br/>
+        <b>Description</b>: Table to connect to.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -1971,24 +3203,80 @@ export class Components {
         'CORDA',
         'COUCHBASE',
         'COUCHDB',
+        'CXF',
+        'CXFRS',
+        'DATASET',
+        'DEBEZIUM-MONGODB',
+        'DEBEZIUM-MYSQL',
+        'DEBEZIUM-POSTGRESQL',
+        'DEBEZIUM-SQLSERVER',
         'DIRECT',
         'DIRECT-VM',
+        'DISRUPTOR',
         'DROPBOX',
         'DOCKER',
+        'EHCACHE',
+        'ELSQL',
+        'ETCDSTATS',
+        'FACEBOOK',
+        'FHIR',
         'FILE',
+        'FILEWATCH',
+        'FLATPACK',
         'FTP',
         'FTPS',
         'GIT',
+        'GITHUB',
         'GOOGLE-CALENDAR',
         'GOOGLE-DRIVE',
         'GOOGLE-MAIL',
+        'GOOGLE-PUBSUB',
         'GOOGLE-SHEETS',
+        'GORA',
+        'GRPC',
+        'GUAVA-EVENTBUS',
+        'HAZELCAST-INSTANCE',
+        'HAZELCAST-LIST',
+        'HAZELCAST-MAP',
+        'HAZELCAST-MULTIMAP',
+        'HAZELCAST-QUEUE',
+        'HAZELCAST-REPLICATEDMAP',
+        'HAZELCAST-SEDA',
+        'HAZELCAST-SET',
+        'HAZELCAST-TOPIC',
         'HBASE',
         'HDFS',
         'HIPCHAT',
+        'IEC60870-CLIENT',
+        'IEC60870-SERVER',
+        'IGNITE-CACHE',
+        'IGNITE-EVENTS',
+        'IGNITE-MESSAGING',
         'IMAP',
         'IMAPS',
+        'INFINISPAN',
+        'IRC',
+        'JBPM',
+        'JCACHE',
+        'JCLOUDS',
+        'JCR',
         'JETTY',
+        'JGROEPS',
+        'JGROEPSRAFT',
+        'JIRA',
+        'JMS',
+        'JMX',
+        'JOOQ',
+        'JPA',
+        'JT400',
+        'KUBERNETES-DEPLOYMENTS',
+        'KUBERNETES-HPA',
+        'KUBERNETES-JOB',
+        'KUBERNETES-NAMESPACES',
+        'KUBERNETES-NODES',
+        'KUBERNETES-PODS',
+        'KUBERNETES-REPLICATION-CONTROLLERS',
+        'KUBERNETES-SERVICES',
         'NETTY4',
         'LANGUAGE',
         'LOG',
@@ -2044,13 +3332,13 @@ export class Components {
         'BOX',
         'BRAINTREE',
         'BROWSE',
-        'CAFFEINECACHE',
-        'CAFFEINELOADCACHE',
+        'CAFFEINE-CACHE',
+        'CAFFEINE-LOADCACHE',
         'CQL',
         'CHATSCRIPT',
         'CHUNK',
         'CLASS',
-        'CMSMS',
+        'CM-SMS',
         'CMIS',
         'COAP',
         'COMETD',
@@ -2059,33 +3347,117 @@ export class Components {
         'COUCHBASE',
         'COUCHDB',
         'CRYPTO',
-        'CRYPTOCMS',
+        'CRYPTO-CMS',
+        'CXF',
+        'CXFRS',
+        'DATAFORMAT',
+        'DATASET',
+        'DATASET-TEST',
+        'DIGITALOCEAN',
+        'DISRUPTOR',
+        'DNS',
+        'DOZER',
         'DIRECT',
         'DIRECT-VM',
         'DROPBOX',
         'DOCKER',
+        'EHCACHE',
         'ELASTICSEARCH-REST',
+        'ELSQL',
+        'ETCDKEYS',
+        'ETCDSTATS',
+        'ETCDWATCH',
+        'EXEC',
+        'FACEBOOK',
+        'FHIR',
         'FILE',
+        'FLATPACK',
+        'FLINK',
+        'FOP',
+        'FREEMARKER',
         'FTP',
         'FTPS',
-        'GIT',
+        'GANGLIA',
         'GEOCODER',
+        'GIT',
+        'GITHUB',
         'GOOGLE-BIG-QUERY',
         'GOOGLE-CALENDAR',
+        'GOOGLE-CALENDAR-STREAM',
         'GOOGLE-DRIVE',
         'GOOGLE-MAIL',
+        'GOOGLE-MAIL-STREAM',
+        'GOOGLE-PUBSUB',
         'GOOGLE-SHEETS',
+        'GOOGLE-SHEETS-STREAM',
+        'GORA',
+        'GRAPE',
         'GRAPHQL',
+        'GRPC',
+        'GUAVA-EVENTBUS',
+        'HAZELCAST-ATOMICVALUE',
+        'HAZELCAST-LIST',
+        'HAZELCAST-MAP',
+        'HAZELCAST-MULTIMAP',
+        'HAZELCAST-QUEUE',
+        'HAZELCAST-REPLICATEDMAP',
+        'HAZELCAST-RINGBUFFER',
+        'HAZELCAST-SEDA',
+        'HAZELCAST-SET',
+        'HAZELCAST-TOPIC',
         'HBASE',
         'HDFS',
         'HIPCHAT',
         'HTTP',
         'HTTPS',
+        'IEC60870-CLIENT',
+        'IEC60870-SERVER',
+        'IGNITE-CACHE',
+        'IGNITE-COMPUTE',
+        'IGNITE-IDGEN',
+        'IGNITE-MESSAGING',
+        'IGNITE-QUEUE',
+        'IGNITE-SETS',
         'IMAP',
         'IMAPS',
+        'INFINISPAN',
+        'INFLUXDB',
+        'IOTA',
+        'IPFS',
+        'IRC',
         'IRONMQ',
+        'JBPM',
+        'JCACHE',
+        'JCLOUDS',
+        'JCR',
+        'JDBC',
         'JETTY',
+        'JGROEPS',
+        'JGROEPSRAFT',
+        'JING',
+        'JIRA',
+        'JMS',
         'JOLT',
+        'JOOQ',
+        'JPA',
+        'JSLT',
+        'JSON-VALIDATOR',
+        'JT400',
+        'KUBERNETES-CONFIG-MAPS',
+        'KUBERNETES-DEPLOYMENTS',
+        'KUBERNETES-HPA',
+        'KUBERNETES-JOB',
+        'KUBERNETES-NAMESPACES',
+        'KUBERNETES-NODES',
+        'KUBERNETES-PERSISTENT-VOLUMES',
+        'KUBERNETES-PERSISTENT-VOLUMES-CLAIM',
+        'KUBERNETES-PODS',
+        'KUBERNETES-REPLICATION-CONTROLLERS',
+        'KUBERNETES-RESOURCES-QUOTA',
+        'KUBERNETES-SECRETS',
+        'KUBERNETES-SERVICE-ACCOUNTS',
+        'KUBERNETES-SERVICES',
+        'KUDU',
         'LDAP',
         'MOCK',
         'NETTY4',
