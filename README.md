@@ -5,7 +5,7 @@
 The gateway acts as a link between endpoints, allow them to share information and bypass certain protocols. The purpose of Assimbly is to configure and manage these endpoints with the help of a webgui.
 
 On the background [Apache Camel](https://github.com/apache/camel) does the actual work. Assimbly can connect
-many Camel components.
+many [Camel components](https://camel.apache.org/components/latest/index.html).
 
 ![alt text](src/main/webapp/content/images/assimbly_screenshot.jpg?raw=true 'Flows page')
 
