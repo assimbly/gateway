@@ -24,15 +24,20 @@ export class ServiceDialogComponent implements OnInit {
     public servicesNames: Array<string> = [];
     public isSaving: boolean;
     public serviceKeysKeys: Array<string> = [];
-    public listVal: Array<String> = [
+    public driversList: Array<String> = [
         'com.mysql.jdbc.Driver',
         'oracle.jdbc.driver.OracleDriver',
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
+    jmsProvidersList: Array<String> = [
+                                   'ActiveMQ Artemis',
+                                   'AMQ'
+                               ];
+
     public disableType: boolean;
     public serviceType: string;
-    public typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection','AmazonMQ Connection', 'MQ Connection'];
+    public typeServices: string[] = ['ActiveMQ Connection','AmazonMQ Connection','AMQP Connection','JDBC Connection', 'MQ Connection','SonicMQ Connection'];
     private requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     private serviceKeysRemoveList: Array<ServiceKeys> = [];
@@ -258,7 +263,16 @@ export class ServiceDialogComponent implements OnInit {
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:61616', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
+                    { serviceKeyName: 'jmsprovider', valueType: 'list', placeholder: '', isRequired: true }                    
+                ]
+            },
+            {
+                name: 'AMQP Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
                 ]
             }
         );

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation  } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -32,7 +32,8 @@ import { ServicePopupService, ServiceDialogComponent } from 'app/entities/servic
 
 @Component({
     selector: 'jhi-flow-edit-all',
-    templateUrl: './flow-edit-all.component.html'
+    templateUrl: './flow-edit-all.component.html',
+    encapsulation: ViewEncapsulation.None
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
     
@@ -425,6 +426,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'JDBC Connection';
         } else if (type === 'SJMS') {
             return 'MQ Connection';
+        } else if (type === 'AMQP') {
+            return 'AMQP Connection';
         } else {
             return '';
         }
@@ -509,13 +512,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }
                 break;
             }
-            case 'AMAZONMQ': {
-                endpointForm.controls.uri.enable();
-                endpointForm.controls.options.enable();
-                endpointForm.controls.header.enable();
-                endpointForm.controls.service.enable();
-                break;
-            }
+            case 'AMAZONMQ':             
+            case 'AMQP':
             case 'SJMS':
             case 'SONICMQ':
             case 'SQL': {

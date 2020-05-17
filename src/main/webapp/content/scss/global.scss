@@ -601,3 +601,8 @@ a {
     width: 1200px;
     max-width: 1200px;
 }
+
+ng-select select-dropdown > div {
+    position: relative;
+    z-index: 100;
+}
