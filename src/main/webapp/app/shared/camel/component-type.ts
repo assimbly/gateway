@@ -367,6 +367,25 @@ export const typesLinks = [
     `
     },
     {
+        name: 'AMQP',
+        assimblyTypeLink: `/component-amqp`,
+        camelTypeLink: `/amqp-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType<br/>
+        <b>Description</b>: The kind of destination to use (queue, topic, temp-queue, temp-topic).<br/>
+        <b>Default</b>: queue<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Enumeration. Valid values: queue, topic, temp-queue, temp-topic<br/>
+        <br/>
+        <b>Name</b>: destinationName<br/>
+        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
+    `
+    },
+    {
         name: 'AS2',
         assimblyTypeLink: `/component-as2`,
         camelTypeLink: `/as2-component.html`,
@@ -999,6 +1018,7 @@ export class Components {
     fromTypes = [
         'ACTIVEMQ',
         'AMAZONMQ',
+        'AMQP',
         'AS2',
         'AWS-S3',
         'DIRECT',
@@ -1035,6 +1055,7 @@ export class Components {
     toTypes = [
         'ACTIVEMQ',
         'AMAZONMQ',
+        'AMQP',
         'LDAP',
         'AS2',
         'AWS-S3',
@@ -1077,6 +1098,7 @@ export class Components {
     errorTypes = [
         'ACTIVEMQ',
         'AMAZONMQ',
+        'AMQP',
         'AS2',
         'AWS-S3',
         'ELASTICSEARCH-REST',

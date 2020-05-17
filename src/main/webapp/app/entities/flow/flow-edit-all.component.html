@@ -236,7 +236,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="headerPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -251,7 +251,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -364,7 +364,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil  padding-button"></span>&nbsp;
 												</button>
@@ -380,7 +380,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -503,7 +503,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -518,7 +518,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>

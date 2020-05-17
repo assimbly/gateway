@@ -25,13 +25,19 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
-    listVal: Array<String> = [
+    driversList: Array<String> = [
         'com.mysql.jdbc.Driver',
         'oracle.jdbc.driver.OracleDriver',
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
-
+    jmsProvidersList: Array<String> = [
+                                  'ActiveMQ Artemis',
+                                  'AMQ'
+                              ];
+    
+    
+    
     constructor(
         protected serviceKeysService: ServiceKeysService,
         protected jhiAlertService: JhiAlertService,
@@ -177,6 +183,35 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         valueType: 'password',
                         placeholder: '',
                         isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'jmsprovider',
+                        valueType: 'list',
+                        placeholder: '',
+                        isRequired: true
+                    }
+                ]
+            },            
+            {
+                name: 'AMQP Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'amqp://localhost:5672',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'user',
+                        isRequired: false
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
+                        placeholder: '',
+                        isRequired: false
                     }
                 ]
             }
