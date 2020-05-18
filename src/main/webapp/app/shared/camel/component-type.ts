@@ -2622,6 +2622,22 @@ export const typesLinks = [
     `
     },
     {
+        name: 'LANGUAGE',
+        assimblyTypeLink: `/component-language`,
+        camelTypeLink: `/language-component.html`,
+        uriPlaceholder: 'languageName:resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: languageName <br/>
+        <b>Description</b>: Sets the name of the language to use <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: resourceUri <br/>
+        <b>Description</b>: Path to the resource, or a reference to lookup a bean in the Registry to use as the resource <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'LDAP',
         assimblyTypeLink: `/component-ldap`,
         camelTypeLink: `/ldap-component.html`,
@@ -2635,56 +2651,167 @@ export const typesLinks = [
     `
     },
     {
-        name: 'NETTY4',
-        assimblyTypeLink: `/component-netty4`,
-        camelTypeLink: `/netty-component.html`,
-        uriPlaceholder: 'transport://hostname:port',
+        name: 'LDIF',
+        assimblyTypeLink: `/component-ldif`,
+        camelTypeLink: `/ldif-component.html`,
+        uriPlaceholder: 'ldapConnectionName',
         uriPopoverMessage: `
-        <b>Name</b>: transport<br/>
-        <b>Description</b>: The network protocol to use (tcp or udp)<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Enumeration. Valid values: tcp, udp<br/>
-        <br/>
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Name of the server.<br/>
+        <b>Name</b>: ldapConnectionName <br/>
+        <b>Description</b>:The name of the LdapConnection bean to pull from the registry. Note that this must be of scope prototype to avoid it being shared among threads or using a connection that has timed out. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: tcp://localhost:9999<br/>
-    `
-    },
-    {
-        name: 'LANGUAGE',
-        assimblyTypeLink: `/component-language`,
-        camelTypeLink: `/language-component.html`,
-        uriPlaceholder: 'language://languageName[:script]',
-        uriPopoverMessage: `
-        <b>Name</b>: languageName<br/>
-        <b>Description</b>: Sets the name of the language to use. The value can be one of: bean, constant, exchangeProperty, file, groovy, header, javascript, jsonpath, mvel, ognl, 
-        ref, simple, spel, sql, terser, tokenize, xpath, xquery, xtokenize<br/>
-        <b>Required</b>: yes <br/>
-        <b>ResourceUri</b>: String<br/>
-        <b>Description</b>: Path to the source<br/>
-        <b>Required</b>: yes <br/>
-        <br/>
-        <b>Example</b>: simple:" + script or simple:file:target/script/myscript.txt<br/>
     `
     },
     {
         name: 'LOG',
         assimblyTypeLink: `/component-log`,
         camelTypeLink: `/log-component.html`,
-        uriPlaceholder: 'loggingCategory',
+        uriPlaceholder: 'loggerName',
         uriPopoverMessage: `
-        <b>Name</b>: loggingName<br/>
-        <b>Description</b>: The name for the logging<br/>
+        <b>Name</b>: loggerName <br/>
+        <b>Description</b>: Name of the logging category to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'LUCENE',
+        assimblyTypeLink: `/component-lucene`,
+        camelTypeLink: `/lucene-component.html`,
+        uriPlaceholder: 'host:operation',
+        uriPopoverMessage: `
+        <b>Name</b>: host <br/>
+        <b>Description</b>: The URL to the lucene server <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: operation <br/>
+        <b>Description</b>: Operation to do such as insert or query. The value can be one of: insert, query <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: LuceneOperation <br/><br/>
+    `
+    },
+    {
+        name: 'LUMBERJACK',
+        assimblyTypeLink: `/component-lumberjack`,
+        camelTypeLink: `/lumberjack-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host <br/>
+        <b>Description</b>: Network interface on which to listen for Lumberjack. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port <br/>
+        <b>Description</b>: Network port on which to listen for Lumberjack. <br/>
+        <b>Default</b>: 5044 <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int <br/><br/>
+    `
+    },
+    {
+        name: 'MASTER',
+        assimblyTypeLink: `/component-master`,
+        camelTypeLink: `/master-component.html`,
+        uriPlaceholder: 'namespace:delegateUri',
+        uriPopoverMessage: `
+        <b>Name</b>: namespace <br/>
+        <b>Description</b>: The name of the cluster namespace to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: delegateUri <br/>
+        <b>Description</b>: The endpoint uri to use in master/slave mode. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'METRICS',
+        assimblyTypeLink: `/component-metrics`,
+        camelTypeLink: `/metrics-component.html`,
+        uriPlaceholder: 'metricsType:metricsName',
+        uriPopoverMessage: `
+        <b>Name</b>: metricsType <br/>
+        <b>Description</b>: Type of metrics. The value can be one of: gauge, counter, histogram, meter, timer <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: MetricsType <br/><br/>
+        <b>Name</b>: metricsName <br/>
+        <b>Description</b>: Name of metrics. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'MICROMETER',
+        assimblyTypeLink: `/component-micrometer`,
+        camelTypeLink: `/micrometer-component.html`,
+        uriPlaceholder: 'micrometer:metricsType:metricsName',
+        uriPopoverMessage: `
+        <b>Name</b>: metricsType<br/>
+        <b>Description</b>: Type of metrics. The value can be one of: COUNTER, GAUGE, LONG_TASK_TIMER, TIMER, DISTRIBUTION_SUMMARY, OTHER. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Type<br/>
+        <b>Name</b>: metricsName<br/>
+        <b>Description</b>: Name of metrics. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
+        <b>Name</b>: tags<br/>
+        <b>Description</b>: Tags of metrics. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Iterable<br/>
         <br/>
-        <b>Example</b>: foo<br/>
+    `
+    },
+    {
+        name: 'MICROPROFILE-METRICS',
+        assimblyTypeLink: `/component-microprofile-metrics`,
+        camelTypeLink: `/microprofile-metrics-component.html`,
+        uriPlaceholder: 'metricsType:metricsName',
+        uriPopoverMessage: `
+        <b>Name</b>: metricsType <br/>
+        <b>Description</b>: Type of metrics. The value can be one of: gauge, counter, histogram, meter, timer <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: MetricsType <br/><br/>
+        <b>Name</b>: metricsName <br/>
+        <b>Description</b>: Name of metrics. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'MINA',
+        assimblyTypeLink: `/component-mina`,
+        camelTypeLink: `/mina-component.html`,
+        uriPlaceholder: 'protocol:host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: Protocol to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname to use. Use localhost or 0.0.0.0 for local server as consumer. For producer use the hostname or ip address of the remote server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MLLP',
+        assimblyTypeLink: `/component-mllp`,
+        camelTypeLink: `/mllp-component.html`,
+        uriPlaceholder: 'hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Hostname or IP for connection for the TCP connection. The default value is null, which means any local IP address.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number for the TCP connection.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
     `
     },
     {
@@ -2715,13 +2842,26 @@ export const typesLinks = [
     `
     },
     {
-        name: 'NSQ',
-        assimblyTypeLink: `/component-nsq`,
-        camelTypeLink: `/nsq-component.html`,
-        uriPlaceholder: 'topic',
+        name: 'MONGODB-GRIDFS',
+        assimblyTypeLink: `/component-mongodb-gridfs`,
+        camelTypeLink: `/mongodb-gridfs-component.html`,
+        uriPlaceholder: 'connectionBean',
         uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The NSQ topic. <br/>
+        <b>Name</b>: connectionBean<br/>
+        <b>Description</b>: Name of com.mongodb.client.MongoClient to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MSV',
+        assimblyTypeLink: `/component-msv`,
+        camelTypeLink: `/msv-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: URL to a local resource on the classpath, or a reference to lookup a bean in the Registry, or a full URL to a remote resource or resource on the file system which contains the XSD to validate against. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <br/>
@@ -2739,6 +2879,152 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: bean:myBean.myMethod<br/>
+    `
+    },
+    {
+        name: 'MYBATIS',
+        assimblyTypeLink: `/component-mybatis`,
+        camelTypeLink: `/mybatis-component.html`,
+        uriPlaceholder: 'statement',
+        uriPopoverMessage: `
+        <b>Name</b>: statement<br/>
+        <b>Description</b>: The statement name in the MyBatis XML mapping file which maps to the query, insert, update or delete operation you wish to evaluate.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MYBATIS-BEAN',
+        assimblyTypeLink: `/component-mybatis-bean`,
+        camelTypeLink: `/mybatis-bean-component.html`,
+        uriPlaceholder: 'beanName:methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: beanName<br/>
+        <b>Description</b>: Name of the bean with the MyBatis annotations. This can either by a type alias or a FQN class name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: Name of the method on the bean that has the SQL query to be executed.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NAGIOS',
+        assimblyTypeLink: `/component-nagios`,
+        camelTypeLink: `/nagios-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: This is the address of the Nagios host where checks should be send. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The port number of the host. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NATS',
+        assimblyTypeLink: `/component-nagios`,
+        camelTypeLink: `/nagios-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The name of topic we want to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NATS',
+        assimblyTypeLink: `/component-nagios`,
+        camelTypeLink: `/nagios-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The name of topic we want to use. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NETTY4',
+        assimblyTypeLink: `/component-netty4`,
+        camelTypeLink: `/netty-component.html`,
+        uriPlaceholder: 'transport://hostname:port',
+        uriPopoverMessage: `
+        <b>Name</b>: transport<br/>
+        <b>Description</b>: The network protocol to use (tcp or udp)<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Enumeration. Valid values: tcp, udp<br/>
+        <br/>
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Name of the server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Network port<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Example</b>: tcp://localhost:9999<br/>
+    `
+    },
+    {
+        name: 'NETTY-HTTP',
+        assimblyTypeLink: `/component-nagios`,
+        camelTypeLink: `/nagios-component.html`,
+        uriPlaceholder: 'protocol:host:port/path',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: The protocol to use which is either http, https or proxy - a consumer only option. The value can be one of: http, https. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The local hostname such as localhost, or 0.0.0.0 when being a consumer. The remote HTTP server hostname when using producer. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The host port number. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: path <br/>
+        <b>Description</b>: Resource path. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NITRITE',
+        assimblyTypeLink: `/component-nsq`,
+        camelTypeLink: `/nsq-component.html`,
+        uriPlaceholder: 'database',
+        uriPopoverMessage: `
+        <b>Name</b>: database<br/>
+        <b>Description</b>: Path to database file. Will be created if not exists. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'NSQ',
+        assimblyTypeLink: `/component-nsq`,
+        camelTypeLink: `/nsq-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The NSQ topic. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
     `
     },
     {
@@ -2770,6 +3056,162 @@ export const typesLinks = [
         <b>Data Type</b>: Olingo4ApiName<br/>
         <b>Name</b>: methodName<br/>
         <b>Description</b>: What sub operation to use for the selected operation<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MILO-CLIENT',
+        assimblyTypeLink: `/component-milo-client`,
+        camelTypeLink: `/milo-client-component.html`,
+        uriPlaceholder: 'endpointUri',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointUri<br/>
+        <b>Description</b>:  The OPC UA server endpoint. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'MILO-SERVER',
+        assimblyTypeLink: `/component-milo-server`,
+        camelTypeLink: `/milo-server-component.html`,
+        uriPlaceholder: 'itemId',
+        uriPopoverMessage: `
+        <b>Name</b>: itemId<br/>
+        <b>Description</b>: ID of the item. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSHIFT-BUILD-CONFIGS',
+        assimblyTypeLink: `/component-openshift-build-configs`,
+        camelTypeLink: `/openshift-build-configs-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSHIFT-BUILDS',
+        assimblyTypeLink: `/component-openshift-builds`,
+        camelTypeLink: `/openshift-builds-component.html`,
+        uriPlaceholder: 'masterUrl',
+        uriPopoverMessage: `
+        <b>Name</b>: masterUrl<br/>
+        <b>Description</b>: Kubernetes Master url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-CINDER',
+        assimblyTypeLink: `/component-openstack-cinder`,
+        camelTypeLink: `/openstack-cinder-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-GLANCE',
+        assimblyTypeLink: `/component-openstack-glance`,
+        camelTypeLink: `/openstack-glance-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-KEYSTONE',
+        assimblyTypeLink: `/component-openstack-keystone`,
+        camelTypeLink: `/openstack-keystone-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-NEUTRON',
+        assimblyTypeLink: `/component-openstack-neutron`,
+        camelTypeLink: `/openstack-neutron-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-NOVA',
+        assimblyTypeLink: `/component-openstack-nova`,
+        camelTypeLink: `/openstack-nova-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPENSTACK-SWIFT',
+        assimblyTypeLink: `/component-openstack-swift`,
+        camelTypeLink: `/openstack-swift-component.html`,
+        uriPlaceholder: 'host',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: OpenStack host url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OPTAPLANNER',
+        assimblyTypeLink: `/component-optaplanner`,
+        camelTypeLink: `/optaplanner-component.html`,
+        uriPlaceholder: 'configFile',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Specifies the location to the solver file. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PAHO',
+        assimblyTypeLink: `/component-pdf`,
+        camelTypeLink: `/pdf-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: Name of the topic.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
         <br/>
@@ -3277,13 +3719,24 @@ export class Components {
         'KUBERNETES-PODS',
         'KUBERNETES-REPLICATION-CONTROLLERS',
         'KUBERNETES-SERVICES',
-        'NETTY4',
-        'LANGUAGE',
-        'LOG',
+        'LUMBERJACK',
+        'MASTER',
+        'MILO-CLIENT',
+        'MILO-SERVER',
+        'MINA',
+        'MLLP',
         'MONGODB',
+        'MONGODB-GRIDFS',
+        'MYBATIS',
+        'NATS',
+        'NITRITE',
+        'NETTY4',
+        'NETTY-HTTP',
         'NSQ',
         'OLINGO2',
         'OLINGO4',
+        'OPTAPLANNER',
+        'PAHO',
         'KAFKA',
         'RABBITMQ',
         'REST',
@@ -3458,15 +3911,44 @@ export class Components {
         'KUBERNETES-SERVICE-ACCOUNTS',
         'KUBERNETES-SERVICES',
         'KUDU',
+        'LANGUAGE',
         'LDAP',
-        'MOCK',
-        'NETTY4',
-        'PDF',
+        'LDIF',
         'LOG',
+        'LUCENE',
+        'METRICS',
+        'MICROMETER',
+        'MICROPROFILE-METRICS',
+        'MILO-CLIENT',
+        'MILO-SERVER',
+        'MINA',
+        'MLLP',
+        'MOCK',
         'MONGODB',
+        'MONGODB-GRIDFS',
+        'MSV',
         'MUSTACHE',
+        'MVEL',
+        'MYBATIS',
+        'MYBATIS-BEAN',
+        'NAGIOS',
+        'NATS',
+        'NETTY4',
+        'NETTY-HTTP',
+        'NITRITE',
         'OLINGO2',
         'OLINGO4',
+        'OPENSHIFT-BUILD-CONFIGS',
+        'OPENSHIFT-BUILDS',
+        'OPENSTACK-CINDER',
+        'OPENSTACK-GLANCE',
+        'OPENSTACK-KEYSTONE',
+        'OPENSTACK-NEUTRON',
+        'OPENSTACK-NOVA',
+        'OPENSTACK-SWIFT',
+        'OPTAPLANNER',
+        'PAHO',
+        'PDF',
         'NSQ',
         'KAFKA',
         'RABBITMQ',
