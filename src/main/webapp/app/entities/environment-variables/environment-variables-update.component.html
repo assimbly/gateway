@@ -2,7 +2,7 @@
 	<div class="col-8">
 		<form [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
 		    <div class="modal-header">
-		        <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit a Environment Variable</h4>
+		        <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit an Environment Variable</h4>
 		    </div>
 			<div class="modal-body">
 				<jhi-alert-error></jhi-alert-error>
@@ -42,13 +42,14 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-					<fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
-				</button>
-				<button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving"
-					class="btn btn-primary">
-					<fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
-				</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="navigateToEnvironmentVariables()">
+		            <span class="fa fa-ban"></span>&nbsp;
+		            <span>Cancel</span>
+		        </button>
+				<button type="button" (click)="save()" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+		            <span class="fa fa-save"></span>&nbsp;
+		            <span>Save</span>
+		        </button>
 			</div>
 		</form>
 	</div>

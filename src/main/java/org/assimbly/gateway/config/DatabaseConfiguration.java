@@ -11,13 +11,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.sql.SQLException;
 import java.lang.NumberFormatException;
 
 @Configuration
-@EnableJpaRepositories("org.assimbly.gateway.repository")
+@EnableJpaRepositories(basePackages = "org.assimbly.gateway.repository",bootstrapMode = BootstrapMode.DEFERRED)
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {

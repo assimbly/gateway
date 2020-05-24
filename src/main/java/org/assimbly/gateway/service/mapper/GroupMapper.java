@@ -8,7 +8,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Group and its DTO GroupDTO.
  */
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring", uses = {UserMapper.class},unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GroupMapper extends EntityMapper<GroupDTO, Group> {
 
 

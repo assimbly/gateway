@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
@@ -28,7 +28,8 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
         protected environmentVariablesService: EnvironmentVariablesService,
         protected gatewayService: GatewayService,
         protected eventManager: JhiEventManager,
-        protected activatedRoute: ActivatedRoute
+        protected activatedRoute: ActivatedRoute,
+        protected router: Router
     ) {}
 
     ngOnInit() {
@@ -105,6 +106,10 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             ]);
         });
     }
+    
+    navigateToEnvironmentVariables() {
+        this.router.navigate(['/environment-variables']);
+    }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IEnvironmentVariables>>) {
         result.subscribe(
@@ -116,6 +121,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     protected onSaveSuccess() {
         this.isSaving = false;
         this.clear();
+        this.navigateToEnvironmentVariables();
     }
 
     protected onSaveError() {

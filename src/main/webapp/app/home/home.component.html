@@ -1,9 +1,13 @@
-<div [ngSwitch]="isAuthenticated()">
+<div [ngSwitch]="isAuthenticated()" class="background-parent">
 	<div *ngSwitchCase="true">
 		 <jhi-flow>Loading routes...</jhi-flow>
 	</div>
 	<div *ngSwitchCase="false">
-		<div class="jumbotron jumbotron-fluid background">
+		<picture class="background">
+			<source srcset="../../content/images/landingspage/1.webp" type="image/webp">
+			<img src="../../content/images/landingspage/1.jpg" alt="logo">
+		</picture>
+		<div class="jumbotron jumbotron-fluid foreground">
 			<div class="container jumbotron-text">
 				<h4 class="lead d-flex justify-content-center">A message gateway based on Apache Camel</h4>
 				<h1 class="display-4 d-flex justify-content-center">

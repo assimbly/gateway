@@ -101,6 +101,7 @@ public class Group implements Serializable {
         return this;
     }
 
+    /*
     public Group addUser(User user) {
         this.users.add(user);
         user.getGroups().add(this);
@@ -112,7 +113,8 @@ public class Group implements Serializable {
         user.getGroups().remove(this);
         return this;
     }
-
+	*/
+    
     public void setUsers(Set<User> users) {
         this.users = users;
     }

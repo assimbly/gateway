@@ -25,13 +25,19 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     eventSubscriber: Subscription;
     requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
-    listVal: Array<String> = [
+    driversList: Array<String> = [
         'com.mysql.jdbc.Driver',
         'oracle.jdbc.driver.OracleDriver',
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
-
+    jmsProvidersList: Array<String> = [
+                                  'ActiveMQ Artemis',
+                                  'AMQ'
+                              ];
+    
+    
+    
     constructor(
         protected serviceKeysService: ServiceKeysService,
         protected jhiAlertService: JhiAlertService,
@@ -64,22 +70,26 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'Example jdbc:mysql://localhost/dbname'
+                        placeholder: 'Example jdbc:mysql://localhost/dbname',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
-                        placeholder: ''
+                        placeholder: '',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'password ',
                         valueType: 'password',
-                        placeholder: ''
+                        placeholder: '',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'driver',
                         valueType: 'list',
-                        placeholder: ''
+                        placeholder: '',
+                        isRequired: true
                     }
                 ]
             },
@@ -89,17 +99,20 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'Example tcp://localhost:2506'
+                        placeholder: 'Example tcp://localhost:2506',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
-                        placeholder: 'Example Administrator'
+                        placeholder: 'Example Administrator',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'password',
                         valueType: 'password',
-                        placeholder: ''
+                        placeholder: '',
+                        isRequired: true    
                     }
                 ]
             },
@@ -109,27 +122,96 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'Example tcp://localhost:61616'
+                        placeholder: 'Example tcp://localhost:61616',
+                        isRequired: true    
                     }
+                    /*,
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'user',
+                        isRequired: false    
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
+                        placeholder: '',
+                        isRequired: false    
+                    }*/
                 ]
             },
+            {
+                name: 'AmazonMQ Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'Example ssl://servername:61617',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'user',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
+                        placeholder: '',
+                        isRequired: true
+                    }
+                ]
+            },            
             {
                 name: 'MQ Connection',
                 serviceKeys: [
                     {
                         serviceKeyName: 'url',
                         valueType: 'text',
-                        placeholder: 'tcp://localhost:61616'
+                        placeholder: 'tcp://localhost:61616',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'username',
                         valueType: 'text',
-                        placeholder: '(Optional)'
+                        placeholder: 'user',
+                        isRequired: true
                     },
                     {
                         serviceKeyName: 'password',
                         valueType: 'password',
-                        placeholder: ''
+                        placeholder: '',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'jmsprovider',
+                        valueType: 'list',
+                        placeholder: '',
+                        isRequired: true
+                    }
+                ]
+            },            
+            {
+                name: 'AMQP Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'amqp://localhost:5672',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'user',
+                        isRequired: false
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
+                        placeholder: '',
+                        isRequired: false
                     }
                 ]
             }
@@ -166,7 +248,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                 rsk.key = sk.serviceKeyName;
                 rsk.valueType = sk.valueType;
                 rsk.placeholder = sk.placeholder;
-                rsk.isRequired = true;
+                rsk.isRequired = sk.isRequired;
                 requiredServiceKeys.push(rsk);
             });
             this.serviceKeys.unshift(...requiredServiceKeys);
@@ -272,4 +354,5 @@ export interface ServiceKeyInformation {
     serviceKeyName: string;
     valueType: string;
     placeholder: string;
+    isRequired: boolean;
 }
