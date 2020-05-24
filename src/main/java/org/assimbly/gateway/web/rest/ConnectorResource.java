@@ -14,14 +14,12 @@ import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -470,6 +468,24 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/resume/{id}",e.getMessage(),"unable to resume flow " + flowId,flowId);
 		}     
      }    
+
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/isstarted/{id}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> isFlowStarted(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		boolean started = connector.isFlowStarted(flowId);
+    		String isStarted = Boolean.toString(started);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",isStarted,isStarted,flowId);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",e.getMessage(),"unable to get status for flow " + flowId,flowId);
+		}  
+    	
+    }
+    
     
     @GetMapping(path = "/connector/{connectorId}/flow/status/{id}", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getFlowStatus(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
@@ -610,19 +626,19 @@ public class ConnectorResource {
 		}
     }
     
-    @GetMapping(path = "/connector/{connectorId}/flow/documenation/version", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/connector/{connectorId}/flow/documentation/version", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getDocumentationVersion(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
 
 		try {
     		String documentation = connector.getDocumentationVersion();
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/version",documentation,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documentation/version",documentation,plainResponse);
 		} catch (Exception e) {
    			e.printStackTrace();
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/version",e.getMessage());
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documentation/version",e.getMessage());
 		}
     }
 	
-    @GetMapping(path = "/connector/{connectorId}/flow/documenation/{componenttype}", produces = {"text/plain","application/xml","application/json"})
+    @GetMapping(path = "/connector/{connectorId}/flow/documentation/{componenttype}", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getDocumentation(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String componenttype) throws Exception {
 
     	plainResponse = true;
@@ -630,12 +646,12 @@ public class ConnectorResource {
 		try {
     		String documentation = connector.getDocumentation(componenttype, mediaType);
     		if(documentation.startsWith("Unknown")) {
-				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",documentation);
+				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documentation/{componenttype}",documentation);
 			}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",documentation,plainResponse);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documentation/{componenttype}",documentation,plainResponse);
 		} catch (Exception e) {
    			e.printStackTrace();
-			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documenation/{componenttype}",e.getMessage());
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/documentation/{componenttype}",e.getMessage());
 		}
     }
 
@@ -712,6 +728,61 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/route/{id}",e.getMessage());
 		}
     }
+
+    @GetMapping(path = "/connector/{connectorId}/flow/routes", produces = {"application/xml","application/json"})
+    public ResponseEntity<String> getAllCamelRoutes(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
+
+		try {
+    		String camelRoutes = connector.getAllCamelRoutesConfiguration(mediaType);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/routes",camelRoutes,true);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/flow/routes",e.getMessage());
+		}
+		
+    }
+
+    /**
+     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     *
+     * @param connectorid (gatewayId)
+     * @param id (FlowId)
+     * @param configuration as XML / if empty get from db (for the time being)
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/connector/{connectorId}/resolvedependencybyscheme/{scheme}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> resolveDepedencyByScheme(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable String scheme) throws Exception {
+    	
+       	try {
+       		String result = connector.resolveDependency(scheme);       		
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}",result);			
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}",e.getMessage());
+   		}
+    }    
+    
+
+    /**
+     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     *
+     * @param connectorid (gatewayId)
+     * @param id (FlowId)
+     * @param configuration as XML / if empty get from db (for the time being)
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @PostMapping(path = "/connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> resolveDepedency(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable String groupId,@PathVariable String artifactId,@PathVariable String version) throws Exception {
+       	try {
+       		String result = connector.resolveDependency(groupId, artifactId, version);       		
+       		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}",result);			
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}",e.getMessage());
+   		}
+    }
     
     /**
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
@@ -767,10 +838,11 @@ public class ConnectorResource {
 	            }
 
         		connectorIsStarting = true;
+        		System.out.println("adding failureListener");
 				connector.addEventNotifier(failureListener);
 
         		connector.start();
-		        
+
 				int count = 1;
 
                 while (!connector.isStarted() && count < 300)
@@ -780,7 +852,7 @@ public class ConnectorResource {
                 }
 
         		connectorIsStarting = false;
-        		
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

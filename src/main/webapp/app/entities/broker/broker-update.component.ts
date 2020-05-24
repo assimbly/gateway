@@ -64,13 +64,6 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     setDefaultConfiguration() {
-        //vkbeautify.xml(text [,indent_pattern]);
-
-        /*
-        this.artemisConfiguration = this.formatXml('<?xml version="1.0"?><!-- Example broker.xml --><configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:activemq" xsi:schemaLocation="urn:activemq /schema/artemis-server.xsd"><core xmlns="urn:activemq:core"><persistence-enabled>false</persistence-enabled><cluster-user>myUsername2</cluster-user><cluster-password>myPassword2</cluster-password><acceptors><acceptor name="in-vm">vm://0</acceptor><acceptor name="tcp">tcp://127.0.0.1:61616</acceptor></acceptors><security-settings>' +
-        '<security-setting match="#"><permission type="createAddress" roles="user"/><permission type="createDurableQueue" roles="user"/><permission type="deleteDurableQueue" roles="user"/><permission type="createNonDurableQueue" roles="user"/><permission type="deleteNonDurableQueue" roles="user"/><permission type="consume" roles="user"/> <permission type="send" roles="user"/></security-setting></security-settings></core></configuration>');
-        */
-
         this.artemisConfiguration = artemisBrokerConfiguration;
         this.activemqConfiguration = activemqBrokerConfiguration;
     }
@@ -83,15 +76,25 @@ export class BrokerUpdateComponent implements OnInit {
         this.brokerConfigurationFailed = '';
 
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
-            this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(
-                response => {
-                    this.isSaving = true;
-                    this.subscribeToSaveResponse(this.brokerService.update(this.broker));
+            this.isSaving = true;
+            this.brokerService.update(this.broker).subscribe(
+                response => {    
+                    
+                    this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(
+                        response => {
+                            this.isSaving = false;
+                            this.previousState();
+                        },
+                        err => {
+                            this.isSaving = false;
+                            this.brokerConfigurationFailed = err.error;
+                        }
+                    )
                 },
                 err => {
                     this.isSaving = false;
                     this.brokerConfigurationFailed = err.error;
-                }
+                }    
             );
         } else if (this.broker.configurationType === 'file') {
             this.isSaving = true;

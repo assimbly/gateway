@@ -1,58 +1,90 @@
 <div>
-    <h2 id="page-heading">
-        <span>Security (TLS whitelist)</span>
-        <button id="uploadCertificate" class="btn btn-primary float-right" style="margin-left: 20px;" type="button" (click)="uploadCertificate()">
-            <fa-icon [icon]="'save'"></fa-icon><span> Upload certificate</span>
-        </button>
-        
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-security" [routerLink]="['/security/new']">
-            <fa-icon [icon]="'plus'"></fa-icon><span> Manage Whitelist</span>
-        </button>
-    </h2>
-    <br/>
-    <div class="table-responsive" *ngIf="securities">
-        <table class="table table-striped">
-            <thead>
-            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-            <th jhiSortBy="id" [style.display]="'none'"><span>ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="url"><span>Url</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="certificateName"><span>Certificate Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="certificateExpiry"><span>Certificate Expiry</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th></th>
-            </tr>
-            </thead>
-            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-            <tr *ngFor="let security of securities ;trackBy: trackId">
-                <td [style.display]="'none'"><a [routerLink]="['/security', security.id, 'view' ]">{{security.id}}</a></td>
-                <td>{{security.url}}</td>
-                <td>{{security.certificateName}}</td>
-                <td>{{security.certificateExpiry | date:'medium'}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['/security', security.id, 'view' ]"
-                                class="btn btn-info btn-sm">
-                            <fa-icon [icon]="'eye'"></fa-icon>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <!-- <button type="submit"
+	<div class="row">
+		<div class="col-10">
+			<h2>
+				<span>Security (TLS whitelist)</span>
+			</h2>
+		</div>
+		<div class="col-2">
+			<a role="button"
+				class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
+				href="https://github.com/assimbly/gateway/wiki/TLS-Certificates"
+				placement="right" title="Assimbly Documentation" target="_blank">
+				<picture>
+				<source srcset="../../../content/images/assimbly_transparant.webp">
+				<img src="../../../content/images/assimbly_transparant.png"
+					alt="assibmly-logo"> </picture>
+			</a>
+		</div>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col-8"></div>
+		<div class="col-4">
+			<button id="uploadCertificate" class="btn btn-primary float-right"
+				style="margin-left: 20px;" type="button"
+				(click)="uploadCertificate()">
+				<fa-icon [icon]="'save'"></fa-icon>
+				<span> Upload certificate</span>
+			</button>
+			<button id="jh-create-entity"
+				class="btn btn-primary float-right jh-create-entity create-security"
+				[routerLink]="['/security/new']">
+				<fa-icon [icon]="'plus'"></fa-icon>
+				<span> Manage Whitelist</span>
+			</button>
+		</div>
+	</div>
+	<br />
+	<div class="table-responsive" *ngIf="securities">
+		<table class="table table-striped">
+			<thead>
+				<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
+					[callback]="reset.bind(this)">
+					<th jhiSortBy="id" [style.display]="'none'"><span>ID</span> <fa-icon
+							[icon]="'sort'"></fa-icon></th>
+					<th jhiSortBy="url"><span>Url</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+					<th jhiSortBy="certificateName"><span>Certificate Name</span>
+						<fa-icon [icon]="'sort'"></fa-icon></th>
+					<th jhiSortBy="certificateExpiry"><span>Certificate
+							Expiry</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody infinite-scroll (scrolled)="loadPage(page + 1)"
+				[infiniteScrollDisabled]="page >= links['last']"
+				[infiniteScrollDistance]="0">
+				<tr *ngFor="let security of securities ;trackBy: trackId">
+					<td [style.display]="'none'"><a
+						[routerLink]="['/security', security.id, 'view' ]">{{security.id}}</a></td>
+					<td>{{security.url}}</td>
+					<td>{{security.certificateName}}</td>
+					<td>{{security.certificateExpiry | date:'medium'}}</td>
+					<td class="text-right">
+						<div class="btn-group flex-btn-group-container">
+							<button type="submit"
+								[routerLink]="['/security', security.id, 'view' ]"
+								class="btn btn-info btn-sm">
+								<fa-icon [icon]="'eye'"></fa-icon>
+								<span class="d-none d-md-inline">View</span>
+							</button>
+							<!-- <button type="submit"
                                 [routerLink]="['/security', security.id, 'edit']"
                                 class="btn btn-primary btn-sm">
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button> -->
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'security/'+ security.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <fa-icon [icon]="'times'"></fa-icon>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+							<button type="submit"
+								[routerLink]="['/', { outlets: { popup: 'security/'+ security.id + '/delete'} }]"
+								replaceUrl="true" queryParamsHandling="merge"
+								class="btn btn-danger btn-sm">
+								<fa-icon [icon]="'times'"></fa-icon>
+								<span class="d-none d-md-inline">Delete</span>
+							</button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>

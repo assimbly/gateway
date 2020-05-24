@@ -155,8 +155,16 @@
 										<div class="input-group">
 											<a class="col-8"></a>
 											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/apache-camel.webp">
+													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
+												</picture>
 											</a>
 											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/assimbly_transparant.webp">
+													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
+												</picture>
 											</a>
 										</div>
 										<div class="form-group" [style.display]="'none'">
@@ -206,7 +214,7 @@
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/> -->
-												<ng-select [items]="fromComponentOptions" [clearable]="false" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"></ng-select>
+												<ng-select [items]="fromComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"></ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions, '0')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption, '0')" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
@@ -228,7 +236,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="headerPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -243,7 +251,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -275,10 +283,18 @@
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
 										<div class="input-group">
 											<a class="col-8"></a>
-												<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-												</a>
-												<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-												</a>												
+											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/apache-camel.webp">
+													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
+												</picture>
+											</a>
+											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/assimbly_transparant.webp">
+													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
+												</picture>
+											</a>												
 										</div>										
 										<div class="form-group" [style.display]="'none'">
 											<label for="id">ID</label>
@@ -348,7 +364,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil  padding-button"></span>&nbsp;
 												</button>
@@ -364,7 +380,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -406,8 +422,16 @@
 										<div class="input-group">
 											<a class="col-8"></a>
 											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/apache-camel.webp">
+													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
+												</picture>
 											</a>
 											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
+												<picture>
+													<source srcset="../../../content/images/assimbly_transparant.webp">
+													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
+												</picture>
 											</a>
 										</div>	
 										<div class="form-group" [style.display]="'none'">
@@ -479,7 +503,7 @@
 											<label class="form-control-label" for="field_header">Header</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
@@ -494,7 +518,7 @@
 											<label class="form-control-label" for="field_service">Service</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
+												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
 												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>

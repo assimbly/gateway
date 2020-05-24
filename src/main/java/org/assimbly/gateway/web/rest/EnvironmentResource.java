@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiParam;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ import java.net.URISyntaxException;
 @RequestMapping("/api")
 public class EnvironmentResource {
 
+    private final Logger log = LoggerFactory.getLogger(EnvironmentResource.class);
+	
 	@Autowired
     private DBConfiguration DBConfiguration;
     
@@ -35,10 +39,12 @@ public class EnvironmentResource {
     @PostMapping(path = "/environment/{gatewayid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml", "application/json"})
     public ResponseEntity<String> setGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @PathVariable Long gatewayid, @RequestBody String configuration) throws Exception {
 
-       	try {        	
+       	try {
+       		log.info("Importing configuration into database");
         	DBConfiguration.convertConfigurationToDB(gatewayid, contentType, configuration);
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set");
    		} catch (Exception e) {
+       		log.error("Import of configuration failed: " + e.getMessage());
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
    		}
     	
@@ -57,11 +63,13 @@ public class EnvironmentResource {
        	try {
 			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
+				log.error("Failed to get configuration: " + configuration);
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
 			}
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
        		
    		} catch (Exception e) {
+   			log.error("Failed to get configuration: " + e.getMessage());
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", e.getMessage());
    		}
 

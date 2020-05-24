@@ -63,7 +63,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     public flowAlerts: string;
     public flowAlertsButton: string;
-    public numberOfAlerts: string;
+    public numberOfAlerts: any;
     public showNumberOfItems: number;
 
     fromEndpointTooltip: string;
@@ -454,10 +454,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     checkDate(r) {
-        if (r === '1970-01-01T00:59:59.999+0100') {
-            return '-';
-        } else {
+        if(!!r){
             return moment(r).format('YYYY-MM-DD HH:mm:ss');
+        }else{
+            return '-';
         }
     }
 

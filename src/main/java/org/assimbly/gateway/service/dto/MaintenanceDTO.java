@@ -19,7 +19,7 @@ public class MaintenanceDTO implements Serializable {
 
     private String frequency;
 
-    private Long flowId;
+    //private Long flowId;
 
     public Long getId() {
         return id;
@@ -61,13 +61,14 @@ public class MaintenanceDTO implements Serializable {
         this.frequency = frequency;
     }
 
+    /*
     public Long getFlowId() {
         return flowId;
     }
 
     public void setFlowId(Long flowId) {
         this.flowId = flowId;
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {
@@ -98,7 +99,6 @@ public class MaintenanceDTO implements Serializable {
             ", endTime='" + getEndTime() + "'" +
             ", duration='" + getDuration() + "'" +
             ", frequency='" + getFrequency() + "'" +
-            ", flow=" + getFlowId() +
             "}";
     }
 }

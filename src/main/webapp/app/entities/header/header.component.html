@@ -1,28 +1,48 @@
 <div>
-    <div>
-    	<h2 id="page-heading">
-            <span>Headers</span>
-	        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/header/new']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-	            <span class="fa fa-plus"></span>
-	            <span>Create Header</span>
+	<div>
+		<div class="row">
+			<div class="col-10">
+				<h2 id="page-heading">
+					<span>Headers</span>
+				</h2>
+			</div>
+			<div class="col-2">
+				<a role="button"
+					class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
+					href="https://github.com/assimbly/gateway/wiki/Headers"
+					placement="right" title="Assimbly Broker" target="_blank"> <picture>
+					<source srcset="../../../content/images/assimbly_transparant.webp">
+					<img src="../../../content/images/assimbly_transparant.png"
+						alt="assibmly-logo"> </picture>
+				</a>
+			</div>
+		</div>
+		<div class="row">
+			<button id="jh-create-entity"
+				class="btn btn-primary float-right jh-create-entity create-header"
+				[routerLink]="['/header/new']" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+				<span class="fa fa-plus"></span> <span>Create Header</span>
 			</button>
-        </h2>        
-	    <div class="row">
-	    </div>
-	    <br/>
-       <div class="row">
-           <div class="col-md-11">
-	        	<ng-select [items]="headers" bindLabel="name" bindValue="id" id="field_header" [(ngModel)]="selectedHeaderId" (change)="selectOption()"></ng-select>
-           </div>
-           <div class="col-md-1 text-right">
-        	 <button type="submit" [routerLink]="['../header', selectedHeaderId ]" class="btn btn-info" [disabled]="!selectedHeaderId">
-    	        <span class="fa fa-eye"></span>
-	        </button>
-           </div>
-       </div>
-    </div>
-    <!-- <jhi-alert></jhi-alert> -->
-    <br/>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-md-11">
+				<ng-select [items]="headers" bindLabel="name" bindValue="id"
+					id="field_header" [(ngModel)]="selectedHeaderId"
+					(change)="selectOption()"></ng-select>
+			</div>
+			<div class="col-md-1 text-right">
+				<button type="submit"
+					[routerLink]="['../header', selectedHeaderId ]"
+					class="btn btn-info" [disabled]="!selectedHeaderId">
+					<span class="fa fa-eye"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<!-- <jhi-alert></jhi-alert> -->
+	<br />
 </div>
 
-<jhi-header-keys *ngIf="headers.length > 0" [headerKeys]="headerKeys" [headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
+<jhi-header-keys *ngIf="headers.length > 0" [headerKeys]="headerKeys"
+	[headerId]="selectedHeaderId">Loading header keys...</jhi-header-keys>
