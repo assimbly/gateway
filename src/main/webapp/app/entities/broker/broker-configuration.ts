@@ -6,12 +6,26 @@ export const artemisBrokerConfiguration = `<?xml version='1.0'?>
 
       <persistence-enabled>false</persistence-enabled>
 
-      <cluster-user>myUsername</cluster-user>
-      <cluster-password>myPassword</cluster-password>
+      <cluster-user>admin</cluster-user>
+      <cluster-password>admin</cluster-password>
 
       <acceptors>
-         <acceptor name="in-vm">vm://0</acceptor>
-         <acceptor name="tcp">tcp://0.0.0.0:61616</acceptor>
+      
+         <!-- Acceptor for every supported protocol -->
+         <acceptor name="artemis">tcp://0.0.0.0:61616?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE,AMQP,STOMP,HORNETQ,MQTT,OPENWIRE;useEpoll=true;amqpCredits=1000;amqpLowCredits=300</acceptor>
+
+         <!-- AMQP Acceptor.  Listens on default AMQP port for AMQP traffic.-->
+         <acceptor name="amqp">tcp://0.0.0.0:5672?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300</acceptor>
+
+         <!-- STOMP Acceptor. -->
+         <acceptor name="stomp">tcp://0.0.0.0:61613?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=STOMP;useEpoll=true</acceptor>
+
+         <!-- HornetQ Compatibility Acceptor.  Enables HornetQ Core and STOMP for legacy HornetQ clients. -->
+         <acceptor name="hornetq">tcp://0.0.0.0:5445?anycastPrefix=jms.queue.;multicastPrefix=jms.topic.;protocols=HORNETQ,STOMP;useEpoll=true</acceptor>
+
+         <!-- MQTT Acceptor -->
+         <acceptor name="mqtt">tcp://0.0.0.0:1883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true</acceptor>
+        
       </acceptors>
 
       <security-settings>

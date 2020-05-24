@@ -63,7 +63,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     public flowAlerts: string;
     public flowAlertsButton: string;
-    public numberOfAlerts: string;
+    public numberOfAlerts: any;
     public showNumberOfItems: number;
 
     fromEndpointTooltip: string;
