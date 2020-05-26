@@ -3205,9 +3205,9 @@ export const typesLinks = [
     `
     },
     {
-        name: 'PAHO',
-        assimblyTypeLink: `/component-pdf`,
-        camelTypeLink: `/pdf-component.html`,
+        name: 'PAHTO',
+        assimblyTypeLink: `/component-pahto`,
+        camelTypeLink: `/pahto-component.html`,
         uriPlaceholder: 'topic',
         uriPopoverMessage: `
         <b>Name</b>: topic<br/>
@@ -3229,6 +3229,147 @@ export const typesLinks = [
         <b>Data Type</b>: PdfOperation<br/>
         <br/>
         <b>Example</b>: create<br/>
+    `
+    },
+    {
+        name: 'PLATFORM-HTTP',
+        assimblyTypeLink: `/component-platform-http`,
+        camelTypeLink: `/platform-http-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path<br/>
+        <b>Description</b>: The path under which this endpoint serves the HTTP requests.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PGEVENT',
+        assimblyTypeLink: `/component-pgevent`,
+        camelTypeLink: `/pgevent-component.html`,
+        uriPlaceholder: 'host:port/database/channel',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: To connect using hostname and port to the database.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: localhost<br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: To connect using hostname and port to the database.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: 5432<br/>
+        <b>Data Type</b>: Integer<br/>
+        <b>Name</b>: database<br/>
+        <b>Description</b>: The database name.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: channel<br/>
+        <b>Description</b>: The channel name.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: create<br/>
+    `
+    },
+    {
+        name: 'PG-REPLICATION-SLOT',
+        assimblyTypeLink: `/component-replication-slot`,
+        camelTypeLink: `/pg-replication-slot-component.html`,
+        uriPlaceholder: 'host:port/database/slot:outputPlugin',
+        uriPopoverMessage: `
+        <b>Name</b>: slot<br/>
+        <b>Description</b>: Replication Slot name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Postgres host.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: localhost<br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Postgres port.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: 5432<br/>
+        <b>Data Type</b>: Integer<br/>
+        <b>Name</b>: database<br/>
+        <b>Description</b>: Postgres database name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: outputPlugin<br/>
+        <b>Description</b>: Output plugin name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PUBNUB',
+        assimblyTypeLink: `/component-pubnub`,
+        camelTypeLink: `/pubnub-component.html`,
+        uriPlaceholder: 'channel',
+        uriPopoverMessage: `
+        <b>Name</b>: channel<br/>
+        <b>Description</b>: The channel used for subscribing/publishing events.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PULSAR',
+        assimblyTypeLink: `/component-pulsar`,
+        camelTypeLink: `/pulsar-component.html`,
+        uriPlaceholder: 'persistence://tenant/namespace/topic',
+        uriPopoverMessage: `
+        <b>Name</b>: persistence<br/>
+        <b>Description</b>: Whether the topic is persistent or non-persistent. The value can be one of: persistent, non-persistent.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: tenant<br/>
+        <b>Description</b>: The tenant.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: namespace<br/>
+        <b>Description</b>: The namespace.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: The topic.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'QUARTZ2',
+        assimblyTypeLink: `/component-quartz`,
+        camelTypeLink: `/quartz-component.html`,
+        uriPlaceholder: 'groupName/triggerName',
+        uriPopoverMessage: `
+        <b>Name</b>: groupName<br/>
+        <b>Description</b>: The quartz group name to use. The combination of group name and timer name should be unique.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: Camel <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: triggerName<br/>
+        <b>Description</b>: The quartz timer name to use. The combination of group name and timer name should be unique.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'QUICKFIX',
+        assimblyTypeLink: `/component-quickfix`,
+        camelTypeLink: `/quickfix-component.html`,
+        uriPlaceholder: 'configurationName',
+        uriPopoverMessage: `
+        <b>Name</b>: configurationName<br/>
+        <b>Description</b>: The configFile is the name of the QuickFIX/J configuration to use for the FIX engine (located as a resource found in your classpath).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
     `
     },
     {
@@ -3256,6 +3397,32 @@ export const typesLinks = [
     `
     },
     {
+        name: 'REACTIVE-STREAMS',
+        assimblyTypeLink: `/component-reactive-streams`,
+        camelTypeLink: `/reactive-streams-component.html`,
+        uriPlaceholder: 'stream',
+        uriPopoverMessage: `
+        <b>Name</b>: stream<br/>
+        <b>Description</b>: Name of the stream channel used by the endpoint to exchange messages.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'REF',
+        assimblyTypeLink: `/component-ref`,
+        camelTypeLink: `/ref-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name of endpoint to lookup in the registry.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
         name: 'REST',
         assimblyTypeLink: `/component-rest`,
         camelTypeLink: `/rest-component.html`,
@@ -3277,6 +3444,107 @@ export const typesLinks = [
         `
     },
     {
+        name: 'REST-API',
+        assimblyTypeLink: `/component-rest-api`,
+        camelTypeLink: `/rest-api-component.html`,
+        uriPlaceholder: 'path/contextIdPattern',
+        uriPopoverMessage: `
+        <b>Name</b>: path<br/>
+        <b>Description</b>: The base path.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: contextIdPattern<br/>
+        <b>Description</b>: Optional CamelContext id pattern to only allow Rest APIs from rest services within CamelContext’s which name matches the pattern.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'REST-OPENAPI',
+        assimblyTypeLink: `/component-rest-openapi`,
+        camelTypeLink: `/rest-openapi-component.html`,
+        uriPlaceholder: 'specificationUri#operationId',
+        uriPopoverMessage: `
+        <b>Name</b>: specificationUri<br/>
+        <b>Description</b>: Path to the OpenApi specification file.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Default</b>: openapi.json <br/>
+        <b>Data Type</b>: URI<br/><br/>
+        <b>Name</b>: operationId<br/>
+        <b>Description</b>: ID of the operation from the OpenApi specification.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'REST-SWAGGER',
+        assimblyTypeLink: `/component-rest-swagger`,
+        camelTypeLink: `/rest-swagger-component.html`,
+        uriPlaceholder: 'specificationUri#operationId',
+        uriPopoverMessage: `
+        <b>Name</b>: specificationUri<br/>
+        <b>Description</b>: Path to the Swagger specification file. The scheme, host base path are taken from this specification, but these can be overridden with properties on the component or endpoint level.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI<br/><br/>
+        <b>Name</b>: operationId<br/>
+        <b>Description</b>: ID of the operation from the Swagger specification.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'RSS',
+        assimblyTypeLink: `/component-rss`,
+        camelTypeLink: `/rss-component.html`,
+        uriPlaceholder: 'feedUri',
+        uriPopoverMessage: `
+        <b>Name</b>: feedUri<br/>
+        <b>Description</b>: The URI to the feed to poll.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'SAGA',
+        assimblyTypeLink: `/component-saga`,
+        camelTypeLink: `/saga-component.html`,
+        uriPlaceholder: 'action',
+        uriPopoverMessage: `
+        <b>Name</b>: action<br/>
+        <b>Description</b>: Action to execute (complete or compensate). The value can be one of: COMPLETE, COMPENSATE.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: SagaEndpointAction<br/><br/>
+        `
+    },
+    {
+        name: 'SALESFORCE',
+        assimblyTypeLink: `/component-salesforce`,
+        camelTypeLink: `/salesforce-component.html`,
+        uriPlaceholder: 'operationName:topicName',
+        uriPopoverMessage: `
+        <b>Name</b>: operationName<br/>
+        <b>Description</b>: The operation to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: OperationName<br/><br/>
+        <b>Name</b>: topicName<br/>
+        <b>Description</b>: The name of the topic/channel to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'SAP-NETWEAVER',
+        assimblyTypeLink: `/component-sap-netweaver`,
+        camelTypeLink: `/sap-netweaver-component.html`,
+        uriPlaceholder: 'url',
+        uriPopoverMessage: `
+        <b>Name</b>: url<br/>
+        <b>Description</b>: Url to the SAP net-weaver gateway server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
         name: 'SCHEDULER',
         assimblyTypeLink: `/component-scheduler`,
         camelTypeLink: `/scheduler-component.html`,
@@ -3288,6 +3556,76 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <br/>
         <b>Example</b>: foo<br/>
+    `
+    },
+    {
+        name: 'SCHEMATRON',
+        assimblyTypeLink: `/component-schematron`,
+        camelTypeLink: `/schematron-component.html`,
+        uriPlaceholder: 'path',
+        uriPopoverMessage: `
+        <b>Name</b>: path<br/>
+        <b>Description</b>: The path to the schematron rules file. Can either be in class path or location in the file system.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'SCP',
+        assimblyTypeLink: `/component-scp`,
+        camelTypeLink: `/scp-component.html`,
+        uriPlaceholder: 'host:port/directoryName',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname of the FTP server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port of the FTP server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: int<br/>
+        <b>Name</b>: directoryName<br/>
+        <b>Description</b>: The starting directory.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'SERVICE',
+        assimblyTypeLink: `/component-service`,
+        camelTypeLink: `/service-component.html`,
+        uriPlaceholder: 'delegateUri',
+        uriPopoverMessage: `
+        <b>Name</b>: delegateUri<br/>
+        <b>Description</b>: The endpoint uri to expose as service<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SERVICENOW',
+        assimblyTypeLink: `/component-servicenow`,
+        camelTypeLink: `/servicenow-component.html`,
+        uriPlaceholder: 'instanceName',
+        uriPopoverMessage: `
+        <b>Name</b>: instanceName<br/>
+        <b>Description</b>:  The ServiceNow instance name<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SERVLET',
+        assimblyTypeLink: `/component-servlet`,
+        camelTypeLink: `/servlet-component.html`,
+        uriPlaceholder: 'contextPath',
+        uriPopoverMessage: `
+        <b>Name</b>: contextPath<br/>
+        <b>Description</b>:  The context-path to use<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
     `
     },
     {
@@ -3348,6 +3686,36 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SJMS2',
+        assimblyTypeLink: `/component-sjms2`,
+        camelTypeLink: `/sjms2-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType<br/>
+        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic.<br/>
+        <b>Default</b>: queue<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Name</b>: destinationName<br/>
+        <b>Description</b>: DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name..<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'SIP',
+        assimblyTypeLink: `/component-sip`,
+        camelTypeLink: `/sip-component.html`,
+        uriPlaceholder: 'uri',
+        uriPopoverMessage: `
+        <b>Name</b>: uri<br/>
+        <b>Description</b>: URI of the SIP server to connect to (the username and password can be included such as: john:secretmyserver:9999)<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI <br/><br/>
+    `
+    },
+    {
         name: 'SLACK',
         assimblyTypeLink: `/component-slack`,
         camelTypeLink: `/slack-component.html`,
@@ -3401,6 +3769,52 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SMPP',
+        assimblyTypeLink: `/component-smpp`,
+        camelTypeLink: `/smpp-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname for the SMSC server to use.<br/>
+        <b>Required</b>: no <br/>
+        <b>Default</b>: localhost <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number for the SMSC server to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Default</b>: 2775 <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+    `
+    },
+    {
+        name: 'SNMP',
+        assimblyTypeLink: `/component-snmp`,
+        camelTypeLink: `/snmp-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname of the SNMP enabled device.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number of the SNMP enabled device.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+    `
+    },
+    {
+        name: 'SOLR',
+        assimblyTypeLink: `/component-solr`,
+        camelTypeLink: `/solr-component.html`,
+        uriPlaceholder: 'url',
+        uriPopoverMessage: `
+        <b>Name</b>: url<br/>
+        <b>Description</b>: Hostname and port for the solr server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'SONICMQ',
         assimblyTypeLink: `/component-sonicmq`,
         camelTypeLink: `/sjms-component.html`,
@@ -3420,6 +3834,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SOROUSH',
+        assimblyTypeLink: `/component-soroush`,
+        camelTypeLink: `/soroush-component.html`,
+        uriPlaceholder: 'action',
+        uriPopoverMessage: `
+        <b>Name</b>: action<br/>
+        <b>Description</b>: The action to do. The value can be one of: sendMessage, getMessage, uploadFile, downloadFile<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: SoroushAction <br/><br/>
+    `
+    },
+    {
         name: 'SPARK',
         assimblyTypeLink: `/component-spark`,
         camelTypeLink: `/spark-component.html`,
@@ -3430,6 +3856,131 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/><br/>
         <b>Example</b>: dataframe<br/>
+    `
+    },
+    {
+        name: 'SPLUNK',
+        assimblyTypeLink: `/component-splunk`,
+        camelTypeLink: `/splunk-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name has no purpose<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-BATCH',
+        assimblyTypeLink: `/component-spring-batch`,
+        camelTypeLink: `/spring-batch-component.html`,
+        uriPlaceholder: 'jobName',
+        uriPopoverMessage: `
+        <b>Name</b>: jobName<br/>
+        <b>Description</b>: The name of the Spring Batch job located in the registry.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-EVENT',
+        assimblyTypeLink: `/component-spring-event`,
+        camelTypeLink: `/spring-event-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: Name of endpoint.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-INTEGRATION',
+        assimblyTypeLink: `/component-spring-integration`,
+        camelTypeLink: `/spring-integration-component.html`,
+        uriPlaceholder: 'defaultChannel',
+        uriPopoverMessage: `
+        <b>Name</b>: defaultChannel<br/>
+        <b>Description</b>: The default channel name which is used by the Spring Integration Spring context. It will equal to the inputChannel name for the Spring Integration consumer and the outputChannel name for the Spring Integration provider.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-LDAP',
+        assimblyTypeLink: `/component-spring-ldap`,
+        camelTypeLink: `/spring-ldap-component.html`,
+        uriPlaceholder: 'templateName',
+        uriPopoverMessage: `
+        <b>Name</b>: templateName<br/>
+        <b>Description</b>: Name of the Spring LDAP Template bean.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-REDIS',
+        assimblyTypeLink: `/component-spring-redis`,
+        camelTypeLink: `/spring-redis-component.html`,
+        uriPlaceholder: 'host:port',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The host where Redis server is running.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Redis server port number.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-WS',
+        assimblyTypeLink: `/component-spring-ws`,
+        camelTypeLink: `/spring-ws-component.html`,
+        uriPlaceholder: 'type:lookupKey:webServiceEndpointUri',
+        uriPopoverMessage: `
+        <b>Name</b>: type<br/>
+        <b>Description</b>: Endpoint mapping type if endpoint mapping is used.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: EndpointMappingType<br/><br/>
+        <b>Name</b>: lookupKey<br/>
+        <b>Description</b>: Endpoint mapping key if endpoint mapping is used.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: webServiceEndpointUri<br/>
+        <b>Description</b>: The default Web Service endpoint uri to use for the producer.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: expression<br/>
+        <b>Description</b>: The XPath expression to use when option type=xpathresult. Then this option is required to be configured.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SQL',
+        assimblyTypeLink: `/component-sql`,
+        camelTypeLink: `/sql-component.html`,
+        uriPlaceholder: 'query',
+        uriPopoverMessage: `
+        <b>Name</b>: query<br/>
+        <b>Description</b>: Sets the SQL query to perform. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: select id from order<br/>
+    `
+    },
+    {
+        name: 'SQL-STORED',
+        assimblyTypeLink: `/component-sql-stored`,
+        camelTypeLink: `/sql-stored-component.html`,
+        uriPlaceholder: 'template',
+        uriPopoverMessage: `
+        <b>Name</b>: template<br/>
+        <b>Description</b>: Sets the StoredProcedure template to perform. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -3450,16 +4001,27 @@ export const typesLinks = [
     `
     },
     {
-        name: 'SQL',
-        assimblyTypeLink: `/component-sql`,
-        camelTypeLink: `/sql-component.html`,
-        uriPlaceholder: 'query',
+        name: 'STAX',
+        assimblyTypeLink: `/component-stax`,
+        camelTypeLink: `/stax-component.html`,
+        uriPlaceholder: 'contentHandlerClass',
         uriPopoverMessage: `
-        <b>Name</b>: query<br/>
-        <b>Description</b>: Sets the SQL query to perform. <br/>
+        <b>Name</b>: contentHandlerClass<br/>
+        <b>Description</b>: The FQN class name for the ContentHandler implementation to use.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: select id from order<br/>
+    `
+    },
+    {
+        name: 'STOMP',
+        assimblyTypeLink: `/component-stomp`,
+        camelTypeLink: `/stomp-component.html`,
+        uriPlaceholder: 'destination',
+        uriPopoverMessage: `
+        <b>Name</b>: destination<br/>
+        <b>Description</b>: Name of the queue.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -3506,6 +4068,40 @@ export const typesLinks = [
     `
     },
     {
+        name: 'THRIFT',
+        assimblyTypeLink: `/component-thrift`,
+        camelTypeLink: `/thrift-component.html`,
+        uriPlaceholder: 'host:port/service',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The Thrift server host name. This is localhost or 0.0.0.0 (if not defined) when being a consumer or remote server host name when using producer.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The Thrift server port.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Integer<br/>
+        <b>Name</b>: service<br/>
+        <b>Description</b>: Fully qualified service name from the thrift descriptor file (package dot service definition name).<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'TIKA',
+        assimblyTypeLink: `/component-tika`,
+        camelTypeLink: `/tika-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation type. The value can be one of: parse, detect<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: TikaOperation<br/>
+        <br/>
+    `
+    },
+    {
         name: 'TIMER',
         assimblyTypeLink: `/component-timer`,
         camelTypeLink: `/timer-component.html`,
@@ -3520,6 +4116,76 @@ export const typesLinks = [
     `
     },
     {
+        name: 'TWILIO',
+        assimblyTypeLink: `/component-twilio`,
+        camelTypeLink: `/twilio-component.html`,
+        uriPlaceholder: 'apiName/methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: apiName<br/>
+        <b>Description</b>: What kind of operation to perform.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: TwilioApiName<br/>
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What sub operation to use for the selected operation. The value can be one of: create, delete, fetch, read, update.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+        <b>Example</b>: ACCOUNT/create<br/>
+    `
+    },
+    {
+        name: 'TWITTER-DIRECTMESSAGE',
+        assimblyTypeLink: `/component-twitter-directmessage`,
+        camelTypeLink: `/twitter-directmessage-component.html`,
+        uriPlaceholder: 'user',
+        uriPopoverMessage: `
+        <b>Name</b>: user<br/>
+        <b>Description</b>: The user name to send a direct message. This will be ignored for consumer.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'TWITTER-SEARCH',
+        assimblyTypeLink: `/component-twitter-search`,
+        camelTypeLink: `/twitter-search-component.html`,
+        uriPlaceholder: 'keywords',
+        uriPopoverMessage: `
+        <b>Name</b>: keywords<br/>
+        <b>Description</b>: The search query, use the keywords AND, OR, - and () to narrow the search results.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'TWITTER-TIMELINE',
+        assimblyTypeLink: `/component-twitter-timeline`,
+        camelTypeLink: `/twitter-timeline-component.html`,
+        uriPlaceholder: 'timelineType',
+        uriPopoverMessage: `
+        <b>Name</b>: timelineType<br/>
+        <b>Description</b>: The timeline type to produce/consume. The value can be one of: PUBLIC, HOME, USER, MENTIONS, RETWEETSOFME, UNKNOWN.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: TimelineType<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'UNDERTOW',
+        assimblyTypeLink: `/component-undertow`,
+        camelTypeLink: `/undertow-component.html`,
+        uriPlaceholder: 'httpURI',
+        uriPopoverMessage: `
+        <b>Name</b>: httpURI<br/>
+        <b>Description</b>: The url of the HTTP endpoint to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: URI<br/>
+        <br/>
+    `
+    },
+    {
         name: 'VALIDATOR',
         assimblyTypeLink: `/component-validator`,
         camelTypeLink: `/validator-component.html`,
@@ -3530,6 +4196,30 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/><br/>
         <b>Example</b>: http://acme.com/cheese.xsd | file:../foo/bar.xsd <br/>
+    `
+    },
+    {
+        name: 'VELOCITY',
+        assimblyTypeLink: `/component-velocity`,
+        camelTypeLink: `/velocity-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'VERTX',
+        assimblyTypeLink: `/component-vertx`,
+        camelTypeLink: `/vertx-component.html`,
+        uriPlaceholder: 'address',
+        uriPopoverMessage: `
+        <b>Name</b>: address<br/>
+        <b>Description</b>: Sets the event bus address used to communicate. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
     `
     },
     {
@@ -3580,6 +4270,54 @@ export const typesLinks = [
     `
     },
     {
+        name: 'WEATHER',
+        assimblyTypeLink: `/component-weather`,
+        camelTypeLink: `/weather-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The name value is not used.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'WEB3J',
+        assimblyTypeLink: `/component-web3j`,
+        camelTypeLink: `/web3j-component.html`,
+        uriPlaceholder: 'nodeAddress',
+        uriPopoverMessage: `
+        <b>Name</b>: nodeAddress<br/>
+        <b>Description</b>: Sets the node address used to communicate.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'WEBHOOK',
+        assimblyTypeLink: `/component-webhook`,
+        camelTypeLink: `/webhook-component.html`,
+        uriPlaceholder: 'endpointUri',
+        uriPopoverMessage: `
+        <b>Name</b>: endpointUri<br/>
+        <b>Description</b>: The delegate uri. Must belong to a component that supports webhooks.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'WEKA',
+        assimblyTypeLink: `/component-weka`,
+        camelTypeLink: `/weka-component.html`,
+        uriPlaceholder: 'command',
+        uriPopoverMessage: `
+        <b>Name</b>: command<br/>
+        <b>Description</b>: The command to use. The value can be one of: filter, model, read, write, push, pop, version.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Command<br/><br/>
+    `
+    },
+    {
         name: 'WORDPRESS',
         assimblyTypeLink: `/component-wordpress`,
         camelTypeLink: `/wordpress-component.html`,
@@ -3596,6 +4334,126 @@ export const typesLinks = [
     `
     },
     {
+        name: 'WORKDAY',
+        assimblyTypeLink: `/component-workday`,
+        camelTypeLink: `/workday-component.html`,
+        uriPlaceholder: 'entity:path',
+        uriPopoverMessage: `
+        <b>Name</b>: entity<br/>
+        <b>Description</b>: The entity to be requested or subscribed via API. The value can be one of: report<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Entity<br/><br/>
+        <b>Name</b>: path<br/>
+        <b>Description</b>: The API path to access an entity structure.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XCHANGE',
+        assimblyTypeLink: `/component-xchange`,
+        camelTypeLink: `/xchange-component.html`,
+        uriPlaceholder: 'name',
+        uriPopoverMessage: `
+        <b>Name</b>: name<br/>
+        <b>Description</b>: The exchange to connect to.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XJ',
+        assimblyTypeLink: `/component-xj`,
+        camelTypeLink: `/xj-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the template.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XMPP',
+        assimblyTypeLink: `/component-xmpp`,
+        camelTypeLink: `/xmpp-component.html`,
+        uriPlaceholder: 'host:port/participant',
+        uriPopoverMessage: `
+        <b>Name</b>: host<br/>
+        <b>Description</b>: Hostname for the chat server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: Port number for the chat server.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Integer<br/><br/>
+        <b>Name</b>: participant<br/>
+        <b>Description</b>: JID (Jabber ID) of person to receive messages. room parameter has precedence over participant.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XQUERY',
+        assimblyTypeLink: `/component-xquery`,
+        camelTypeLink: `/xquery-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: The name of the template to load from classpath or file system.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XSLT',
+        assimblyTypeLink: `/component-xslt`,
+        camelTypeLink: `/xslt-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the template.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'XSLT-SAXON',
+        assimblyTypeLink: `/component-xslt-saxon`,
+        camelTypeLink: `/xslt-saxon-component.html`,
+        uriPlaceholder: 'resourceUri',
+        uriPopoverMessage: `
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: Path to the template.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'YAMMER',
+        assimblyTypeLink: `/component-yammer`,
+        camelTypeLink: `/yammer-component.html`,
+        uriPlaceholder: 'function',
+        uriPopoverMessage: `
+        <b>Name</b>: function<br/>
+        <b>Description</b>: The function to use. The value can be one of: MESSAGES, MY_FEED, ALGO, FOLLOWING, SENT, PRIVATE, RECEIVED, USERS, CURRENT.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: YammerFunctionType<br/><br/>
+    `
+    },
+    {
+        name: 'ZENDESK',
+        assimblyTypeLink: `/component-zendesk`,
+        camelTypeLink: `/zendesk-component.html`,
+        uriPlaceholder: 'methodName',
+        uriPopoverMessage: `
+        <b>Name</b>: methodName<br/>
+        <b>Description</b>: What operation to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
         name: 'ZOOKEEPER',
         assimblyTypeLink: `/component-zookeeper`,
         camelTypeLink: `/zookeeper-component.html`,
@@ -3607,6 +4465,22 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/><br/>
         <b>Name</b>: path<br/>
         <b>Description</b>: The node in the ZooKeeper server (aka znode). <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'ZOOKEEPER-MASTER',
+        assimblyTypeLink: `/component-zookeeper-master`,
+        camelTypeLink: `/zookeeper-master-component.html`,
+        uriPlaceholder: 'groupName:consumerEndpointUri',
+        uriPopoverMessage: `
+        <b>Name</b>: groupName<br/>
+        <b>Description</b>: The name of the cluster group to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: consumerEndpointUri<br/>
+        <b>Description</b>: The consumer endpoint to use in master/slave mode. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/><br/>
     `
@@ -3736,28 +4610,67 @@ export class Components {
         'OLINGO2',
         'OLINGO4',
         'OPTAPLANNER',
-        'PAHO',
+        'PAHTO',
+        'PLATFORM-HTTP',
+        'PGEVENT',
+        'PG-REPLICATION-SLOT',
+        'PUBNUB',
+        'PULSAR',
+        'QUARTZ2',
+        'QUICKFIX',
         'KAFKA',
         'RABBITMQ',
+        'REACTIVE-STREAMS',
+        'REF',
         'REST',
+        'REST-API',
+        'RSS',
         'SCHEDULER',
         'SEDA',
+        'SERVICE',
+        'SERVLET',
+        'SALESFORCE',
         'SFTP',
         'SSH',
         'SJMS',
+        'SJMS2',
+        'SIP',
         'SLACK',
+        'SMPP',
+        'SNMP',
         'SMTPS',
         'SMTP',
         'SONICMQ',
+        'SOROUSH',
+        'SPLUNK',
+        'SPRING-EVENT',
+        'SPRING-INTEGRATION',
+        'SPRING-REDIS',
+        'SPRING-WS',
         'SQL',
+        'STOMP',
         'STUB',
         'STREAM',
-        'TIMER',
         'TELEGRAM',
+        'THRIFT',
+        'TIMER',
+        'TWILIO',
+        'TWITTER-DIRECTMESSAGE',
+        'TWITTER-SEARCH',
+        'TWITTER-TIMELINE',
+        'VERTX',
         'VM',
-        'WEBSOCKET',
+        'WEATHER',
+        'WEB3J',
         'WORDPRESS',
-        'ZOOKEEPER'
+        'WEBSOCKET',
+        'XMPP',
+        'XQUERY',
+        'XSLT',
+        'YAMMER',
+        'ZENDESK',
+        'ZOOKEEPER',
+        'ZOOKEEPER-MASTER'
     ];
 
     toTypes = [
@@ -3947,34 +4860,86 @@ export class Components {
         'OPENSTACK-NOVA',
         'OPENSTACK-SWIFT',
         'OPTAPLANNER',
-        'PAHO',
+        'PAHTO',
         'PDF',
+        'PGEVENT',
+        'PUBNUB',
+        'PULSAR',
+        'QUICKFIX',
         'NSQ',
         'KAFKA',
         'RABBITMQ',
+        'REACTIVE-STREAMS',
+        'REF',
         'REST',
+        'REST-OPENAPI',
+        'REST-SWAGGER',
+        'SAGA',
         'SCHEDULER',
+        'SCHEMATRON',
+        'SCP',
         'SEDA',
+        'SERVICENOW',
+        'SALESFORCE',
+        'SAP-NETWEAVER',
         'SFTP',
         'SSH',
         'SJMS',
+        'SJMS2',
+        'SIP',
         'SLACK',
+        'SMPP',
         'SMTPS',
         'SMTP',
-        'SMTPS',
+        'SNMP',
+        'SOLR',
         'SONICMQ',
+        'SOROUSH',
         'SPARK',
+        'SPLUNK',
+        'SPRING-BATCH',
+        'SPRING-EVENT',
+        'SPRING-INTEGRATION',
+        'SPRING-LDAP',
+        'SPRING-REDIS',
+        'SPRING-WS',
         'SQL',
+        'SQL-STORED',
+        'STAX',
+        'STOMP',
         'STUB',
         'STREAM',
         'TELEGRAM',
+        'THRIFT',
+        'TIKA',
+        'TWILIO',
+        'TWITTER-DIRECTMESSAGE',
+        'TWITTER-SEARCH',
+        'TWITTER-TIMELINE',
+        'UNDERTOW',
         'TIMER',
         'VALIDATOR',
+        'VELOCITY',
+        'VERTX',
         'VM',
         'WASTEBIN',
-        'WEBSOCKET',
+        'WEATHER',
+        'WEB3J',
+        'WEBHOOK',
+        'WEKA',
         'WORDPRESS',
-        'ZOOKEEPER'
+        'WORKDAY',
+        'WEBSOCKET',
+        'XCHANGE',
+        'XJ',
+        'XMPP',
+        'XQUERY',
+        'XSLT',
+        'XSLT-SAXON',
+        'YAMMER',
+        'ZENDESK',
+        'ZOOKEEPER',
+        'ZOOKEEPER-MASTER'
     ];
 
     errorTypes = [
