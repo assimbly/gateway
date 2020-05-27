@@ -468,6 +468,24 @@ public class ConnectorResource {
 			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/resume/{id}",e.getMessage(),"unable to resume flow " + flowId,flowId);
 		}     
      }    
+
+    
+    @GetMapping(path = "/connector/{connectorId}/flow/isstarted/{id}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> isFlowStarted(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+
+		try {
+        	init();
+        	flowId = id.toString();
+    		boolean started = connector.isFlowStarted(flowId);
+    		String isStarted = Boolean.toString(started);
+			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",isStarted,isStarted,flowId);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/status/{id}",e.getMessage(),"unable to get status for flow " + flowId,flowId);
+		}  
+    	
+    }
+    
     
     @GetMapping(path = "/connector/{connectorId}/flow/status/{id}", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getFlowStatus(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
@@ -820,6 +838,7 @@ public class ConnectorResource {
 	            }
 
         		connectorIsStarting = true;
+        		System.out.println("adding failureListener");
 				connector.addEventNotifier(failureListener);
 
         		connector.start();

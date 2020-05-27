@@ -316,8 +316,21 @@ a {
     height: 38px;
 }
 
+.assimbly-link {
+    align: right;
+    float: right;
+}
+
+.assimbly-gateway-img img {
+    background-repeat: no-repeat;
+    background-size: 100%;
+    width: 60px;
+    height: 50px;
+}
+
 .activemq-link {
     align: right;
+    float: right;
 }
 
 .activemq-broker-img {
@@ -587,4 +600,9 @@ a {
 .increase-popover-width {
     width: 1200px;
     max-width: 1200px;
+}
+
+ng-select select-dropdown > div {
+    position: relative;
+    z-index: 100;
 }

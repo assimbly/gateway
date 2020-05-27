@@ -9,5 +9,9 @@
         <extension>html</extension>
         <mime-type>text/html;charset=utf-8</mime-type>
     </mime-mapping>
+    
+   <session-config>
+        <session-timeout>28800</session-timeout>
+    </session-config>
 
 </web-app>

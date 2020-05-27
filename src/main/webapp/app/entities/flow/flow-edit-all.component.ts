@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -32,10 +32,10 @@ import { ServicePopupService, ServiceDialogComponent } from 'app/entities/servic
 
 @Component({
     selector: 'jhi-flow-edit-all',
-    templateUrl: './flow-edit-all.component.html'
+    templateUrl: './flow-edit-all.component.html',
+    encapsulation: ViewEncapsulation.None
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
-    
     flow: IFlow;
     fromEndpoint: IFromEndpoint;
     fromEndpointOptions: Array<Option> = [];
@@ -46,10 +46,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toEndpoint: IToEndpoint;
     services: Service[];
     headers: IHeader[];
-    
-    public logLevelListType = [LogLevelType.OFF, LogLevelType.INFO, LogLevelType.ERROR, LogLevelType.TRACE,LogLevelType.WARN,LogLevelType.DEBUG];
-       
-    
+
+    public logLevelListType = [
+        LogLevelType.OFF,
+        LogLevelType.INFO,
+        LogLevelType.ERROR,
+        LogLevelType.TRACE,
+        LogLevelType.WARN,
+        LogLevelType.DEBUG
+    ];
+
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
@@ -78,7 +84,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     offloadingPopoverMessage: string;
     maximumRedeliveriesPopoverMessage: string;
     redeliveryDelayPopoverMessage: string;
-    logLevelPopoverMessage: string
+    logLevelPopoverMessage: string;
 
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
@@ -417,12 +423,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     returnServiceType(type: any) {
         if (type === 'ACTIVEMQ') {
             return 'ActiveMQ Connection';
+        } else if (type === 'AMAZONMQ') {
+            return 'AmazonMQ Connection';
         } else if (type === 'SONICMQ') {
             return 'SonicMQ Connection';
         } else if (type === 'SQL') {
             return 'JDBC Connection';
         } else if (type === 'SJMS') {
             return 'MQ Connection';
+        } else if (type === 'AMQP') {
+            return 'AMQP Connection';
         } else {
             return '';
         }
@@ -439,6 +449,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let type = typesLinks.find(x => x.name === endpoint.type.toString());
         let componentType = endpoint.type.toString().toLowerCase();
         if (componentType === 'activemq') {
+            componentType = 'jms';
+        } else if (componentType === 'amazonmq') {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
@@ -505,6 +517,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }
                 break;
             }
+            case 'AMAZONMQ':
+            case 'AMQP':
             case 'SJMS':
             case 'SONICMQ':
             case 'SQL': {
@@ -1145,7 +1159,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
-        result.subscribe((res: Flow) => this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+        result.subscribe(
+            (res: Flow) => this.onSaveSuccess(res),
+            (res: Response) => this.onSaveError()
+        );
     }
 
     private onSaveSuccess(result: Flow) {
