@@ -86,6 +86,7 @@ server:
             timeout: 28800
             cookie:
                 http-only: true
+                max-age: 28800
 
 # Properties to be exposed on the /info management endpoint
 info:

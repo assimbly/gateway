@@ -166,11 +166,14 @@ export class BrokerComponent implements OnInit, OnDestroy {
             const nodeId = infoSplitted[4].split('=').pop();
             const state = infoSplitted[5].split('=').pop();
             const version = infoSplitted[6].split('=')[1];
+            const type = infoSplitted[7].split('=')[1];
 
             this.brokerInfo = `
                <br/>
-               <b>Broker Node ID:</b> ${nodeId}<br/>
+               <b>Broker type:</b> ${type}<br/>
                <b>Broker version:</b> ${version}<br/>
+               <b>Broker Node ID:</b> ${nodeId}<br/>
+               <br/>               
                <b>Broker state:</b> ${state}<br/>
                <b>Broker uptime:</b> ${uptime}<br/>
                <br/>

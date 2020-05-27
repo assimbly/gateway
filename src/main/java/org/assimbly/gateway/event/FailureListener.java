@@ -1,7 +1,5 @@
 package org.assimbly.gateway.event;
 
-import java.util.EventObject;
-
 import org.apache.camel.impl.event.ExchangeFailedEvent;
 import org.apache.camel.impl.event.ExchangeFailureHandledEvent;
 import org.apache.camel.spi.CamelEvent;
@@ -23,36 +21,17 @@ public class FailureListener extends EventNotifierSupport {
    @Autowired	
    private SimpMessageSendingOperations messagingTemplate;
 
-private String flowId;
-   
-	public void notify(EventObject eventObject) throws Exception {
-
-		if (eventObject instanceof ExchangeFailureHandledEvent) {
-
-	    	ExchangeFailureHandledEvent exchangeFailedEvent = (ExchangeFailureHandledEvent) eventObject;
-	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
-
-	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" + flowId);
-	        }else {
-	            log.warn("Can't send alert to websocket. messagingTemplate=null");
-	        }
-
-		}else if (eventObject instanceof ExchangeFailedEvent) {
-
-	    	ExchangeFailedEvent exchangeFailedEvent = (ExchangeFailedEvent) eventObject;
-	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
-
-	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" +  flowId);
-	        }else {
-	            log.warn("Can't send alert to websocket. messagingTemplate=null");
-	        }
-	    }    
-	}
+   private String flowId;
 	
-    public boolean isEnabled(EventObject event) {
-        return true;
+    public boolean isEnabled(CamelEvent event) {
+	  
+      //only notify on failures	
+      if (event instanceof ExchangeFailureHandledEvent  || event instanceof ExchangeFailedEvent) {
+		     return true;
+	  }
+	  
+	  return false;
+
     }
 
     protected void doStart() throws Exception {
@@ -65,8 +44,42 @@ private String flowId;
 
 	@Override
 	public void notify(CamelEvent event) throws Exception {
-		// TODO Auto-generated method stub
 		
-	}
+		if (event instanceof ExchangeFailureHandledEvent) {
 
+	    	ExchangeFailureHandledEvent exchangeFailedEvent = (ExchangeFailureHandledEvent) event;
+	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
+
+			int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "." 
+
+			if (flowIdPart != -1) 
+			{
+				flowId= flowId.substring(0 , flowIdPart); //this will give abc
+			}
+	        
+	        if(this.messagingTemplate!=null) {
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" + flowId);
+	        }else {
+	            log.warn("Can't send alert to websocket. messagingTemplate=null");
+	        }
+
+		}else if (event instanceof ExchangeFailedEvent) {
+
+	    	ExchangeFailedEvent exchangeFailedEvent = (ExchangeFailedEvent) event;
+	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
+
+			int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "." 
+
+			if (flowIdPart != -1) 
+			{
+				flowId= flowId.substring(0 , flowIdPart); //this will give abc
+			}
+
+	        if(this.messagingTemplate!=null) {
+	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" +  flowId);
+	        }else {
+	            log.warn("Can't send alert to websocket. messagingTemplate=null");
+	        }
+	    }
+	}
 }

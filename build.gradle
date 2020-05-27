@@ -34,7 +34,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '3.0.0'
+version = '3.1.0'
 
 description = ""
 
@@ -310,17 +310,17 @@ dependencies {
     implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
 	// custom dependencies (non-jhipster)
-    implementation group: "org.assimbly", name: "connector", version: "3.0.0", changing: true    
+    implementation group: "org.assimbly", name: "connector", version: "3.1.0", changing: true    
 	implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
 	implementation "org.jdom:jdom2:2.0.6"
-	//implementation "io.hawt:hawtio-springboot:2.9.1"
+	//implementation "io.hawt:hawtio-springboot:2.10.0"
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
 	
-	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.11.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.11.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.11.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.11.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.11.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.12.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.12.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.12.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.12.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.12.0'
 		
 	//java 9+
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'

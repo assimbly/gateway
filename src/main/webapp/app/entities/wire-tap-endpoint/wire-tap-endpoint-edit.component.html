@@ -44,11 +44,11 @@
             <div class="form-group" formArrayName="options">
                 <label class="form-control-label" for="field_options">Options</label>
                 <div class="row mx-0 mb-1" *ngFor="let option of endpointOptions; let idx = index" [formGroupName]="idx">
-                	<ng-select [items]="wiretapComponentOptions" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(idx)"></ng-select>
+                	<ng-select [items]="wiretapComponentOptions" [ngStyle]="{'display':'block', 'width': '370px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(idx)"></ng-select>
                 
                     <!--  <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" placeholder="key"
                         formControlName="key" (focusout)="validateOptions(idx)" />-->
-                    <input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" placeholder="value"
+                    <input type="text" class="col-6 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" placeholder="value"
                         formControlName="value" (focusout)="validateOptions(idx)" />
                     <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption()">
                         <span class="fa fa-plus"></span>
