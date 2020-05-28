@@ -454,9 +454,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     checkDate(r) {
-        if(!!r){
+        if (!!r) {
             return moment(r).format('YYYY-MM-DD HH:mm:ss');
-        }else{
+        } else {
             return '-';
         }
     }

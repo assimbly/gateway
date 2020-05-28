@@ -78,8 +78,7 @@ export class BrokerUpdateComponent implements OnInit {
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
             this.isSaving = true;
             this.brokerService.update(this.broker).subscribe(
-                response => {    
-                    
+                response => {
                     this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(
                         response => {
                             this.isSaving = false;
@@ -89,12 +88,12 @@ export class BrokerUpdateComponent implements OnInit {
                             this.isSaving = false;
                             this.brokerConfigurationFailed = err.error;
                         }
-                    )
+                    );
                 },
                 err => {
                     this.isSaving = false;
                     this.brokerConfigurationFailed = err.error;
-                }    
+                }
             );
         } else if (this.broker.configurationType === 'file') {
             this.isSaving = true;
@@ -129,7 +128,10 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {
-        result.subscribe((res: HttpResponse<IBroker>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IBroker>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {
@@ -142,7 +144,10 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     protected subscribeToCreateResponse(result: Observable<HttpResponse<IBroker>>) {
-        result.subscribe((res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body), (res: HttpErrorResponse) => this.onCreateError());
+        result.subscribe(
+            (res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body),
+            (res: HttpErrorResponse) => this.onCreateError()
+        );
     }
 
     protected onCreateSuccess(createdBroker) {

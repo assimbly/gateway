@@ -106,7 +106,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             ]);
         });
     }
-    
+
     navigateToEnvironmentVariables() {
         this.router.navigate(['/environment-variables']);
     }
