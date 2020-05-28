@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation  } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -36,7 +36,6 @@ import { ServicePopupService, ServiceDialogComponent } from 'app/entities/servic
     encapsulation: ViewEncapsulation.None
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
-    
     flow: IFlow;
     fromEndpoint: IFromEndpoint;
     fromEndpointOptions: Array<Option> = [];
@@ -47,10 +46,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     toEndpoint: IToEndpoint;
     services: Service[];
     headers: IHeader[];
-    
-    public logLevelListType = [LogLevelType.OFF, LogLevelType.INFO, LogLevelType.ERROR, LogLevelType.TRACE,LogLevelType.WARN,LogLevelType.DEBUG];
-       
-    
+
+    public logLevelListType = [
+        LogLevelType.OFF,
+        LogLevelType.INFO,
+        LogLevelType.ERROR,
+        LogLevelType.TRACE,
+        LogLevelType.WARN,
+        LogLevelType.DEBUG
+    ];
+
     isSaving: boolean;
     savingFlowFailed = false;
     savingFlowFailedMessage = 'Saving failed (check logs)';
@@ -79,7 +84,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     offloadingPopoverMessage: string;
     maximumRedeliveriesPopoverMessage: string;
     redeliveryDelayPopoverMessage: string;
-    logLevelPopoverMessage: string
+    logLevelPopoverMessage: string;
 
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
@@ -418,9 +423,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     returnServiceType(type: any) {
         if (type === 'ACTIVEMQ') {
             return 'ActiveMQ Connection';
-        }else if (type === 'AMAZONMQ') {
+        } else if (type === 'AMAZONMQ') {
             return 'AmazonMQ Connection';
-        }else if (type === 'SONICMQ') {
+        } else if (type === 'SONICMQ') {
             return 'SonicMQ Connection';
         } else if (type === 'SQL') {
             return 'JDBC Connection';
@@ -512,7 +517,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }
                 break;
             }
-            case 'AMAZONMQ':             
+            case 'AMAZONMQ':
             case 'AMQP':
             case 'SJMS':
             case 'SONICMQ':
@@ -1154,7 +1159,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     private subscribeToSaveResponse(result: Observable<Flow>) {
-        result.subscribe((res: Flow) => this.onSaveSuccess(res), (res: Response) => this.onSaveError());
+        result.subscribe(
+            (res: Flow) => this.onSaveSuccess(res),
+            (res: Response) => this.onSaveError()
+        );
     }
 
     private onSaveSuccess(result: Flow) {

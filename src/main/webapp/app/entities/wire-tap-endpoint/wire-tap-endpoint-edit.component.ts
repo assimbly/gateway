@@ -165,11 +165,9 @@ export class WireTapEndpointEditComponent implements OnInit {
         componentType = componentType.toLowerCase();
         if (componentType === 'activemq') {
             componentType = 'jms';
-        }
-        else if (componentType === 'amazonmq') {
+        } else if (componentType === 'amazonmq') {
             componentType = 'jms';
-        }
-        else if (componentType === 'sonicmq') {
+        } else if (componentType === 'sonicmq') {
             componentType = 'sjms';
         }
 

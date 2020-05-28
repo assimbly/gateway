@@ -30,14 +30,18 @@ export class ServiceDialogComponent implements OnInit {
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
-    jmsProvidersList: Array<String> = [
-                                   'ActiveMQ Artemis',
-                                   'AMQ'
-                               ];
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
 
     public disableType: boolean;
     public serviceType: string;
-    public typeServices: string[] = ['ActiveMQ Connection','AmazonMQ Connection','AMQP Connection','JDBC Connection', 'MQ Connection','SonicMQ Connection'];
+    public typeServices: string[] = [
+        'ActiveMQ Connection',
+        'AmazonMQ Connection',
+        'AMQP Connection',
+        'JDBC Connection',
+        'MQ Connection',
+        'SonicMQ Connection'
+    ];
     private requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     private serviceKeysRemoveList: Array<ServiceKeys> = [];
@@ -264,7 +268,7 @@ export class ServiceDialogComponent implements OnInit {
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:61616', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
-                    { serviceKeyName: 'jmsprovider', valueType: 'list', placeholder: '', isRequired: true }                    
+                    { serviceKeyName: 'jmsprovider', valueType: 'list', placeholder: '', isRequired: true }
                 ]
             },
             {
@@ -272,7 +276,7 @@ export class ServiceDialogComponent implements OnInit {
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
                 ]
             }
         );

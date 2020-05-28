@@ -31,13 +31,8 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
-    jmsProvidersList: Array<String> = [
-                                  'ActiveMQ Artemis',
-                                  'AMQ'
-                              ];
-    
-    
-    
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
+
     constructor(
         protected serviceKeysService: ServiceKeysService,
         protected jhiAlertService: JhiAlertService,
@@ -112,7 +107,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         serviceKeyName: 'password',
                         valueType: 'password',
                         placeholder: '',
-                        isRequired: true    
+                        isRequired: true
                     }
                 ]
             },
@@ -123,7 +118,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         serviceKeyName: 'url',
                         valueType: 'text',
                         placeholder: 'Example tcp://localhost:61616',
-                        isRequired: true    
+                        isRequired: true
                     }
                     /*,
                     {
@@ -162,7 +157,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         isRequired: true
                     }
                 ]
-            },            
+            },
             {
                 name: 'MQ Connection',
                 serviceKeys: [
@@ -191,7 +186,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         isRequired: true
                     }
                 ]
-            },            
+            },
             {
                 name: 'AMQP Connection',
                 serviceKeys: [
