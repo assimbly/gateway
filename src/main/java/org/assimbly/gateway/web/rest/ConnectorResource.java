@@ -742,6 +742,21 @@ public class ConnectorResource {
 		
     }
 
+    @GetMapping(path = "/connector/{connectorId}/testconnection/{host}/{port}/{timeout}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> testConnection(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable String host,@PathVariable int port, @PathVariable int timeout) throws Exception {
+
+		try {
+    		String testConnectionResult = connector.testConnection(host, port, timeout);
+			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/testconnection/{host}/{port}/{timeout}",testConnectionResult);
+		} catch (Exception e) {
+   			e.printStackTrace();
+			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/testconnection/{host}/{port}/{timeout}",e.getMessage());
+		}
+		
+    }
+
+    
+    
     /**
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
      *

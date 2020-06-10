@@ -137,6 +137,55 @@
 					<ng-template #errorPopover let-message="message">
 						<div [innerHtml]="errorPopoverMessage"></div>
 					</ng-template>
+					<ng-template #hostnamePopover let-message="message">
+								<div [innerHtml]="hostnamePopoverMessage"></div>
+					</ng-template>
+					<ng-template #portPopover let-message="message">
+								<div [innerHtml]="portPopoverMessage"></div>
+					</ng-template>
+					<ng-template #timeoutPopover let-message="message">
+								<div [innerHtml]="timeoutPopoverMessage"></div>
+					</ng-template>
+					
+					<ng-template #testConnectionModal>
+							<div class="modal-header">
+						      <h4 class="modal-title">Test Connection</h4>
+						      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+						        <span aria-hidden="true">&times;</span>
+						      </button>
+						    </div>
+						    <div class="modal-body" [formGroup]="testConnectionForm">						    
+						     	<div class="form-group row">							     	
+							     	<div class="col-8">
+							     		<label class="form-control-label" for="field_header">Host name</label>
+							     		<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="hostnamePopover"  container="body" placement="right" class="fa fa-info-circle"></i>
+							    		<input type="text" class="form-control" formControlName="connectionHost" id="connectionHost" required />
+								 	</div>
+								   <div class="col-3">
+								     <label class="form-control-label" for="example-number-input">Port</label>				  
+	   					     		 <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="portPopover"  container="body" placement="right" class="fa fa-info-circle"></i>								     
+							    	 <input type="number" class="form-control" min="1" max="65535" formControlName="connectionPort" id="connectionPort" />
+								  </div>
+								  <div class="col-1"></div>
+								</div>  
+						    	<div class="form-group row">								  
+								  <div class="col-8">
+								  		<label class="form-control-label" for="example-number-input">Timeout</label>
+							     		<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="timeoutPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
+								    	<input type="number" class="form-control" formControlName="connectionTimeout" id="connectionTimeout" />
+								 	</div>
+								 	<div class="col-4"></div>								 	
+								</div>
+							 	<div [innerHtml]="testConnectionMessage">
+							 	</div>							 								
+						    </div>
+						    <div class="modal-footer">
+						      <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
+						      <button type="button" class="btn btn-primary" (click)="testConnection()">Test</button>						      
+						    </div>
+					</ng-template>
+
+
 					
 					<!-- styling of tabset is in global.scss -->
 					<ngb-accordion [closeOthers]="true" activeIds="From" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
@@ -153,18 +202,22 @@
 								<jhi-alert-error></jhi-alert-error>
 									<div class="col-12" style="padding-left: 20px;" [formGroupName]="'0'">
 										<div class="input-group">
-											<a class="col-8"></a>
-											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/apache-camel.webp">
-													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
-												</picture>
-											</a>
-											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{fromTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/assimbly_transparant.webp">
-													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
-												</picture>
+											<a class="col-11"></a>
+											<a class="col-1">
+												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
+								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>								      				
+								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+											        <a ngbDropdownItem role="button" href="{{fromTypeCamelLink}}" [ngClass]="{'disabled': !fromTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+														<span>Camel Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" href="{{fromTypeAssimblyLink}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.type}}.">
+														<span>Assimbly Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+														<span>Test Connection</span>
+													</a>													
+											      </div>
+											   </div>   
 											</a>
 										</div>
 										<div class="form-group" [style.display]="'none'">
@@ -282,20 +335,24 @@
 								<jhi-alert-error></jhi-alert-error>								
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
 										<div class="input-group">
-											<a class="col-8"></a>
-											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/apache-camel.webp">
-													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
-												</picture>
+											<a class="col-11"></a>
+											<a class="col-1">
+												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
+								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>								      				
+								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+											        <a ngbDropdownItem role="button" href="{{toTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.type}}.">
+														<span>Camel Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" href="{{toTypeAssimblyLinks[toIndex]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
+														<span>Assimbly Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+														<span>Test Connection</span>
+													</a>													
+											      </div>
+											   </div>   
 											</a>
-											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{toTypeAssimblyLinks[toIndex]}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/assimbly_transparant.webp">
-													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
-												</picture>
-											</a>												
-										</div>										
+										</div>
 										<div class="form-group" [style.display]="'none'">
 											<label for="id">ID</label>
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />
@@ -420,20 +477,24 @@
 							<ng-template ngbPanelContent>
 									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="'1'">
 										<div class="input-group">
-											<a class="col-8"></a>
-											<a role="button" class="col-2 btn btn-outline-danger right-border-radius-0 camel-link p-button-camel flow-camel-button" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/apache-camel.webp">
-													<img src="../../../content/images/apache-camel.png" alt="apache-camel-logo">
-												</picture>
+											<a class="col-11"></a>
+											<a class="col-1">
+												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
+								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>								      				
+								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+											        <a ngbDropdownItem role="button" href="{{errorTypeCamelLink}}" [ngClass]="{'disabled': !errorTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
+														<span>Camel Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" href="{{errorTypeAssimblyLink}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.type}}.">
+														<span>Assimbly Documentation</span>
+													</a>
+													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+														<span>Test Connection</span>
+													</a>													
+											      </div>
+											   </div>   
 											</a>
-											<a role="button" class="col-2 btn btn-outline-danger left-border-radius-0 p-question-button flow-assimbly-button" href="{{errorTypeAssimblyLink}}" placement="left" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.type}}.">
-												<picture>
-													<source srcset="../../../content/images/assimbly_transparant.webp">
-													<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
-												</picture>
-											</a>
-										</div>	
+										</div>
 										<div class="form-group" [style.display]="'none'">
 											<label for="id">ID</label>
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />

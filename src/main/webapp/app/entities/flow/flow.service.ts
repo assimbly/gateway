@@ -165,6 +165,14 @@ export class FlowService {
         });
     }
 
+    testConnection(gatewayid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
+        console.log('url=' + `${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`);
+        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+    
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
         const exportDate = this.getDate();
