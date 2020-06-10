@@ -606,3 +606,7 @@ ng-select select-dropdown > div {
     position: relative;
     z-index: 100;
 }
+
+.dropdown-toggle::after {
+    display:none;
+}

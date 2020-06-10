@@ -36,6 +36,7 @@ import { ServicePopupService, ServiceDialogComponent } from 'app/entities/servic
     encapsulation: ViewEncapsulation.None
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
+
     flow: IFlow;
     fromEndpoint: IFromEndpoint;
     fromEndpointOptions: Array<Option> = [];
@@ -119,6 +120,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     displayNextButton = false;
     invalidUriMessage: string;
 
+    testConnectionForm: FormGroup;
+    testConnectionMessage: string;
+    connectionHost: any;
+    connectionPort: any;
+    connectionTimeout: any;
+    hostnamePopoverMessage: string;
+    portPopoverMessage: string;
+    timeoutPopoverMessage: string;
+    
+    
     fromFilterService: Array<Service> = [];
     fromServiceType: string;
     toFilterService: Array<Array<Service>> = [[]];
@@ -555,6 +566,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.fromPopoverMessage = `Source of messages.`;
         this.toPopoverMessage = `Destination of messages. Multiple destinations can be configured.`;
         this.errorPopoverMessage = `Fault destination of messages.`;
+        this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
+        this.portPopoverMessage = `Number of the port. Range between 1 and 65536`;
+        this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
     }
 
     initializeForm(flow: Flow) {
@@ -589,6 +603,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         });
     }
 
+    initializeTestConnectionForm() {
+        this.testConnectionForm = new FormGroup({
+            connectionHost: new FormControl(null, Validators.required),
+            connectionPort: new FormControl(80),
+            connectionTimeout: new FormControl(10)
+        });
+    }
+    
     updateForm() {
         this.updateFlowData(this.flow);
         let endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
@@ -737,10 +759,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }, 0);
     }
 
-    openModal(uriEditor: TemplateRef<any>) {
-        this.modalRef = this.modalService.open(uriEditor);
+    openModal(templateRef: TemplateRef<any>) {
+        this.modalRef = this.modalService.open(templateRef);
     }
-
+    
+    openTestConnectionModal(templateRef: TemplateRef<any>) {
+        this.initializeTestConnectionForm();
+        this.testConnectionMessage = "";
+        this.modalRef = this.modalService.open(templateRef);
+    }
+    
     cancelModal(): void {
         if (this.modalRef) {
             this.modalRef.dismiss();
@@ -748,6 +776,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
     }
 
+    testConnection() {
+
+        this.testConnectionMessage = '<i class="fa fa-refresh fa-spin fa-fw"></i><span class="sr-only"></span>Testing...';
+        this.connectionHost = (<FormGroup>this.testConnectionForm.controls.connectionHost.value);
+        this.connectionPort = (<FormGroup>this.testConnectionForm.controls.connectionPort.value);
+        this.connectionTimeout = (<FormGroup>this.testConnectionForm.controls.connectionTimeout.value);
+        
+        this.flowService.testConnection(this.flow.gatewayId, this.connectionHost, this.connectionPort, this.connectionTimeout).subscribe(result => {
+            this.testConnectionMessage = result.body;
+        });
+    }
+    
     previousState() {
         window.history.back();
     }
@@ -1158,6 +1198,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         endpoint.controls.uri.markAsUntouched();
     }
 
+    
     private subscribeToSaveResponse(result: Observable<Flow>) {
         result.subscribe(
             (res: Flow) => this.onSaveSuccess(res),
