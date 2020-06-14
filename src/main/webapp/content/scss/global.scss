@@ -610,3 +610,11 @@ ng-select select-dropdown > div {
 .dropdown-toggle::after {
     display:none;
 }
+
+.option-tooltip .tooltip-inner {
+  max-width: 400px;
+  width: 400px;
+  text-align:left;
+  z-index: 100;
+  position: relative;
+}
