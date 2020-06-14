@@ -266,8 +266,16 @@
 											<label class="form-control-label" for="field_options">Options</label>
 											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index" [formGroupName]="idx">
-												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/> -->
-												<ng-select [items]="fromComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"></ng-select>
+												<ng-select [items]="fromComponentOptions" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])">
+												    <ng-template ng-option-tmp let-item="item">
+													    <div [ngbTooltip]="fromOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+													     <ng-template #fromOptionTooltip>
+													     	<div>
+													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+													     	</div>
+													     </ng-template>
+												    </ng-template>
+												</ng-select>
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions, '0')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption, '0')" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
@@ -398,8 +406,17 @@
 											<label class="form-control-label" for="field_options">Options</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx" [formGroupName]="idx">
-												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Name of the option. Click the Camel component button for documentation on valid options."/> -->
-												<ng-select [items]="toComponentOptions[toIndex]" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])"></ng-select>
+												<ng-select [items]="toComponentOptions[toIndex]" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])">
+												    <ng-template ng-option-tmp let-item="item">
+													    <div [ngbTooltip]="toOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+													     <ng-template #toOptionTooltip>
+													     	<div>
+													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+													     	</div>
+													     </ng-template>
+												    </ng-template>
+												</ng-select>
+												<!-- <ng-select [items]="toComponentOptions[toIndex]" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])"></ng-select> -->
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex], toIndex+2)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption, toIndex+2)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].type.value === 'WASTEBIN' || toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
@@ -542,7 +559,18 @@
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="row mx-0 mb-1" *ngFor="let errOption of errorEndpointOptions; let idx = index" [formGroupName]="idx">
 												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"  data-toggle="tooltip" title="Name of the option. Click the Camel component button for documentation on valid options."/>-->
-												<ng-select [items]="errorComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"></ng-select>
+
+												<ng-select [items]="errorComponentOptions" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}"  formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])">
+												    <ng-template ng-option-tmp let-item="item">
+													    <div [ngbTooltip]="errorOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+													     <ng-template #errorOptionTooltip>
+													     	<div>
+													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+													     	</div>
+													     </ng-template>
+												    </ng-template>
+												</ng-select>
+												<!-- <ng-select [items]="errorComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"></ng-select> -->
 												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"  data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
 												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions, '1')"><span class="fa fa-plus"></span></button>
 												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption, '1')" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>

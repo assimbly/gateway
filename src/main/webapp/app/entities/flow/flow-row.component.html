@@ -39,7 +39,7 @@
 						<span class="fa fa-stop"></span>
 					</button>
 		      		<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-secondary':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
-		      		 type="button" style="min-width: 20em;" data-container="body" class="btn btn-sm btn-block btn-arrow-right" placement="right" popoverTitle="Status" [ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">
+		      		 type="button" style="min-width: 20em;" data-container="body" class="btn btn-sm btn-block btn-arrow-right text-left" placement="right" popoverTitle="Status" [ngbPopover]="statusFlowButtonTemplate" [autoClose]="'outside'">
 		      		       <span style="text-transform: uppercase;">{{flow.name}}</span>
 					</button>
 			 		

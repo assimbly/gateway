@@ -479,7 +479,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // get options keys
             this.getComponentOptions(componentType).subscribe(data => {
-                this.fromComponentOptions = Object.keys(data.properties).sort();
+
+                let componentOptions = data.properties;
+                
+                this.fromComponentOptions = Object.keys(componentOptions).map(key => ({...componentOptions[key],...{name: key}}));                
+                this.fromComponentOptions.sort(function(a, b) {
+                     return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+                });                
             });
         } else if (endpoint instanceof ToEndpoint) {
             endpointForm.controls.service.setValue('');
@@ -491,7 +497,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe(data => {
-                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(data.properties).sort();
+                
+                let componentOptions = data.properties;
+                
+                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)] = Object.keys(componentOptions).map(key => ({...componentOptions[key],...{name: key}}));                
+                this.toComponentOptions[this.toEndpoints.indexOf(endpoint)].sort(function(a, b) {
+                     return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+                });
             });
         } else if (endpoint instanceof ErrorEndpoint) {
             endpointForm.controls.service.setValue('');
@@ -503,7 +515,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
             // set options keys
             this.getComponentOptions(componentType).subscribe(data => {
-                this.errorComponentOptions = Object.keys(data.properties).sort();
+                
+                let componentOptions = data.properties;
+                
+                this.errorComponentOptions = Object.keys(componentOptions).map(key => ({...componentOptions[key],...{name: key}}));                
+                this.errorComponentOptions.sort(function(a, b) {
+                     return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+                });
             });
         }
 
