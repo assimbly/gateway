@@ -646,7 +646,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowService.getConfiguration(this.flow.id).subscribe(
             data => {
                 this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
-                    this.flowService.resume(this.flow.id).subscribe(
+                    this.flowService.resume(this.flow.id).subscribe(                            
                         response => {
                             if (response.status === 200) {
                                 // this.setFlowStatus('resumed');

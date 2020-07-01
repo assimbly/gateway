@@ -68,7 +68,7 @@ export class FlowService {
     }
 
     getConfiguration(flowid: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, { observe: 'response' });
+        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, {headers: new HttpHeaders({PlaceholderReplacement:'true'}), observe: 'response' });
     }
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
@@ -166,7 +166,6 @@ export class FlowService {
     }
 
     testConnection(gatewayid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
-        console.log('url=' + `${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`);
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
             observe: 'response',
             responseType: 'text'
@@ -180,8 +179,9 @@ export class FlowService {
         this.http
             .get(url, {
                 headers: new HttpHeaders({
-                    Accept: 'application/xml',
-                    'Content-Type': 'application/octet-stream'
+                    Accept: 'application/xml', 
+                    'Content-Type': 'application/octet-stream',
+                    PlaceholderReplacement:'false'
                 }),
                 observe: 'response',
                 responseType: 'blob'
@@ -203,7 +203,8 @@ export class FlowService {
             .get(url, {
                 headers: new HttpHeaders({
                     Accept: 'application/xml',
-                    'Content-Type': 'application/octet-stream'
+                    'Content-Type': 'application/octet-stream',
+                    PlaceholderReplacement:'false'    
                 }),
                 observe: 'response',
                 responseType: 'blob'
