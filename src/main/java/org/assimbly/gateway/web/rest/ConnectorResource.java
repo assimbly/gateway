@@ -893,7 +893,7 @@ public class ConnectorResource {
 	       		if(flow.isAutoStart()) {
 	       			String configuration;
 	       			log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
-					configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application");
+					configuration = assimblyDBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application",true);
 					connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
 					connector.startFlow(flow.getId().toString());
 	       		}

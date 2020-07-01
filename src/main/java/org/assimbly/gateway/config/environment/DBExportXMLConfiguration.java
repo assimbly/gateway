@@ -148,6 +148,7 @@ public class DBExportXMLConfiguration {
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
 		}
+
 		xmlConfiguration = DocConverter.convertDocToString(doc);
 
 		return xmlConfiguration;
@@ -222,11 +223,12 @@ public class DBExportXMLConfiguration {
 		connector.appendChild(headers);
 		connector.appendChild(environmentVariablesList);
 
-		setXMLOffloadingPropertiesFromDB(connectorId);
-		setXMLEnvironmentVariablesFromDB(connectorId);
-
 		servicesList = new ArrayList<String>();
 		headersList = new ArrayList<String>();
+		
+		setXMLOffloadingPropertiesFromDB(connectorId);
+
+		setXMLEnvironmentVariablesFromDB(connectorId);
 
 	}
 
@@ -255,9 +257,9 @@ public class DBExportXMLConfiguration {
 		
 		// set offloading
 		String flowOffloading = flowDB.isOffLoading().toString();
-		Element offloading = doc.createElement("offloading");
-		offloading.appendChild(doc.createTextNode(flowOffloading));
-		flow.appendChild(offloading);
+		Element isOffloading = doc.createElement("offloading");
+		isOffloading.appendChild(doc.createTextNode(flowOffloading));
+		flow.appendChild(isOffloading);
 		
 		// set maximumRedeliveries
 		String flowMaximumRedeliveries = Integer.toString(flowDB.getMaximumRedeliveries());
@@ -276,11 +278,12 @@ public class DBExportXMLConfiguration {
 		Element logLevel = doc.createElement("logLevel");
 		logLevel.appendChild(doc.createTextNode(flowLogLevel));
 		flow.appendChild(logLevel);
-		
-		
+
 		// set endpoints
 		setXMLFromEndpointFromDB(fromEndpoint);
+
 		setXMLToEndpointsFromDB(toEndpoints);
+
 		setXMLErrorEndpointFromDB(errorEndpoint);
 
 	}
@@ -307,8 +310,7 @@ public class DBExportXMLConfiguration {
 				if (confOptions.isEmpty() || confOptions == null) {
 					confOptions = "dataSource=" + confServiceId;
 				} else if (!confOptions.contains("dataSource")) {
-					confOptions = "&dataSource=" + confServiceId;
-					;
+					confOptions = "&dataSource=" + confServiceId;					
 				}
 			}
 
@@ -353,15 +355,18 @@ public class DBExportXMLConfiguration {
 
 				serviceId.setTextContent(confServiceId);
 				offloading.appendChild(serviceId);
+				
 				setXMLServiceFromDB(confServiceId, "wireTap", confService);
+
 			}
 
 			if (confHeader != null) {
-				String confHeaderId = confService.getId().toString();
-				Element headerId = doc.createElement("service_id");
+				String confHeaderId = confHeader.getId().toString();
+				Element headerId = doc.createElement("header_id");
 
 				offloading.appendChild(headerId);
 				headerId.setTextContent(confHeaderId);
+
 				setXMLHeaderFromDB(confHeaderId, "wireTap", confHeader);
 			}
 
@@ -613,10 +618,10 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB)
-			throws Exception {
-
+	public void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
+		
 		if (!servicesList.contains(serviceid)) {
+
 			servicesList.add(serviceid);
 
 			Element service = doc.createElement("service");
@@ -647,8 +652,11 @@ public class DBExportXMLConfiguration {
 				Element serviceParameter = doc.createElement(parameterName);
 				serviceParameter.setTextContent(parameterValue);
 				keys.appendChild(serviceParameter);
+				
 			}
+			
 		}
+
 	}
 
 	public void setXMLHeaderFromDB(String headerid, String type, Header headerDB) throws Exception {
@@ -691,7 +699,7 @@ public class DBExportXMLConfiguration {
 		List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll();
 
 		if (wiretapEndpoints.size() > 0) {
-
+			
 			WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
 
 			// set id
@@ -707,6 +715,7 @@ public class DBExportXMLConfiguration {
 			offloading.appendChild(name);
 
 			setXMLWireTapEndpointFromDB(wiretapEndpoint);
+
 		}
 	}
 
@@ -736,6 +745,7 @@ public class DBExportXMLConfiguration {
 
 			}
 		}
+
 	}
 
 	private String setDefaultComponentType(String componentType) {

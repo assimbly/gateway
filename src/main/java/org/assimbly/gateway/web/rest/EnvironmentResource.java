@@ -58,10 +58,10 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/environment/{gatewayid}", produces = {"text/plain","application/xml", "application/json"})
-    public ResponseEntity<String> getGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid) throws Exception {
+    public ResponseEntity<String> getGatewayConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid ) throws Exception {
 
        	try {
-			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType);
+			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType,isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				log.error("Failed to get configuration: " + configuration);
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
@@ -83,10 +83,10 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping(path = "/environment/{gatewayid}/byflowids", produces = {"text/plain","application/xml", "application/json"},consumes = {"text/plain"})
-    public ResponseEntity<String> getConfigurationByFlowids(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @RequestBody String flowids) throws Exception {
+    public ResponseEntity<String> getConfigurationByFlowids(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid, @RequestBody String flowids) throws Exception {
 
        	try {
-			configuration = DBConfiguration.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids);
+			configuration = DBConfiguration.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids, isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
 			}
@@ -124,9 +124,10 @@ public class EnvironmentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/environment/{gatewayid}/flow/{flowid}", produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
+    public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {
-            configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType);
+            configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType, isPlaceholderReplacement);
+            
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", configuration);
 			}
