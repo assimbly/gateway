@@ -37,7 +37,7 @@
         "ngx-cookie": "4.0.2",
         "ngx-infinite-scroll": "8.0.1",
         "ngx-webstorage": "4.0.1",
-        "npm": "^6.13.6",
+        "npm": "^6.14.6",
         "reflect-metadata": "0.1.13",
         "rxjs": "6.5.3",
         "sockjs-client": "1.4.0",
