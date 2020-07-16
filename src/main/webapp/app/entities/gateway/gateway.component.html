@@ -21,16 +21,30 @@
             </button>
         </div>
     </div>
-    <hr>
-    <div>
-        <button type="button" (click)="uploadConfiguration()"
-            class="btn btn-info btn-sm float-right mb-3">
-            <span class="fa fa-upload"></span>
-            <span class="d-none d-md-inline">Import XML Configuration</span>
-        </button>
-    </div>    
+    
+	<!-- New button to restart the gateway -->
+	<table class="table table-sm">
+      	<tr>
+            <td colspan="2">
+				<div class="d-block pull-right">
+			        <button type="button" (click)="restartGateway(1)" 
+			            class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
+			            <span class="fa fa-wrench"></span>
+			            <span class="d-none d-md-inline">Restart</span>			            
+			        </button>
+		 	        &nbsp;  <!-- not pretty, I know... -->
+			        <button type="button" (click)="uploadConfiguration()"
+			            class="btn btn-info btn-sm float-right mb-3 ">
+			            <span class="fa fa-upload"></span>
+			            <span class="d-none d-md-inline">Import XML Configuration</span>
+			        </button>
+		    	</div>
+	   		</td>
+	   	</tr>
+    </table>
+    
     <!-- <jhi-alert></jhi-alert>-->
-    <br/>
+    <!-- <br/>  -->
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
@@ -44,7 +58,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td lass="w-25">
+                    <td class="w-25">
                         <span class="font-weight-bold">ID:</span>
                     </td>
                     <td class="w-75">
