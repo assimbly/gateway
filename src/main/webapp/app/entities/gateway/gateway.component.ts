@@ -65,6 +65,27 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.eventManager.subscribe('gatewayListModification', res => this.reset());
     }
 
+    restartGateway(index: number) {
+        alert('Are you sure? This will restart Assimbly Gateway and all its flows.');
+        console.log('Number of gateways: ' + this.gateways.length);
+
+        this.gatewayService.stopGateway(index).subscribe(
+            (res: HttpResponse<IGateway[]>) => {
+                this.gateways = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+        console.log('Gateway is gestopt');
+
+        this.gatewayService.startGateway(index).subscribe(
+            (res: HttpResponse<IGateway[]>) => {
+                this.gateways = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+        console.log('Gateway is gestart');
+    }
+
     protected onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
