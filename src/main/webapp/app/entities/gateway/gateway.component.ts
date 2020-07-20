@@ -8,6 +8,7 @@ import { IGateway } from 'app/shared/model/gateway.model';
 import { AccountService } from 'app/core';
 import { GatewayService } from './gateway.service';
 import { FlowService } from '../flow/flow.service';
+import { delay } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-gateway',
@@ -17,6 +18,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
     gateways: IGateway[] = [];
     currentAccount: any;
     eventSubscriber: Subscription;
+
 
     constructor(
         protected flowService: FlowService,
@@ -67,23 +69,25 @@ export class GatewayComponent implements OnInit, OnDestroy {
 
     restartGateway(index: number) {
         alert('Are you sure? This will restart Assimbly Gateway and all its flows.');
-        console.log('Number of gateways: ' + this.gateways.length);
 
         this.gatewayService.stopGateway(index).subscribe(
-            (res: HttpResponse<IGateway[]>) => {
+           (res: HttpResponse<IGateway[]>) => {
                 this.gateways = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
-        );
-        console.log('Gateway is gestopt');
+             );
+            console.log('Gateway is gestopt');
 
-        this.gatewayService.startGateway(index).subscribe(
-            (res: HttpResponse<IGateway[]>) => {
-                this.gateways = res.body;
+            setTimeout(()=>{ this.startGateway()}, 1000)
+    }
+
+    startGateway() {
+        this.gatewayService.startGateway(1).subscribe(
+           (res: HttpResponse<IGateway[]>) => {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
-        );
-        console.log('Gateway is gestart');
+             );
+            console.log('Gateway is gestart');
     }
 
     protected onError(errorMessage: string) {
