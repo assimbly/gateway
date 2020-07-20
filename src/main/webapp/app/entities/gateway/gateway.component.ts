@@ -77,8 +77,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
             (res: HttpErrorResponse) => this.onError(res.message)
              );
             console.log('Gateway is gestopt');
-
-            setTimeout(()=>{ this.startGateway()}, 1000)
+            setTimeout(() => { this.startGateway()}, 1000)
     }
 
     startGateway() {
