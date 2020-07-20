@@ -21,29 +21,21 @@
             </button>
         </div>
     </div>
-    
-	<!-- New button to restart the gateway -->
-	<table class="table table-sm" style="margin-bottom: 5px;">
-      	<tr>
-            <td colspan="2">
-				<div class="d-block pull-right">
-			        <button type="button" (click)="restartGateway(1)" style="margin-right: 5px;"
-			            class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
-			            <span class="fa fa-wrench"></span>
-			            <span class="d-none d-md-inline">Restart</span>			            
-                    </button>
-			        <button type="button" (click)="uploadConfiguration()"
-			            class="btn btn-info btn-sm float-right mb-3 ">
-			            <span class="fa fa-upload"></span>
-			            <span class="d-none d-md-inline">Import XML Configuration</span>
-			        </button>
-		    	</div>
-	   		</td>
-	   	</tr>
-    </table>
+    <hr>
+    <div class="d-block pull-right">
+        <button type="button" (click)="restartGateway(1)" style="margin-right: 5px;"
+            class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
+            <span class="fa fa-wrench"></span>
+            <span class="d-none d-md-inline">Restart</span>			            
+        </button>
+        <button type="button" (click)="uploadConfiguration()" style="margin-right: 3px;"
+            class="btn btn-info btn-sm float-right mb-3 ">
+            <span class="fa fa-upload"></span>
+            <span class="d-none d-md-inline">Import XML Configuration</span>
+        </button>
+    </div>
     
     <!-- <jhi-alert></jhi-alert>-->
-    <!-- <br/>  -->
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
