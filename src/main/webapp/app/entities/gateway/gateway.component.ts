@@ -8,7 +8,6 @@ import { IGateway } from 'app/shared/model/gateway.model';
 import { AccountService } from 'app/core';
 import { GatewayService } from './gateway.service';
 import { FlowService } from '../flow/flow.service';
-import { delay } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-gateway',
@@ -70,18 +69,18 @@ export class GatewayComponent implements OnInit, OnDestroy {
     restartGateway(index: number) {
         alert('Are you sure? This will restart Assimbly Gateway and all its flows.');
 
-        this.gatewayService.stopGateway(index).subscribe(
+        this.gatewayService.stop(index).subscribe(
            (res: HttpResponse<IGateway[]>) => {
                 this.gateways = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
              );
             console.log('Gateway is gestopt');
-            setTimeout(() => { this.startGateway()}, 1000)
+            setTimeout(() => { this.startGateway(index)}, 1000)
     }
 
-    startGateway() {
-        this.gatewayService.startGateway(1).subscribe(
+    startGateway(index: number) {
+        this.gatewayService.start(index).subscribe(
            (res: HttpResponse<IGateway[]>) => {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
