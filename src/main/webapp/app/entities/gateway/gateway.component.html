@@ -22,15 +22,20 @@
         </div>
     </div>
     <hr>
-    <div>
-        <button type="button" (click)="uploadConfiguration()"
-            class="btn btn-info btn-sm float-right mb-3">
+    <div class="d-block pull-right">
+        <button type="button" (click)="restartGateway(1)" style="margin-right: 5px;"
+            class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
+            <span class="fa fa-wrench"></span>
+            <span class="d-none d-md-inline">Restart</span>			            
+        </button>
+        <button type="button" (click)="uploadConfiguration()" style="margin-right: 3px;"
+            class="btn btn-info btn-sm float-right mb-3 ">
             <span class="fa fa-upload"></span>
             <span class="d-none d-md-inline">Import XML Configuration</span>
         </button>
-    </div>    
+    </div>
+    
     <!-- <jhi-alert></jhi-alert>-->
-    <br/>
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
@@ -44,7 +49,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td lass="w-25">
+                    <td class="w-25">
                         <span class="font-weight-bold">ID:</span>
                     </td>
                     <td class="w-75">

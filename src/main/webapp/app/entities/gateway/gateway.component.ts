@@ -18,6 +18,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
 
+
     constructor(
         protected flowService: FlowService,
         protected gatewayService: GatewayService,
@@ -63,6 +64,28 @@ export class GatewayComponent implements OnInit, OnDestroy {
     uploadConfiguration() {
         this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
         this.eventManager.subscribe('gatewayListModification', res => this.reset());
+    }
+
+    restartGateway(index: number) {
+        alert('Are you sure? This will restart Assimbly Gateway and all its flows.');
+
+        this.gatewayService.stop(index).subscribe(
+           (res: HttpResponse<IGateway[]>) => {
+                this.gateways = res.body;
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+             );
+            console.log('Gateway is gestopt');
+            setTimeout(() => { this.startGateway(index)}, 1000)
+    }
+
+    startGateway(index: number) {
+        this.gatewayService.start(index).subscribe(
+           (res: HttpResponse<IGateway[]>) => {
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+             );
+            console.log('Gateway is gestart');
     }
 
     protected onError(errorMessage: string) {
