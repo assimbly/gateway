@@ -17,12 +17,12 @@ export class GatewayService {
 
     constructor(protected http: HttpClient) {}
 
-    stopGateway(id: number):  Observable<HttpResponse<any>> {
+    stop(id: number):  Observable<HttpResponse<any>> {
         console.log('Stop gateway with id : ' + id + ' on url: ' + `${this.connectorUrl}/${id}/stop`);
         return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response'});
     }
 
-    startGateway(id: number): Observable<HttpResponse<any>> {
+    start(id: number): Observable<HttpResponse<any>> {
         console.log('Start gateway with id : ' + id + ' on url: ' + `${this.connectorUrl}/${id}/start`);
         return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response' });
     }
