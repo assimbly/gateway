@@ -18,13 +18,11 @@ export class GatewayService {
     constructor(protected http: HttpClient) {}
 
     stop(id: number):  Observable<HttpResponse<any>> {
-        console.log('Stop gateway with id : ' + id + ' on url: ' + `${this.connectorUrl}/${id}/stop`);
-        return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response'});
+        return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        console.log('Start gateway with id : ' + id + ' on url: ' + `${this.connectorUrl}/${id}/start`);
-        return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response' });
+        return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
     }
 
     create(gateway: IGateway): Observable<EntityResponseType> {

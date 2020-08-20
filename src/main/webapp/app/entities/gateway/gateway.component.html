@@ -1,4 +1,24 @@
 <div>
+	<ng-template #restartGatewayModal>
+			<div class="modal-header">
+		      <h4 class="modal-title">Restart Gateway</h4>
+		      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+		        <span aria-hidden="true">&times;</span>
+		      </button>
+		    </div>
+		    <div class="modal-body">						    
+		     	<div class="row">							     	
+			     	<div class="col-12">
+			     		Are you sure? This will restart Assimbly gateway (and shutdown its flows).		
+				 	</div>
+				</div>  
+			 	<div [innerHtml]="restartGatewayMessage"></div>							 								
+		    </div>
+		    <div class="modal-footer">
+		      <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
+		      <button type="button" class="btn btn-primary" (click)="restartGateway(1)">Restart</button>						      
+		    </div>
+	</ng-template>
     <div class="row">
         <div class="col-6">
             <h2>
@@ -23,10 +43,11 @@
     </div>
     <hr>
     <div class="d-block pull-right">
-        <button type="button" (click)="restartGateway(1)" style="margin-right: 5px;"
+        <button type="button" (click)="openRestartGatewayModal(restartGatewayModal)" style="margin-right: 5px;"
             class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
-            <span class="fa fa-wrench"></span>
-            <span class="d-none d-md-inline">Restart</span>			            
+            <span class="fa fa-refresh"></span>
+            <span class="d-none d-md-inline">Restart</span>
+            			            
         </button>
         <button type="button" (click)="uploadConfiguration()" style="margin-right: 3px;"
             class="btn btn-info btn-sm float-right mb-3 ">

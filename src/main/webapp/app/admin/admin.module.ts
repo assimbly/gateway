@@ -4,6 +4,8 @@ import { GatewaySharedModule } from '../../app/shared';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { SearchByNamePipe } from './log-viewer/log-viewer.searchbyname.pipe';
+
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
 import {
@@ -60,7 +62,8 @@ import {
         JhiDocsComponent,
         // JhiMetricsMonitoringComponent,
         // JhiMetricsMonitoringModalComponent,
-        LogViewerLineValidationDirective
+        LogViewerLineValidationDirective,
+        SearchByNamePipe
     ],
     entryComponents: [UserMgmtDeleteDialogComponent, HealthModalComponent],
     providers: [AuditsService, JhiConfigurationService, HealthService, MetricsService, LogsService, LogViewerService, UserResolve],
