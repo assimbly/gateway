@@ -22,8 +22,11 @@ entity Flow {
 	maximumRedeliveries Integer,
 	redeliveryDelay Integer,
 	loadBalancing Boolean,
-	logLevel LogLevelType
-	instances Integer		
+	logLevel LogLevelType,
+	instances Integer,
+	version Integer,
+	created Instant,
+	lastModified Instant			
 }
 
 entity FromEndpoint {

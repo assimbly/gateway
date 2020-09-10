@@ -473,6 +473,7 @@ public class DBExportXMLConfiguration {
 			String confOptions = toEndpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = toEndpointDB.getService();
 			Header confHeader = toEndpointDB.getHeader();
+		
 
 			if (confUri != null) {
 
@@ -494,10 +495,10 @@ public class DBExportXMLConfiguration {
 					if (confOptions.isEmpty() || confOptions == null) {
 						confOptions = "dataSource=" + confServiceId;
 					} else if (!confOptions.contains("dataSource")) {
-						confOptions = "&dataSource=" + confServiceId;
-						;
+						confOptions = "&dataSource=" + confServiceId;						
 					}
-				}
+				}				
+		
 
 				confUri = componentType + confUri;
 
@@ -538,6 +539,24 @@ public class DBExportXMLConfiguration {
 					headerId.setTextContent(confHeaderId);
 					setXMLHeaderFromDB(confHeaderId, "to", confHeader);
 				}
+			}else if(confComponentType.equalsIgnoreCase("wastebin")) {
+				
+				Element endpoint = doc.createElement("to");
+				flow.appendChild(endpoint);
+
+				Element id = doc.createElement("id");
+				id.setTextContent(confId);
+				endpoint.appendChild(id);
+
+				Element uri = doc.createElement("uri");
+
+				componentType = confComponentType.toLowerCase();
+
+				confUri = "mock:" + componentType;
+
+				uri.setTextContent(confUri);
+				endpoint.appendChild(uri);
+				
 			}
 		}
 	}
