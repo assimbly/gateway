@@ -1,10 +1,9 @@
 package org.assimbly.gateway.config.environment;
 
 
-
-import org.assimbly.connector.Broker;
-import org.assimbly.connector.service.ActiveMQArtemis;
-import org.assimbly.connector.service.ActiveMQClassic;
+import org.assimbly.broker.Broker;
+import org.assimbly.broker.ActiveMQArtemis;
+import org.assimbly.broker.ActiveMQClassic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
