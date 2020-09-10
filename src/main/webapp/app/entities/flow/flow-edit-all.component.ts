@@ -29,6 +29,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 import { HeaderPopupService, HeaderDialogComponent } from 'app/entities/header';
 import { ServicePopupService, ServiceDialogComponent } from 'app/entities/service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'jhi-flow-edit-all',
@@ -947,13 +948,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.isSaving = true;
         this.setDataFromForm();
         this.setOptions();
+        this.setVersion();
         this.savingFlowFailed = false;
         this.savingFlowSuccess = false;
-
+        
+        
         if (!!this.fromEndpoint.id && !!this.errorEndpoint.id && !!this.flow.id) {
+            
             this.toEndpoints.forEach(toEndpoint => {
                 toEndpoint.flowId = this.flow.id;
             });
+            
             this.flowService.update(this.flow).subscribe(flow => {
                 this.flow = flow.body;
                 const updateFromEndpoint = this.fromEndpointService.update(this.fromEndpoint);
@@ -1086,6 +1091,21 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         endpoint.headerId = formEndpointData.header.value;
     }
 
+    setVersion() {
+        
+        let now = moment();
+        
+        if(this.flow.id){
+            this.flow.version = this.flow.version + 1;
+            this.flow.lastModified = now;
+        }else{
+            this.flow.version = 1;
+            this.flow.created = now;
+            this.flow.lastModified = now;
+        }
+        
+    }
+    
     goBack() {
         window.history.back();
     }

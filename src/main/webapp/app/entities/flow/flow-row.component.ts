@@ -381,10 +381,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     getFlowDetails() {
+        
+        const createdFormatted = moment(this.flow.created).format("YYYY-MM-DD HH:mm:ss");
+        const lastModifiedFormatted = moment(this.flow.lastModified).format("YYYY-MM-DD HH:mm:ss");
+                
         this.flowDetails = `
         
                 <b>ID:</b> ${this.flow.id}<br/>
-                <b>Name:</b> ${this.flow.name}<br/><br/>
+                <b>Name:</b> ${this.flow.name}<br/>
+                <b>Version:</b> ${this.flow.version}<br/><br/>
+                <b>Created:</b> ${createdFormatted}<br/>
+                <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
                 <b>Offloading:</b> ${this.flow.offLoading}<br/><br/>
                 <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
