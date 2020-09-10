@@ -10,6 +10,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
@@ -55,6 +56,15 @@ public class Flow implements Serializable {
     @Column(name = "instances")
     private Integer instances;
 
+    @Column(name = "version")
+    private Integer version;
+
+    @Column(name = "created")
+    private Instant created;
+
+    @Column(name = "last_modified")
+    private Instant lastModified;
+    
     @ManyToOne
     @JsonIgnoreProperties("flows")
     private Gateway gateway;
@@ -202,6 +212,45 @@ public class Flow implements Serializable {
     public void setInstances(Integer instances) {
         this.instances = instances;
     }
+    
+    public Integer getVersion() {
+        return version;
+    }
+
+    public Flow version(Integer version) {
+        this.version = version;
+        return this;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Instant getCreated() {
+        return created;
+    }
+
+    public Flow created(Instant created) {
+        this.created = created;
+        return this;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public Flow lastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }     
 
     public Gateway getGateway() {
         return gateway;

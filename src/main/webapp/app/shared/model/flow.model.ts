@@ -1,4 +1,5 @@
 import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { Moment } from 'moment';
 
 export interface IFlow {
     id?: number;
@@ -10,6 +11,9 @@ export interface IFlow {
     type?: string;
     loadBalancing?: boolean;
     instances?: number;
+    version?: number;
+    created?: Moment;
+    lastModified?: Moment;    
     logLevel?: LogLevelType;
     gatewayId?: number;
     fromEndpointId?: number;
@@ -28,6 +32,9 @@ export class Flow implements IFlow {
         public type?: string,
         public loadBalancing?: boolean,
         public instances?: number,
+        public version?: number,
+        public created?: Moment,
+        public lastModified?: Moment,    
         public logLevel?: LogLevelType,
         public gatewayId?: number,
         public fromEndpointId?: number,

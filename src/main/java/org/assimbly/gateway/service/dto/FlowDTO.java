@@ -3,6 +3,7 @@ package org.assimbly.gateway.service.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
+import java.time.Instant;
 import java.util.Set;
 
 import org.assimbly.gateway.domain.ToEndpoint;
@@ -32,6 +33,12 @@ public class FlowDTO implements Serializable {
     private LogLevelType logLevel;
 
     private Integer instances;
+
+    private Integer version;
+
+    private Instant created;
+
+    private Instant lastModified;
 
     private Long gatewayId;
 
@@ -122,6 +129,30 @@ public class FlowDTO implements Serializable {
         this.instances = instances;
     }
 
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+    
+    public Instant getCreated() {
+        return created;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+    
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }       
+    
     public Long getGatewayId() {
         return gatewayId;
     }
