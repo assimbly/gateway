@@ -43,6 +43,15 @@
             <column name="log_level" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="version" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="created" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified" type="datetime">
+                <constraints nullable="true" />
+            </column>
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -54,6 +63,8 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
+        <dropDefaultValue tableName="flow" columnName="created" columnDataType="datetime"/>
+        <dropDefaultValue tableName="flow" columnName="last_modified" columnDataType="datetime"/>
     </changeSet>
 
     <changeSet id="20180114132915-1-relations" author="jhipster">
@@ -84,6 +95,9 @@
             <column name="load_balancing" type="boolean"/>
             <column name="instances" type="numeric"/>
             <column name="log_level" type="string"/>
+            <column name="version" type="numeric"/>
+            <column name="created" type="datetime"/>
+            <column name="last_modified" type="datetime"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>
