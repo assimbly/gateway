@@ -279,6 +279,24 @@ public class DBExportXMLConfiguration {
 		logLevel.appendChild(doc.createTextNode(flowLogLevel));
 		flow.appendChild(logLevel);
 
+		// set version
+		String flowVersion = flowDB.getVersion().toString();
+		Element version = doc.createElement("version");
+		version.appendChild(doc.createTextNode(flowVersion));
+		flow.appendChild(version);
+
+		// set created
+		String flowCreated = flowDB.getCreated().toString();
+		Element created = doc.createElement("created");
+		created.appendChild(doc.createTextNode(flowCreated));
+		flow.appendChild(created);
+
+		// set lastModified
+		String flowLastModified = flowDB.getLastModified().toString();
+		Element lastModified = doc.createElement("lastModified");
+		lastModified.appendChild(doc.createTextNode(flowLastModified));
+		flow.appendChild(lastModified);
+		
 		// set endpoints
 		setXMLFromEndpointFromDB(fromEndpoint);
 
