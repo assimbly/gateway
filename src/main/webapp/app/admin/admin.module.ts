@@ -17,8 +17,8 @@ import {
     UserMgmtDeleteDialogComponent,
     LogsComponent,
     LogViewerComponent,
-    //JhiMetricsMonitoringModalComponent,
-    //JhiMetricsMonitoringComponent,
+    // JhiMetricsMonitoringModalComponent,
+    // JhiMetricsMonitoringComponent,
     HealthModalComponent,
     HealthComponent,
     JhiConfigurationComponent,
@@ -26,12 +26,15 @@ import {
     AuditsService,
     JhiConfigurationService,
     HealthService,
-    //JhiMetricsService,
+    // JhiMetricsService,
     MetricsService,
     LogsService,
     LogViewerService,
     UserResolve,
-    LogViewerLineValidationDirective
+    LogViewerLineValidationDirective,
+    DeploymentLineValidationDirective,
+    DeploymentComponent,
+    DeploymentSearchbyname
 } from './';
 
 @NgModule({
@@ -50,10 +53,13 @@ import {
     ],
     declarations: [
         AuditsComponent,
+        DeploymentLineValidationDirective,
+        DeploymentComponent,
         UserMgmtComponent,
         UserMgmtDetailComponent,
         UserMgmtUpdateComponent,
         UserMgmtDeleteDialogComponent,
+        DeploymentSearchbyname,
         LogsComponent,
         LogViewerComponent,
         JhiConfigurationComponent,
