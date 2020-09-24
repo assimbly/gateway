@@ -1,6 +1,5 @@
 import { Route } from '@angular/router';
-
-import { DeploymentComponent } from './deployment.component';
+import { DeploymentComponent } from 'app/admin';
 
 export const deploymentRoute: Route = {
     path: 'deployment',
