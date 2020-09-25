@@ -13,6 +13,8 @@ import {
     GatewayDeleteDialogComponent,
     GatewayImportPopupComponent,
     GatewayImportDialogComponent,
+    GatewayExportPopupComponent,
+    GatewayExportDialogComponent,
     gatewayRoute,
     gatewayPopupRoute,
     GatewayPopupService
@@ -29,7 +31,9 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
-        GatewayImportDialogComponent
+        GatewayImportDialogComponent,
+        GatewayExportPopupComponent,
+        GatewayExportDialogComponent
     ],
     entryComponents: [
         GatewayComponent,
@@ -37,7 +41,9 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
         GatewayDeleteDialogComponent,
         GatewayDeletePopupComponent,
         GatewayImportPopupComponent,
-        GatewayImportDialogComponent
+        GatewayImportDialogComponent,
+        GatewayExportPopupComponent,
+        GatewayExportDialogComponent
     ],
     providers: [Components, GatewayService, GatewayPopupService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

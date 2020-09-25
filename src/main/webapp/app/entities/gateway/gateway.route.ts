@@ -12,6 +12,7 @@ import { GatewayUpdateComponent } from './gateway-update.component';
 import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { GatewayImportPopupComponent } from 'app/entities/gateway';
+import { GatewayExportPopupComponent } from 'app/entities/gateway/gateway-export-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class GatewayResolve implements Resolve<IGateway> {
@@ -94,6 +95,19 @@ export const gatewayPopupRoute: Routes = [
     {
         path: 'import',
         component: GatewayImportPopupComponent,
+        resolve: {
+            gateway: GatewayResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Gateways'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'export',
+        component: GatewayExportPopupComponent,
         resolve: {
             gateway: GatewayResolve
         },

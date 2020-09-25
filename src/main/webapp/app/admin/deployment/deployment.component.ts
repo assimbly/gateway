@@ -22,7 +22,9 @@ export class DeploymentComponent implements OnInit {
     ngOnInit(): void {}
 
     downloadConfiguration() {
-        this.deploymentService.exportGatewayConfiguration();
+        this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
+
+        // this.deploymentService.exportGatewayConfiguration();
     }
 
     uploadConfiguration() {

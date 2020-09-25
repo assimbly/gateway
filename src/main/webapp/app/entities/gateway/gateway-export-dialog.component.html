@@ -1,6 +1,6 @@
 <form name="importForm">
     <div class="modal-header">
-        <h4 class="modal-title" id="myGatewayLabel">Import XML Configuration</h4>
+        <h4 class="modal-title" id="myGatewayLabel">Export Configuration (XML)</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
     </div>
     <div class="modal-body">
@@ -10,22 +10,15 @@
                 <option *ngFor="let gateway of gateways" value="{{gateway.id}}">{{gateway.id}}</option>
             </select>
         </div>
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold">XML configuration</label>
-            <div class="custom-file">
-                <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
-                <label for="file" class="custom-file-label">{{fileName}}</label>
-            </div>
-        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-primary" [disabled]="!gatewayId || !xmlConfiguration" (click)="importConfiguration()">
+        <button type="button" class="btn btn-primary" (click)="exportConfiguration(gateways, gatewayId)">
             <span class="fa fa-upload"></span>&nbsp;
-            <span>Import</span>
+            <span>Export</span>
         </button>
         <jhi-alert-error></jhi-alert-error>
     </div>
