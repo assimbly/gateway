@@ -47,9 +47,8 @@ export class GatewayExportDialogComponent implements AfterContentInit {
     }
 
     exportConfiguration(gateways: IGateway[], gatewayId: number) {
-        console.log(gateways);
+        gatewayId = gatewayId--;
         this.deploymentService.exportGatewayConfiguration(gateways.find(i => i.id === gatewayId));
-        console.log(gateways.find(i => i.id === gatewayId));
     }
 }
 
