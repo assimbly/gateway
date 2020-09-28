@@ -23,8 +23,6 @@ export class DeploymentComponent implements OnInit {
 
     downloadConfiguration() {
         this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
-
-        // this.deploymentService.exportGatewayConfiguration();
     }
 
     uploadConfiguration() {
