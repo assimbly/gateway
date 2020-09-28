@@ -75,15 +75,6 @@ export class GatewayComponent implements OnInit, OnDestroy {
         }
     }
 
-    downloadConfiguration(gateway: IGateway) {
-        this.flowService.exportGatewayConfiguration(gateway);
-    }
-
-    uploadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
-        this.eventManager.subscribe('gatewayListModification', res => this.reset());
-    }
-
     restartGateway(index: number) {
         this.gatewayService.stop(index).subscribe(
             (res: HttpResponse<string>) => {

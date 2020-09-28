@@ -37,15 +37,6 @@ export class GatewayExportDialogComponent implements AfterContentInit {
         this.activeModal.dismiss('cancel');
     }
 
-    selectFolder(event) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            this.xmlConfiguration = reader.result;
-        };
-        reader.readAsBinaryString(event.target.files[0]);
-        this.fileName = event.target.files[0].name;
-    }
-
     exportConfiguration(gateways: IGateway[], gatewayId: number) {
         gatewayId = gatewayId--;
         this.deploymentService.exportGatewayConfiguration(gateways.find(i => i.id === gatewayId));
