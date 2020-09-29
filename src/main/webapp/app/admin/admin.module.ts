@@ -33,7 +33,6 @@ import {
     LogViewerService,
     UserResolve,
     LogViewerLineValidationDirective,
-    DeploymentLineValidationDirective,
     DeploymentService,
     DeploymentComponent
 } from './';
@@ -68,7 +67,6 @@ import {
         // JhiMetricsMonitoringComponent,
         // JhiMetricsMonitoringModalComponent,
         LogViewerLineValidationDirective,
-        DeploymentLineValidationDirective,
         SearchByNamePipe,
         DeploymentSearchbyname
     ],
