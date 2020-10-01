@@ -17,7 +17,7 @@ export class GatewayService {
 
     constructor(protected http: HttpClient) {}
 
-    stop(id: number):  Observable<HttpResponse<any>> {
+    stop(id: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
     }
 
@@ -45,13 +45,11 @@ export class GatewayService {
     delete(id: number): Observable<HttpResponse<any>> {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
-        
+
     setGatewayConfiguration(gatewayid, configuration): Observable<any> {
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
         };
-        return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);        
+        return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
     }
-
-    
 }

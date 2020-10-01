@@ -5,6 +5,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { SearchByNamePipe } from './log-viewer/log-viewer.searchbyname.pipe';
+import { DeploymentSearchbyname } from 'app/admin/deployment/deployment.searchbyname.pipe';
 
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
@@ -17,8 +18,8 @@ import {
     UserMgmtDeleteDialogComponent,
     LogsComponent,
     LogViewerComponent,
-    //JhiMetricsMonitoringModalComponent,
-    //JhiMetricsMonitoringComponent,
+    // JhiMetricsMonitoringModalComponent,
+    // JhiMetricsMonitoringComponent,
     HealthModalComponent,
     HealthComponent,
     JhiConfigurationComponent,
@@ -26,12 +27,14 @@ import {
     AuditsService,
     JhiConfigurationService,
     HealthService,
-    //JhiMetricsService,
+    // JhiMetricsService,
     MetricsService,
     LogsService,
     LogViewerService,
     UserResolve,
-    LogViewerLineValidationDirective
+    LogViewerLineValidationDirective,
+    DeploymentService,
+    DeploymentComponent
 } from './';
 
 @NgModule({
@@ -56,6 +59,7 @@ import {
         UserMgmtDeleteDialogComponent,
         LogsComponent,
         LogViewerComponent,
+        DeploymentComponent,
         JhiConfigurationComponent,
         HealthComponent,
         HealthModalComponent,
@@ -63,10 +67,20 @@ import {
         // JhiMetricsMonitoringComponent,
         // JhiMetricsMonitoringModalComponent,
         LogViewerLineValidationDirective,
-        SearchByNamePipe
+        SearchByNamePipe,
+        DeploymentSearchbyname
     ],
     entryComponents: [UserMgmtDeleteDialogComponent, HealthModalComponent],
-    providers: [AuditsService, JhiConfigurationService, HealthService, MetricsService, LogsService, LogViewerService, UserResolve],
+    providers: [
+        AuditsService,
+        JhiConfigurationService,
+        HealthService,
+        MetricsService,
+        LogsService,
+        LogViewerService,
+        DeploymentService,
+        UserResolve
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayAdminModule {}
