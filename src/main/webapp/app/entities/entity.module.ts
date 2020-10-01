@@ -16,7 +16,7 @@ import { GatewayBrokerModule } from './broker/broker.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
-import { FlowService } from '../../app/entities/flow';
+import { DeploymentService } from 'app/admin';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
@@ -34,7 +34,7 @@ import { FlowService } from '../../app/entities/flow';
         GatewayErrorEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
-        GatewayBrokerModule,        
+        GatewayBrokerModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
@@ -59,7 +59,7 @@ import { FlowService } from '../../app/entities/flow';
     ],
     declarations: [],
     entryComponents: [],
-    providers: [],
+    providers: [DeploymentService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayEntityModule {}

@@ -27,7 +27,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
         protected eventManager: JhiEventManager,
         protected accountService: AccountService,
         private router: Router,
-        private modalService: NgbModal,
+        private modalService: NgbModal
     ) {}
 
     loadAll() {
@@ -58,16 +58,16 @@ export class GatewayComponent implements OnInit, OnDestroy {
     registerChangeInGateways() {
         this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
     }
-    
+
     openModal(templateRef: TemplateRef<any>) {
         this.modalRef = this.modalService.open(templateRef);
     }
-    
+
     openRestartGatewayModal(templateRef: TemplateRef<any>) {
-        this.restartGatewayMessage = "";
+        this.restartGatewayMessage = '';
         this.modalRef = this.modalService.open(templateRef);
     }
-    
+
     cancelModal(): void {
         if (this.modalRef) {
             this.modalRef.dismiss();
@@ -75,36 +75,28 @@ export class GatewayComponent implements OnInit, OnDestroy {
         }
     }
 
-    downloadConfiguration(gateway: IGateway) {
-        this.flowService.exportGatewayConfiguration(gateway);
-    }
-
-    uploadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
-        this.eventManager.subscribe('gatewayListModification', res => this.reset());
-    }
-
     restartGateway(index: number) {
-
         this.gatewayService.stop(index).subscribe(
-           (res: HttpResponse<string>) => {
-               this.startGateway(index);
+            (res: HttpResponse<string>) => {
+                this.startGateway(index);
             },
             (res: HttpErrorResponse) => {
-                this.restartGatewayMessage = "Assimbly Gateway failed to stop: " + res.message;
-                this.onError(res.message)                
-            });
+                this.restartGatewayMessage = 'Assimbly Gateway failed to stop: ' + res.message;
+                this.onError(res.message);
+            }
+        );
     }
 
     startGateway(index: number) {
         this.gatewayService.start(index).subscribe(
-           (res: HttpResponse<string>) => {
-               this.restartGatewayMessage = "Assimbly Gateway is (re)started successful";
+            (res: HttpResponse<string>) => {
+                this.restartGatewayMessage = 'Assimbly Gateway is (re)started successful';
             },
             (res: HttpErrorResponse) => {
-                this.restartGatewayMessage = "Assimbly Gateway failed to start: " + res.message;
-                this.onError(res.message)
-            });
+                this.restartGatewayMessage = 'Assimbly Gateway failed to start: ' + res.message;
+                this.onError(res.message);
+            }
+        );
     }
 
     protected onError(errorMessage: string) {

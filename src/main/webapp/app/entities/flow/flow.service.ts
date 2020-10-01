@@ -5,15 +5,14 @@ import { Observable, Observer, Subscription } from 'rxjs';
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared';
 
-import { Router, NavigationEnd } from '@angular/router';
-import { WindowRef } from '../../shared/auth/window.service';
+import { Router } from '@angular/router';
+import { WindowRef } from 'app/shared';
 import { saveAs } from 'file-saver/FileSaver';
-import { IGateway, Gateway } from 'app/shared/model/gateway.model';
+import { IGateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
-import { tap } from 'rxjs/operators';
 import { CSRFService } from 'app/core';
 
 type EntityResponseType = HttpResponse<IFlow>;
@@ -68,7 +67,10 @@ export class FlowService {
     }
 
     getConfiguration(flowid: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, {headers: new HttpHeaders({PlaceholderReplacement:'true'}), observe: 'response' });
+        return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, {
+            headers: new HttpHeaders({ PlaceholderReplacement: 'true' }),
+            observe: 'response'
+        });
     }
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
@@ -171,7 +173,7 @@ export class FlowService {
             responseType: 'text'
         });
     }
-    
+
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
         const exportDate = this.getDate();
@@ -179,9 +181,9 @@ export class FlowService {
         this.http
             .get(url, {
                 headers: new HttpHeaders({
-                    Accept: 'application/xml', 
+                    Accept: 'application/xml',
                     'Content-Type': 'application/octet-stream',
-                    PlaceholderReplacement:'false'
+                    PlaceholderReplacement: 'false'
                 }),
                 observe: 'response',
                 responseType: 'blob'
@@ -204,7 +206,7 @@ export class FlowService {
                 headers: new HttpHeaders({
                     Accept: 'application/xml',
                     'Content-Type': 'application/octet-stream',
-                    PlaceholderReplacement:'false'    
+                    PlaceholderReplacement: 'false'
                 }),
                 observe: 'response',
                 responseType: 'blob'
@@ -241,13 +243,10 @@ export class FlowService {
         const headers = {};
         headers['X-XSRF-TOKEN'] = this.csrfService.getCSRF('XSRF-TOKEN');
 
-        this.stompClient.connect(
-            headers,
-            () => {
-                this.connectedPromise('success');
-                this.connectedPromise = null;
-            }
-        );
+        this.stompClient.connect(headers, () => {
+            this.connectedPromise('success');
+            this.connectedPromise = null;
+        });
     }
 
     disconnect() {
@@ -311,7 +310,7 @@ export class FlowService {
 
     private getDate() {
         const date = new Date();
-        let year = date.getFullYear();
+        const year = date.getFullYear();
 
         let month = (1 + date.getMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
