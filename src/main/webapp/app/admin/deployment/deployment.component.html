@@ -4,7 +4,7 @@
 <div class="form-group">
     <div class="row">
         <div class="col-12">
-            <h3>Gateways</h3>
+            <h2>Gateways</h2>
             <button (click)="uploadConfiguration()" class="btn btn-primary btn-sm" type="button">
                 <span class="fa fa-upload"></span>
                 <span class="d-none d-md-inline">Import Configuration (XML)</span>
@@ -13,8 +13,16 @@
                 <span class="fa fa-download"></span>
                 <span (click)="downloadConfiguration()" class="d-none d-md-inline">Export Configuration (XML)</span>
             </button>
-
-            <label class="mt-5 col-12 col-form-label">Select a gateway to see the flows.</label>
+            <h3 class="mt-3">Schedule Exports</h3>
+            <label class="col-12 col-form-label">Select a time interval to schedule exporting.</label>
+            <select class="form-control w-50">
+                <option selected>Once per day</option>
+                <option>Once per week</option>
+                <option>Once per month</option>
+            </select>
+            <hr>
+            <h2>Export Flows</h2>
+            <label class="col-12 col-form-label">Select a gateway to see the flows.</label>
             <select class="form-control w-50" (change)="getFlowsForSelectedGateway($event.target.value)">
                 <option disabled selected hidden>Choose a gateway</option>
                 <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
