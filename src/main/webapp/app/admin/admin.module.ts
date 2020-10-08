@@ -5,7 +5,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { SearchByNamePipe } from './log-viewer/log-viewer.searchbyname.pipe';
-import { DeploymentSearchbyname } from 'app/admin/deployment/deployment.searchbyname.pipe';
 
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
@@ -67,8 +66,7 @@ import {
         // JhiMetricsMonitoringComponent,
         // JhiMetricsMonitoringModalComponent,
         LogViewerLineValidationDirective,
-        SearchByNamePipe,
-        DeploymentSearchbyname
+        SearchByNamePipe
     ],
     entryComponents: [UserMgmtDeleteDialogComponent, HealthModalComponent],
     providers: [
