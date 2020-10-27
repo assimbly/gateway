@@ -15,16 +15,24 @@ import { FlowService } from 'app/entities/flow';
 export class DeploymentComponent implements OnInit {
     gateways: IGateway[] = [];
     flows: IFlow[];
+    frequencies: String[] = ['Never', 'Once a day', 'Once a week', 'Once a month'];
+    selectedFrequency: String = 'Never';
+    gatewayId: number;
     constructor(
         private router: Router,
         protected eventManager: JhiEventManager,
         protected gatewayService: GatewayService,
+        protected deploymentService: DeploymentService,
         protected jhiAlertService: JhiAlertService,
         protected flowService: FlowService
     ) {}
 
     ngOnInit(): void {
         this.loadAllGateways();
+    }
+
+    updateBackupFrequency(gatewayId, frequency) {
+        this.deploymentService.updateBackupFrequency(gatewayId, frequency);
     }
 
     loadAllGateways() {
