@@ -191,22 +191,6 @@ public class ConnectorResource {
    		}
     }
 
-
-    /**
-     * POST  /updatebackup : updates the backup frequency
-     *
-     * @param connectorId (by gatewayId)
-     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping connector failed
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @PostMapping(path = "/connector/{connectorId}/updatebackup", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> updateBackup(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,  @PathVariable Long connectorId, @RequestBody String frequency) throws Exception {
-        System.out.println("Runs.");
-        log.error("Runs..");
-        log.debug("Runs...");
-        return ResponseUtil.createSuccessResponse(connectorId, mediaType, "/connector/{connectorId}/updatebackup", "Backup frequency updated");
-    }
-
     /**
     * GET  /stop : stops connector.
     *
