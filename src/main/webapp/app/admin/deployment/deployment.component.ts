@@ -22,7 +22,6 @@ export class DeploymentComponent implements OnInit {
         private router: Router,
         protected eventManager: JhiEventManager,
         protected gatewayService: GatewayService,
-        protected deploymentService: DeploymentService,
         protected jhiAlertService: JhiAlertService,
         protected flowService: FlowService
     ) {}
@@ -32,7 +31,9 @@ export class DeploymentComponent implements OnInit {
     }
 
     updateBackupFrequency(gatewayId, frequency) {
-        this.deploymentService.updateBackupFrequency(gatewayId, frequency);
+        this.gatewayService.updateBackupFrequency(gatewayId, frequency).subscribe(res => {
+            console.log(res);
+        });
     }
 
     loadAllGateways() {
