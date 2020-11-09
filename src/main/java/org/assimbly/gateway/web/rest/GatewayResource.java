@@ -2,6 +2,7 @@ package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
 import org.assimbly.gateway.config.environment.BrokerManager;
+import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -17,6 +18,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -38,6 +41,9 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @RestController
 @RequestMapping("/api")
 public class GatewayResource {
+
+    @Autowired
+    private DBConfiguration DBConfiguration;
 
     private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
 
@@ -118,10 +124,12 @@ public class GatewayResource {
         return null;
     }
 
-    private void scheduleJob(Trigger trigger, int gatewayid) throws SchedulerException {
+    private void scheduleJob(Trigger trigger, int gatewayid, String url) throws SchedulerException {
         if (isCreated("" + gatewayid))
             scheduler.deleteJob(getJobKey("" + gatewayid));
         scheduler.getContext().put("gatewayid", gatewayid);
+        scheduler.getContext().put("database", DBConfiguration);
+        scheduler.getContext().put("url", url);
         scheduler.scheduleJob(JobBuilder.newJob(ExportConfigJob.class).withIdentity("" + gatewayid, "" + gatewayid).build(), trigger);
     }
 
@@ -132,30 +140,29 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping connector failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping(path = "/gateways/{gatewayid}/updatebackup", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> updateBackup(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @RequestBody String frequency) throws Exception {
+    @PostMapping(path = "/gateways/{gatewayid}/updatebackup/{frequency}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> updateBackup(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable String frequency, @RequestBody String url) throws Exception {
         if(!ran) {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             ran = true;
         }
-
         switch (frequency) {
             case "Once a day":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(05).repeatForever()).build(), Math.toIntExact(gatewayid));
+                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON-FRI *")).build(), Math.toIntExact(gatewayid), url);
                 break;
             case "Once a week":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(10).repeatForever()).build(), Math.toIntExact(gatewayid));
+                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON *")).build(), Math.toIntExact(gatewayid), url);
                 break;
             case "Once a month":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(15).repeatForever()).build(), Math.toIntExact(gatewayid));
+                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 1 1/1 ? *")).build(), Math.toIntExact(gatewayid), url);
                 break;
             default:
                 if (isCreated("" + gatewayid))
                     scheduler.deleteJob(getJobKey("" + gatewayid));
                 break;
             }
-        return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(gatewayid, mediaType, "/gateways/{gatewayid}/updatebackup", "Backup frequency updated");
+        return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(gatewayid, mediaType, "/gateways/{gatewayid}/updatebackup/{frequency}", "Backup frequency updated");
     }
 
     /**

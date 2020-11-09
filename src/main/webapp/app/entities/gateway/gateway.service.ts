@@ -53,12 +53,12 @@ export class GatewayService {
         return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
     }
 
-    updateBackupFrequency(gatewayid, frequency): Observable<any> {
+    updateBackupFrequency(gatewayid, frequency, url): Observable<any> {
         try {
             const options = {
                 headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
             };
-            return this.http.post(`${this.resourceUrl}/${gatewayid}/updatebackup`, frequency, options);
+            return this.http.post(`${this.resourceUrl}/${gatewayid}/updatebackup/${frequency}`, url, options);
         } catch (e) {
             console.log(e);
         }

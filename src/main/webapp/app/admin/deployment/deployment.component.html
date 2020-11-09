@@ -17,7 +17,7 @@
 
             <label class="col-12 col-form-label">Select a gateway to schedule the exports.</label>
             <select class="form-control w-50" [(ngModel)]="gatewayId">
-                <option disabled selected hidden>Choose a gateway</option>
+                <option [ngValue]="null" [disabled]="true" [hidden]="true" >Choose a gateway</option>
                 <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
             </select>
 
@@ -25,7 +25,10 @@
             <select class="form-control w-50" [(ngModel)]="selectedFrequency">
                 <option *ngFor="let frequency of frequencies" value="{{frequency}}">{{frequency}}</option>
             </select>
-            <input class="btn btn-primary mt-2" type="button" value="Save" (click)="updateBackupFrequency(gatewayId, selectedFrequency)"/>
+
+            <label class="col-12 col-form-label">Select a location where the configurations have to be saved to.</label>
+            <input [(ngModel)]="url" class="form-control w-50" type="text" placeholder="C:/user/documents/Assimbly/backups/"/>
+            <input class="btn btn-primary mt-2" type="button" value="Save" (click)="updateBackupFrequency(gatewayId, selectedFrequency, url)"/>
             <hr>
 
             <h2>Export Flows</h2>
