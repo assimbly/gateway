@@ -17,7 +17,8 @@ export class DeploymentComponent implements OnInit {
     flows: IFlow[];
     frequencies: String[] = ['Never', 'Once a day', 'Once a week', 'Once a month'];
     selectedFrequency: String = 'Never';
-    gatewayId: number;
+    gatewayId: number = null;
+    url: String;
     constructor(
         private router: Router,
         protected eventManager: JhiEventManager,
@@ -30,8 +31,8 @@ export class DeploymentComponent implements OnInit {
         this.loadAllGateways();
     }
 
-    updateBackupFrequency(gatewayId, frequency) {
-        this.gatewayService.updateBackupFrequency(gatewayId, frequency).subscribe(res => {
+    updateBackupFrequency(gatewayId, frequency, url) {
+        this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
             console.log(res);
         });
     }

@@ -6,20 +6,27 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Component;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@Component
 public class ExportConfigJob implements Job {
-    @Autowired
-    private DBConfiguration DBConfiguration;
+
     private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
-    private String configuration;
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
-            int gatewayid = (int) context.getScheduler().getContext().get("gatewayid");
-            long longValue = Long.valueOf(gatewayid);
-            configuration = DBConfiguration.convertDBToConfiguration(longValue, "json",false);
+            Files.write(Paths.get(context.getScheduler().getContext().get("url") + "" + LocalDateTime.now() + ".xml"), ((DBConfiguration) context.getScheduler().getContext().get("database")).convertDBToConfiguration((long) (int) context.getScheduler().getContext().get("gatewayid"), "xml",false).getBytes());
         } catch (Exception e) {
-            log.info(e.toString() + " this");
+            log.info("Exception in ExportConfigJob: " + e);
         }
     }
 }
