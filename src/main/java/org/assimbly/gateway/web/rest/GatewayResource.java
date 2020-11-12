@@ -148,13 +148,13 @@ public class GatewayResource {
             ran = true;
         }
         switch (frequency) {
-            case "Once a day":
+            case "Daily":
                 scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON-FRI *")).build(), Math.toIntExact(gatewayid), url);
                 break;
-            case "Once a week":
+            case "Weekly":
                 scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON *")).build(), Math.toIntExact(gatewayid), url);
                 break;
-            case "Once a month":
+            case "Monthly":
                 scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 1 1/1 ? *")).build(), Math.toIntExact(gatewayid), url);
                 break;
             default:

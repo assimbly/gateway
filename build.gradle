@@ -238,8 +238,6 @@ dependencies {
     if (!project.hasProperty("gae")) {
         implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
     }
-    // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
-    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
@@ -319,6 +317,8 @@ dependencies {
 	implementation "org.jdom:jdom2:2.0.6"
 	//implementation "io.hawt:hawtio-springboot:2.10.0"
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
+    // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
 
 	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.12.0'
 	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.12.0'

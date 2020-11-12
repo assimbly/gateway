@@ -15,7 +15,7 @@ import { FlowService } from 'app/entities/flow';
 export class DeploymentComponent implements OnInit {
     gateways: IGateway[] = [];
     flows: IFlow[];
-    frequencies: String[] = ['Never', 'Once a day', 'Once a week', 'Once a month'];
+    frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
     selectedFrequency: String = 'Never';
     gatewayId: number = null;
     url: String;
