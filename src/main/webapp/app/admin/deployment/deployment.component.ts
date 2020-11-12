@@ -15,6 +15,10 @@ import { FlowService } from 'app/entities/flow';
 export class DeploymentComponent implements OnInit {
     gateways: IGateway[] = [];
     flows: IFlow[];
+    frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
+    selectedFrequency: String = 'Never';
+    gatewayId: number = null;
+    url: String;
     constructor(
         private router: Router,
         protected eventManager: JhiEventManager,
@@ -25,6 +29,12 @@ export class DeploymentComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadAllGateways();
+    }
+
+    updateBackupFrequency(gatewayId, frequency, url) {
+        this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
+            console.log(res);
+        });
     }
 
     loadAllGateways() {
