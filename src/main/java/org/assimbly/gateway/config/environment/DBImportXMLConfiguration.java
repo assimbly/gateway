@@ -177,7 +177,7 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
-		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);
+		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);		
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
 
@@ -285,9 +285,9 @@ public class DBImportXMLConfiguration {
 		System.out.println("id=" + id);
 		
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String fromUri = xPath.evaluate("//flows/flow[id='" + id + "']/from/uri", doc);
-		String fromServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/from/service_id", doc);
-		String fromHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/from/header_id", doc);
+		String fromUri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='from']/uri", doc);
+		String fromServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='from']/service_id", doc);
+		String fromHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='from']/header_id", doc);
 		String fromOptions = null;
 
 		// get type
@@ -303,7 +303,7 @@ public class DBImportXMLConfiguration {
 		}
 
 		// get options
-		Map<String, String> fromOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/from/options/*");
+		Map<String, String> fromOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[type='from']/options/*");
 
 		for (Map.Entry<String, String> entry : fromOptionsMap.entrySet()) {
 
@@ -373,7 +373,7 @@ public class DBImportXMLConfiguration {
 		if (newFlow) {
 			toEndpoints = new HashSet<ToEndpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfToEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/to)", doc));
+			int numberOfToEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint[type='to'])", doc));
 			numberOfToEndpoints = numberOfToEndpoints + 1;
 
 			for (int i = 1; i < numberOfToEndpoints; i++) {
@@ -403,9 +403,9 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String toUri = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/uri", doc);
-		String toServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/service_id", doc);
-		String toHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/header_id", doc);
+		String toUri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/uri", doc);
+		String toServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/service_id", doc);
+		String toHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/header_id", doc);
 		String toOptions = null;
 
 		// get type
@@ -423,7 +423,7 @@ public class DBImportXMLConfiguration {
 		}
 
 		// get options
-		Map<String, String> toOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/to/options/*");
+		Map<String, String> toOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[type='to']/options/*");
 
 		for (Map.Entry<String, String> entry : toOptionsMap.entrySet()) {
 
@@ -494,9 +494,9 @@ public class DBImportXMLConfiguration {
 	private ErrorEndpoint getErrorEndpointFromXML(String id, Document doc, ErrorEndpoint errorEndpoint)	throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String errorUri = xPath.evaluate("//flows/flow[id='" + id + "']/error/uri", doc);
-		String errorServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/error/service_id", doc);
-		String errorHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/error/header_id", doc);
+		String errorUri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='error']/uri", doc);
+		String errorServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to']/service_id", doc);
+		String errorHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to']/header_id", doc);
 		String errorOptions = null;
 
 		// get type
@@ -514,7 +514,7 @@ public class DBImportXMLConfiguration {
 
 		// get options
 
-		Map<String, String> errorOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/error/options/*");
+		Map<String, String> errorOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[type='to']/options/*");
 
 		for (Map.Entry<String, String> entry : errorOptionsMap.entrySet()) {
 

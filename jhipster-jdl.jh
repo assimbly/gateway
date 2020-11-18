@@ -29,21 +29,10 @@ entity Flow {
 	lastModified Instant			
 }
 
-entity FromEndpoint {
-	type EndpointType,
-    uri String,
-    options String
-}
-
-entity ToEndpoint {
-	type EndpointType,
-    uri String,
-    options String
-}
-
-entity ErrorEndpoint {
-	type EndpointType,
-    uri String,
+entity Endpoint {
+	compponentType ComponentType,
+    type String,
+	uri String,	
     options String
 }
 
@@ -108,7 +97,7 @@ enum ConnectorType {
     CAMEL,SPRINGINTEGRATION,CURL
 }
 
-enum EndpointType {
+enum ComponentType {
    ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
 }
 
@@ -141,16 +130,12 @@ relationship OneToMany {
 }
 
 relationship ManyToOne {
-	FromEndpoint{service} to Service,
-    ToEndpoint{service} to Service,
-    ErrorEndpoint{service} to Service
+	Endpoint{service} to Service,
     WireTapEndpoint{service} to Service	
 }
 
 relationship ManyToOne {
-	FromEndpoint{header} to Header,
-    ToEndpoint{header} to Header,
-    ErrorEndpoint{header} to Header
+	Endpoint{header} to Header,
     WireTapEndpoint{header} to Header
 }
 
