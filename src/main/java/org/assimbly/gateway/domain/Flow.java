@@ -79,7 +79,7 @@ public class Flow implements Serializable {
  
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
-    private Set<ToEndpoint> toEndpoints = new HashSet<>();
+    private Set<Endpoint> endpoints = new HashSet<>();
     
     /*
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
@@ -291,29 +291,29 @@ public class Flow implements Serializable {
         this.errorEndpoint = errorEndpoint;
     }
 
-    public Set<ToEndpoint> getToEndpoints() {
-        return toEndpoints;
+    public Set<Endpoint> getEndpoints() {
+        return endpoints;
     }
 
-    public Flow toEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public Flow endpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
         return this;
     }
 
-    public Flow addToEndpoint(ToEndpoint toEndpoint) {
-        this.toEndpoints.add(toEndpoint);
-        toEndpoint.setFlow(this);
+    public Flow addEndpoint(Endpoint endpoint) {
+        this.endpoints.add(endpoint);
+        endpoint.setFlow(this);
         return this;
     }
 
-    public Flow removeToEndpoint(ToEndpoint toEndpoint) {
-        this.toEndpoints.remove(toEndpoint);
-        toEndpoint.setFlow(null);
+    public Flow removeEndpoint(Endpoint endpoint) {
+        this.endpoints.remove(endpoint);
+        endpoint.setFlow(null);
         return this;
     }
 
-    public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public void setEndpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

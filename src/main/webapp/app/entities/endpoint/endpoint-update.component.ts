@@ -4,8 +4,8 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { JhiAlertService } from 'ng-jhipster';
 
-import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
-import { ToEndpointService } from './to-endpoint.service';
+import { IEndpoint } from 'app/shared/model/endpoint.model';
+import { EndpointService } from './endpoint.service';
 import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow';
 import { IService } from 'app/shared/model/service.model';
@@ -14,11 +14,11 @@ import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from 'app/entities/header';
 
 @Component({
-    selector: 'jhi-to-endpoint-update',
-    templateUrl: './to-endpoint-update.component.html'
+    selector: 'jhi-endpoint-update',
+    templateUrl: './endpoint-update.component.html'
 })
-export class ToEndpointUpdateComponent implements OnInit {
-    toEndpoint: IToEndpoint;
+export class EndpointUpdateComponent implements OnInit {
+    endpoint: IEndpoint;
     isSaving: boolean;
 
     flows: IFlow[];
@@ -29,7 +29,7 @@ export class ToEndpointUpdateComponent implements OnInit {
 
     constructor(
         protected jhiAlertService: JhiAlertService,
-        protected toEndpointService: ToEndpointService,
+        protected endpointService: EndpointService,
         protected flowService: FlowService,
         protected serviceService: ServiceService,
         protected headerService: HeaderService,
@@ -38,8 +38,8 @@ export class ToEndpointUpdateComponent implements OnInit {
 
     ngOnInit() {
         this.isSaving = false;
-        this.activatedRoute.data.subscribe(({ toEndpoint }) => {
-            this.toEndpoint = toEndpoint;
+        this.activatedRoute.data.subscribe(({ endpoint }) => {
+            this.endpoint = endpoint;
         });
         this.flowService.query().subscribe(
             (res: HttpResponse<IFlow[]>) => {
@@ -47,12 +47,12 @@ export class ToEndpointUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.serviceService.query({ filter: 'toendpoint-is-null' }).subscribe(
+        this.serviceService.query({ filter: 'endpoint-is-null' }).subscribe(
             (res: HttpResponse<IService[]>) => {
-                if (!this.toEndpoint.serviceId) {
+                if (!this.endpoint.serviceId) {
                     this.services = res.body;
                 } else {
-                    this.serviceService.find(this.toEndpoint.serviceId).subscribe(
+                    this.serviceService.find(this.endpoint.serviceId).subscribe(
                         (subRes: HttpResponse<IService>) => {
                             this.services = [subRes.body].concat(res.body);
                         },
@@ -62,12 +62,12 @@ export class ToEndpointUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.headerService.query({ filter: 'toendpoint-is-null' }).subscribe(
+        this.headerService.query({ filter: 'endpoint-is-null' }).subscribe(
             (res: HttpResponse<IHeader[]>) => {
-                if (!this.toEndpoint.headerId) {
+                if (!this.endpoint.headerId) {
                     this.headers = res.body;
                 } else {
-                    this.headerService.find(this.toEndpoint.headerId).subscribe(
+                    this.headerService.find(this.endpoint.headerId).subscribe(
                         (subRes: HttpResponse<IHeader>) => {
                             this.headers = [subRes.body].concat(res.body);
                         },
@@ -85,15 +85,15 @@ export class ToEndpointUpdateComponent implements OnInit {
 
     save() {
         this.isSaving = true;
-        if (this.toEndpoint.id !== undefined) {
-            this.subscribeToSaveResponse(this.toEndpointService.update(this.toEndpoint));
+        if (this.endpoint.id !== undefined) {
+            this.subscribeToSaveResponse(this.endpointService.update(this.endpoint));
         } else {
-            this.subscribeToSaveResponse(this.toEndpointService.create(this.toEndpoint));
+            this.subscribeToSaveResponse(this.endpointService.create(this.endpoint));
         }
     }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<IToEndpoint>>) {
-        result.subscribe((res: HttpResponse<IToEndpoint>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+    protected subscribeToSaveResponse(result: Observable<HttpResponse<IEndpoint>>) {
+        result.subscribe((res: HttpResponse<IEndpoint>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
 
     protected onSaveSuccess() {

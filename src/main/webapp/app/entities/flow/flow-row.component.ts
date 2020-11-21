@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { IToEndpoint, ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
 import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 
 import { FlowService } from './flow.service';
 import { FromEndpointService } from '../from-endpoint';
-import { ToEndpointService } from '../to-endpoint';
+import { EndpointService } from '../endpoint';
 import { ErrorEndpointService } from '../error-endpoint';
 import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
@@ -40,7 +40,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     @Input() isAdmin: boolean;
 
     fromEndpoint: FromEndpoint = new FromEndpoint();
-    toEndpoints: Array<ToEndpoint> = [new ToEndpoint()];
+    toEndpoints: Array<Endpoint> = [new Endpoint()];
     errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
 
     public isFlowStarted: boolean;
@@ -94,7 +94,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     constructor(
         private flowService: FlowService,
         private fromEndpointService: FromEndpointService,
-        private toEndpointService: ToEndpointService,
+        private endpointService: EndpointService,
         private errorEndpointService: ErrorEndpointService,
         private securityService: SecurityService,
         private loginModalService: LoginModalService,
@@ -120,7 +120,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.setFlowStatusDefaults();
         this.getStatus(this.flow.id);
 
-        this.toEndpoints = this.flow.toEndpoints;
+        this.toEndpoints = this.flow.endpoints;
         this.getFromEndpoint(this.flow.fromEndpointId);
         this.getToEndpoint();
 

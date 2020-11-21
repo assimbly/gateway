@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.time.Instant;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 /**
@@ -46,7 +46,7 @@ public class FlowDTO implements Serializable {
 
     private Long errorEndpointId;
     
-    private Set<ToEndpoint> toEndpoints;
+    private Set<Endpoint> endpoints;
 
     public Long getId() {
         return id;
@@ -177,12 +177,12 @@ public class FlowDTO implements Serializable {
         this.errorEndpointId = errorEndpointId;
     }
 
-    public Set<ToEndpoint> getToEndpoints() {
-        return toEndpoints;
+    public Set<Endpoint> getEndpoints() {
+        return endpoints;
     }
  
-    public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public void setEndpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
     }   
     
     @Override

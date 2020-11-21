@@ -4,24 +4,24 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
-import { ToEndpointService } from 'app/entities/to-endpoint/to-endpoint.service';
-import { IToEndpoint, ToEndpoint, EndpointType } from 'app/shared/model/to-endpoint.model';
+import { EndpointService } from 'app/entities/endpoint/endpoint.service';
+import { IEndpoint, Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
 
 describe('Service Tests', () => {
-    describe('ToEndpoint Service', () => {
+    describe('Endpoint Service', () => {
         let injector: TestBed;
-        let service: ToEndpointService;
+        let service: EndpointService;
         let httpMock: HttpTestingController;
-        let elemDefault: IToEndpoint;
+        let elemDefault: IEndpoint;
         beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [HttpClientTestingModule]
             });
             injector = getTestBed();
-            service = injector.get(ToEndpointService);
+            service = injector.get(EndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new ToEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new Endpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {
@@ -36,7 +36,7 @@ describe('Service Tests', () => {
                 req.flush(JSON.stringify(returnedFromService));
             });
 
-            it('should create a ToEndpoint', async () => {
+            it('should create a Endpoint', async () => {
                 const returnedFromService = Object.assign(
                     {
                         id: 0
@@ -45,14 +45,14 @@ describe('Service Tests', () => {
                 );
                 const expected = Object.assign({}, returnedFromService);
                 service
-                    .create(new ToEndpoint(null))
+                    .create(new Endpoint(null))
                     .pipe(take(1))
                     .subscribe(resp => expect(resp).toMatchObject({ body: expected }));
                 const req = httpMock.expectOne({ method: 'POST' });
                 req.flush(JSON.stringify(returnedFromService));
             });
 
-            it('should update a ToEndpoint', async () => {
+            it('should update a Endpoint', async () => {
                 const returnedFromService = Object.assign(
                     {
                         type: 'BBBBBB',
@@ -71,7 +71,7 @@ describe('Service Tests', () => {
                 req.flush(JSON.stringify(returnedFromService));
             });
 
-            it('should return a list of ToEndpoint', async () => {
+            it('should return a list of Endpoint', async () => {
                 const returnedFromService = Object.assign(
                     {
                         type: 'BBBBBB',
@@ -93,7 +93,7 @@ describe('Service Tests', () => {
                 httpMock.verify();
             });
 
-            it('should delete a ToEndpoint', async () => {
+            it('should delete a Endpoint', async () => {
                 const rxPromise = service.delete(123).subscribe(resp => expect(resp.ok));
 
                 const req = httpMock.expectOne({ method: 'DELETE' });

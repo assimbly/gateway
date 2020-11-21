@@ -3,30 +3,30 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { AccountService } from 'app/core';
-import { ToEndpointService } from './to-endpoint.service';
+import { EndpointService } from './endpoint.service';
 
 @Component({
-    selector: 'jhi-to-endpoint',
-    templateUrl: './to-endpoint.component.html'
+    selector: 'jhi-endpoint',
+    templateUrl: './endpoint.component.html'
 })
-export class ToEndpointComponent implements OnInit, OnDestroy {
-    toEndpoints: IToEndpoint[];
+export class EndpointComponent implements OnInit, OnDestroy {
+    endpoints: IEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
     constructor(
-        protected toEndpointService: ToEndpointService,
+        protected endpointService: EndpointService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
     ) {}
 
     loadAll() {
-        this.toEndpointService.query().subscribe(
-            (res: HttpResponse<IToEndpoint[]>) => {
-                this.toEndpoints = res.body;
+        this.endpointService.query().subscribe(
+            (res: HttpResponse<IEndpoint[]>) => {
+                this.endpoints = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -37,19 +37,19 @@ export class ToEndpointComponent implements OnInit, OnDestroy {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
-        this.registerChangeInToEndpoints();
+        this.registerChangeInEndpoints();
     }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: IToEndpoint) {
+    trackId(index: number, item: IEndpoint) {
         return item.id;
     }
 
-    registerChangeInToEndpoints() {
-        this.eventSubscriber = this.eventManager.subscribe('toEndpointListModification', response => this.loadAll());
+    registerChangeInEndpoints() {
+        this.eventSubscriber = this.eventManager.subscribe('endpointListModification', response => this.loadAll());
     }
 
     protected onError(errorMessage: string) {

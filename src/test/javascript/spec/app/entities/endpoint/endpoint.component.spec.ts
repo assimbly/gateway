@@ -4,28 +4,28 @@ import { Observable, of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ToEndpointComponent } from 'app/entities/to-endpoint/to-endpoint.component';
-import { ToEndpointService } from 'app/entities/to-endpoint/to-endpoint.service';
-import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { EndpointComponent } from 'app/entities/endpoint/endpoint.component';
+import { EndpointService } from 'app/entities/endpoint/endpoint.service';
+import { Endpoint } from 'app/shared/model/endpoint.model';
 
 describe('Component Tests', () => {
-    describe('ToEndpoint Management Component', () => {
-        let comp: ToEndpointComponent;
-        let fixture: ComponentFixture<ToEndpointComponent>;
-        let service: ToEndpointService;
+    describe('Endpoint Management Component', () => {
+        let comp: EndpointComponent;
+        let fixture: ComponentFixture<EndpointComponent>;
+        let service: EndpointService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ToEndpointComponent],
+                declarations: [EndpointComponent],
                 providers: []
             })
-                .overrideTemplate(ToEndpointComponent, '')
+                .overrideTemplate(EndpointComponent, '')
                 .compileComponents();
 
-            fixture = TestBed.createComponent(ToEndpointComponent);
+            fixture = TestBed.createComponent(EndpointComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(ToEndpointService);
+            service = fixture.debugElement.injector.get(EndpointService);
         });
 
         it('Should call load all on init', () => {
@@ -34,7 +34,7 @@ describe('Component Tests', () => {
             spyOn(service, 'query').and.returnValue(
                 of(
                     new HttpResponse({
-                        body: [new ToEndpoint(123)],
+                        body: [new Endpoint(123)],
                         headers
                     })
                 )
@@ -45,7 +45,7 @@ describe('Component Tests', () => {
 
             // THEN
             expect(service.query).toHaveBeenCalled();
-            expect(comp.toEndpoints[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+            expect(comp.endpoints[0]).toEqual(jasmine.objectContaining({ id: 123 }));
         });
     });
 });

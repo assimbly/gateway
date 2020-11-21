@@ -17,7 +17,7 @@
     <include file="config/liquibase/changelog/20200212091700_added_entity_Gateway.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212091800_added_entity_EnvironmentVariables.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092000_added_entity_FromEndpoint.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20200212092100_added_entity_ToEndpoint.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200212092100_added_entity_Endpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092200_added_entity_ErrorEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092300_added_entity_WireTapEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092400_added_entity_Service.xml" relativeToChangelogFile="false"/>
@@ -32,7 +32,7 @@
     <include file="config/liquibase/changelog/20200212091700_added_entity_constraints_Gateway.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212091800_added_entity_constraints_EnvironmentVariables.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092000_added_entity_constraints_FromEndpoint.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20200212092100_added_entity_constraints_ToEndpoint.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200212092100_added_entity_constraints_Endpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092200_added_entity_constraints_ErrorEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092300_added_entity_constraints_WireTapEndpoint.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092500_added_entity_constraints_ServiceKeys.xml" relativeToChangelogFile="false"/>

@@ -14,7 +14,7 @@ import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.domain.WireTapEndpoint;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
@@ -58,7 +58,7 @@ public class DBExportXMLConfiguration {
 
 	private ErrorEndpoint errorEndpoint;
 
-	private Set<ToEndpoint> toEndpoints;
+	private Set<Endpoint> endpoints;
 
 	public String xmlConfiguration;
 	private Element rootElement;
@@ -128,7 +128,7 @@ public class DBExportXMLConfiguration {
 		// check if endpoints are configured
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
+		if (fromEndpoint == null || endpoints == null || errorEndpoint == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
@@ -143,7 +143,7 @@ public class DBExportXMLConfiguration {
 
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
+		if (fromEndpoint == null || endpoints == null || errorEndpoint == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
@@ -159,7 +159,7 @@ public class DBExportXMLConfiguration {
 
 		fromEndpoint = flow.getFromEndpoint();
 		errorEndpoint = flow.getErrorEndpoint();
-		toEndpoints = flow.getToEndpoints();
+		endpoints = flow.getEndpoints();
 
 	}
 
@@ -302,7 +302,7 @@ public class DBExportXMLConfiguration {
 		setXMLFromEndpointFromDB(fromEndpoint);
 
 		System.out.println("Set to endpoint");
-		setEndpointsFromDB(toEndpoints);
+		setEndpointsFromDB(endpoints);
 
 		System.out.println("Set error endpoint");
 		setXMLErrorEndpointFromDB(errorEndpoint);
@@ -488,9 +488,9 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setEndpointsFromDB(Set<ToEndpoint> endpointsDB) throws Exception {
+	public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
 
-		for (ToEndpoint endpointDB : endpointsDB) {
+		for (Endpoint endpointDB : endpointsDB) {
 
 			String confId = Long.toString(endpointDB.getId());
 			String confUri = endpointDB.getUri();

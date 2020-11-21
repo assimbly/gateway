@@ -5,7 +5,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
 import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-endpoint.module';
-import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
+import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
 import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
@@ -38,7 +38,7 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     imports: [
         GatewaySharedModule,
         GatewayFromEndpointModule,
-        GatewayToEndpointModule,
+        GatewayEndpointModule,
         GatewayErrorEndpointModule,
         GatewayServiceModule,
         GatewaySecurityModule,

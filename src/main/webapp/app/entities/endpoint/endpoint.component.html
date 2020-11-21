@@ -1,16 +1,14 @@
 <div>
     <h2 id="page-heading">
-        <span>To Endpoints</span>
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-to-endpoint" [routerLink]="['/to-endpoint/new']">
+        <span>Endpoints</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-endpoint" [routerLink]="['/endpoint/new']">
             <fa-icon [icon]="'plus'"></fa-icon>
-            <span >
-            Create To Endpoint
-            </span>
+            <span>Create Endpoint</span>
         </button>
     </h2>
     <jhi-alert></jhi-alert>
     <br/>
-    <div class="table-responsive" *ngIf="toEndpoints">
+    <div class="table-responsive" *ngIf="endpoints">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -25,42 +23,42 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let toEndpoint of toEndpoints ;trackBy: trackId">
-                <td><a [routerLink]="['/to-endpoint', toEndpoint.id, 'view' ]">{{toEndpoint.id}}</a></td>
-                <td>{{toEndpoint.type}}</td>
-                <td>{{toEndpoint.uri}}</td>
-                <td>{{toEndpoint.options}}</td>
+            <tr *ngFor="let endpoint of endpoints ;trackBy: trackId">
+                <td><a [routerLink]="['/endpoint', endpoint.id, 'view' ]">{{endpoint.id}}</a></td>
+                <td>{{endpoint.type}}</td>
+                <td>{{endpoint.uri}}</td>
+                <td>{{endpoint.options}}</td>
                 <td>
-                    <div *ngIf="toEndpoint.flowId">
-                        <a [routerLink]="['../flow', toEndpoint.flowId , 'view' ]" >{{toEndpoint.flowId}}</a>
+                    <div *ngIf="endpoint.flowId">
+                        <a [routerLink]="['../flow', endpoint.flowId , 'view' ]" >{{endpoint.flowId}}</a>
                     </div>
                 </td>
                 <td>
-                    <div *ngIf="toEndpoint.serviceId">
-                        <a [routerLink]="['../service', toEndpoint.serviceId , 'view' ]" >{{toEndpoint.serviceId}}</a>
+                    <div *ngIf="endpoint.serviceId">
+                        <a [routerLink]="['../service', endpoint.serviceId , 'view' ]" >{{endpoint.serviceId}}</a>
                     </div>
                 </td>
                 <td>
-                    <div *ngIf="toEndpoint.headerId">
-                        <a [routerLink]="['../header', toEndpoint.headerId , 'view' ]" >{{toEndpoint.headerId}}</a>
+                    <div *ngIf="endpoint.headerId">
+                        <a [routerLink]="['../header', endpoint.headerId , 'view' ]" >{{endpoint.headerId}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['/to-endpoint', toEndpoint.id, 'view' ]"
+                                [routerLink]="['/endpoint', endpoint.id, 'view' ]"
                                 class="btn btn-info btn-sm">
                             <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/to-endpoint', toEndpoint.id, 'edit']"
+                                [routerLink]="['/endpoint', endpoint.id, 'edit']"
                                 class="btn btn-primary btn-sm">
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline">Edit</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'to-endpoint/'+ toEndpoint.id + '/delete'} }]"
+                                [routerLink]="['/', { outlets: { popup: 'endpoint/'+ endpoint.id + '/delete'} }]"
                                 replaceUrl="true"
                                 queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">

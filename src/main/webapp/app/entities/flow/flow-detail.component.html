@@ -83,48 +83,48 @@
             </ng-template>
         </ngb-tab>
 
-        <ngb-tab title="To ({{toIndex+1}})" id="toTab{{toIndex}}" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
+        <ngb-tab title="Endpoint ({{endpointIndex+1}})" id="endpointTab{{endpointIndex}}" *ngFor="let endpoint of endpoints; index as endpointIndex">
             <ng-template ngbTabContent>
                 <jhi-alert-error></jhi-alert-error>
                 <div row id="tabBackground">
                     <table class="table table-sm">
-                        <tbody *ngIf="!!toEndpoint">
+                        <tbody *ngIf="!!endpoint">
                             <tr>
                                 <th class="detailsTable">ID</th>
                                 <td class="detailsTable">
-                                    <a [routerLink]="['/to-endpoint', toEndpoint.id]">{{toEndpoint.id}}</a>
+                                    <a [routerLink]="['/endpoint', endpoint.id]">{{endpoint.id}}</a>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Type</th>
                                 <td>
-                                    {{toEndpoint.type}}
+                                    {{endpoint.type}}
                                     <span class="float-right">
-                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{toTypeAssimblyLinks[toIndex]}}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
-                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm flow-assimbly-button" href="{{toTypeCamelLinks[toIndex]}}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
+                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{endpointTypeAssimblyLinks[endpointIndex]}}" target="_blank" title="Assimbly {{errorEndpoint?.type}} component documentation"><span class="fa fa-question"></span></a>
+                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm flow-assimbly-button" href="{{endpointTypeCamelLinks[endpointIndex]}}" target="_blank" title="Camel {{errorEndpoint?.type}} component documentation">
                                         </a>
                                     </span>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Uri</th>
-                                <td>{{toEndpoint.uri}}</td>
+                                <td>{{endpoint.uri}}</td>
                             </tr>
                             <tr>
                                 <th>Options</th>
-                                <td>{{toEndpoint.options}}</td>
+                                <td>{{endpoint.options}}</td>
                             </tr>
                             <tr [style.display]="'none'">
                                 <th>Flow</th>
-                                <td>{{toEndpoint.flowId}}</td>
+                                <td>{{endpoint.flowId}}</td>
                             </tr>
                             <tr>
                                 <th>Service</th>
-                                <td>{{toEndpoint.serviceId}}</td>
+                                <td>{{endpoint.serviceId}}</td>
                             </tr>
                             <tr>
                                 <th class="lastItemBorder">Header</th>
-                                <td class="lastItemBorder">{{toEndpoint.headerId}}</td>
+                                <td class="lastItemBorder">{{endpoint.headerId}}</td>
                             </tr>
                         </tbody>
                     </table>

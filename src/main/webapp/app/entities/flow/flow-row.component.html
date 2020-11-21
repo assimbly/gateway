@@ -28,7 +28,7 @@
 					</button>
 					<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-secondary':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
 					   type="button" (click)="pause()" class="btn btn-sm" [disabled]="!isFlowPaused && isFlowStopped || disableActionBtns" *ngIf="!isFlowPaused">
-						<span class="fa fa-pause"></span></span>
+						<span class="fa fa-pause"></span>
 					</button>
 					<button [ngClass]="{'btn-primary': statusFlow === 'inactive', 'btn-success':statusFlow === 'active', 'btn-secondary':statusFlow === 'paused', 'btn-danger':statusFlow === 'inactiveError' }"
 					    type="button" (click)="resume()" class="btn btn-sm" [disabled]="disableActionBtns" *ngIf="!isFlowResumed">
