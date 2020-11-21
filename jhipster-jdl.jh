@@ -31,15 +31,10 @@ entity Flow {
 
 entity Endpoint {
 	compponentType ComponentType,
-    type String,
+	endpointType Endpoint
 	uri String,	
-    options String
-}
-
-entity WireTapEndpoint {
-	type EndpointType,
-    uri String,
-    options String
+    options String,
+    reply Boolean   
 }
 
 entity Service {
@@ -84,7 +79,6 @@ entity Broker {
 	configuration String,
 }
 
-
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP
 }
@@ -117,26 +111,16 @@ relationship OneToMany {
 	Gateway{environmentVariables} to EnvironmentVariables
 }
 
-relationship OneToOne {
-	Flow{fromEndpoint} to FromEndpoint
-}
-
-relationship OneToOne {
-	Flow{errorEndpoint} to ErrorEndpoint
-}
-
 relationship OneToMany {
 	Flow{endpoint} to endpoint
 }
 
 relationship ManyToOne {
 	Endpoint{service} to Service,
-    WireTapEndpoint{service} to Service	
 }
 
 relationship ManyToOne {
 	Endpoint{header} to Header,
-    WireTapEndpoint{header} to Header
 }
 
 relationship OneToMany {
