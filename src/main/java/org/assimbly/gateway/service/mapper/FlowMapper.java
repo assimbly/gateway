@@ -18,8 +18,8 @@ public interface FlowMapper extends EntityMapper<FlowDTO, Flow> {
 
     @Mapping(source = "fromEndpointId", target = "fromEndpoint")
     @Mapping(source = "errorEndpointId", target = "errorEndpoint")
-    @Mapping(target = "toEndpoints", ignore = true)
-    @Mapping(target = "removeToEndpoint", ignore = true)
+    @Mapping(target = "endpoints", ignore = true)
+    @Mapping(target = "removeEndpoint", ignore = true)
     @Mapping(source = "gatewayId", target = "gateway")
     Flow toEntity(FlowDTO flowDTO);
 

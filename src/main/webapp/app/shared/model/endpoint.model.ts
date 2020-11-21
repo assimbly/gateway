@@ -13,7 +13,7 @@ export const enum EndpointType {
     WASTEBIN = 'WASTEBIN'
 }
 
-export interface IToEndpoint {
+export interface IEndpoint {
     id?: number;
     type?: EndpointType;
     uri?: string;
@@ -23,7 +23,7 @@ export interface IToEndpoint {
     headerId?: number;
 }
 
-export class ToEndpoint implements IToEndpoint {
+export class Endpoint implements IEndpoint {
     constructor(
         public id?: number,
         public type?: EndpointType,

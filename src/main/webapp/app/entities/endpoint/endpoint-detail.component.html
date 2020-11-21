@@ -1,38 +1,38 @@
 <div class="row justify-content-center">
     <div class="col-8">
-        <div *ngIf="toEndpoint">
-            <h2><span>To Endpoint</span> {{toEndpoint.id}}</h2>
+        <div *ngIf="endpoint">
+            <h2><span>Endpoint</span> {{endpoint.id}}</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
                 <dt><span>Type</span></dt>
                 <dd>
-                    <span>{{toEndpoint.type}}</span>
+                    <span>{{endpoint.type}}</span>
                 </dd>
                 <dt><span>Uri</span></dt>
                 <dd>
-                    <span>{{toEndpoint.uri}}</span>
+                    <span>{{endpoint.uri}}</span>
                 </dd>
                 <dt><span>Options</span></dt>
                 <dd>
-                    <span>{{toEndpoint.options}}</span>
+                    <span>{{endpoint.options}}</span>
                 </dd>
                 <dt><span>Flow</span></dt>
                 <dd>
-                    <div *ngIf="toEndpoint.flowId">
-                        <a [routerLink]="['/flow', toEndpoint.flowId, 'view']">{{toEndpoint.flowId}}</a>
+                    <div *ngIf="endpoint.flowId">
+                        <a [routerLink]="['/flow', endpoint.flowId, 'view']">{{endpoint.flowId}}</a>
                     </div>
                 </dd>
                 <dt><span>Service</span></dt>
                 <dd>
-                    <div *ngIf="toEndpoint.serviceId">
-                        <a [routerLink]="['/service', toEndpoint.serviceId, 'view']">{{toEndpoint.serviceId}}</a>
+                    <div *ngIf="endpoint.serviceId">
+                        <a [routerLink]="['/service', endpoint.serviceId, 'view']">{{endpoint.serviceId}}</a>
                     </div>
                 </dd>
                 <dt><span>Header</span></dt>
                 <dd>
-                    <div *ngIf="toEndpoint.headerId">
-                        <a [routerLink]="['/header', toEndpoint.headerId, 'view']">{{toEndpoint.headerId}}</a>
+                    <div *ngIf="endpoint.headerId">
+                        <a [routerLink]="['/header', endpoint.headerId, 'view']">{{endpoint.headerId}}</a>
                     </div>
                 </dd>
             </dl>
@@ -44,7 +44,7 @@
             </button>
 
             <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
-                    [routerLink]="['/to-endpoint', toEndpoint.id, 'edit']"
+                    [routerLink]="['/endpoint', endpoint.id, 'edit']"
                     class="btn btn-primary">
                 <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
             </button>

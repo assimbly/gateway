@@ -4,24 +4,24 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ToEndpointDetailComponent } from 'app/entities/to-endpoint/to-endpoint-detail.component';
-import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { EndpointDetailComponent } from 'app/entities/endpoint/endpoint-detail.component';
+import { Endpoint } from 'app/shared/model/endpoint.model';
 
 describe('Component Tests', () => {
-    describe('ToEndpoint Management Detail Component', () => {
-        let comp: ToEndpointDetailComponent;
-        let fixture: ComponentFixture<ToEndpointDetailComponent>;
-        const route = ({ data: of({ toEndpoint: new ToEndpoint(123) }) } as any) as ActivatedRoute;
+    describe('Endpoint Management Detail Component', () => {
+        let comp: EndpointDetailComponent;
+        let fixture: ComponentFixture<EndpointDetailComponent>;
+        const route = ({ data: of({ endpoint: new Endpoint(123) }) } as any) as ActivatedRoute;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ToEndpointDetailComponent],
+                declarations: [EndpointDetailComponent],
                 providers: [{ provide: ActivatedRoute, useValue: route }]
             })
-                .overrideTemplate(ToEndpointDetailComponent, '')
+                .overrideTemplate(EndpointDetailComponent, '')
                 .compileComponents();
-            fixture = TestBed.createComponent(ToEndpointDetailComponent);
+            fixture = TestBed.createComponent(EndpointDetailComponent);
             comp = fixture.componentInstance;
         });
 
@@ -33,7 +33,7 @@ describe('Component Tests', () => {
                 comp.ngOnInit();
 
                 // THEN
-                expect(comp.toEndpoint).toEqual(jasmine.objectContaining({ id: 123 }));
+                expect(comp.endpoint).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });

@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { FromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { Endpoint } from 'app/shared/model/endpoint.model';
 import { ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 import { Gateway } from 'app/shared/model/gateway.model';
 
 import { FlowService } from './flow.service';
 import { FromEndpointService } from '../from-endpoint';
-import { ToEndpointService } from '../to-endpoint';
+import { EndpointService } from '../endpoint';
 import { ErrorEndpointService } from '../error-endpoint';
 import { GatewayService } from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -28,15 +28,15 @@ export class FlowDetailComponent implements OnInit {
     flow: IFlow;
     gateway: Gateway;
     fromEndpoint: FromEndpoint;
-    toEndpoints: Array<ToEndpoint>;
+    endpoints: Array<Endpoint>;
     errorEndpoint: ErrorEndpoint;
 
     // typesLinks: Array<TypeLinks>;
 
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
-    toTypeAssimblyLinks: Array<string> = [];
-    toTypeCamelLinks: Array<string> = [];
+    endpointTypeAssimblyLinks: Array<string> = [];
+    endpointTypeCamelLinks: Array<string> = [];
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
 
@@ -49,7 +49,7 @@ export class FlowDetailComponent implements OnInit {
         public tabsetConfig: NgbTabsetConfig,
         protected gatewayService: GatewayService,
         protected fromEndpointService: FromEndpointService,
-        protected toEndpointService: ToEndpointService,
+        protected endpointService: EndpointService,
         protected errorEndpointService: ErrorEndpointService,
         protected eventManager: JhiEventManager,
         protected flowService: FlowService,
@@ -74,7 +74,7 @@ export class FlowDetailComponent implements OnInit {
             this.flow = flow.body;
             this.getGateway(flow.body.gatewayId);
             this.getFromEndpoint(flow.body.fromEndpointId);
-            this.getToEndpointByFlowId(flow.body.id);
+            this.getEndpointByFlowId(flow.body.id);
             this.getErrorEndpoint(flow.body.errorEndpointId);
         });
     }
@@ -98,15 +98,15 @@ export class FlowDetailComponent implements OnInit {
         });
     }
 
-    getToEndpointByFlowId(id) {
+    getEndpointByFlowId(id) {
         if (!id) {
             return;
         }
 
-        this.toEndpointService.findByFlowId(id).subscribe(toEndpoints => {
-            this.toEndpoints = toEndpoints.body;
-            this.toEndpoints.forEach(toEndpoint => {
-                this.setTypeLinks(toEndpoint);
+        this.endpointService.findByFlowId(id).subscribe(endpoints => {
+            this.endpoints = endpoints.body;
+            this.endpoints.forEach(endpoint => {
+                this.setTypeLinks(endpoint);
             });
         });
     }
@@ -142,10 +142,10 @@ export class FlowDetailComponent implements OnInit {
             type = typesLinks.find(x => x.name === endpoint.type.toString());
             this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
             this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
-        } else if (endpoint instanceof ToEndpoint) {
+        } else if (endpoint instanceof Endpoint) {
             type = typesLinks.find(x => x.name === endpoint.type.toString());
-            this.toTypeAssimblyLinks[this.toEndpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
-            this.toTypeCamelLinks[this.toEndpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
+            this.endpointTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+            this.endpointTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find(x => x.name === endpoint.type.toString());
             this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;

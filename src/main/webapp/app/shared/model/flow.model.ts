@@ -1,4 +1,4 @@
-import { IToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { Moment } from 'moment';
 
 export interface IFlow {
@@ -18,7 +18,7 @@ export interface IFlow {
     gatewayId?: number;
     fromEndpointId?: number;
     errorEndpointId?: number;
-    toEndpoints?: IToEndpoint[];
+    endpoints?: IEndpoint[];
 }
 
 export class Flow implements IFlow {
@@ -39,7 +39,7 @@ export class Flow implements IFlow {
         public gatewayId?: number,
         public fromEndpointId?: number,
         public errorEndpointId?: number,
-        public toEndpoints?: IToEndpoint[]
+        public endpoints?: IEndpoint[]
     ) {
         this.autoStart = this.autoStart || false;
         this.offLoading = this.offLoading || false;

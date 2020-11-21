@@ -126,7 +126,7 @@ relationship OneToOne {
 }
 
 relationship OneToMany {
-	Flow{toEndpoint} to ToEndpoint
+	Flow{endpoint} to endpoint
 }
 
 relationship ManyToOne {

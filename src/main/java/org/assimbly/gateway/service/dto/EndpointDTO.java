@@ -5,9 +5,9 @@ import java.util.Objects;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
 /**
- * A DTO for the ToEndpoint entity.
+ * A DTO for the Endpoint entity.
  */
-public class ToEndpointDTO implements Serializable {
+public class EndpointDTO implements Serializable {
 
     private Long id;
 
@@ -88,11 +88,11 @@ public class ToEndpointDTO implements Serializable {
             return false;
         }
 
-        ToEndpointDTO toEndpointDTO = (ToEndpointDTO) o;
-        if (toEndpointDTO.getId() == null || getId() == null) {
+        EndpointDTO endpointDTO = (EndpointDTO) o;
+        if (endpointDTO.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), toEndpointDTO.getId());
+        return Objects.equals(getId(), endpointDTO.getId());
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ToEndpointDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "ToEndpointDTO{" +
+        return "EndpointDTO{" +
             "id=" + getId() +
             ", type='" + getType() + "'" +
             ", uri='" + getUri() + "'" +

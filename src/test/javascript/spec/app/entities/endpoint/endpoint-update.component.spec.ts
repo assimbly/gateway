@@ -4,27 +4,27 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ToEndpointUpdateComponent } from 'app/entities/to-endpoint/to-endpoint-update.component';
-import { ToEndpointService } from 'app/entities/to-endpoint/to-endpoint.service';
-import { ToEndpoint } from 'app/shared/model/to-endpoint.model';
+import { EndpointUpdateComponent } from 'app/entities/endpoint/endpoint-update.component';
+import { EndpointService } from 'app/entities/endpoint/endpoint.service';
+import { Endpoint } from 'app/shared/model/endpoint.model';
 
 describe('Component Tests', () => {
-    describe('ToEndpoint Management Update Component', () => {
-        let comp: ToEndpointUpdateComponent;
-        let fixture: ComponentFixture<ToEndpointUpdateComponent>;
-        let service: ToEndpointService;
+    describe('Endpoint Management Update Component', () => {
+        let comp: EndpointUpdateComponent;
+        let fixture: ComponentFixture<EndpointUpdateComponent>;
+        let service: EndpointService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ToEndpointUpdateComponent]
+                declarations: [EndpointUpdateComponent]
             })
-                .overrideTemplate(ToEndpointUpdateComponent, '')
+                .overrideTemplate(EndpointUpdateComponent, '')
                 .compileComponents();
 
-            fixture = TestBed.createComponent(ToEndpointUpdateComponent);
+            fixture = TestBed.createComponent(EndpointUpdateComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(ToEndpointService);
+            service = fixture.debugElement.injector.get(EndpointService);
         });
 
         describe('save', () => {
@@ -32,9 +32,9 @@ describe('Component Tests', () => {
                 'Should call update service on save for existing entity',
                 fakeAsync(() => {
                     // GIVEN
-                    const entity = new ToEndpoint(123);
+                    const entity = new Endpoint(123);
                     spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.toEndpoint = entity;
+                    comp.endpoint = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async
@@ -49,9 +49,9 @@ describe('Component Tests', () => {
                 'Should call create service on save for new entity',
                 fakeAsync(() => {
                     // GIVEN
-                    const entity = new ToEndpoint();
+                    const entity = new Endpoint();
                     spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.toEndpoint = entity;
+                    comp.endpoint = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async

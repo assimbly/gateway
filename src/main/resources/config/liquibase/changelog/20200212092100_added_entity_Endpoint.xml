@@ -9,10 +9,10 @@
         <property name="autoIncrement" value="true"/>
 
     <!--
-        Added the entity ToEndpoint.
+        Added the entity Endpoint.
     -->
     <changeSet id="20200212092100-1" author="jhipster">
-        <createTable tableName="to_endpoint">
+        <createTable tableName="endpoint">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -53,9 +53,9 @@
     -->
     <changeSet id="20200212092100-1-data" author="jhipster" context="faker">
         <loadData
-                  file="config/liquibase/fake-data/to_endpoint.csv"
+                  file="config/liquibase/fake-data/endpoint.csv"
                   separator=";"
-                  tableName="to_endpoint">
+                  tableName="endpoint">
             <column name="id" type="numeric"/>
             <column name="type" type="string"/>
             <column name="uri" type="string"/>

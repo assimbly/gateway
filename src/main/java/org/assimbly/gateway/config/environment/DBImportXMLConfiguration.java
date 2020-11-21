@@ -16,7 +16,7 @@ import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
@@ -73,7 +73,7 @@ public class DBImportXMLConfiguration {
 
 	private ErrorEndpoint errorEndpoint;
 
-	private Set<ToEndpoint> toEndpoints;
+	private Set<Endpoint> endpoints;
 
 	private org.assimbly.gateway.domain.Service service;
 
@@ -83,7 +83,7 @@ public class DBImportXMLConfiguration {
 
 	public String configuration;
 
-	private ToEndpoint toEndpoint;
+	private Endpoint endpoint;
 
 	private Set<ServiceKeys> serviceKeys;
 
@@ -197,13 +197,13 @@ public class DBImportXMLConfiguration {
 				flow.setId(id);
 
 				fromEndpoint = getFromEndpointFromXML(flowId, doc, null);
-				toEndpoints = getToEndpointsFromXML(flowId, doc, flow, true);
+				endpoints = getEndpointsFromXML(flowId, doc, flow, true);
 				errorEndpoint = getErrorEndpointFromXML(flowId, doc, null);
 
 			} else {
 				flow = flowOptional.get();
 				fromEndpoint = getFromEndpointFromXML(flowId, doc, flow.getFromEndpoint());
-				toEndpoints = getToEndpointsFromXML(flowId, doc, flow, false);
+				endpoints = getEndpointsFromXML(flowId, doc, flow, false);
 				errorEndpoint = getErrorEndpointFromXML(flowId, doc, flow.getErrorEndpoint());
 			}
 
@@ -256,7 +256,7 @@ public class DBImportXMLConfiguration {
 			}
 
 			flow.setFromEndpoint(fromEndpoint);
-			flow.setToEndpoints(toEndpoints);
+			flow.setEndpoints(endpoints);
 			flow.setErrorEndpoint(errorEndpoint);
 
 			flow = flowRepository.save(flow);
@@ -367,38 +367,38 @@ public class DBImportXMLConfiguration {
 		return fromEndpoint;
 	}
 
-	private Set<ToEndpoint> getToEndpointsFromXML(String id, Document doc, Flow flow, boolean newFlow)
+	private Set<Endpoint> getEndpointsFromXML(String id, Document doc, Flow flow, boolean newFlow)
 			throws Exception {
 
 		if (newFlow) {
-			toEndpoints = new HashSet<ToEndpoint>();
+			endpoints = new HashSet<Endpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfToEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint[type='to'])", doc));
-			numberOfToEndpoints = numberOfToEndpoints + 1;
+			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint[type='to'])", doc));
+			numberOfEndpoints = numberOfEndpoints + 1;
 
-			for (int i = 1; i < numberOfToEndpoints; i++) {
+			for (int i = 1; i < numberOfEndpoints; i++) {
 				String index = Integer.toString(i);
-				toEndpoint = getToEndpointFromXML(id, doc, flow, null, index);
-				toEndpoints.add(toEndpoint);
+				endpoint = getEndpointFromXML(id, doc, flow, null, index);
+				endpoints.add(endpoint);
 			}
 		} else {
 
-			toEndpoints = flow.getToEndpoints();
+			endpoints = flow.getEndpoints();
 
-			for (ToEndpoint toEndpoint : toEndpoints) {
+			for (Endpoint endpoint : endpoints) {
 
-				Long toEndpointId = toEndpoint.getId();
-				String index = "id='" + Long.toString(toEndpointId) + "'";
-				toEndpoint = getToEndpointFromXML(id, doc, flow, toEndpoint, index);
-				toEndpoints.add(toEndpoint);
+				Long endpointId = endpoint.getId();
+				String index = "id='" + Long.toString(endpointId) + "'";
+				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index);
+				endpoints.add(endpoint);
 			}
 
 		}
 
-		return toEndpoints;
+		return endpoints;
 	}
 
-	private ToEndpoint getToEndpointFromXML(String id, Document doc, Flow flow, ToEndpoint toEndpoint, String index)
+	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index)
 			throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -471,23 +471,23 @@ public class DBImportXMLConfiguration {
 			toHeader = null;
 		}
 
-		if (toEndpoint == null) {
-			toEndpoint = new ToEndpoint();
+		if (endpoint == null) {
+			endpoint = new Endpoint();
 		}
 
-		toEndpoint.setUri(toUri);
-		toEndpoint.setType(toType);
-		toEndpoint.setFlow(flow);
-		toEndpoint.setOptions(toOptions);
+		endpoint.setUri(toUri);
+		endpoint.setType(toType);
+		endpoint.setFlow(flow);
+		endpoint.setOptions(toOptions);
 
 		if (toService != null) {
-			toEndpoint.setService(toService);
+			endpoint.setService(toService);
 		}
 		if (toHeader != null) {
-			toEndpoint.setHeader(toHeader);
+			endpoint.setHeader(toHeader);
 		}
 
-		return toEndpoint;
+		return endpoint;
 
 	}
 

@@ -12,12 +12,12 @@ import java.util.Objects;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
 /**
- * A ToEndpoint.
+ * A Endpoint.
  */
 @Entity
-@Table(name = "to_endpoint")
+@Table(name = "endpoint")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class ToEndpoint implements Serializable {
+public class Endpoint implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +36,7 @@ public class ToEndpoint implements Serializable {
     private String options;
 
     @ManyToOne
-    @JsonIgnoreProperties("toEndpoints")
+    @JsonIgnoreProperties("endpoints")
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,7 +60,7 @@ public class ToEndpoint implements Serializable {
         return type;
     }
 
-    public ToEndpoint type(EndpointType type) {
+    public Endpoint type(EndpointType type) {
         this.type = type;
         return this;
     }
@@ -73,7 +73,7 @@ public class ToEndpoint implements Serializable {
         return uri;
     }
 
-    public ToEndpoint uri(String uri) {
+    public Endpoint uri(String uri) {
         this.uri = uri;
         return this;
     }
@@ -86,7 +86,7 @@ public class ToEndpoint implements Serializable {
         return options;
     }
 
-    public ToEndpoint options(String options) {
+    public Endpoint options(String options) {
         this.options = options;
         return this;
     }
@@ -99,7 +99,7 @@ public class ToEndpoint implements Serializable {
         return flow;
     }
 
-    public ToEndpoint flow(Flow flow) {
+    public Endpoint flow(Flow flow) {
         this.flow = flow;
         return this;
     }
@@ -112,7 +112,7 @@ public class ToEndpoint implements Serializable {
         return service;
     }
 
-    public ToEndpoint service(Service service) {
+    public Endpoint service(Service service) {
         this.service = service;
         return this;
     }
@@ -125,7 +125,7 @@ public class ToEndpoint implements Serializable {
         return header;
     }
 
-    public ToEndpoint header(Header header) {
+    public Endpoint header(Header header) {
         this.header = header;
         return this;
     }
@@ -143,11 +143,11 @@ public class ToEndpoint implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ToEndpoint toEndpoint = (ToEndpoint) o;
-        if (toEndpoint.getId() == null || getId() == null) {
+        Endpoint endpoint = (Endpoint) o;
+        if (endpoint.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), toEndpoint.getId());
+        return Objects.equals(getId(), endpoint.getId());
     }
 
     @Override
@@ -157,7 +157,7 @@ public class ToEndpoint implements Serializable {
 
     @Override
     public String toString() {
-        return "ToEndpoint{" +
+        return "Endpoint{" +
             "id=" + getId() +
             ", type='" + getType() + "'" +
             ", uri='" + getUri() + "'" +

@@ -5,27 +5,27 @@ import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
-import { ToEndpointDeleteDialogComponent } from 'app/entities/to-endpoint/to-endpoint-delete-dialog.component';
-import { ToEndpointService } from 'app/entities/to-endpoint/to-endpoint.service';
+import { EndpointDeleteDialogComponent } from 'app/entities/endpoint/endpoint-delete-dialog.component';
+import { EndpointService } from 'app/entities/endpoint/endpoint.service';
 
 describe('Component Tests', () => {
-    describe('ToEndpoint Management Delete Component', () => {
-        let comp: ToEndpointDeleteDialogComponent;
-        let fixture: ComponentFixture<ToEndpointDeleteDialogComponent>;
-        let service: ToEndpointService;
+    describe('Endpoint Management Delete Component', () => {
+        let comp: EndpointDeleteDialogComponent;
+        let fixture: ComponentFixture<EndpointDeleteDialogComponent>;
+        let service: EndpointService;
         let mockEventManager: any;
         let mockActiveModal: any;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [GatewayTestModule],
-                declarations: [ToEndpointDeleteDialogComponent]
+                declarations: [EndpointDeleteDialogComponent]
             })
-                .overrideTemplate(ToEndpointDeleteDialogComponent, '')
+                .overrideTemplate(EndpointDeleteDialogComponent, '')
                 .compileComponents();
-            fixture = TestBed.createComponent(ToEndpointDeleteDialogComponent);
+            fixture = TestBed.createComponent(EndpointDeleteDialogComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(ToEndpointService);
+            service = fixture.debugElement.injector.get(EndpointService);
             mockEventManager = fixture.debugElement.injector.get(JhiEventManager);
             mockActiveModal = fixture.debugElement.injector.get(NgbActiveModal);
         });
