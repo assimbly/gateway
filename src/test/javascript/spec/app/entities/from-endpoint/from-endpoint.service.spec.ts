@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 import { FromEndpointService } from 'app/entities/from-endpoint/from-endpoint.service';
-import { IFromEndpoint, FromEndpoint, EndpointType } from 'app/shared/model/from-endpoint.model';
+import { IFromEndpoint, FromEndpoint, ComponentType } from 'app/shared/model/from-endpoint.model';
 
 describe('Service Tests', () => {
     describe('FromEndpoint Service', () => {
@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(FromEndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new FromEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new FromEndpoint(0, ComponentType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

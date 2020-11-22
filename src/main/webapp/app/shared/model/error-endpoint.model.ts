@@ -1,4 +1,4 @@
-export const enum EndpointType {
+export const enum ComponentType {
     ACTIVEMQ = 'ACTIVEMQ',
     FILE = 'FILE',
     HTTP = 'HTTP',
@@ -15,7 +15,7 @@ export const enum EndpointType {
 
 export interface IErrorEndpoint {
     id?: number;
-    type?: EndpointType;
+    type?: ComponentType;
     uri?: string;
     options?: string;
     serviceId?: number;
@@ -25,7 +25,7 @@ export interface IErrorEndpoint {
 export class ErrorEndpoint implements IErrorEndpoint {
     constructor(
         public id?: number,
-        public type?: EndpointType,
+        public type?: ComponentType,
         public uri?: string,
         public options?: string,
         public serviceId?: number,

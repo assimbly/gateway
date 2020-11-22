@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 
 // add a new component here
-// 1) Add to the EndpointType list
+// 1) Add to the ComponentType list
 // 2) Add to typelinks for live documentation
-// 3) Add to differentEndpoint type (from/to/error)
+// 3) Add to different Component type (from/to/error)
 
-export enum EndpointType {
+export enum ComponentType {
     ACTIVEMQ = 'ACTIVEMQ',
     AHC = 'AHC',
     AHCWS = 'AHC-WS',
@@ -3746,7 +3746,7 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Name</b>: channel<br/>
-        <b>Description</b>: Channel is like a “room” for discussions (ex. topic, discussion, team)<br/>
+        <b>Description</b>: Channel is like a room for discussions (ex. topic, discussion, team)<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: Integer <br/><br/>
         <b>Example</b>: ?<br/>

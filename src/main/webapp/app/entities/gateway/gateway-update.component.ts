@@ -8,7 +8,7 @@ import { IGateway, EnvironmentType, GatewayType } from 'app/shared/model/gateway
 import { GatewayService } from './gateway.service';
 import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
 import { WireTapEndpointService } from 'app/entities/wire-tap-endpoint';
-import { EndpointType, Components } from '../../shared/camel/component-type';
+import { ComponentType, Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
 
 @Component({
@@ -45,9 +45,9 @@ export class GatewayUpdateComponent implements OnInit {
         if (typeof this.gateway.id === 'undefined') {
             this.gateway.type = GatewayType.ADAPTER;
             this.gateway.stage = EnvironmentType.DEVELOPMENT;
-            this.gateway.defaultFromEndpointType = EndpointType.FILE;
-            this.gateway.defaultToEndpointType = EndpointType.FILE;
-            this.gateway.defaultErrorEndpointType = EndpointType.FILE;
+            this.gateway.defaultFromComponentType = ComponentType.FILE;
+            this.gateway.defaultToComponentType = ComponentType.FILE;
+            this.gateway.defaultErrorComponentType = ComponentType.FILE;
         }
 
         this.wireTapEndpointService.query({ filter: 'gateway-is-null' }).subscribe(
@@ -106,17 +106,17 @@ export class GatewayUpdateComponent implements OnInit {
 
     setTypeGateway() {
         if (this.gateway.type.toString() === 'BROKER') {
-            this.gateway.defaultFromEndpointType = EndpointType.ACTIVEMQ;
-            this.gateway.defaultToEndpointType = EndpointType.ACTIVEMQ;
-            this.gateway.defaultErrorEndpointType = EndpointType.ACTIVEMQ;
+            this.gateway.defaultFromComponentType = ComponentType.ACTIVEMQ;
+            this.gateway.defaultToComponentType = ComponentType.ACTIVEMQ;
+            this.gateway.defaultErrorComponentType = ComponentType.ACTIVEMQ;
         } else if (this.gateway.type.toString() === 'ARTEMIS') {
-            this.gateway.defaultFromEndpointType = EndpointType.SJMS;
-            this.gateway.defaultToEndpointType = EndpointType.SJMS;
-            this.gateway.defaultErrorEndpointType = EndpointType.SJMS;
+            this.gateway.defaultFromComponentType = ComponentType.SJMS;
+            this.gateway.defaultToComponentType = ComponentType.SJMS;
+            this.gateway.defaultErrorComponentType = ComponentType.SJMS;
         } else {
-            this.gateway.defaultFromEndpointType = EndpointType.FILE;
-            this.gateway.defaultToEndpointType = EndpointType.FILE;
-            this.gateway.defaultErrorEndpointType = EndpointType.FILE;
+            this.gateway.defaultFromComponentType = ComponentType.FILE;
+            this.gateway.defaultToComponentType = ComponentType.FILE;
+            this.gateway.defaultErrorComponentType = ComponentType.FILE;
         }
     }
 

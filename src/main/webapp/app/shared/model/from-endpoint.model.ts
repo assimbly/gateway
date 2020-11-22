@@ -1,4 +1,4 @@
-export enum EndpointType {
+export enum ComponentType {
     ACTIVEMQ = 'ACTIVEMQ',
     FILE = 'FILE',
     HTTP = 'HTTP',
@@ -16,7 +16,7 @@ export enum EndpointType {
 
 export interface IFromEndpoint {
     id?: number;
-    type?: EndpointType;
+    type?: ComponentType;
     uri?: string;
     options?: string;
     serviceId?: number;
@@ -26,7 +26,7 @@ export interface IFromEndpoint {
 export class FromEndpoint implements IFromEndpoint {
     constructor(
         public id?: number,
-        public type?: EndpointType,
+        public type?: ComponentType,
         public uri?: string,
         public options?: string,
         public serviceId?: number,

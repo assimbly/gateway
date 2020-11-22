@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 import { ErrorEndpointService } from 'app/entities/error-endpoint/error-endpoint.service';
-import { IErrorEndpoint, ErrorEndpoint, EndpointType } from 'app/shared/model/error-endpoint.model';
+import { IErrorEndpoint, ErrorEndpoint, ComponentType } from 'app/shared/model/error-endpoint.model';
 
 describe('Service Tests', () => {
     describe('ErrorEndpoint Service', () => {
@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(ErrorEndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new ErrorEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new ErrorEndpoint(0, ComponentType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

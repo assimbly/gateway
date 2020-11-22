@@ -13,7 +13,7 @@ import { Service } from 'app/shared/model/service.model';
 import { Header } from 'app/shared/model/header.model';
 
 import { HeaderService } from '../header';
-import { EndpointType, Components } from '../../shared/camel/component-type';
+import { ComponentType, Components } from '../../shared/camel/component-type';
 
 @Component({
     selector: 'jhi-error-endpoint-dialog',

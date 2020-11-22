@@ -61,14 +61,14 @@ public class GatewayResourceIntTest {
     private static final ConnectorType DEFAULT_CONNECTOR_TYPE = ConnectorType.CAMEL;
     private static final ConnectorType UPDATED_CONNECTOR_TYPE = ConnectorType.SPRINGINTEGRATION;
 
-    private static final String DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE = "AAAAAAAAAA";
-    private static final String UPDATED_DEFAULT_FROM_ENDPOINT_TYPE = "BBBBBBBBBB";
+    private static final String DEFAULT_DEFAULT_FROM_COMPONENT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_DEFAULT_FROM_COMPONENT_TYPE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_DEFAULT_TO_ENDPOINT_TYPE = "AAAAAAAAAA";
-    private static final String UPDATED_DEFAULT_TO_ENDPOINT_TYPE = "BBBBBBBBBB";
+    private static final String DEFAULT_DEFAULT_TO_COMPONENT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_DEFAULT_TO_COMPONENT_TYPE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE = "AAAAAAAAAA";
-    private static final String UPDATED_DEFAULT_ERROR_ENDPOINT_TYPE = "BBBBBBBBBB";
+    private static final String DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_DEFAULT_ERROR_COMPONENT_TYPE = "BBBBBBBBBB";
 
     @Autowired
     private GatewayRepository gatewayRepository;
@@ -123,9 +123,9 @@ public class GatewayResourceIntTest {
             .environmentName(DEFAULT_ENVIRONMENT_NAME)
             .stage(DEFAULT_STAGE)
             .connectorType(DEFAULT_CONNECTOR_TYPE)
-            .defaultFromEndpointType(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE)
-            .defaultToEndpointType(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE)
-            .defaultErrorEndpointType(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE);
+            .defaultFromComponentType(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE)
+            .defaultToComponentType(DEFAULT_DEFAULT_TO_COMPONENT_TYPE)
+            .defaultErrorComponentType(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE);
         return gateway;
     }
 
@@ -155,9 +155,9 @@ public class GatewayResourceIntTest {
         assertThat(testGateway.getEnvironmentName()).isEqualTo(DEFAULT_ENVIRONMENT_NAME);
         assertThat(testGateway.getStage()).isEqualTo(DEFAULT_STAGE);
         assertThat(testGateway.getConnectorType()).isEqualTo(DEFAULT_CONNECTOR_TYPE);
-        assertThat(testGateway.getDefaultFromEndpointType()).isEqualTo(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE);
-        assertThat(testGateway.getDefaultToEndpointType()).isEqualTo(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE);
-        assertThat(testGateway.getDefaultErrorEndpointType()).isEqualTo(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE);
+        assertThat(testGateway.getDefaultFromComponentType()).isEqualTo(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE);
+        assertThat(testGateway.getDefaultToComponentType()).isEqualTo(DEFAULT_DEFAULT_TO_COMPONENT_TYPE);
+        assertThat(testGateway.getDefaultErrorComponentType()).isEqualTo(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE);
     }
 
     @Test
@@ -196,9 +196,9 @@ public class GatewayResourceIntTest {
             .andExpect(jsonPath("$.[*].environmentName").value(hasItem(DEFAULT_ENVIRONMENT_NAME.toString())))
             .andExpect(jsonPath("$.[*].stage").value(hasItem(DEFAULT_STAGE.toString())))
             .andExpect(jsonPath("$.[*].connectorType").value(hasItem(DEFAULT_CONNECTOR_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultFromEndpointType").value(hasItem(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultToEndpointType").value(hasItem(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultErrorEndpointType").value(hasItem(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE.toString())));
+            .andExpect(jsonPath("$.[*].defaultFromComponentType").value(hasItem(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].defaultToComponentType").value(hasItem(DEFAULT_DEFAULT_TO_COMPONENT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].defaultErrorComponentType").value(hasItem(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE.toString())));
     }
     
     @Test
@@ -217,9 +217,9 @@ public class GatewayResourceIntTest {
             .andExpect(jsonPath("$.environmentName").value(DEFAULT_ENVIRONMENT_NAME.toString()))
             .andExpect(jsonPath("$.stage").value(DEFAULT_STAGE.toString()))
             .andExpect(jsonPath("$.connectorType").value(DEFAULT_CONNECTOR_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultFromEndpointType").value(DEFAULT_DEFAULT_FROM_ENDPOINT_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultToEndpointType").value(DEFAULT_DEFAULT_TO_ENDPOINT_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultErrorEndpointType").value(DEFAULT_DEFAULT_ERROR_ENDPOINT_TYPE.toString()));
+            .andExpect(jsonPath("$.defaultFromComponentType").value(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE.toString()))
+            .andExpect(jsonPath("$.defaultToComponentType").value(DEFAULT_DEFAULT_TO_COMPONENT_TYPE.toString()))
+            .andExpect(jsonPath("$.defaultErrorComponentType").value(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE.toString()));
     }
 
     @Test
@@ -248,9 +248,9 @@ public class GatewayResourceIntTest {
             .environmentName(UPDATED_ENVIRONMENT_NAME)
             .stage(UPDATED_STAGE)
             .connectorType(UPDATED_CONNECTOR_TYPE)
-            .defaultFromEndpointType(UPDATED_DEFAULT_FROM_ENDPOINT_TYPE)
-            .defaultToEndpointType(UPDATED_DEFAULT_TO_ENDPOINT_TYPE)
-            .defaultErrorEndpointType(UPDATED_DEFAULT_ERROR_ENDPOINT_TYPE);
+            .defaultFromComponentType(UPDATED_DEFAULT_FROM_COMPONENT_TYPE)
+            .defaultToComponentType(UPDATED_DEFAULT_TO_COMPONENT_TYPE)
+            .defaultErrorComponentType(UPDATED_DEFAULT_ERROR_COMPONENT_TYPE);
         GatewayDTO gatewayDTO = gatewayMapper.toDto(updatedGateway);
 
         restGatewayMockMvc.perform(put("/api/gateways")
@@ -267,9 +267,9 @@ public class GatewayResourceIntTest {
         assertThat(testGateway.getEnvironmentName()).isEqualTo(UPDATED_ENVIRONMENT_NAME);
         assertThat(testGateway.getStage()).isEqualTo(UPDATED_STAGE);
         assertThat(testGateway.getConnectorType()).isEqualTo(UPDATED_CONNECTOR_TYPE);
-        assertThat(testGateway.getDefaultFromEndpointType()).isEqualTo(UPDATED_DEFAULT_FROM_ENDPOINT_TYPE);
-        assertThat(testGateway.getDefaultToEndpointType()).isEqualTo(UPDATED_DEFAULT_TO_ENDPOINT_TYPE);
-        assertThat(testGateway.getDefaultErrorEndpointType()).isEqualTo(UPDATED_DEFAULT_ERROR_ENDPOINT_TYPE);
+        assertThat(testGateway.getDefaultFromComponentType()).isEqualTo(UPDATED_DEFAULT_FROM_COMPONENT_TYPE);
+        assertThat(testGateway.getDefaultToComponentType()).isEqualTo(UPDATED_DEFAULT_TO_COMPONENT_TYPE);
+        assertThat(testGateway.getDefaultErrorComponentType()).isEqualTo(UPDATED_DEFAULT_ERROR_COMPONENT_TYPE);
     }
 
     @Test

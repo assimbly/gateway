@@ -17,7 +17,7 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.Endpoint;
-import org.assimbly.gateway.domain.enumeration.EndpointType;
+import org.assimbly.gateway.domain.enumeration.ComponentType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -109,9 +109,9 @@ public class DBImportXMLConfiguration {
 		String type = xPath.evaluate("//connectors/connector/type", doc);
 		String environmentName = xPath.evaluate("//connectors/connector/environmentName", doc);
 		String stage = xPath.evaluate("//connectors/connector/stage", doc);
-		String defaultFromEndpointType = xPath.evaluate("//connectors/connector/defaultFromEndpointType", doc);
-		String defaultToEndpointType = xPath.evaluate("//connectors/connector/defaultToEndpointType", doc);
-		String defaultErrorEndpointType = xPath.evaluate("//connectors/connector/defaultErrorEndpointType", doc);
+		String defaultFromComponentType = xPath.evaluate("//connectors/connector/defaultFromComponentType", doc);
+		String defaultToComponentType = xPath.evaluate("//connectors/connector/defaultToComponentType", doc);
+		String defaultErrorComponentType = xPath.evaluate("//connectors/connector/defaultErrorComponentType", doc);
 
 		
 		log.info("GatewayID=" + gatewayId);
@@ -134,9 +134,9 @@ public class DBImportXMLConfiguration {
 			gateway.setEnvironmentName(environmentName);
 			gateway.setType(GatewayType.valueOf(type));
 			gateway.setStage(EnvironmentType.valueOf(stage));
-			gateway.setDefaultFromEndpointType(defaultFromEndpointType);
-			gateway.setDefaultToEndpointType(defaultToEndpointType);
-			gateway.setDefaultErrorEndpointType(defaultErrorEndpointType);
+			gateway.setDefaultFromComponentType(defaultFromComponentType);
+			gateway.setDefaultToComponentType(defaultToComponentType);
+			gateway.setDefaultErrorComponentType(defaultErrorComponentType);
 
 			// create environment variables
 			setEnvironmentVariablesFromXML(doc, connectorId, gateway);
@@ -294,7 +294,7 @@ public class DBImportXMLConfiguration {
 		String[] fromUriSplitted = fromUri.split(":", 2);
 		String fromTypeAsString = fromUriSplitted[0].toUpperCase();
 		fromTypeAsString = fromTypeAsString.replace("-", "");
-		EndpointType fromType = EndpointType.valueOf(fromTypeAsString);
+		ComponentType fromType = ComponentType.valueOf(fromTypeAsString);
 
 		// get uri
 		fromUri = fromUriSplitted[1];
@@ -413,7 +413,7 @@ public class DBImportXMLConfiguration {
 		String toTypeAsString = toUriSplitted[0].toUpperCase();
 		toTypeAsString = toTypeAsString.replace("-", "");
 
-		EndpointType toType = EndpointType.valueOf(toTypeAsString);
+		ComponentType toType = ComponentType.valueOf(toTypeAsString);
 
 		// get uri
 		toUri = toUriSplitted[1];
@@ -476,7 +476,7 @@ public class DBImportXMLConfiguration {
 		}
 
 		endpoint.setUri(toUri);
-		endpoint.setType(toType);
+		endpoint.setComponentType(toType);
 		endpoint.setFlow(flow);
 		endpoint.setOptions(toOptions);
 
@@ -504,7 +504,7 @@ public class DBImportXMLConfiguration {
 		String errorTypeAsString = errorUriSplitted[0].toUpperCase();
 		errorTypeAsString = errorTypeAsString.replace("-", "");
 	
-		EndpointType errorType = EndpointType.valueOf(errorTypeAsString);
+		ComponentType errorType = ComponentType.valueOf(errorTypeAsString);
 
 		// get uri
 		errorUri = errorUriSplitted[1];

@@ -3,10 +3,10 @@ package org.assimbly.gateway.domain.enumeration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * The EndpointType enumeration.
+ * The ComponentType enumeration.
  * This is an alpabetic list based on Camel's component reference https://camel.apache.org/components/latest
  */
-public enum EndpointType {
+public enum ComponentType {
 	
 	ACTIVEMQ("ACTIVEMQ"),
 	
@@ -775,7 +775,7 @@ public enum EndpointType {
 	
     private String endpoint;
  
-    EndpointType(String endpoint) {
+    ComponentType(String endpoint) {
         this.endpoint = endpoint;
     }
  

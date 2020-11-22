@@ -70,9 +70,9 @@ describe('Service Tests', () => {
                         environmentName: 'BBBBBB',
                         stage: 'BBBBBB',
                         connectorType: 'BBBBBB',
-                        defaultFromEndpointType: 'BBBBBB',
-                        defaultToEndpointType: 'BBBBBB',
-                        defaultErrorEndpointType: 'BBBBBB'
+                        defaultFromComponentType: 'BBBBBB',
+                        defaultToComponentType: 'BBBBBB',
+                        defaultErrorComponentType: 'BBBBBB'
                     },
                     elemDefault
                 );
@@ -94,9 +94,9 @@ describe('Service Tests', () => {
                         environmentName: 'BBBBBB',
                         stage: 'BBBBBB',
                         connectorType: 'BBBBBB',
-                        defaultFromEndpointType: 'BBBBBB',
-                        defaultToEndpointType: 'BBBBBB',
-                        defaultErrorEndpointType: 'BBBBBB'
+                        defaultFromComponentType: 'BBBBBB',
+                        defaultToComponentType: 'BBBBBB',
+                        defaultErrorComponentType: 'BBBBBB'
                     },
                     elemDefault
                 );
