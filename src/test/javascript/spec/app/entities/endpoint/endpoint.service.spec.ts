@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 import { EndpointService } from 'app/entities/endpoint/endpoint.service';
-import { IEndpoint, Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
+import { IEndpoint, Endpoint, ComponentType } from 'app/shared/model/endpoint.model';
 
 describe('Service Tests', () => {
     describe('Endpoint Service', () => {
@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(EndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new Endpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new Endpoint(0, ComponentType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

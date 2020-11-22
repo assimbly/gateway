@@ -199,17 +199,17 @@ public class DBExportXMLConfiguration {
 		stage.appendChild(doc.createTextNode(gateway.getStage().toString()));
 		connector.appendChild(stage);
 
-		Element defaultFromEndpointType = doc.createElement("defaultFromEndpointType");
-		defaultFromEndpointType.appendChild(doc.createTextNode(gateway.getDefaultFromEndpointType()));
-		connector.appendChild(defaultFromEndpointType);
+		Element defaultFromComponentType = doc.createElement("defaultFromComponentType");
+		defaultFromComponentType.appendChild(doc.createTextNode(gateway.getDefaultFromComponentType()));
+		connector.appendChild(defaultFromComponentType);
 
-		Element defaultToEndpointType = doc.createElement("defaultToEndpointType");
-		defaultToEndpointType.appendChild(doc.createTextNode(gateway.getDefaultToEndpointType()));
-		connector.appendChild(defaultToEndpointType);
+		Element defaultToComponentType = doc.createElement("defaultToComponentType");
+		defaultToComponentType.appendChild(doc.createTextNode(gateway.getDefaultToComponentType()));
+		connector.appendChild(defaultToComponentType);
 
-		Element defaultErrorEndpointType = doc.createElement("defaultErrorEndpointType");
-		defaultErrorEndpointType.appendChild(doc.createTextNode(gateway.getDefaultErrorEndpointType()));
-		connector.appendChild(defaultErrorEndpointType);
+		Element defaultErrorComponentType = doc.createElement("defaultErrorComponentType");
+		defaultErrorComponentType.appendChild(doc.createTextNode(gateway.getDefaultErrorComponentType()));
+		connector.appendChild(defaultErrorComponentType);
 
 		offloading = doc.createElement("offloading");
 		flows = doc.createElement("flows");
@@ -312,7 +312,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
-		String confcomponentType = wireTapEndpointDB.getType().getEndpoint();
+		String confComponentType = wireTapEndpointDB.getType().getEndpoint();
 		String confOptions = wireTapEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
 		Header confHeader = wireTapEndpointDB.getHeader();
@@ -322,7 +322,7 @@ public class DBExportXMLConfiguration {
 			Element uri = doc.createElement("uri");
 			offloading.appendChild(uri);
 
-			componentType = confcomponentType.toLowerCase();
+			componentType = confComponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
 
@@ -494,7 +494,7 @@ public class DBExportXMLConfiguration {
 
 			String confId = Long.toString(endpointDB.getId());
 			String confUri = endpointDB.getUri();
-			String confComponentType = endpointDB.getType().getEndpoint();
+			String confComponentType = endpointDB.getComponentType().getEndpoint();
 			String confOptions = endpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();

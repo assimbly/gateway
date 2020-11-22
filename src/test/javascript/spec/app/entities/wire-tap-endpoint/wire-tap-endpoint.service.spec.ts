@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 import { WireTapEndpointService } from 'app/entities/wire-tap-endpoint/wire-tap-endpoint.service';
-import { IWireTapEndpoint, WireTapEndpoint, EndpointType } from 'app/shared/model/wire-tap-endpoint.model';
+import { IWireTapEndpoint, WireTapEndpoint, ComponentType } from 'app/shared/model/wire-tap-endpoint.model';
 
 describe('Service Tests', () => {
     describe('WireTapEndpoint Service', () => {
@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(WireTapEndpointService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new WireTapEndpoint(0, EndpointType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
+            elemDefault = new WireTapEndpoint(0, ComponentType.ACTIVEMQ, 'AAAAAAA', 'AAAAAAA');
         });
 
         describe('Service methods', async () => {

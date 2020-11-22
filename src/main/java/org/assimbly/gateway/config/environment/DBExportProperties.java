@@ -164,7 +164,7 @@ public class DBExportProperties {
 
 			for (Endpoint endpoint : endpoints) {
 
-				componentType = endpoint.getType().name();
+				componentType = endpoint.getComponentType().name();
 				uri = endpoint.getUri();
 				options = endpoint.getOptions();
 

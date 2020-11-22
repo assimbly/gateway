@@ -5,7 +5,7 @@ import { Observable, forkJoin } from 'rxjs';
 import {} from 'rxjs/Observable';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { IWireTapEndpoint, WireTapEndpoint, EndpointType } from 'app/shared/model/wire-tap-endpoint.model';
+import { IWireTapEndpoint, WireTapEndpoint, ComponentType } from 'app/shared/model/wire-tap-endpoint.model';
 import { IService, Service } from 'app/shared/model/service.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
 
@@ -92,7 +92,7 @@ export class WireTapEndpointUpdateComponent implements OnInit {
                 this.flowService.getWikiDocUrl(),
                 this.flowService.getCamelDocUrl()
             ).subscribe(([services, headers, wikiDocUrl, camelDocUrl]) => {
-                this.wireTapEndpoint.type = EndpointType.FILE;
+                this.wireTapEndpoint.type = ComponentType.FILE;
                 this.services = services.body;
                 this.serviceCreated = this.services.length > 0;
                 this.headers = headers.body;

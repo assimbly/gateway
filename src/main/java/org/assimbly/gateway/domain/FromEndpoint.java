@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.assimbly.gateway.domain.enumeration.EndpointType;
+import org.assimbly.gateway.domain.enumeration.ComponentType;
 
 /**
  * A FromEndpoint.
@@ -26,7 +26,7 @@ public class FromEndpoint implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private EndpointType type;
+    private ComponentType type;
 
     @Column(name = "uri")
     private String uri;
@@ -49,16 +49,16 @@ public class FromEndpoint implements Serializable {
         this.id = id;
     }
 
-    public EndpointType getType() {
+    public ComponentType getType() {
         return type;
     }
 
-    public FromEndpoint type(EndpointType type) {
+    public FromEndpoint type(ComponentType type) {
         this.type = type;
         return this;
     }
 
-    public void setType(EndpointType type) {
+    public void setType(ComponentType type) {
         this.type = type;
     }
 

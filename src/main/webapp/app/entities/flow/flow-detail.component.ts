@@ -15,7 +15,7 @@ import { GatewayService } from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 
-import { EndpointType, typesLinks } from '../../shared/camel/component-type';
+import { ComponentType, typesLinks } from '../../shared/camel/component-type';
 import { JhiEventManager } from 'ng-jhipster';
 import { Subscription } from 'rxjs';
 
@@ -35,8 +35,8 @@ export class FlowDetailComponent implements OnInit {
 
     fromTypeAssimblyLink: string;
     fromTypeCamelLink: string;
-    endpointTypeAssimblyLinks: Array<string> = [];
-    endpointTypeCamelLinks: Array<string> = [];
+    componentTypeAssimblyLinks: Array<string> = [];
+    componentTypeCamelLinks: Array<string> = [];
     errorTypeAssimblyLink: string;
     errorTypeCamelLink: string;
 
@@ -143,9 +143,9 @@ export class FlowDetailComponent implements OnInit {
             this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
             this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
         } else if (endpoint instanceof Endpoint) {
-            type = typesLinks.find(x => x.name === endpoint.type.toString());
-            this.endpointTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
-            this.endpointTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
+            type = typesLinks.find(x => x.name === endpoint.componentType.toString());
+            this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+            this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
         } else if (endpoint instanceof ErrorEndpoint) {
             type = typesLinks.find(x => x.name === endpoint.type.toString());
             this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;

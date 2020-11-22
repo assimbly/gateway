@@ -21,11 +21,11 @@ public class GatewayDTO implements Serializable {
 
     private EnvironmentType stage;
 
-    private String defaultFromEndpointType;
+    private String defaultFromComponentType;
 
-    private String defaultToEndpointType;
+    private String defaultToComponentType;
 
-    private String defaultErrorEndpointType;
+    private String defaultErrorComponentType;
 
     private Long wiretapEndpointId;
 
@@ -79,28 +79,28 @@ public class GatewayDTO implements Serializable {
         this.connectorType = connectorType;
     }
 
-    public String getDefaultFromEndpointType() {
-        return defaultFromEndpointType;
+    public String getDefaultFromComponentType() {
+        return defaultFromComponentType;
     }
 
-    public void setDefaultFromEndpointType(String defaultFromEndpointType) {
-        this.defaultFromEndpointType = defaultFromEndpointType;
+    public void setDefaultFromComponentType(String defaultFromComponentType) {
+        this.defaultFromComponentType = defaultFromComponentType;
     }
 
-    public String getDefaultToEndpointType() {
-        return defaultToEndpointType;
+    public String getDefaultToComponentType() {
+        return defaultToComponentType;
     }
 
-    public void setDefaultToEndpointType(String defaultToEndpointType) {
-        this.defaultToEndpointType = defaultToEndpointType;
+    public void setDefaultToComponentType(String defaultToComponentType) {
+        this.defaultToComponentType = defaultToComponentType;
     }
 
-    public String getDefaultErrorEndpointType() {
-        return defaultErrorEndpointType;
+    public String getDefaultErrorComponentType() {
+        return defaultErrorComponentType;
     }
 
-    public void setDefaultErrorEndpointType(String defaultErrorEndpointType) {
-        this.defaultErrorEndpointType = defaultErrorEndpointType;
+    public void setDefaultErrorComponentType(String defaultErrorComponentType) {
+        this.defaultErrorComponentType = defaultErrorComponentType;
     }
 
     public Long getWiretapEndpointId() {
@@ -141,9 +141,9 @@ public class GatewayDTO implements Serializable {
             ", environmentName='" + getEnvironmentName() + "'" +
             ", stage='" + getStage() + "'" +
             ", connectorType='" + getConnectorType() + "'" +
-            ", defaultFromEndpointType='" + getDefaultFromEndpointType() + "'" +
-            ", defaultToEndpointType='" + getDefaultToEndpointType() + "'" +
-            ", defaultErrorEndpointType='" + getDefaultErrorEndpointType() + "'" +
+            ", defaultFromComponentType='" + getDefaultFromComponentType() + "'" +
+            ", defaultToComponentType='" + getDefaultToComponentType() + "'" +
+            ", defaultErrorComponentType='" + getDefaultErrorComponentType() + "'" +
             ", wiretapEndpoint=" + getWiretapEndpointId() +
             "}";
     }

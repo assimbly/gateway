@@ -31,13 +31,13 @@
             <column name="connector_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="default_from_endpoint_type" type="varchar(255)">
+            <column name="default_from_component_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="default_to_endpoint_type" type="varchar(255)">
+            <column name="default_to_component_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="default_error_endpoint_type" type="varchar(255)">
+            <column name="default_error_component_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="wiretap_endpoint_id" type="bigint">
@@ -71,9 +71,9 @@
             <column name="environment_name" type="string"/>
             <column name="stage" type="string"/>
             <column name="connector_type" type="string"/>
-            <column name="default_from_endpoint_type" type="string"/>
-            <column name="default_to_endpoint_type" type="string"/>
-            <column name="default_error_endpoint_type" type="string"/>
+            <column name="default_from_component_type" type="string"/>
+            <column name="default_to_component_type" type="string"/>
+            <column name="default_error_component_type" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

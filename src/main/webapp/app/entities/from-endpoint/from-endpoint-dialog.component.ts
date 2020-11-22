@@ -14,7 +14,7 @@ import { FromEndpointService } from './from-endpoint.service';
 
 import { ServiceService } from '../service';
 import { HeaderService } from '../header';
-import { EndpointType, Components } from '../../shared/camel/component-type';
+import { ComponentType, Components } from '../../shared/camel/component-type';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
