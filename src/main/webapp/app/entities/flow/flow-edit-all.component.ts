@@ -9,7 +9,7 @@ import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
+import { IEndpoint, Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
 import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 import { IService, Service } from 'app/shared/model/service.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
@@ -294,6 +294,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                 }
                                 toEndpoint = new Endpoint(
                                     toEndpoint.id,
+									toEndpoint.endpointType,
                                     toEndpoint.componentType,
                                     toEndpoint.uri,
                                     toEndpoint.options,
@@ -368,6 +369,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     this.toEndpoints = new Array<Endpoint>(new Endpoint());
                     this.toEndpoints.forEach((endpoint, i) => {
+				        endpoint.endpointType = EndpointType.TO;
                         endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
                     });
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.toEndpoints[0]));
@@ -831,7 +833,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.toEndpoints.push(new Endpoint());
         this.toEndpointsOptions.push([new Option()]);
         const toEndpoint = this.toEndpoints.find((e, i) => i === this.toEndpoints.length - 1);
-        toEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
+        toEndpoint.endpointType = EndpointType.TO;
+		toEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
         (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(toEndpoint));
         this.setTypeLinks(toEndpoint, 2 + this.toEndpoints.indexOf(toEndpoint));
         setTimeout(() => {

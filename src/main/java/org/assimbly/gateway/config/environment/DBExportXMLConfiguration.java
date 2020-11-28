@@ -301,7 +301,7 @@ public class DBExportXMLConfiguration {
 		System.out.println("Set from endpoint");
 		setXMLFromEndpointFromDB(fromEndpoint);
 
-		System.out.println("Set to endpoint");
+		System.out.println("Set endpoint");
 		setEndpointsFromDB(endpoints);
 
 		System.out.println("Set error endpoint");
@@ -494,13 +494,17 @@ public class DBExportXMLConfiguration {
 
 			String confId = Long.toString(endpointDB.getId());
 			String confUri = endpointDB.getUri();
+			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
 			String confComponentType = endpointDB.getComponentType().getEndpoint();
 			String confOptions = endpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();
 		
 			System.out.println("1. confId" + confId);
-	
+
+			System.out.println("1111. confEndpointType=" + endpointDB.getEndpointType().name());	
+			System.out.println("2222. confEndpointType=" + endpointDB.getEndpointType().toString());
+			System.out.println("3333. confEndpointType=" + endpointDB.getEndpointType().getEndpoint());
 
 			if (confUri != null) {
 
@@ -514,7 +518,7 @@ public class DBExportXMLConfiguration {
 				endpoint.appendChild(id);
 
 				Element type = doc.createElement("type");
-				type.setTextContent("to");
+				type.setTextContent(confEndpointType);
 				endpoint.appendChild(type);
 
 				Element uri = doc.createElement("uri");
@@ -550,7 +554,7 @@ public class DBExportXMLConfiguration {
 
 					serviceId.setTextContent(confServiceId);
 					endpoint.appendChild(serviceId);
-					setXMLServiceFromDB(confServiceId, "to", confService);
+					setXMLServiceFromDB(confServiceId, confEndpointType, confService);
 				}
 
 				if (confHeader != null) {
@@ -559,7 +563,7 @@ public class DBExportXMLConfiguration {
 
 					endpoint.appendChild(headerId);
 					headerId.setTextContent(confHeaderId);
-					setXMLHeaderFromDB(confHeaderId, "to", confHeader);
+					setXMLHeaderFromDB(confHeaderId, confEndpointType, confHeader);
 				}
 			}else if(confComponentType.equalsIgnoreCase("wastebin")) {
 				
@@ -580,7 +584,7 @@ public class DBExportXMLConfiguration {
 				endpoint.appendChild(uri);
 				
 				Element type = doc.createElement("type");
-				type.setTextContent("to");
+				type.setTextContent(confEndpointType);
 				endpoint.appendChild(type);
 				
 			}

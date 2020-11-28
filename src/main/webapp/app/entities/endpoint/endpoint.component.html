@@ -13,9 +13,11 @@
             <thead>
             <tr>
             <th><span>ID</span></th>
-            <th><span>Type</span></th>
+            <th><span>EndpointType</span></th>
+            <th><span>ComponentType</span></th>
             <th><span>Uri</span></th>
             <th><span>Options</span></th>
+            <th><span>ResponseId</span></th>
             <th><span>Flow</span></th>
             <th><span>Service</span></th>
             <th><span>Header</span></th>
@@ -25,7 +27,8 @@
             <tbody>
             <tr *ngFor="let endpoint of endpoints ;trackBy: trackId">
                 <td><a [routerLink]="['/endpoint', endpoint.id, 'view' ]">{{endpoint.id}}</a></td>
-                <td>{{endpoint.type}}</td>
+                <td>{{endpoint.endpointType}}</td>
+                <td>{{endpoint.componentType}}</td>
                 <td>{{endpoint.uri}}</td>
                 <td>{{endpoint.options}}</td>
                 <td>

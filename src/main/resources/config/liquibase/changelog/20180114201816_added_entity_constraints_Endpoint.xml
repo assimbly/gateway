@@ -6,8 +6,14 @@
     <!--
         Added the constraints for entity Endpoint.
     -->
-    <changeSet id="20200212092100-2" author="jhipster">
+    <changeSet id="20180114201816-2" author="jhipster">
         
+        <addForeignKeyConstraint baseColumnNames="flow_id"
+                                 baseTableName="endpoint"
+                                 constraintName="fk_endpoint_flow_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="flow"/>
+
         <addForeignKeyConstraint baseColumnNames="service_id"
                                  baseTableName="endpoint"
                                  constraintName="fk_endpoint_service_id"
@@ -19,12 +25,6 @@
                                  constraintName="fk_endpoint_header_id"
                                  referencedColumnNames="id"
                                  referencedTableName="header"/>
-
-        <addForeignKeyConstraint baseColumnNames="flow_id"
-                                 baseTableName="endpoint"
-                                 constraintName="fk_endpoint_flow_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="flow"/>
 
     </changeSet>
 </databaseChangeLog>
