@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import org.assimbly.gateway.domain.enumeration.ComponentType;
+import org.assimbly.gateway.domain.enumeration.EndpointType;
 
 /**
  * A Endpoint.
@@ -26,6 +27,10 @@ public class Endpoint implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "endpointType")
+    private EndpointType endpointType;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "componentType")
     private ComponentType componentType;
 
@@ -35,6 +40,9 @@ public class Endpoint implements Serializable {
     @Column(name = "options")
     private String options;
 
+    @Column(name = "responseId")
+    private Integer responseId;
+    
     @ManyToOne
     @JsonIgnoreProperties("endpoints")
     private Flow flow;
@@ -54,6 +62,19 @@ public class Endpoint implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public EndpointType getEndpointType() {
+        return endpointType;
+    }
+
+    public Endpoint endpointType(EndpointType endpointType) {
+        this.endpointType = endpointType;
+        return this;
+    }
+
+    public void setEndpointType(EndpointType endpointType) {
+        this.endpointType = endpointType;
     }
 
     public ComponentType getComponentType() {
@@ -93,6 +114,19 @@ public class Endpoint implements Serializable {
 
     public void setOptions(String options) {
         this.options = options;
+    }
+
+    public Integer getResponseId() {
+        return responseId;
+    }
+
+    public Endpoint responseId(Integer responseId) {
+        this.responseId = responseId;
+        return this;
+    }
+
+    public void setResponseId(Integer responseId) {
+        this.responseId = responseId;
     }
 
     public Flow getFlow() {
@@ -159,9 +193,11 @@ public class Endpoint implements Serializable {
     public String toString() {
         return "Endpoint{" +
             "id=" + getId() +
+            ", endpointType='" + getEndpointType() + "'" +
             ", componentType='" + getComponentType() + "'" +
             ", uri='" + getUri() + "'" +
             ", options='" + getOptions() + "'" +
+            ", responseId='" + getResponseId() + "'" +
             "}";
     }
 }

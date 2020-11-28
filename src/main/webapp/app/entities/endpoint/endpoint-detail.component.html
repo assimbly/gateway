@@ -5,6 +5,10 @@
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
+                <dt><span>EndpointType</span></dt>
+                <dd>
+                    <span>{{endpoint.endpointType}}</span>
+                </dd>
                 <dt><span>ComponentType</span></dt>
                 <dd>
                     <span>{{endpoint.componentType}}</span>
@@ -17,6 +21,10 @@
                 <dd>
                     <span>{{endpoint.options}}</span>
                 </dd>
+                <dt><span>Response</span></dt>
+                <dd>
+                    <span>{{endpoint.responseId}}</span>
+                </dd>                
                 <dt><span>Flow</span></dt>
                 <dd>
                     <div *ngIf="endpoint.flowId">

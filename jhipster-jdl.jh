@@ -9,11 +9,6 @@ entity Gateway {
 	defaultErrorEndpointType String
 }
 
-entity EnvironmentVariables {
-	key String,
-	value String
-}
-
 entity Flow {
 	name String,
 	type String,
@@ -30,11 +25,11 @@ entity Flow {
 }
 
 entity Endpoint {
+	endpointType EndpointType,
 	compponentType ComponentType,
-	endpointType Endpoint
 	uri String,	
     options String,
-    reply Boolean   
+    responseId Integer   
 }
 
 entity Service {
@@ -56,6 +51,11 @@ entity HeaderKeys {
 	key String,
 	value String,
 	type String	
+}
+
+entity EnvironmentVariables {
+	key String,
+	value String
 }
 
 entity Maintenance {
@@ -89,6 +89,10 @@ enum EnvironmentType {
 
 enum ConnectorType {
     CAMEL,SPRINGINTEGRATION,CURL
+}
+
+enum EndpointType {
+   FROM, TO, ERROR, WIRETAP, RESPONSE 
 }
 
 enum ComponentType {

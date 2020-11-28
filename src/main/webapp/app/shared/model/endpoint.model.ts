@@ -1,3 +1,11 @@
+export const enum EndpointType {
+    FROM = 'FROM',
+    TO = 'TO',
+    ERROR = 'ERROR',
+    RESPONSE = 'RESPONSE',
+	WIRETAP = 'WIRETAP'
+}
+
 export const enum ComponentType {
     ACTIVEMQ = 'ACTIVEMQ',
     FILE = 'FILE',
@@ -15,10 +23,12 @@ export const enum ComponentType {
 
 export interface IEndpoint {
     id?: number;
+	endpointType?: EndpointType;
     componentType?: ComponentType;
     uri?: string;
     options?: string;
-    flowId?: number;
+    responseId?: number;
+	flowId?: number;
     serviceId?: number;
     headerId?: number;
 }
@@ -26,10 +36,12 @@ export interface IEndpoint {
 export class Endpoint implements IEndpoint {
     constructor(
         public id?: number,
-        public componentType?: ComponentType,
+		public endpointType?: EndpointType,        
+		public componentType?: ComponentType,
         public uri?: string,
         public options?: string,
-        public flowId?: number,
+		public responseId?: number,        
+		public flowId?: number,
         public serviceId?: number,
         public headerId?: number
     ) {}

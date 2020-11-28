@@ -38,7 +38,11 @@
                     <input type="text" class="form-control" name="options" id="field_options"
                         [(ngModel)]="endpoint.options" />
                 </div>
-
+                <div class="form-group">
+                    <label class="form-control-label" for="field_options">ResponseId</label>
+                    <input type="text" class="form-control" name="reponseId" id="field_options"
+                        [(ngModel)]="endpoint.responseId" />
+                </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_flow">Flow</label>
                     <select class="form-control" id="field_flow" name="flow" [(ngModel)]="endpoint.flowId" >

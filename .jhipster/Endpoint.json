@@ -1,9 +1,9 @@
 {
-    "name": "ToEndpoint",
+    "name": "Endpoint",
     "fields": [
         {
-            "fieldName": "type",
-            "fieldType": "EndpointType",
+            "fieldName": "componentType",
+            "fieldType": "ComponentType",
             "fieldValues": "ACTIVEMQ,FILE,HTTP4,KAFKA,SFTP,SJMS,SMTP,SONICMQ,SQL,STREAM,VM,WASTEBIN"
         },
         {
@@ -13,6 +13,15 @@
         {
             "fieldName": "options",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "endpointType",
+            "fieldType": "EndpointType",
+            "fieldValues": "FROM"
+        },
+        {
+            "fieldName": "responseId",
+            "fieldType": "Integer"
         }
     ],
     "relationships": [
@@ -20,28 +29,34 @@
             "relationshipName": "flow",
             "otherEntityName": "flow",
             "relationshipType": "many-to-one",
-            "otherEntityField": "id"
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
         },
         {
             "relationshipType": "many-to-one",
             "relationshipName": "service",
             "otherEntityName": "service",
-            "otherEntityField": "id"
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
         },
         {
             "relationshipType": "many-to-one",
             "relationshipName": "header",
             "otherEntityName": "header",
-            "otherEntityField": "id"
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
         }
     ],
     "changelogDate": "20180114201816",
-    "entityTableName": "to_endpoint",
+    "entityTableName": "endpoint",
     "dto": "mapstruct",
     "pagination": "no",
     "service": "serviceImpl",
     "jpaMetamodelFiltering": false,
     "fluentMethods": true,
     "clientRootFolder": "",
-    "applications": "*"
+    "applications": "*",
+    "searchEngine": false,
+    "databaseType": "sql",
+    "readOnly": false
 }
