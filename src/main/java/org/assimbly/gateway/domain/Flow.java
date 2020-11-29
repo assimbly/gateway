@@ -69,14 +69,6 @@ public class Flow implements Serializable {
     @JsonIgnoreProperties("flows")
     private Gateway gateway;
  
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private FromEndpoint fromEndpoint;
- 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private ErrorEndpoint errorEndpoint;
- 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     private Set<Endpoint> endpoints = new HashSet<>();
@@ -263,32 +255,6 @@ public class Flow implements Serializable {
 
     public void setGateway(Gateway gateway) {
         this.gateway = gateway;
-    }
-
-    public FromEndpoint getFromEndpoint() {
-        return fromEndpoint;
-    }
-
-    public Flow fromEndpoint(FromEndpoint fromEndpoint) {
-        this.fromEndpoint = fromEndpoint;
-        return this;
-    }
-
-    public void setFromEndpoint(FromEndpoint fromEndpoint) {
-        this.fromEndpoint = fromEndpoint;
-    }
-
-    public ErrorEndpoint getErrorEndpoint() {
-        return errorEndpoint;
-    }
-
-    public Flow errorEndpoint(ErrorEndpoint errorEndpoint) {
-        this.errorEndpoint = errorEndpoint;
-        return this;
-    }
-
-    public void setErrorEndpoint(ErrorEndpoint errorEndpoint) {
-        this.errorEndpoint = errorEndpoint;
     }
 
     public Set<Endpoint> getEndpoints() {

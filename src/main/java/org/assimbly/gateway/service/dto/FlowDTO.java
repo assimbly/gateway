@@ -42,10 +42,6 @@ public class FlowDTO implements Serializable {
 
     private Long gatewayId;
 
-    private Long fromEndpointId;
-
-    private Long errorEndpointId;
-    
     private Set<Endpoint> endpoints;
 
     public Long getId() {
@@ -161,22 +157,6 @@ public class FlowDTO implements Serializable {
         this.gatewayId = gatewayId;
     }
 
-    public Long getFromEndpointId() {
-        return fromEndpointId;
-    }
-
-    public void setFromEndpointId(Long fromEndpointId) {
-        this.fromEndpointId = fromEndpointId;
-    }
-
-    public Long getErrorEndpointId() {
-        return errorEndpointId;
-    }
-
-    public void setErrorEndpointId(Long errorEndpointId) {
-        this.errorEndpointId = errorEndpointId;
-    }
-
     public Set<Endpoint> getEndpoints() {
         return endpoints;
     }
@@ -220,8 +200,6 @@ public class FlowDTO implements Serializable {
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
-            ", fromEndpoint=" + getFromEndpointId() +
-            ", errorEndpoint=" + getErrorEndpointId() +
             "}";
     }
 }

@@ -8,10 +8,6 @@ import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway';
-import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { FromEndpointService } from 'app/entities/from-endpoint';
-import { IErrorEndpoint } from 'app/shared/model/error-endpoint.model';
-import { ErrorEndpointService } from 'app/entities/error-endpoint';
 
 @Component({
     selector: 'jhi-flow-update',
@@ -25,16 +21,10 @@ export class FlowUpdateComponent implements OnInit {
 
     gateways: IGateway[];
 
-    fromendpoints: IFromEndpoint[];
-
-    errorendpoints: IErrorEndpoint[];
-
     constructor(
         protected jhiAlertService: JhiAlertService,
         protected flowService: FlowService,
         protected gatewayService: GatewayService,
-        protected fromEndpointService: FromEndpointService,
-        protected errorEndpointService: ErrorEndpointService,
         protected activatedRoute: ActivatedRoute
     ) {}
 
@@ -49,36 +39,7 @@ export class FlowUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.fromEndpointService.query({ filter: 'flow-is-null' }).subscribe(
-            (res: HttpResponse<IFromEndpoint[]>) => {
-                if (!this.flow.fromEndpointId) {
-                    this.fromendpoints = res.body;
-                } else {
-                    this.fromEndpointService.find(this.flow.fromEndpointId).subscribe(
-                        (subRes: HttpResponse<IFromEndpoint>) => {
-                            this.fromendpoints = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
-        this.errorEndpointService.query({ filter: 'flow-is-null' }).subscribe(
-            (res: HttpResponse<IErrorEndpoint[]>) => {
-                if (!this.flow.errorEndpointId) {
-                    this.errorendpoints = res.body;
-                } else {
-                    this.errorEndpointService.find(this.flow.errorEndpointId).subscribe(
-                        (subRes: HttpResponse<IErrorEndpoint>) => {
-                            this.errorendpoints = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
+
     }
 
     previousState() {
@@ -115,11 +76,4 @@ export class FlowUpdateComponent implements OnInit {
         return item.id;
     }
 
-    trackFromEndpointById(index: number, item: IFromEndpoint) {
-        return item.id;
-    }
-
-    trackErrorEndpointById(index: number, item: IErrorEndpoint) {
-        return item.id;
-    }
 }

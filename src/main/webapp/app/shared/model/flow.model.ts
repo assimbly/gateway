@@ -16,8 +16,6 @@ export interface IFlow {
     lastModified?: Moment;    
     logLevel?: LogLevelType;
     gatewayId?: number;
-    fromEndpointId?: number;
-    errorEndpointId?: number;
     endpoints?: IEndpoint[];
 }
 
@@ -37,8 +35,6 @@ export class Flow implements IFlow {
         public lastModified?: Moment,    
         public logLevel?: LogLevelType,
         public gatewayId?: number,
-        public fromEndpointId?: number,
-        public errorEndpointId?: number,
         public endpoints?: IEndpoint[]
     ) {
         this.autoStart = this.autoStart || false;

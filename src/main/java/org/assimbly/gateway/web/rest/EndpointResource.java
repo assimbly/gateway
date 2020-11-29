@@ -5,7 +5,6 @@ import org.assimbly.gateway.repository.EndpointRepository;
 import org.assimbly.gateway.service.EndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.dto.FromEndpointDTO;
 import org.assimbly.gateway.service.dto.EndpointDTO;
 import org.assimbly.gateway.service.mapper.EndpointMapper;
 
