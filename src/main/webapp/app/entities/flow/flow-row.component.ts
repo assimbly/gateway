@@ -1,13 +1,9 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
-import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 
 import { FlowService } from './flow.service';
-import { FromEndpointService } from '../from-endpoint';
 import { EndpointService } from '../endpoint';
-import { ErrorEndpointService } from '../error-endpoint';
 import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService, AccountService, Account } from 'app/core';
@@ -36,12 +32,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     mySubscription: Subscription;
 
     @Input() flow: Flow;
-    @Input() fromEndpoints: FromEndpoint[];
+    //@Input() fromEndpoints: Endpoint[];
     @Input() isAdmin: boolean;
 
-    fromEndpoint: FromEndpoint = new FromEndpoint();
-    toEndpoints: Array<Endpoint> = [new Endpoint()];
-    errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
+	endpoints: Array<Endpoint> = [new Endpoint()];
+    fromEndpoint: Endpoint = new Endpoint();
+    toEndpoints: Array<Endpoint> = [];
+    errorEndpoint: Endpoint = new Endpoint();
 
     public isFlowStarted: boolean;
     public isFlowRestarted: boolean;
@@ -93,9 +90,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     constructor(
         private flowService: FlowService,
-        private fromEndpointService: FromEndpointService,
         private endpointService: EndpointService,
-        private errorEndpointService: ErrorEndpointService,
         private securityService: SecurityService,
         private loginModalService: LoginModalService,
         private modalService: NgbModal,
@@ -119,10 +114,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.setFlowStatusDefaults();
         this.getStatus(this.flow.id);
-
-        this.toEndpoints = this.flow.endpoints;
-        this.getFromEndpoint(this.flow.fromEndpointId);
-        this.getToEndpoint();
+        this.endpoints = this.flow.endpoints;
+        this.getEndpoints();
 
         this.registerTriggeredAction();
     }
@@ -473,25 +466,25 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
     }
 
-    getFromEndpoint(id: number) {
-        this.fromEndpoints
-            .filter(fromEndpoint => fromEndpoint.id === id)
-            .map(fromEndpoint => {
-                this.fromEndpoint = fromEndpoint;
-                this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
-            });
-    }
 
-    getToEndpoint() {
-        this.toEndpoints.forEach(toEndpoint => {
-            this.toEndpointsTooltips.push(this.endpointTooltip(toEndpoint.componentType, toEndpoint.uri, toEndpoint.options));
-        });
-    }
+    getEndpoints() {
 
-    getErrorEndpoint(id: number) {
-        this.errorEndpointService.find(id).subscribe(errorEndpoint => {
-            this.errorEndpoint = errorEndpoint.body;
-            this.errorEndpointTooltip = this.endpointTooltip(errorEndpoint.body.type, errorEndpoint.body.uri, errorEndpoint.body.options);
+		console.log("1 getEndpoints");
+        this.endpoints.forEach(endpoint => {
+			console.log("2. endpointType" + endpoint.endpointType.valueOf());	
+
+			if (endpoint.endpointType.valueOf() === 'FROM') {
+				console.log("3a from");
+                this.fromEndpoint = endpoint;
+                this.fromEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+            } else if (endpoint.endpointType.valueOf() ===  'TO') {
+					console.log("3b to");
+				this.toEndpoints.push(endpoint);	
+                this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+            } else if (endpoint.endpointType.valueOf() ===  'ERROR') {
+	            this.errorEndpoint = endpoint;
+    	        this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+            }            	
         });
     }
 

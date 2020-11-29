@@ -6,9 +6,7 @@ import { GatewayServiceModule } from './service/service.module';
 import { GatewayServiceKeysModule } from './service-keys/service-keys.module';
 import { GatewayHeaderModule } from './header/header.module';
 import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
-import { GatewayFromEndpointModule } from './from-endpoint/from-endpoint.module';
 import { GatewayEndpointModule } from './endpoint/endpoint.module';
-import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
 import { GatewaySecurityModule } from './security/security.module';
 import { GatewayBrokerModule } from './broker/broker.module';
@@ -29,9 +27,7 @@ import { DeploymentService } from 'app/admin';
         GatewayServiceKeysModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
-        GatewayFromEndpointModule,
         GatewayEndpointModule,
-        GatewayErrorEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
         GatewayBrokerModule,
@@ -43,8 +39,6 @@ import { DeploymentService } from 'app/admin';
         GatewayGatewayModule,
         GatewayFlowModule,
         GatewayEnvironmentVariablesModule,
-        GatewayErrorEndpointModule,
-        GatewayFromEndpointModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
         GatewayServiceModule,

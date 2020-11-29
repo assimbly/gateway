@@ -2,15 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-import { FromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { Endpoint } from 'app/shared/model/endpoint.model';
-import { ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
 import { Gateway } from 'app/shared/model/gateway.model';
 
 import { FlowService } from './flow.service';
-import { FromEndpointService } from '../from-endpoint';
 import { EndpointService } from '../endpoint';
-import { ErrorEndpointService } from '../error-endpoint';
 import { GatewayService } from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
@@ -27,9 +23,7 @@ import { Subscription } from 'rxjs';
 export class FlowDetailComponent implements OnInit {
     flow: IFlow;
     gateway: Gateway;
-    fromEndpoint: FromEndpoint;
     endpoints: Array<Endpoint>;
-    errorEndpoint: ErrorEndpoint;
 
     // typesLinks: Array<TypeLinks>;
 
@@ -48,9 +42,7 @@ export class FlowDetailComponent implements OnInit {
     constructor(
         public tabsetConfig: NgbTabsetConfig,
         protected gatewayService: GatewayService,
-        protected fromEndpointService: FromEndpointService,
         protected endpointService: EndpointService,
-        protected errorEndpointService: ErrorEndpointService,
         protected eventManager: JhiEventManager,
         protected flowService: FlowService,
         protected activatedRoute: ActivatedRoute
@@ -73,9 +65,7 @@ export class FlowDetailComponent implements OnInit {
         this.flowService.find(id).subscribe(flow => {
             this.flow = flow.body;
             this.getGateway(flow.body.gatewayId);
-            this.getFromEndpoint(flow.body.fromEndpointId);
             this.getEndpointByFlowId(flow.body.id);
-            this.getErrorEndpoint(flow.body.errorEndpointId);
         });
     }
 
@@ -85,17 +75,6 @@ export class FlowDetailComponent implements OnInit {
         }
 
         this.gatewayService.find(id).subscribe(gateway => (this.gateway = gateway.body));
-    }
-
-    getFromEndpoint(id) {
-        if (!id) {
-            return;
-        }
-
-        this.fromEndpointService.find(id).subscribe(fromEndpoint => {
-            this.fromEndpoint = fromEndpoint.body;
-            this.setTypeLinks(this.fromEndpoint);
-        });
     }
 
     getEndpointByFlowId(id) {
@@ -108,17 +87,6 @@ export class FlowDetailComponent implements OnInit {
             this.endpoints.forEach(endpoint => {
                 this.setTypeLinks(endpoint);
             });
-        });
-    }
-
-    getErrorEndpoint(id) {
-        if (!id) {
-            return;
-        }
-
-        this.errorEndpointService.find(id).subscribe(errorEndpoint => {
-            this.errorEndpoint = errorEndpoint.body;
-            this.setTypeLinks(this.errorEndpoint);
         });
     }
 
@@ -138,18 +106,8 @@ export class FlowDetailComponent implements OnInit {
     private setTypeLinks(endpoint: any) {
         let type;
 
-        if (endpoint instanceof FromEndpoint) {
-            type = typesLinks.find(x => x.name === endpoint.type.toString());
-            this.fromTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
-            this.fromTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
-        } else if (endpoint instanceof Endpoint) {
-            type = typesLinks.find(x => x.name === endpoint.componentType.toString());
-            this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
-            this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
-        } else if (endpoint instanceof ErrorEndpoint) {
-            type = typesLinks.find(x => x.name === endpoint.type.toString());
-            this.errorTypeAssimblyLink = this.wikiDocUrl + type.assimblyTypeLink;
-            this.errorTypeCamelLink = this.camelDocUrl + type.camelTypeLink;
-        }
+        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
+        this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
+        this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
     }
 }

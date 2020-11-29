@@ -8,8 +8,6 @@ import java.util.Set;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
@@ -20,7 +18,6 @@ import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.WireTapEndpointRepository;
-import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,10 +50,6 @@ public class DBExportXMLConfiguration {
 
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;
-
-	private FromEndpoint fromEndpoint;
-
-	private ErrorEndpoint errorEndpoint;
 
 	private Set<Endpoint> endpoints;
 
@@ -126,9 +119,9 @@ public class DBExportXMLConfiguration {
 		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
 
 		// check if endpoints are configured
-		getGeneralFlowPropertiesFromDB(flow);
+		endpoints = flow.getEndpoints();
 
-		if (fromEndpoint == null || endpoints == null || errorEndpoint == null) {
+		if (endpoints == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
@@ -141,9 +134,9 @@ public class DBExportXMLConfiguration {
 
 	public String getXMLFlowConfiguration(Flow flow) throws Exception {
 
-		getGeneralFlowPropertiesFromDB(flow);
+		endpoints = flow.getEndpoints();
 
-		if (fromEndpoint == null || endpoints == null || errorEndpoint == null) {
+		if (endpoints == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
@@ -155,13 +148,6 @@ public class DBExportXMLConfiguration {
 
 	}
 
-	private void getGeneralFlowPropertiesFromDB(Flow flow) throws Exception {
-
-		fromEndpoint = flow.getFromEndpoint();
-		errorEndpoint = flow.getErrorEndpoint();
-		endpoints = flow.getEndpoints();
-
-	}
 
 	// set methods
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
@@ -298,14 +284,8 @@ public class DBExportXMLConfiguration {
 		flow.appendChild(lastModified);
 		
 		// set endpoints
-		System.out.println("Set from endpoint");
-		setXMLFromEndpointFromDB(fromEndpoint);
-
-		System.out.println("Set endpoint");
+		System.out.println("Set endpoints");
 		setEndpointsFromDB(endpoints);
-
-		System.out.println("Set error endpoint");
-		setXMLErrorEndpointFromDB(errorEndpoint);
 
 	}
 
@@ -394,99 +374,6 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setXMLFromEndpointFromDB(FromEndpoint fromEndpointDB) throws Exception {
-
-		String confId = Long.toString(fromEndpointDB.getId());
-		String confUri = fromEndpointDB.getUri();
-		String confComponentType = fromEndpointDB.getType().getEndpoint();
-		String confOptions = fromEndpointDB.getOptions();
-		org.assimbly.gateway.domain.Service confService = fromEndpointDB.getService();
-		Header confHeader = fromEndpointDB.getHeader();
-
-		if (confUri != null) {
-
-			Element endpoint = doc.createElement("endpoint");
-			flow.appendChild(endpoint);
-
-			Element id = doc.createElement("id");
-			id.setTextContent(confId);
-			endpoint.appendChild(id);
-
-			Element type = doc.createElement("type");
-			type.setTextContent("from");
-			endpoint.appendChild(type);
-			
-			Element uri = doc.createElement("uri");
-
-			componentType = confComponentType.toLowerCase();
-
-			componentType = setDefaultComponentType(componentType);
-
-			if (componentType.equals("sql")) {
-				String confServiceId = confService.getId().toString();
-				if (confOptions.isEmpty() || confOptions == null) {
-					confOptions = "dataSource=" + confServiceId;
-				} else if (!confOptions.contains("dataSource")) {
-					confOptions = "&dataSource=" + confServiceId;
-					;
-				}
-			}
-
-			confUri = componentType + confUri;
-			uri.setTextContent(confUri);
-			endpoint.appendChild(uri);
-			
-			if (confOptions != null && !confOptions.isEmpty()) {
-
-				Element options = doc.createElement("options");
-				endpoint.appendChild(options);
-
-				String[] confOptionsSplitted = confOptions.split("&");
-
-				if (confOptionsSplitted.length > 1) {
-
-					for (String confOption : confOptionsSplitted) {
-						String[] confOptionSplitted = confOption.split("=");
-
-						if (confOptionSplitted.length > 0) {
-							Element option = doc.createElement(confOptionSplitted[0]);
-							option.setTextContent(confOptionSplitted[1]);
-							options.appendChild(option);
-						}
-					}
-				} else {
-
-					String[] confOptionSplitted = confOptions.split("=");
-
-					if (confOptionSplitted.length > 0) {
-						Element option = doc.createElement(confOptionSplitted[0]);
-						option.setTextContent(confOptionSplitted[1]);
-						options.appendChild(option);
-					}
-
-				}
-			}
-
-			if (confService != null) {
-				String confServiceId = confService.getId().toString();
-				Element serviceId = doc.createElement("service_id");
-
-				serviceId.setTextContent(confServiceId);
-				endpoint.appendChild(serviceId);
-				setXMLServiceFromDB(confServiceId, "from", confService);
-			}
-
-			if (confHeader != null) {
-				String confHeaderId = confHeader.getId().toString();
-				Element headerId = doc.createElement("header_id");
-
-				endpoint.appendChild(headerId);
-				headerId.setTextContent(confHeaderId);
-				setXMLHeaderFromDB(confHeaderId, "from", confHeader);
-			}
-
-		}
-	}
 
 	public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
 
@@ -502,8 +389,6 @@ public class DBExportXMLConfiguration {
 		
 			System.out.println("1. confId" + confId);
 
-			System.out.println("1111. confEndpointType=" + endpointDB.getEndpointType().name());	
-			System.out.println("2222. confEndpointType=" + endpointDB.getEndpointType().toString());
 			System.out.println("3333. confEndpointType=" + endpointDB.getEndpointType().getEndpoint());
 
 			if (confUri != null) {
@@ -594,85 +479,6 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setXMLErrorEndpointFromDB(ErrorEndpoint errorEndpointDB) throws Exception {
-
-		String confId = Long.toString(errorEndpointDB.getId());
-		String confUri = errorEndpointDB.getUri();
-		String confComponentType = errorEndpointDB.getType().getEndpoint();
-		String confOptions = errorEndpointDB.getOptions();
-		org.assimbly.gateway.domain.Service confService = errorEndpointDB.getService();
-		Header confHeader = errorEndpointDB.getHeader();
-
-		if (confUri != null) {
-
-			Element endpoint = doc.createElement("endpoint");
-			flow.appendChild(endpoint);
-
-			Element id = doc.createElement("id");
-			id.setTextContent(confId);
-			endpoint.appendChild(id);
-
-			Element type = doc.createElement("type");
-			type.setTextContent("error");
-			endpoint.appendChild(type);
-			
-			Element uri = doc.createElement("uri");
-
-			componentType = confComponentType.toLowerCase();
-
-			componentType = setDefaultComponentType(componentType);
-
-			if (componentType.equals("sql")) {
-				String confServiceId = confService.getId().toString();
-				if (confOptions.isEmpty() || confOptions == null) {
-					confOptions = "dataSource=" + confServiceId;
-				} else if (!confOptions.contains("dataSource")) {
-					confOptions = "&dataSource=" + confServiceId;
-					;
-				}
-			}
-
-			confUri = componentType + confUri;
-			uri.setTextContent(confUri);
-			endpoint.appendChild(uri);
-			
-			if (confOptions != null && !confOptions.isEmpty()) {
-
-				Element options = doc.createElement("options");
-				endpoint.appendChild(options);
-
-				String[] confOptionsSplitted = confOptions.split("&");
-
-				for (String confOption : confOptionsSplitted) {
-					String[] confOptionSplitted = confOption.split("=");
-
-					if (confOptionSplitted.length > 1) {
-						Element option = doc.createElement(confOptionSplitted[0]);
-						option.setTextContent(confOptionSplitted[1]);
-						options.appendChild(option);
-					}
-				}
-			}
-
-			if (confService != null) {
-				String confServiceId = confService.getId().toString();
-				Element serviceId = doc.createElement("service_id");
-
-				serviceId.setTextContent(confServiceId);
-				endpoint.appendChild(serviceId);
-				setXMLServiceFromDB(confServiceId, "error", errorEndpointDB.getService());
-			}
-
-			if (confHeader != null) {
-				String confHeaderId = confHeader.getId().toString();
-				Element headerId = doc.createElement("header_id");
-
-				endpoint.appendChild(headerId);
-				headerId.setTextContent(confHeaderId);
-				setXMLHeaderFromDB(confHeaderId, "error", errorEndpointDB.getHeader());
-			}
-		}
-	}
 
 	public void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
 		
@@ -809,8 +615,6 @@ public class DBExportXMLConfiguration {
 			componentType = confComponentType.toLowerCase();
 
 			componentType = setDefaultComponentType(componentType);
-
-			System.out.println("3.");
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();

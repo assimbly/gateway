@@ -28,8 +28,8 @@ export class GatewayDeleteDialogComponent {
     confirmDelete(id: number) {
         this.gatewayService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
-                name: 'fromEndpointListModification',
-                content: 'Deleted an fromEndpoint'
+                name: 'gatewayListModification',
+                content: 'Deleted a gateway'
             });
             this.activeModal.dismiss(true);
         });
