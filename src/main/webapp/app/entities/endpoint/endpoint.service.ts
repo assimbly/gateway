@@ -44,7 +44,7 @@ export class EndpointService {
     }
 
     find(id: number): Observable<EntityResponseType> {
-        return this.http.get<IEndpoint>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+        return this.http.get<IEndpoint>(`${this.resourceUrlEndpoint}/${id}`, { observe: 'response' });
     }
 
     findByFlowId(id: number): Observable<HttpResponse<any>> {

@@ -284,7 +284,6 @@ public class DBExportXMLConfiguration {
 		flow.appendChild(lastModified);
 		
 		// set endpoints
-		System.out.println("Set endpoints");
 		setEndpointsFromDB(endpoints);
 
 	}
@@ -302,9 +301,7 @@ public class DBExportXMLConfiguration {
 			Element uri = doc.createElement("uri");
 			offloading.appendChild(uri);
 
-			componentType = confComponentType.toLowerCase();
-
-			componentType = setDefaultComponentType(componentType);
+			componentType = setDefaultComponentType(confComponentType.toLowerCase());
 
 			if (componentType.equals("sql")) {
 				String confServiceId = confService.getId().toString();
@@ -387,13 +384,7 @@ public class DBExportXMLConfiguration {
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();
 		
-			System.out.println("1. confId" + confId);
-
-			System.out.println("3333. confEndpointType=" + endpointDB.getEndpointType().getEndpoint());
-
 			if (confUri != null) {
-
-				System.out.println("2. confId" + confId);
 
 				Element endpoint = doc.createElement("endpoint");
 				flow.appendChild(endpoint);
@@ -411,8 +402,6 @@ public class DBExportXMLConfiguration {
 
 				uri.setTextContent(confUri);
 				endpoint.appendChild(uri);
-
-				System.out.println("4");
 				
 				if (confOptions != null && !confOptions.isEmpty()) {
 					Element options = doc.createElement("options");
@@ -430,9 +419,7 @@ public class DBExportXMLConfiguration {
 						}
 					}
 				}
-
-				System.out.println("5");
-								
+							
 				if (confService != null) {
 					String confServiceId = confService.getId().toString();
 					Element serviceId = doc.createElement("service_id");
@@ -473,8 +460,6 @@ public class DBExportXMLConfiguration {
 				endpoint.appendChild(type);
 				
 			}
-			
-			System.out.println("6");
 			
 		}
 	}

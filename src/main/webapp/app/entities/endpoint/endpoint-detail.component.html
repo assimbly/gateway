@@ -21,23 +21,23 @@
                 <dd>
                     <span>{{endpoint.options}}</span>
                 </dd>
-                <dt><span>Response</span></dt>
+                <dt><span>Response ID</span></dt>
                 <dd>
                     <span>{{endpoint.responseId}}</span>
                 </dd>                
-                <dt><span>Flow</span></dt>
+                <dt><span>Flow ID</span></dt>
                 <dd>
                     <div *ngIf="endpoint.flowId">
                         <a [routerLink]="['/flow', endpoint.flowId, 'view']">{{endpoint.flowId}}</a>
                     </div>
                 </dd>
-                <dt><span>Service</span></dt>
+                <dt><span>Service ID</span></dt>
                 <dd>
                     <div *ngIf="endpoint.serviceId">
                         <a [routerLink]="['/service', endpoint.serviceId, 'view']">{{endpoint.serviceId}}</a>
                     </div>
                 </dd>
-                <dt><span>Header</span></dt>
+                <dt><span>Header ID</span></dt>
                 <dd>
                     <div *ngIf="endpoint.headerId">
                         <a [routerLink]="['/header', endpoint.headerId, 'view']">{{endpoint.headerId}}</a>
@@ -51,11 +51,11 @@
                 <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
             </button>
 
-            <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            <!--  <button type="button" *jhiHasAnyAuthority="'ROLE_ADMIN'"
                     [routerLink]="['/endpoint', endpoint.id, 'edit']"
                     class="btn btn-primary">
                 <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
-            </button>
+            </button>-->
         </div>
     </div>
 </div>
