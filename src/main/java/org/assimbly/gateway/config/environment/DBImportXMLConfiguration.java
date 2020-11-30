@@ -16,6 +16,7 @@ import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.domain.enumeration.ComponentType;
+import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -270,7 +271,7 @@ public class DBImportXMLConfiguration {
 		if (newFlow) {
 			endpoints = new HashSet<Endpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint[type='to'])", doc));
+			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint)", doc));
 			numberOfEndpoints = numberOfEndpoints + 1;
 
 			for (int i = 1; i < numberOfEndpoints; i++) {
@@ -300,88 +301,91 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String toUri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/uri", doc);
-		String toServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/service_id", doc);
-		String toHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[type='to'][" + index + "]/header_id", doc);
-		String toOptions = null;
+		String type = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/type", doc);
+		String uri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/uri", doc);
+		String options = null;
+		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
+		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
 
 		// get type
-		String[] toUriSplitted = toUri.split(":", 2);
-		String toTypeAsString = toUriSplitted[0].toUpperCase();
-		toTypeAsString = toTypeAsString.replace("-", "");
+		String[] uriSplitted = uri.split(":", 2);
+		String componentTypeAsString = uriSplitted[0].toUpperCase();
+		componentTypeAsString = componentTypeAsString.replace("-", "");
 
-		ComponentType toType = ComponentType.valueOf(toTypeAsString);
-
+		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
+		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+		
 		// get uri
-		toUri = toUriSplitted[1];
-		while (toUri.startsWith("/")) {
-			toUri = toUri.substring(1);
-			;
+		uri = uriSplitted[1];
+		while (uri.startsWith("/")) {
+			uri = uri.substring(1);
+			
 		}
 
 		// get options
-		Map<String, String> toOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[type='to']/options/*");
+		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint/options/*");
 
-		for (Map.Entry<String, String> entry : toOptionsMap.entrySet()) {
+		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
 
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			if (toOptions != null) {
-				toOptions = toOptions + "&" + key + "=" + value;
+			if (options != null) {
+				options = options + "&" + key + "=" + value;
 				;
 			} else {
-				toOptions = key + "=" + value;
+				options = key + "=" + value;
 			}
 
 		}
 
 		// get service if configured
-		org.assimbly.gateway.domain.Service toService;
+		org.assimbly.gateway.domain.Service service;
 		try {
-			Long serviceId = Long.parseLong(toServiceId, 10);
-			String toServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
-			Optional<org.assimbly.gateway.domain.Service>toServiceOptional = serviceRepository.findByName(toServiceName);
-			if(toServiceOptional.isPresent()) {
-				toService = toServiceOptional.get();
+			Long serviceIdLong = Long.parseLong(serviceId, 10);
+			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
+			Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+			if(serviceOptional.isPresent()) {
+				service = serviceOptional.get();
 			}else {
-				toService = null;
+				service = null;
 			}
 		} catch (NumberFormatException nfe) {
-			toService = null;
+			service = null;
 		}
 
 		// get header if configured
-		Header toHeader;
+		Header header;
 		try {
 			
-			Long headerId = Long.parseLong(toHeaderId, 10);
-			String toHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
-			Optional<Header> toHeaderOptional = toHeaderOptional = headerRepository.findByName(toHeaderName);
-			if(toHeaderOptional.isPresent()) {
-				toHeader = toHeaderOptional.get();
+			Long headerIdLong = Long.parseLong(headerId, 10);
+			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerIdLong + "]/name",doc);
+			Optional<Header> headerOptional = headerOptional = headerRepository.findByName(headerName);
+			if(headerOptional.isPresent()) {
+				header = headerOptional.get();
 			}else {
-				toHeader = null;
+				header = null;
 			}			
 				
 		} catch (NumberFormatException nfe) {
-			toHeader = null;
+			header = null;
 		}
 
 		if (endpoint == null) {
 			endpoint = new Endpoint();
 		}
 
-		endpoint.setUri(toUri);
-		endpoint.setComponentType(toType);
+		endpoint.setEndpointType(endpointType);
+		endpoint.setComponentType(componentType);
+		endpoint.setUri(uri);
 		endpoint.setFlow(flow);
-		endpoint.setOptions(toOptions);
+		endpoint.setOptions(options);
 
-		if (toService != null) {
-			endpoint.setService(toService);
+		if (service != null) {
+			endpoint.setService(service);
 		}
-		if (toHeader != null) {
-			endpoint.setHeader(toHeader);
+		if (header != null) {
+			endpoint.setHeader(header);
 		}
 
 		return endpoint;
