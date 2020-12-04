@@ -106,7 +106,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadPage(page) {
-        this.page = 0; //page;
+        this.page = 0; // page;
         this.itemsPerPage = this.itemsPerPage + 5;
         this.loadFlows();
     }

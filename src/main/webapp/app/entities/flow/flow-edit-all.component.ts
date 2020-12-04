@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -182,10 +182,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         this.registerChangeInFlows();
     }
-
-    ngAfterViewInit() {
-	    this._cdRef.detectChanges();
-	}
 
     load(id, isCloning?: boolean) {
         forkJoin(

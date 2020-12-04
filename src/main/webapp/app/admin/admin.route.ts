@@ -12,7 +12,7 @@ import {
     userMgmtRoute
 } from './';
 
-import { UserRouteAccessService } from '../../app/core';
+import { UserRouteAccessService } from 'app/core';
 
 const ADMIN_ROUTES = [
     auditsRoute,
