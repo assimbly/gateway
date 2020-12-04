@@ -129,7 +129,7 @@ public class EndpointDTO implements Serializable {
             ", componentType='" + getComponentType() + "'" +
             ", uri='" + getUri() + "'" +
             ", options='" + getOptions() + "'" +
-            ", responseId='" + getResponseId() + "'" +
+            ", responseId=" + getResponseId() +
             ", flow=" + getFlowId() +
             ", service=" + getServiceId() +
             ", header=" + getHeaderId() +
