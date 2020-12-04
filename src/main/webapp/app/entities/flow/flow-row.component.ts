@@ -469,16 +469,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     getEndpoints() {
 
-		console.log("1 getEndpoints");
         this.endpoints.forEach(endpoint => {
-			console.log("2. endpointType" + endpoint.endpointType.valueOf());	
 
 			if (endpoint.endpointType.valueOf() === 'FROM') {
-				console.log("3a from");
                 this.fromEndpoint = endpoint;
                 this.fromEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
             } else if (endpoint.endpointType.valueOf() ===  'TO') {
-					console.log("3b to");
 				this.toEndpoints.push(endpoint);	
                 this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
             } else if (endpoint.endpointType.valueOf() ===  'ERROR') {
