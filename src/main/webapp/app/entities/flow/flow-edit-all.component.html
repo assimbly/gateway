@@ -15,6 +15,7 @@
 				<div class="border-bottom my-3">
 					<h3>General</h3>
 				</div>
+
 				<div>
 					<jhi-alert-error></jhi-alert-error>
 					<div class="form-group" [style.display]="'none'">
@@ -105,10 +106,7 @@
 								</option>
 
 			            </select>
-			            <!--
-							<select class="form-control" id="field_logLevel" formControlName="logLevel">
-									<option *ngFor="let id of logLevelListType" [ngValue]="logLevel[id]">{{logLevel[id]}}</option>
-							</select>-->
+			            
 						</div>
 						<div class="form-group" *ngIf="!singleGateway">
 							<label class="form-control-label" for="field_gateway">Gateway</label>
@@ -130,14 +128,8 @@
 					<ng-template #servicePopover let-message="message">
 								<div [innerHtml]="servicePopoverMessage"></div>
 					</ng-template>
-					<ng-template #fromPopover let-message="message">
-						<div [innerHtml]="fromPopoverMessage"></div>
-					</ng-template>
-					<ng-template #toPopover let-message="message">
-						<div [innerHtml]="toPopoverMessage"></div>
-					</ng-template>
-					<ng-template #errorPopover let-message="message">
-						<div [innerHtml]="errorPopoverMessage"></div>
+					<ng-template #popover let-message="message">
+						<div [innerHtml]="popoverMessage"></div>
 					</ng-template>
 					<ng-template #hostnamePopover let-message="message">
 								<div [innerHtml]="hostnamePopoverMessage"></div>
@@ -189,171 +181,25 @@
 
 
 
-					<!-- styling of tabset is in global.scss -->
-					<ngb-accordion [closeOthers]="true" activeIds="From" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
-						<ngb-panel ngbPanelTitle id="fromTab">
-							 <ng-template ngbPanelTitle>
-								<span><b>From</b></span>
-						      <i triggers="mouseenter:mouseleave"
-							placement="right" triggers="mouseenter:mouseleave"
-							popoverTitle="Info"
-							 [popover]="fromPopover"
-							class="fa fa-info-circle"></i>
+					<ngb-accordion [closeOthers]="false" activeIds="tab" formArrayName="endpointsData" (tabChange)="next(false, false, $event)" #tabs>
+
+						<ngb-panel ngbPanelTitle id="tab" *ngFor="let endpoint of endpoints; index as index">
+ 						   <ng-template ngbPanelTitle>
+								<span><b>{{endpoint.endpointType}}</b></span>
 						    </ng-template>
 							<ng-template ngbPanelContent>
 								<jhi-alert-error></jhi-alert-error>
-									<div class="col-12" style="padding-left: 20px;" [formGroupName]="'0'">
+									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="index" id="{{ 'tab' + index }}">
 										<div class="input-group">
 											<a class="col-11"></a>
 											<a class="col-1">
 												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
-								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>
+								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#000000;"></i></a>
 								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-											        <a ngbDropdownItem role="button" href="{{fromComponentTypeCamelLink}}" [ngClass]="{'disabled': !fromComponentTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{fromEndpoint?.componentType}}.">
+											        <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
 														<span>Camel Documentation</span>
 													</a>
-													<a ngbDropdownItem role="button" href="{{fromComponentTypeAssimblyLink}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{fromEndpoint?.componentType}}.">
-														<span>Assimbly Documentation</span>
-													</a>
-													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
-														<span>Test Connection</span>
-													</a>
-											      </div>
-											   </div>
-											</a>
-										</div>
-										<div class="form-group" [style.display]="'none'">
-											<label for="id">ID</label>
-											<input type="text" class="form-control" id="id" readonly formControlName="id" />
-										</div>
-										<ng-template #uriPopover let-message="message">
-													<div [innerHtml]="fromUriPopoverMessage"></div>
-										</ng-template>
-										<ng-template #uriFromEditor>
-												<div class="modal-header">
-											      <h4 class="modal-title">URI (context path)</h4>
-											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-											        <span aria-hidden="true">&times;</span>
-											      </button>
-											    </div>
-											    <div class="modal-body">
-											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" rows="5" [(ngModel)]="fromEndpoint.uri"></textarea>
-											    </div>
-											    <div class="modal-footer">
-											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
-											    </div>
-										</ng-template>
-
-										<div class="form-group">
-											<div class="input-group border-bottom my-3">
-												<h5>URI&ensp;</h5>
-												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-											</div>
-											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_from_type" (change)="setTypeLinks(fromEndpoint, 0, $event)"></ng-select>
-												<a>:</a><span style="display:inline-block; width: 14px;"></span>
-												<input type="text" class="form-control col-6.5" id="field_uri" formControlName="uri" placeholder="{{fromUriPlaceholder}}" [(ngModel)]="fromEndpoint.uri"/>
-												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriFromEditor)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][0]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][0]['controls'].componentType.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][0]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][0]['controls'].uri.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
-										</div>
-										<div class="form-group" formArrayName="options">
-											<label class="form-control-label" for="field_options">Options</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="row mx-0 mb-1" *ngFor="let fromOption of fromEndpointOptions; let idx = index" [formGroupName]="idx">
-												<ng-select [items]="fromComponentOptions" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])">
-												    <ng-template ng-option-tmp let-item="item">
-													    <div [ngbTooltip]="fromOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
-													     <ng-template #fromOptionTooltip>
-													     	<div>
-													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
-													     	</div>
-													     </ng-template>
-												    </ng-template>
-												</ng-select>
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])"/>
-												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(fromEndpointOptions, '0')"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(fromEndpointOptions, fromOption, '0')" [disabled]="fromEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
-												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
-													</div>
-												</div>
-												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<br/>
-										<div class="border-bottom my-3"><h5>Header & Service </h5></div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="headerPopover"  container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
-												</button>
-												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(fromEndpoint, editFlowForm['controls'].endpointsData['controls'][0]['controls'].header)">
-													<span class="fa fa-plus padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_service">Service</label>
-											<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="fromFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
-												</button>
-												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(fromEndpoint, fromServiceType, editFlowForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
-													<span class="fa fa-plus padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][0]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
-										</div>
-									</div>
-							</ng-template>
-						</ngb-panel>
-
-						<ngb-panel ngbPanelTitle id="toTab" *ngFor="let toEndpoint of toEndpoints; index as toIndex">
-							 <ng-template ngbPanelTitle>
-								<span><b>To ({{toIndex+1}})</b></span>
-						      	<i triggers="mouseenter:mouseleave"
-							placement="right" triggers="mouseenter:mouseleave"
-							popoverTitle="Info"
-							 [popover]="toPopover"
-							class="fa fa-info-circle"></i>
-						    </ng-template>
-							<ng-template ngbPanelContent>
-								<jhi-alert-error></jhi-alert-error>
-									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="toIndex+2">
-										<div class="input-group">
-											<a class="col-11"></a>
-											<a class="col-1">
-												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
-								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>
-								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-											        <a ngbDropdownItem role="button" href="{{toComponentTypeCamelLinks[toIndex]}}" [ngClass]="{'disabled': !toComponentTypeCamelLinks[toIndex]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{toEndpoint?.componentType}}.">
-														<span>Camel Documentation</span>
-													</a>
-													<a ngbDropdownItem role="button" href="{{toComponentTypeAssimblyLinks[toIndex]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{toEndpoint?.componentType}}.">
+													<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">
 														<span>Assimbly Documentation</span>
 													</a>
 													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
@@ -368,9 +214,9 @@
 											<input type="text" class="form-control" id="id" formControlName="id" readonly />
 										</div>
 										<ng-template #uriPopover let-message="message">
-											<div style="min-width:300px;" [innerHtml]="toUriPopoverMessages[toIndex]"></div>
+											<div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
 										</ng-template>
-										<ng-template #uriToEditor>
+										<ng-template #uriEditor>
 												<div class="modal-header">
 											      <h4 class="modal-title">URI (context path)</h4>
 											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
@@ -378,252 +224,108 @@
 											      </button>
 											    </div>
 											    <div class="modal-body">
-											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}" rows="5" [(ngModel)]="toEndpoint.uri"></textarea>
+											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}" rows="5" [(ngModel)]="endpoint.uri"></textarea>
 											    </div>
 											    <div class="modal-footer">
 											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
 											    </div>
 										</ng-template>
+																			
+										
 										<div class="form-group">
 											<div class="input-group border-bottom my-3">
 												<h5>URI&ensp;</h5>
 												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
 												</div>
 											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_to_type" (change)="setTypeLinks(toEndpoint, toIndex+2, $event)"></ng-select>
-												<a>:</a><span style="display:inline-block; width: 14px;"></span>
-												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{toUriPlaceholders[toIndex]}}"  [(ngModel)]="toEndpoint.uri"/>
-												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriToEditor)">
+												<ng-select  *ngIf="endpoint.endpointType==='FROM'" class="col-3" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+												<ng-select  *ngIf="endpoint.endpointType==='TO'" class="col-3" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+												<ng-select  *ngIf="endpoint.endpointType==='ERROR'" class="col-3" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>												<a>:</a><span style="display:inline-block; width: 14px;"></span>
+												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri"/>
+												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
 											</div>
 										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
+										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
+											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
 										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].uri.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
+										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
+											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
 										</div>
 										<div class="form-group" formArrayName="options">
 											<label class="form-control-label" for="field_options">Options</label>
 											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="row mx-0 mb-1" *ngFor="let toOption of toEndpointsOptions[toIndex]; index as idx" [formGroupName]="idx">
-												<ng-select [items]="toComponentOptions[toIndex]" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])">
+											<div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
+												<ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx])">
 												    <ng-template ng-option-tmp let-item="item">
-													    <div [ngbTooltip]="toOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
-													     <ng-template #toOptionTooltip>
+													    <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+													     <ng-template #optionTooltip>
 													     	<div>
 													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
 													     	</div>
 													     </ng-template>
 												    </ng-template>
 												</ng-select>
-												<!-- <ng-select [items]="toComponentOptions[toIndex]" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])"></ng-select> -->
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
-												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(toEndpointsOptions[toIndex], toIndex+2)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(toEndpointsOptions[toIndex], toOption, toIndex+2)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN' || toEndpointsOptions[toIndex].length === 1"><span class="fa fa-remove"></span></button>
+												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
+												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
+												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><span class="fa fa-remove"></span></button>
 												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].key.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
+													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.touched)">
+														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
 													</div>
 												</div>
 												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].value.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
+													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.touched)">
+														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
 													</div>
 												</div>
 											</div>
 										</div>
 										<br/>
-										<div class="border-bottom my-3"><h5>Header & Service</h5></div>
+										<div class="border-bottom my-3"><h5>Header</h5></div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select  [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'">
+												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
+												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
 													<span class="fa fa-pencil  padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'">
+												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
 												</button>
-												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(toEndpoint, editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'">
+												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
 												</button>
 											</div>
 										</div>
 
+										<div class="border-bottom my-3"><h5>Header</h5></div>
 										<div class="form-group">
-											<label class="form-control-label" for="field_service">Service</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
 											<div class="input-group">
-												<ng-select [items]="toFilterService[toIndex]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'">
+												<ng-select [items]="filterService[index]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
+												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
 													<span class="fa fa-pencil padding-button"></span>&nbsp;
 												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.disabled">
+												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
 												</button>
-												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(toEndpoint, toServiceType[toIndex], editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].componentType.value === 'WASTEBIN'">
+												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
 													<span class="fa fa-plus padding-button"></span>&nbsp;
 												</button>
 											</div>
 										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][toIndex+2]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
+										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.touched)">
+											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
 										</div>
-										<div class="text-right form-group" role="group">
-											<button type="button" class="btn btn-danger" (click)="removeToEndpoint(toEndpoint, 'toEndpointData'+toIndex)" [disabled]="toEndpoints.length === 1">
+										<div class="text-right form-group" role="group" *ngIf="endpoint.endpointType==='TO'">
+											<button type="button" class="btn btn-danger" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="numberOfToEndpoints === 1">
 												<span class="fa fa-remove"></span>&nbsp;
 												<span>Remove To endpoint</span>
 											</button>
-											<button type="button" class="btn btn-primary" (click)="addNewToEndpoint()" [disabled]="toEndpoints.length > 2">
+											<button type="button" class="btn btn-primary" (click)="addEndpoint(endpoint, index)">
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Add To endpoint</span>
 											</button>
 										</div>
-									</div>
-							</ng-template>
-						</ngb-panel>
-
-						<ngb-panel ngbPanelTitle id="errorTab">
-							 <ng-template ngbPanelTitle>
-								<span><b>Error</b></span>
-						      <i triggers="mouseenter:mouseleave"
-							placement="right" triggers="mouseenter:mouseleave"
-							popoverTitle="Info"
-							 [popover]="errorPopover"
-							class="fa fa-info-circle"></i>
-						    </ng-template>
-							<ng-template ngbPanelContent>
-									<div  class="col-12" style="padding-left: 20px;" [formGroupName]="'1'">
-										<div class="input-group">
-											<a class="col-11"></a>
-											<a class="col-1">
-												 <div ngbDropdown class="d-inline-block" placement="bottom-right">
-								      				<a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-ellipsis-h" style="color:#FFFFFF;"></i></a>
-								      				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-											        <a ngbDropdownItem role="button" href="{{errorComponentTypeCamelLink}}" [ngClass]="{'disabled': !errorComponentTypeCamelLink}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{errorEndpoint?.componentType}}.">
-														<span>Camel Documentation</span>
-													</a>
-													<a ngbDropdownItem role="button" href="{{errorComponentTypeAssimblyLink}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{errorEndpoint?.componentType}}.">
-														<span>Assimbly Documentation</span>
-													</a>
-													<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
-														<span>Test Connection</span>
-													</a>
-											      </div>
-											   </div>
-											</a>
-										</div>
-										<div class="form-group" [style.display]="'none'">
-											<label for="id">ID</label>
-											<input type="text" class="form-control" id="id" formControlName="id" readonly />
-										</div>
-										<ng-template #uriPopover let-message="message">
-											<div style="min-width:300px;" [innerHtml]="errorUriPopoverMessage"></div>
-										</ng-template>
-										<ng-template #uriErrorEditor>
-												<div class="modal-header">
-											      <h4 class="modal-title">URI (context path)</h4>
-											      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-											        <span aria-hidden="true">&times;</span>
-											      </button>
-											    </div>
-											    <div class="modal-body">
-											    	 <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{errorUriPlaceholder}}" rows="5" [(ngModel)]="errorEndpoint.uri"></textarea>
-											    </div>
-											    <div class="modal-footer">
-											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
-											    </div>
-										</ng-template>
-
-										<div class="form-group">
-											<div class="input-group border-bottom my-3">
-												<h5>URI&ensp;</h5>
-												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-											</div>
-											<div class="input-group" style="margin-left: -14px;">
-												<ng-select class="col-3" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_error_type" (change)="setTypeLinks(errorEndpoint, 1, $event)"></ng-select>
-												<a>:</a><span style="display:inline-block; width: 14px;"></span>
-												<input type="text" class="form-control" id="field_uri" formControlName="uri" placeholder="{{errorUriPlaceholder}}" [(ngModel)]="errorEndpoint.uri"/>
-												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriErrorEditor)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][1]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][1]['controls'].componentType.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].componentType.errors.required" class="invalid-field-message">Type is required. Please select one.</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][1]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][1]['controls'].uri.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
-										</div>
-										<div class="form-group" formArrayName="options">
-											<label class="form-control-label" for="field_options">Options</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="row mx-0 mb-1" *ngFor="let errOption of errorEndpointOptions; let idx = index" [formGroupName]="idx">
-												<!-- <input type="text" class="col-5 right-border-radius-0 d-inline-block form-control" id="field_options-key-{{idx}}" formControlName="key" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"  data-toggle="tooltip" title="Name of the option. Click the Camel component button for documentation on valid options."/>-->
-
-												<ng-select [items]="errorComponentOptions" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}"  formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])">
-												    <ng-template ng-option-tmp let-item="item">
-													    <div [ngbTooltip]="errorOptionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
-													     <ng-template #errorOptionTooltip>
-													     	<div>
-													     		<b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
-													     	</div>
-													     </ng-template>
-												    </ng-template>
-												</ng-select>
-												<!-- <ng-select [items]="errorComponentOptions" [addTag]="true" [ngStyle]="{'display':'block', 'width': '300px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"></ng-select> -->
-												<input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx])"  data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
-												<button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(errorEndpointOptions, '1')"><span class="fa fa-plus"></span></button>
-												<button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(errorEndpointOptions, errOption, '1')" [disabled]="errorEndpointOptions.length === 1"><span class="fa fa-remove"></span></button>
-												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].key.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
-													</div>
-												</div>
-												<div class="col-5 d-inline-block px-0">
-													<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].value.touched)">
-														<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<br/>
-										<div class="border-bottom my-3"><h5>Header & Service</h5></div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_header">Header</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="headerPopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-												<button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
-												</button>
-												<button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(errorEndpoint, editFlowForm['controls'].endpointsData['controls'][1]['controls'].header)">
-													<span class="fa fa-plus padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="form-control-label" for="field_service">Service</label>
-											<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="servicePopover" container="body" placement="right" class="fa fa-info-circle"></i>
-											<div class="input-group">
-												<ng-select [items]="errorFilterService" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
-												<button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
-												<button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.disabled">
-												</button>
-												<button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(errorEndpoint, errorServiceType, editFlowForm['controls'].endpointsData['controls'][1]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.disabled">
-													<span class="fa fa-plus padding-button"></span>&nbsp;
-												</button>
-											</div>
-										</div>
-										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.touched)">
-											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][1]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
-										</div>
-									</div>
+									</div> 
 							</ng-template>
 						</ngb-panel>
 					</ngb-accordion>
