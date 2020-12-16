@@ -38,9 +38,9 @@ version = '3.1.0'
 
 description = ""
 
-sourceCompatibility=1.8
-targetCompatibility=1.8
-assert System.properties["java.specification.version"] == "1.8" || "11" || "12" || "13"
+sourceCompatibility=11
+targetCompatibility=11
+assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
@@ -320,11 +320,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
 
-	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.12.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.12.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.12.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.12.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.12.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.16.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.16.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.16.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.16.0'
+	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.16.0'
 
 	//java 9+
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'

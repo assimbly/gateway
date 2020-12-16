@@ -257,12 +257,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 					                        	(<FormArray>this.editFlowForm.controls.endpointsData).insert(index, formgroup);
 						
 												this.getOptions(
-					                                this.endpoint,
-					                                this.editFlowForm.controls.endpointsData.get((index).toString()),
-					                                this.endpointsOptions[index]
+						                                this.endpoint,
+						                                this.editFlowForm.controls.endpointsData.get((index).toString()),
+						                                this.endpointsOptions[index]
 					                            );
-					
-					                            this.setTypeLinks(endpoint, index);
+							
+					                            this.setTypeLinks(this.endpoint, index);
 						
 												index = index + 1;	
 											}, this);
@@ -338,8 +338,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         });
 
     }
-
-	
 
     clone() {
         //reset id and flow name to null
@@ -584,6 +582,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
+	
         if (!endpoint.options) {
             endpoint.options = '';
         }
@@ -593,20 +592,26 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         options.forEach((option, index) => {
 
             const o = new Option();
-            o.key = option.split('=')[0];
-            o.value = option.substring(option.lastIndexOf("=") + 1);
 
             if (typeof endpointForm.controls.options.controls[index] === 'undefined') {
                 endpointForm.controls.options.push(this.initializeOption());
             }
 
+			if(option.includes('=')){
+	            o.key = option.split('=')[0];
+				o.value = option.split('=').slice(1).join('=');
+			}else{
+				o.key = null;
+				o.value = null;
+			}
+
             endpointForm.controls.options.controls[index].patchValue({
                 key: o.key,
                 value: o.value
             });
-
-            endpointOptions.push(o);
-
+	
+	        endpointOptions.push(o);
+		
         });
 
     }

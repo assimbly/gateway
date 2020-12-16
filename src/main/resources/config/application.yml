@@ -99,7 +99,7 @@ info:
 # Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-jhipster:
+jhipster:   
     async:
         core-pool-size: 4
         max-pool-size: 50
@@ -144,6 +144,5 @@ application:
   gateway:
     name: default
     base-directory: default
-    
 hawtio:
   authenticationEnabled:  false     
