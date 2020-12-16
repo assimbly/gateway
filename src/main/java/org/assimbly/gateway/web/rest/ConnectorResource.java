@@ -853,7 +853,6 @@ public class ConnectorResource {
 	            }
 
         		connectorIsStarting = true;
-        		System.out.println("adding failureListener");
 				connector.addEventNotifier(failureListener);
 
         		connector.start();

@@ -39,12 +39,12 @@ public class LoggingConfiguration {
     private final String serverPort;
 
     private final JHipsterProperties jHipsterProperties;
-
-    public LoggingConfiguration(@Value("${spring.application.name}") String appName, @Value("${server.port}") String serverPort,
-         JHipsterProperties jHipsterProperties) {
+    
+    public LoggingConfiguration(@Value("${spring.application.name}") String appName, @Value("${server.port}") String serverPort, JHipsterProperties jHipsterProperties) {
         this.appName = appName;
         this.serverPort = serverPort;
         this.jHipsterProperties = jHipsterProperties;
+        
         if (jHipsterProperties.getLogging().getLogstash().isEnabled()) {
             addLogstashAppender(context);
             addContextListener(context);
@@ -57,6 +57,7 @@ public class LoggingConfiguration {
     private void addContextListener(LoggerContext context) {
         LogbackLoggerContextListener loggerContextListener = new LogbackLoggerContextListener();
         loggerContextListener.setContext(context);
+                
         context.addListener(loggerContextListener);
     }
 

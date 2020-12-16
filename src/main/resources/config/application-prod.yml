@@ -13,7 +13,7 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
-logging:
+logging: 
     level:
         ROOT: INFO
         org.assimbly.gateway: INFO
@@ -34,7 +34,7 @@ spring:
             enabled: false
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:file:./build/h2db/db/gateway;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1
         username: gateway
         password:
         hikari:
@@ -114,6 +114,7 @@ jhipster:
             enabled: false
             report-frequency: 60 # in seconds
     logging:
+        
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false
             host: localhost

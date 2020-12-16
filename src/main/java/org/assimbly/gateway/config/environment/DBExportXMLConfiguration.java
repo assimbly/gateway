@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.assimbly.gateway.domain.Flow;
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.Gateway;
@@ -326,23 +327,21 @@ public class DBExportXMLConfiguration {
 				if (confOptionsSplitted.length > 1) {
 
 					for (String confOption : confOptionsSplitted) {
-						String[] confOptionSplitted = confOption.split("=");
-
-						if (confOptionSplitted.length > 0) {
-							Element option = doc.createElement(confOptionSplitted[0]);
-							option.setTextContent(confOptionSplitted[1]);
-							options.appendChild(option);
-						}
+						String confOptionKey = confOption.split("=")[0];
+						String confOptionValue = StringUtils.substringAfter(confOption, "=");
+						
+						Element option = doc.createElement(confOptionKey);
+						option.setTextContent(confOptionValue);
+						options.appendChild(option);
 					}
 				} else {
 
-					String[] confOptionSplitted = confOptions.split("=");
+					String confOptionKey = confOptions.split("=")[0];
+					String confOptionValue = StringUtils.substringAfter(confOptions, "=");
 
-					if (confOptionSplitted.length > 0) {
-						Element option = doc.createElement(confOptionSplitted[0]);
-						option.setTextContent(confOptionSplitted[1]);
-						options.appendChild(option);
-					}
+					Element option = doc.createElement(confOptionKey);
+					option.setTextContent(confOptionValue);
+					options.appendChild(option);
 
 				}
 			}
@@ -410,13 +409,12 @@ public class DBExportXMLConfiguration {
 					String[] confOptionsSplitted = confOptions.split("&");
 
 					for (String confOption : confOptionsSplitted) {
-						String[] confOptionSplitted = confOption.split("=");
-
-						if (confOptionSplitted.length > 1) {
-							Element option = doc.createElement(confOptionSplitted[0]);
-							option.setTextContent(confOptionSplitted[1]);
-							options.appendChild(option);
-						}
+						String confOptionKey = confOption.split("=")[0];
+						String confOptionValue = StringUtils.substringAfter(confOption, "=");
+						
+						Element option = doc.createElement(confOptionKey);
+						option.setTextContent(confOptionValue);
+						options.appendChild(option);
 					}
 				}
 							
