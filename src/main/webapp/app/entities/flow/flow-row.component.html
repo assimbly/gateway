@@ -11,7 +11,7 @@
 		<div class="btn-group-justified" role="group">
 			 <div class="btn-group" role="group">
 	      	   	<button [ngClass]="{'btn-outline-primary': statusFlow === 'inactive', 'btn-outline-success':statusFlow === 'active', 'btn-outline-secondary':statusFlow === 'paused', 'btn-outline-danger':statusFlow === 'inactiveError' }"
-	      	   	 type="button" class="btn btn-sm" style="min-width: 15em;" placement="right" popoverTitle="From Endpoint" [popover]="fromEndpointTooltip">
+	      	   	 type="button" class="btn btn-sm" style="min-width: 15em;" placement="right" popoverTitle="From Endpoint" [popover]="fromEndpointTooltip" (click)="navigateToEndpoint(fromEndpoint)">
 	      	   		<span>{{fromEndpoint.componentType}}</span>
 				</button>
 			    </div> 	
@@ -46,7 +46,7 @@
 				 </div>
 				 <div class="btn-group" role="group" style="margin-left: 1em;" *ngFor="let toEndpoint of toEndpoints; let i = index">
 					   	<button  [ngClass]="{'btn-outline-primary': statusFlow === 'inactive', 'btn-outline-success':statusFlow === 'active', 'btn-outline-secondary':statusFlow === 'paused', 'btn-outline-danger':statusFlow === 'inactiveError' }"
-					   	 type="button" style="min-width: 15em;" class="btn btn-sm btn-block" data-container="body" placement="right" popoverTitle="To Endpoint" [popover]="toEndpointsTooltips[i]">
+					   	 type="button" style="min-width: 15em;" class="btn btn-sm btn-block" data-container="body" placement="right" popoverTitle="To Endpoint" [popover]="toEndpointsTooltips[i]" (click)="navigateToEndpoint(toEndpoint)">
 							<span>{{toEndpoint.componentType}}</span>
 						</button>
 				  </div>

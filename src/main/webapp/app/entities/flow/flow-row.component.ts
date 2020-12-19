@@ -306,7 +306,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         switch (action) {
             case 'edit':
                 this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id])
+                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, 'edit'])
                     : this.router.navigate(['../flow', this.flow.id]);
                 break;
             case 'clone':
@@ -341,6 +341,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 break;
         }
     }
+
+    navigateToEndpoint(endpoint: Endpoint) {
+            this.isAdmin
+                ? this.router.navigate(['../../flow/edit-all', this.flow.id], { queryParams: { mode: 'edit' , endpointid: endpoint.id} })
+                : this.router.navigate(['../flow', this.flow.id]);
+	
+	}
 
     getFlowLastError(id: number, action: string, errMessage: string) {
         if (errMessage) {

@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { NgbTabset, NgbTabChangeEvent, NgbAccordion, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule, NgbCollapseModule, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IGateway, Gateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
@@ -44,7 +44,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     public endpointTypes = ['FROM','TO','ERROR'];
 
-    public logLevelListType = [
+	panelCollapsed:any='uno'
+	public isCollapsed = true;
+	active;
+  	disabled = true;
+	activeEndpoint: any;
+    
+	public logLevelListType = [
         LogLevelType.OFF,
         LogLevelType.INFO,
         LogLevelType.ERROR,
@@ -116,8 +122,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     selectedService: Service = new Service();
     closeResult: string;
 
-    numberOfFromEndpoints: number = 1;
-    numberOfToEndpoints: number = 1;
+    numberOfFromEndpoints: number = 0;
+    numberOfToEndpoints: number = 0;
 
     errorSetHeader = false;
 
@@ -127,11 +133,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private camelDocUrl: string;
 
     modalRef: NgbModalRef | null;
-
-    @ViewChild('tab', { static: false }) ngbTabset: NgbTabset;
-	//@ViewChildren("user", { read: ElementRef }) renderedUsers: QueryList<ElementRef>;
-
-
 
     constructor(
         private eventManager: JhiEventManager,
@@ -157,13 +158,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.createRoute = 0;
         this.setPopoverMessages();
 
+
+		this.activeEndpoint = 	this.route.snapshot.queryParamMap.get('endpointid');
+
         this.subscription = this.route.params.subscribe(params => {
+	
             if (params['clone']) {
                 this.load(params['id'], true);
             } else {
                 this.load(params['id']);
             }
         });
+
+
+	
+		console.log('this.activeEndpoint='  + this.activeEndpoint); 
+
 
         this.registerChangeInFlows();
 
@@ -247,6 +257,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 						                            endpoint.headerId
 						                        );
 					
+												console.log('endpointid' + endpoint.id);
+					
 												if (isCloning) {this.endpoint.id = null}
 
 							    				this.endpoints.push(this.endpoint);
@@ -263,10 +275,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 					                            );
 							
 					                            this.setTypeLinks(this.endpoint, index);
+
+												if(this.endpoint.endpointType === 'FROM'){
+													this.numberOfFromEndpoints = this.numberOfFromEndpoints + 1;
+												}else if(this.endpoint.endpointType === 'TO'){
+													this.numberOfToEndpoints = this.numberOfToEndpoints + 1;
+												}
 						
 												index = index + 1;	
 											}, this);
 									}, this);
+		
+		
 		
 								if (isCloning) {
 		                                //reset id and flow name to null
@@ -278,6 +298,20 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 		                                this.endpoint.id = null;
 		                                this.updateForm();
 		                        }
+
+								if(this.activeEndpoint){
+									const activeIndex = this.endpoints.findIndex(item => item.id == this.activeEndpoint);
+									if(activeIndex===-1){
+										this.active = '0';
+									}else{
+										this.active = activeIndex.toString();	
+									}									
+								}else{
+									this.active = '0';		
+								}	
+
+
+
 		                        this.finished = true;
 
 	                        });
@@ -309,6 +343,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[0] = [new Option()];
                     this.setTypeLinks(this.endpoint, 0);
+					this.numberOfFromEndpoints = 1;
 
 				    this.endpoints.push(this.endpoint);
 
@@ -318,7 +353,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[1] = [new Option()];
                     this.setTypeLinks(this.endpoint, 1);
-
+					this.numberOfToEndpoints = 1;
+					
 				    this.endpoints.push(this.endpoint);
 
                     this.endpoint = new Endpoint();
@@ -335,9 +371,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }, 0);
             }
 
+			this.active = '0';		
+
         });
 
     }
+
 
     clone() {
         //reset id and flow name to null
@@ -685,8 +724,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 	
         this.setTypeLinks(endpoint, index + 1);
 
-		const currentScrollPosition = this.findPos(document.getElementById("tab" + index))
-		window.scroll(0, currentScrollPosition + 420);
+		const newIndex = index + 1;
+		
+	    this.active = newIndex.toString();	
 
     }
 
@@ -703,9 +743,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.endpointsOptions.splice(i, 1);
         this.editFlowForm.removeControl(endpointDataName);
         (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i);
-        setTimeout(() => {
-            this.ngbTabset.select(`tab${this.endpoints.length - 1}`);
-        }, 0);
+
     }
 
     openModal(templateRef: TemplateRef<any>) {
@@ -1007,56 +1045,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    next(nextClicked: boolean, isNextTab?: boolean, e?: NgbTabChangeEvent) {
-	
-        const activeTab = this.ngbTabset.tabs.find(t => t.id === this.ngbTabset.activeId);
-        const index = this.ngbTabset.tabs['_results'].indexOf(activeTab);
-        const endpoints = (<FormArray>this.editFlowForm.controls.endpointsData).controls;
-
-             let endpoint = <FormGroup>endpoints[index];
-            this.validateTypeAndUri(endpoint);
-            if (endpoints[index].valid) {
-                this.flowService
-                    .validateFlowsUri(
-                        this.editFlowForm.controls.gateway.value,
-                        this.formatUri(this.endpointsOptions[index], this.endpoints[index], endpoint)
-                    )
-                    .subscribe(
-                        () => {
-                            if (nextClicked) {
-                                this.goToNextTab(endpoints, index + 1);
-                            }
-                        },
-                        () => {
-                            this.setInvalidUriMessage(`ToEndpoint (${index})`);
-                            if (nextClicked) {
-                                this.goToNextTab(endpoints, index + 1);
-                            }
-                        }
-                    );
-            } else if (isNextTab) {
-                this.markAsUntouchedTypeAndUri(<FormGroup>endpoints[index + 1]);
-            } else {
-                e.preventDefault();
-            }
-
-    }
-
     setInvalidUriMessage(endpointName: string) {
         this.invalidUriMessage = `Uri for ${endpointName} is not valid.`;
         setTimeout(() => {
             this.invalidUriMessage = '';
         }, 15000);
-    }
-
-    goToNextTab(endpoints: AbstractControl[], index) {
-        this.ngbTabset.select(this.ngbTabset.tabs['_results'][index].id);
-        if (endpoints.find(e => !e.valid)) {
-            this.displayNextButton = true;
-            this.next(true, true);
-        } else {
-            this.displayNextButton = false;
-        }
     }
 
     formatUri(endpointOptions, endpoint, formEndpoint): string {
