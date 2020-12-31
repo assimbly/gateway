@@ -116,15 +116,15 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-	Flow{endpoint} to endpoint
+	Flow{endpoint} to Endpoint
 }
 
 relationship ManyToOne {
-	Endpoint{service} to Service,
+	Endpoint{service} to Service
 }
 
 relationship ManyToOne {
-	Endpoint{header} to Header,
+	Endpoint{header} to Header
 }
 
 relationship OneToMany {
