@@ -1,0 +1,62 @@
+{
+    "name": "Endpoint",
+    "fields": [
+        {
+            "fieldName": "componentType",
+            "fieldType": "ComponentType",
+            "fieldValues": "ACTIVEMQ,FILE,HTTP4,KAFKA,SFTP,SJMS,SMTP,SONICMQ,SQL,STREAM,VM,WASTEBIN"
+        },
+        {
+            "fieldName": "uri",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "options",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "endpointType",
+            "fieldType": "EndpointType",
+            "fieldValues": "FROM"
+        },
+        {
+            "fieldName": "responseId",
+            "fieldType": "Integer"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipName": "flow",
+            "otherEntityName": "flow",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "service",
+            "otherEntityName": "service",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "header",
+            "otherEntityName": "header",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "endpoint"
+        }
+    ],
+    "changelogDate": "20180114201816",
+    "entityTableName": "endpoint",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*",
+    "searchEngine": false,
+    "databaseType": "sql",
+    "readOnly": false
+}

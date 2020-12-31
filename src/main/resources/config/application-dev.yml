@@ -42,7 +42,7 @@ spring:
             indent-output: true
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:file:./build/h2db/db/gateway;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1
         username: gateway
         password:
         hikari:

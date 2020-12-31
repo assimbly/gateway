@@ -7,7 +7,6 @@ import { filter, map } from 'rxjs/operators';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowComponent } from './flow.component';
-import { FlowConfigurationComponent } from './flow-configuration.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditAllComponent } from './flow-edit-all.component';
@@ -62,15 +61,6 @@ export const flowRoute: Routes = [
         component: FlowEditAllComponent,
         data: {
             authorities: ['ROLE_ADMIN'],
-            pageTitle: 'Flows'
-        },
-        canActivate: [UserRouteAccessService]
-    },
-    {
-        path: 'flow/configuration',
-        component: FlowConfigurationComponent,
-        data: {
-            authorities: ['ROLE_USER'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]

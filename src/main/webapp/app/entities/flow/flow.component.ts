@@ -3,7 +3,7 @@ import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/ht
 import { Subscription, forkJoin } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
-import { EndpointType } from '../../shared/camel/component-type';
+import { ComponentType } from '../../shared/camel/component-type';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { AccountService } from 'app/core';
@@ -11,8 +11,6 @@ import { AccountService } from 'app/core';
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
-import { FromEndpointService } from '../from-endpoint';
-import { IFromEndpoint } from 'app/shared/model/from-endpoint.model';
 import { GatewayService } from '../gateway';
 import { SecurityService } from '../security';
 
@@ -26,7 +24,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     gateway: IGateway;
     flows: IFlow[];
     flow: IFlow;
-    fromEndpoints: IFromEndpoint[];
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
@@ -59,7 +56,6 @@ export class FlowComponent implements OnInit, OnDestroy {
         protected parseLinks: JhiParseLinks,
         protected accountService: AccountService,
         protected gatewayService: GatewayService,
-        protected fromEndpointService: FromEndpointService,
         protected securityService: SecurityService,
         protected router: Router
     ) {
@@ -110,14 +106,13 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
 
     loadPage(page) {
-        this.page = 0; //page;
+        this.page = 0; // page;
         this.itemsPerPage = this.itemsPerPage + 5;
         this.loadFlows();
     }
 
     ngOnInit() {
         this.getGateways();
-        this.getFromEndpoints();
         this.accountService.identity().then(account => {
             this.currentAccount = account;
             this.flowService.connect();
@@ -149,9 +144,9 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.gateway.type = GatewayType.ADAPTER;
                 this.gateway.environmentName = 'Dev1';
                 this.gateway.stage = EnvironmentType.DEVELOPMENT;
-                this.gateway.defaultFromEndpointType = EndpointType.FILE;
-                this.gateway.defaultToEndpointType = EndpointType.FILE;
-                this.gateway.defaultErrorEndpointType = EndpointType.FILE;
+                this.gateway.defaultFromComponentType = ComponentType.FILE;
+                this.gateway.defaultToComponentType = ComponentType.FILE;
+                this.gateway.defaultErrorComponentType = ComponentType.FILE;
 
                 this.gatewayService.create(this.gateway).subscribe(gateway => {
                     this.gateway = gateway.body;
@@ -190,12 +185,6 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.indexGateway = 0;
             }
         }
-    }
-
-    getFromEndpoints(): void {
-        this.fromEndpointService.query().subscribe(data => {
-            this.fromEndpoints = data.body;
-        });
     }
 
     trackId(index: number, item: IFlow) {

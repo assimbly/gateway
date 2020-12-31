@@ -1,13 +1,9 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-import { IFromEndpoint, FromEndpoint } from 'app/shared/model/from-endpoint.model';
-import { IToEndpoint, ToEndpoint } from 'app/shared/model/to-endpoint.model';
-import { IErrorEndpoint, ErrorEndpoint } from 'app/shared/model/error-endpoint.model';
+import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
 
 import { FlowService } from './flow.service';
-import { FromEndpointService } from '../from-endpoint';
-import { ToEndpointService } from '../to-endpoint';
-import { ErrorEndpointService } from '../error-endpoint';
+import { EndpointService } from '../endpoint';
 import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService, AccountService, Account } from 'app/core';
@@ -36,12 +32,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     mySubscription: Subscription;
 
     @Input() flow: Flow;
-    @Input() fromEndpoints: FromEndpoint[];
+    //@Input() fromEndpoints: Endpoint[];
     @Input() isAdmin: boolean;
 
-    fromEndpoint: FromEndpoint = new FromEndpoint();
-    toEndpoints: Array<ToEndpoint> = [new ToEndpoint()];
-    errorEndpoint: ErrorEndpoint = new ErrorEndpoint();
+	endpoints: Array<Endpoint> = [new Endpoint()];
+    fromEndpoint: Endpoint = new Endpoint();
+    toEndpoints: Array<Endpoint> = [];
+    errorEndpoint: Endpoint = new Endpoint();
 
     public isFlowStarted: boolean;
     public isFlowRestarted: boolean;
@@ -89,13 +86,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     alreadyConnectedOnce = false;
     private subscription: Subscription;
 
+
+
     modalRef: NgbModalRef | null;
 
     constructor(
         private flowService: FlowService,
-        private fromEndpointService: FromEndpointService,
-        private toEndpointService: ToEndpointService,
-        private errorEndpointService: ErrorEndpointService,
+        private endpointService: EndpointService,
         private securityService: SecurityService,
         private loginModalService: LoginModalService,
         private modalService: NgbModal,
@@ -119,10 +116,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.setFlowStatusDefaults();
         this.getStatus(this.flow.id);
-
-        this.toEndpoints = this.flow.toEndpoints;
-        this.getFromEndpoint(this.flow.fromEndpointId);
-        this.getToEndpoint();
+        this.endpoints = this.flow.endpoints;
+        this.getEndpoints();
 
         this.registerTriggeredAction();
     }
@@ -313,7 +308,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         switch (action) {
             case 'edit':
                 this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id])
+                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, 'edit'])
                     : this.router.navigate(['../flow', this.flow.id]);
                 break;
             case 'clone':
@@ -349,6 +344,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
     }
 
+    navigateToEndpoint(endpoint: Endpoint) {
+            this.isAdmin
+                ? this.router.navigate(['../../flow/edit-all', this.flow.id], { queryParams: { mode: 'edit' , endpointid: endpoint.id} })
+                : this.router.navigate(['../flow', this.flow.id]);
+	
+	}
+
     getFlowLastError(id: number, action: string, errMessage: string) {
         if (errMessage) {
             if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
@@ -375,16 +377,35 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     getFlowStats(id: number) {
+
         this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
             this.setFlowStatistic(res.body);
         });
+
+		//refresh every 5 seconds
+		this.intervalTime = setInterval(() => {
+            this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
+                this.setFlowStatistic(res.body);
+            });
+        }, 5000)
+    }
+
+    stopGetFlowStats() {
+        clearInterval(this.intervalTime);
     }
 
     getFlowDetails() {
+        
+        const createdFormatted = moment(this.flow.created).format("YYYY-MM-DD HH:mm:ss");
+        const lastModifiedFormatted = moment(this.flow.lastModified).format("YYYY-MM-DD HH:mm:ss");
+                
         this.flowDetails = `
         
                 <b>ID:</b> ${this.flow.id}<br/>
-                <b>Name:</b> ${this.flow.name}<br/><br/>
+                <b>Name:</b> ${this.flow.name}<br/>
+                <b>Version:</b> ${this.flow.version}<br/><br/>
+                <b>Created:</b> ${createdFormatted}<br/>
+                <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
                 <b>Offloading:</b> ${this.flow.offLoading}<br/><br/>
                 <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
@@ -396,7 +417,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     setFlowStatistic(res) {
         /* Example Available stats
-          * 
+          *
           * "maxProcessingTime": 1381,
             "lastProcessingTime": 1146,
             "meanProcessingTime": 1262,
@@ -433,30 +454,60 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             let processingTime = ``;
 
             if (res.stats.lastProcessingTime > 0) {
-                processingTime = `<b>Processing time</b><br/>
-                Last: ${res.stats.lastProcessingTime} ms<br/>
-                Min: ${res.stats.minProcessingTime} ms<br/>
-                Max: ${res.stats.maxProcessingTime} ms<br/>
-                Average: ${res.stats.meanProcessingTime} ms<br/>`;
+
+                processingTime = `<tr>
+			      <th scope="row">Min</th>
+			      <td>${res.stats.minProcessingTime} ms</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Max</th>
+			      <td>${res.stats.maxProcessingTime} ms</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Average</th>
+			      <td>${res.stats.meanProcessingTime} ms</td>
+			    </tr>`;
+
             }
 
             this.flowStatistic =
                 `
-                <br/>
-                <b>Start time:</b> ${this.checkDate(res.stats.startTimestamp)}<br/>
-                <b>Run time:</b> ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/><br/>
-                <b>First:</b> ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
-                <b>Last:</b> ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/><br/>
-                <b>Completed:</b> ${completed}<br/>
-                <b>Failed:</b> ${failures}<br/>
-                <br/>` + processingTime;
+			<table class="table">
+			  <tbody>
+			    <tr>
+			      <th scope="row">Start time</th>
+			      <td>${this.checkDate(res.stats.startTimestamp)}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Running</th>
+			      <td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">First Message</th>
+			      <td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Last Message</th>
+			      <td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>
+			    </tr>` + processingTime +
+              `
+			    <tr>
+			      <th scope="row">Completed</th>
+			      <td>${completed}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Failed</th>
+			      <td>${failures}</td>
+			    </tr>
+               </tbody>
+			</table>`;
         }
     }
 
     checkDate(r) {
-        if(!!r){
+        if (!!r) {
             return moment(r).format('YYYY-MM-DD HH:mm:ss');
-        }else{
+        } else {
             return '-';
         }
     }
@@ -466,25 +517,21 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
     }
 
-    getFromEndpoint(id: number) {
-        this.fromEndpoints
-            .filter(fromEndpoint => fromEndpoint.id === id)
-            .map(fromEndpoint => {
-                this.fromEndpoint = fromEndpoint;
-                this.fromEndpointTooltip = this.endpointTooltip(fromEndpoint.type, fromEndpoint.uri, fromEndpoint.options);
-            });
-    }
 
-    getToEndpoint() {
-        this.toEndpoints.forEach(toEndpoint => {
-            this.toEndpointsTooltips.push(this.endpointTooltip(toEndpoint.type, toEndpoint.uri, toEndpoint.options));
-        });
-    }
+    getEndpoints() {
 
-    getErrorEndpoint(id: number) {
-        this.errorEndpointService.find(id).subscribe(errorEndpoint => {
-            this.errorEndpoint = errorEndpoint.body;
-            this.errorEndpointTooltip = this.endpointTooltip(errorEndpoint.body.type, errorEndpoint.body.uri, errorEndpoint.body.options);
+        this.endpoints.forEach(endpoint => {
+
+			if (endpoint.endpointType.valueOf() === 'FROM') {
+                this.fromEndpoint = endpoint;
+                this.fromEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+            } else if (endpoint.endpointType.valueOf() ===  'TO') {
+				this.toEndpoints.push(endpoint);	
+                this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+            } else if (endpoint.endpointType.valueOf() ===  'ERROR') {
+	            this.errorEndpoint = endpoint;
+    	        this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+            }            	
         });
     }
 
@@ -646,7 +693,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowService.getConfiguration(this.flow.id).subscribe(
             data => {
                 this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
-                    this.flowService.resume(this.flow.id).subscribe(
+                    this.flowService.resume(this.flow.id).subscribe(                            
                         response => {
                             if (response.status === 200) {
                                 // this.setFlowStatus('resumed');

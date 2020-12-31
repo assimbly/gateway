@@ -8,7 +8,6 @@ import {
     WireTapEndpointComponent,
     WireTapEndpointDetailComponent,
     WireTapEndpointUpdateComponent,
-    WireTapEndpointEditComponent,
     WireTapEndpointDeletePopupComponent,
     WireTapEndpointDeleteDialogComponent,
     wireTapEndpointRoute,
@@ -32,21 +31,18 @@ const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
         WireTapEndpointComponent,
         WireTapEndpointDetailComponent,
         WireTapEndpointUpdateComponent,
-        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],
     entryComponents: [
         WireTapEndpointComponent,
         WireTapEndpointUpdateComponent,
-        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],
     providers: [
         Components,
         WireTapEndpointUpdateComponent,
-        WireTapEndpointEditComponent,
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],

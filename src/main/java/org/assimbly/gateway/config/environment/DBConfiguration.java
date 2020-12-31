@@ -60,7 +60,7 @@ public class DBConfiguration {
 	}
 
 	// exports connector to XML, JSON or YAML format
-	public String convertDBToConfiguration(Long gatewayId, String mediaType) throws Exception {
+	public String convertDBToConfiguration(Long gatewayId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
 		xmlConfiguration = dbExportXML.getXMLConfiguration(gatewayId);
 
@@ -73,13 +73,15 @@ public class DBConfiguration {
 		}
 
 		// replace environment variables
-		configuration = PlaceholdersReplacement(configuration);
-
+		if(isPlaceHolderReplacement) {
+			configuration = PlaceholdersReplacement(configuration);
+		}
+		
 		return configuration;
 	}
 
 	// exports connector by flowids to XML, JSON or YAML format
-	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids) throws Exception {
+	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids, boolean isPlaceHolderReplacement) throws Exception {
 
 		xmlConfiguration = dbExportXML.getXMLConfigurationByIds(gatewayId, flowids);
 
@@ -92,13 +94,15 @@ public class DBConfiguration {
 		}
 
 		// replace environment variables
-		configuration = PlaceholdersReplacement(configuration);
+		if(isPlaceHolderReplacement) {
+			configuration = PlaceholdersReplacement(configuration);
+		}
 
 		return configuration;
 	}
 	
 	// exports flow to XML, JSON or YAML
-	public String convertDBToFlowConfiguration(Long id, String mediaType) throws Exception {
+	public String convertDBToFlowConfiguration(Long id, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
 		xmlConfiguration = dbExportXML.getXMLFlowConfiguration(id);
 
@@ -111,8 +115,10 @@ public class DBConfiguration {
 		}
 
 		// replace environment variables
-		configuration = PlaceholdersReplacement(configuration);
-
+		if(isPlaceHolderReplacement) {
+			configuration = PlaceholdersReplacement(configuration);
+		}
+		
 		return configuration;
 
 	}

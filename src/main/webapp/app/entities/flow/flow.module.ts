@@ -1,12 +1,9 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
-import { GatewayFromEndpointModule } from '../../entities/from-endpoint/from-endpoint.module';
-import { GatewayToEndpointModule } from '../../entities/to-endpoint/to-endpoint.module';
-import { GatewayErrorEndpointModule } from '../../entities/error-endpoint/error-endpoint.module';
+import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
@@ -17,7 +14,6 @@ import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import {
     FlowComponent,
     FlowEditAllComponent,
-    FlowConfigurationComponent,
     FlowDetailComponent,
     FlowUpdateComponent,
     FlowDeletePopupComponent,
@@ -37,9 +33,7 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 @NgModule({
     imports: [
         GatewaySharedModule,
-        GatewayFromEndpointModule,
-        GatewayToEndpointModule,
-        GatewayErrorEndpointModule,
+        GatewayEndpointModule,
         GatewayServiceModule,
         GatewaySecurityModule,
         GatewayHeaderModule,
@@ -56,11 +50,9 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         FlowComponent,
         FlowUpdateComponent,
         FlowEditAllComponent,
-        FlowConfigurationComponent,
         FlowDetailComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
-        FlowConfigurationComponent,
         FlowRowComponent,
         FlowSearchByNamePipe
     ],
@@ -69,10 +61,8 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         FlowUpdateComponent,
         FlowEditAllComponent,
         FlowDeleteDialogComponent,
-        FlowConfigurationComponent,
         FlowDeleteDialogComponent,
-        FlowDeletePopupComponent,
-        FlowConfigurationComponent
+        FlowDeletePopupComponent
     ],
     providers: [FlowService, FlowPopupService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

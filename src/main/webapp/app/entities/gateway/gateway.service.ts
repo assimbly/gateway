@@ -13,8 +13,17 @@ type EntityArrayResponseType = HttpResponse<IGateway[]>;
 export class GatewayService {
     public resourceUrl = SERVER_API_URL + 'api/gateways';
     public environmentUrl = SERVER_API_URL + 'api/environment';
+    public connectorUrl = SERVER_API_URL + 'api/connector';
 
     constructor(protected http: HttpClient) {}
+
+    stop(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
+    }
+
+    start(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
+    }
 
     create(gateway: IGateway): Observable<EntityResponseType> {
         return this.http.post<IGateway>(this.resourceUrl, gateway, { observe: 'response' });
@@ -42,5 +51,16 @@ export class GatewayService {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
         };
         return this.http.post(`${this.environmentUrl}/${gatewayid}`, configuration, options);
+    }
+
+    updateBackupFrequency(gatewayid, frequency, url): Observable<any> {
+        try {
+            const options = {
+                headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
+            };
+            return this.http.post(`${this.resourceUrl}/${gatewayid}/updatebackup/${frequency}`, url, options);
+        } catch (e) {
+            console.log(e);
+        }
     }
 }

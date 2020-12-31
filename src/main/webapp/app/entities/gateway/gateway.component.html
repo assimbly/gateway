@@ -1,4 +1,24 @@
 <div>
+	<ng-template #restartGatewayModal>
+			<div class="modal-header">
+		      <h4 class="modal-title">Restart Gateway</h4>
+		      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+		        <span aria-hidden="true">&times;</span>
+		      </button>
+		    </div>
+		    <div class="modal-body">
+		     	<div class="row">
+			     	<div class="col-12">
+			     		Are you sure? This will restart Assimbly gateway (and shutdown its flows).
+				 	</div>
+				</div>
+			 	<div [innerHtml]="restartGatewayMessage"></div>
+		    </div>
+		    <div class="modal-footer">
+		      <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
+		      <button type="button" class="btn btn-primary" (click)="restartGateway(1)">Restart</button>
+		    </div>
+	</ng-template>
     <div class="row">
         <div class="col-6">
             <h2>
@@ -11,7 +31,7 @@
 					<source srcset="../../../content/images/assimbly_transparant.webp">
 					<img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo">
 				</picture>
-			</a>	 	
+			</a>
 	   </div>
         <div class="col-6" *ngIf='gateways.length === 0'>
             <button type="submit" class="btn btn-primary float-right jh-create-entity create-gateway" id="newButton" [routerLink]="['/gateway/new']"
@@ -22,15 +42,16 @@
         </div>
     </div>
     <hr>
-    <div>
-        <button type="button" (click)="uploadConfiguration()"
-            class="btn btn-info btn-sm float-right mb-3">
-            <span class="fa fa-upload"></span>
-            <span class="d-none d-md-inline">Import XML Configuration</span>
+    <div class="d-block pull-right">
+        <button type="button" (click)="openRestartGatewayModal(restartGatewayModal)" style="margin-right: 5px;"
+            class="btn btn-info btn-sm mb-3 "  *jhiHasAnyAuthority="'ROLE_ADMIN'" >
+            <span class="fa fa-refresh"></span>
+            <span class="d-none d-md-inline">Restart</span>
+
         </button>
-    </div>    
+    </div>
+
     <!-- <jhi-alert></jhi-alert>-->
-    <br/>
     <div class="table-responsive" *ngIf="gateways">
         <table class="table table-bordered table-sm" *ngFor="let gateway of gateways ;trackBy: trackId" style="margin-bottom: 30px;">
             <thead>
@@ -44,7 +65,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td lass="w-25">
+                    <td class="w-25">
                         <span class="font-weight-bold">ID:</span>
                     </td>
                     <td class="w-75">
@@ -93,7 +114,7 @@
                         <span class="font-weight-bold">From:</span>
                     </td>
                     <td>
-                        {{gateway.defaultFromEndpointType}}
+                        {{gateway.defaultFromComponentType}}
                     </td>
                 </tr>
                 <tr>
@@ -101,7 +122,7 @@
                         <span class="font-weight-bold">To:</span>
                     </td>
                     <td>
-                        {{gateway.defaultToEndpointType}}
+                        {{gateway.defaultToComponentType}}
                     </td>
                 </tr>
                 <tr>
@@ -109,7 +130,7 @@
                         <span class="font-weight-bold">Error:</span>
                     </td>
                     <td>
-                        {{gateway.defaultErrorEndpointType}}
+                        {{gateway.defaultErrorComponentType}}
                     </td>
                 </tr>
             </tbody>
@@ -117,10 +138,6 @@
                 <tr>
                     <td colspan="2">
                         <div class="d-block pull-right">
-                            <button type="button" class="btn btn-info btn-sm" (click)="downloadConfiguration(gateway)">
-                                <span class="fa fa-download"></span>
-                                <span class="d-none d-md-inline">Export XML Configuration</span>
-                            </button>
                             <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/gateway', gateway.id, 'edit']" replaceUrl="true" queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>

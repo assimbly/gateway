@@ -322,7 +322,7 @@ a {
 }
 
 .assimbly-gateway-img img {
-	background-repeat: no-repeat;
+    background-repeat: no-repeat;
     background-size: 100%;
     width: 60px;
     height: 50px;
@@ -605,4 +605,16 @@ a {
 ng-select select-dropdown > div {
     position: relative;
     z-index: 100;
+}
+
+.dropdown-toggle::after {
+    display:none;
+}
+
+.option-tooltip .tooltip-inner {
+  max-width: 400px;
+  width: 400px;
+  text-align:left;
+  z-index: 100;
+  position: relative;
 }

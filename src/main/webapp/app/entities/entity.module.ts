@@ -6,9 +6,7 @@ import { GatewayServiceModule } from './service/service.module';
 import { GatewayServiceKeysModule } from './service-keys/service-keys.module';
 import { GatewayHeaderModule } from './header/header.module';
 import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
-import { GatewayFromEndpointModule } from './from-endpoint/from-endpoint.module';
-import { GatewayToEndpointModule } from './to-endpoint/to-endpoint.module';
-import { GatewayErrorEndpointModule } from './error-endpoint/error-endpoint.module';
+import { GatewayEndpointModule } from './endpoint/endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
 import { GatewaySecurityModule } from './security/security.module';
 import { GatewayBrokerModule } from './broker/broker.module';
@@ -16,7 +14,7 @@ import { GatewayBrokerModule } from './broker/broker.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
-import { FlowService } from '../../app/entities/flow';
+import { DeploymentService } from 'app/admin';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
@@ -29,12 +27,10 @@ import { FlowService } from '../../app/entities/flow';
         GatewayServiceKeysModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
-        GatewayFromEndpointModule,
-        GatewayToEndpointModule,
-        GatewayErrorEndpointModule,
+        GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
-        GatewayBrokerModule,        
+        GatewayBrokerModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
@@ -43,13 +39,11 @@ import { FlowService } from '../../app/entities/flow';
         GatewayGatewayModule,
         GatewayFlowModule,
         GatewayEnvironmentVariablesModule,
-        GatewayErrorEndpointModule,
-        GatewayFromEndpointModule,
         GatewayHeaderModule,
         GatewayHeaderKeysModule,
         GatewayServiceModule,
         GatewayServiceKeysModule,
-        GatewayToEndpointModule,
+        GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
         GatewayBrokerModule,
@@ -59,7 +53,7 @@ import { FlowService } from '../../app/entities/flow';
     ],
     declarations: [],
     entryComponents: [],
-    providers: [],
+    providers: [DeploymentService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayEntityModule {}

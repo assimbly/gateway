@@ -69,6 +69,18 @@
             "fieldName": "logLevel",
             "fieldType": "LogLevelType",
             "fieldValues": "ERROR,WARN,INFO,DEBUG,TRACE,OFF"
+        },
+        {
+            "fieldName": "version",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "created",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "lastModified",
+            "fieldType": "Instant"
         }
     ],
     "changelogDate": "20180114132915",

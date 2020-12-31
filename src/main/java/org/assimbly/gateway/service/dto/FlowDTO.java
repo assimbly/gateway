@@ -3,9 +3,10 @@ package org.assimbly.gateway.service.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
+import java.time.Instant;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 /**
@@ -33,13 +34,15 @@ public class FlowDTO implements Serializable {
 
     private Integer instances;
 
+    private Integer version;
+
+    private Instant created;
+
+    private Instant lastModified;
+
     private Long gatewayId;
 
-    private Long fromEndpointId;
-
-    private Long errorEndpointId;
-    
-    private Set<ToEndpoint> toEndpoints;
+    private Set<Endpoint> endpoints;
 
     public Long getId() {
         return id;
@@ -122,6 +125,30 @@ public class FlowDTO implements Serializable {
         this.instances = instances;
     }
 
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+    
+    public Instant getCreated() {
+        return created;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+    
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }       
+    
     public Long getGatewayId() {
         return gatewayId;
     }
@@ -130,28 +157,12 @@ public class FlowDTO implements Serializable {
         this.gatewayId = gatewayId;
     }
 
-    public Long getFromEndpointId() {
-        return fromEndpointId;
-    }
-
-    public void setFromEndpointId(Long fromEndpointId) {
-        this.fromEndpointId = fromEndpointId;
-    }
-
-    public Long getErrorEndpointId() {
-        return errorEndpointId;
-    }
-
-    public void setErrorEndpointId(Long errorEndpointId) {
-        this.errorEndpointId = errorEndpointId;
-    }
-
-    public Set<ToEndpoint> getToEndpoints() {
-        return toEndpoints;
+    public Set<Endpoint> getEndpoints() {
+        return endpoints;
     }
  
-    public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public void setEndpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
     }   
     
     @Override
@@ -189,8 +200,6 @@ public class FlowDTO implements Serializable {
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
-            ", fromEndpoint=" + getFromEndpointId() +
-            ", errorEndpoint=" + getErrorEndpointId() +
             "}";
     }
 }

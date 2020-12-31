@@ -42,11 +42,17 @@
                         </a>
                     </li>
                     <li>
+                        <a class="dropdown-item" routerLink="endpoint" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                            <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+                            <span>Endpoints</span>
+                        </a>
+                    </li>                    
+                    <li>
                         <a class="dropdown-item" routerLink="header" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                             <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
                             <span>Headers</span>
                         </a>
-                    </li>                    
+                    </li>
                     <li>
                         <a class="dropdown-item" routerLink="service" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                             <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
@@ -70,7 +76,7 @@
                             <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
                             <span>Security (TLS)</span>
                         </a>
-                    </li>                    
+                    </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
@@ -98,6 +104,12 @@
                         <a class="dropdown-item" routerLink="admin/jhi-health" routerLinkActive="active" (click)="collapseNavbar()">
                             <fa-icon icon="heart" fixedWidth="true"></fa-icon>
                             <span>Health</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="admin/deployment" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon icon="list" fixedWidth="true"></fa-icon>
+                            <span>Deployment</span>
                         </a>
                     </li>
                     <li>
