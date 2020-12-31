@@ -49,14 +49,14 @@ public class Gateway implements Serializable {
     @Column(name = "connector_type")
     private ConnectorType connectorType;
 
-    @Column(name = "default_from_endpoint_type")
-    private String defaultFromEndpointType;
+    @Column(name = "default_from_component_type")
+    private String defaultFromComponentType;
 
-    @Column(name = "default_to_endpoint_type")
-    private String defaultToEndpointType;
+    @Column(name = "default_to_component_type")
+    private String defaultToComponentType;
 
-    @Column(name = "default_error_endpoint_type")
-    private String defaultErrorEndpointType;
+    @Column(name = "default_error_component_type")
+    private String defaultErrorComponentType;
 
     @OneToOne    @JoinColumn(unique = true)
     private WireTapEndpoint wiretapEndpoint;
@@ -146,43 +146,43 @@ public class Gateway implements Serializable {
         this.connectorType = connectorType;
     }
 
-    public String getDefaultFromEndpointType() {
-        return defaultFromEndpointType;
+    public String getDefaultFromComponentType() {
+        return defaultFromComponentType;
     }
 
-    public Gateway defaultFromEndpointType(String defaultFromEndpointType) {
-        this.defaultFromEndpointType = defaultFromEndpointType;
+    public Gateway defaultFromComponentType(String defaultFromComponentType) {
+        this.defaultFromComponentType = defaultFromComponentType;
         return this;
     }
 
-    public void setDefaultFromEndpointType(String defaultFromEndpointType) {
-        this.defaultFromEndpointType = defaultFromEndpointType;
+    public void setDefaultFromComponentType(String defaultFromComponentType) {
+        this.defaultFromComponentType = defaultFromComponentType;
     }
 
-    public String getDefaultToEndpointType() {
-        return defaultToEndpointType;
+    public String getDefaultToComponentType() {
+        return defaultToComponentType;
     }
 
-    public Gateway defaultToEndpointType(String defaultToEndpointType) {
-        this.defaultToEndpointType = defaultToEndpointType;
+    public Gateway defaultToComponentType(String defaultToComponentType) {
+        this.defaultToComponentType = defaultToComponentType;
         return this;
     }
 
-    public void setDefaultToEndpointType(String defaultToEndpointType) {
-        this.defaultToEndpointType = defaultToEndpointType;
+    public void setDefaultToComponentType(String defaultToComponentType) {
+        this.defaultToComponentType = defaultToComponentType;
     }
 
-    public String getDefaultErrorEndpointType() {
-        return defaultErrorEndpointType;
+    public String getDefaultErrorComponentType() {
+        return defaultErrorComponentType;
     }
 
-    public Gateway defaultErrorEndpointType(String defaultErrorEndpointType) {
-        this.defaultErrorEndpointType = defaultErrorEndpointType;
+    public Gateway defaultErrorComponentType(String defaultErrorComponentType) {
+        this.defaultErrorComponentType = defaultErrorComponentType;
         return this;
     }
 
-    public void setDefaultErrorEndpointType(String defaultErrorEndpointType) {
-        this.defaultErrorEndpointType = defaultErrorEndpointType;
+    public void setDefaultErrorComponentType(String defaultErrorComponentType) {
+        this.defaultErrorComponentType = defaultErrorComponentType;
     }
 
     public WireTapEndpoint getWiretapEndpoint() {
@@ -306,9 +306,9 @@ public class Gateway implements Serializable {
             ", environmentName='" + getEnvironmentName() + "'" +
             ", stage='" + getStage() + "'" +
             ", connectorType='" + getConnectorType() + "'" +
-            ", defaultFromEndpointType='" + getDefaultFromEndpointType() + "'" +
-            ", defaultToEndpointType='" + getDefaultToEndpointType() + "'" +
-            ", defaultErrorEndpointType='" + getDefaultErrorEndpointType() + "'" +
+            ", defaultFromComponentType='" + getDefaultFromComponentType() + "'" +
+            ", defaultToComponentType='" + getDefaultToComponentType() + "'" +
+            ", defaultErrorComponentType='" + getDefaultErrorComponentType() + "'" +
             "}";
     }
 }

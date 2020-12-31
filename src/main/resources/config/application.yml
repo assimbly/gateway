@@ -99,7 +99,7 @@ info:
 # Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-jhipster:
+jhipster:   
     async:
         core-pool-size: 4
         max-pool-size: 50
@@ -137,13 +137,12 @@ jhipster:
 
 application:
   info:
-    version: 3.0.0
+    version: 3.1.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
   gateway:
     name: default
     base-directory: default
-    
 hawtio:
   authenticationEnabled:  false     

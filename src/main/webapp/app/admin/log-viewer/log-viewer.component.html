@@ -2,11 +2,29 @@
 <hr>
 
 <div class="form-group">
-    <textarea class="form-control" id="exampleTextarea" [(ngModel)]="log" rows="25" readonly #logArea></textarea>
+	<code contenteditable="true" *ngFor="let logLine of (logLines | SearchByName: searchText)">
+		<div>
+			  <span *ngIf="logLine.includes('ERROR') else logLineWarning" style="color: red">{{logLine}}</span>
+		</div>
+		<ng-template #logLineWarning>
+			<span *ngIf="logLine.includes('WARN') else logLineDefault" style="color: orange">{{logLine}}</span>
+		</ng-template>	
+		<ng-template #logLineDefault>
+			<span style="color: green">{{logLine}}</span>
+		</ng-template>	
+	</code>
 </div>
 
 <form name="logsForm" #logsForm="ngForm">
     <div class="form-row align-items-center float-right">
+        <div class="col-auto">
+   	            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Filter:</div>
+                </div>
+                <input type="text" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"></input>
+            </div>
+		</div>	
         <div class="col-auto">
             <label class="sr-only" for="lines">Lines</label>
             <div class="input-group mb-2" data-toggle="tooltip" 

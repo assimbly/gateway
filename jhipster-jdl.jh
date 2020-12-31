@@ -9,11 +9,6 @@ entity Gateway {
 	defaultErrorEndpointType String
 }
 
-entity EnvironmentVariables {
-	key String,
-	value String
-}
-
 entity Flow {
 	name String,
 	type String,
@@ -22,32 +17,19 @@ entity Flow {
 	maximumRedeliveries Integer,
 	redeliveryDelay Integer,
 	loadBalancing Boolean,
-	logLevel LogLevelType
-	instances Integer		
+	logLevel LogLevelType,
+	instances Integer,
+	version Integer,
+	created Instant,
+	lastModified Instant			
 }
 
-entity FromEndpoint {
-	type EndpointType,
-    uri String,
-    options String
-}
-
-entity ToEndpoint {
-	type EndpointType,
-    uri String,
-    options String
-}
-
-entity ErrorEndpoint {
-	type EndpointType,
-    uri String,
-    options String
-}
-
-entity WireTapEndpoint {
-	type EndpointType,
-    uri String,
-    options String
+entity Endpoint {
+	endpointType EndpointType,
+	compponentType ComponentType,
+	uri String,	
+    options String,
+    responseId Integer   
 }
 
 entity Service {
@@ -71,6 +53,11 @@ entity HeaderKeys {
 	type String	
 }
 
+entity EnvironmentVariables {
+	key String,
+	value String
+}
+
 entity Maintenance {
 	startTime Instant,
 	endTime Instant,
@@ -92,7 +79,6 @@ entity Broker {
 	configuration String,
 }
 
-
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP
 }
@@ -106,6 +92,10 @@ enum ConnectorType {
 }
 
 enum EndpointType {
+   FROM, TO, ERROR, WIRETAP, RESPONSE 
+}
+
+enum ComponentType {
    ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
 }
 
@@ -125,30 +115,16 @@ relationship OneToMany {
 	Gateway{environmentVariables} to EnvironmentVariables
 }
 
-relationship OneToOne {
-	Flow{fromEndpoint} to FromEndpoint
-}
-
-relationship OneToOne {
-	Flow{errorEndpoint} to ErrorEndpoint
-}
-
 relationship OneToMany {
-	Flow{toEndpoint} to ToEndpoint
+	Flow{endpoint} to Endpoint
 }
 
 relationship ManyToOne {
-	FromEndpoint{service} to Service,
-    ToEndpoint{service} to Service,
-    ErrorEndpoint{service} to Service
-    WireTapEndpoint{service} to Service	
+	Endpoint{service} to Service
 }
 
 relationship ManyToOne {
-	FromEndpoint{header} to Header,
-    ToEndpoint{header} to Header,
-    ErrorEndpoint{header} to Header
-    WireTapEndpoint{header} to Header
+	Endpoint{header} to Header
 }
 
 relationship OneToMany {

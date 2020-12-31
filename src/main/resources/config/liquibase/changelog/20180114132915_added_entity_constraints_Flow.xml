@@ -14,17 +14,5 @@
                                  referencedColumnNames="id"
                                  referencedTableName="gateway"/>
 
-        <addForeignKeyConstraint baseColumnNames="from_endpoint_id"
-                                 baseTableName="flow"
-                                 constraintName="fk_flow_from_endpoint_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="from_endpoint"/>
-
-        <addForeignKeyConstraint baseColumnNames="error_endpoint_id"
-                                 baseTableName="flow"
-                                 constraintName="fk_flow_error_endpoint_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="error_endpoint"/>
-
     </changeSet>
 </databaseChangeLog>

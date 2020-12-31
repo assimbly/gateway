@@ -8,8 +8,10 @@ import { LogViewerService } from './log-viewer.service';
 export class LogViewerComponent implements OnInit {
     @ViewChild('logArea', { static: false }) private logArea: ElementRef;
     public log: string;
+    public logLines: string[];
     public lines: number;
-
+    searchText: string = '';
+    
     constructor(private logViewerService: LogViewerService) {}
 
     ngOnInit() {
@@ -21,6 +23,8 @@ export class LogViewerComponent implements OnInit {
         let tt = this.lines;
         this.logViewerService.getLogs(this.lines).subscribe(res => {
             this.log = res.body;
+            this.logLines = this.log.split(/\r?\n/);
+            
             setTimeout(() => {
                 try {
                     this.logArea.nativeElement.scrollTop = this.logArea.nativeElement.scrollHeight;

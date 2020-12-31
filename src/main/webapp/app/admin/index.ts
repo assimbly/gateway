@@ -30,3 +30,6 @@ export * from './user-management/user-management-detail.component';
 export * from './user-management/user-management.component';
 export * from './user-management/user-management.route';
 export * from './admin.route';
+export * from './deployment/deployment.component';
+export * from './deployment/deployment.route';
+export * from './deployment/deployment.service';

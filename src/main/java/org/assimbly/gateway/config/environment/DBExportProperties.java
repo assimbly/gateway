@@ -6,11 +6,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,18 +23,15 @@ public class DBExportProperties {
 
 	private TreeMap<String, String> properties;
 
-	public String options;
+	public String endpointType;
 	public String componentType;
 	public String uri;
-
+	public String options;
+	
 	@Autowired
 	private FlowRepository flowRepository;
 
-	private FromEndpoint fromEndpoint;
-
-	private ErrorEndpoint errorEndpoint;
-
-	private Set<ToEndpoint> toEndpoints;
+	private Set<Endpoint> endpoints;
 
 	private org.assimbly.gateway.domain.Service service;
 
@@ -81,7 +76,7 @@ public class DBExportProperties {
 
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
+		if (endpoints == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			getEndpointPropertiesFromDB(flow);
@@ -97,7 +92,7 @@ public class DBExportProperties {
 
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (fromEndpoint == null || toEndpoints == null || errorEndpoint == null) {
+		if (endpoints == null) {
 			throw new Exception("Set of configuration failed. Endpoint cannot be null");
 		} else {
 			getEndpointPropertiesFromDB(flow);
@@ -150,38 +145,16 @@ public class DBExportProperties {
 
 		options = "";
 
-		switch (type) {
-		case "from":
+		for (Endpoint endpoint : endpoints) {
 
-			componentType = fromEndpoint.getType().name();
-			uri = fromEndpoint.getUri();
-			options = fromEndpoint.getOptions();
-
-			getURIProperties(type, componentType, uri, options);
-
-			break;
-		case "to":
-
-			for (ToEndpoint toEndpoint : toEndpoints) {
-
-				componentType = toEndpoint.getType().name();
-				uri = toEndpoint.getUri();
-				options = toEndpoint.getOptions();
-
-				getURIProperties(type, componentType, uri, options);
-			}
-
-			break;
-		case "error":
-
-			componentType = errorEndpoint.getType().name();
-			uri = errorEndpoint.getUri();
-			options = errorEndpoint.getOptions();
+			endpointType = endpoint.getEndpointType().name();
+			componentType = endpoint.getComponentType().name();
+			uri = endpoint.getUri();
+			options = endpoint.getOptions();
 
 			getURIProperties(type, componentType, uri, options);
-
-			break;
 		}
+
 	}
 
 	public void getURIProperties(String type, String componentType, String uri, String confOptions) {
@@ -201,26 +174,10 @@ public class DBExportProperties {
 
 	public void getServiceFromAssimblyDB(String type) {
 
-		switch (type) {
-		case "from":
-
-			service = fromEndpoint.getService();
-			break;
-
-		case "to":
-
-			for (ToEndpoint toEndpoint : toEndpoints) {
-				service = toEndpoint.getService();
-			}
-
-			break;
-
-		case "error":
-
-			service = errorEndpoint.getService();
-			break;
+		for (Endpoint endpoint : endpoints) {
+			service = endpoint.getService();
 		}
-
+		
 		if (service != null) {
 			getServiceProperties(type, service);
 		}
@@ -233,24 +190,9 @@ public class DBExportProperties {
 
 	public void getHeaderFromAssimblyDB(String type) {
 
-		switch (type) {
-		case "from":
+		for (Endpoint endpoint : endpoints) {
 
-			header = fromEndpoint.getHeader();
-
-			break;
-		case "to":
-
-			for (ToEndpoint toEndpoint : toEndpoints) {
-
-				header = toEndpoint.getHeader();
-			}
-
-			break;
-		case "error":
-
-			header = errorEndpoint.getHeader();
-			break;
+			header = endpoint.getHeader();
 		}
 
 		if (header != null) {
@@ -264,9 +206,7 @@ public class DBExportProperties {
 
 	private void getGeneralFlowPropertiesFromDB(Flow flow) throws Exception {
 
-		fromEndpoint = flow.getFromEndpoint();
-		errorEndpoint = flow.getErrorEndpoint();
-		toEndpoints = flow.getToEndpoints();
+		endpoints = flow.getEndpoints();
 
 	}
 

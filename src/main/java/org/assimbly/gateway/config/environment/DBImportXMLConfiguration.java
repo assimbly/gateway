@@ -10,13 +10,12 @@ import java.util.Set;
 
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.EnvironmentVariables;
-import org.assimbly.gateway.domain.ErrorEndpoint;
-import org.assimbly.gateway.domain.FromEndpoint;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
-import org.assimbly.gateway.domain.ToEndpoint;
+import org.assimbly.gateway.domain.Endpoint;
+import org.assimbly.gateway.domain.enumeration.ComponentType;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
@@ -26,7 +25,6 @@ import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
-import org.assimbly.gateway.web.rest.FlowResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,11 +67,7 @@ public class DBImportXMLConfiguration {
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
-	private FromEndpoint fromEndpoint;
-
-	private ErrorEndpoint errorEndpoint;
-
-	private Set<ToEndpoint> toEndpoints;
+	private Set<Endpoint> endpoints;
 
 	private org.assimbly.gateway.domain.Service service;
 
@@ -83,7 +77,7 @@ public class DBImportXMLConfiguration {
 
 	public String configuration;
 
-	private ToEndpoint toEndpoint;
+	private Endpoint endpoint;
 
 	private Set<ServiceKeys> serviceKeys;
 
@@ -109,9 +103,9 @@ public class DBImportXMLConfiguration {
 		String type = xPath.evaluate("//connectors/connector/type", doc);
 		String environmentName = xPath.evaluate("//connectors/connector/environmentName", doc);
 		String stage = xPath.evaluate("//connectors/connector/stage", doc);
-		String defaultFromEndpointType = xPath.evaluate("//connectors/connector/defaultFromEndpointType", doc);
-		String defaultToEndpointType = xPath.evaluate("//connectors/connector/defaultToEndpointType", doc);
-		String defaultErrorEndpointType = xPath.evaluate("//connectors/connector/defaultErrorEndpointType", doc);
+		String defaultFromComponentType = xPath.evaluate("//connectors/connector/defaultFromComponentType", doc);
+		String defaultToComponentType = xPath.evaluate("//connectors/connector/defaultToComponentType", doc);
+		String defaultErrorComponentType = xPath.evaluate("//connectors/connector/defaultErrorComponentType", doc);
 
 		
 		log.info("GatewayID=" + gatewayId);
@@ -134,9 +128,9 @@ public class DBImportXMLConfiguration {
 			gateway.setEnvironmentName(environmentName);
 			gateway.setType(GatewayType.valueOf(type));
 			gateway.setStage(EnvironmentType.valueOf(stage));
-			gateway.setDefaultFromEndpointType(defaultFromEndpointType);
-			gateway.setDefaultToEndpointType(defaultToEndpointType);
-			gateway.setDefaultErrorEndpointType(defaultErrorEndpointType);
+			gateway.setDefaultFromComponentType(defaultFromComponentType);
+			gateway.setDefaultToComponentType(defaultToComponentType);
+			gateway.setDefaultErrorComponentType(defaultErrorComponentType);
 
 			// create environment variables
 			setEnvironmentVariablesFromXML(doc, connectorId, gateway);
@@ -177,7 +171,7 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
-		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);
+		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);		
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
 
@@ -195,16 +189,10 @@ public class DBImportXMLConfiguration {
 			if (!flowOptional.isPresent()) {
 				flow = new Flow();
 				flow.setId(id);
-
-				fromEndpoint = getFromEndpointFromXML(flowId, doc, null);
-				toEndpoints = getToEndpointsFromXML(flowId, doc, flow, true);
-				errorEndpoint = getErrorEndpointFromXML(flowId, doc, null);
-
+				endpoints = getEndpointsFromXML(flowId, doc, flow, true);
 			} else {
 				flow = flowOptional.get();
-				fromEndpoint = getFromEndpointFromXML(flowId, doc, flow.getFromEndpoint());
-				toEndpoints = getToEndpointsFromXML(flowId, doc, flow, false);
-				errorEndpoint = getErrorEndpointFromXML(flowId, doc, flow.getErrorEndpoint());
+				endpoints = getEndpointsFromXML(flowId, doc, flow, false);
 			}
 
 			if (!gatewayOptional.isPresent()) {
@@ -255,9 +243,7 @@ public class DBImportXMLConfiguration {
 				flow.setLogLevel(LogLevelType.OFF);
 			}
 
-			flow.setFromEndpoint(fromEndpoint);
-			flow.setToEndpoints(toEndpoints);
-			flow.setErrorEndpoint(errorEndpoint);
+			flow.setEndpoints(endpoints);
 
 			flow = flowRepository.save(flow);
 
@@ -279,300 +265,130 @@ public class DBImportXMLConfiguration {
 		setHeadersFromXML(doc, headerIds);
 	}
 
-	private FromEndpoint getFromEndpointFromXML(String id, Document doc, FromEndpoint fromEndpoint) throws Exception {
-
-		
-		System.out.println("id=" + id);
-		
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		String fromUri = xPath.evaluate("//flows/flow[id='" + id + "']/from/uri", doc);
-		String fromServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/from/service_id", doc);
-		String fromHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/from/header_id", doc);
-		String fromOptions = null;
-
-		// get type
-		String[] fromUriSplitted = fromUri.split(":", 2);
-		String fromTypeAsString = fromUriSplitted[0].toUpperCase();
-		fromTypeAsString = fromTypeAsString.replace("-", "");
-		EndpointType fromType = EndpointType.valueOf(fromTypeAsString);
-
-		// get uri
-		fromUri = fromUriSplitted[1];
-		while (fromUri.startsWith("/")) {
-			fromUri = fromUri.substring(1);
-		}
-
-		// get options
-		Map<String, String> fromOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/from/options/*");
-
-		for (Map.Entry<String, String> entry : fromOptionsMap.entrySet()) {
-
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			if (fromOptions != null) {
-				fromOptions = fromOptions + "&" + key + "=" + value;
-				;
-			} else {
-				fromOptions = key + "=" + value;
-			}
-		}
-
-		// get service if configured
-		org.assimbly.gateway.domain.Service fromService;
-		try {
-			Long serviceId = Long.parseLong(fromServiceId, 10);
-			String fromServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
-			
-			Optional<org.assimbly.gateway.domain.Service> fromServiceOptional = serviceRepository.findByName(fromServiceName);
-			if(fromServiceOptional.isPresent()) {
-				fromService = fromServiceOptional.get();
-			}else {
-				fromService = null;
-			}
-		} catch (NumberFormatException nfe) {
-			fromService = null;
-		}
-
-		// get header if configured
-		Header fromHeader;
-		try {
-			Long headerId = Long.parseLong(fromHeaderId, 10);
-			String fromHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
-			Optional<Header> fromHeaderOptional = fromHeaderOptional = headerRepository.findByName(fromHeaderName);
-			if(fromHeaderOptional.isPresent()) {
-				fromHeader = fromHeaderOptional.get();
-			}else {
-				fromHeader = null;
-			}
-		} catch (NumberFormatException nfe) {
-			fromHeader = null;
-		}
-
-		if (fromEndpoint == null) {
-			fromEndpoint = new FromEndpoint();
-		}
-
-		fromEndpoint.setUri(fromUri);
-		fromEndpoint.setType(fromType);
-		fromEndpoint.setOptions(fromOptions);
-
-		if (fromService != null) {
-			fromEndpoint.setService(fromService);
-		}
-		if (fromHeader != null) {
-			fromEndpoint.setHeader(fromHeader);
-		}
-
-		return fromEndpoint;
-	}
-
-	private Set<ToEndpoint> getToEndpointsFromXML(String id, Document doc, Flow flow, boolean newFlow)
+	private Set<Endpoint> getEndpointsFromXML(String id, Document doc, Flow flow, boolean newFlow)
 			throws Exception {
 
 		if (newFlow) {
-			toEndpoints = new HashSet<ToEndpoint>();
+			endpoints = new HashSet<Endpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfToEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/to)", doc));
-			numberOfToEndpoints = numberOfToEndpoints + 1;
+			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint)", doc));
+			numberOfEndpoints = numberOfEndpoints + 1;
 
-			for (int i = 1; i < numberOfToEndpoints; i++) {
+			for (int i = 1; i < numberOfEndpoints; i++) {
 				String index = Integer.toString(i);
-				toEndpoint = getToEndpointFromXML(id, doc, flow, null, index);
-				toEndpoints.add(toEndpoint);
+				endpoint = getEndpointFromXML(id, doc, flow, null, index);
+				endpoints.add(endpoint);
 			}
 		} else {
 
-			toEndpoints = flow.getToEndpoints();
+			endpoints = flow.getEndpoints();
 
-			for (ToEndpoint toEndpoint : toEndpoints) {
+			for (Endpoint endpoint : endpoints) {
 
-				Long toEndpointId = toEndpoint.getId();
-				String index = "id='" + Long.toString(toEndpointId) + "'";
-				toEndpoint = getToEndpointFromXML(id, doc, flow, toEndpoint, index);
-				toEndpoints.add(toEndpoint);
+				Long endpointId = endpoint.getId();
+				String index = "id='" + Long.toString(endpointId) + "'";
+				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index);
+				endpoints.add(endpoint);
 			}
 
 		}
 
-		return toEndpoints;
+		return endpoints;
 	}
 
-	private ToEndpoint getToEndpointFromXML(String id, Document doc, Flow flow, ToEndpoint toEndpoint, String index)
+	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index)
 			throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String toUri = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/uri", doc);
-		String toServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/service_id", doc);
-		String toHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/to[" + index + "]/header_id", doc);
-		String toOptions = null;
+		String type = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/type", doc);
+		String uri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/uri", doc);
+		String options = null;
+		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
+		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
 
 		// get type
-		String[] toUriSplitted = toUri.split(":", 2);
-		String toTypeAsString = toUriSplitted[0].toUpperCase();
-		toTypeAsString = toTypeAsString.replace("-", "");
+		String[] uriSplitted = uri.split(":", 2);
+		String componentTypeAsString = uriSplitted[0].toUpperCase();
+		componentTypeAsString = componentTypeAsString.replace("-", "");
 
-		EndpointType toType = EndpointType.valueOf(toTypeAsString);
-
+		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
+		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+		
 		// get uri
-		toUri = toUriSplitted[1];
-		while (toUri.startsWith("/")) {
-			toUri = toUri.substring(1);
-			;
+		uri = uriSplitted[1];
+		while (uri.startsWith("/")) {
+			uri = uri.substring(1);
+			
 		}
 
 		// get options
-		Map<String, String> toOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/to/options/*");
+		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint/options/*");
 
-		for (Map.Entry<String, String> entry : toOptionsMap.entrySet()) {
+		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
 
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			if (toOptions != null) {
-				toOptions = toOptions + "&" + key + "=" + value;
+			if (options != null) {
+				options = options + "&" + key + "=" + value;
 				;
 			} else {
-				toOptions = key + "=" + value;
+				options = key + "=" + value;
 			}
 
 		}
 
 		// get service if configured
-		org.assimbly.gateway.domain.Service toService;
+		org.assimbly.gateway.domain.Service service;
 		try {
-			Long serviceId = Long.parseLong(toServiceId, 10);
-			String toServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
-			Optional<org.assimbly.gateway.domain.Service>toServiceOptional = serviceRepository.findByName(toServiceName);
-			if(toServiceOptional.isPresent()) {
-				toService = toServiceOptional.get();
+			Long serviceIdLong = Long.parseLong(serviceId, 10);
+			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
+			Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+			if(serviceOptional.isPresent()) {
+				service = serviceOptional.get();
 			}else {
-				toService = null;
+				service = null;
 			}
 		} catch (NumberFormatException nfe) {
-			toService = null;
+			service = null;
 		}
 
 		// get header if configured
-		Header toHeader;
+		Header header;
 		try {
 			
-			Long headerId = Long.parseLong(toHeaderId, 10);
-			String toHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
-			Optional<Header> toHeaderOptional = toHeaderOptional = headerRepository.findByName(toHeaderName);
-			if(toHeaderOptional.isPresent()) {
-				toHeader = toHeaderOptional.get();
+			Long headerIdLong = Long.parseLong(headerId, 10);
+			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerIdLong + "]/name",doc);
+			Optional<Header> headerOptional = headerOptional = headerRepository.findByName(headerName);
+			if(headerOptional.isPresent()) {
+				header = headerOptional.get();
 			}else {
-				toHeader = null;
+				header = null;
 			}			
 				
 		} catch (NumberFormatException nfe) {
-			toHeader = null;
+			header = null;
 		}
 
-		if (toEndpoint == null) {
-			toEndpoint = new ToEndpoint();
+		if (endpoint == null) {
+			endpoint = new Endpoint();
 		}
 
-		toEndpoint.setUri(toUri);
-		toEndpoint.setType(toType);
-		toEndpoint.setFlow(flow);
-		toEndpoint.setOptions(toOptions);
+		endpoint.setEndpointType(endpointType);
+		endpoint.setComponentType(componentType);
+		endpoint.setUri(uri);
+		endpoint.setFlow(flow);
+		endpoint.setOptions(options);
 
-		if (toService != null) {
-			toEndpoint.setService(toService);
+		if (service != null) {
+			endpoint.setService(service);
 		}
-		if (toHeader != null) {
-			toEndpoint.setHeader(toHeader);
-		}
-
-		return toEndpoint;
-
-	}
-
-	private ErrorEndpoint getErrorEndpointFromXML(String id, Document doc, ErrorEndpoint errorEndpoint)	throws Exception {
-
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		String errorUri = xPath.evaluate("//flows/flow[id='" + id + "']/error/uri", doc);
-		String errorServiceId = xPath.evaluate("//flows/flow[id='" + id + "']/error/service_id", doc);
-		String errorHeaderId = xPath.evaluate("//flows/flow[id='" + id + "']/error/header_id", doc);
-		String errorOptions = null;
-
-		// get type
-		String[] errorUriSplitted = errorUri.split(":", 2);
-		String errorTypeAsString = errorUriSplitted[0].toUpperCase();
-		errorTypeAsString = errorTypeAsString.replace("-", "");
-	
-		EndpointType errorType = EndpointType.valueOf(errorTypeAsString);
-
-		// get uri
-		errorUri = errorUriSplitted[1];
-		while (errorUri.startsWith("/")) {
-			errorUri = errorUri.substring(1);
+		if (header != null) {
+			endpoint.setHeader(header);
 		}
 
-		// get options
-
-		Map<String, String> errorOptionsMap = getMap(doc, "//flows/flow[id='" + id + "']/error/options/*");
-
-		for (Map.Entry<String, String> entry : errorOptionsMap.entrySet()) {
-
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			if (errorOptions != null) {
-				errorOptions = errorOptions + "&" + key + "=" + value;				
-			} else {
-				errorOptions = key + "=" + value;
-			}
-		}
-
-		// get service if configured
-		org.assimbly.gateway.domain.Service errorService;
-		try {
-			Long serviceId = Long.parseLong(errorServiceId, 10);
-			String errorServiceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
-			Optional<org.assimbly.gateway.domain.Service> errorServiceOptional = serviceRepository.findByName(errorServiceName);
-			if(errorServiceOptional.isPresent()) {
-				errorService = errorServiceOptional.get();
-			}else {
-				errorService = null;
-			}
-		} catch (NumberFormatException nfe) {
-			errorService = null;
-		}
-
-		// get header if configured
-		Header errorHeader;
-		try {
-			Long headerId = Long.parseLong(errorHeaderId, 10);
-			String errorHeaderName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name",doc);
-			Optional<org.assimbly.gateway.domain.Header> errorHeaderOptional = headerRepository.findByName(errorHeaderName);
-			if(errorHeaderOptional.isPresent()) {
-				errorHeader = errorHeaderOptional.get();
-			}else {
-				errorHeader = null;
-			}
-		} catch (NumberFormatException nfe) {
-			errorHeader = null;
-		}
-
-		if (errorEndpoint == null) {
-			errorEndpoint = new ErrorEndpoint();
-		}
-
-		errorEndpoint.setUri(errorUri);
-		errorEndpoint.setType(errorType);
-		errorEndpoint.setOptions(errorOptions);
-		if (errorService != null) {
-			errorEndpoint.setService(errorService);
-		}
-		if (errorHeader != null) {
-			errorEndpoint.setHeader(errorHeader);
-		}
-
-		return errorEndpoint;
+		return endpoint;
 
 	}
 

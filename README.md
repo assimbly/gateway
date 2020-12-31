@@ -1,6 +1,6 @@
 # Assimbly
 
-**Assimbly** is a message gateway. 
+**Assimbly** is a message gateway.
 
 The gateway acts as a link between endpoints, allow them to share information and bypass certain protocols. The purpose of Assimbly is to configure and manage these endpoints with the help of a webgui.
 
@@ -24,7 +24,6 @@ The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 -   Web based: Access flows from any browser.
 -   Ease of use: Configure and manage flows with ease.
 -   Separate-of-concerns: Seperate connections from application and other middleware.
-
 
 # Documentation
 

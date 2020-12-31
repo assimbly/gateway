@@ -27,13 +27,17 @@ export class ServiceUpdateComponent implements OnInit {
         'org.postgresql.Driver',
         'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     ];
-    jmsProvidersList: Array<String> = [
-                                   'ActiveMQ Artemis',
-                                   'AMQ'
-                               ];
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
 
     public disableType: boolean;
-    public typeServices: string[] = ['ActiveMQ Connection','AmazonMQ Connection','AMQP Connection','JDBC Connection', 'MQ Connection','SonicMQ Connection'];
+    public typeServices: string[] = [
+        'ActiveMQ Connection',
+        'AmazonMQ Connection',
+        'AMQP Connection',
+        'JDBC Connection',
+        'MQ Connection',
+        'SonicMQ Connection'
+    ];
     requiredServiceKey: Array<RequiredServiceKey> = [];
     requiredType: RequiredServiceKey;
     serviceKeysRemoveList: Array<ServiceKeys> = [];
@@ -134,7 +138,10 @@ export class ServiceUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IService>>) {
-        result.subscribe((res: HttpResponse<IService>) => this.onSaveSuccess(res.body), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IService>) => this.onSaveSuccess(res.body),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess(result: IService) {
@@ -233,7 +240,7 @@ export class ServiceUpdateComponent implements OnInit {
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:61616', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '',isRequired: false }
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
                 ]
             },
             {
@@ -258,7 +265,7 @@ export class ServiceUpdateComponent implements OnInit {
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
                 ]
             }
         );

@@ -46,20 +46,6 @@
                         <option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_fromEndpoint">From Endpoint</label>
-                    <select class="form-control" id="field_fromEndpoint" name="fromEndpoint" [(ngModel)]="flow.fromEndpointId">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="fromEndpointOption.id" *ngFor="let fromEndpointOption of fromendpoints; trackBy: trackFromEndpointById">{{fromEndpointOption.id}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_errorEndpoint">Error Endpoint</label>
-                    <select class="form-control" id="field_errorEndpoint" name="errorEndpoint" [(ngModel)]="flow.errorEndpointId">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="errorEndpointOption.id" *ngFor="let errorEndpointOption of errorendpoints; trackBy: trackErrorEndpointById">{{errorEndpointOption.id}}</option>
-                    </select>
-                </div>
             </div>
             <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity Endpoint.
+    -->
+    <changeSet id="20180114201816-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="flow_id"
+                                 baseTableName="endpoint"
+                                 constraintName="fk_endpoint_flow_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="flow"/>
+
+        <addForeignKeyConstraint baseColumnNames="service_id"
+                                 baseTableName="endpoint"
+                                 constraintName="fk_endpoint_service_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="service"/>
+
+        <addForeignKeyConstraint baseColumnNames="header_id"
+                                 baseTableName="endpoint"
+                                 constraintName="fk_endpoint_header_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="header"/>
+
+    </changeSet>
+</databaseChangeLog>

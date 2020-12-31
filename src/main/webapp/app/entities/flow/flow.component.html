@@ -1,9 +1,12 @@
 <div>
-	<div class="row mt-3" style="margin-left: 0.3em">
-		<h2>Flows</h2>
-	</div>
 
-	<div *ngIf="multipleGateways">
+	<div class="row mt-3" style="margin-left: 0.3em">
+		<h2>Flows</h2><br/>
+	</div>
+	<div class="row mt-3" style="margin-left: 0.3em;">
+		<p style="margin-top: -1.6em;"><b>Stage={{singleGatewayStage}}</b></p>
+	</div>
+ 	<div *ngIf="multipleGateways">
 		<label class="col-xl-2 col-md-4 col-12 col-form-label">Showing
 			flows for gateway</label> <select
 			class="col-xl-4 col-md-4 col-sm-12 form-control"
@@ -19,10 +22,10 @@
 		</button>
 	</div>
 	<div class="col-1.5">
-		<input type="text" align="left" style="margin-left: 0.3em"
-			[(ngModel)]="searchText"
-			id="searchTextId" name="searchText"
-			placeholder="Filter By Flow Name"></input>
+        <input type="text" align="left" style="margin-left: 0.3em"
+               [(ngModel)]="searchText"
+               id="searchTextId" name="searchText"
+               placeholder="Filter By Flow Name"/>
 	</div>
 	<br />
 	<div *ngIf="flows?.length == 0">
@@ -48,9 +51,9 @@
                        </th> -->
 					<th [style.display]="'none'"><span>Error</span></th>
 					<th class="border-bottom-none">
-						<!-- <th class="row border-bottom-none">                        
+						<!-- <th class="row border-bottom-none">
 	                   	<div class="col-7"> </div>
-	                   	
+
                        	<div  class="input-group float-right col-5">
 						 	<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
 							<div class="input-group-append">
@@ -58,19 +61,18 @@
 									(click)="trigerAction(selectedAction)">
 									<span>All</span>
 								</button>
-							</div> 
+							</div>
 						</div>-->
 					</th>
 				</tr>
 			</thead>
-			<tbody *ngIf="fromEndpoints" infinite-scroll
+			<tbody *ngIf="flows" infinite-scroll
 				(scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)"
 				[infiniteScrollDisabled]="page >= links['last']"
 				[infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
-				<!-- <tbody *ngIf="fromEndpoints" infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0"> -->
 				<tr jhi-flow-row
 					*ngFor="let flow of  (flows | FlowSearchByName: searchText) ;trackBy: trackId"
-					[flow]="flow" [fromEndpoints]="fromEndpoints" [isAdmin]="isAdmin"
+					[flow]="flow" [isAdmin]="isAdmin"
 					ng-init="$last && finished()"></tr>
 			</tbody>
 		</table>

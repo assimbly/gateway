@@ -43,17 +43,22 @@
             <column name="log_level" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="version" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="created" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified" type="datetime">
+                <constraints nullable="true" />
+            </column>
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="from_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_from_endpoint_id" />
-            </column>
-            <column name="error_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_flow_error_endpoint_id" />
-            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
+        <dropDefaultValue tableName="flow" columnName="created" columnDataType="datetime"/>
+        <dropDefaultValue tableName="flow" columnName="last_modified" columnDataType="datetime"/>
     </changeSet>
 
     <changeSet id="20180114132915-1-relations" author="jhipster">
@@ -84,6 +89,9 @@
             <column name="load_balancing" type="boolean"/>
             <column name="instances" type="numeric"/>
             <column name="log_level" type="string"/>
+            <column name="version" type="numeric"/>
+            <column name="created" type="datetime"/>
+            <column name="last_modified" type="datetime"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

@@ -28,9 +28,9 @@ export interface IGateway {
     environmentName?: string;
     stage?: EnvironmentType;
     connectorType?: ConnectorType;
-    defaultFromEndpointType?: string;
-    defaultToEndpointType?: string;
-    defaultErrorEndpointType?: string;
+    defaultFromComponentType?: string;
+    defaultToComponentType?: string;
+    defaultErrorComponentType?: string;
     wiretapEndpointId?: number;
     flows?: IFlow[];
     environmentVariables?: IEnvironmentVariables[];
@@ -44,9 +44,9 @@ export class Gateway implements IGateway {
         public environmentName?: string,
         public stage?: EnvironmentType,
         public connectorType?: ConnectorType,
-        public defaultFromEndpointType?: string,
-        public defaultToEndpointType?: string,
-        public defaultErrorEndpointType?: string,
+        public defaultFromComponentType?: string,
+        public defaultToComponentType?: string,
+        public defaultErrorComponentType?: string,
         public wiretapEndpointId?: number,
         public flows?: IFlow[],
         public environmentVariables?: IEnvironmentVariables[]

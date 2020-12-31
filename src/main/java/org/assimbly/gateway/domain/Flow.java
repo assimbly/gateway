@@ -10,6 +10,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
@@ -55,21 +56,22 @@ public class Flow implements Serializable {
     @Column(name = "instances")
     private Integer instances;
 
+    @Column(name = "version")
+    private Integer version;
+
+    @Column(name = "created")
+    private Instant created;
+
+    @Column(name = "last_modified")
+    private Instant lastModified;
+    
     @ManyToOne
     @JsonIgnoreProperties("flows")
     private Gateway gateway;
  
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private FromEndpoint fromEndpoint;
- 
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private ErrorEndpoint errorEndpoint;
- 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
-    private Set<ToEndpoint> toEndpoints = new HashSet<>();
+    private Set<Endpoint> endpoints = new HashSet<>();
     
     /*
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
@@ -202,6 +204,45 @@ public class Flow implements Serializable {
     public void setInstances(Integer instances) {
         this.instances = instances;
     }
+    
+    public Integer getVersion() {
+        return version;
+    }
+
+    public Flow version(Integer version) {
+        this.version = version;
+        return this;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Instant getCreated() {
+        return created;
+    }
+
+    public Flow created(Instant created) {
+        this.created = created;
+        return this;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public Flow lastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }     
 
     public Gateway getGateway() {
         return gateway;
@@ -216,55 +257,29 @@ public class Flow implements Serializable {
         this.gateway = gateway;
     }
 
-    public FromEndpoint getFromEndpoint() {
-        return fromEndpoint;
+    public Set<Endpoint> getEndpoints() {
+        return endpoints;
     }
 
-    public Flow fromEndpoint(FromEndpoint fromEndpoint) {
-        this.fromEndpoint = fromEndpoint;
+    public Flow endpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
         return this;
     }
 
-    public void setFromEndpoint(FromEndpoint fromEndpoint) {
-        this.fromEndpoint = fromEndpoint;
-    }
-
-    public ErrorEndpoint getErrorEndpoint() {
-        return errorEndpoint;
-    }
-
-    public Flow errorEndpoint(ErrorEndpoint errorEndpoint) {
-        this.errorEndpoint = errorEndpoint;
+    public Flow addEndpoint(Endpoint endpoint) {
+        this.endpoints.add(endpoint);
+        endpoint.setFlow(this);
         return this;
     }
 
-    public void setErrorEndpoint(ErrorEndpoint errorEndpoint) {
-        this.errorEndpoint = errorEndpoint;
-    }
-
-    public Set<ToEndpoint> getToEndpoints() {
-        return toEndpoints;
-    }
-
-    public Flow toEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public Flow removeEndpoint(Endpoint endpoint) {
+        this.endpoints.remove(endpoint);
+        endpoint.setFlow(null);
         return this;
     }
 
-    public Flow addToEndpoint(ToEndpoint toEndpoint) {
-        this.toEndpoints.add(toEndpoint);
-        toEndpoint.setFlow(this);
-        return this;
-    }
-
-    public Flow removeToEndpoint(ToEndpoint toEndpoint) {
-        this.toEndpoints.remove(toEndpoint);
-        toEndpoint.setFlow(null);
-        return this;
-    }
-
-    public void setToEndpoints(Set<ToEndpoint> toEndpoints) {
-        this.toEndpoints = toEndpoints;
+    public void setEndpoints(Set<Endpoint> endpoints) {
+        this.endpoints = endpoints;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
