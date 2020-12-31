@@ -86,6 +86,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     alreadyConnectedOnce = false;
     private subscription: Subscription;
 
+
+
     modalRef: NgbModalRef | null;
 
     constructor(
@@ -375,9 +377,21 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     getFlowStats(id: number) {
+
         this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
             this.setFlowStatistic(res.body);
         });
+
+		//refresh every 5 seconds
+		this.intervalTime = setInterval(() => {
+            this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
+                this.setFlowStatistic(res.body);
+            });
+        }, 5000)
+    }
+
+    stopGetFlowStats() {
+        clearInterval(this.intervalTime);
     }
 
     getFlowDetails() {
@@ -403,7 +417,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     setFlowStatistic(res) {
         /* Example Available stats
-          * 
+          *
           * "maxProcessingTime": 1381,
             "lastProcessingTime": 1146,
             "meanProcessingTime": 1262,
@@ -440,23 +454,53 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             let processingTime = ``;
 
             if (res.stats.lastProcessingTime > 0) {
-                processingTime = `<b>Processing time</b><br/>
-                Last: ${res.stats.lastProcessingTime} ms<br/>
-                Min: ${res.stats.minProcessingTime} ms<br/>
-                Max: ${res.stats.maxProcessingTime} ms<br/>
-                Average: ${res.stats.meanProcessingTime} ms<br/>`;
+
+                processingTime = `<tr>
+			      <th scope="row">Min</th>
+			      <td>${res.stats.minProcessingTime} ms</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Max</th>
+			      <td>${res.stats.maxProcessingTime} ms</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Average</th>
+			      <td>${res.stats.meanProcessingTime} ms</td>
+			    </tr>`;
+
             }
 
             this.flowStatistic =
                 `
-                <br/>
-                <b>Start time:</b> ${this.checkDate(res.stats.startTimestamp)}<br/>
-                <b>Run time:</b> ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'} <br/><br/>
-                <b>First:</b> ${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}<br/>
-                <b>Last:</b> ${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}<br/><br/>
-                <b>Completed:</b> ${completed}<br/>
-                <b>Failed:</b> ${failures}<br/>
-                <br/>` + processingTime;
+			<table class="table">
+			  <tbody>
+			    <tr>
+			      <th scope="row">Start time</th>
+			      <td>${this.checkDate(res.stats.startTimestamp)}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Running</th>
+			      <td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">First Message</th>
+			      <td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Last Message</th>
+			      <td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>
+			    </tr>` + processingTime +
+              `
+			    <tr>
+			      <th scope="row">Completed</th>
+			      <td>${completed}</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Failed</th>
+			      <td>${failures}</td>
+			    </tr>
+               </tbody>
+			</table>`;
         }
     }
 
