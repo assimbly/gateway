@@ -45,6 +45,16 @@ local.properties
 /src/main/resources/rebel.xml
 .h2.server.properties
 
+######################
+# Intellij
+######################
+*.iws
+*.iml
+.idea_modules/
+.idea/
+atlassian-ide-plugin.xml
+out/
+
 # External tool builders
 .externalToolBuilders/**
 
