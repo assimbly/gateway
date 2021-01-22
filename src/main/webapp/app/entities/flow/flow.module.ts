@@ -8,12 +8,16 @@ import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 import { GatewaySecurityModule } from '../../entities/security/security.module';
-
+import { AceModule } from 'ngx-ace-wrapper';
+import { ACE_CONFIG } from 'ngx-ace-wrapper';
+import { AceConfigInterface } from 'ngx-ace-wrapper';
+import { AceEditorModule } from 'ng2-ace-editor';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
 import {
     FlowComponent,
     FlowEditAllComponent,
+    FlowMessageSenderComponent,
     FlowDetailComponent,
     FlowUpdateComponent,
     FlowDeletePopupComponent,
@@ -29,6 +33,7 @@ import { FlowService } from 'app/entities/flow/flow.service';
 import { Components } from 'app/shared/camel/component-type';
 
 const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
+const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
     imports: [
@@ -38,6 +43,8 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         GatewaySecurityModule,
         GatewayHeaderModule,
         GatewayMaintenanceModule,
+        AceEditorModule,
+        AceModule,
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
         NgSelectModule,
@@ -50,6 +57,7 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         FlowComponent,
         FlowUpdateComponent,
         FlowEditAllComponent,
+        FlowMessageSenderComponent,
         FlowDetailComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent,
@@ -60,11 +68,19 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
         FlowComponent,
         FlowUpdateComponent,
         FlowEditAllComponent,
+        FlowMessageSenderComponent,
         FlowDeleteDialogComponent,
         FlowDeleteDialogComponent,
         FlowDeletePopupComponent
     ],
-    providers: [FlowService, FlowPopupService],
+    providers: [
+        FlowService,
+        FlowPopupService,
+        {
+            provide: ACE_CONFIG,
+            useValue: DEFAULT_ACE_CONFIG
+        }
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayFlowModule {}

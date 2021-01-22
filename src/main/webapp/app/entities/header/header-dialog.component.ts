@@ -24,7 +24,7 @@ export class HeaderDialogComponent implements OnInit {
     headerKeys: Array<HeaderKeys> = [];
     headerKeysKeys: Array<String> = [];
     isSaving: boolean;
-    public typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'simple', 'xpath'];
+    public typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
 
     constructor(
         public activeModal: NgbActiveModal,
