@@ -174,6 +174,53 @@ export class FlowService {
         });
     }
 
+    send(
+        gatewayId: number,
+        uri: string,
+        endpointId: string,
+        headerId: string,
+        serviceId: string,
+        numberOfTimes: string,
+        messageBody: string
+    ): Observable<any> {
+        const options = new HttpHeaders({
+            uri: uri,
+            endpointId: endpointId,
+            headerid: headerId,
+            serviceid: serviceId,
+            'Content-Type': 'text/plain',
+            Accept: 'text/plain'
+        });
+        return this.http.post(`${this.connectorUrl}/${gatewayId}/send/${numberOfTimes}`, messageBody, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    sendRequest(
+        gatewayId: number,
+        uri: string,
+        endpointId: string,
+        headerId: string,
+        serviceId: string,
+        messageBody: string
+    ): Observable<any> {
+        const options = new HttpHeaders({
+            uri: uri,
+            endpointId: endpointId,
+            headerid: headerId,
+            serviceid: serviceId,
+            'Content-Type': 'text/plain',
+            Accept: 'text/plain'
+        });
+        return this.http.post(`${this.connectorUrl}/${gatewayId}/sendrequest`, messageBody, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
     exportGatewayConfiguration(gateway: IGateway) {
         const url = `${this.environmentUrl}/${gateway.id}`;
         const exportDate = this.getDate();
