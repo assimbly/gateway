@@ -69,6 +69,8 @@ public class ApplicationProperties {
 
     	private String name;
     	private String baseDirectory;
+    	private boolean tracing;
+    	private boolean debugging;
     	
         public String getName() {
             return name;
@@ -85,6 +87,24 @@ public class ApplicationProperties {
         public void setBaseDirectory(String baseDirectory) {
             this.baseDirectory = baseDirectory;
         }
+
+        public boolean getTracing() {
+	        return tracing;
+	    }
+	
+	    public void setName(boolean tracing) {
+	        this.tracing = tracing;
+	    }
+
+
+        public boolean getDebugging() {
+	        return debugging;
+	    }
+	
+	    public void setDebugging(boolean debugging) {
+	        this.debugging = debugging;
+	    }
+	    
     }
     
 }
