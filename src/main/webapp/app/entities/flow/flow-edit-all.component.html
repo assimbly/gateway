@@ -103,7 +103,7 @@
 						</p>
 					</div>
 				</div>
-			</div>	
+			</div>
 			<div id="collapseExample" [ngbCollapse]="panelCollapsed != 'settings'" [attr.aria-expanded]="!isCollapsed">
 					<ng-template #autoStartPopover let-message="message">
 					<div [innerHtml]="autoStartPopoverMessage"></div>
@@ -120,11 +120,11 @@
 					<ng-template #logLevelPopover let-message="message">
 					<div [innerHtml]="logLevelPopoverMessage"></div>
 					</ng-template>
-					
+
 				<div class="form-group row">
 					<div class="col-2"></div>
 					<div class="col-10">
-					
+
 					<div class="form-group">
 						<label class="form-control-label" for="field_autostart">Autostart</label>
 						<i triggers="mouseenter:mouseleave" placement="right"
@@ -187,14 +187,14 @@
 							<option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
 						</select>
 					</div>
-					</div>	
-				</div>	
+					</div>
+				</div>
 			</div>
 
 
 				<div class="d-flex">
 				  <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
-				  	<ng-container *ngFor="let endpoint of endpoints; index as index">				  	
+				  	<ng-container *ngFor="let endpoint of endpoints; index as index">
 					    <li ngbNavItem="{{index}}">
 					      <a ngbNavLink>{{endpoint.endpointType}}</a>
 					      <ng-template ngbNavContent>
@@ -240,8 +240,8 @@
 											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
 											    </div>
 										</ng-template>
-																			
-										
+
+
 										<div class="form-group">
 											<div class="input-group border-bottom my-3">
 												<h5>URI&ensp;</h5>
@@ -330,17 +330,17 @@
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Empty</span>
 											</button>
-											<button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO'" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="numberOfToEndpoints === 1">
+											<button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))"><!--disabled when from selected and numberoffromendpoints > 1, or when to selected and numberOfToEndpoints > 1-->
 												<span class="fa fa-remove"></span>&nbsp;
 												<span>Remove</span>
 											</button>
-											<button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO'" (click)="addEndpoint(endpoint, index)">
+											<button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)">
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Add</span>
-											</button>											
+											</button>
 										</div>
-									</div> 
-					        
+									</div>
+
 					      </ng-template>
 					    </li>
 				    </ng-container>
