@@ -10,6 +10,7 @@ import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.event.FailureListener;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
 import org.assimbly.gateway.service.dto.HeaderDTO;
@@ -58,6 +59,9 @@ public class ConnectorResource {
     @Autowired
     FailureListener failureListener;
 
+    @Autowired
+    GatewayRepository gatewayRepository;
+    
     @Autowired
     FlowRepository flowRepository;
 
@@ -190,6 +194,7 @@ public class ConnectorResource {
        			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector already running");
        		}else {
 				connector.addEventNotifier(failureListener);
+				connector.setTracing(false);
        			connector.start();
        			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector started");
        		}
@@ -945,6 +950,8 @@ public class ConnectorResource {
                 Gateway gateway = applicationProperties.getGateway();
 
                 String applicationBaseDirectory = gateway.getBaseDirectory();
+                boolean applicationTracing = gateway.getTracing();
+                boolean applicationDebugging = gateway.getDebugging();
 
 	            if(!applicationBaseDirectory.equals("default")) {
 	            	connector.setBaseDirectory(applicationBaseDirectory);
@@ -952,6 +959,8 @@ public class ConnectorResource {
 
         		connectorIsStarting = true;
 				connector.addEventNotifier(failureListener);
+				connector.setTracing(applicationTracing);
+				connector.setDebugging(applicationDebugging);
 
         		connector.start();
 
