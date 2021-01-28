@@ -734,8 +734,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setRequest() {
         const endpointForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
 
-        this.isSending = false;
-
         this.requestExchangePattern = this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
             this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
@@ -757,12 +755,16 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        this.isSending = false;
         this.jhiAlertService.success('Send successfully', null, null);
+        setTimeout(() => {
+            this.isSending = false;
+        }, 1000);
         if (showResponse) {
             this.setEditorMode(body);
             this.responseBody = body;
             this.active = '1';
+        } else {
+            this.responseBody = body;
         }
     }
 

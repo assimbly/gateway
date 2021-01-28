@@ -160,16 +160,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.activeEndpoint = this.route.snapshot.queryParamMap.get('endpointid');
 
         this.subscription = this.route.params.subscribe(params => {
-            console.log('params2=' + JSON.stringify(params));
-
-            console.log('params3=' + params['clone']);
-            console.log('params4=' + params['blbal']);
-
             if (params['mode'] === 'clone') {
-                console.log('params is true');
                 this.load(params['id'], true);
             } else {
-                console.log('params is false');
                 this.load(params['id'], false);
             }
         });
@@ -223,9 +216,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow.gatewayId = this.gateways[this.indexGateway].id;
                         }
 
-                        console.log('flowid=' + this.flow.id);
-                        console.log('flowname=' + this.flow.name);
-
                         this.initializeForm(this.flow);
 
                         this.endpointService.findByFlowId(id).subscribe(flowEndpointsData => {
@@ -252,15 +242,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         endpoint.headerId
                                     );
 
-                                    console.log('endpointid' + endpoint.id);
-
                                     if (isCloning) {
                                         this.endpoint.id = null;
                                     }
 
                                     this.endpoints.push(this.endpoint);
 
-                                    let endpointX = this.endpoint;
                                     let formgroup = this.initializeEndpointData(endpoint);
                                     (<FormArray>this.editFlowForm.controls.endpointsData).insert(index, formgroup);
 
@@ -283,7 +270,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             }, this);
 
                             if (isCloning) {
-                                console.log('isCloning komt hier');
                                 //reset id and flow name to null
                                 this.flow.id = null;
                                 this.flow.name = null;
@@ -394,6 +380,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
             f => f.type === this.serviceType[this.endpoints.indexOf(endpoint)]
         );
+
         if (this.filterService[this.endpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
             formService.setValue(this.filterService[this.endpoints.indexOf(endpoint)].find(fs => fs.id === endpoint.serviceId).id);
         }
@@ -443,7 +430,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType = 'mock';
         }
 
-        endpointForm.controls.service.setValue('');
+        if (endpoint.serviceId) {
+            endpointForm.controls.service.setValue('');
+        }
+
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
         this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
@@ -536,7 +526,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         tEndpointsUnique.forEach((endpoint, i) => {
             if (this.selectedComponentType === endpoint.componentType) {
-                console.log('adding endpoint');
                 this.URIList.push(endpoint);
             }
         });
