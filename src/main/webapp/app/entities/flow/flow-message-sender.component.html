@@ -356,7 +356,8 @@
                 <button type="button"
                         (click)="send()" [disabled]="messageSenderForm.invalid || isSending"
                         class="btn btn-primary">
-                    <span class="fa fa-paper-plane"></span>&nbsp; <span>Send</span>
+                    <span class="fa fa-paper-plane" *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending">Send</span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"></span> <span *ngIf="isSending">Sending</span>
                 </button>
             </div>
             <div *ngIf="savingFlowFailed">

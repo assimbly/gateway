@@ -65,7 +65,7 @@
                             </ng-template>
                             <td *ngIf="serviceKey.valueType !== 'list'; else isList">
                                 <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" placeholder="{{serviceKey.placeholder}}"
-                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel" 
+                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel"
                                     [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"/>
                                 <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                                     <span *ngIf="value.errors.required">Value is required.</span>
@@ -73,11 +73,11 @@
                             </td>
                             <ng-template #isList>
                                 <td>
-                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel"> 
-                                    	<ng-container *ngIf="serviceKey.key == 'driver'"">                                       
+                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
+                                    	<ng-container *ngIf="serviceKey.key == 'driver'"">
                                    	     <option[value]="l" *ngFor="let l of driversList">{{l}}</option>
                                         </ng-container>
-                                       	<ng-container *ngIf="serviceKey.key == 'jmsprovider'"">                                       
+                                       	<ng-container *ngIf="serviceKey.key == 'jmsprovider'"">
                                    	     <option[value]="l" *ngFor="let l of jmsProvidersList">{{l}}</option>
                                         </ng-container>
                                     </select>
@@ -92,7 +92,7 @@
                                         <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
                                             <span class="fa fa-plus"></span>
                                         </button>
-                                        <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" 
+                                        <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired"
                                             class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
                                             <span class="fa fa-trash"></span>
                                         </button>

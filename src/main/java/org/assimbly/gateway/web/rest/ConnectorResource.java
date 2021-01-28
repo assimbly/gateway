@@ -808,7 +808,7 @@ public class ConnectorResource {
             return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/send","Sent succesfully");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/send",e.getMessage());
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/send","Error: " + e.getMessage() + " Cause: " + e.getCause());
         }
     }
 
