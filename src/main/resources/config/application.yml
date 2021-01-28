@@ -144,5 +144,7 @@ application:
   gateway:
     name: default
     base-directory: default
+    tracing: false
+    debugging: false
 hawtio:
   authenticationEnabled:  false
