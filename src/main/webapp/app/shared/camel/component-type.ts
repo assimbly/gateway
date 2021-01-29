@@ -425,7 +425,7 @@ export const typesLinks = [
     {
         name: 'AMQPS',
         assimblyTypeLink: `/component-amqps`,
-        camelTypeLink: `/amqps-component.html`,
+        camelTypeLink: `/amqp-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
         <b>Name</b>: destinationType <br/>
@@ -5041,8 +5041,6 @@ export class Components {
         'ACTIVEMQ',
         'AMAZONMQ',
         'AWS-S3',
-        'AMQP',
-        'AMQPS',
         'ELASTICSEARCH-REST',
         'FILE',
         'FTPS',
