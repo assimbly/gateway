@@ -412,6 +412,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             return 'MQ Connection';
         } else if (componentType === 'AMQP') {
             return 'AMQP Connection';
+        } else if (componentType === 'AMQPS') {
+            return 'AMQPS Connection';
         } else {
             return '';
         }
@@ -435,6 +437,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         if (componentType === 'activemq') {
             componentType = 'jms';
+        } else if (componentType === 'amqps') {
+            componentType = 'amqp';
         } else if (componentType === 'amazonmq') {
             componentType = 'jms';
         } else if (componentType === 'sonicmq') {
@@ -488,6 +492,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             }
             case 'AMAZONMQ':
             case 'AMQP':
+            case 'AMQPS':
             case 'SJMS':
             case 'SONICMQ':
             case 'SQL': {
