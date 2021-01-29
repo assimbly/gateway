@@ -34,6 +34,7 @@ export class ServiceUpdateComponent implements OnInit {
         'ActiveMQ Connection',
         'AmazonMQ Connection',
         'AMQP Connection',
+        'AMQPS Connection',
         'JDBC Connection',
         'MQ Connection',
         'SonicMQ Connection'
@@ -264,6 +265,14 @@ export class ServiceUpdateComponent implements OnInit {
                 name: 'AMQP Connection',
                 serviceKeys: [
                     { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
+                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
+                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
+                ]
+            },
+            {
+                name: 'AMQPS Connection',
+                serviceKeys: [
+                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqps://localhost:5672', isRequired: true },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
                 ]
