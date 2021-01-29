@@ -1,0 +1,374 @@
+<div class="container">
+    <div class="row">
+        <ng-template #componentPopover let-message="message">
+            <div [innerHtml]="componentPopoverMessage"></div>
+        </ng-template>
+        <ng-template #optionsPopover let-message="message">
+            <div [innerHtml]="optionsPopoverMessage"></div>
+        </ng-template>
+        <ng-template #headerPopover let-message="message">
+            <div [innerHtml]="headerPopoverMessage"></div>
+        </ng-template>
+        <ng-template #servicePopover let-message="message">
+            <div [innerHtml]="servicePopoverMessage"></div>
+        </ng-template>
+        <ng-template #popover let-message="message">
+            <div [innerHtml]="popoverMessage"></div>
+        </ng-template>
+        <ng-template #hostnamePopover let-message="message">
+            <div [innerHtml]="hostnamePopoverMessage"></div>
+        </ng-template>
+        <ng-template #portPopover let-message="message">
+            <div [innerHtml]="portPopoverMessage"></div>
+        </ng-template>
+        <ng-template #timeoutPopover let-message="message">
+            <div [innerHtml]="timeoutPopoverMessage"></div>
+        </ng-template>
+        <ng-template #testConnectionModal>
+            <div class="modal-header">
+                <h4 class="modal-title">Test Connection</h4>
+                <button type="button"
+                        class="close"
+                        aria-label="Close"
+                        (click)="cancelModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"
+                 [formGroup]="testConnectionForm">
+                <div class="form-group row">
+                    <div class="col-8">
+                        <label class="form-control-label" for="field_header">Host name</label>
+                        <i triggers="mouseenter:mouseleave"
+                           popoverTitle="Info"
+                           [popover]="hostnamePopover"
+                           container="body"
+                           placement="right"
+                           class="fa fa-info-circle"></i>
+                        <input type="text"
+                               class="form-control"
+                               formControlName="connectionHost"
+                               id="connectionHost"
+                               required />
+                    </div>
+                    <div class="col-3">
+                        <label class="form-control-label" for="example-number-input">Port</label>
+                        <i triggers="mouseenter:mouseleave"
+                           popoverTitle="Info"
+                           [popover]="portPopover"
+                           container="body"
+                           placement="right"
+                           class="fa fa-info-circle"></i>
+                        <input type="number"
+                               class="form-control"
+                               min="1"
+                               max="65535"
+                               formControlName="connectionPort"
+                               id="connectionPort" />
+                    </div>
+                    <div class="col-1"></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-8">
+                        <label class="form-control-label"
+                               for="example-number-input">Timeout</label>
+                        <i triggers="mouseenter:mouseleave"
+                           popoverTitle="Info"
+                           [popover]="timeoutPopover"
+                           container="body"
+                           placement="right"
+                           class="fa fa-info-circle"></i>
+                        <input type="number"
+                               class="form-control"
+                               formControlName="connectionTimeout"
+                               id="connectionTimeout" />
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+                <div [innerHtml]="testConnectionMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        (click)="cancelModal()">Close</button>
+                <button type="button"
+                        class="btn btn-primary"
+                        (click)="testConnection()">Test</button>
+            </div>
+        </ng-template>
+
+        <ng-template #endpointPopover let-message="message">
+            <div [innerHtml]="endpointPopoverMessage"></div>
+        </ng-template>
+        <ng-template #exchangePatternPopover let-message="message">
+            <div [innerHtml]="exchangePatternPopoverMessage"></div>
+        </ng-template>
+        <ng-template #numberOfTimesPopover let-message="message">
+            <div [innerHtml]="numberOfTimesPopoverMessage"></div>
+        </ng-template>
+
+        <form [formGroup]="messageSenderForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="row col-12">
+                    <label class="form-control-label"
+                           for="field_exchangepattern">Exchange Pattern  </label>
+                    <i triggers="mouseenter:mouseleave"
+                       popoverTitle="Info"
+                       [popover]="exchangePatternPopover"
+                       class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+                    </div>
+                    <div class="row col-12">
+                        <select type="text"
+                                class="form-control"
+                                id="field_exchangepattern"
+                                formControlName="exchangepattern">
+                            <option value="FireAndForget">FireAndForget</option>
+                            <option value="RequestAndReply">RequestAndReply</option>
+                        </select>
+                    </div>
+                    <div class="row col-12" style="margin-top: 1em;">
+                        <label class="form-control-label"
+                           for="field_numberOfTimes">Number of times  </label>
+	                    <i triggers="mouseenter:mouseleave"
+	                       popoverTitle="Info"
+	                       [popover]="numberOfTimesPopover"
+	                       class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+                    </div>
+                    <div class="row col-12">
+                        <input min="0"
+                               max="1000"
+                               size="0"
+                               maxlength="4"
+                               type="number"
+                               name="numberOfMessages"
+                               class="form-control"
+                               id="numberOfTimes"
+                               formControlName="numberoftimes"
+                               required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
+                    <ng-container>
+                        <li ngbNavItem="0">
+                            <a ngbNavLink>Request</a>
+                            <ng-template ngbNavContent>
+
+                                <div  class="col-12" style="padding-left: 20px;" [formGroupName]="0" id="{{ 'tab' + 0 }}">
+                                    <div class="input-group">
+                                        <a class="col-10"></a>
+                                        <a class="col-2">
+                                            <div ngbDropdown class="d-inline-block" placement="bottom-right">
+                                                <a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-bars"></i> Docs</a>
+                                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                                    <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[0]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[0]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{requestEndpoint?.componentType}}.">
+                                                        <span>Camel Documentation</span>
+                                                    </a>
+                                                    <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[0]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{requestEndpoint?.componentType}}.">
+                                                        <span>Assimbly Documentation</span>
+                                                    </a>
+                                                    <a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+                                                        <span>Test Connection</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="form-group" [style.display]="'none'">
+                                        <label for="id">ID</label>
+                                        <input type="text" class="form-control" id="id" formControlName="id" readonly />
+                                    </div>
+                                    <ng-template #uriPopover let-message="message">
+                                        <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[0]"></div>
+                                    </ng-template>
+                                    <ng-template #uriEditor>
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">URI (context path)</h4>
+                                            <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}" rows="5" [(ngModel)]="requestEndpoint.uri"></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
+                                        </div>
+                                    </ng-template>
+
+                                    <div class="form-group">
+                                        <div class="input-group border-bottom my-3">
+                                            <h5>URI&ensp;</h5>
+                                            <i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
+                                        </div>
+                                        <div class="row mx-0 mb-1">
+                                            <ng-select  *ngIf="requestEndpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '124px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(requestEndpoint, 0, $event)"></ng-select>
+                                            <span style="display:inline-block; width: 14px;"></span>
+                                            <a>:</a>
+                                            <ng-select [items]="URIList" [addTag]="true" bindLabel="uri" bindValue="uri" class="col-7"  [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}"  [(ngModel)]="requestEndpoint.uri" dropdownPosition="bottom"></ng-select>
+                                            <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
+                                                <span class="fa fa-pencil padding-button"></span>&nbsp;
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.errors && (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.dirty || messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.touched)">
+                                        <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
+                                    </div>
+                                    <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].uri.errors && (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].uri.dirty || messageSenderForm['controls'].endpointsData['controls'][0]['controls'].uri.touched)">
+                                        <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
+                                    </div>
+
+                                    <div class="form-group" formArrayName="options">
+                                        <label class="form-control-label" for="field_options">Options</label>
+                                        <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
+                                        <div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[0]; index as idx" [formGroupName]="idx">
+                                            <ng-select [items]="componentOptions[0]" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '216px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])">
+                                                <ng-template ng-option-tmp let-item="item">
+                                                    <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+                                                    <ng-template #optionTooltip>
+                                                        <div>
+                                                            <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+                                                        </div>
+                                                    </ng-template>
+                                                </ng-template>
+                                            </ng-select>
+                                            <input type="text" class="col-5 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" (focusout)="validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                                            <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[0], 0)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
+                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[0], option, 0)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[0].length === 1"><span class="fa fa-remove"></span></button>
+                                            <div class="col-5 d-inline-block px-0">
+                                                <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.errors && (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.dirty || messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.touched)">
+                                                    <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-5 d-inline-block px-0">
+                                                <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.errors && (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.dirty || messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.touched)">
+                                                    <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br/>
+
+                                    <div class="border-bottom my-3"><h5>Header</h5></div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
+                                            <button type="button" *ngIf="headerCreated && messageSenderForm['controls'].endpointsData['controls'][0]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(requestEndpoint, messageSenderForm['controls'].endpointsData['controls'][0]['controls'].header)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'">
+                                                <span class="fa fa-pencil  padding-button"></span>&nbsp;
+                                            </button>
+                                            <button type="button" *ngIf="headerCreated && !messageSenderForm['controls'].endpointsData['controls'][0]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(requestEndpoint, messageSenderForm['controls'].endpointsData['controls'][0]['controls'].header)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'">
+                                            </button>
+                                            <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(requestEndpoint, messageSenderForm['controls'].endpointsData['controls'][0]['controls'].header)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'">
+                                                <span class="fa fa-plus padding-button"></span>&nbsp;
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-bottom my-3"><h5>Service</h5></div>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <ng-select [items]="filterService[0]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
+                                            <button type="button" *ngIf="serviceCreated && messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(requestEndpoint, serviceType[0], messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'">
+                                                <span class="fa fa-pencil padding-button"></span>&nbsp;
+                                            </button>
+                                            <button type="button" *ngIf="serviceCreated && !messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(requestEndpoint, serviceType[0], messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.disabled">
+                                            </button>
+                                            <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(requestEndpoint, serviceType[0], messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service)" [disabled]="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'">
+                                                <span class="fa fa-plus padding-button"></span>&nbsp;
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.errors && (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.dirty || messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.touched)">
+                                        <div *ngIf="messageSenderForm['controls'].endpointsData['controls'][0]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
+                                        <ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+
+                                       <!-- <div class="row">
+                                            <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
+                                        </div>
+                                        <div class="row">
+                                            <ace-editor #editor formControlName="responsebody" [(text)]="responseBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+                                        </div>-->
+
+                                    </div>
+
+                                </div>
+                            </ng-template>
+                        </li>
+
+                        <li ngbNavItem="1">
+                                <a ngbNavLink>Response</a>
+                                <ng-template ngbNavContent>
+                                    <div class="container">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
+                                            </div>
+                                            <div class="row">
+                                                <ace-editor #editor [(text)]="responseBody" [mode]="responseEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </ng-template>
+                        </li>
+                    </ng-container>
+                </ul>
+                <div [ngbNavOutlet]="nav" class="ml-4"></div>
+            </div>
+
+            <br/>
+
+            <div class="row">
+                <div class="col-2">
+                    <span></span>
+                </div>
+                <div class="col-10" >
+                    <jhi-alert *ngIf="isAlert"></jhi-alert>
+                </div>
+            </div>
+
+            <br/>
+
+            <div class="float-right"
+                 style="margin-right: 14px;">
+                <button type="button"
+                        class="btn btn-secondary"
+                        [routerLink]="['/']">
+                    <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
+                </button>
+                <!--
+                <button type="button"
+                        (click)="save()"
+                        [disabled]="messageSenderForm.invalid || isSaving"
+                        class="btn btn-primary">
+                    <span class="fa fa-save"></span>&nbsp; <span>Save</span>
+                </button>-->
+                <button type="button"
+                        (click)="send()" [disabled]="messageSenderForm.invalid || isSending"
+                        class="btn btn-primary">
+                    <span class="fa fa-paper-plane"></span>&nbsp; <span>Send</span>
+                </button>
+            </div>
+            <div *ngIf="savingFlowFailed">
+                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+            </div>
+            <div *ngIf="savingFlowSuccess">
+                <span class="text-success">*{{savingFlowSuccessMessage}}</span>
+            </div>
+            <div *ngIf="!!invalidUriMessage">
+                <span class="text-danger">*{{invalidUriMessage}}</span>
+            </div>
+        </form>
+
+    </div>
+</div>

@@ -1,10 +1,9 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { Service } from 'app/shared/model/service.model';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core';
@@ -125,13 +124,13 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         serviceKeyName: 'username',
                         valueType: 'text',
                         placeholder: 'user',
-                        isRequired: false    
+                        isRequired: false
                     },
                     {
                         serviceKeyName: 'password',
                         valueType: 'password',
                         placeholder: '',
-                        isRequired: false    
+                        isRequired: false
                     }*/
                 ]
             },
@@ -209,6 +208,29 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
                         isRequired: false
                     }
                 ]
+            },
+            {
+                name: 'AMQPS Connection',
+                serviceKeys: [
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'amqps://localhost:5672',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'user',
+                        isRequired: false
+                    },
+                    {
+                        serviceKeyName: 'password',
+                        valueType: 'password',
+                        placeholder: '',
+                        isRequired: false
+                    }
+                ]
             }
         );
     }
@@ -220,6 +242,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.addServiceKeys();
         }
     }
+
     ngOnChanges(changes: SimpleChanges) {
         this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
@@ -249,6 +272,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.serviceKeys.unshift(...requiredServiceKeys);
         }
     }
+
     save(serviceKey: ServiceKeys, i: number) {
         this.isSaving = true;
         if (!!serviceKey.id) {
@@ -258,6 +282,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.subscribeToSaveResponse(this.serviceKeysService.create(serviceKey), true, i);
         }
     }
+
     addServiceKeys() {
         const newServiceKeys = new ServiceKeys();
         newServiceKeys.isDisabled = false;
@@ -272,6 +297,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             this.addServiceKeys();
         }
     }
+
     editServiceKey(serviceKey) {
         serviceKey.isDisabled = false;
     }
@@ -305,6 +331,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         );
         this.serviceKeys.push(serviceKeyForClone);
     }
+
     private onSaveSuccess(result: IServiceKeys, isCreate: boolean, i: number) {
         result.isRequired = this.requiredServiceKey
             .find(rsk => rsk.name === this.service.type)
@@ -345,6 +372,7 @@ export interface RequiredServiceKey {
     name: string;
     serviceKeys: Array<ServiceKeyInformation>;
 }
+
 export interface ServiceKeyInformation {
     serviceKeyName: string;
     valueType: string;

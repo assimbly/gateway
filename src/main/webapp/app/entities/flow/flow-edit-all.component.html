@@ -42,7 +42,7 @@
 						[popover]="hostnamePopover" container="body" placement="right"
 						class="fa fa-info-circle"></i> <input type="text"
 						class="form-control" formControlName="connectionHost"
-						id="connectionHost" required />
+						id="connectionHost" required/>
 				</div>
 				<div class="col-3">
 					<label class="form-control-label" for="example-number-input">Port</label>
@@ -75,8 +75,9 @@
 		</div>
 		</ng-template>
 
-		<form [formGroup]="editFlowForm" (ngSubmit)="save(false)" *ngIf="finished" novalidate class="needs-validation">
-			<jhi-alert-error></jhi-alert-error>
+		<!--<form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">-->
+            <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
+            <jhi-alert-error></jhi-alert-error>
 			<div class="form-group" [style.display]="'none'">
 				<label for="id">ID</label>
 				<input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id" />
@@ -92,7 +93,7 @@
 						<div
 							*ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
 							<div *ngIf="editFlowForm['controls'].name.errors.required"
-								class="invalid-field-message">Name is required.</div>
+								class="invalid-field-message">Flowname is required.</div>
 						</div>
 					</div>
 					<div class="col-2">
@@ -103,7 +104,7 @@
 						</p>
 					</div>
 				</div>
-			</div>	
+			</div>
 			<div id="collapseExample" [ngbCollapse]="panelCollapsed != 'settings'" [attr.aria-expanded]="!isCollapsed">
 					<ng-template #autoStartPopover let-message="message">
 					<div [innerHtml]="autoStartPopoverMessage"></div>
@@ -120,11 +121,11 @@
 					<ng-template #logLevelPopover let-message="message">
 					<div [innerHtml]="logLevelPopoverMessage"></div>
 					</ng-template>
-					
+
 				<div class="form-group row">
 					<div class="col-2"></div>
 					<div class="col-10">
-					
+
 					<div class="form-group">
 						<label class="form-control-label" for="field_autostart">Autostart</label>
 						<i triggers="mouseenter:mouseleave" placement="right"
@@ -187,15 +188,15 @@
 							<option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
 						</select>
 					</div>
-					</div>	
-				</div>	
+					</div>
+				</div>
 			</div>
 
 
-				<div class="d-flex">
+			<div class="d-flex">
 				  <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
-				  	<ng-container *ngFor="let endpoint of endpoints; index as index">				  	
-					    <li ngbNavItem="{{index}}">
+				  	<ng-container *ngFor="let endpoint of endpoints; index as index">
+					    <li ngbNavItem="{{index}}" novalidate>
 					      <a ngbNavLink>{{endpoint.endpointType}}</a>
 					      <ng-template ngbNavContent>
 
@@ -240,22 +241,25 @@
 											      <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
 											    </div>
 										</ng-template>
-																			
-										
+
+
 										<div class="form-group">
 											<div class="input-group border-bottom my-3">
 												<h5>URI&ensp;</h5>
 												<i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
-												</div>
-											<div class="input-group" style="margin-left: -14px;">
-												<ng-select  *ngIf="endpoint.endpointType==='FROM'" class="col-3" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-												<ng-select  *ngIf="endpoint.endpointType==='TO'" class="col-3" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-												<ng-select  *ngIf="endpoint.endpointType==='ERROR'" class="col-3" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>												<a>:</a><span style="display:inline-block; width: 14px;"></span>
-												<input type="text" class="form-control col-9" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri"/>
-												<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">
-													<span class="fa fa-pencil padding-button"></span>&nbsp;
-												</button>
 											</div>
+                                            <div class="row mx-0 mb-1">
+                                                <ng-select  *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                <ng-select  *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                <ng-select  *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                <span style="display:inline-block; width: 14px;"></span>
+                                                <a>:</a>
+                                                <ng-select [items]="URIList" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+                                                <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
+                                                    <span class="fa fa-pencil padding-button"></span>&nbsp;
+                                                </button>
+                                            </div>
+
 										</div>
 										<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
 											<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
@@ -337,10 +341,10 @@
 											<button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO'" (click)="addEndpoint(endpoint, index)">
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Add</span>
-											</button>											
+											</button>
 										</div>
-									</div> 
-					        
+									</div>
+
 					      </ng-template>
 					    </li>
 				    </ng-container>
@@ -354,8 +358,8 @@
 						[routerLink]="['/']">
 						<span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
 					</button>
-					<button type="button" (click)="save(true)"
-						[disabled]="editFlowForm.invalid || isSaving"
+					<button type="button" (click)="save()"
+						[disabled]="isSaving"
 						class="btn btn-primary">
 						<span class="fa fa-save"></span>&nbsp; <span>Save</span>
 					</button>

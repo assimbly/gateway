@@ -22,7 +22,6 @@ public enum ComponentType {
 	AMAZONMQ("AMAZONMQ"),
 
 	AMQP("AMQP"),
-
     AMQPS("AMQPS"),
 
 	APNS("APNS"),
@@ -158,6 +157,7 @@ public enum ComponentType {
 	COAP("COAP"),
 
 	COMETD("COMETD"),
+
 
 	CONSUL("CONSUL"),
 
