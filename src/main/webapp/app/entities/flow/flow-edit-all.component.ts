@@ -420,6 +420,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
         componentType = endpoint.componentType.toString().toLowerCase();
 
+        /*
         if (componentType === 'activemq') {
             componentType = 'jms';
         } else if (componentType === 'amazonmq') {
@@ -428,7 +429,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType = 'sjms';
         } else if (componentType === 'wastebin') {
             componentType = 'mock';
-        }
+        }*/
 
         if (endpoint.serviceId) {
             endpointForm.controls.service.setValue('');

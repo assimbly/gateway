@@ -260,6 +260,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
 
         componentType = endpoint.componentType.toString().toLowerCase();
+
+        /*
         if (componentType === 'activemq') {
             componentType = 'jms';
         } else if (componentType === 'amazonmq') {
@@ -268,7 +270,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             componentType = 'sjms';
         } else if (componentType === 'wastebin') {
             componentType = 'mock';
-        }
+        }*/
 
         endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
