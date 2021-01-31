@@ -226,9 +226,9 @@
                                         <label class="form-control-label" for="field_options">Options</label>
                                         <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
                                         <div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[0]; index as idx" [formGroupName]="idx">
-                                            <ng-select [items]="componentOptions[0]" bindLabel="displayName" bindValue="name" [addTag]="true" [ngStyle]="{'display':'block', 'width': '216px'}" formControlName="key" id="field_options-key-{{idx}}" (focusout)="validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])">
+                                            <ng-select [items]="componentOptions[0]" bindLabel="displayName" bindValue="name" formControlName="key" [addTag]="true" [ngStyle]="{'display':'block', 'width': '216px'}" (change)="changeOptionSelection(selectedOption, 0,idx)" [(ngModel)]="selectedOption"  id="field_options-key-{{idx}}" (focusout)="validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])">
                                                 <ng-template ng-option-tmp let-item="item">
-                                                    <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="1000" placement="bottom" data-container="body">{{item.displayName}}</div>
+                                                    <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
                                                     <ng-template #optionTooltip>
                                                         <div>
                                                             <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
