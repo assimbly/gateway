@@ -105,6 +105,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     servicePopoverMessage: string;
     popoverMessage: string;
 
+    selectedOption: string;
     componentOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
@@ -410,7 +411,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     initializeOption(): FormGroup {
         return new FormGroup({
             key: new FormControl(null),
-            value: new FormControl(null)
+            value: new FormControl(null),
+            defaultValue: new FormControl('')
         });
     }
 
@@ -538,6 +540,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     selectOptions(endpointIndex): FormArray {
         const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[endpointIndex];
         return <FormArray>(<FormGroup>endpointData).controls.options;
+    }
+
+    changeOptionSelection(selectedOption, index, optionIndex) {
+        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        let defaultValue = componentOption[0].defaultValue;
+
+        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[index];
+        const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
+
+        if (defaultValue) {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
+        } else {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
+        }
     }
 
     openModal(templateRef: TemplateRef<any>) {
