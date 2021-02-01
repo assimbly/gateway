@@ -75,6 +75,7 @@
             </div>
         </ng-template>
 
+
         <!--<form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">-->
         <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
             <jhi-alert-error></jhi-alert-error>
@@ -125,6 +126,7 @@
                 <div class="form-group row">
                     <div class="col-2"></div>
                     <div class="col-10">
+
 
                         <div class="form-group">
                             <label class="form-control-label" for="field_autostart">Autostart</label>
@@ -178,6 +180,7 @@
                             <option *ngFor="let logLevel of logLevelListType"
                                     [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
                                 {{logLevel}}</option>
+
 
                         </select>
                         </div>
@@ -334,11 +337,11 @@
                                             <span class="fa fa-pencil"></span>&nbsp;
                                             <span>Empty</span>
                                         </button>
-                                        <button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO'" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="numberOfToEndpoints === 1">
+                                        <button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))">
                                             <span class="fa fa-remove"></span>&nbsp;
                                             <span>Remove</span>
                                         </button>
-                                        <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO'" (click)="addEndpoint(endpoint, index)">
+                                        <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)">
                                             <span class="fa fa-pencil"></span>&nbsp;
                                             <span>Add</span>
                                         </button>
