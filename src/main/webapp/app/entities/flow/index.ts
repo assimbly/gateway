@@ -6,4 +6,5 @@ export * from './flow-detail.component';
 export * from './flow.component';
 export * from './flow.route';
 export * from './flow-edit-all.component';
+export * from './flow-message-sender.component';
 export * from './flow-row.component';

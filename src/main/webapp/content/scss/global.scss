@@ -608,13 +608,93 @@ ng-select select-dropdown > div {
 }
 
 .dropdown-toggle::after {
-    display:none;
+    display: none;
 }
 
 .option-tooltip .tooltip-inner {
-  max-width: 400px;
-  width: 400px;
-  text-align:left;
-  z-index: 100;
-  position: relative;
+    max-width: 400px;
+    width: 400px;
+    text-align: left;
+    z-index: 100;
+    position: relative;
+}
+
+//Set half collumn size
+.extra-col {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-0-5 {
+    @extend .extra-col;
+    flex: 0 0 4.16666667%;
+    max-width: 4.16666667%;
+}
+
+.col-1-5 {
+    @extend .extra-col;
+    flex: 0 0 12.5%;
+    max-width: 12.5%;
+}
+
+.col-2-5 {
+    @extend .extra-col;
+    flex: 0 0 20.833333325%;
+    max-width: 20.833333325%;
+}
+
+.col-3-5 {
+    @extend .extra-col;
+    flex: 0 0 29.166666655%;
+    max-width: 29.166666655%;
+}
+
+.col-4-5 {
+    @extend .extra-col;
+    flex: 0 0 37.499999985%;
+    max-width: 37.499999985%;
+}
+
+.col-5-5 {
+    @extend .extra-col;
+    flex: 0 0 45.833333315%;
+    max-width: 45.833333315%;
+}
+
+.col-6-5 {
+    @extend .extra-col;
+    flex: 0 0 54.166666645%;
+    max-width: 54.166666645%;
+}
+
+.col-7-5 {
+    @extend .extra-col;
+    flex: 0 0 62.499999975%;
+    max-width: 62.499999975%;
+}
+
+.col-8-5 {
+    @extend .extra-col;
+    flex: 0 0 70.833333305%;
+    max-width: 70.833333305%;
+}
+
+.col-9-5 {
+    @extend .extra-col;
+    flex: 0 0 79.166666635%;
+    max-width: 79.166666635%;
+}
+
+.col-10-5 {
+    @extend .extra-col;
+    flex: 0 0 87.499999965%;
+    max-width: 87.499999965%;
+}
+
+.col-11-5 {
+    @extend .extra-col;
+    flex: 0 0 95.8333333%;
+    max-width: 95.8333333%;
 }

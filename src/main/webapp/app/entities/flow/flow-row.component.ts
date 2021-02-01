@@ -306,12 +306,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         switch (action) {
             case 'edit':
                 this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, 'edit'])
+                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'edit' }])
                     : this.router.navigate(['../flow', this.flow.id]);
                 break;
             case 'clone':
                 this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, 'clone'])
+                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'clone' }])
                     : this.router.navigate(['../flow', this.flow.id]);
                 break;
             case 'delete':

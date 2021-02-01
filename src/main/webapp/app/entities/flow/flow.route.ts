@@ -11,6 +11,7 @@ import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditAllComponent } from './flow-edit-all.component';
 import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
+import { FlowMessageSenderComponent } from 'app/entities/flow/flow-message-sender.component';
 
 @Injectable({ providedIn: 'root' })
 export class FlowResolve implements Resolve<IFlow> {
@@ -34,6 +35,15 @@ export const flowRoute: Routes = [
         component: FlowComponent,
         data: {
             authorities: ['ROLE_USER'],
+            pageTitle: 'Flows'
+        },
+        canActivate: [UserRouteAccessService]
+    },
+    {
+        path: 'flow/message-sender',
+        component: FlowMessageSenderComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
         },
         canActivate: [UserRouteAccessService]
