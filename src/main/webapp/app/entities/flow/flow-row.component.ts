@@ -1,21 +1,18 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { IFlow, Flow } from 'app/shared/model/flow.model';
-import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Flow, IFlow } from 'app/shared/model/flow.model';
+import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
 
 import { FlowService } from './flow.service';
 import { EndpointService } from '../endpoint';
 import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
-import { LoginModalService, AccountService, Account } from 'app/core';
+import { LoginModalService } from 'app/core';
 
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import * as moment from 'moment';
-import { map } from 'rxjs/operators';
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
-import { NavigationEnd } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FlowDeleteDialogComponent } from 'app/entities/flow';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 enum Status {
     active = 'active',
@@ -73,6 +70,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     flowRowID: string;
     flowRowErrorEndpointID: string;
+
+    statsTableRows: Array<string> = [];
 
     intervalTime: any;
 
@@ -373,17 +372,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
     }
 
-    getFlowStats(id: number) {
-        this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
-            this.setFlowStatistic(res.body);
-        });
+    getFlowStats(flow: IFlow) {
+        this.startGetFlowStats(flow);
 
         //refresh every 5 seconds
         this.intervalTime = setInterval(() => {
-            this.flowService.getFlowStats(id, this.flow.gatewayId).subscribe(res => {
-                this.setFlowStatistic(res.body);
-            });
+            this.startGetFlowStats(flow);
         }, 5000);
+    }
+
+    startGetFlowStats(flow: IFlow) {
+        this.flowStatistic = ``;
+        this.statsTableRows = [];
+
+        for (let endpoint of flow.endpoints) {
+            if (endpoint.endpointType === EndpointType.FROM) {
+                this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
+                    console.log('1: ' + res.body);
+                    this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
+                });
+            }
+        }
     }
 
     stopGetFlowStats() {
@@ -410,7 +419,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         `;
     }
 
-    setFlowStatistic(res) {
+    setFlowStatistic(res, uri) {
         /* Example Available stats
           *
           * "maxProcessingTime": 1381,
@@ -448,53 +457,85 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
             let processingTime = ``;
 
+            if (this.statsTableRows.length === 0) {
+                this.statsTableRows[0] = `<td>${uri}</td>`;
+                this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+                this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
+                this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
+                this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+                this.statsTableRows[5] = `<td>${completed}</td>`;
+                this.statsTableRows[6] = `<td>${failures}</td>`;
+                this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
+                this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
+                this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
+            } else {
+                this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
+                this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+                this.statsTableRows[2] =
+                    this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
+                this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
+                this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+                this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
+                this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
+                this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
+                this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
+                this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
+            }
+
             if (res.stats.lastProcessingTime > 0) {
                 processingTime = `<tr>
 			      <th scope="row">Min</th>
-			      <td>${res.stats.minProcessingTime} ms</td>
+			      ${this.statsTableRows[7]}
 			    </tr>
 			    <tr>
 			      <th scope="row">Max</th>
-			      <td>${res.stats.maxProcessingTime} ms</td>
+			      ${this.statsTableRows[8]}
 			    </tr>
 			    <tr>
 			      <th scope="row">Average</th>
-			      <td>${res.stats.meanProcessingTime} ms</td>
+			      ${this.statsTableRows[9]}
 			    </tr>`;
             }
 
             this.flowStatistic =
                 `
+            <div class="col-12">
 			<table class="table">
 			  <tbody>
+                 <tr>
+                    <th scope="row">Endpoint</th>
+                    ${this.statsTableRows[0]}
+                </tr>
 			    <tr>
 			      <th scope="row">Start time</th>
-			      <td>${this.checkDate(res.stats.startTimestamp)}</td>
+                    ${this.statsTableRows[1]}
 			    </tr>
 			    <tr>
 			      <th scope="row">Running</th>
-			      <td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>
+                    ${this.statsTableRows[2]}
 			    </tr>
 			    <tr>
 			      <th scope="row">First Message</th>
-			      <td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>
+                    ${this.statsTableRows[3]}
 			    </tr>
 			    <tr>
 			      <th scope="row">Last Message</th>
-			      <td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>
+			       ${this.statsTableRows[4]}
 			    </tr>` +
                 processingTime +
                 `
 			    <tr>
 			      <th scope="row">Completed</th>
-			      <td>${completed}</td>
+                  ${this.statsTableRows[5]}
 			    </tr>
 			    <tr>
 			      <th scope="row">Failed</th>
-			      <td>${failures}</td>
+                  ${this.statsTableRows[6]}
 			    </tr>
                </tbody>
-			</table>`;
+			</table>
+			<div>
+        `;
         }
     }
 
