@@ -334,7 +334,7 @@
 												<span class="fa fa-remove"></span>&nbsp;
 												<span>Remove</span>
 											</button>
-											<button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)">
+											<button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)">
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Add</span>
 											</button>
