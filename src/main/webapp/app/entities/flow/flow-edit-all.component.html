@@ -330,7 +330,7 @@
 												<span class="fa fa-pencil"></span>&nbsp;
 												<span>Empty</span>
 											</button>
-											<button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))"><!--disabled when from selected and numberoffromendpoints > 1, or when to selected and numberOfToEndpoints > 1-->
+											<button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))">
 												<span class="fa fa-remove"></span>&nbsp;
 												<span>Remove</span>
 											</button>
