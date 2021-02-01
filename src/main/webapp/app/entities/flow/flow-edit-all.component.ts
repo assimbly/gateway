@@ -45,12 +45,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     public endpointTypes = ['FROM', 'TO', 'ERROR'];
 
-    panelCollapsed: any = 'uno';
-    public isCollapsed = true;
-    active;
-    disabled = true;
-    activeEndpoint: any;
-
     public logLevelListType = [
         LogLevelType.OFF,
         LogLevelType.INFO,
@@ -59,6 +53,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         LogLevelType.WARN,
         LogLevelType.DEBUG
     ];
+
+    panelCollapsed: any = 'uno';
+    public isCollapsed = true;
+    active;
+    disabled = true;
+    activeEndpoint: any;
 
     isSaving: boolean;
     savingFlowFailed = false;
@@ -75,11 +75,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     embeddedBroker = false;
     createRoute: number;
-    newId: number;
     predicate: any;
-    queryCount: any;
     reverse: any;
-    totalItems: number;
     serviceCreated: boolean;
     headerCreated: boolean;
 
@@ -97,6 +94,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     popoverMessage: string;
 
     selectedComponentType: string;
+    selectedOption: string;
     componentOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
@@ -125,8 +123,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     numberOfFromEndpoints: number = 0;
     numberOfToEndpoints: number = 0;
-
-    errorSetHeader = false;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -160,16 +156,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.activeEndpoint = this.route.snapshot.queryParamMap.get('endpointid');
 
         this.subscription = this.route.params.subscribe(params => {
-            console.log('params2=' + JSON.stringify(params));
-
-            console.log('params3=' + params['clone']);
-            console.log('params4=' + params['blbal']);
-
             if (params['mode'] === 'clone') {
-                console.log('params is true');
                 this.load(params['id'], true);
             } else {
-                console.log('params is false');
                 this.load(params['id'], false);
             }
         });
@@ -223,9 +212,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.flow.gatewayId = this.gateways[this.indexGateway].id;
                         }
 
-                        console.log('flowid=' + this.flow.id);
-                        console.log('flowname=' + this.flow.name);
-
                         this.initializeForm(this.flow);
 
                         this.endpointService.findByFlowId(id).subscribe(flowEndpointsData => {
@@ -252,15 +238,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         endpoint.headerId
                                     );
 
-                                    console.log('endpointid' + endpoint.id);
-
                                     if (isCloning) {
                                         this.endpoint.id = null;
                                     }
 
                                     this.endpoints.push(this.endpoint);
 
-                                    let endpointX = this.endpoint;
                                     let formgroup = this.initializeEndpointData(endpoint);
                                     (<FormArray>this.editFlowForm.controls.endpointsData).insert(index, formgroup);
 
@@ -283,7 +266,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             }, this);
 
                             if (isCloning) {
-                                console.log('isCloning komt hier');
                                 //reset id and flow name to null
                                 this.flow.id = null;
                                 this.flow.name = null;
@@ -394,6 +376,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
             f => f.type === this.serviceType[this.endpoints.indexOf(endpoint)]
         );
+
         if (this.filterService[this.endpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
             formService.setValue(this.filterService[this.endpoints.indexOf(endpoint)].find(fs => fs.id === endpoint.serviceId).id);
         }
@@ -435,6 +418,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
         componentType = endpoint.componentType.toString().toLowerCase();
 
+        /*
         if (componentType === 'activemq') {
             componentType = 'jms';
         } else if (componentType === 'amqps') {
@@ -445,9 +429,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType = 'sjms';
         } else if (componentType === 'wastebin') {
             componentType = 'mock';
+        }*/
+
+        if (endpoint.serviceId) {
+            endpointForm.controls.service.setValue('');
         }
 
-        endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
         this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
@@ -525,6 +512,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
+        this.optionsPopoverMessage = ``;
         this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
         this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit services.`;
@@ -541,7 +529,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         tEndpointsUnique.forEach((endpoint, i) => {
             if (this.selectedComponentType === endpoint.componentType) {
-                console.log('adding endpoint');
                 this.URIList.push(endpoint);
             }
         });
@@ -575,7 +562,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     initializeOption(): FormGroup {
         return new FormGroup({
             key: new FormControl(null),
-            value: new FormControl(null)
+            value: new FormControl(null),
+            defaultValue: new FormControl('')
         });
     }
 
@@ -708,6 +696,20 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     selectOptions(endpointIndex): FormArray {
         const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointIndex];
         return <FormArray>(<FormGroup>endpointData).controls.options;
+    }
+
+    changeOptionSelection(selectedOption, index, optionIndex) {
+        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        let defaultValue = componentOption[0].defaultValue;
+
+        const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[index];
+        const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
+
+        if (defaultValue) {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
+        } else {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
+        }
     }
 
     addEndpoint(endpoint, index) {

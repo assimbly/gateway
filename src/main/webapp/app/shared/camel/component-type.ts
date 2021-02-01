@@ -1350,7 +1350,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'FILEWATCH',
+        name: 'FILE-WATCH',
         assimblyTypeLink: `/component-filewatch`,
         camelTypeLink: `/filewatch-component.html`,
         uriPlaceholder: 'path',
@@ -4590,7 +4590,7 @@ export class Components {
         'FACEBOOK',
         'FHIR',
         'FILE',
-        'FILEWATCH',
+        'FILE-WATCH',
         'FLATPACK',
         'FTP',
         'FTPS',

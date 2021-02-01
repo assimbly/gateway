@@ -58,9 +58,6 @@ apply plugin: 'eclipse'
 
 configurations.all {
   exclude module: 'log4j-slf4j-impl'
-  resolutionStrategy {
-    force 'org.apache.activemq:artemis-core-client:2.11.0', 'org.apache.activemq:artemis-broker:2.11.0','org.apache.activemq:artemis-commons:2.11.0','org.apache.activemq:artemis-selector:2.11.0','org.apache.activemq:artemis-journal:2.11.0'
-  }
 }
 
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
@@ -321,12 +318,6 @@ dependencies {
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
-
-	implementation group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.16.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-commons', version: '2.16.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-server', version: '2.16.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-selector', version: '2.16.0'
-	implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.16.0'
 
 	//java 9+
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'

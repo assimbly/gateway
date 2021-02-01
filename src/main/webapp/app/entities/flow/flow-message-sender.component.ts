@@ -101,6 +101,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     servicePopoverMessage: string;
     popoverMessage: string;
 
+    selectedOption: string;
     componentOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
@@ -258,6 +259,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
 
         componentType = endpoint.componentType.toString().toLowerCase();
+
+        /*
         if (componentType === 'activemq') {
             componentType = 'jms';
         } else if (componentType === 'amazonmq') {
@@ -266,7 +269,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             componentType = 'sjms';
         } else if (componentType === 'wastebin') {
             componentType = 'mock';
-        }
+        }*/
 
         endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
@@ -407,7 +410,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     initializeOption(): FormGroup {
         return new FormGroup({
             key: new FormControl(null),
-            value: new FormControl(null)
+            value: new FormControl(null),
+            defaultValue: new FormControl('')
         });
     }
 
@@ -535,6 +539,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     selectOptions(endpointIndex): FormArray {
         const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[endpointIndex];
         return <FormArray>(<FormGroup>endpointData).controls.options;
+    }
+
+    changeOptionSelection(selectedOption, index, optionIndex) {
+        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        let defaultValue = componentOption[0].defaultValue;
+
+        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[index];
+        const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
+
+        if (defaultValue) {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
+        } else {
+            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
+        }
     }
 
     openModal(templateRef: TemplateRef<any>) {
@@ -733,8 +751,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setRequest() {
         const endpointForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
 
-        this.isSending = false;
-
         this.requestExchangePattern = this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
             this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
@@ -756,12 +772,16 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        this.isSending = false;
         this.jhiAlertService.success('Send successfully', null, null);
+        setTimeout(() => {
+            this.isSending = false;
+        }, 1000);
         if (showResponse) {
             this.setEditorMode(body);
             this.responseBody = body;
             this.active = '1';
+        } else {
+            this.responseBody = body;
         }
     }
 
