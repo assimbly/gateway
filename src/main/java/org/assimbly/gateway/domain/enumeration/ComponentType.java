@@ -7,106 +7,107 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * This is an alpabetic list based on Camel's component reference https://camel.apache.org/components/latest
  */
 public enum ComponentType {
-	
+
 	ACTIVEMQ("ACTIVEMQ"),
-	
+
 	AHC("AHC"),
-	
+
 	@JsonProperty("AHC-WS")
 	AHCWS("AHC-WS"),
-	
+
 	@JsonProperty("AHC-WSS")
-	
+
 	AHCWSS("AHC-WSS"),
-	
+
 	AMAZONMQ("AMAZONMQ"),
-	
+
 	AMQP("AMQP"),
-	
+    AMQPS("AMQPS"),
+
 	APNS("APNS"),
-	
+
 	AS2("AS2"),
-	
+
 	ASTERISK("ASTERISK"),
-	
+
 	ATMOS("ATMOS"),
-	
+
 	@JsonProperty("ATMOSPHERE-WEBSOCKET")
 	ATMOSPHEREWEBSOCKET("ATMOSPHERE-WEBSOCKET"),
-	
+
 	ATOM("ATOM"),
-	
+
 	@JsonProperty("ATOMIX-MAP")
 	ATOMIXMAP("ATOMIX-MAP"),
-	
+
 	@JsonProperty("ATOMIX-MESSAGING")
 	ATOMIXMESSAGING("ATOMIX-MESSAGING"),
-	
+
 	@JsonProperty("ATOMIX-MULTIMAP")
 	ATOMIXMULTIMAP("ATOMIX-MULTIMAP"),
-	
+
 	@JsonProperty("ATOMIX-QUEUE")
 	ATOMIXQUEUE("ATOMIX-QUEUE"),
-	
+
 	@JsonProperty("ATOMIX-SET")
-	ATOMIXSET("ATOMIX-SET"),	
-	
+	ATOMIXSET("ATOMIX-SET"),
+
 	@JsonProperty("ATOMIX-VALUE")
-	ATOMIXVALUE("ATOMIX-VALUE"),	
-	
+	ATOMIXVALUE("ATOMIX-VALUE"),
+
 	AVRO("AVRO"),
-	
+
 	@JsonProperty("AWS-CW")
-	AWSCW("AWS-CW"),	
+	AWSCW("AWS-CW"),
 
 	@JsonProperty("AWS-DDB")
-	AWSDDB("AWS-DDB"),	
-	
+	AWSDDB("AWS-DDB"),
+
 	@JsonProperty("AWS-DDBSTREAM")
-	AWSDDBSTREAM("AWS-DDBSTREAM"),	
-	
+	AWSDDBSTREAM("AWS-DDBSTREAM"),
+
 	@JsonProperty("AWS-EC2")
 	AWSEC2("AWS-EC2"),
-	
+
 	@JsonProperty("AWS-ECS")
 	AWSECS("AWS-ECS"),
-	
+
 	@JsonProperty("AWS-EKS")
-	AWSEKS("AWS-EKS"),	
-	
+	AWSEKS("AWS-EKS"),
+
 	@JsonProperty("AWS-KMS")
-	AWSKMS("AWS-KMS"),	
-	
+	AWSKMS("AWS-KMS"),
+
 	@JsonProperty("AWS-KINESIS")
-	AWSKINESIS("AWS-KINESIS"),	
+	AWSKINESIS("AWS-KINESIS"),
 
 	@JsonProperty("AWS-KINESIS-FIREHOSE")
-	AWSKINESISFIREHOSE("AWS-KINESIS-FIREHOSE"),	
+	AWSKINESISFIREHOSE("AWS-KINESIS-FIREHOSE"),
 
 	@JsonProperty("AWS-LAMBDA")
-	AWSLAMBDA("AWS-LAMBDA"),	
+	AWSLAMBDA("AWS-LAMBDA"),
 
 	@JsonProperty("AWS-MQ")
-	AWSMQ("AWS-MQ"),	
+	AWSMQ("AWS-MQ"),
 
 	@JsonProperty("AWS-MSK")
 	AWSMSK("AWS-MSK"),
-	
+
 	@JsonProperty("AWS-S3")
 	AWSS3("AWS-S3"),
-	
+
 	@JsonProperty("AWS-SDB")
 	AWSSDB("AWS-SDB"),
-	
+
 	@JsonProperty("AWS-SES")
 	AWSSES("AWS-SES"),
-	
+
 	@JsonProperty("AWS-SNS")
 	AWSSNS("AWS-SNS"),
-	
+
 	@JsonProperty("AWS-SQS")
 	AWSSQS("AWS-SQS"),
-	
+
 	@JsonProperty("AWS-SWF")
 	AWSSWF("AWS-SWF"),
 
@@ -118,7 +119,7 @@ public enum ComponentType {
 
 	@JsonProperty("AZURE-QUEUE")
 	AZUREQUEUE("AZURE-QUEUE"),
-	
+
 	@JsonProperty("BEAN-VALIDATOR")
 	BEANVALIDATOR("BEAN-VALIDATOR"),
 
@@ -127,7 +128,7 @@ public enum ComponentType {
 	CLASS("CLASS"),
 
 	BEANSTALK("BEANSTALK"),
-	
+
 	BONITA("BONITA"),
 
 	BOX("BOX"),
@@ -145,7 +146,7 @@ public enum ComponentType {
 	CQL("CQL"),
 
 	CHATSCRIPT("CHATSCRIPT"),
-	
+
 	CHUNK("CHUNK"),
 
 	@JsonProperty("CM-SMS")
@@ -157,27 +158,28 @@ public enum ComponentType {
 
 	COMETD("COMETD"),
 
+
 	CONSUL("CONSUL"),
 
 	CONTROLBUS("CONTROLBUS"),
 
 	CORDA("CORDA"),
-	
+
 	COUCHBASE("COUCHBASE"),
-	
+
 	COUCHDB("COUCHDB"),
-	
+
 	CRON("CRON"),
 
 	CRYPTO("CRYPTO"),
-	
+
 	@JsonProperty("CRYPTO-SMS")
 	CRYPTOSMS("CRYPTO-SMS"),
 
 	CXF("CXF"),
-	
+
 	CXFRS("CXFRS"),
-	
+
 	DATAFORMAT("DATAFORMAT"),
 
 	DATASET("DATASET"),
@@ -189,25 +191,25 @@ public enum ComponentType {
 	DEBEZIUMMONGODB("DEBEZIUM-MONGODB"),
 
 	@JsonProperty("DEBEZIUM-MYSQL")
-	DEBEZIUMMYSQL("DEBEZIUM-MYSQL"),	
+	DEBEZIUMMYSQL("DEBEZIUM-MYSQL"),
 
 	@JsonProperty("DEBEZIUM-POSTGRESQL")
 	DEBEZIUMPOSTGRESQL("DEBEZIUM-POSTGRESQL"),
 
 	@JsonProperty("DEBEZIUM-SQLSERVER")
 	DEBEZIUMSQLSERVER("DEBEZIUM-SQLSERVER"),
-	
+
 	DIGITALOCEAN("DIGITALOCEAN"),
 
 	DIRECT("DIRECT"),
-	
+
 	@JsonProperty("DIRECT-VM")
-	DIRECTVM("DIRECT-VM"),	
+	DIRECTVM("DIRECT-VM"),
 
 	DISRUPTOR("DISRUPTOR"),
-	
+
 	@JsonProperty("DISRUPTOR-VM")
-	DISRUPTORVM("DISRUPTOR-VM"),		
+	DISRUPTORVM("DISRUPTOR-VM"),
 
 	DNS("DNS"),
 
@@ -220,11 +222,11 @@ public enum ComponentType {
 	DROPBOX("DROPBOX"),
 
 	EHCACHE("EHCACHE"),
-	
+
 	ELASTICSEARCH("ELASTICSEARCH"),
 
 	@JsonProperty("ELASTICSEARCH-REST")
-	ELASTICSEARCHREST("ELASTICSEARCH-REST"),	
+	ELASTICSEARCHREST("ELASTICSEARCH-REST"),
 
 	ELSQL("ELSQL"),
 
@@ -239,30 +241,30 @@ public enum ComponentType {
 	FACEBOOK("FACEBOOK"),
 
 	FHIR("FHIR"),
-	
+
 	FILE("FILE"),
 
 	@JsonProperty("FILE-WATCH")
-	FILEWATCH("FILE-WATCH"),	
+	FILEWATCH("FILE-WATCH"),
 
 	FLATPACK("FLATPACK"),
 
 	FLINK("FLINK"),
 
 	FOP("FOP"),
-	
+
 	FREEMARKER("FREEMARKER"),
-	
+
 	FTP("FTP"),
-	
+
 	FTPS("FTPS"),
 
 	GANGLIA("GANGLIA"),
 
 	GEOCODER("GEOCODER"),
-	
+
 	GIT("GIT"),
-	
+
 	GITHUB("GITHUB"),
 
 	@JsonProperty("GOOGLE-BIGQUERY")
@@ -270,7 +272,7 @@ public enum ComponentType {
 
 	@JsonProperty("GOOGLE-BIGQUERY-SQL")
 	GOOGLEBIGQUERYSQL("GOOGLE-BIGQUERY-SQL"),
-	
+
 	@JsonProperty("GOOGLE-CALENDAR")
 	GOOGLECALENDAR("GOOGLE-CALENDAR"),
 
@@ -288,13 +290,13 @@ public enum ComponentType {
 
 	@JsonProperty("GOOGLE-PUBSUB")
 	GOOGLEPUBSUB("GOOGLE-PUBSUB"),
-	
+
 	@JsonProperty("GOOGLE-SHEETS")
 	GOOGLESHEETS("GOOGLE-SHEETS"),
 
 	@JsonProperty("GOOGLE-SHEETS-STREAM")
 	GOOGLESHEETSSTREAM("GOOGLE-SHEETS-STREAM"),
-	
+
 	GORA("GORA"),
 
 	GRAPE("GRAPE"),
@@ -348,13 +350,13 @@ public enum ComponentType {
 	HTTP("HTTP"),
 
 	HTTPS("HTTPS"),
-	
+
 	@JsonProperty("IEC60870-CLIENT")
 	IEC60870CLIENT("IEC60870-CLIENT"),
-	
+
 	@JsonProperty("IEC60870-SERVER")
 	IEC60870SERVER("IEC60870-SERVER"),
-	
+
 	@JsonProperty("IGNITE-CACHE")
 	IGNITECACHE("IGNITE-CACHE"),
 
@@ -366,10 +368,10 @@ public enum ComponentType {
 
 	@JsonProperty("IGNITE-IDGEN")
 	IGNITEIDGEN("IGNITE-IDGEN"),
-	
+
 	@JsonProperty("IGNITE-MESSAGING")
 	IGNITEMESSAGING("IGNITE-MESSAGING"),
-	
+
 	@JsonProperty("IGNITE-QUEUE")
 	IGNITEQUEUE("IGNITE-QUEUE"),
 
@@ -377,14 +379,14 @@ public enum ComponentType {
 	IGNITESET("IGNITE-SET"),
 
 	IMAP("IMAP"),
-	
+
 	IMAPS("IMAPS"),
 
-	INFINISPAN("INFINISPAN"),	
+	INFINISPAN("INFINISPAN"),
 
-	INFLUXDB("INFLUXDB"),	
+	INFLUXDB("INFLUXDB"),
 
-	IOTA("IOTA"),	
+	IOTA("IOTA"),
 
 	IPFS("IPFS"),
 
@@ -420,7 +422,7 @@ public enum ComponentType {
 	JOLT("JOLT"),
 
 	JOOQ("JOOQ"),
-	
+
 	JPA("JPA"),
 
 	JSLT("JSLT"),
@@ -434,7 +436,7 @@ public enum ComponentType {
 
 	@JsonProperty("KUBERNETES-CONFIG-MAPS")
 	KUBERNETESCONFIGMAPS("KUBERNETES-CONFIG-MAPS"),
-	
+
 	@JsonProperty("KUBERNETES-DEPLOYMENTS")
 	KUBERNETESDEPLOYMENTS("KUBERNETES-DEPLOYMENTS"),
 
@@ -452,7 +454,7 @@ public enum ComponentType {
 
 	@JsonProperty("KUBERNETES-PERSISTENT-VOLUMES")
 	KUBERNETESPERSISTENTVOLUMES("KUBERNETES-PERSISTENT-VOLUMES"),
-	
+
 	@JsonProperty("KUBERNETES-PERSISTENT-VOLUMES-CLAIM")
 	KUBERNETESPERSISTENTVOLUMESCLAIM("KUBERNETES-PERSISTENT-VOLUMES-CLAIM"),
 
@@ -470,7 +472,7 @@ public enum ComponentType {
 
 	@JsonProperty("KUBERNETES-SERVICE-ACCOUNTS")
 	KUBERNETESSERVICEACCOUNTS("KUBERNETES-SERVICE-ACCOUNTS"),
-	
+
 	@JsonProperty("KUBERNETES-SERVICES")
 	KUBERNETESSERVICES("KUBERNETES-SERVICES"),
 
@@ -479,20 +481,20 @@ public enum ComponentType {
 
 	@JsonProperty("OPENSHIFT-BUILD-CONFIGS")
 	OPENSHIFTBUILDCONFIGS("OPENSHIFT-BUILD-CONFIGS"),
-	
+
 	KUDU("KUDU"),
-	
+
 	LANGUAGE("LANGUAGE"),
 
 	LDAP("LDAP"),
 
 	LDIF("LDIF"),
-	
-	LEVELDB("LEVELDB"),
-	
-	LOG("LOG"),	
 
-	LUCENE("LUCENE"),	
+	LEVELDB("LEVELDB"),
+
+	LOG("LOG"),
+
+	LUCENE("LUCENE"),
 
 	LUMBERJACK("LUMBERJACK"),
 
@@ -523,12 +525,12 @@ public enum ComponentType {
 	MONGODBGRIDFS("MONGODB-GRIDFS"),
 
 	MSV("MSV"),
-	
+
 	MUSTACHE("MUSTACHE"),
 
 	MVEL("MVEL"),
-	
-	MYBATIS("MYBATIS"),	
+
+	MYBATIS("MYBATIS"),
 
 	@JsonProperty("MYBATIS-BEAN")
 	MYBATISBEAN("MYBATIS-BEAN"),
@@ -545,9 +547,9 @@ public enum ComponentType {
 	NITRITE("NITRITE"),
 
 	NSQ("NSQ"),
-	
+
 	OLINGO2("OLINGO2"),
-	
+
 	OLINGO4("OLINGO4"),
 
 	@JsonProperty("OPENSTACK-CINDER")
@@ -596,24 +598,24 @@ public enum ComponentType {
 	QUARTZ("QUARTZ"),
 
 	QUICKFIX("QUICKFIX"),
-	
+
 	RABBITMQ("RABBITMQ"),
 
 	@JsonProperty("REACTIVE-STREAMS")
-	REACTIVESTREAMS("REACTIVE-STREAMS"),	
-	
+	REACTIVESTREAMS("REACTIVE-STREAMS"),
+
 	REF("REF"),
-	
+
 	REST("REST"),
 
 	@JsonProperty("REST-API")
-	RESTAPI("REST-API"),	
+	RESTAPI("REST-API"),
 
 	@JsonProperty("REST-OPENAPI")
-	RESTOPENAPI("REST-OPENAPI"),	
-	
+	RESTOPENAPI("REST-OPENAPI"),
+
 	@JsonProperty("REST-SWAGGER")
-	RESTSWAGGER("REST-SWAGGER"),	
+	RESTSWAGGER("REST-SWAGGER"),
 
 	RSS("RSS"),
 
@@ -623,23 +625,23 @@ public enum ComponentType {
 
 	@JsonProperty("SAP-NETWEAVER")
 	SAPNETWEAVER("SAP-NETWEAVER"),
-	
+
 	SCHEDULER("SCHEDULER"),
 
 	SCHEMATRON("SCHEMATRON"),
-	
+
 	SCP("SCP"),
 
 	SEDA("SEDA"),
 
 	SERVICE("SERVICE"),
-	
+
 	SERVICENOW("SERVICENOW"),
-	
+
 	SERVLET("SERVLET"),
 
 	SFTP("SFTP"),
-	
+
 	SIP("SIP"),
 
 	SIPS("SIPS"),
@@ -659,13 +661,13 @@ public enum ComponentType {
 	SMTP("SMTP"),
 
 	SMTPS("SMTPS"),
-	
+
 	SOLR("SOLR"),
-	
+
 	SOLRS("SOLRS"),
 
 	SPARK("SPARK"),
-	
+
 	@JsonProperty("SPARK-REST")
 	SPARKREST("SPARK-REST"),
 
@@ -676,10 +678,10 @@ public enum ComponentType {
 
 	@JsonProperty("SPRING-INTEGRATION")
 	SPRINGINTEGRATION("SPRING-INTEGRATION"),
-	
+
 	@JsonProperty("SPRING-LDAP")
 	SPRINGLDAP("SPRING-LDAP"),
-	
+
 	@JsonProperty("SPRING-REDIS")
 	SPRINGREDIS("SPRING-REDIS"),
 
@@ -688,7 +690,7 @@ public enum ComponentType {
 
 	@JsonProperty("SPRING-EVENT")
 	SPRINGEVENT("SPRING-EVENT"),
-	
+
 	SQL("SQL"),
 
 	@JsonProperty("SQL-STORED")
@@ -703,22 +705,22 @@ public enum ComponentType {
 	STOMP("STOMP"),
 
 	STREAM("STREAM"),
-	
+
 	STUB("STUB"),
-	
+
 	TELEGRAM("TELEGRAM"),
 
 	THRIFT("THRIFT"),
 
 	TIKA("TIKA"),
-	
+
 	TIMER("TIMER"),
 
 	TWILIO("TWILIO"),
 
 	@JsonProperty("TWITTER-DIRECTMESSAGE")
 	TWITTERDIRECTMESSAGE("TWITTER-DIRECTMESSAGE"),
-	
+
 	@JsonProperty("TWITTER-SEARCH")
 	TWITTERSEARCH("TWITTER-SEARCH"),
 
@@ -732,9 +734,9 @@ public enum ComponentType {
 	VELOCITY("VELOCITY"),
 
 	VERTX("VERTX"),
-	
+
 	VM("VM"),
-	
+
 	WASTEBIN("WASTEBIN"),
 
 	WEATHER("WEATHER"),
@@ -749,7 +751,7 @@ public enum ComponentType {
 	WEBSOCKETJSR("WEBSOCKET-JSR"),
 
 	WORDPRESS("WORDPRESS"),
-	
+
 	XCHANGE("XCHANGE"),
 
 	XJ("XJ"),
@@ -759,7 +761,7 @@ public enum ComponentType {
 	XQUERY("XQUERY"),
 
 	XSLT("XSLT"),
-	
+
 	@JsonProperty("XSLT-SAXON")
 	XSLTSAXON("XSLT-SAXON"),
 
@@ -772,16 +774,16 @@ public enum ComponentType {
 	@JsonProperty("ZOOKEEPER-MASTER")
 	ZOOKEEPERMASTER("ZOOKEEPER-MASTER");
 
-	
+
     private String endpoint;
- 
+
     ComponentType(String endpoint) {
         this.endpoint = endpoint;
     }
- 
+
     public String getEndpoint() {
         return endpoint;
     }
-	
-	
+
+
 }
