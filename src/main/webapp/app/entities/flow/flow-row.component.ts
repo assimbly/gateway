@@ -36,7 +36,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     @Input() isAdmin: boolean;
 
     endpoints: Array<Endpoint> = [new Endpoint()];
-    fromEndpoint: Endpoint = new Endpoint();
+    fromEndpoint: Array<Endpoint> = [];
     toEndpoints: Array<Endpoint> = [];
     errorEndpoint: Endpoint = new Endpoint();
 
@@ -63,7 +63,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     public numberOfAlerts: any;
     public showNumberOfItems: number;
 
-    fromEndpointTooltip: string;
+    fromEndpointTooltips: Array<string> = [];
     toEndpointsTooltips: Array<string> = [];
     errorEndpointTooltip: string;
     public statusFlow: Status;
@@ -514,8 +514,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     getEndpoints() {
         this.endpoints.forEach(endpoint => {
             if (endpoint.endpointType.valueOf() === 'FROM') {
-                this.fromEndpoint = endpoint;
-                this.fromEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+                this.fromEndpoint.push(endpoint);
+                this.fromEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
             } else if (endpoint.endpointType.valueOf() === 'TO') {
                 this.toEndpoints.push(endpoint);
                 this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
