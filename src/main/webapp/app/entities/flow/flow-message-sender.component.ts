@@ -236,7 +236,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         } else if (componentType === 'AMQP') {
             return 'AMQP Connection';
         } else if (componentType === 'AMQPS') {
-            return 'AMQPS Connection';
+            return 'AMQP Connection';
         } else {
             return '';
         }
@@ -254,34 +254,37 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
 
         let type;
+        let camelType;
         let componentType;
+        let camelComponentType;
 
-        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
+        camelComponentType = componentType = endpoint.componentType.toString().toLowerCase();
 
-        componentType = endpoint.componentType.toString().toLowerCase();
-
-        /*
         if (componentType === 'activemq') {
-            componentType = 'jms';
+            camelComponentType = 'jms';
+        } else if (componentType === 'amqps') {
+            camelComponentType = 'amqp';
         } else if (componentType === 'amazonmq') {
-            componentType = 'jms';
+            camelComponentType = 'jms';
         } else if (componentType === 'sonicmq') {
-            componentType = 'sjms';
+            camelComponentType = 'sjms';
         } else if (componentType === 'wastebin') {
-            componentType = 'mock';
-        }*/
+            camelComponentType = 'mock';
+        }
+        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
+        camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
 
         endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
         this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
-        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + type.camelTypeLink;
+        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + camelType.camelTypeLink;
 
         this.uriPlaceholders[endpointFormIndex] = type.uriPlaceholder;
         this.uriPopoverMessages[endpointFormIndex] = type.uriPopoverMessage;
 
         // set options keys
-        this.getComponentOptions(componentType).subscribe(data => {
+        this.getComponentOptions(camelComponentType).subscribe(data => {
             let componentOptions = data.properties;
 
             this.componentOptions[0] = Object.keys(componentOptions).map(key => ({ ...componentOptions[key], ...{ name: key } }));

@@ -1,30 +1,27 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { NgbNavModule, NgbCollapseModule, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { IGateway, Gateway } from 'app/shared/model/gateway.model';
-import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
+import { Gateway } from 'app/shared/model/gateway.model';
+import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
-import { IEndpoint, Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
-import { IService, Service } from 'app/shared/model/service.model';
-import { IHeader, Header } from 'app/shared/model/header.model';
+import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
+import { Service } from 'app/shared/model/service.model';
+import { IHeader } from 'app/shared/model/header.model';
 
 import { EndpointService } from '../endpoint/';
 import { ServiceService } from '../service';
 import { HeaderService } from '../header';
 import { GatewayService } from '../gateway';
 
-import { FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { ComponentType, typesLinks, Components } from '../../shared/camel/component-type';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Components, ComponentType, typesLinks } from '../../shared/camel/component-type';
 import { map } from 'rxjs/operators';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { NgSelectModule } from '@ng-select/ng-select';
 
-import { HeaderPopupService, HeaderDialogComponent } from 'app/entities/header';
-import { ServicePopupService, ServiceDialogComponent } from 'app/entities/service';
+import { HeaderDialogComponent, HeaderPopupService } from 'app/entities/header';
+import { ServiceDialogComponent, ServicePopupService } from 'app/entities/service';
 import * as moment from 'moment';
 
 @Component({
@@ -396,7 +393,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         } else if (componentType === 'AMQP') {
             return 'AMQP Connection';
         } else if (componentType === 'AMQPS') {
-            return 'AMQPS Connection';
+            return 'AMQP Connection';
         } else {
             return '';
         }
@@ -412,24 +409,26 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
 
         let type;
+        let camelType;
         let componentType;
+        let camelComponentType;
 
         this.selectedComponentType = endpoint.componentType.toString();
-        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
-        componentType = endpoint.componentType.toString().toLowerCase();
+        camelComponentType = componentType = endpoint.componentType.toString().toLowerCase();
 
-        /*
         if (componentType === 'activemq') {
-            componentType = 'jms';
+            camelComponentType = 'jms';
         } else if (componentType === 'amqps') {
-            componentType = 'amqp';
+            camelComponentType = 'amqp';
         } else if (componentType === 'amazonmq') {
-            componentType = 'jms';
+            camelComponentType = 'jms';
         } else if (componentType === 'sonicmq') {
-            componentType = 'sjms';
+            camelComponentType = 'sjms';
         } else if (componentType === 'wastebin') {
-            componentType = 'mock';
-        }*/
+            camelComponentType = 'mock';
+        }
+        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
+        camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
 
         if (endpoint.serviceId) {
             endpointForm.controls.service.setValue('');
@@ -438,13 +437,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
         this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
-        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + type.camelTypeLink;
+        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + camelType.camelTypeLink;
 
         this.uriPlaceholders[endpointFormIndex] = type.uriPlaceholder;
         this.uriPopoverMessages[endpointFormIndex] = type.uriPopoverMessage;
 
         // set options keys
-        this.getComponentOptions(componentType).subscribe(data => {
+        this.getComponentOptions(camelComponentType).subscribe(data => {
             let componentOptions = data.properties;
 
             this.componentOptions[this.endpoints.indexOf(endpoint)] = Object.keys(componentOptions).map(key => ({
