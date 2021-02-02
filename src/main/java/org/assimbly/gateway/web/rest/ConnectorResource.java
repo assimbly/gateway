@@ -45,6 +45,7 @@ public class ConnectorResource {
 	private Connector connector = new CamelConnector();
 
 	private String flowId;
+    private String endpointId;
 
 	private boolean plainResponse;
 
@@ -61,7 +62,7 @@ public class ConnectorResource {
 
     @Autowired
     GatewayRepository gatewayRepository;
-    
+
     @Autowired
     FlowRepository flowRepository;
 
@@ -712,15 +713,18 @@ public class ConnectorResource {
 		}
     }
 
-    @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}", produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+    @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}/{endpointid}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id, @PathVariable Long endpointid) throws Exception {
 
     	plainResponse = true;
 
 		try {
         	init();
+
         	flowId = id.toString();
-    		String flowStats = connector.getFlowStats(flowId, mediaType);
+        	endpointId = endpointid.toString();
+
+        	String flowStats = connector.getFlowStats(flowId, endpointId, mediaType);
     		if(flowStats.startsWith("Error")||flowStats.startsWith("Warning")) {plainResponse = false;}
 			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",flowStats,plainResponse);
 		} catch (Exception e) {
