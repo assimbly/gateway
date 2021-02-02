@@ -140,8 +140,8 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response', responseType: 'text' });
     }
 
-    getFlowStats(id: number, gatewayid: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`, { observe: 'response' });
+    getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
     }
 
     getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
