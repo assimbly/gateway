@@ -1,15 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { IService, Service } from 'app/shared/model/service.model';
-import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
+import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { IService } from 'app/shared/model/service.model';
+import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { RequiredServiceKey } from '../service-keys';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'jhi-service-update',
@@ -221,7 +220,12 @@ export class ServiceUpdateComponent implements OnInit {
             {
                 name: 'JDBC Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example jdbc:mysql://localhost/dbname', isRequired: true },
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'Example jdbc:mysql://localhost/dbname',
+                        isRequired: true
+                    },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: '', isRequired: true },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true },
                     { serviceKeyName: 'driver', valueType: 'list', placeholder: '', isRequired: true }
@@ -230,15 +234,30 @@ export class ServiceUpdateComponent implements OnInit {
             {
                 name: 'SonicMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:2506', isRequired: true },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'Example Administrator', isRequired: true },
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'Example tcp://localhost:2506',
+                        isRequired: true
+                    },
+                    {
+                        serviceKeyName: 'username',
+                        valueType: 'text',
+                        placeholder: 'Example Administrator',
+                        isRequired: true
+                    },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true }
                 ]
             },
             {
                 name: 'ActiveMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example tcp://localhost:61616', isRequired: true },
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'Example tcp://localhost:61616',
+                        isRequired: true
+                    },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
                 ]
@@ -246,7 +265,12 @@ export class ServiceUpdateComponent implements OnInit {
             {
                 name: 'AmazonMQ Connection',
                 serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'Example ssl://servername:61617', isRequired: true },
+                    {
+                        serviceKeyName: 'url',
+                        valueType: 'text',
+                        placeholder: 'Example ssl://servername:61617',
+                        isRequired: true
+                    },
                     { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: true },
                     { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true }
                 ]
