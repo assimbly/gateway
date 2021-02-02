@@ -424,7 +424,7 @@ export const typesLinks = [
     },
     {
         name: 'AMQPS',
-        assimblyTypeLink: `/component-amqp`,
+        assimblyTypeLink: `/component-amqps`,
         camelTypeLink: `/amqp-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `

@@ -38,7 +38,6 @@ export class ServiceDialogComponent implements OnInit {
         'ActiveMQ Connection',
         'AmazonMQ Connection',
         'AMQP Connection',
-        'AMQPS Connection',
         'JDBC Connection',
         'MQ Connection',
         'SonicMQ Connection'
