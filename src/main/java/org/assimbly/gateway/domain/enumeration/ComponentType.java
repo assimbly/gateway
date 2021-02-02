@@ -8,57 +8,58 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public enum ComponentType {
 
-	ACTIVEMQ("ACTIVEMQ"),
+    ACTIVEMQ("ACTIVEMQ"),
 
-	AHC("AHC"),
+    AHC("AHC"),
 
-	@JsonProperty("AHC-WS")
-	AHCWS("AHC-WS"),
+    @JsonProperty("AHC-WS")
+    AHCWS("AHC-WS"),
 
-	@JsonProperty("AHC-WSS")
+    @JsonProperty("AHC-WSS")
 
-	AHCWSS("AHC-WSS"),
+    AHCWSS("AHC-WSS"),
 
-	AMAZONMQ("AMAZONMQ"),
+    AMAZONMQ("AMAZONMQ"),
 
-	AMQP("AMQP"),
+    AMQP("AMQP"),
+
     AMQPS("AMQPS"),
 
-	APNS("APNS"),
+    APNS("APNS"),
 
-	AS2("AS2"),
+    AS2("AS2"),
 
-	ASTERISK("ASTERISK"),
+    ASTERISK("ASTERISK"),
 
-	ATMOS("ATMOS"),
+    ATMOS("ATMOS"),
 
-	@JsonProperty("ATMOSPHERE-WEBSOCKET")
-	ATMOSPHEREWEBSOCKET("ATMOSPHERE-WEBSOCKET"),
+    @JsonProperty("ATMOSPHERE-WEBSOCKET")
+    ATMOSPHEREWEBSOCKET("ATMOSPHERE-WEBSOCKET"),
 
-	ATOM("ATOM"),
+    ATOM("ATOM"),
 
-	@JsonProperty("ATOMIX-MAP")
-	ATOMIXMAP("ATOMIX-MAP"),
+    @JsonProperty("ATOMIX-MAP")
+    ATOMIXMAP("ATOMIX-MAP"),
 
-	@JsonProperty("ATOMIX-MESSAGING")
-	ATOMIXMESSAGING("ATOMIX-MESSAGING"),
+    @JsonProperty("ATOMIX-MESSAGING")
+    ATOMIXMESSAGING("ATOMIX-MESSAGING"),
 
-	@JsonProperty("ATOMIX-MULTIMAP")
-	ATOMIXMULTIMAP("ATOMIX-MULTIMAP"),
+    @JsonProperty("ATOMIX-MULTIMAP")
+    ATOMIXMULTIMAP("ATOMIX-MULTIMAP"),
 
-	@JsonProperty("ATOMIX-QUEUE")
-	ATOMIXQUEUE("ATOMIX-QUEUE"),
+    @JsonProperty("ATOMIX-QUEUE")
+    ATOMIXQUEUE("ATOMIX-QUEUE"),
 
-	@JsonProperty("ATOMIX-SET")
-	ATOMIXSET("ATOMIX-SET"),
+    @JsonProperty("ATOMIX-SET")
+    ATOMIXSET("ATOMIX-SET"),
 
-	@JsonProperty("ATOMIX-VALUE")
-	ATOMIXVALUE("ATOMIX-VALUE"),
+    @JsonProperty("ATOMIX-VALUE")
+    ATOMIXVALUE("ATOMIX-VALUE"),
 
-	AVRO("AVRO"),
+    AVRO("AVRO"),
 
-	@JsonProperty("AWS-CW")
-	AWSCW("AWS-CW"),
+    @JsonProperty("AWS-CW")
+    AWSCW("AWS-CW"),
 
 	@JsonProperty("AWS-DDB")
 	AWSDDB("AWS-DDB"),
@@ -90,26 +91,26 @@ public enum ComponentType {
 	@JsonProperty("AWS-MQ")
 	AWSMQ("AWS-MQ"),
 
-	@JsonProperty("AWS-MSK")
-	AWSMSK("AWS-MSK"),
+    @JsonProperty("AWS-MSK")
+    AWSMSK("AWS-MSK"),
 
-	@JsonProperty("AWS-S3")
-	AWSS3("AWS-S3"),
+    @JsonProperty("AWS-S3")
+    AWSS3("AWS-S3"),
 
-	@JsonProperty("AWS-SDB")
-	AWSSDB("AWS-SDB"),
+    @JsonProperty("AWS-SDB")
+    AWSSDB("AWS-SDB"),
 
-	@JsonProperty("AWS-SES")
-	AWSSES("AWS-SES"),
+    @JsonProperty("AWS-SES")
+    AWSSES("AWS-SES"),
 
-	@JsonProperty("AWS-SNS")
-	AWSSNS("AWS-SNS"),
+    @JsonProperty("AWS-SNS")
+    AWSSNS("AWS-SNS"),
 
-	@JsonProperty("AWS-SQS")
-	AWSSQS("AWS-SQS"),
+    @JsonProperty("AWS-SQS")
+    AWSSQS("AWS-SQS"),
 
-	@JsonProperty("AWS-SWF")
-	AWSSWF("AWS-SWF"),
+    @JsonProperty("AWS-SWF")
+    AWSSWF("AWS-SWF"),
 
 	@JsonProperty("AWS-TRANSLATE")
 	AWSTRANSLATE("AWS-TRANSLATE"),
@@ -157,7 +158,6 @@ public enum ComponentType {
 	COAP("COAP"),
 
 	COMETD("COMETD"),
-
 
 	CONSUL("CONSUL"),
 
@@ -247,9 +247,9 @@ public enum ComponentType {
 	@JsonProperty("FILE-WATCH")
 	FILEWATCH("FILE-WATCH"),
 
-	FLATPACK("FLATPACK"),
+    FLATPACK("FLATPACK"),
 
-	FLINK("FLINK"),
+    FLINK("FLINK"),
 
 	FOP("FOP"),
 
@@ -532,19 +532,19 @@ public enum ComponentType {
 
 	MYBATIS("MYBATIS"),
 
-	@JsonProperty("MYBATIS-BEAN")
-	MYBATISBEAN("MYBATIS-BEAN"),
+    @JsonProperty("MYBATIS-BEAN")
+    MYBATISBEAN("MYBATIS-BEAN"),
 
-	NAGIOS("NAGIOS"),
+    NAGIOS("NAGIOS"),
 
-	NATS("NATS"),
+    NATS("NATS"),
 
-	NETTY4("NETTY4"),
+    NETTY4("NETTY4"),
 
-	@JsonProperty("NETTY-HTTP")
-	NETTYHTTP("NETTY-HTTP"),
+    @JsonProperty("NETTY-HTTP")
+    NETTYHTTP("NETTY-HTTP"),
 
-	NITRITE("NITRITE"),
+    NITRITE("NITRITE"),
 
 	NSQ("NSQ"),
 
