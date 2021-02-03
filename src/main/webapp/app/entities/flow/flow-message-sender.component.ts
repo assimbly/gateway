@@ -21,6 +21,8 @@ import { GatewayService } from '../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Components, ComponentType, typesLinks } from '../../shared/camel/component-type';
+import { Services } from '../../shared/camel/service-connections';
+
 import { map } from 'rxjs/operators';
 
 import { HeaderDialogComponent, HeaderPopupService } from 'app/entities/header';
@@ -145,6 +147,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         public components: Components,
+        public servicesList: Services,
         private modalService: NgbModal,
         private headerPopupService: HeaderPopupService,
         private servicePopupService: ServicePopupService
@@ -204,41 +207,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     //this filters services not of the correct type
     filterServices(endpoint: any, formService: FormControl) {
-        this.serviceType[0] = this.returnServiceType(endpoint.componentType);
+        this.serviceType[0] = this.servicesList.getServiceType(endpoint.componentType);
         this.filterService[0] = this.services.filter(f => f.type === this.serviceType[0]);
         if (this.filterService[0].length > 0 && endpoint.serviceId) {
             formService.setValue(this.filterService[0].find(fs => fs.id === endpoint.serviceId).id);
-        }
-    }
-
-    /*
-    filterServices(endpoint: any, formService: FormControl) {
-        this.serviceType[this.endpoints.indexOf(endpoint)] = this.returnServiceType(endpoint.componentType);
-        this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
-            f => f.type === this.serviceType[this.endpoints.indexOf(endpoint)]
-        );
-        if (this.filterService[this.endpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
-            formService.setValue(this.filterService[this.endpoints.indexOf(endpoint)].find(fs => fs.id === endpoint.serviceId).id);
-        }
-    }*/
-
-    returnServiceType(componentType: any) {
-        if (componentType === 'ACTIVEMQ') {
-            return 'ActiveMQ Connection';
-        } else if (componentType === 'AMAZONMQ') {
-            return 'AmazonMQ Connection';
-        } else if (componentType === 'SONICMQ') {
-            return 'SonicMQ Connection';
-        } else if (componentType === 'SQL') {
-            return 'JDBC Connection';
-        } else if (componentType === 'SJMS') {
-            return 'MQ Connection';
-        } else if (componentType === 'AMQP') {
-            return 'AMQP Connection';
-        } else if (componentType === 'AMQPS') {
-            return 'AMQP Connection';
-        } else {
-            return '';
         }
     }
 
@@ -258,19 +230,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         let componentType;
         let camelComponentType;
 
-        camelComponentType = componentType = endpoint.componentType.toString().toLowerCase();
+        componentType = endpoint.componentType.toString().toLowerCase();
 
-        if (componentType === 'activemq') {
-            camelComponentType = 'jms';
-        } else if (componentType === 'amqps') {
-            camelComponentType = 'amqp';
-        } else if (componentType === 'amazonmq') {
-            camelComponentType = 'jms';
-        } else if (componentType === 'sonicmq') {
-            camelComponentType = 'sjms';
-        } else if (componentType === 'wastebin') {
-            camelComponentType = 'mock';
-        }
+        camelComponentType = this.components.getCamelComponentType(componentType);
+
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
         camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
 
@@ -293,47 +256,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             });
         });
 
-        endpointForm.patchValue({ componentType: componentType.toUpperCase() });
-
-        switch (endpointForm.controls.componentType.value) {
-            case 'WASTEBIN': {
-                endpointForm.controls.uri.disable();
-                endpointForm.controls.options.disable();
-                endpointForm.controls.service.disable();
-                endpointForm.controls.header.disable();
-                break;
-            }
-            case 'ACTIVEMQ': {
-                endpointForm.controls.uri.enable();
-                endpointForm.controls.options.enable();
-                endpointForm.controls.header.enable();
-                if (this.embeddedBroker) {
-                    endpointForm.controls.service.disable();
-                } else {
-                    endpointForm.controls.service.enable();
-                }
-                break;
-            }
-            case 'AMAZONMQ':
-            case 'AMQP':
-            case 'AMQPS':
-            case 'SJMS':
-            case 'SONICMQ':
-            case 'SQL': {
-                endpointForm.controls.uri.enable();
-                endpointForm.controls.options.enable();
-                endpointForm.controls.header.enable();
-                endpointForm.controls.service.enable();
-                break;
-            }
-            default: {
-                endpointForm.controls.uri.enable();
-                endpointForm.controls.options.enable();
-                endpointForm.controls.header.enable();
-                endpointForm.controls.service.disable();
-                break;
-            }
-        }
+        this.enableFields(endpointForm);
 
         this.setURIlist();
     }
@@ -355,6 +278,36 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
     }
 
+    enableFields(endpointForm) {
+        let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+
+        if (endpointForm.controls.componentType.value === 'WASTEBIN') {
+            endpointForm.controls.uri.disable();
+            endpointForm.controls.options.disable();
+            endpointForm.controls.service.disable();
+            endpointForm.controls.header.disable();
+        } else if (endpointForm.controls.componentType.value === 'WASTEBIN') {
+            endpointForm.controls.uri.enable();
+            endpointForm.controls.options.enable();
+            endpointForm.controls.header.enable();
+            if (this.embeddedBroker) {
+                endpointForm.controls.service.disable();
+            } else {
+                endpointForm.controls.service.enable();
+            }
+        } else if (componentHasService) {
+            endpointForm.controls.uri.enable();
+            endpointForm.controls.options.enable();
+            endpointForm.controls.header.enable();
+            endpointForm.controls.service.enable();
+        } else {
+            endpointForm.controls.uri.enable();
+            endpointForm.controls.options.enable();
+            endpointForm.controls.header.enable();
+            endpointForm.controls.service.disable();
+        }
+    }
+
     setURIlist() {
         this.URIList = [];
 
@@ -366,26 +319,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             }
         });
     }
-
-    /*
-    setSendEndpoint(e?: Event) {
-
-        if (typeof e !== 'undefined') {
-            console.log('event is defined');
-            let endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
-            let selectedEndpoint = this.endpoints.filter(endpoint => {
-                console.log((<IEndpoint>e).id)
-                return endpoint.id === (<IEndpoint>e).id
-            })
-
-            console.log("selectedEndpoint=" + selectedEndpoint);
-            console.log("selectedEndpoint[0]=" + selectedEndpoint[0]);
-
-            this.updateEndpointData(selectedEndpoint[0], endpointsData.controls[0] as FormControl);
-        }
-
-    }
-    */
 
     initializeForm() {
         this.messageSenderForm = new FormGroup({

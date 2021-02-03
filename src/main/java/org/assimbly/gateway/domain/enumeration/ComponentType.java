@@ -351,6 +351,8 @@ public enum ComponentType {
 
 	HTTPS("HTTPS"),
 
+    IBMMQ("IBMMQ"),
+
 	@JsonProperty("IEC60870-CLIENT")
 	IEC60870CLIENT("IEC60870-CLIENT"),
 
