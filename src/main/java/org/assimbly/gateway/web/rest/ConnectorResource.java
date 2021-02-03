@@ -7,9 +7,13 @@ import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.ApplicationProperties.Gateway;
 import org.assimbly.gateway.config.environment.DBConfiguration;
-import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.event.FailureListener;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.repository.GatewayRepository;
+import org.assimbly.gateway.repository.HeaderRepository;
+import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.w3c.dom.Element;
 
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +45,7 @@ public class ConnectorResource {
 	private Connector connector = new CamelConnector();
 
 	private String flowId;
+    private String endpointId;
 
 	private boolean plainResponse;
 
@@ -57,7 +61,17 @@ public class ConnectorResource {
     FailureListener failureListener;
 
     @Autowired
+    GatewayRepository gatewayRepository;
+
+    @Autowired
     FlowRepository flowRepository;
+
+    @Autowired
+    HeaderRepository headerRepository;
+
+    @Autowired
+    ServiceRepository serviceRepository;
+
 
     @Autowired
     DBConfiguration assimblyDBConfiguration;
@@ -181,6 +195,7 @@ public class ConnectorResource {
        			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector already running");
        		}else {
 				connector.addEventNotifier(failureListener);
+				connector.setTracing(false);
        			connector.start();
        			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector started");
        		}
@@ -203,7 +218,6 @@ public class ConnectorResource {
 
       	try {
       		String config = connector.getConfiguration(connectorId.toString(), mediaType);
-      		System.out.println("config=" + config);
   			connector.stop();
   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/stop","Connector stopped");
   		} catch (Exception e) {
@@ -699,15 +713,18 @@ public class ConnectorResource {
 		}
     }
 
-    @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}", produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
+    @GetMapping(path = "/connector/{connectorId}/flow/stats/{id}/{endpointid}", produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> getFlowStats(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id, @PathVariable Long endpointid) throws Exception {
 
     	plainResponse = true;
 
 		try {
         	init();
+
         	flowId = id.toString();
-    		String flowStats = connector.getFlowStats(flowId, mediaType);
+        	endpointId = endpointid.toString();
+
+        	String flowStats = connector.getFlowStats(flowId, endpointId, mediaType);
     		if(flowStats.startsWith("Error")||flowStats.startsWith("Warning")) {plainResponse = false;}
 			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/flow/stats/{id}",flowStats,plainResponse);
 		} catch (Exception e) {
@@ -756,13 +773,107 @@ public class ConnectorResource {
     }
 
 
+    /**
+     * POST  /connector/{connectorId}/send : Send messages to an endpoint (fire and forget).
+     *
+     * @param connectorId (gatewayId)
+     * @return if message has been send
+     * @throws Exception Message send failure
+     */
+    @PostMapping(path = "/connector/{connectorId}/send/{numberOfTimes}", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> send(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,
+                                       @RequestHeader(name = "uri", required = false) String uri,
+                                       @RequestHeader(name = "headerid", required = false) String headerId,
+                                       @RequestHeader(name = "serviceid", required = false) String serviceId,
+                                       @RequestHeader(name = "endpointid", required = false) String endpointId,
+                                       @PathVariable Integer numberOfTimes,
+                                       @PathVariable Long connectorId,
+                                       @RequestBody Optional<String> requestBody) throws Exception {
+
+        String body = requestBody.orElse(" ");
+
+        TreeMap<String, String> serviceMap = new TreeMap<>();
+
+        TreeMap<String, Object> headerMap = new TreeMap<>();
+
+        try {
+            if(serviceId != null && !serviceId.isBlank()) {
+                serviceMap = getService(serviceId);
+                serviceMap.put("to." + endpointId + ".uri",uri);
+                serviceMap.put("to." + endpointId + ".service.id",serviceId);
+                setService(serviceMap,endpointId);
+            }
+
+            if(headerId != null && !headerId.isBlank()) {
+                headerMap = getHeaders(headerId);
+            }
+
+            if(!headerMap.isEmpty()){
+                connector.sendWithHeaders(uri, body, headerMap, numberOfTimes);
+            }else {
+                connector.send(uri,body,numberOfTimes);
+            }
+
+            return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/send","Sent succesfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/send","Error: " + e.getMessage() + " Cause: " + e.getCause());
+        }
+    }
+
+    /**
+     * POST  /connector/{connectorId}/sendrequest : Send request messages to an endpoint.
+     *
+     * @param connectorId (gatewayId)
+     * @return the reply message
+     * @throws Exception Message send failure
+     */
+    @PostMapping(path = "/connector/{connectorId}/sendrequest", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
+    public ResponseEntity<String> sendRequest(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,
+                                       @RequestHeader(name = "uri", required = false) String uri,
+                                       @RequestHeader(name = "headerid", required = false) String headerId,
+                                       @RequestHeader(name = "serviceid", required = false) String serviceId,
+                                       @RequestHeader(name = "endpointid", required = false) String endpointId,
+                                       @PathVariable Long connectorId,
+                                       @RequestBody Optional<String> requestBody) throws Exception {
+
+        String body = requestBody.orElse(" ");
+        String result = "No reply";
+
+        TreeMap<String, String> serviceMap = new TreeMap<>();
+
+        TreeMap<String, Object> headerMap = new TreeMap<>();
+
+        try {
+            if(serviceId != null && !serviceId.isBlank()) {
+                serviceMap = getService(serviceId);
+                serviceMap.put("to." + endpointId + ".uri",uri);
+                serviceMap.put("to." + endpointId + ".service.id",serviceId);
+                setService(serviceMap,endpointId);
+            }
+
+            if(headerId != null && !headerId.isBlank()) {
+                headerMap = getHeaders(headerId);
+            }
+
+            if(!headerMap.isEmpty()){
+                result = connector.sendRequestWithHeaders(uri, body, headerMap);
+            }else {
+                result = connector.sendRequest(uri,body);
+            }
+
+            return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/send",result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/send",e.getMessage());
+        }
+    }
+
 
     /**
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
      *
      * @param connectorId (gatewayId)
-     * @param id (FlowId)
-     * @param configuration as XML / if empty get from db (for the time being)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
@@ -783,8 +894,6 @@ public class ConnectorResource {
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
      *
      * @param connectorId (gatewayId)
-     * @param id (FlowId)
-     * @param configuration as XML / if empty get from db (for the time being)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
@@ -803,8 +912,6 @@ public class ConnectorResource {
      * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
      *
      * @param connectorId (gatewayId)
-     * @param id (FlowId)
-     * @param configuration as XML / if empty get from db (for the time being)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
@@ -847,6 +954,8 @@ public class ConnectorResource {
                 Gateway gateway = applicationProperties.getGateway();
 
                 String applicationBaseDirectory = gateway.getBaseDirectory();
+                boolean applicationTracing = gateway.getTracing();
+                boolean applicationDebugging = gateway.getDebugging();
 
 	            if(!applicationBaseDirectory.equals("default")) {
 	            	connector.setBaseDirectory(applicationBaseDirectory);
@@ -854,6 +963,8 @@ public class ConnectorResource {
 
         		connectorIsStarting = true;
 				connector.addEventNotifier(failureListener);
+				connector.setTracing(applicationTracing);
+				connector.setDebugging(applicationDebugging);
 
         		connector.start();
 
@@ -903,6 +1014,57 @@ public class ConnectorResource {
 		}
 
 	}
+
+	private TreeMap<String, Object> getHeaders(String headerId){
+
+        TreeMap<String, Object> headerMap = new TreeMap<>();
+
+        Long headerIdLong =  Long.valueOf(headerId);
+        Optional<Header> header = headerRepository.findById(headerIdLong);
+
+        if(header.isPresent()){
+            Set<HeaderKeys> headerKeys = header.get().getHeaderKeys();
+
+            for (HeaderKeys headerKey : headerKeys) {
+                String parameterName = headerKey.getKey();
+                String parameterValue = headerKey.getValue();
+                String parameterType = headerKey.getType();
+
+                String key = headerKey.getKey();
+                String value= headerKey.getType() + "(" + headerKey.getValue() + ")";
+
+                headerMap.put(key, value);
+            }
+        }
+
+        return headerMap;
+    }
+
+    private TreeMap<String, String> getService(String serviceId){
+
+        TreeMap<String, String> serviceMap = new TreeMap<>();
+
+        Long serviceIdLong =  Long.valueOf(serviceId);
+        Optional<Service> service = serviceRepository.findById(serviceIdLong);
+
+        if(service.isPresent()){
+            Set<ServiceKeys> serviceKeys = service.get().getServiceKeys();
+
+            for (ServiceKeys serviceKey : serviceKeys) {
+                String key = "service." + serviceId + "." +  serviceKey.getKey();
+                String value = serviceKey.getValue();
+                serviceMap.put(key, value);
+            }
+        }
+
+        return serviceMap;
+    }
+
+
+    private void setService(TreeMap<String, String> serviceMap, String endpointId) throws Exception {
+        connector.setConnection(serviceMap,"to." + endpointId + ".service.id");
+    }
+
 
     public static boolean isWindows()
     {

@@ -22,7 +22,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     isSaving: boolean;
     headerKey: IHeaderKeys;
     headerKeyId: number;
-    typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'simple', 'xpath'];
+    typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
     eventSubscriber: Subscription;
 
     constructor(

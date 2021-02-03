@@ -14,19 +14,29 @@
 			<option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
 		</select>
 	</div>
-	<div class="col-12 text-right">
-		<button class="btn btn-primary" style="margin-right: 1.5em" type="submit"
-			*jhiHasAnyAuthority="'ROLE_ADMIN'"
-			[routerLink]="['../flow', 'edit-all' ]">
-			<span class="fa fa-plus"></span> <span>Create flow</span>
-		</button>
-	</div>
-	<div class="col-1.5">
-        <input type="text" align="left" style="margin-left: 0.3em"
-               [(ngModel)]="searchText"
-               id="searchTextId" name="searchText"
-               placeholder="Filter By Flow Name"/>
-	</div>
+    <div class="row">
+        <div class="col-3">
+            <input type="text" align="left" style="margin-left: 0.3em"
+                   [(ngModel)]="searchText"
+                   id="searchTextId" name="searchText"
+                   placeholder="Filter By Flow Name"/>
+        </div>
+        <div class="col-8 text-right">
+            <button class="btn btn-primary" type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['../flow', 'message-sender' ]">
+                <span class="fa fa-envelope"></span> <span>Send message</span>
+            </button>
+            <button class="btn btn-primary" type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['../flow', 'edit-all' ]" style="margin-right:-2em">
+                <span class="fa fa-plus"></span> <span>Create flow</span>
+            </button>
+        </div>
+        <div class="col-1">
+        </div>
+    </div>
+
 	<br />
 	<div *ngIf="flows?.length == 0">
 		<div class="card-block pt-4">

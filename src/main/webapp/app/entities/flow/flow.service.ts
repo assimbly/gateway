@@ -140,8 +140,8 @@ export class FlowService {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response', responseType: 'text' });
     }
 
-    getFlowStats(id: number, gatewayid: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}`, { observe: 'response' });
+    getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
     }
 
     getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
@@ -169,6 +169,53 @@ export class FlowService {
 
     testConnection(gatewayid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    send(
+        gatewayId: number,
+        uri: string,
+        endpointId: string,
+        headerId: string,
+        serviceId: string,
+        numberOfTimes: string,
+        messageBody: string
+    ): Observable<any> {
+        const options = new HttpHeaders({
+            uri: uri,
+            endpointId: endpointId,
+            headerid: headerId,
+            serviceid: serviceId,
+            'Content-Type': 'text/plain',
+            Accept: 'text/plain'
+        });
+        return this.http.post(`${this.connectorUrl}/${gatewayId}/send/${numberOfTimes}`, messageBody, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    sendRequest(
+        gatewayId: number,
+        uri: string,
+        endpointId: string,
+        headerId: string,
+        serviceId: string,
+        messageBody: string
+    ): Observable<any> {
+        const options = new HttpHeaders({
+            uri: uri,
+            endpointId: endpointId,
+            headerid: headerId,
+            serviceid: serviceId,
+            'Content-Type': 'text/plain',
+            Accept: 'text/plain'
+        });
+        return this.http.post(`${this.connectorUrl}/${gatewayId}/sendrequest`, messageBody, {
+            headers: options,
             observe: 'response',
             responseType: 'text'
         });
