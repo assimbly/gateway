@@ -142,9 +142,9 @@ export enum ComponentType {
     HAZELCASTTOPIC = 'HAZELCAST-TOPIC',
     HBASE = 'HBASE',
     HDFS = 'HDFS',
-    HIPCHAT = 'HIPCHAT',
     HTTP = 'HTTP',
     HTTPS = 'HTTPS',
+    IBMMQ = 'IBMMQ',
     IEC60870CLIENT = 'IEC60870-CLIENT',
     IEC60870SERVER = 'IEC60870-SERVER',
     IGNITECACHE = 'IGNITE-CACHE',
@@ -1940,27 +1940,6 @@ export const typesLinks = [
     `
     },
     {
-        name: 'HIPCHAT',
-        assimblyTypeLink: `/component-hipchat`,
-        camelTypeLink: `/hipchat-component.html`,
-        uriPlaceholder: 'protocol:host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: The protocol for the hipchat server, such as http.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The host for the hipchat server, such as api.hipchat.com.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The port for the hipchat server. Is by default 80.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int <br/><br/>
-        <b>Example</b>: http:example.com:80 <br/>
-    `
-    },
-    {
         name: 'HTTP',
         assimblyTypeLink: `/component-http`,
         camelTypeLink: `/http-component.html`,
@@ -1984,6 +1963,25 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
         <b>Example</b>: servername:443/orders  (without https://)<br/>
+    `
+    },
+    {
+        name: 'IBMMQ',
+        assimblyTypeLink: `/component-ibmmq`,
+        camelTypeLink: `/sjms-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType<br/>
+        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
+        <b>Default</b>: queue<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
+        <br/>
+        <b>Name</b>: destinationName<br/>
+        <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
     `
     },
     {
@@ -4539,7 +4537,9 @@ export const typesLinks = [
 ];
 
 // add the component types for a specific endpoint
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class Components {
     fromTypes = [
         'ACTIVEMQ',
@@ -4615,7 +4615,7 @@ export class Components {
         'HAZELCAST-TOPIC',
         'HBASE',
         'HDFS',
-        'HIPCHAT',
+        'IBMMQ',
         'IEC60870-CLIENT',
         'IEC60870-SERVER',
         'IGNITE-CACHE',
@@ -4828,9 +4828,9 @@ export class Components {
         'HAZELCAST-TOPIC',
         'HBASE',
         'HDFS',
-        'HIPCHAT',
         'HTTP',
         'HTTPS',
+        'IBMMQ',
         'IEC60870-CLIENT',
         'IEC60870-SERVER',
         'IGNITE-CACHE',
@@ -5014,6 +5014,7 @@ export class Components {
         'FTPS',
         'HTTP',
         'HTTPS',
+        'IBMMQ',
         'IMAP',
         'IMAPS',
         'IRONMQ',
@@ -5047,6 +5048,7 @@ export class Components {
         'FTP',
         'HTTP',
         'HTTPS',
+        'IBMMQ',
         'IMAP',
         'IMAPS',
         'NETTY4',
@@ -5061,4 +5063,26 @@ export class Components {
         'STREAM',
         'WEBSOCKET'
     ];
+
+    getCamelComponentType(componentType: any) {
+        let camelComponentType: string;
+
+        if (componentType === 'activemq') {
+            camelComponentType = 'jms';
+        } else if (componentType === 'amqps') {
+            camelComponentType = 'amqp';
+        } else if (componentType === 'amazonmq') {
+            camelComponentType = 'jms';
+        } else if (componentType === 'ibmmq') {
+            camelComponentType = 'sjms';
+        } else if (componentType === 'sonicmq') {
+            camelComponentType = 'sjms';
+        } else if (componentType === 'wastebin') {
+            camelComponentType = 'mock';
+        } else {
+            camelComponentType = componentType;
+        }
+
+        return camelComponentType;
+    }
 }

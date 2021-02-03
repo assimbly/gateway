@@ -30,7 +30,9 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlowService } from 'app/entities/flow/flow.service';
+
 import { Components } from 'app/shared/camel/component-type';
+import { Services } from 'app/shared/camel/service-connections';
 
 const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};

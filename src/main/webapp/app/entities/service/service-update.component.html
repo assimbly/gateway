@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
 		<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" autocomplete="off">
-		
+
 		    <div class="modal-header">
 		        <h4 class="modal-title" id="myServiceLabel">Create or edit a Service</h4>
 		    </div>
@@ -23,13 +23,13 @@
 		        <div class="form-group">
 		            <label class="form-control-label" for="field_type">Type</label>
 		            <select class="form-control" id="field_service" name="serviceKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
-		                <option [ngValue]="type" *ngFor="let type of typeServices">{{type}}</option>
+		                <option [ngValue]="type" *ngFor="let type of services.connectionsList">{{type}}</option>
 		            </select>
 		            <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
 		                <span *ngIf="type.errors.required">Type is required.</span>
 		            </div>
 		        </div>
-		
+
 		        <div>
 		            <div class="table-responsive" *ngIf="serviceKeys">
 		                <table class="table">
@@ -57,7 +57,7 @@
 		                                <td>
 		                                	<input type="text" class="form-control" [(ngModel)]="serviceKey.key" value="serviceKey.key" name="serviceKey-key-{{idx}}"
 		                                        required maxlength="255" [jhiExistingServiceKeys]="serviceKeysKeys" [disabled]="serviceKey.isRequired"
-		                                        id="serviceKey-key-{{idx}}" #key="ngModel" />		                                    
+		                                        id="serviceKey-key-{{idx}}" #key="ngModel" />
 		                                    <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
 		                                        <span *ngIf="key.errors.required">Key is required.</span>
 		                                        <span *ngIf="key.errors.existingServiceKey">Key already exists.</span>
@@ -66,7 +66,7 @@
 		                            </ng-template>
 		                            <td *ngIf="serviceKey.valueType !== 'list'; else isList">
 		                                <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" placeholder="{{serviceKey.placeholder}}"
-		                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel" 
+		                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel"
 		                                    [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"/>
 		                                <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
 		                                    <span *ngIf="value.errors.required">Value is required.</span>
@@ -74,11 +74,11 @@
 		                            </td>
 	                               <ng-template #isList>
 		                                <td>
-		                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel"> 
-		                                    	<ng-container *ngIf="serviceKey.key == 'driver'"">                                       
+		                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
+		                                    	<ng-container *ngIf="serviceKey.key == 'driver'">
 		                                   	     <option[value]="l" *ngFor="let l of driversList">{{l}}</option>
 		                                        </ng-container>
-		                                       	<ng-container *ngIf="serviceKey.key == 'jmsprovider'"">                                       
+		                                       	<ng-container *ngIf="serviceKey.key == 'jmsprovider'">
 		                                   	     <option[value]="l" *ngFor="let l of jmsProvidersList">{{l}}</option>
 		                                        </ng-container>
 		                                    </select>

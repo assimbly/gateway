@@ -4,6 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GatewaySharedModule } from 'app/shared';
 import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
+
+import { Services } from 'app/shared/camel/service-connections';
+
 import {
     ServiceComponent,
     ServiceDetailComponent,

@@ -8,6 +8,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IWireTapEndpoint, WireTapEndpoint, ComponentType } from 'app/shared/model/wire-tap-endpoint.model';
 import { IService, Service } from 'app/shared/model/service.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
+import { Services } from '../../shared/camel/service-connections';
 
 import { WireTapEndpointService } from './wire-tap-endpoint.service';
 import { ServiceService } from '../service';
@@ -50,6 +51,7 @@ export class WireTapEndpointUpdateComponent implements OnInit {
         private serviceService: ServiceService,
         private headerService: HeaderService,
         private flowService: FlowService,
+        public servicesList: Services,
         private eventManager: JhiEventManager,
         private route: ActivatedRoute,
         private router: Router,
@@ -163,44 +165,33 @@ export class WireTapEndpointUpdateComponent implements OnInit {
 
         let componentType = this.wireTapForm.controls.type.value;
         componentType = componentType.toLowerCase();
-        if (componentType === 'activemq') {
-            componentType = 'jms';
-        } else if (componentType === 'amazonmq') {
-            componentType = 'jms';
-        } else if (componentType === 'sonicmq') {
-            componentType = 'sjms';
-        }
 
         // get options keys
         this.getComponentOptions(componentType).subscribe(data => {
             this.wiretapComponentOptions = Object.keys(data.properties);
         });
 
-        switch (this.wireTapForm.controls.type.value) {
-            case 'WASTEBIN': {
-                this.wireTapForm.controls.uri.disable();
-                this.wireTapForm.controls.options.disable();
-                this.wireTapForm.controls.service.disable();
-                this.wireTapForm.controls.header.disable();
-                break;
-            }
-            case 'ACTIVEMQ':
-            case 'SJMS':
-            case 'SONICMQ':
-            case 'SQL': {
-                this.wireTapForm.controls.uri.enable();
-                this.wireTapForm.controls.options.enable();
-                this.wireTapForm.controls.header.enable();
-                this.wireTapForm.controls.service.enable();
-                break;
-            }
-            default: {
-                this.wireTapForm.controls.uri.enable();
-                this.wireTapForm.controls.options.enable();
-                this.wireTapForm.controls.header.enable();
-                this.wireTapForm.controls.service.disable();
-                break;
-            }
+        this.enableFields(this.wireTapForm);
+    }
+
+    enableFields(endpointForm) {
+        let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+
+        if (endpointForm.controls.componentType.value === 'WASTEBIN') {
+            endpointForm.controls.uri.disable();
+            endpointForm.controls.options.disable();
+            endpointForm.controls.service.disable();
+            endpointForm.controls.header.disable();
+        } else if (componentHasService) {
+            endpointForm.controls.uri.enable();
+            endpointForm.controls.options.enable();
+            endpointForm.controls.header.enable();
+            endpointForm.controls.service.enable();
+        } else {
+            endpointForm.controls.uri.enable();
+            endpointForm.controls.options.enable();
+            endpointForm.controls.header.enable();
+            endpointForm.controls.service.disable();
         }
     }
 
@@ -288,24 +279,10 @@ export class WireTapEndpointUpdateComponent implements OnInit {
     }
 
     filterServices() {
-        this.serviceType = this.returnServiceType(this.wireTapEndpoint.type);
+        this.serviceType = this.servicesList.getServiceType(this.wireTapEndpoint.type);
         this.filteredService = this.services.filter(f => f.type === this.serviceType);
         if (this.filteredService.length > 0 && this.wireTapEndpoint.serviceId) {
             this.wireTapForm.controls.service.setValue(this.filteredService.find(fs => fs.id === this.wireTapEndpoint.serviceId).id);
-        }
-    }
-
-    returnServiceType(type: any) {
-        if (type === 'ACTIVEMQ') {
-            return 'ActiveMQ Connection';
-        } else if (type === 'SONICMQ') {
-            return 'SonicMQ Connection';
-        } else if (type === 'SQL') {
-            return 'JDBC Connection';
-        } else if (type === 'SJMS') {
-            return 'MQ Connection';
-        } else {
-            return '';
         }
     }
 
