@@ -12,6 +12,7 @@ export enum ComponentType {
     AHCWSS = 'AHC-WSS',
     AMAZONMQ = 'AMAZONMQ',
     AMQP = 'AMQP',
+    AMQPS = 'AMQPS',
     APNS = 'APNS',
     AS2 = 'AS2',
     ASTERISK = 'ASTERISK',
@@ -407,6 +408,23 @@ export const typesLinks = [
     {
         name: 'AMQP',
         assimblyTypeLink: `/component-amqp`,
+        camelTypeLink: `/amqp-component.html`,
+        uriPlaceholder: 'destinationType:destinationName',
+        uriPopoverMessage: `
+        <b>Name</b>: destinationType <br/>
+        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic. <br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Name</b>: destinationName <br/>
+        <b>Description</b>: Name of the queue or topic to use as destination. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: queue:foo <br/>
+    `
+    },
+    {
+        name: 'AMQPS',
+        assimblyTypeLink: `/component-amqps`,
         camelTypeLink: `/amqp-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
@@ -1332,7 +1350,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'FILEWATCH',
+        name: 'FILE-WATCH',
         assimblyTypeLink: `/component-filewatch`,
         camelTypeLink: `/filewatch-component.html`,
         uriPlaceholder: 'path',
@@ -4528,6 +4546,7 @@ export class Components {
         'AHC-WS',
         'AMAZONMQ',
         'AMQP',
+        'AMQPS',
         'APNS',
         'AS2',
         'AWS-S3',
@@ -4571,7 +4590,7 @@ export class Components {
         'FACEBOOK',
         'FHIR',
         'FILE',
-        'FILEWATCH',
+        'FILE-WATCH',
         'FLATPACK',
         'FTP',
         'FTPS',
@@ -4713,6 +4732,7 @@ export class Components {
         'AHC-WS',
         'AMAZONMQ',
         'AMQP',
+        'AMQPS',
         'APNS',
         'AS2',
         'AWS-S3',
@@ -4981,6 +5001,7 @@ export class Components {
         'ACTIVEMQ',
         'AMAZONMQ',
         'AMQP',
+        'AMQPS',
         'AS2',
         'AWS-S3',
         'CRON',
