@@ -103,7 +103,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     servicePopoverMessage: string;
     popoverMessage: string;
 
-    selectedOption: string;
+    selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
@@ -237,6 +237,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
         camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
 
+        endpointForm.controls.componentType.patchValue(endpoint.componentType);
         endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
@@ -481,7 +482,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
         let defaultValue = componentOption[0].defaultValue;
 
-        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[index];
+        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
         const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
 
         if (defaultValue) {
