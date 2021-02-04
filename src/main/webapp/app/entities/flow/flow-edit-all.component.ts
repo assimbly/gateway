@@ -93,7 +93,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     popoverMessage: string;
 
     selectedComponentType: string;
-    selectedOption: string;
+    selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
