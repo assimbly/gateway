@@ -8,6 +8,10 @@
         {
             "fieldName": "value",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "encrypt",
+            "fieldType": "Boolean"
         }
     ],
     "relationships": [

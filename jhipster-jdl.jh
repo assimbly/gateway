@@ -12,7 +12,7 @@ entity Gateway {
 entity Flow {
 	name String,
 	type String,
-	autoStart Boolean,	
+	autoStart Boolean,
 	offLoading Boolean,
 	maximumRedeliveries Integer,
 	redeliveryDelay Integer,
@@ -21,26 +21,26 @@ entity Flow {
 	instances Integer,
 	version Integer,
 	created Instant,
-	lastModified Instant			
+	lastModified Instant
 }
 
 entity Endpoint {
 	endpointType EndpointType,
 	compponentType ComponentType,
-	uri String,	
+	uri String,
     options String,
-    responseId Integer   
+    responseId Integer
 }
 
 entity Service {
 	name String,
-	type String	
+	type String
 }
 
 entity ServiceKeys {
 	key String,
 	value String,
-	type String	
+	type String
 }
 
 entity Header {
@@ -50,12 +50,13 @@ entity Header {
 entity HeaderKeys {
 	key String,
 	value String,
-	type String	
+	type String
 }
 
 entity EnvironmentVariables {
 	key String,
-	value String
+	value String,
+	encrypt Boolean
 }
 
 entity Maintenance {
@@ -92,15 +93,15 @@ enum ConnectorType {
 }
 
 enum EndpointType {
-   FROM, TO, ERROR, WIRETAP, RESPONSE 
+   FROM, TO, ERROR, WIRETAP, RESPONSE
 }
 
 enum ComponentType {
-   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN 
+   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN
 }
 
 enum LogLevelType {
-   ERROR, WARN, INFO, DEBUG, TRACE, OFF 
+   ERROR, WARN, INFO, DEBUG, TRACE, OFF
 }
 
 relationship OneToOne {

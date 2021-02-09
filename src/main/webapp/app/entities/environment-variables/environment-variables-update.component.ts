@@ -1,14 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
-import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
 import { GatewayService } from 'app/entities/gateway';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 
 @Component({
@@ -70,6 +70,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             id: new FormControl(this.environmentVariables.id),
             key: new FormControl(this.environmentVariables.key, Validators.required),
             value: new FormControl(this.environmentVariables.value, Validators.required),
+            encrypt: new FormControl(this.environmentVariables.encrypt, Validators.required),
             gatewayId: new FormControl(this.environmentVariables.gatewayId)
         });
     }

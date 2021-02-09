@@ -14,6 +14,8 @@ public class EnvironmentVariablesDTO implements Serializable {
 
     private String value;
 
+    private Boolean encrypted;
+
     private Long gatewayId;
 
     public Long getId() {
@@ -38,6 +40,14 @@ public class EnvironmentVariablesDTO implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Boolean getEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(Boolean encrypted) {
+        this.encrypted = encrypted;
     }
 
     public Long getGatewayId() {
