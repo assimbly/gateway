@@ -12,6 +12,10 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
+encryption:
+    jasypt:
+        algorithm: PBEWithHMACSHA512AndAES_256
+        password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
 
 logging:
     level:
@@ -20,7 +24,7 @@ logging:
         org.assimbly.gateway: DEBUG
 
 management:
-  health:
+    health:
     elasticsearch:
       enabled: false
 
@@ -72,6 +76,10 @@ spring:
         cache-duration: PT1S # 1 second, see the ISO 8601 standard
     thymeleaf:
         cache: false
+    encryption:
+        jasypt:
+            algorithm: PBEWithHMACSHA512AndAES_256
+            password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
 
 server:
     port: 8080

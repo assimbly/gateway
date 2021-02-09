@@ -13,7 +13,12 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
-logging: 
+encryption:
+    jasypt:
+        algorithm: PBEWithHMACSHA512AndAES_256
+        password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
+
+logging:
     level:
         ROOT: INFO
         org.assimbly.gateway: INFO
@@ -38,7 +43,7 @@ spring:
         username: gateway
         password:
         hikari:
-            auto-commit: false        
+            auto-commit: false
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedH2Dialect
         database: H2
@@ -110,11 +115,12 @@ jhipster:
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         #jmx:
             #enabled: true
+
         logs: # Reports Dropwizard metrics in the logs
             enabled: false
             report-frequency: 60 # in seconds
     logging:
-        
+
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false
             host: localhost
