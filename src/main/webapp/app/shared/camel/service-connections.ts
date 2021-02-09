@@ -151,7 +151,13 @@ export class Services {
                 {
                     serviceKeyName: 'url',
                     valueType: 'text',
-                    placeholder: 'Example tcp://localhost:1416',
+                    placeholder: 'Example localhost(1416)',
+                    isRequired: true
+                },
+                {
+                    serviceKeyName: 'queuemanager',
+                    valueType: 'text',
+                    placeholder: 'Example QUEUE.MGR',
                     isRequired: true
                 },
                 {
@@ -159,14 +165,7 @@ export class Services {
                     valueType: 'text',
                     placeholder: 'Example MQ.CHANNEL',
                     isRequired: true
-                },
-                {
-                    serviceKeyName: 'username',
-                    valueType: 'text',
-                    placeholder: 'Example Administrator',
-                    isRequired: true
-                },
-                { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true }
+                }
             ]
         },
         {
