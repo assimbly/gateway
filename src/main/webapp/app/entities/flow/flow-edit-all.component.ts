@@ -238,22 +238,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         endpoint.headerId
                                     );
 
-                                    if (isCloning) {
-                                        this.endpoint.id = null;
-                                    }
-
-                                    this.endpoints.push(this.endpoint);
+                                    this.endpoints.push(endpoint);
 
                                     let formgroup = this.initializeEndpointData(endpoint);
                                     (<FormArray>this.editFlowForm.controls.endpointsData).insert(index, formgroup);
 
                                     this.getOptions(
-                                        this.endpoint,
+                                        endpoint,
                                         this.editFlowForm.controls.endpointsData.get(index.toString()),
                                         this.endpointsOptions[index]
                                     );
-
-                                    this.setTypeLinks(this.endpoint, index);
 
                                     if (this.endpoint.endpointType === 'FROM') {
                                         this.numberOfFromEndpoints = this.numberOfFromEndpoints + 1;
@@ -261,20 +255,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         this.numberOfToEndpoints = this.numberOfToEndpoints + 1;
                                     }
 
+                                    this.setTypeLinks(endpoint, index);
+
                                     index = index + 1;
                                 }, this);
                             }, this);
-
-                            if (isCloning) {
-                                //reset id and flow name to null
-                                this.flow.id = null;
-                                this.flow.name = null;
-
-                                this.flow.endpoints = null;
-
-                                this.endpoint.id = null;
-                                this.updateForm();
-                            }
 
                             if (this.activeEndpoint) {
                                 const activeIndex = this.endpoints.findIndex(item => item.id == this.activeEndpoint);
@@ -285,6 +270,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                 }
                             } else {
                                 this.active = '0';
+                            }
+
+                            if (isCloning) {
+                                this.clone();
                             }
 
                             this.finished = true;
@@ -387,6 +376,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         if (typeof e !== 'undefined') {
             endpoint.componentType = e;
+            endpointForm.controls.service.setValue(endpoint.serviceId);
         } else if (!endpoint.type === null) {
             endpoint.componentType = 'FILE';
         }
@@ -403,10 +393,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         type = typesLinks.find(x => x.name === endpoint.componentType.toString());
         camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
-
-        if (endpoint.serviceId) {
-            endpointForm.controls.service.setValue('');
-        }
 
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
@@ -542,6 +528,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     updateForm() {
         this.updateFlowData(this.flow);
+
         let endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
         this.endpoints.forEach((endpoint, i) => {
             this.updateEndpointData(endpoint, endpointsData.controls[i] as FormControl);
