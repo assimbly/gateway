@@ -710,13 +710,15 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
         }
     }
-
     addEndpoint(endpoint, index) {
+        let newIndex = index + 1;
+
         if (endpoint.responseId != undefined) {
-            index += 1;
+            newIndex += 1;
         }
-        this.endpoints.splice(index + 1, 0, new Endpoint());
-        this.endpointsOptions.splice(index + 1, 0, [new Option()]);
+
+        this.endpoints.splice(newIndex, 0, new Endpoint());
+        this.endpointsOptions.splice(newIndex, 0, [new Option()]);
 
         if (endpoint.endpointType === 'FROM') {
             this.numberOfFromEndpoints = this.numberOfFromEndpoints + 1;
@@ -724,17 +726,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.numberOfToEndpoints = this.numberOfToEndpoints + 1;
         }
 
-        const newEndpoint = this.endpoints.find((e, i) => i === index + 1);
-
+        const newEndpoint = this.endpoints.find((e, i) => i === newIndex);
         newEndpoint.endpointType = endpoint.endpointType;
         newEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
 
-        (<FormArray>this.editFlowForm.controls.endpointsData).insert(index + 1, this.initializeEndpointData(newEndpoint));
+        (<FormArray>this.editFlowForm.controls.endpointsData).insert(newIndex, this.initializeEndpointData(newEndpoint));
+        this.setTypeLinks(endpoint, newIndex);
 
-        this.setTypeLinks(endpoint, index + 1);
-
-        const newIndex = index + 1;
-
+        let optionArray: Array<string> = [];
+        optionArray.splice(0, 0, '');
+        this.selectedOptions.splice(newIndex, 0, optionArray);
         this.active = newIndex.toString();
     }
 
