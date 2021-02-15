@@ -199,7 +199,7 @@
             <div class="d-flex">
                 <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
                     <ng-container *ngFor="let endpoint of endpoints; index as index">
-                        <li ngbNavItem="{{index}}" novalidate>
+                        <li ngbNavItem="{{index}}" [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px' }" novalidate>
                             <a ngbNavLink>{{endpoint.endpointType}}</a>
                             <ng-template ngbNavContent>
 
@@ -356,7 +356,6 @@
                                             <span class="fa fa-remove"></span>
                                             <span>Remove Response Endpoint</span>
                                         </button>
-                                        <p>Number of response endpoints: {{numberOfResponseEndpoints}}</p>
                                     </div>
                                 </div>
 
