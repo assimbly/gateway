@@ -309,18 +309,11 @@ public class DBImportXMLConfiguration {
 		String options = null;
 		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
 		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
-//<<<<<<< HEAD
-//		String responseId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
-//=======
         String responseIdAsString = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
 
 		// get type
 		String[] uriSplitted = uri.split(":", 2);
 
-//<<<<<<< HEAD
-//		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
-//		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
-//=======
         String componentTypeAsString = uriSplitted[0].toUpperCase();
 
         componentTypeAsString = componentTypeAsString.replace("-", "");
@@ -383,14 +376,6 @@ public class DBImportXMLConfiguration {
 			header = null;
 		}
 
-//<<<<<<< HEAD
-//		// get responseId if configured
-//        Integer responseIdInt;
-//		try{
-//		    responseIdInt = Integer.parseInt(responseId);
-//        } catch (NumberFormatException nfe) {
-//		    responseIdInt = null;
-//=======
 		//get responseId if configured
         Integer responseId = null;
         if(StringUtils.isNumeric(responseIdAsString)){
