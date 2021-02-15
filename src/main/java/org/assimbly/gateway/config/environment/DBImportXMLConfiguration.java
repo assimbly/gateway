@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.Gateway;
@@ -45,7 +46,7 @@ import org.w3c.dom.NodeList;
 public class DBImportXMLConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DBImportXMLConfiguration.class);
-    
+
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
 	public String options;
@@ -107,16 +108,19 @@ public class DBImportXMLConfiguration {
 		String defaultToComponentType = xPath.evaluate("//connectors/connector/defaultToComponentType", doc);
 		String defaultErrorComponentType = xPath.evaluate("//connectors/connector/defaultErrorComponentType", doc);
 
-		
+        if (defaultFromComponentType.isEmpty()) {defaultFromComponentType = "FILE";};
+        if (defaultToComponentType.isEmpty()) {defaultToComponentType = "FILE";};
+        if (defaultErrorComponentType.isEmpty()) {defaultErrorComponentType = "FILE";};
+
 		log.info("GatewayID=" + gatewayId);
 
-		
+
 		if (!gatewayId.isEmpty()) {
 
 			log.info("Importing gateway: " + name);
-			
+
 			gatewayOptional = gatewayRepository.findById(connectorId);
-			
+
 			if (!gatewayOptional.isPresent()) {
 				gateway = new Gateway();
 			}else {
@@ -136,15 +140,15 @@ public class DBImportXMLConfiguration {
 			setEnvironmentVariablesFromXML(doc, connectorId, gateway);
 
 			gatewayRepository.save(gateway);
-			
+
 			// create services and headers
 			setServicesAndHeadersFromXML(doc);
 
 			// create flows
 			setFlowsFromXML(doc, connectorId);
-			
+
 			log.info("Importing gateway finished");
-			
+
 		}else {
 			log.error("Can't import gateway. No valid gateway id found.");
 			throw new Exception("Can't import gateway. No valid gateway id found.");
@@ -171,18 +175,18 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
-		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);		
+		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
 
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
 		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/logLevel", doc);
-		
+
 		if (!flowId.isEmpty()) {
 
 			log.info("Importing flow: " + flowName);
-			
+
 			flowOptional = flowRepository.findById(id);
 			gatewayOptional = gatewayRepository.findById(connectorId);
 
@@ -219,23 +223,23 @@ public class DBImportXMLConfiguration {
 			} else {
 				flow.setOffLoading(false);
 			}
-			
+
 			if (flowMaximumRedeliveries != null) {
 				flow.setMaximumRedeliveries(Integer.parseInt(flowMaximumRedeliveries));
 			} else {
 				flow.setMaximumRedeliveries(0);
 			}
-			
+
 			if (flowRedeliveryDelay != null) {
 				flow.setRedeliveryDelay(Integer.parseInt(flowRedeliveryDelay));
 			} else {
 				flow.setRedeliveryDelay(3000);
 			}
-			
-			if (flowLogLevel != null) {				
+
+			if (flowLogLevel != null) {
 				flowLogLevel = flowLogLevel.toUpperCase();
 				if(flowLogLevel.equals("ERROR")||flowLogLevel.equals("WARN")||flowLogLevel.equals("INFO")||flowLogLevel.equals("DEBUG")||flowLogLevel.equals("TRACE")) {
-					flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));					
+					flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
 				}else {
 					flow.setLogLevel(LogLevelType.OFF);
 				}
@@ -269,7 +273,7 @@ public class DBImportXMLConfiguration {
 			throws Exception {
 
 		if (newFlow) {
-			endpoints = new HashSet<Endpoint>();
+            endpoints = new HashSet<Endpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint)", doc));
 			numberOfEndpoints = numberOfEndpoints + 1;
@@ -280,7 +284,6 @@ public class DBImportXMLConfiguration {
 				endpoints.add(endpoint);
 			}
 		} else {
-
 			endpoints = flow.getEndpoints();
 
 			for (Endpoint endpoint : endpoints) {
@@ -293,7 +296,7 @@ public class DBImportXMLConfiguration {
 
 		}
 
-		return endpoints;
+        return endpoints;
 	}
 
 	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index)
@@ -306,24 +309,26 @@ public class DBImportXMLConfiguration {
 		String options = null;
 		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
 		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
+        String responseIdAsString = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
 
 		// get type
 		String[] uriSplitted = uri.split(":", 2);
-		String componentTypeAsString = uriSplitted[0].toUpperCase();
-		componentTypeAsString = componentTypeAsString.replace("-", "");
 
-		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
-		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
-		
+        String componentTypeAsString = uriSplitted[0].toUpperCase();
+
+        componentTypeAsString = componentTypeAsString.replace("-", "");
+
+        ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
+        EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+
 		// get uri
 		uri = uriSplitted[1];
 		while (uri.startsWith("/")) {
 			uri = uri.substring(1);
-			
 		}
 
 		// get options
-		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint/options/*");
+		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[" + index + "]/options/*");
 
 		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
 
@@ -357,7 +362,7 @@ public class DBImportXMLConfiguration {
 		// get header if configured
 		Header header;
 		try {
-			
+
 			Long headerIdLong = Long.parseLong(headerId, 10);
 			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerIdLong + "]/name",doc);
 			Optional<Header> headerOptional = headerOptional = headerRepository.findByName(headerName);
@@ -365,19 +370,26 @@ public class DBImportXMLConfiguration {
 				header = headerOptional.get();
 			}else {
 				header = null;
-			}			
-				
+			}
+
 		} catch (NumberFormatException nfe) {
 			header = null;
 		}
+
+		//get responseId if configured
+        Integer responseId = null;
+        if(StringUtils.isNumeric(responseIdAsString)){
+            responseId = Integer.parseInt(responseIdAsString);
+        }
 
 		if (endpoint == null) {
 			endpoint = new Endpoint();
 		}
 
-		endpoint.setEndpointType(endpointType);
+        endpoint.setEndpointType(endpointType);
 		endpoint.setComponentType(componentType);
-		endpoint.setUri(uri);
+        endpoint.responseId(responseId);
+        endpoint.setUri(uri);
 		endpoint.setFlow(flow);
 		endpoint.setOptions(options);
 
@@ -388,7 +400,7 @@ public class DBImportXMLConfiguration {
 			endpoint.setHeader(header);
 		}
 
-		return endpoint;
+        return endpoint;
 
 	}
 
@@ -402,11 +414,11 @@ public class DBImportXMLConfiguration {
 			String serviceType = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/type",doc);
 
 			log.info("Importing service: " + serviceName);
-			
+
 			try {
 				serviceIdLong = Long.parseLong(serviceId, 10);
 				Optional<org.assimbly.gateway.domain.Service> serviceOptional = serviceRepository.findByName(serviceName);
-				
+
 				if(!serviceOptional.isPresent()) {
 					service = new org.assimbly.gateway.domain.Service();
 					serviceKeys = new HashSet<ServiceKeys>();
@@ -445,7 +457,7 @@ public class DBImportXMLConfiguration {
 
 				String key = entry.getKey();
 				String value = entry.getValue();
-				
+
 				ServiceKeys serviceKey;
 
 				if (key.equals("type")) {
@@ -469,19 +481,19 @@ public class DBImportXMLConfiguration {
 			if (service != null && serviceKeys != null) {
 				service.setServiceKeys(serviceKeys);
 				service = serviceRepository.save(service);
-				
+
 				String generatedServiceId = service.getId().toString();
-				
+
 				//update service_id to generated service_id
 				if(!serviceId.equals(generatedServiceId)) {
 					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
-					
+
 					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
 						servicesIdNodes.item(i).setTextContent(generatedServiceId);
 					}
 
 				}
-				
+
 				service = null;
 				serviceKeys = null;
 			}
@@ -501,7 +513,7 @@ public class DBImportXMLConfiguration {
 			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name", doc);
 
 			log.info("Importing header: " + headerName);
-			
+
 			try {
 				headerIdLong = Long.parseLong(headerId, 10);
 				Optional<Header> headerOptional = headerRepository.findByName(headerName);
@@ -571,17 +583,17 @@ public class DBImportXMLConfiguration {
 				header = headerRepository.save(header);
 
 				String generatedHeaderId = header.getId().toString();
-				
-				//update service_id to generated service_id				
+
+				//update service_id to generated service_id
 				if(!headerId.equals(generatedHeaderId)) {
 					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[headder_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
-					
+
 					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
 						servicesIdNodes.item(i).setTextContent(generatedHeaderId);
 					}
 
 				}
-				
+
 				header = null;
 				headerKeys = null;
 			}
@@ -593,7 +605,7 @@ public class DBImportXMLConfiguration {
 	}
 
 	public void setEnvironmentVariablesFromXML(Document doc, Long connectorId, Gateway gateway) throws Exception {
-		
+
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
 		Set<EnvironmentVariables> environmentVariablesList = gateway.getEnvironmentVariables();

@@ -608,7 +608,8 @@ public class ConnectorResource {
 		try {
         	flowId = id.toString();
     		String numberOfEntries = connector.getFlowAlertsCount(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",numberOfEntries,numberOfEntries,flowId);
+
+            return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",numberOfEntries,numberOfEntries,flowId);
 		} catch (Exception e) {
    			e.printStackTrace();
 			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",e.getMessage(),"unable to get failed entries of flow log" + flowId,flowId);
