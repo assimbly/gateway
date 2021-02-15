@@ -1,20 +1,9 @@
 package org.assimbly.gateway.config.environment;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import org.assimbly.gateway.domain.Flow;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
-import org.assimbly.gateway.domain.EnvironmentVariables;
-import org.assimbly.gateway.domain.Gateway;
-import org.assimbly.gateway.domain.Header;
-import org.assimbly.gateway.domain.HeaderKeys;
-import org.assimbly.gateway.domain.ServiceKeys;
-import org.assimbly.gateway.domain.Endpoint;
-import org.assimbly.gateway.domain.WireTapEndpoint;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -22,13 +11,16 @@ import org.assimbly.gateway.repository.WireTapEndpointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -36,7 +28,9 @@ public class DBExportXMLConfiguration {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
-	public String options;
+    private final ApplicationProperties applicationProperties;
+
+    public String options;
 	public String componentType;
 	public String uri;
 
@@ -72,7 +66,11 @@ public class DBExportXMLConfiguration {
 
 	private Node environmentVariablesList;
 
-	public String getXMLConfiguration(Long gatewayId) throws Exception {
+    public DBExportXMLConfiguration(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
+
+    public String getXMLConfiguration(Long gatewayId) throws Exception {
 
 		setXMLGeneralPropertiesFromDB(gatewayId);
 
@@ -162,6 +160,10 @@ public class DBExportXMLConfiguration {
 
 		rootElement = doc.createElement("connectors");
 		doc.appendChild(rootElement);
+
+        Element version = doc.createElement("version");
+        version.setTextContent(applicationProperties.getInfo().getVersion());
+        rootElement.appendChild(version);
 
 		Element connector = doc.createElement("connector");
 		rootElement.appendChild(connector);
