@@ -390,7 +390,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         for (let endpoint of flow.endpoints) {
             if (endpoint.endpointType === EndpointType.FROM) {
                 this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
-                    console.log('1: ' + res.body);
                     this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
                 });
             }

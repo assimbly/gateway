@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.Gateway;
@@ -107,6 +108,9 @@ public class DBImportXMLConfiguration {
 		String defaultToComponentType = xPath.evaluate("//connectors/connector/defaultToComponentType", doc);
 		String defaultErrorComponentType = xPath.evaluate("//connectors/connector/defaultErrorComponentType", doc);
 
+        if (defaultFromComponentType.isEmpty()) {defaultFromComponentType = "FILE";};
+        if (defaultToComponentType.isEmpty()) {defaultToComponentType = "FILE";};
+        if (defaultErrorComponentType.isEmpty()) {defaultErrorComponentType = "FILE";};
 
 		log.info("GatewayID=" + gatewayId);
 
@@ -269,7 +273,7 @@ public class DBImportXMLConfiguration {
 			throws Exception {
 
 		if (newFlow) {
-			endpoints = new HashSet<Endpoint>();
+            endpoints = new HashSet<Endpoint>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoint)", doc));
 			numberOfEndpoints = numberOfEndpoints + 1;
@@ -280,7 +284,6 @@ public class DBImportXMLConfiguration {
 				endpoints.add(endpoint);
 			}
 		} else {
-
 			endpoints = flow.getEndpoints();
 
 			for (Endpoint endpoint : endpoints) {
@@ -293,7 +296,7 @@ public class DBImportXMLConfiguration {
 
 		}
 
-		return endpoints;
+        return endpoints;
 	}
 
 	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index)
@@ -306,25 +309,33 @@ public class DBImportXMLConfiguration {
 		String options = null;
 		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
 		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
-		String responseId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
+//<<<<<<< HEAD
+//		String responseId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
+//=======
+        String responseIdAsString = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
 
 		// get type
 		String[] uriSplitted = uri.split(":", 2);
-		String componentTypeAsString = uriSplitted[0].toUpperCase();
-		componentTypeAsString = componentTypeAsString.replace("-", "");
 
-		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
-		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+//<<<<<<< HEAD
+//		ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
+//		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+//=======
+        String componentTypeAsString = uriSplitted[0].toUpperCase();
+
+        componentTypeAsString = componentTypeAsString.replace("-", "");
+
+        ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
+        EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
 
 		// get uri
 		uri = uriSplitted[1];
 		while (uri.startsWith("/")) {
 			uri = uri.substring(1);
-
 		}
 
 		// get options
-		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint/options/*");
+		Map<String, String> optionsMap = getMap(doc, "//flows/flow[id='" + id + "']/endpoint[" + index + "]/options/*");
 
 		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
 
@@ -372,21 +383,28 @@ public class DBImportXMLConfiguration {
 			header = null;
 		}
 
-		// get responseId if configured
-        Integer responseIdInt;
-		try{
-		    responseIdInt = Integer.parseInt(responseId);
-        } catch (NumberFormatException nfe) {
-		    responseIdInt = null;
+//<<<<<<< HEAD
+//		// get responseId if configured
+//        Integer responseIdInt;
+//		try{
+//		    responseIdInt = Integer.parseInt(responseId);
+//        } catch (NumberFormatException nfe) {
+//		    responseIdInt = null;
+//=======
+		//get responseId if configured
+        Integer responseId = null;
+        if(StringUtils.isNumeric(responseIdAsString)){
+            responseId = Integer.parseInt(responseIdAsString);
         }
 
 		if (endpoint == null) {
 			endpoint = new Endpoint();
 		}
 
-		endpoint.setEndpointType(endpointType);
+        endpoint.setEndpointType(endpointType);
 		endpoint.setComponentType(componentType);
-		endpoint.setUri(uri);
+        endpoint.responseId(responseId);
+        endpoint.setUri(uri);
 		endpoint.setFlow(flow);
 		endpoint.setOptions(options);
 
@@ -396,11 +414,11 @@ public class DBImportXMLConfiguration {
 		if (header != null) {
 			endpoint.setHeader(header);
 		}
-		if(responseIdInt != null){
-		    endpoint.setResponseId(responseIdInt);
+		if(responseId != null){
+		    endpoint.setResponseId(responseId);
         }
 
-		return endpoint;
+        return endpoint;
 
 	}
 

@@ -289,7 +289,7 @@
 
                                     <div class="form-group">
                                         <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
-                                        <ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+                                        <ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
 
                                        <!-- <div class="row">
                                             <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
@@ -315,7 +315,6 @@
                                             <div class="row">
                                                 <ace-editor #editor [(text)]="responseBody" [mode]="responseEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
                                             </div>
-
                                         </div>
                                     </div>
 
