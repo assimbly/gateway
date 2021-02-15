@@ -42,7 +42,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     endpoints: IEndpoint[] = new Array<Endpoint>();
     endpoint: IEndpoint;
 
-    public endpointTypes = ['FROM', 'TO', 'ERROR'];
+    public endpointTypes = ['FROM', 'TO', 'ERROR']; //Dont include RESPONSE here!
 
     public logLevelListType = [
         LogLevelType.OFF,
@@ -123,6 +123,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     numberOfFromEndpoints: number = 0;
     numberOfToEndpoints: number = 0;
+    numberOfResponseEndpoints: number = 0;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -223,6 +224,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                             this.endpointTypes.forEach((endpointType, j) => {
                                 let filteredEndpoints = endpoints.filter(endpoint => endpoint.endpointType === endpointType);
 
+                                let filteredEndpointsWithResponse = new Array<Endpoint>();
+
+                                //add response endpoints
+                                filteredEndpoints.forEach(endpoint => {
+                                    filteredEndpointsWithResponse.push(endpoint);
+                                    if (endpoint.responseId != undefined) {
+                                        endpoints.filter(ep => {
+                                            if (ep.endpointType === 'RESPONSE' && ep.responseId === endpoint.responseId) {
+                                                this.numberOfResponseEndpoints += 1;
+                                                filteredEndpointsWithResponse.push(ep);
+                                            }
+                                        });
+                                    }
+                                });
+                                filteredEndpoints = filteredEndpointsWithResponse;
+
                                 filteredEndpoints.forEach((endpoint, i) => {
                                     if (typeof this.endpointsOptions[index] === 'undefined') {
                                         this.endpointsOptions.push([]);
@@ -234,6 +251,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         endpoint.componentType,
                                         endpoint.uri,
                                         endpoint.options,
+                                        endpoint.responseId,
                                         endpoint.flowId,
                                         endpoint.serviceId,
                                         endpoint.headerId
@@ -570,7 +588,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             componentType: endpoint.componentType,
             uri: endpoint.uri,
             service: endpoint.serviceId,
-            header: endpoint.headerId
+            header: endpoint.headerId,
+            responseId: endpoint.responseId
         });
     }
 
@@ -683,9 +702,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
         }
     }
-
     addEndpoint(endpoint, index) {
-        const newIndex = index + 1;
+        let newIndex = index + 1;
+
+        if (endpoint.responseId != undefined) {
+            newIndex += 1;
+        }
 
         this.endpoints.splice(newIndex, 0, new Endpoint());
         this.endpointsOptions.splice(newIndex, 0, [new Option()]);
@@ -708,7 +730,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         let optionArray: Array<string> = [];
         optionArray.splice(0, 0, '');
         this.selectedOptions.splice(newIndex, 0, optionArray);
-
         this.active = newIndex.toString();
     }
 
@@ -717,13 +738,63 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             this.numberOfFromEndpoints = this.numberOfFromEndpoints - 1;
         } else if (endpoint.endpointType === 'TO') {
             this.numberOfToEndpoints = this.numberOfToEndpoints - 1;
+            if (endpoint.responseId != undefined) {
+                this.removeResponseEndpoint(endpoint);
+            }
         }
 
         const i = this.endpoints.indexOf(endpoint);
         this.endpoints.splice(i, 1);
         this.endpointsOptions.splice(i, 1);
-        this.editFlowForm.removeControl(endpointDataName);
+        this.editFlowForm.removeControl(endpointDataName); //'endpointData'+index
         (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i);
+    }
+
+    addResponseEndpoint(endpoint) {
+        this.numberOfResponseEndpoints = this.numberOfResponseEndpoints + 1;
+
+        let toIndex = this.endpoints.indexOf(endpoint);
+        let responseIndex = toIndex + 1;
+
+        this.endpoints.splice(responseIndex, 0, new Endpoint());
+        this.endpointsOptions.splice(responseIndex, 0, [new Option()]);
+
+        const newEndpoint = this.endpoints.find((e, i) => i === responseIndex);
+
+        newEndpoint.endpointType = EndpointType.RESPONSE;
+        newEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
+
+        (<FormArray>this.editFlowForm.controls.endpointsData).insert(responseIndex, this.initializeEndpointData(newEndpoint));
+
+        this.setTypeLinks(newEndpoint, responseIndex);
+
+        const newIndex = responseIndex;
+
+        //dummy id's for endpoints
+        endpoint.id = toIndex;
+        newEndpoint.id = responseIndex;
+
+        endpoint.responseId = this.numberOfResponseEndpoints;
+
+        newEndpoint.responseId = endpoint.responseId;
+
+        this.active = newIndex.toString();
+    }
+
+    removeResponseEndpoint(endpoint) {
+        let responseIndex: any;
+        responseIndex = endpoint.responseId != undefined ? this.endpoints.indexOf(endpoint) + 1 : undefined;
+        // Find the index of the response endpoint belonging to the to endpoint
+
+        if (responseIndex != undefined) {
+            this.numberOfResponseEndpoints = this.numberOfResponseEndpoints - 1;
+            endpoint.responseId = undefined;
+
+            this.endpoints.splice(responseIndex, 1);
+            this.endpointsOptions.splice(responseIndex, 1);
+            this.editFlowForm.removeControl('endpointData' + responseIndex);
+            (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(responseIndex);
+        }
     }
 
     openModal(templateRef: TemplateRef<any>) {

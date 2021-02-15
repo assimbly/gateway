@@ -19,7 +19,7 @@ public class EndpointDTO implements Serializable {
     private String uri;
 
     private String options;
-    
+
     private Integer responseId;
 
     private Long flowId;
@@ -43,7 +43,7 @@ public class EndpointDTO implements Serializable {
     public void setEndpointType(EndpointType endpointType) {
         this.endpointType = endpointType;
     }
-    
+
     public ComponentType getComponentType() {
         return componentType;
     }
@@ -72,10 +72,10 @@ public class EndpointDTO implements Serializable {
         return responseId;
     }
 
-    public void setResonseId(Integer responseId) {
+    public void setResponseId(Integer responseId) {
         this.responseId = responseId;
     }
-    
+
     public Long getFlowId() {
         return flowId;
     }
