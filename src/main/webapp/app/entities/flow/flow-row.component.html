@@ -80,25 +80,22 @@
 	<!-- <span triggers="mouseenter" placement="right" popoverTitle="URI" [popover]="errorEndpointTooltip">{{errorEndpointId.type}}</span> -->
 </td>
 <td class="text-right">
-  <div class="float-left" >
-<ng-template #statusFlowButtonTemplate let-message="message">
-	<div [innerHtml]="flowStatusButton"></div>
-	</ng-template>
-	<p style="margin-top: 27px;">
-		<h4 class="float-left">
-		<ng-template #alertsFlowButtonTemplate let-message="message">
-		       <div [innerHtml]="flowAlertsButton"></div>
-		</ng-template>
-		<h5 class="float-left" style="margin-left: 10px; vertical-align: top;">
-			<span
-				class="badge badge-warning fa fa-exclamation-triangle" *ngIf="flowAlerts === 'true'"
-				(mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)'
-				triggers="mouseenter" popoverTitle="Show last alerts"
-				[ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">
-					<span *ngIf="numberOfAlerts > 1">{{numberOfAlerts}} Alerts</span>
-					<span *ngIf="numberOfAlerts == 1">1 Alert</span>
-				</span>
-		</h5>
-	</p>
-	   </div>
+    <div class="float-left" >
+        <ng-template #statusFlowButtonTemplate let-message="message">
+            <div [innerHtml]="flowStatusButton"></div>
+        </ng-template>
+        <p style="margin-top: 27px;">
+            <h4 class="float-left">
+                <ng-template #alertsFlowButtonTemplate let-message="message">
+                   <div [innerHtml]="flowAlertsButton"></div>
+                </ng-template>
+            </h4>
+            <h5 class="float-left" style="margin-left: 10px; vertical-align: top;">
+                <span class="badge badge-warning fa fa-exclamation-triangle" *ngIf="flowAlerts === 'true'" (mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)' triggers="mouseenter" popoverTitle="Show last alerts" [ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">
+                        <span *ngIf="numberOfAlerts > 1">{{numberOfAlerts}} Alerts</span>
+                        <span *ngIf="numberOfAlerts == 1">1 Alert</span>
+                </span>
+            </h5>
+        </p>
+    </div>
 </td>

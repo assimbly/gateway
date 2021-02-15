@@ -47,37 +47,36 @@ public class FailureListener extends EventNotifierSupport {
 
 		if (event instanceof ExchangeFailureHandledEvent) {
 
-	    	ExchangeFailureHandledEvent exchangeFailedEvent = (ExchangeFailureHandledEvent) event;
+            ExchangeFailureHandledEvent exchangeFailedEvent = (ExchangeFailureHandledEvent) event;
 	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
-			int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "."
+            int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "."
 
-			if (flowIdPart != -1)
+            if (flowIdPart != -1)
 			{
 				flowId= flowId.substring(0 , flowIdPart); //this will give abc
 			}
 
 	        if(this.messagingTemplate!=null) {
-	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" + flowId);
+                this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" + flowId);
 	        }else {
-	            log.warn("Can't send alert to websocket. messagingTemplate=null");
-	        }
+                log.warn("Can't send alert to websocket. messagingTemplate=null");
+            }
 
 		}else if (event instanceof ExchangeFailedEvent) {
 
-	    	ExchangeFailedEvent exchangeFailedEvent = (ExchangeFailedEvent) event;
+            ExchangeFailedEvent exchangeFailedEvent = (ExchangeFailedEvent) event;
 	        flowId = exchangeFailedEvent.getExchange().getFromRouteId();
 
-			int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "."
+            int flowIdPart = flowId.indexOf("-"); //this finds the first occurrence of "."
 
-			if (flowIdPart != -1)
+            if (flowIdPart != -1)
 			{
 				flowId= flowId.substring(0 , flowIdPart); //this will give abc
 			}
 
-	        if(this.messagingTemplate!=null) {
-                log.warn("Sending alert to " + flowId);
-	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" +  flowId);
+            if(this.messagingTemplate!=null) {
+                this.messagingTemplate.convertAndSend("/topic/" + flowId + "/alert","alert:" +  flowId);
 	        }else {
 	            log.warn("Can't send alert to websocket. messagingTemplate=null");
 	        }
