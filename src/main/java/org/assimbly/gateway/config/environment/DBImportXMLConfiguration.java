@@ -399,6 +399,9 @@ public class DBImportXMLConfiguration {
 		if (header != null) {
 			endpoint.setHeader(header);
 		}
+		if(responseId != null){
+		    endpoint.setResponseId(responseId);
+        }
 
         return endpoint;
 

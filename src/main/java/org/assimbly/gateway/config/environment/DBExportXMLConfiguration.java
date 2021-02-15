@@ -444,6 +444,13 @@ public class DBExportXMLConfiguration {
 					headerId.setTextContent(confHeaderId);
 					setXMLHeaderFromDB(confHeaderId, confEndpointType, confHeader);
 				}
+				if (confResponseId != null) {
+
+				    Element responseId = doc.createElement("response_id");
+
+				    endpoint.appendChild(responseId);
+				    responseId.setTextContent(Integer.toString(confResponseId));
+                }
 			}else if(confComponentType.equalsIgnoreCase("wastebin")) {
 
 				Element endpoint = doc.createElement("endpoint");
