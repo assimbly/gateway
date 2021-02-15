@@ -377,12 +377,12 @@ public class DBExportXMLConfiguration {
 
 			String confId = Long.toString(endpointDB.getId());
 			String confUri = endpointDB.getUri();
+            Integer confResponseId = endpointDB.getResponseId();
 			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
 			String confComponentType = endpointDB.getComponentType().getEndpoint();
 			String confOptions = endpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();
-			Integer confResponseId = endpointDB.getResponseId();
 
 			if (confUri != null) {
 
@@ -397,7 +397,13 @@ public class DBExportXMLConfiguration {
 				type.setTextContent(confEndpointType);
 				endpoint.appendChild(type);
 
-				Element uri = doc.createElement("uri");
+                if (confResponseId != null) {
+                    Element resonseId = doc.createElement("response_id");
+                    resonseId.setTextContent(Integer.toString(confResponseId));
+                    endpoint.appendChild(resonseId);
+                }
+
+                Element uri = doc.createElement("uri");
 				confUri = createUri(confUri, confComponentType, confOptions, confService);
 
 				uri.setTextContent(confUri);

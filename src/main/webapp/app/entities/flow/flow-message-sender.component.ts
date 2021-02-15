@@ -824,6 +824,26 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
     }
 
+    allowDrop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    drop(e) {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        this.readFile(file);
+    }
+
+    readFile(file: File) {
+        var reader = new FileReader();
+        reader.onload = () => {
+            //console.log(reader.result);
+            this.requestBody = reader.result.toString();
+        };
+        reader.readAsText(file);
+    }
+
     private subscribeToSaveResponse(result: Observable<Flow>) {
         result.subscribe(
             (res: Flow) => this.onSaveSuccess(res),
