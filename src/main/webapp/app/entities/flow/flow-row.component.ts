@@ -36,6 +36,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     fromEndpoint: Array<Endpoint> = [];
     toEndpoints: Array<Endpoint> = [];
     errorEndpoint: Endpoint = new Endpoint();
+    responseEndpoints: Array<Endpoint> = [];
 
     public isFlowStarted: boolean;
     public isFlowRestarted: boolean;
@@ -63,6 +64,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     fromEndpointTooltips: Array<string> = [];
     toEndpointsTooltips: Array<string> = [];
     errorEndpointTooltip: string;
+    responseEndpointTooltips: Array<string> = [];
     public statusFlow: Status;
     public previousState: string;
     public p = false;
@@ -563,6 +565,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             } else if (endpoint.endpointType.valueOf() === 'ERROR') {
                 this.errorEndpoint = endpoint;
                 this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+            } else if (endpoint.endpointType.valueOf() === 'RESPONSE') {
+                this.responseEndpoints.push(endpoint);
+                this.responseEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
             }
         });
     }

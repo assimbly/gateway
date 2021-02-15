@@ -27,7 +27,7 @@ public class DBExportProperties {
 	public String componentType;
 	public String uri;
 	public String options;
-	
+
 	@Autowired
 	private FlowRepository flowRepository;
 
@@ -49,9 +49,9 @@ public class DBExportProperties {
 
 		propertiesList = new ArrayList<>();
 		List<Flow> flows= flowRepository.findAllByGatewayId(gatewayId);
-		
+
 		for (Flow flow : flows) {
-			
+
 			if (flow != null) {
 				TreeMap<String, String> flowConfiguration = getFlowProperties(flow.getId());
 				if (flowConfiguration != null) {
@@ -113,6 +113,11 @@ public class DBExportProperties {
 		getURIfromAssimblyDB("to");
 		getServiceFromAssimblyDB("to");
 		getHeaderFromAssimblyDB("to");
+
+        // set response properties
+        getURIfromAssimblyDB("response");
+        getServiceFromAssimblyDB("response");
+        getHeaderFromAssimblyDB("response");
 
 		// set error properties
 		getURIfromAssimblyDB("error");
@@ -177,7 +182,7 @@ public class DBExportProperties {
 		for (Endpoint endpoint : endpoints) {
 			service = endpoint.getService();
 		}
-		
+
 		if (service != null) {
 			getServiceProperties(type, service);
 		}
@@ -220,6 +225,6 @@ public class DBExportProperties {
 		}
 
 		return componentType;
-	}	
+	}
 
 }
