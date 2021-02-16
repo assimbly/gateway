@@ -133,10 +133,10 @@ public class EnvironmentVariablesResource {
     }
 
     private EnvironmentVariablesDTO encryptValue(EnvironmentVariablesDTO environmentVariablesDTO) {
-        if (environmentVariablesDTO.getEncrypted()) {
+        if (environmentVariablesDTO.isEncrypted()) {
             connector.setEncryptionProperties(encryptionProperties.getProperties());
             EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
-            environmentVariablesDTO.setValue("ENC(" + encryptionUtil.encrypt(environmentVariablesDTO.getValue()) + ")");
+            environmentVariablesDTO.setValue(encryptionUtil.encrypt(environmentVariablesDTO.getValue()));
         }
         return environmentVariablesDTO;
     }

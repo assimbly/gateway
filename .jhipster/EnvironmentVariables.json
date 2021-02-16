@@ -10,7 +10,7 @@
             "fieldType": "String"
         },
         {
-            "fieldName": "encrypt",
+            "fieldName": "encrypted",
             "fieldType": "Boolean"
         }
     ],
@@ -19,7 +19,8 @@
             "relationshipName": "gateway",
             "otherEntityName": "gateway",
             "relationshipType": "many-to-one",
-            "otherEntityField": "id"
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "environmentVariables"
         }
     ],
     "changelogDate": "20180114132914",
@@ -30,5 +31,8 @@
     "jpaMetamodelFiltering": false,
     "fluentMethods": true,
     "clientRootFolder": "",
-    "applications": "*"
+    "applications": "*",
+    "searchEngine": false,
+    "databaseType": "sql",
+    "readOnly": false
 }

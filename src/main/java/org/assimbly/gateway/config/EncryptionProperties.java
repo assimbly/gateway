@@ -37,7 +37,7 @@ public class EncryptionProperties {
 
     public Properties getProperties() {
         Properties properties = new Properties();
-        properties.setProperty("algorithm", getJasypt().password);
+        properties.setProperty("algorithm", getJasypt().algorithm);
         properties.setProperty("password", getJasypt().password);
         return properties;
     }

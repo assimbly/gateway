@@ -1,18 +1,22 @@
 package org.assimbly.gateway.web.rest;
 
+import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.connector.Connector;
+import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.ServiceKeysService;
+import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.dto.ServiceKeysDTO;
-import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +32,11 @@ public class ServiceKeysResource {
     private static final String ENTITY_NAME = "serviceKeys";
 
     private final ServiceKeysService serviceKeysService;
+
+    private final Connector connector = new CamelConnector();
+
+    @Autowired
+    private EncryptionProperties encryptionProperties;
 
     public ServiceKeysResource(ServiceKeysService serviceKeysService) {
         this.serviceKeysService = serviceKeysService;
@@ -46,7 +55,7 @@ public class ServiceKeysResource {
         if (serviceKeysDTO.getId() != null) {
             throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ServiceKeysDTO result = serviceKeysService.save(serviceKeysDTO);
+        ServiceKeysDTO result = serviceKeysService.save(encryptPassword(serviceKeysDTO));
         return ResponseEntity.created(new URI("/api/service-keys/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -67,7 +76,7 @@ public class ServiceKeysResource {
         if (serviceKeysDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        ServiceKeysDTO result = serviceKeysService.save(serviceKeysDTO);
+        ServiceKeysDTO result = serviceKeysService.save(encryptPassword(serviceKeysDTO));
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
             .body(result);
@@ -109,4 +118,14 @@ public class ServiceKeysResource {
         serviceKeysService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    private ServiceKeysDTO encryptPassword(ServiceKeysDTO serviceKeysDTO) {
+        if (serviceKeysDTO.getKey().equals("password")) {
+            connector.setEncryptionProperties(encryptionProperties.getProperties());
+            EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
+            serviceKeysDTO.setValue(encryptionUtil.encrypt(serviceKeysDTO.getValue()));
+        }
+        return serviceKeysDTO;
+    }
+
 }
