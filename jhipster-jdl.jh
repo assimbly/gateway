@@ -56,7 +56,7 @@ entity HeaderKeys {
 entity EnvironmentVariables {
 	key String,
 	value String,
-	encrypt Boolean
+	encrypted Boolean
 }
 
 entity Maintenance {

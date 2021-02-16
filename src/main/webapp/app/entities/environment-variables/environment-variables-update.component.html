@@ -21,29 +21,33 @@
                         <!-- <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>-->
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="encrypted">Encrypt value?</label>
+                    <select class="form-control" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
+                            formControlName="encrypted" [value]="environmentVariables.encrypted">
+                        <option [ngValue]=false [selected]="!environmentVariables.encrypted">no</option>
+                        <option [ngValue]=true [selected]="environmentVariables.encrypted">yes</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label class="form-control-label" for="value">Value</label>
+                    <input [(ngModel)]="environmentVariables.value" name="value"
+                           *ngIf="environmentVariablesForm.controls.encrypted.value == true"
+                           type="password" class="form-control" id="value" (click)="environmentVariables.value = ''"
+                           formControlName="value"/>
                     <input [(ngModel)]="environmentVariables.value"
+                           *ngIf="environmentVariablesForm.controls.encrypted.value == false "
                            type="text" class="form-control" id="value"
                            formControlName="value"/>
                     <div
                         *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)"
                         class="invalid-field-message">
-                        <span *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
+                            <span
+                                *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="encrypt">Encrypt</label>
-                    <select class="form-control" id="encrypt"
-                            formControlName="encrypt">
-                        <option [ngValue]="false">no</option>
-                        <option [ngValue]="true">yes</option>
-                    </select>
-                    <ng-template #oneGateway><input type="text"
-                                                    class="form-control" id="encryptField" readonly
-                                                    formControlName="encrypt"/></ng-template>
-                </div>
+
 
                 <div class="form-group">
                     <label class="form-control-label" for="gateway">Gateway</label>
@@ -58,17 +62,20 @@
                                                     formControlName="gatewayId"/></ng-template>
                 </div>
             </div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="navigateToEnvironmentVariables()">
-		            <span class="fa fa-ban"></span>&nbsp;
-		            <span>Cancel</span>
-		        </button>
-				<button type="button" (click)="save()" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-		            <span class="fa fa-save"></span>&nbsp;
-		            <span>Save</span>
-		        </button>
-			</div>
-		</form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        (click)="navigateToEnvironmentVariables()">
+                    <span class="fa fa-ban"></span>&nbsp;
+                    <span>Cancel</span>
+                </button>
+                <button type="button" (click)="save()"
+                        [disabled]="editForm.form.invalid || isSaving || !(editForm.form.touched)"
+                        class="btn btn-primary">
+                    <span class="fa fa-save"></span>&nbsp;
+                    <span>Save</span>
+                </button>
+            </div>
+        </form>
 	</div>
 </div>
 

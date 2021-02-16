@@ -42,7 +42,7 @@ public class EnvironmentVariablesDTO implements Serializable {
         this.value = value;
     }
 
-    public Boolean getEncrypted() {
+    public Boolean isEncrypted() {
         return encrypted;
     }
 
