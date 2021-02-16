@@ -65,13 +65,18 @@
 		                                </td>
 		                            </ng-template>
 		                            <td *ngIf="serviceKey.valueType !== 'list'; else isList">
-		                                <input type="{{serviceKey.valueType}}" class="form-control" [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" placeholder="{{serviceKey.placeholder}}"
-		                                    id="serviceKey-value-{{idx}}" required maxlength="255" value="serviceKey.value" #value="ngModel"
-		                                    [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"/>
-		                                <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
-		                                    <span *ngIf="value.errors.required">Value is required.</span>
-		                                </div>
-		                            </td>
+                                        <input type="{{serviceKey.valueType}}" class="form-control"
+                                               [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}"
+                                               placeholder="{{serviceKey.placeholder}}"
+                                               id="serviceKey-value-{{idx}}" required maxlength="255"
+                                               value="serviceKey.value" #value="ngModel"
+                                               [attr.autocomplete]="serviceKey.valueType === 'password' ? 'new-password' : 'nope'"
+                                               (click)="serviceKey.value = (serviceKey.valueType === 'password') ? undefined :serviceKey.value"/>
+                                        <div *ngIf="value.invalid && (value.dirty || value.touched)"
+                                             class="invalid-field-message">
+                                            <span *ngIf="value.errors.required">Value is required.</span>
+                                        </div>
+                                    </td>
 	                               <ng-template #isList>
 		                                <td>
 		                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
