@@ -1,14 +1,18 @@
 package org.assimbly.gateway.web.rest;
 
+import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.connector.Connector;
+import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.EnvironmentVariablesService;
+import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
-
-import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -17,9 +21,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.List;
 import java.util.Optional;
+
+;
+
 
 /**
  * REST controller for managing EnvironmentVariables.
@@ -28,11 +34,17 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class EnvironmentVariablesResource {
 
+
     private final Logger log = LoggerFactory.getLogger(EnvironmentVariablesResource.class);
 
     private static final String ENTITY_NAME = "environmentVariables";
 
     private final EnvironmentVariablesService environmentVariablesService;
+
+    private final Connector connector = new CamelConnector();
+
+    @Autowired
+    private EncryptionProperties encryptionProperties;
 
     public EnvironmentVariablesResource(EnvironmentVariablesService environmentVariablesService) {
         this.environmentVariablesService = environmentVariablesService;
@@ -51,7 +63,8 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() != null) {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
+
+        EnvironmentVariablesDTO result = environmentVariablesService.save(encryptValue(environmentVariablesDTO));
         return ResponseEntity.created(new URI("/api/environment-variables/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -72,7 +85,7 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
+        EnvironmentVariablesDTO result = environmentVariablesService.save(encryptValue(environmentVariablesDTO));
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, environmentVariablesDTO.getId().toString()))
             .body(result);
@@ -88,11 +101,11 @@ public class EnvironmentVariablesResource {
         log.debug("REST request to get all EnvironmentVariables");
         Page<EnvironmentVariablesDTO> page = environmentVariablesService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/environment-variables");
-        return ResponseEntity.ok().headers(headers).body(page.getContent());        
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
 
     }
-   
-    
+
+
     /**
      * GET  /environment-variables/:id : get the "id" environmentVariables.
      *
@@ -117,5 +130,14 @@ public class EnvironmentVariablesResource {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
         environmentVariablesService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    private EnvironmentVariablesDTO encryptValue(EnvironmentVariablesDTO environmentVariablesDTO) {
+        if (environmentVariablesDTO.isEncrypted()) {
+            connector.setEncryptionProperties(encryptionProperties.getProperties());
+            EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
+            environmentVariablesDTO.setValue(encryptionUtil.encrypt(environmentVariablesDTO.getValue()));
+        }
+        return environmentVariablesDTO;
     }
 }
