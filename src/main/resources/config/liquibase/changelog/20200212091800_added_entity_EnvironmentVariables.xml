@@ -19,7 +19,10 @@
             <column name="jhi_key" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="value" type="varchar(255)">
+            <column name="value" type="clob">
+                <constraints nullable="true" />
+            </column>
+            <column name="encrypted" type="boolean">
                 <constraints nullable="true" />
             </column>
             <column name="gateway_id" type="bigint">
@@ -49,6 +52,7 @@
                   tableName="environment_variables">
             <column name="id" type="numeric"/>
             <column name="jhi_key" type="string"/>
+            <column name="encrypted" type="boolean"/>
             <column name="value" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>

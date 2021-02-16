@@ -42,7 +42,7 @@
                     </td>
                     <td>
                         <input type="text" class="form-control" [(ngModel)]="headerKey.value" name="headerKeys-value-{{idx}}" id="headerKeys-value-{{idx}}"
-                            required maxlength="255" value="headerKey.value" [disabled]="headerKey.isDisabled" #value="ngModel" />
+                            required maxlength="1000" value="headerKey.value" [disabled]="headerKey.isDisabled" #value="ngModel" />
                         <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
                             <span *ngIf="value.errors.required">Value is required.</span>
                         </div>
