@@ -70,7 +70,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             id: new FormControl(this.environmentVariables.id),
             key: new FormControl(this.environmentVariables.key, Validators.required),
             value: new FormControl(this.environmentVariables.value, Validators.required),
-            encrypt: new FormControl(this.environmentVariables.encrypt, Validators.required),
+            encrypted: new FormControl(this.environmentVariables.encrypted, Validators.required),
             gatewayId: new FormControl(this.environmentVariables.gatewayId)
         });
     }
