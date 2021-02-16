@@ -116,7 +116,7 @@ public class FlowDTO implements Serializable {
         this.logLevel = logLevel;
     }
 
-    
+
     public Integer getInstances() {
         return instances;
     }
@@ -132,7 +132,7 @@ public class FlowDTO implements Serializable {
     public void setVersion(Integer version) {
         this.version = version;
     }
-    
+
     public Instant getCreated() {
         return created;
     }
@@ -140,15 +140,15 @@ public class FlowDTO implements Serializable {
     public void setCreated(Instant created) {
         this.created = created;
     }
-    
+
     public Instant getLastModified() {
         return lastModified;
     }
 
     public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
-    }       
-    
+    }
+
     public Long getGatewayId() {
         return gatewayId;
     }
@@ -160,11 +160,11 @@ public class FlowDTO implements Serializable {
     public Set<Endpoint> getEndpoints() {
         return endpoints;
     }
- 
+
     public void setEndpoints(Set<Endpoint> endpoints) {
         this.endpoints = endpoints;
-    }   
-    
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -200,6 +200,7 @@ public class FlowDTO implements Serializable {
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
+            ", endpoints=" + getEndpoints() +
             "}";
     }
 }
