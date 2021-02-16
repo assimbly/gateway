@@ -963,7 +963,6 @@ public class ConnectorResource {
                     connector.setBaseDirectory(applicationBaseDirectory);
                 }
 
-                //connector.setEncryptionProperties(encryptionProperties);
                 connectorIsStarting = true;
                 connector.setEncryptionProperties(encryptionProperties.getProperties());
                 connector.addEventNotifier(failureListener);
