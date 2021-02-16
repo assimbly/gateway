@@ -39,7 +39,7 @@ entity Service {
 
 entity ServiceKeys {
 	key String,
-	value String,
+	value TextBlob,
 	type String
 }
 
@@ -49,13 +49,13 @@ entity Header {
 
 entity HeaderKeys {
 	key String,
-	value String,
+	value TextBlob,
 	type String
 }
 
 entity EnvironmentVariables {
 	key String,
-	value String,
+	value TextBlob,
 	encrypted Boolean
 }
 

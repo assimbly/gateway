@@ -34,10 +34,15 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     ngOnInit() {
         this.initializeForm();
+
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ environmentVariables }) => {
             this.environmentVariables = environmentVariables;
         });
+
+        if(!this.environmentVariables.encrypted){
+			this.environmentVariables.encrypted = false;
+		}		
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.environmentVariables.id = null;
@@ -70,7 +75,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             id: new FormControl(this.environmentVariables.id),
             key: new FormControl(this.environmentVariables.key, Validators.required),
             value: new FormControl(this.environmentVariables.value, Validators.required),
-            encrypted: new FormControl(this.environmentVariables.encrypted, Validators.required),
+            encrypted: new FormControl(this.environmentVariables.encrypted),
             gatewayId: new FormControl(this.environmentVariables.gatewayId)
         });
     }
@@ -100,7 +105,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     private getAllEnvironmentVariablesKeys() {
         this.environmentVariablesService.query().subscribe(res => {
-            this.allEnvironmentVariablesKeys = res.body.map(res => res.key);
+            this.allEnvironmentVariablesKeys = res.body.map(res2 => res2.key);
             this.environmentVariablesForm.controls.key.setValidators([
                 Validators.required,
                 forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)
