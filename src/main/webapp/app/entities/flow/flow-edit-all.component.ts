@@ -405,12 +405,27 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
 
         if (typeof e !== 'undefined') {
-            console.log('1b');
+            //set componenttype to selected component and clear other fields
             endpoint.componentType = e;
-            endpointForm.controls.service.setValue(endpoint.serviceId);
-        } else if (!endpoint.componentType) {
-            console.log('1c');
+            endpoint.uri = '';
+            endpoint.headerId = '';
+            endpoint.serviceId = '';
 
+            let i;
+            let numberOfOptions = this.endpointsOptions[endpointFormIndex].length - 1;
+            for (i = numberOfOptions; i > 0; i--) {
+                this.endpointsOptions[endpointFormIndex][i] = null;
+                this.removeOption(this.endpointsOptions[endpointFormIndex], this.endpointsOptions[endpointFormIndex][i], endpointFormIndex);
+            }
+
+            endpointForm.controls.uri.patchValue(endpoint.uri);
+            (<FormArray>endpointForm.controls.options).controls[0].patchValue({
+                key: null,
+                value: null
+            });
+            endpointForm.controls.service.patchValue(endpoint.serviceId);
+            endpointForm.controls.header.patchValue(endpoint.headerId);
+        } else if (!endpoint.componentType) {
             endpoint.componentType = ComponentType.FILE;
         }
 
@@ -668,10 +683,12 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     removeOption(options: Array<Option>, option: Option, endpointIndex) {
         const index = options.indexOf(option);
         let formOptions = this.selectOptions(endpointIndex);
+
         formOptions.removeAt(index);
         options.splice(index, 1);
     }
 
+    /*
     validateOptions(option: FormGroup) {
         if (option.value.key || option.value.value) {
             option.controls.key.setValidators([Validators.required]);
@@ -682,7 +699,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
         option.controls.key.updateValueAndValidity();
         option.controls.value.updateValueAndValidity();
-    }
+    }*/
 
     selectOptions(endpointIndex): FormArray {
         const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointIndex];
@@ -1147,6 +1164,18 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
+    }
+
+    private decycle(obj, stack = []) {
+        if (!obj || typeof obj !== 'object') return obj;
+
+        if (stack.includes(obj)) return null;
+
+        let s = stack.concat([obj]);
+
+        return Array.isArray(obj)
+            ? obj.map(x => this.decycle(x, s))
+            : Object.entries(Object.entries(obj).map(([k, v]) => [k, this.decycle(v, s)]));
     }
 }
 
