@@ -29,11 +29,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -50,7 +53,7 @@ public class SecurityResource {
 	@Autowired
 	private ConnectorResource connectorResource;
 
-    
+
     private final SecurityService securityService;
 
     public SecurityResource(SecurityService securityService) {
@@ -62,53 +65,53 @@ public class SecurityResource {
      *
      * @param securityDTO the securityDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new securityDTO, or with status 400 (Bad Request) if the security has already an ID
-     * @throws Exception 
+     * @throws Exception
      */
     @PostMapping("/securities")
     public ResponseEntity<SecurityDTO[]> createSecurity(@RequestBody SecurityDTO securityDTO) throws Exception {
         log.debug("REST request to save Security : {}", securityDTO);
-        
+
         if (securityDTO.getId() != null) {
             throw new BadRequestAlertException("A new security cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        
+
         try {
 	        Connector connector = connectorResource.getConnector();
 	        String url = securityDTO.getUrl();
 	        Certificate[] certificates = connector.getCertificates(url);
 	        Map<String,Certificate> certificateMap = connector.importCertificatesInTruststore(certificates);
-	        
+
 	        SecurityDTO[] result = new SecurityDTO[certificates.length];
 	        int index = 0;
-	        
+
 	        for (Map.Entry<String, Certificate> entry : certificateMap.entrySet()) {
 	            String key = entry.getKey();
 	            Certificate certificate = entry.getValue();
 	            X509Certificate real = (X509Certificate) certificate;
-	
+
 	            String certificateName = key;
 	            Instant certificateExpiry = real.getNotAfter().toInstant();
-	            
+
 	            String certificateFile = convertX509CertificateToPem(real);
-	            
+
 	            securityDTO.setCertificateFile(certificateFile);
 	            securityDTO.setCertificateName(certificateName);
 	            securityDTO.setCertificateExpiry(certificateExpiry);
 	            SecurityDTO saved = securityService.save(securityDTO);
 	            result[index] = saved;
-	            
+
 	            index++;
 	        }
-	        
+
 	        return ResponseEntity.ok()
 	                .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, "Added " + url + " to TLS whitelist"))
 	                .body(result);
-	        
+
         } catch (Exception e) {
             log.debug("Add url to Whitelist failed: ", e.getMessage());
-            throw new BadRequestAlertException("Adding url to whitelist failed. (See error log) ", ENTITY_NAME, e.getMessage());              
+            throw new BadRequestAlertException("Adding url to whitelist failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
-        
+
     }
 
     /**
@@ -154,30 +157,30 @@ public class SecurityResource {
      */
     @GetMapping("/securities/{id}")
     public ResponseEntity<SecurityDTO> getSecurity(@PathVariable Long id){
-        log.debug("REST request to get Security : {}", id);        
+        log.debug("REST request to get Security : {}", id);
         Optional<SecurityDTO> securityDTO = securityService.findOne(id);
         return ResponseEntity.ok().body(securityDTO.get());
     }
-    
+
     @GetMapping("/securities/details/{certificateName}")
     public ResponseEntity<String> getSecurityDetails(@PathVariable String certificateName) throws Exception{
 
-        log.debug("REST request to get certificate details for certificate: " + certificateName);        
+        log.debug("REST request to get certificate details for certificate: " + certificateName);
 
         if (certificateName == null) {
             throw new BadRequestAlertException("Certificatename cannot be found", ENTITY_NAME, "unknown certificatename");
         }
-       
+
         Optional<Security> security = securityService.findByCertificateName(certificateName);
         String certificateFile = security.get().getCertificateFile();
-        X509Certificate real = convertPemToX509Certificate(certificateFile); 
-        
+        X509Certificate real = convertPemToX509Certificate(certificateFile);
+
         String certificateString = "Type=" + real.getType() + ";Signing Algorithm=" + real.getSigAlgName() + ";IssuerDN Principal=" + real.getIssuerX500Principal() + ";SubjectDN Principal=" + real.getSubjectX500Principal();
-        
+
         return ResponseEntity.ok().body(certificateString);
 
-    }   
-    
+    }
+
     /**
      * DELETE  /securities/:id : delete the "id" security.
      *
@@ -190,22 +193,22 @@ public class SecurityResource {
         Connector connector = connectorResource.getConnector();
         Optional<SecurityDTO> securityDTO = securityService.findOne(id);
         String certificateName = securityDTO.get().getCertificateName();
-        
+
         if (certificateName == null) {
             throw new BadRequestAlertException("Certificatename cannot be found", ENTITY_NAME, "unknown certificatename");
         }
-        
+
         try {
 	        connector.deleteCertificatesInTruststore(certificateName);
 	        securityService.delete(id);
 	        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
         }catch (Exception e) {
             log.debug("Remove url to Whitelist failed: ", e.getMessage());
-            throw new BadRequestAlertException("Remove url to whitelist failed. (See error log) ", ENTITY_NAME, e.getMessage());              
+            throw new BadRequestAlertException("Remove url to whitelist failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
     }
 
-    
+
     /**
      * Remote  /securities/:id : delete the "url" security.
      *
@@ -217,17 +220,17 @@ public class SecurityResource {
         log.debug("REST request to remove certificates in truststore for url ", url);
         Connector connector = connectorResource.getConnector();
         List<Security> certificates = securityService.findAllByUrl(url);
-        	
+
         for (Security certificate : certificates) {
         	String certificateName = certificate.getCertificateName();
         	connector.deleteCertificatesInTruststore(certificateName);
         	securityService.delete(certificate.getId());
         }
-        
+
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, "delete")).build();
     }
 
-    
+
     /**
      * Remote  /securities/:id : delete the "url" security.
      *
@@ -239,7 +242,7 @@ public class SecurityResource {
         log.debug("REST request to sync all certificates with truststore");
         Connector connector = connectorResource.getConnector();
         List<Security> certificates = securityService.findAll();
-        	
+
         if(certificates.size()==0) {
             return ResponseEntity.ok().body("no certificates found");
         }
@@ -248,9 +251,9 @@ public class SecurityResource {
         	String certificateName = certificate.getCertificateName();
         	String certificateFile = certificate.getCertificateFile();
         	X509Certificate real = convertPemToX509Certificate(certificateFile);
-        	connector.importCertificateInTruststore(certificateName,real);        	
+        	connector.importCertificateInTruststore(certificateName,real);
         }
-        
+
         return ResponseEntity.ok().body("truststore synced");
     }
 
@@ -265,13 +268,13 @@ public class SecurityResource {
         log.debug("REST request to updates certificates in truststore for url ", url);
         Connector connector = connectorResource.getConnector();
         List<Security> certificates = securityService.findAllByUrl(url);
-        	
+
         if(certificates.size()==0) {
             return ResponseEntity.ok().body("no certificates found");
         }
 
         Instant dateNow = Instant.now();
-        
+
         for (Security certificate : certificates) {
         	String certificateName = certificate.getCertificateName();
         	String certificateFile = certificate.getCertificateFile();
@@ -282,19 +285,19 @@ public class SecurityResource {
         	}else {
         		log.info("Certificate '" + certificateName + "' for url " + url + " is valid (Expiry Date: " + certificateExpiry + ")");
         	}
-        	
+
         	X509Certificate real = convertPemToX509Certificate(certificateFile);
-        	connector.importCertificateInTruststore(certificateName,real);        	
+        	connector.importCertificateInTruststore(certificateName,real);
         }
-        
+
         return ResponseEntity.ok().body("truststore updated");
     }
-    
+
     @GetMapping("/securities/isexpired/{withinNumberOfDays}")
     public ResponseEntity<Boolean> isExpired(@PathVariable int withinNumberOfDays) throws Exception{
 
         log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
-        
+
         Boolean isExpired;
         Instant dateNow = Instant.now();
         Instant dateOfExpiry = Instant.now().plusSeconds(withinNumberOfDays * 86400);
@@ -306,31 +309,37 @@ public class SecurityResource {
         }else {
         	isExpired = false;
         }
-                
+
         return ResponseEntity.ok().body(isExpired);
 
-    }   
+    }
 
     @PostMapping(path = "/securities/uploadcertificate", consumes = {"text/plain"}, produces = {"text/plain","application/xml", "application/json"})
-    public ResponseEntity<String> uploadCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestBody String certificate) throws Exception {
-        
+    public ResponseEntity<String> uploadCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestBody String certificate) throws Exception {
+
        	try {
 
             SecurityDTO securityDTO = new SecurityDTO();
-       		
+
        		//get connector
         	Connector connector = connectorResource.getConnector();
 
-    	    //create certificate from String
-    	    CertificateFactory cf = CertificateFactory.getInstance("X.509");
-    	    InputStream certificateStream = new ByteArrayInputStream(certificate.getBytes());
-    	    Certificate cert = cf.generateCertificate(certificateStream);
+            Certificate cert;
+            if(fileType.equalsIgnoreCase("pem")){
+                cert = convertPemToX509Certificate(certificate);
+            }else{
+                //create certificate from String
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                InputStream certificateStream = new ByteArrayInputStream(certificate.getBytes());
+                cert = cf.generateCertificate(certificateStream);
+            }
+
             Certificate[] certificates = new X509Certificate[1];
-            certificates[0] = cert;		
+            certificates[0] = cert;
 
             //import certificate into truststore
             Map<String,Certificate> certificateMap = connector.importCertificatesInTruststore(certificates);
-           
+
             //save new entry to database
             for (Map.Entry<String, Certificate> entry : certificateMap.entrySet()) {
                 String key = entry.getKey();
@@ -339,13 +348,13 @@ public class SecurityResource {
 
                 String certificateKey = key;
                 Instant certificateExpiry = real.getNotAfter().toInstant();
-                
+
                 //Gets certificate Name
                 String realCertificateName = real.getSubjectDN().getName();
                 realCertificateName = realCertificateName.substring(realCertificateName.indexOf("CN=") + 3);
                 realCertificateName = realCertificateName.substring(0, realCertificateName.indexOf(","));
 	            String certificateFile = convertX509CertificateToPem(real);
-                
+
                 securityDTO.setUrl("Generic (" + realCertificateName + ")");
                 securityDTO.setCertificateFile(certificateFile);
                 securityDTO.setCertificateName(certificateKey);
@@ -355,65 +364,66 @@ public class SecurityResource {
             }
 
             log.debug("Uploaded certificate: " + cert);
-    	    
+
    			return ResponseUtil.createSuccessResponse(1L, mediaType,"/securities/uploadcertificate","Certification File uploaded");
    		} catch (Exception e) {
             log.debug("Uploaded certificate failed: ", e.getMessage());
    			return ResponseUtil.createFailureResponse(1L, mediaType,"/securities/uploadcertificate",e.getMessage());
    		}
-    	
-    } 
 
-    
+    }
+
+
     protected static String convertX509CertificateToPem(X509Certificate certificate) throws CertificateEncodingException {
-    	
+
     	 org.apache.commons.codec.binary.Base64 encoder = new org.apache.commons.codec.binary.Base64(64);
     	 byte[] derCertificate = certificate.getEncoded();
     	 String pemCertificate = new String(encoder.encode(derCertificate));
-    	 
+
     	 return "-----BEGIN CERTIFICATE-----\n" + pemCertificate + "-----END CERTIFICATE-----";
-    	 
+
     }
-    
 
     public static X509Certificate convertPemToX509Certificate(String pemCertificate) throws CertificateException {
 
         org.apache.commons.codec.binary.Base64 decoder = new org.apache.commons.codec.binary.Base64(64);
         CertificateFactory cf = CertificateFactory.getInstance("X509");
     	X509Certificate certificate = null;
-        
+
         try {
             if (pemCertificate != null && !pemCertificate.trim().isEmpty()) {
-            	pemCertificate = pemCertificate
-                		.replace("-----BEGIN CERTIFICATE-----\n", "")
-                        .replace("-----END CERTIFICATE-----", ""); // NEED FOR PEM FORMAT CERT STRING
-                
+
+                Pattern parse = Pattern.compile("(?m)(?s)^---*BEGIN.*---*$(.*)^---*END.*---*$.*");
+                pemCertificate = parse.matcher(pemCertificate).replaceFirst("$1");
+
                 byte[] derCertificate = decoder.decode(pemCertificate);
+
                 certificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(derCertificate));
+
             }
         } catch (CertificateException e) {
             throw new CertificateException(e);
         }
         return certificate;
     }
-    
+
     @PostConstruct
     private void init() throws Exception {
 
     	log.debug("REST request to sync all certificates with truststore");
         Connector connector = connectorResource.getConnector();
         List<Security> certificates = securityService.findAll();
-        	
+
         if(certificates.size()>0) {
         	for (Security certificate : certificates) {
             	String certificateName = certificate.getCertificateName();
             	String certificateFile = certificate.getCertificateFile();
             	X509Certificate real = convertPemToX509Certificate(certificateFile);
-            	connector.importCertificateInTruststore(certificateName,real);        	
+            	connector.importCertificateInTruststore(certificateName,real);
             }
         }
-        
+
     }
 
-    
+
 }
