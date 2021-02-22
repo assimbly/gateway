@@ -873,7 +873,7 @@ public class ConnectorResource {
 
 
     /**
-     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     * POST  /connector/{connectorId}/resolvedependencybyscheme/{scheme} : Resolve the Mave dependency by URI scheme (for example SFTP or FILE).
      *
      * @param connectorId (gatewayId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
@@ -893,7 +893,7 @@ public class ConnectorResource {
 
 
     /**
-     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     * POST  /connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}
      *
      * @param connectorId (gatewayId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
