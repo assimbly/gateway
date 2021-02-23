@@ -122,7 +122,7 @@ public class GatewayApp {
                 "External URL: \t\t{}://{}:{}{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
                 "Java WorkingDir: \t{}\n\t" +
-                "Apache Camel version: \t3.7.0 \n\t" +
+                "Apache Camel version: \t3.7.1 \n\t" +
                 "Profile(s): \t\t{}\n----------------------------------------------------------",
             applicationName,
             applicationVersion,
