@@ -199,7 +199,7 @@
             <div class="d-flex">
                 <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
                     <ng-container *ngFor="let endpoint of endpoints; index as index">
-                        <li ngbNavItem="{{index}}" novalidate>
+                        <li ngbNavItem="{{index}}" [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px' }" novalidate>
                             <a ngbNavLink>{{endpoint.endpointType}}</a>
                             <ng-template ngbNavContent>
 
@@ -255,6 +255,7 @@
                                             <ng-select  *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
                                             <ng-select  *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
                                             <ng-select  *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                            <ng-select  *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
                                             <span style="display:inline-block; width: 14px;"></span>
                                             <a>:</a>
                                             <ng-select [items]="URIList" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
@@ -273,7 +274,7 @@
                                         <label class="form-control-label" for="field_options">Options</label>
                                         <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
                                         <div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
-                                            <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="true" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOption, index,idx)" [(ngModel)]="selectedOption" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx])">
+                                                <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="true" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx)" [(ngModel)]="selectedOptions[index][idx]">
                                                 <ng-template ng-option-tmp let-item="item">
                                                     <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
                                                     <ng-template #optionTooltip>
@@ -284,10 +285,10 @@
                                                 </ng-template>
                                             </ng-select>
                                             <a> </a>
-                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value" (focusout)="validateOptions(editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx])" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
                                             <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
                                             <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><span class="fa fa-remove"></span></button>
-                                            <div class="col-5 d-inline-block px-0">
+                                            <!--<div class="col-5 d-inline-block px-0">
                                                 <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.touched)">
                                                     <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
                                                 </div>
@@ -296,7 +297,7 @@
                                                 <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.touched)">
                                                     <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                         </div>
                                     </div>
                                     <br/>
@@ -341,9 +342,19 @@
                                             <span class="fa fa-remove"></span>&nbsp;
                                             <span>Remove</span>
                                         </button>
-                                        <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)">
+                                        <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)" [ngbTooltip]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2) ? 'Only 3 FROM type endpoints allowed' : ''" placement="right">
                                             <span class="fa fa-pencil"></span>&nbsp;
                                             <span>Add</span>
+                                        </button>
+                                    </div>
+                                    <div class="text-right form-group" role="group">
+                                        <button type="button" class="btn btn-primary" *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)" [disabled]="numberOfResponseEndpoints>0" (click)="addResponseEndpoint(endpoint)">
+                                            <span class="fa fa-pencil"></span>
+                                            <span [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'" placement="right">Add Response Endpoint</span>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))" (click)="removeResponseEndpoint(endpoint)">
+                                            <span class="fa fa-remove"></span>
+                                            <span>Remove Response Endpoint</span>
                                         </button>
                                     </div>
                                 </div>

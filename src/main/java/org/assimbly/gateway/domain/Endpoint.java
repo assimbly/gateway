@@ -42,7 +42,7 @@ public class Endpoint implements Serializable {
 
     @Column(name = "responseId")
     private Integer responseId;
-    
+
     @ManyToOne
     @JsonIgnoreProperties("endpoints")
     private Flow flow;

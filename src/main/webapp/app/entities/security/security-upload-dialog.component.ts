@@ -16,6 +16,7 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     securities: Array<ISecurity> = [];
     certificateFile: any;
     fileName = 'Choose file';
+    fileType: string;
     uploadError = false;
     uploadErrorMessage: String;
 
@@ -39,10 +40,11 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
         };
         reader.readAsBinaryString(event.target.files[0]);
         this.fileName = event.target.files[0].name;
+        this.fileType = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
     }
 
     uploadCertificate() {
-        this.securityService.uploadCertificate(this.certificateFile).subscribe(
+        this.securityService.uploadCertificate(this.certificateFile, this.fileType).subscribe(
             data => {
                 this.uploadError = false;
                 this.activeModal.dismiss(true);

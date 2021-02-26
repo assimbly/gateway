@@ -73,7 +73,7 @@ public class EndpointResource {
     @PostMapping("/endpoints")
     public ResponseEntity<List<EndpointDTO>> createEndpoints(@RequestBody List<EndpointDTO> endpointsDTO) throws URISyntaxException {
         log.debug("REST request to save List<Endpoint> : {}", endpointsDTO);
-        
+
         List<Endpoint> endpoints = endpointMapper.toEntity(endpointsDTO);
         endpoints = endpointRepository.saveAll(endpoints);
         List<EndpointDTO> results = endpointMapper.toDto(endpoints);
@@ -114,10 +114,11 @@ public class EndpointResource {
     @PutMapping("/endpoints")
     public ResponseEntity<List<EndpointDTO>> updateEndpoints(@RequestBody List<EndpointDTO> endpointsDTO) throws URISyntaxException {
         log.debug("REST request to update Endpoints : {}", endpointsDTO);
+
         List<Endpoint> endpoints = endpointMapper.toEntity(endpointsDTO);
         endpoints = endpointRepository.saveAll(endpoints);
         List<EndpointDTO> results = endpointMapper.toDto(endpoints);
-        
+
         return ResponseEntity.ok().body(results);
     }
 
@@ -143,8 +144,8 @@ public class EndpointResource {
         log.debug("REST request to get Endpoints by flowId " + id);
         List<Endpoint> endpoints = endpointRepository.findByFlowId(id);
         return endpointMapper.toDto(endpoints);
-    }  
-    
+    }
+
     /**
      * GET  /endpoint/:id : get the "id" endpoint.
      *
@@ -170,7 +171,7 @@ public class EndpointResource {
         endpointService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-    
+
     /**
      * DELETE  /endpoints : delete list of endpoints.
      *
@@ -181,15 +182,15 @@ public class EndpointResource {
     public ResponseEntity<Void> deleteEndpoints(@RequestBody List<EndpointDTO> endpointsDTO) throws URISyntaxException {
         log.debug("REST request to delete List<Endpoint> : {}", endpointsDTO);
         List<Endpoint> endpoints = endpointMapper.toEntity(endpointsDTO);
-        
+
         ArrayList<String> arrayOfIds = new ArrayList<String>();
         for (Endpoint endpoint : endpoints) {
         	arrayOfIds.add(endpoint.getId().toString());
-        }    
-	
+        }
+
         endpointRepository.deleteInBatch(endpoints);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, arrayOfIds.toString())).build();
     }
-    
-    
+
+
 }

@@ -1,11 +1,11 @@
 package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
-
 import org.assimbly.connector.Connector;
 import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.ApplicationProperties.Gateway;
+import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.event.FailureListener;
@@ -13,7 +13,6 @@ import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
-import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.w3c.dom.Element;
-
-import java.net.URISyntaxException;
-import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Resource to return information about the currently running Spring profiles.
@@ -42,20 +42,23 @@ public class ConnectorResource {
 
     private final ApplicationProperties applicationProperties;
 
-	private Connector connector = new CamelConnector();
+    private Connector connector = new CamelConnector();
 
-	private String flowId;
+    private String flowId;
     private String endpointId;
 
-	private boolean plainResponse;
+    private boolean plainResponse;
 
-	private String gatewayConfiguration;
-	private String flowConfiguration;
+    private String gatewayConfiguration;
+    private String flowConfiguration;
 
-	private String status;
-	private String type;
+    private String status;
+    private String type;
 
-	private boolean connectorIsStarting = false;
+    private boolean connectorIsStarting = false;
+
+    @Autowired
+    EncryptionProperties encryptionProperties;
 
     @Autowired
     FailureListener failureListener;
@@ -71,7 +74,6 @@ public class ConnectorResource {
 
     @Autowired
     ServiceRepository serviceRepository;
-
 
     @Autowired
     DBConfiguration assimblyDBConfiguration;
@@ -95,14 +97,13 @@ public class ConnectorResource {
      */
     @PostMapping(path = "/connector/{connectorId}/setconfiguration", consumes =  {"text/plain","application/xml","application/json"}, produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> setConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@RequestBody String configuration) throws Exception {
-
-       	try {
-       		connector.setConfiguration(connectorId.toString(), mediaType, configuration);
-   			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setconfiguration","Connector configuration set");
-   		} catch (Exception e) {
-   			e.printStackTrace();
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/setconfiguration",e.getMessage());
-   		}
+        try {
+            connector.setConfiguration(connectorId.toString(), mediaType, configuration);
+            return ResponseUtil.createSuccessResponse(connectorId, mediaType, "/connector/{connectorId}/setconfiguration", "Connector configuration set");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(connectorId, mediaType, "/connector/{connectorId}/setconfiguration", e.getMessage());
+        }
 
     }
 
@@ -116,18 +117,18 @@ public class ConnectorResource {
     @GetMapping(path = "/connector/{connectorId}/getconfiguration", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
 
-    	plainResponse = true;
+        plainResponse = true;
 
-    	try {
-			gatewayConfiguration = connector.getConfiguration(connectorId.toString(),mediaType);
-			if(gatewayConfiguration.startsWith("Error")||gatewayConfiguration.startsWith("Warning")) {
-				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",gatewayConfiguration);
-			}
-			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",gatewayConfiguration,plainResponse);
-   		} catch (Exception e) {
-   			e.printStackTrace();
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",e.getMessage());
-   		}
+        try {
+            gatewayConfiguration = connector.getConfiguration(connectorId.toString(), mediaType);
+            if (gatewayConfiguration.startsWith("Error") || gatewayConfiguration.startsWith("Warning")) {
+                return ResponseUtil.createFailureResponse(connectorId, mediaType, "/connector/{connectorId}/getconfiguration", gatewayConfiguration);
+            }
+            return ResponseUtil.createSuccessResponse(connectorId, mediaType, "/connector/{connectorId}/getconfiguration", gatewayConfiguration, plainResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(connectorId, mediaType, "/connector/{connectorId}/getconfiguration", e.getMessage());
+        }
 
     }
 
@@ -144,7 +145,7 @@ public class ConnectorResource {
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId,@PathVariable Long id,@RequestBody String configuration) throws Exception {
 
        	try {
-       		connector.setFlowConfiguration(id.toString(), mediaType, configuration);
+            connector.setFlowConfiguration(id.toString(), mediaType, configuration);
        		return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/setflowconfiguration/{id}","Flow configuration set");
    		} catch (Exception e) {
    			e.printStackTrace();
@@ -166,7 +167,7 @@ public class ConnectorResource {
     	plainResponse = true;
 
     	try {
-			flowConfiguration = connector.getFlowConfiguration(id.toString(),mediaType);
+            flowConfiguration = connector.getFlowConfiguration(id.toString(), mediaType);
 			if(flowConfiguration.startsWith("Error")||flowConfiguration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/getconfiguration",flowConfiguration);
 			}
@@ -191,19 +192,19 @@ public class ConnectorResource {
     public ResponseEntity<String> start(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId) throws Exception {
        	try {
 
-       		if(connector.isStarted()) {
-       			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector already running");
-       		}else {
-				connector.addEventNotifier(failureListener);
-				connector.setTracing(false);
-       			connector.start();
-       			return ResponseUtil.createSuccessResponse(connectorId, mediaType,"/connector/{connectorId}/start","Connector started");
-       		}
+            if (connector.isStarted()) {
+                return ResponseUtil.createFailureResponse(connectorId, mediaType, "/connector/{connectorId}/start", "Connector already running");
+            } else {
+                connector.addEventNotifier(failureListener);
+                connector.setTracing(false);
+                connector.start();
+                return ResponseUtil.createSuccessResponse(connectorId, mediaType, "/connector/{connectorId}/start", "Connector started");
+            }
 
-   		} catch (Exception e) {
-   			e.printStackTrace();
-   			return ResponseUtil.createFailureResponse(connectorId, mediaType,"/connector/{connectorId}/start",e.getMessage());
-   		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(connectorId, mediaType, "/connector/{connectorId}/start", e.getMessage());
+        }
     }
 
     /**
@@ -377,22 +378,22 @@ public class ConnectorResource {
     @GetMapping(path = "/connector/{connectorId}/flow/start/{id}", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> startflow(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long connectorId, @PathVariable Long id) throws Exception {
 
-		try {
-        	init();
-        	flowId = id.toString();
-    		status = connector.startFlow(flowId);
-    		if(status.equals("started")) {
-    	    	if(this.messagingTemplate!=null) {
-    	        	this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event","event:started");
-    	        }
-    			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/start/{id}","started flow " + flowId,"started flow " + flowId,flowId);
-    		}else {
-    			throw new Exception(status);
-    		}
-		} catch (Exception e) {
-   			e.printStackTrace();
-			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/start/{id}",e.getMessage(),"unable to start flow " + flowId,flowId);
-		}
+        try {
+            init();
+            flowId = id.toString();
+            status = connector.startFlow(flowId);
+            if (status.equals("started")) {
+                if (this.messagingTemplate != null) {
+                    this.messagingTemplate.convertAndSend("/topic/" + flowId + "/event", "event:started");
+                }
+                return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType, "/connector/{connectorId}/flow/start/{id}", "started flow " + flowId, "started flow " + flowId, flowId);
+            } else {
+                throw new Exception(status);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType, "/connector/{connectorId}/flow/start/{id}", e.getMessage(), "unable to start flow " + flowId, flowId);
+        }
 
     }
 
@@ -607,7 +608,8 @@ public class ConnectorResource {
 		try {
         	flowId = id.toString();
     		String numberOfEntries = connector.getFlowAlertsCount(flowId);
-			return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",numberOfEntries,numberOfEntries,flowId);
+
+            return ResponseUtil.createSuccessResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",numberOfEntries,numberOfEntries,flowId);
 		} catch (Exception e) {
    			e.printStackTrace();
 			return ResponseUtil.createFailureResponseWithHeaders(connectorId, mediaType,"/connector/{connectorId}/flow/failedlogentries/{id}",e.getMessage(),"unable to get failed entries of flow log" + flowId,flowId);
@@ -871,7 +873,7 @@ public class ConnectorResource {
 
 
     /**
-     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     * POST  /connector/{connectorId}/resolvedependencybyscheme/{scheme} : Resolve the Mave dependency by URI scheme (for example SFTP or FILE).
      *
      * @param connectorId (gatewayId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
@@ -891,7 +893,7 @@ public class ConnectorResource {
 
 
     /**
-     * POST  /connector/{connectorId}/setcertificates : Sets TLS certificates.
+     * POST  /connector/{connectorId}/resolvedependency/{groupId}/{artifactId}/{version}
      *
      * @param connectorId (gatewayId)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
@@ -957,30 +959,30 @@ public class ConnectorResource {
                 boolean applicationTracing = gateway.getTracing();
                 boolean applicationDebugging = gateway.getDebugging();
 
-	            if(!applicationBaseDirectory.equals("default")) {
-	            	connector.setBaseDirectory(applicationBaseDirectory);
-	            }
-
-        		connectorIsStarting = true;
-				connector.addEventNotifier(failureListener);
-				connector.setTracing(applicationTracing);
-				connector.setDebugging(applicationDebugging);
-
-        		connector.start();
-
-				int count = 1;
-
-                while (!connector.isStarted() && count < 300)
-                {
-		        	Thread.sleep(100);
-		        	count++;
+                if (!applicationBaseDirectory.equals("default")) {
+                    connector.setBaseDirectory(applicationBaseDirectory);
                 }
 
-        		connectorIsStarting = false;
+                connectorIsStarting = true;
+                connector.setEncryptionProperties(encryptionProperties.getProperties());
+                connector.addEventNotifier(failureListener);
+                connector.setTracing(applicationTracing);
+                connector.setDebugging(applicationDebugging);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+                connector.start();
+
+                int count = 1;
+
+                while (!connector.isStarted() && count < 300) {
+                    Thread.sleep(100);
+                    count++;
+                }
+
+                connectorIsStarting = false;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 	}
 

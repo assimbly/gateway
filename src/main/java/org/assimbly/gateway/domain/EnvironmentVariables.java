@@ -5,7 +5,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -28,6 +27,9 @@ public class EnvironmentVariables implements Serializable {
 
     @Column(name = "value")
     private String value;
+
+    @Column(name = "encrypted")
+    private Boolean encrypted;
 
     @ManyToOne
     @JsonIgnoreProperties("environmentVariables")
@@ -66,6 +68,14 @@ public class EnvironmentVariables implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(Boolean encrypted) {
+        this.encrypted = encrypted;
     }
 
     public Gateway getGateway() {
@@ -108,6 +118,7 @@ public class EnvironmentVariables implements Serializable {
             "id=" + getId() +
             ", key='" + getKey() + "'" +
             ", value='" + getValue() + "'" +
+            ", encrypt='" + isEncrypted() + "'" +
             "}";
     }
 }

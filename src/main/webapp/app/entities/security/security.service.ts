@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import * as moment from 'moment';
 import { DATE_FORMAT } from 'app/shared/constants/input.constants';
@@ -65,8 +65,15 @@ export class SecurityService {
         return this.http.post(`${this.resourceUrl}/updateTrustore`, url, { observe: 'response', responseType: 'text' });
     }
 
-    uploadCertificate(certificate): Observable<HttpResponse<any>> {
-        return this.http.post(`${this.resourceUrl}/uploadcertificate`, certificate, { observe: 'response', responseType: 'text' });
+    uploadCertificate(certificate, fileType): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            fileType: fileType
+        });
+        return this.http.post(`${this.resourceUrl}/uploadcertificate`, certificate, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
     }
 
     protected convertDateFromClient(security: ISecurity): ISecurity {
