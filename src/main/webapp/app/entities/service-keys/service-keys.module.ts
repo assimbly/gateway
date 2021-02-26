@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { Services } from 'app/shared/camel/service-connections';
 import { GatewaySharedModule } from 'app/shared';
 import {
     ServiceKeysComponent,

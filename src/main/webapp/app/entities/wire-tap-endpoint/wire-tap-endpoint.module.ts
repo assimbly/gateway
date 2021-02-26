@@ -1,5 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { Services } from 'app/shared/camel/service-connections';
 
 import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from '../../shared';
@@ -40,12 +41,7 @@ const ENTITY_STATES = [...wireTapEndpointRoute, ...wireTapEndpointPopupRoute];
         WireTapEndpointDeleteDialogComponent,
         WireTapEndpointDeletePopupComponent
     ],
-    providers: [
-        Components,
-        WireTapEndpointUpdateComponent,
-        WireTapEndpointDeleteDialogComponent,
-        WireTapEndpointDeletePopupComponent
-    ],
+    providers: [Components, WireTapEndpointUpdateComponent, WireTapEndpointDeleteDialogComponent, WireTapEndpointDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GatewayWireTapEndpointModule {}

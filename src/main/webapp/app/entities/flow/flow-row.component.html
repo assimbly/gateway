@@ -52,6 +52,12 @@
 							<span>{{toEndpoint.componentType}}</span>
 						</button>
 				  </div>
+                <div class="btn-group" role="group" style="margin-left: 1em;" *ngFor="let responseEndpoint of responseEndpoints; let i = index">
+                        <button  [ngClass]="{'btn-outline-primary': statusFlow === 'inactive', 'btn-outline-success':statusFlow === 'active', 'btn-outline-secondary':statusFlow === 'paused', 'btn-outline-danger':statusFlow === 'inactiveError' }"
+                             type="button" style="min-width: 15em;" class="btn btn-sm btn-block" data-container="body" placement="right" triggers="mouseenter:mouseleave" popoverTitle="Response Endpoint" [popover]="responseEndpointTooltips[i]" (click)="navigateToEndpoint(responseEndpoint)">
+                            <span>{{responseEndpoint.componentType}}</span>
+                        </button>
+                </div>
 			  </div>
 			  <div class="col">
 				<i  class="fa fa-info" aria-hidden="true" data-container="body"
@@ -80,25 +86,22 @@
 	<!-- <span triggers="mouseenter" placement="right" popoverTitle="URI" [popover]="errorEndpointTooltip">{{errorEndpointId.type}}</span> -->
 </td>
 <td class="text-right">
-  <div class="float-left" >
-<ng-template #statusFlowButtonTemplate let-message="message">
-	<div [innerHtml]="flowStatusButton"></div>
-	</ng-template>
-	<p style="margin-top: 27px;">
-		<h4 class="float-left">
-		<ng-template #alertsFlowButtonTemplate let-message="message">
-		       <div [innerHtml]="flowAlertsButton"></div>
-		</ng-template>
-		<h5 class="float-left" style="margin-left: 10px; vertical-align: top;">
-			<span
-				class="badge badge-warning fa fa-exclamation-triangle" *ngIf="flowAlerts === 'true'"
-				(mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)'
-				triggers="mouseenter" popoverTitle="Show last alerts"
-				[ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">
-					<span *ngIf="numberOfAlerts > 1">{{numberOfAlerts}} Alerts</span>
-					<span *ngIf="numberOfAlerts == 1">1 Alert</span>
-				</span>
-		</h5>
-	</p>
-	   </div>
+    <div class="float-left" >
+        <ng-template #statusFlowButtonTemplate let-message="message">
+            <div [innerHtml]="flowStatusButton"></div>
+        </ng-template>
+        <p style="margin-top: 27px;">
+            <h4 class="float-left">
+                <ng-template #alertsFlowButtonTemplate let-message="message">
+                   <div [innerHtml]="flowAlertsButton"></div>
+                </ng-template>
+            </h4>
+            <h5 class="float-left" style="margin-left: 10px; vertical-align: top;">
+                <span class="badge badge-warning fa fa-exclamation-triangle" *ngIf="flowAlerts === 'true'" (mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)' triggers="mouseenter" popoverTitle="Show last alerts" [ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">
+                        <span *ngIf="numberOfAlerts > 1">{{numberOfAlerts}} Alerts</span>
+                        <span *ngIf="numberOfAlerts == 1">1 Alert</span>
+                </span>
+            </h5>
+        </p>
+    </div>
 </td>

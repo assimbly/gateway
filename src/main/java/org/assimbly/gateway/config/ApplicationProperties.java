@@ -10,15 +10,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
-	
-	public final Info info = new Info();
+
+    public final Info info = new Info();
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
+    //   public final Encryption encryption = new Encryption();
+
 
     public Info getInfo() {
         return info;
     }
-    
+
     public Documentation getDocumentation() {
         return documentation;
     }
@@ -26,12 +28,13 @@ public class ApplicationProperties {
     public Gateway getGateway() {
         return gateway;
     }
-    
+
+
     public static class Info {
 
-    	private String version;
+        private String version;
 
-    	
+
         public String getVersion() {
             return version;
         }
@@ -39,14 +42,14 @@ public class ApplicationProperties {
         public void setVersion(String version) {
             this.version = version;
         }
-        
+
     }
 
     public static class Documentation {
 
     	private String url;
     	private String camelUrl;
-    	
+
         public String getUrl() {
             return url;
         }
@@ -62,7 +65,7 @@ public class ApplicationProperties {
         public void setCamelUrl(String camelUrl) {
             this.camelUrl = camelUrl;
         }
-        
+
     }
 
     public static class Gateway {
@@ -71,7 +74,7 @@ public class ApplicationProperties {
     	private String baseDirectory;
     	private boolean tracing;
     	private boolean debugging;
-    	
+
         public String getName() {
             return name;
         }
@@ -89,22 +92,22 @@ public class ApplicationProperties {
         }
 
         public boolean getTracing() {
-	        return tracing;
-	    }
-	
-	    public void setName(boolean tracing) {
-	        this.tracing = tracing;
-	    }
+            return tracing;
+        }
+
+        public void setName(boolean tracing) {
+            this.tracing = tracing;
+        }
 
 
         public boolean getDebugging() {
-	        return debugging;
-	    }
-	
-	    public void setDebugging(boolean debugging) {
-	        this.debugging = debugging;
-	    }
-	    
+            return debugging;
+        }
+
+        public void setDebugging(boolean debugging) {
+            this.debugging = debugging;
+        }
+
     }
-    
+
 }

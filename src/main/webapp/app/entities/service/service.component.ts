@@ -8,6 +8,7 @@ import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core';
 import { ServiceService } from './service.service';
 import { ServiceKeysComponent, ServiceKeysService } from '../../entities/service-keys';
+import { Services } from '../../shared/camel/service-connections';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -27,11 +28,11 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     isSaving: boolean;
     disabledServiceType = true;
     selectedService: Service = new Service();
-    typeServices: string[] = ['JDBC Connection', 'SonicMQ Connection', 'ActiveMQ Connection', 'AmazonMQ Connection', 'MQ Connection'];
 
     constructor(
         protected serviceService: ServiceService,
         protected jhiAlertService: JhiAlertService,
+        public servicesLists: Services,
         protected eventManager: JhiEventManager,
         protected accountService: AccountService
     ) {}

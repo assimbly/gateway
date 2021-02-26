@@ -19,7 +19,7 @@
             <column name="jhi_key" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="value" type="varchar(255)">
+            <column name="value" type="clob">
                 <constraints nullable="true" />
             </column>
             <column name="type" type="varchar(255)">

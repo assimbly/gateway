@@ -13,6 +13,7 @@ import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
 import { RequiredServiceKey } from '../service-keys';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
+import { Services } from '../../shared/camel/service-connections';
 
 @Component({
     selector: 'jhi-service-dialog',
@@ -24,24 +25,11 @@ export class ServiceDialogComponent implements OnInit {
     public servicesNames: Array<string> = [];
     public isSaving: boolean;
     public serviceKeysKeys: Array<string> = [];
-    public driversList: Array<String> = [
-        'com.mysql.jdbc.Driver',
-        'oracle.jdbc.driver.OracleDriver',
-        'org.postgresql.Driver',
-        'com.microsoft.sqlserver.jdbc.SQLServerDriver'
-    ];
+    public driversList: Array<String> = this.services.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
 
     public disableType: boolean;
     public serviceType: string;
-    public typeServices: string[] = [
-        'ActiveMQ Connection',
-        'AmazonMQ Connection',
-        'AMQP Connection',
-        'JDBC Connection',
-        'MQ Connection',
-        'SonicMQ Connection'
-    ];
     private requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     private serviceKeysRemoveList: Array<ServiceKeys> = [];
@@ -50,6 +38,7 @@ export class ServiceDialogComponent implements OnInit {
         public activeModal: NgbActiveModal,
         protected serviceService: ServiceService,
         protected serviceKeysService: ServiceKeysService,
+        public services: Services,
         protected eventManager: JhiEventManager,
         protected jhiAlertService: JhiAlertService,
         protected activatedRoute: ActivatedRoute,
@@ -66,8 +55,8 @@ export class ServiceDialogComponent implements OnInit {
             res => this.onError(res.body)
         );
         if (this.activatedRoute.fragment['value'] !== 'clone' || this.serviceType === null) {
-            this.service.type = this.typeServices.find(st => st === this.serviceType);
-            this.disableType = this.typeServices.some(st => st === this.serviceType);
+            this.service.type = this.services.connectionsList.find(st => st === this.serviceType);
+            this.disableType = this.services.connectionsList.some(st => st === this.serviceType);
         }
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
@@ -229,92 +218,7 @@ export class ServiceDialogComponent implements OnInit {
     }
 
     private addRequiredServiceKeys() {
-        this.requiredServiceKey.push(
-            {
-                name: 'JDBC Connection',
-                serviceKeys: [
-                    {
-                        serviceKeyName: 'url',
-                        valueType: 'text',
-                        placeholder: 'Example jdbc:mysql://localhost/dbname',
-                        isRequired: true
-                    },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: '', isRequired: true },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true },
-                    { serviceKeyName: 'driver', valueType: 'list', placeholder: '', isRequired: true }
-                ]
-            },
-            {
-                name: 'SonicMQ Connection',
-                serviceKeys: [
-                    {
-                        serviceKeyName: 'url',
-                        valueType: 'text',
-                        placeholder: 'Example tcp://localhost:2506',
-                        isRequired: true
-                    },
-                    {
-                        serviceKeyName: 'username',
-                        valueType: 'text',
-                        placeholder: 'Example Administrator',
-                        isRequired: true
-                    },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true }
-                ]
-            },
-            {
-                name: 'ActiveMQ Connection',
-                serviceKeys: [
-                    {
-                        serviceKeyName: 'url',
-                        valueType: 'text',
-                        placeholder: 'Example tcp://localhost:61616',
-                        isRequired: true
-                    }
-                    /*,
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '',isRequired: false }*/
-                ]
-            },
-            {
-                name: 'AmazonMQ Connection',
-                serviceKeys: [
-                    {
-                        serviceKeyName: 'url',
-                        valueType: 'text',
-                        placeholder: 'Example ssl://servername:61617',
-                        isRequired: true
-                    },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: true },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: true }
-                ]
-            },
-            {
-                name: 'MQ Connection',
-                serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'tcp://localhost:61616', isRequired: true },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false },
-                    { serviceKeyName: 'jmsprovider', valueType: 'list', placeholder: '', isRequired: true }
-                ]
-            },
-            {
-                name: 'AMQP Connection',
-                serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
-                ]
-            },
-            {
-                name: 'AMQPS Connection',
-                serviceKeys: [
-                    { serviceKeyName: 'url', valueType: 'text', placeholder: 'amqp://localhost:5672', isRequired: true },
-                    { serviceKeyName: 'username', valueType: 'text', placeholder: 'user', isRequired: false },
-                    { serviceKeyName: 'password', valueType: 'password', placeholder: '', isRequired: false }
-                ]
-            }
-        );
+        this.requiredServiceKey = this.services.keysList;
     }
 }
 
