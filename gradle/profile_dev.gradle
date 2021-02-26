@@ -27,7 +27,11 @@ springBoot {
 }
 
 bootRun {
-    args = []
+    if (project.hasProperty('args')) {
+        args project.args.split(',')
+    }else{
+        args = []
+    }
 }
 
 task webpack(type: YarnTask) {
