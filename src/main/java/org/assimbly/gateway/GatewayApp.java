@@ -3,6 +3,7 @@ package org.assimbly.gateway;
 import io.github.jhipster.config.JHipsterConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.slf4j.Logger;
@@ -65,13 +66,15 @@ public class GatewayApp {
      */
     public static void main(String[] args) {
 
-        SpringApplication app = new SpringApplication(GatewayApp.class);
+        boolean startApplication = CommandsUtil.parseParameters(args);
 
-        DefaultProfileUtil.addDefaultProfile(app);
+        if(startApplication){
+            SpringApplication app = new SpringApplication(GatewayApp.class);
+            DefaultProfileUtil.addDefaultProfile(app);
+            Environment env = app.run(args).getEnvironment();
+            logApplicationStartup(env);
+        }
 
-        Environment env = app.run(args).getEnvironment();
-
-        logApplicationStartup(env);
     }
 
     private static void logApplicationStartup(Environment env) {
