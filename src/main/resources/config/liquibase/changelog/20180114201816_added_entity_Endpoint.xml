@@ -19,10 +19,10 @@
             <column name="component_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="uri" type="varchar(255)">
+            <column name="uri" type="clob">
                 <constraints nullable="true" />
             </column>
-            <column name="options" type="varchar(255)">
+            <column name="options" type="clob">
                 <constraints nullable="true" />
             </column>
             <column name="endpoint_type" type="varchar(255)">

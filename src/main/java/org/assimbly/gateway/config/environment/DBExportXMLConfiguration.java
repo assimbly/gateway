@@ -604,7 +604,13 @@ public class DBExportXMLConfiguration {
 				environmentValueNode.appendChild(doc.createTextNode(environmentValue));
 				environmentVariableNode.appendChild(environmentValueNode);
 
-			}
+                // set environmentVariableValue
+                Boolean environmentEncrypted = environmentVariable.isEncrypted();
+                Element environmentEncryptedNode = doc.createElement("encrypted");
+                environmentEncryptedNode.appendChild(doc.createTextNode(environmentEncrypted.toString()));
+                environmentVariableNode.appendChild(environmentEncryptedNode);
+
+            }
 		}
 
 	}
