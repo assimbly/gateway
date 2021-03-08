@@ -305,6 +305,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 });
             } else if (!this.finished) {
                 setTimeout(() => {
+                    //create new flow object
                     this.flow = new Flow();
                     this.flow.autoStart = false;
                     this.flow.offLoading = false;
@@ -321,15 +322,23 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     }
                     this.initializeForm(this.flow);
 
+                    //create new from endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.FROM;
-
                     this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultFromComponentType];
 
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[0] = [new Option()];
 
+                    //set documentation links
                     this.setTypeLinks(this.endpoint, 0);
+
+                    let componentType = this.endpoint.componentType.toString().toLowerCase();
+                    let camelComponentType = this.components.getCamelComponentType(componentType);
+
+                    //get list of options (from Camel Catalog
+                    this.setComponentOptions(this.endpoint, camelComponentType);
+
                     this.numberOfFromEndpoints = 1;
 
                     let optionArrayFrom: Array<string> = [];
@@ -338,6 +347,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     this.endpoints.push(this.endpoint);
 
+                    //create new to endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.TO;
                     this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
@@ -345,6 +355,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.endpointsOptions[1] = [new Option()];
 
                     this.setTypeLinks(this.endpoint, 1);
+                    componentType = this.endpoint.componentType.toString().toLowerCase();
+                    camelComponentType = this.components.getCamelComponentType(componentType);
+
+                    this.setComponentOptions(this.endpoint, camelComponentType);
+
                     this.numberOfToEndpoints = 1;
 
                     let optionArrayTo: Array<string> = [];
@@ -353,12 +368,17 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     this.endpoints.push(this.endpoint);
 
+                    //create new error endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.ERROR;
                     this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultErrorComponentType];
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[2] = [new Option()];
                     this.setTypeLinks(this.endpoint, 2);
+
+                    componentType = this.endpoint.componentType.toString().toLowerCase();
+                    camelComponentType = this.components.getCamelComponentType(componentType);
+                    this.setComponentOptions(this.endpoint, camelComponentType);
 
                     let optionArrayError: Array<string> = [];
                     optionArrayError.splice(0, 0, '');
@@ -753,19 +773,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.selectedOptions[endpointIndex].splice(optionIndex, 1);
     }
 
-    /*
-    validateOptions(option: FormGroup) {
-        if (option.value.key || option.value.value) {
-            option.controls.key.setValidators([Validators.required]);
-            option.controls.value.setValidators([Validators.required]);
-        } else {
-            option.controls.key.clearValidators();
-            option.controls.value.clearValidators();
-        }
-        option.controls.key.updateValueAndValidity();
-        option.controls.value.updateValueAndValidity();
-    }*/
-
     selectOptions(endpointIndex): FormArray {
         const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointIndex];
         return <FormArray>(<FormGroup>endpointData).controls.options;
@@ -778,25 +785,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (componentOption[0]) {
             defaultValue = componentOption[0].defaultValue;
         } else {
-            console.log('add to custom options');
             const customOption = new Option();
             customOption.key = selectedOption;
 
             let componentType = endpoint.componentType.toString().toLowerCase();
             let camelComponentType = this.components.getCamelComponentType(componentType);
 
-            console.log('add to custom options cameltype=' + camelComponentType);
-
             let optionArray: Array<string> = [];
             optionArray.splice(optionIndex, 0, customOption.key);
 
             console.log('add to custom options cameltype X=' + JSON.stringify(this.selectedOptions[index]));
-
-            //this.selectedOptions[index].splice(optionIndex, 0,optionArray);
-
-            //selectedOptions[index][optionIndex] =
-
-            //console.log('add to custom options cameltype y=' + JSON.stringify(this.selectedOptions[index]));
 
             this.componentOptions[index].push({
                 name: selectedOption,
