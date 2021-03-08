@@ -1968,7 +1968,7 @@ export const typesLinks = [
     {
         name: 'IBMMQ',
         assimblyTypeLink: `/component-ibmmq`,
-        camelTypeLink: `/sjms-component.html`,
+        camelTypeLink: `/jms-component.html`,
         uriPlaceholder: 'destinationType:destinationName',
         uriPopoverMessage: `
         <b>Name</b>: destinationType<br/>
@@ -5074,7 +5074,7 @@ export class Components {
         } else if (componentType === 'amazonmq') {
             camelComponentType = 'jms';
         } else if (componentType === 'ibmmq') {
-            camelComponentType = 'sjms';
+            camelComponentType = 'jms';
         } else if (componentType === 'sonicmq') {
             camelComponentType = 'sjms';
         } else if (componentType === 'wastebin') {

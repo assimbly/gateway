@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription, from } from 'rxjs';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -37,7 +37,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     headers: IHeader[];
 
     endpointsOptions: Array<Array<Option>> = [[]];
-    URIList: IEndpoint[] = new Array<Endpoint>();
+    URIList: Array<Array<Endpoint>> = [[]];
     allendpoints: IEndpoint[] = new Array<Endpoint>();
     endpoints: IEndpoint[] = new Array<Endpoint>();
     endpoint: IEndpoint;
@@ -96,6 +96,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     selectedOptions: Array<Array<any>> = [[]];
     selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
+    customOptions: Array<any> = [];
 
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
     componentTypeCamelLinks: Array<string> = new Array<string>();
@@ -129,6 +130,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     private eventSubscriber: Subscription;
     private wikiDocUrl: string;
     private camelDocUrl: string;
+
+    loading = false;
 
     modalRef: NgbModalRef | null;
 
@@ -318,10 +321,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     }
                     this.initializeForm(this.flow);
 
-                    //initialize options
-                    let optionArray: Array<string> = [];
-                    optionArray.splice(0, 0, '');
-
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.FROM;
 
@@ -329,10 +328,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[0] = [new Option()];
-                    this.selectedOptions.splice(0, 0, optionArray);
 
                     this.setTypeLinks(this.endpoint, 0);
                     this.numberOfFromEndpoints = 1;
+
+                    let optionArrayFrom: Array<string> = [];
+                    optionArrayFrom.splice(0, 0, '');
+                    this.selectedOptions.splice(0, 0, optionArrayFrom);
 
                     this.endpoints.push(this.endpoint);
 
@@ -341,10 +343,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[1] = [new Option()];
-                    this.selectedOptions.splice(1, 0, optionArray);
 
                     this.setTypeLinks(this.endpoint, 1);
                     this.numberOfToEndpoints = 1;
+
+                    let optionArrayTo: Array<string> = [];
+                    optionArrayTo.splice(0, 0, '');
+                    this.selectedOptions.splice(1, 0, optionArrayTo);
 
                     this.endpoints.push(this.endpoint);
 
@@ -353,8 +358,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultErrorComponentType];
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[2] = [new Option()];
-                    this.selectedOptions.splice(2, 0, optionArray);
                     this.setTypeLinks(this.endpoint, 2);
+
+                    let optionArrayError: Array<string> = [];
+                    optionArrayError.splice(0, 0, '');
+                    this.selectedOptions.splice(2, 0, optionArrayError);
 
                     this.endpoints.push(this.endpoint);
 
@@ -451,23 +459,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.uriPopoverMessages[endpointFormIndex] = type.uriPopoverMessage;
 
         // set options keys
-        this.getComponentOptions(camelComponentType).subscribe(data => {
-            let componentOptions = data.properties;
-
-            this.componentOptions[this.endpoints.indexOf(endpoint)] = Object.keys(componentOptions).map(key => ({
-                ...componentOptions[key],
-                ...{ name: key }
-            }));
-            this.componentOptions[this.endpoints.indexOf(endpoint)].sort(function(a, b) {
-                return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+        if (typeof e !== 'undefined') {
+            this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
+                //add custom options if available
+                this.customOptions.forEach(customOption => {
+                    if (customOption.componentType === camelComponentType) {
+                        this.componentOptions[endpointFormIndex].push(customOption);
+                    }
+                });
             });
-        });
+        }
 
         endpointForm.patchValue({ componentType: componentType.toUpperCase() });
 
         this.enableFields(endpointForm);
 
-        this.setURIlist();
+        this.setURIlist(endpointFormIndex);
     }
 
     setPopoverMessages() {
@@ -491,14 +498,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
     }
 
-    setURIlist() {
-        this.URIList = [];
+    setURIlist(index) {
+        this.URIList[index] = [];
 
         let tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
             if (this.selectedComponentType === endpoint.componentType) {
-                this.URIList.push(endpoint);
+                this.URIList[index].push(endpoint);
             }
         });
     }
@@ -608,6 +615,28 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         });
     }
 
+    setComponentOptions(endpoint: Endpoint, componentType: string): Observable<any> {
+        return from(
+            new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    this.getComponentOptions(componentType).subscribe(data => {
+                        let componentOptions = data.properties;
+
+                        this.componentOptions[this.endpoints.indexOf(endpoint)] = Object.keys(componentOptions).map(key => ({
+                            ...componentOptions[key],
+                            ...{ name: key }
+                        }));
+                        this.componentOptions[this.endpoints.indexOf(endpoint)].sort(function(a, b) {
+                            return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+                        });
+
+                        resolve();
+                    });
+                }, 10);
+            })
+        );
+    }
+
     getComponentOptions(componentType: String): any {
         return this.flowService.getComponentOptions(1, componentType).pipe(
             map(options => {
@@ -616,40 +645,69 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         );
     }
 
-    getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>, index: number) {
+    getOptions(endpoint: Endpoint, endpointForm: any, endpointOptions: Array<Option>, index: number) {
+        let optionArray: Array<string> = [];
+
         if (!endpoint.options) {
             endpoint.options = '';
         }
 
-        const options = endpoint.options.split('&');
-        let optionArray: Array<string> = [];
+        let componentType = endpoint.componentType.toString().toLowerCase();
+        let camelComponentType = this.components.getCamelComponentType(componentType);
 
-        options.forEach((option, optionIndex) => {
-            const o = new Option();
+        this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
+            const options = endpoint.options.split('&');
 
-            if (typeof endpointForm.controls.options.controls[optionIndex] === 'undefined') {
-                endpointForm.controls.options.push(this.initializeOption());
-            }
+            options.forEach((option, optionIndex) => {
+                const o = new Option();
 
-            if (option.includes('=')) {
-                o.key = option.split('=')[0];
-                o.value = option
-                    .split('=')
-                    .slice(1)
-                    .join('=');
-            } else {
-                o.key = null;
-                o.value = null;
-            }
+                if (typeof endpointForm.controls.options.controls[optionIndex] === 'undefined') {
+                    endpointForm.controls.options.push(this.initializeOption());
+                }
 
-            optionArray.splice(optionIndex, 0, o.key);
+                if (option.includes('=')) {
+                    o.key = option.split('=')[0];
+                    o.value = option
+                        .split('=')
+                        .slice(1)
+                        .join('=');
+                } else {
+                    o.key = null;
+                    o.value = null;
+                }
 
-            endpointForm.controls.options.controls[optionIndex].patchValue({
-                key: o.key,
-                value: o.value
+                optionArray.splice(optionIndex, 0, o.key);
+
+                endpointForm.controls.options.controls[optionIndex].patchValue({
+                    key: o.key,
+                    value: o.value
+                });
+
+                if (this.componentOptions[index]) {
+                    const optionNameExist = this.componentOptions[index].some(el => el.name === o.key);
+
+                    if (!optionNameExist && o.key) {
+                        this.componentOptions[index].push({
+                            name: o.key,
+                            displayName: o.key,
+                            description: 'Custom option',
+                            group: 'custom',
+                            type: 'string',
+                            componentType: camelComponentType
+                        });
+                        this.customOptions.push({
+                            name: o.key,
+                            displayName: o.key,
+                            description: 'Custom option',
+                            group: 'custom',
+                            type: 'string',
+                            componentType: camelComponentType
+                        });
+                    }
+                }
+
+                endpointOptions.push(o);
             });
-
-            endpointOptions.push(o);
         });
 
         this.selectedOptions.splice(index, 0, optionArray);
@@ -668,6 +726,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         endpointOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
+
             if (option.key && option.value) {
                 endpoint.options += index > 0 ? `&${option.key}=${option.value}` : `${option.key}=${option.value}`;
                 index++;
@@ -677,15 +736,21 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     addOption(options: Array<Option>, endpointIndex) {
         this.selectOptions(endpointIndex).push(this.initializeOption());
+
         options.push(new Option());
     }
 
     removeOption(options: Array<Option>, option: Option, endpointIndex) {
-        const index = options.indexOf(option);
-        let formOptions = this.selectOptions(endpointIndex);
+        const optionIndex = options.indexOf(option);
+        let formOptions: FormArray = this.selectOptions(endpointIndex);
 
-        formOptions.removeAt(index);
-        options.splice(index, 1);
+        //remove from form
+        formOptions.removeAt(optionIndex);
+        formOptions.updateValueAndValidity();
+
+        //remove from arrays
+        options.splice(optionIndex, 1);
+        this.selectedOptions[endpointIndex].splice(optionIndex, 1);
     }
 
     /*
@@ -706,9 +771,51 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         return <FormArray>(<FormGroup>endpointData).controls.options;
     }
 
-    changeOptionSelection(selectedOption, index, optionIndex) {
+    changeOptionSelection(selectedOption, index, optionIndex, endpoint) {
+        let defaultValue;
         let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
-        let defaultValue = componentOption[0].defaultValue;
+
+        if (componentOption[0]) {
+            defaultValue = componentOption[0].defaultValue;
+        } else {
+            console.log('add to custom options');
+            const customOption = new Option();
+            customOption.key = selectedOption;
+
+            let componentType = endpoint.componentType.toString().toLowerCase();
+            let camelComponentType = this.components.getCamelComponentType(componentType);
+
+            console.log('add to custom options cameltype=' + camelComponentType);
+
+            let optionArray: Array<string> = [];
+            optionArray.splice(optionIndex, 0, customOption.key);
+
+            console.log('add to custom options cameltype X=' + JSON.stringify(this.selectedOptions[index]));
+
+            //this.selectedOptions[index].splice(optionIndex, 0,optionArray);
+
+            //selectedOptions[index][optionIndex] =
+
+            //console.log('add to custom options cameltype y=' + JSON.stringify(this.selectedOptions[index]));
+
+            this.componentOptions[index].push({
+                name: selectedOption,
+                displayName: selectedOption,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType
+            });
+
+            this.customOptions.push({
+                name: selectedOption,
+                displayName: selectedOption,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType
+            });
+        }
 
         const endpointData = (<FormArray>this.editFlowForm.controls.endpointsData).controls[index];
         const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
@@ -719,6 +826,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
         }
     }
+
+    addOptionTag(name) {
+        return { name: name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
+    }
+
     addEndpoint(endpoint, index) {
         let newIndex = index + 1;
 
@@ -914,7 +1026,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                         this.setService(endpoint, result.id, formService);
                     },
                     reason => {
-                        this.setService(endpoint, reason.id, formService);
+                        //this.setService(endpoint, reason.id, formService);
                     }
                 );
             });

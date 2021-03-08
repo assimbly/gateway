@@ -27,8 +27,8 @@ entity Flow {
 entity Endpoint {
 	endpointType EndpointType,
 	compponentType ComponentType,
-	uri String,
-    options String,
+	uri TextBlob,
+    options TextBlob,
     responseId Integer
 }
 

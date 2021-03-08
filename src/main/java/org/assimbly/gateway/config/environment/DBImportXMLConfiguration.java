@@ -1,12 +1,10 @@
 package org.assimbly.gateway.config.environment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.Flow;
@@ -37,6 +35,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -182,21 +181,24 @@ public class DBImportXMLConfiguration {
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
 		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/logLevel", doc);
+        String flowVersion = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/version", doc);
+        String flowLastModified = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/lastModified", doc);
 
-		if (!flowId.isEmpty()) {
+		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
 			log.info("Importing flow: " + flowName);
 
-			flowOptional = flowRepository.findById(id);
+			flowOptional = flowRepository.findByName(flowName);
 			gatewayOptional = gatewayRepository.findById(connectorId);
 
 			if (!flowOptional.isPresent()) {
 				flow = new Flow();
 				flow.setId(id);
-				endpoints = getEndpointsFromXML(flowId, doc, flow, true);
+
+                endpoints = getEndpointsFromXML(flowId, doc, flow, true);
 			} else {
 				flow = flowOptional.get();
-				endpoints = getEndpointsFromXML(flowId, doc, flow, false);
+				endpoints = getEndpointsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
 			if (!gatewayOptional.isPresent()) {
@@ -247,6 +249,38 @@ public class DBImportXMLConfiguration {
 				flow.setLogLevel(LogLevelType.OFF);
 			}
 
+
+            if (flowVersion != null) {
+                try {
+                    flow.setVersion(Integer.parseInt(flowVersion));
+                }
+                catch (NumberFormatException e)
+                {
+                    flow.setVersion(1);
+                }
+            } else {
+                flow.setVersion(1);
+            }
+
+            if (flowLastModified != null) {
+                try {
+                    LocalDateTime  lastModifiedDateTime = LocalDateTime.parse(flowLastModified);
+                    ZoneId zone = ZoneId.of("Europe/Berlin");
+                    ZoneOffset zoneOffSet = zone.getRules().getOffset(LocalDateTime.now());
+                    Instant lastModified = lastModifiedDateTime.toInstant(zoneOffSet);
+                    flow.lastModified(lastModified);
+                    flow.created(Instant.now());
+                }
+                catch (Exception e)
+                {
+                    flow.lastModified(Instant.now());
+                    flow.created(Instant.now());
+                }
+            } else {
+                flow.lastModified(Instant.now());
+                flow.created(Instant.now());
+            }
+
 			flow.setEndpoints(endpoints);
 
 			flow = flowRepository.save(flow);
@@ -284,14 +318,20 @@ public class DBImportXMLConfiguration {
 				endpoints.add(endpoint);
 			}
 		} else {
+
 			endpoints = flow.getEndpoints();
+
+			Integer index = 1;
 
 			for (Endpoint endpoint : endpoints) {
 
-				Long endpointId = endpoint.getId();
-				String index = "id='" + Long.toString(endpointId) + "'";
-				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index);
+                XPath xPath = XPathFactory.newInstance().newXPath();
+                id = xPath.evaluate("//flows/flow[name='" + flow.getName() + "']/id", doc);
+
+                Long endpointId = endpoint.getId();
+				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index.toString());
 				endpoints.add(endpoint);
+				index++;
 			}
 
 		}
@@ -299,19 +339,23 @@ public class DBImportXMLConfiguration {
         return endpoints;
 	}
 
-	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index)
-			throws Exception {
+	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
 		String type = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/type", doc);
 		String uri = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/uri", doc);
-		String options = null;
+		String options = "";
 		String serviceId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/service_id", doc);
 		String headerId = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/header_id", doc);
         String responseIdAsString = xPath.evaluate("//flows/flow[id='" + id + "']/endpoint[" + index + "]/response_id", doc);
 
-		// get type
+        System.out.println("X1 id=" + id);
+        System.out.println("X2 index=" + index);
+        System.out.println("X3 serviceid=" + serviceId);
+        System.out.println("X4 uri=" + uri);
+
+        // get type
 		String[] uriSplitted = uri.split(":", 2);
 
         String componentTypeAsString = uriSplitted[0].toUpperCase();
@@ -321,7 +365,7 @@ public class DBImportXMLConfiguration {
         ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
         EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
 
-		// get uri
+        // get uri
 		uri = uriSplitted[1];
 		while (uri.startsWith("/")) {
 			uri = uri.substring(1);
@@ -335,7 +379,7 @@ public class DBImportXMLConfiguration {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			if (options != null) {
+			if (options != null && !options.isEmpty()) {
 				options = options + "&" + key + "=" + value;
 				;
 			} else {
@@ -347,13 +391,21 @@ public class DBImportXMLConfiguration {
 		// get service if configured
 		org.assimbly.gateway.domain.Service service;
 		try {
-			Long serviceIdLong = Long.parseLong(serviceId, 10);
-			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
-			Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+
+            Long serviceIdLong = Long.parseLong(serviceId, 10);
+
+            System.out.println("1. serviceidlong" + serviceIdLong);
+
+            String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
+
+            System.out.println("2. name" + serviceName);
+
+            Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+
 			if(serviceOptional.isPresent()) {
-				service = serviceOptional.get();
+                service = serviceOptional.get();
 			}else {
-				service = null;
+                service = null;
 			}
 		} catch (NumberFormatException nfe) {
 			service = null;
@@ -411,6 +463,8 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
+        Map<String, String> servicesIdMap = new HashMap<String, String>();
+
 		for (String serviceId : serviceIds) {
 
 			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
@@ -425,7 +479,7 @@ public class DBImportXMLConfiguration {
 				if(!serviceOptional.isPresent()) {
 					service = new org.assimbly.gateway.domain.Service();
 					serviceKeys = new HashSet<ServiceKeys>();
-					service.setId(serviceIdLong);
+					service.setId(null);
 					service.setName(serviceName);
 					service.setType(serviceType);
 				} else {
@@ -434,10 +488,11 @@ public class DBImportXMLConfiguration {
 						service.setName(serviceName);
 					} else {
 						service.setName(serviceId);
-					}
+                    }
 					service.setType(serviceType);
 					serviceKeys = service.getServiceKeys();
-				}
+
+                }
 			} catch (NumberFormatException nfe) {
 				service = new org.assimbly.gateway.domain.Service();
 				serviceKeys = new HashSet<ServiceKeys>();
@@ -482,28 +537,65 @@ public class DBImportXMLConfiguration {
 			}
 
 			if (service != null && serviceKeys != null) {
-				service.setServiceKeys(serviceKeys);
+
 				service = serviceRepository.save(service);
+
+                //save servicekeys
+                service.setServiceKeys(serviceKeys);
+                service = serviceRepository.save(service);
 
 				String generatedServiceId = service.getId().toString();
 
-				//update service_id to generated service_id
-				if(!serviceId.equals(generatedServiceId)) {
-					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+                servicesIdMap.put(serviceId, generatedServiceId);
 
-					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
-						servicesIdNodes.item(i).setTextContent(generatedServiceId);
-					}
-
-				}
-
-				service = null;
+                service = null;
 				serviceKeys = null;
 			}
 
 		}
 
-		return "ok";
+
+        for (Map.Entry<String, String> entry : servicesIdMap.entrySet()) {
+
+            String serviceId = entry.getKey();
+            String generatedServiceId= entry.getValue();
+
+            System.out.println("map");
+            System.out.println("key=" + serviceId);
+            System.out.println("value=" + generatedServiceId);
+
+            //update service_id to generated service_id
+            if(!serviceId.equals(generatedServiceId)) {
+
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+
+                for (int i = 0; i < servicesIdNodes.getLength(); i++) {
+                    servicesIdNodes.item(i).setTextContent("id" + generatedServiceId);
+                }
+
+                NodeList servicesNodes = (NodeList) xPath.compile("/connectors/connector/services/service[id=" + serviceId + "]/id").evaluate(doc, XPathConstants.NODESET);
+
+                servicesNodes.item(0).setTextContent("id" + generatedServiceId);
+
+            }
+
+        }
+
+        NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/service_id").evaluate(doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < servicesIdNodes.getLength(); i++) {
+            String updateId =  servicesIdNodes.item(i).getTextContent();
+            servicesIdNodes.item(i).setTextContent(updateId.replace("id",""));
+        }
+
+        NodeList servicesNodes = (NodeList) xPath.compile("/connectors/connector/services/*/id").evaluate(doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < servicesNodes.getLength(); i++) {
+            String updateId =  servicesNodes.item(i).getTextContent();
+            servicesNodes.item(i).setTextContent(updateId.replace("id",""));
+        }
+
+        return "ok";
 	}
 
 	public String setHeadersFromXML(Document doc, List<String> headerIds) throws Exception {
@@ -511,11 +603,11 @@ public class DBImportXMLConfiguration {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
+        Map<String, String> headersIdMap = new HashMap<String, String>();
+
 		for (String headerId : headerIds) {
 
 			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name", doc);
-
-			log.info("Importing header: " + headerName);
 
 			try {
 				headerIdLong = Long.parseLong(headerId, 10);
@@ -524,7 +616,7 @@ public class DBImportXMLConfiguration {
 				if (!headerOptional.isPresent()) {
 					header = new Header();
 					headerKeys = new HashSet<HeaderKeys>();
-					header.setId(headerIdLong);
+					header.setId(null);
 					if (headerName == null || headerName.isEmpty()) {
 						header.setName(headerId);
 					} else {
@@ -582,20 +674,17 @@ public class DBImportXMLConfiguration {
 			}
 
 			if (header != null && headerKeys != null) {
-				header.setHeaderKeys(headerKeys);
+
 				header = headerRepository.save(header);
 
-				String generatedHeaderId = header.getId().toString();
+                header.setHeaderKeys(headerKeys);
+                header = headerRepository.save(header);
 
-				//update service_id to generated service_id
-				if(!headerId.equals(generatedHeaderId)) {
-					NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[headder_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+                String generatedHeaderId = header.getId().toString();
 
-					for (int i = 0; i < servicesIdNodes.getLength(); i++) {
-						servicesIdNodes.item(i).setTextContent(generatedHeaderId);
-					}
+                headersIdMap.put(headerId, generatedHeaderId);
 
-				}
+
 
 				header = null;
 				headerKeys = null;
@@ -603,7 +692,43 @@ public class DBImportXMLConfiguration {
 
 		}
 
-		return "ok";
+        for (Map.Entry<String, String> entry : headersIdMap.entrySet()) {
+
+            String headerId = entry.getKey();
+            String generatedHeaderId= entry.getValue();
+
+            //update header_id to generated header_id
+            if(!headerId.equals(generatedHeaderId)) {
+
+                NodeList headerNodes = (NodeList) xPath.compile("/connectors/connector/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
+                headerNodes.item(0).setTextContent("id" + generatedHeaderId);
+
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+
+                for (int i = 0; i < servicesIdNodes.getLength(); i++) {
+                    servicesIdNodes.item(i).setTextContent("id" + generatedHeaderId);
+                }
+
+            }
+
+        }
+
+
+        NodeList headersIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/header_id").evaluate(doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < headersIdNodes.getLength(); i++) {
+            String updateId =  headersIdNodes.item(i).getTextContent();
+            headersIdNodes.item(i).setTextContent(updateId.replace("id",""));
+        }
+
+        NodeList headersNodes = (NodeList) xPath.compile("/connectors/connector/headers/*/id").evaluate(doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < headersNodes.getLength(); i++) {
+            String updateId =  headersNodes.item(i).getTextContent();
+            headersNodes.item(i).setTextContent(updateId.replace("id",""));
+        }
+
+        return "ok";
 
 	}
 
@@ -627,17 +752,25 @@ public class DBImportXMLConfiguration {
 
 			String key = environmentVariableChildNode.item(1).getTextContent();
 			String value = environmentVariableChildNode.item(3).getTextContent();
+            String encrypted = environmentVariableChildNode.item(5).getTextContent();
+
+            boolean encryptedBoolean = false;
+            if(encrypted.equalsIgnoreCase("true")){
+                encryptedBoolean = true;
+            }
 
 			if (!map.containsKey(key)) {
 				EnvironmentVariables environmentVariable = new EnvironmentVariables();
 				environmentVariable.setKey(key);
 				environmentVariable.setValue(value);
+                environmentVariable.setEncrypted(encryptedBoolean);
 				environmentVariable.setGateway(gateway);
 				environmentVariablesList.add(environmentVariable);
 			} else {
 				EnvironmentVariables environmentVariable = map.get(key);
 				environmentVariable.setKey(key);
 				environmentVariable.setValue(value);
+                environmentVariable.setEncrypted(encryptedBoolean);
 				environmentVariable.setGateway(gateway);
 				environmentVariablesList.add(environmentVariable);
 			}
