@@ -395,8 +395,10 @@ public class DBExportXMLConfiguration {
         }
     }
 
-
     public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
+
+        Element endpoints = doc.createElement("endpoints");
+        flow.appendChild(endpoints);
 
 		for (Endpoint endpointDB : endpointsDB) {
 
@@ -412,7 +414,7 @@ public class DBExportXMLConfiguration {
 			if (confUri != null) {
 
 				Element endpoint = doc.createElement("endpoint");
-				flow.appendChild(endpoint);
+                endpoints.appendChild(endpoint);
 
 				Element id = doc.createElement("id");
 				id.setTextContent(confId);

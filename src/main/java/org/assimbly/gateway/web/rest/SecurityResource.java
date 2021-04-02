@@ -6,7 +6,6 @@ import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.service.dto.SecurityDTO;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import io.swagger.annotations.ApiParam;
@@ -29,14 +28,12 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -52,7 +49,6 @@ public class SecurityResource {
 
 	@Autowired
 	private ConnectorResource connectorResource;
-
 
     private final SecurityService securityService;
 
