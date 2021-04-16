@@ -435,7 +435,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (typeof e !== 'undefined') {
             //set componenttype to selected component and clear other fields
             endpoint.componentType = e;
-            endpoint.uri = '';
+            endpoint.uri = null;
             endpoint.headerId = '';
             endpoint.serviceId = '';
 
