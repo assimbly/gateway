@@ -17,10 +17,7 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -286,6 +283,9 @@ public class DBExportXMLConfiguration {
 		lastModified.appendChild(doc.createTextNode(flowLastModified));
 		flow.appendChild(lastModified);
 
+        // set components
+        setComponentFromDB(endpoints);
+
 		// set endpoints
 		setEndpointsFromDB(endpoints);
 
@@ -373,7 +373,32 @@ public class DBExportXMLConfiguration {
 	}
 
 
-	public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
+    public void setComponentFromDB(Set<Endpoint> endpointsDB) throws Exception {
+
+        Set<String> componentsList = new HashSet<>();
+
+        Element components = doc.createElement("components");
+        flow.appendChild(components);
+
+        for (Endpoint endpointDB : endpointsDB) {
+
+            String confComponentType = endpointDB.getComponentType().getEndpoint();
+
+            if(!componentsList.contains(confComponentType)){
+                componentsList.add(confComponentType);
+
+                Element component = doc.createElement("component");
+                component.setTextContent(confComponentType);
+                components.appendChild(component);
+
+            }
+        }
+    }
+
+    public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
+
+        Element endpoints = doc.createElement("endpoints");
+        flow.appendChild(endpoints);
 
 		for (Endpoint endpointDB : endpointsDB) {
 
@@ -389,7 +414,7 @@ public class DBExportXMLConfiguration {
 			if (confUri != null) {
 
 				Element endpoint = doc.createElement("endpoint");
-				flow.appendChild(endpoint);
+                endpoints.appendChild(endpoint);
 
 				Element id = doc.createElement("id");
 				id.setTextContent(confId);
