@@ -378,14 +378,17 @@
                     <span class="fa fa-save"></span>&nbsp; <span>Save</span>
                 </button>
             </div>
-            <div *ngIf="savingFlowFailed">
-                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
-            </div>
             <div *ngIf="savingFlowSuccess">
                 <span class="text-success">*{{savingFlowSuccessMessage}}</span>
             </div>
+            <div *ngIf="savingFlowFailed">
+                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+            </div>
             <div *ngIf="!!invalidUriMessage">
                 <span class="text-danger">*{{invalidUriMessage}}</span>
+            </div>
+            <div *ngIf="!!notUniqueUriMessage">
+                <span class="text-danger">*{{notUniqueUriMessage}}</span>
             </div>
         </form>
     </div>

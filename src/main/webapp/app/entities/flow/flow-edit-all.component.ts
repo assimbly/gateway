@@ -64,6 +64,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     savingFlowFailedMessage = 'Saving failed (check logs)';
     savingFlowSuccess = false;
     savingFlowSuccessMessage = 'Flow successfully saved';
+    savingCheckEndpoints = true;
+
     finished = false;
 
     gateways: Gateway[];
@@ -107,6 +109,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     editFlowForm: FormGroup;
     displayNextButton = false;
     invalidUriMessage: string;
+    notUniqueUriMessage: string;
 
     testConnectionForm: FormGroup;
     testConnectionMessage: string;
@@ -1079,11 +1082,16 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.setDataFromForm();
         this.setOptions();
         this.setVersion();
+
         this.savingFlowFailed = false;
         this.savingFlowSuccess = false;
         let goToOverview = true;
 
         if (!this.editFlowForm.valid) {
+            return;
+        }
+
+        if (this.checkUniqueEndpoints()) {
             return;
         }
 
@@ -1167,6 +1175,21 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 }
             );
         }
+    }
+
+    checkUniqueEndpoints() {
+        if (this.savingCheckEndpoints) {
+            this.savingCheckEndpoints = false;
+
+            const uniqueEndpoints = [...new Map(this.endpoints.map(item => [item['uri'], item])).values()];
+
+            if (this.endpoints.length !== uniqueEndpoints.length) {
+                this.notUniqueUriMessage = `Endpoint Uri's are not unique (check for possible loops).`;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     setDataFromForm() {
