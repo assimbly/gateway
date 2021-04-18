@@ -82,7 +82,7 @@ spring:
             password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
 
 server:
-    port: 8080
+    port: 8088
 
 # ===================================================================
 # JHipster specific properties

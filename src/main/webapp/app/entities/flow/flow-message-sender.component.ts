@@ -439,13 +439,21 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
         let index = 0;
 
+        console.log('endpointOptions=' + JSON.stringify(endpointOptions));
+
         endpointOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
+
+            console.log('option.key=' + option.key);
+            console.log('option.value=' + option.value);
+
             if (option.key && option.value) {
                 this.requestOptions += index > 0 ? `&${option.key}=${option.value}` : `${option.key}=${option.value}`;
                 index++;
             }
+
+            console.log('setEndpointOptions');
         });
     }
 
