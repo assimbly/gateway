@@ -258,7 +258,7 @@
                                             <ng-select  *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
                                             <span style="display:inline-block; width: 14px;"></span>
                                             <a>:</a>
-                                            <ng-select [items]="URIList" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+                                            <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
                                             <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
                                                 <span class="fa fa-pencil padding-button"></span>&nbsp;
                                             </button>
@@ -274,7 +274,7 @@
                                         <label class="form-control-label" for="field_options">Options</label>
                                         <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
                                         <div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
-                                                <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="true" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx)" [(ngModel)]="selectedOptions[index][idx]">
+                                                <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
                                                 <ng-template ng-option-tmp let-item="item">
                                                     <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
                                                     <ng-template #optionTooltip>
@@ -378,14 +378,17 @@
                     <span class="fa fa-save"></span>&nbsp; <span>Save</span>
                 </button>
             </div>
-            <div *ngIf="savingFlowFailed">
-                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
-            </div>
             <div *ngIf="savingFlowSuccess">
                 <span class="text-success">*{{savingFlowSuccessMessage}}</span>
             </div>
+            <div *ngIf="savingFlowFailed">
+                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+            </div>
             <div *ngIf="!!invalidUriMessage">
                 <span class="text-danger">*{{invalidUriMessage}}</span>
+            </div>
+            <div *ngIf="!!notUniqueUriMessage">
+                <span class="text-danger">*{{notUniqueUriMessage}}</span>
             </div>
         </form>
     </div>

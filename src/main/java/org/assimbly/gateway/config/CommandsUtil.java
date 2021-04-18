@@ -48,11 +48,7 @@ public final class CommandsUtil {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.setNewLine("Command line parameters");
-            formatter.setNewLine("");
-            formatter.printHelp("Assimbly Gateway", options);
-            System.exit(1);
+        	return true;
         }
 
         String baseDirectoryParam = cmd.getOptionValue("application.gateway.base-directory");
