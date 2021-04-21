@@ -56,6 +56,12 @@ entity HeaderKeys {
 	type String
 }
 
+entity Route {
+	name String,
+	type String,
+	content TextBlob
+}
+
 entity EnvironmentVariables {
 	key String,
 	value TextBlob,

@@ -8,6 +8,7 @@ import { GatewayHeaderModule } from './header/header.module';
 import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
 import { GatewayEndpointModule } from './endpoint/endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
+import { GatewayRouteModule } from './route/route.module';
 import { GatewaySecurityModule } from './security/security.module';
 import { GatewayBrokerModule } from './broker/broker.module';
 
@@ -30,6 +31,7 @@ import { DeploymentService } from 'app/admin';
         GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
+        GatewayRouteModule,
         GatewayBrokerModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
@@ -46,6 +48,7 @@ import { DeploymentService } from 'app/admin';
         GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
+        GatewayRouteModule,
         GatewayBrokerModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
