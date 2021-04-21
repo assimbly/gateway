@@ -17,6 +17,8 @@ public class FlowDTO implements Serializable {
     private Long id;
 
     private String name;
+    
+    private String notes;
 
     private Boolean autoStart;
 
@@ -29,6 +31,10 @@ public class FlowDTO implements Serializable {
     private String type;
 
     private Boolean loadBalancing;
+    
+    private Boolean parallelProcessing;
+    
+    private Boolean assimblyHeaders;
 
     private LogLevelType logLevel;
 
@@ -60,6 +66,14 @@ public class FlowDTO implements Serializable {
         this.name = name;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
     public Boolean isAutoStart() {
         return autoStart;
     }
@@ -108,6 +122,22 @@ public class FlowDTO implements Serializable {
         this.loadBalancing = loadBalancing;
     }
 
+    public Boolean isParallelProcessing() {
+        return parallelProcessing;
+    }
+
+    public void setParallelProcessing(Boolean parallelProcessing) {
+        this.parallelProcessing = parallelProcessing;
+    }
+
+    public Boolean isAssimblyHeaders() {
+        return assimblyHeaders;
+    }
+
+    public void setAssimblyHeaders(Boolean assimblyHeaders) {
+        this.assimblyHeaders = assimblyHeaders;
+    }
+    
     public LogLevelType getLogLevel() {
         return logLevel;
     }
@@ -197,10 +227,13 @@ public class FlowDTO implements Serializable {
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
+            ", parallelProcessing='" + isParallelProcessing() + "'" +
+            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
             ", endpoints=" + getEndpoints() +
             "}";
     }
+    
 }

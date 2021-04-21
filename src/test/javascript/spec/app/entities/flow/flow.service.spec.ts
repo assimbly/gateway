@@ -21,7 +21,7 @@ describe('Service Tests', () => {
             service = injector.get(FlowService);
             httpMock = injector.get(HttpTestingController);
 
-            elemDefault = new Flow(0, 'AAAAAAA', false, false);
+            elemDefault = new Flow(0, 'AAAAAAA', 'BBBBBB', false, false);
         });
 
         describe('Service methods', async () => {

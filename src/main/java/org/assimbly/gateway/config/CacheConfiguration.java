@@ -49,7 +49,6 @@ public class CacheConfiguration {
             cm.createCache(org.assimbly.gateway.domain.Gateway.class.getName() + ".environmentVariables", jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.EnvironmentVariables.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Flow.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Flow.class.getName() + ".endpointTos", jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Service.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Service.class.getName()+ ".serviceKeys", jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.ServiceKeys.class.getName(), jcacheConfiguration);            

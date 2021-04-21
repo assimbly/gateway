@@ -47,12 +47,21 @@ public class Flow implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "notes")
+    private String notes;
+    
     @Column(name = "load_balancing")
     private Boolean loadBalancing;
 
+    @Column(name = "parallel_processing")
+    private Boolean parallelProcessing;
+
     @Column(name = "log_level")
     private LogLevelType logLevel;
-    
+
+    @Column(name = "assimbly_headers")
+    private Boolean assimblyHeaders;
+
     @Column(name = "instances")
     private Integer instances;
 
@@ -101,6 +110,19 @@ public class Flow implements Serializable {
         this.name = name;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public Flow notes(String notes) {
+        this.notes = notes;
+        return this;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
     public Boolean isAutoStart() {
         return autoStart;
     }
@@ -126,7 +148,33 @@ public class Flow implements Serializable {
     public void setOffLoading(Boolean offLoading) {
         this.offLoading = offLoading;
     }
+    
+    public Boolean isParallelProcessing() {
+        return parallelProcessing;
+    }
 
+    public Flow parallelProcessing(Boolean parallelProcessing) {
+        this.parallelProcessing = parallelProcessing;
+        return this;
+    }
+
+    public void setParallelProcessing(Boolean parallelProcessing) {
+        this.parallelProcessing = parallelProcessing;
+    }
+    
+    public Boolean isAssimblyHeaders() {
+        return assimblyHeaders;
+    }
+
+    public Flow assimblyHeaders(Boolean assimblyHeaders) {
+        this.assimblyHeaders = assimblyHeaders;
+        return this;
+    }
+
+    public void setAssimblyHeaders(Boolean assimblyHeaders) {
+        this.assimblyHeaders = assimblyHeaders;
+    }    
+    
     public Integer getMaximumRedeliveries() {
         return maximumRedeliveries;
     }
@@ -314,6 +362,8 @@ public class Flow implements Serializable {
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
+            ", parallelProcessing='" + isParallelProcessing() + "'" +
+            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", instances=" + getInstances() +
             "}";
     }
