@@ -1,0 +1,67 @@
+<div>
+    <h2 id="page-heading">
+        <span>Topics</span>
+
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-topic" [routerLink]="['/topic/new']">
+            <fa-icon icon="plus"></fa-icon>
+            <span>
+            Create a new Topic
+            </span>
+        </button>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <jhi-alert></jhi-alert>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="topics?.length === 0">
+        <span>No topics found</span>
+    </div>
+
+    <div class="table-responsive" id="entities" *ngIf="topics?.length > 0">
+        <table class="table table-striped" aria-describedby="page-heading">
+            <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
+                    <th scope="col"  jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="itemsOnPage"><span>Items On Page</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="refreshInterval"><span>Refresh Interval</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="selectedColumn"><span>Selected Column</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="orderColumn"><span>Order Column</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+                <tr *ngFor="let topic of topics ;trackBy: trackId">
+                    <td><a [routerLink]="['/topic', topic.id, 'view']">{{ topic.id }}</a></td>
+                    <td>{{ topic.itemsOnPage }}</td>
+                    <td>{{ topic.refreshInterval }}</td>
+                    <td>{{ topic.selectedColumn }}</td>
+                    <td>{{ topic.orderColumn }}</td>
+                    <td class="text-right">
+                        <div class="btn-group">
+                            <button type="submit"
+                                    [routerLink]="['/topic', topic.id, 'view']"
+                                    class="btn btn-info btn-sm">
+                                <fa-icon icon="eye"></fa-icon>
+                                <span class="d-none d-md-inline">View</span>
+                            </button>
+
+                            <button type="submit"
+                                    [routerLink]="['/topic', topic.id, 'edit']"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon icon="pencil-alt"></fa-icon>
+                                <span class="d-none d-md-inline">Edit</span>
+                            </button>
+
+                            <button type="submit" (click)="delete(topic)"
+                                    class="btn btn-danger btn-sm">
+                                <fa-icon icon="times"></fa-icon>
+                                <span class="d-none d-md-inline">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
