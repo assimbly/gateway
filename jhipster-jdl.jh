@@ -89,6 +89,20 @@ entity Broker {
 	configuration String,
 }
 
+entity Queue {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
+}
+
+entity Topic {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
+}
+
 enum GatewayType {
     ADAPTER, BROKER, API, SOAP
 }
