@@ -175,8 +175,11 @@ public class DBImportXMLConfiguration {
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
 		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);
+        String flowNotes = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/notes", doc);
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
+        String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/assimblyHeaders", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
+        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/parallelProcessing", doc);
 
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
@@ -214,19 +217,37 @@ public class DBImportXMLConfiguration {
 				flow.setName(flowName);
 			}
 
+            if (flowNotes == null || flowNotes.isEmpty()) {
+                flow.setNotes(null);
+            } else {
+                flow.setNotes(flowNotes);
+            }
+
 			if (flowAutostart != null && flowAutostart.equals("true")) {
 				flow.setAutoStart(true);
 			} else {
 				flow.setAutoStart(false);
 			}
 
-			if (flowOffloading != null && flowOffloading.equals("true")) {
+            if (flowAssimblyHeaders != null && flowAssimblyHeaders.equals("true")) {
+                flow.setAssimblyHeaders(true);
+            } else {
+                flow.setAssimblyHeaders(false);
+            }
+
+            if (flowOffloading != null && flowOffloading.equals("true")) {
 				flow.setOffLoading(true);
 			} else {
 				flow.setOffLoading(false);
 			}
 
-			if (flowMaximumRedeliveries != null) {
+            if (flowParallelProcessing != null && flowParallelProcessing.equals("true")) {
+                flow.setParallelProcessing(true);
+            } else {
+                flow.setParallelProcessing(false);
+            }
+
+            if (flowMaximumRedeliveries != null) {
 				flow.setMaximumRedeliveries(Integer.parseInt(flowMaximumRedeliveries));
 			} else {
 				flow.setMaximumRedeliveries(0);

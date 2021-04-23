@@ -110,8 +110,14 @@
                 <ng-template #autoStartPopover let-message="message">
                     <div [innerHtml]="autoStartPopoverMessage"></div>
                 </ng-template>
+                <ng-template #assimblyHeadersPopover let-message="message">
+                    <div [innerHtml]="assimblyHeadersPopoverMessage"></div>
+                </ng-template>
                 <ng-template #offloadingPopover let-message="message">
                     <div [innerHtml]="offloadingPopoverMessage"></div>
+                </ng-template>
+                <ng-template #parallelProcessingPopover let-message="message">
+                    <div [innerHtml]="parallelProcessingPopoverMessage"></div>
                 </ng-template>
                 <ng-template #maximumRedeliveriesPopover let-message="message">
                     <div [innerHtml]="maximumRedeliveriesPopoverMessage"></div>
@@ -140,6 +146,17 @@
                         </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-control-label" for="field_assimbly_headers">Assimbly Headers</label>
+                            <i triggers="mouseenter:mouseleave" placement="right"
+                               triggers="mouseenter:mouseleave" popoverTitle="Info"
+                               [popover]="assimblyHeadersPopover" class="fa fa-info-circle"></i> <select
+                            type="text" class="form-control" id="field_assimbly_headers"
+                            *ngIf="flow" formControlName="assimblyHeaders">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-control-label" for="field_offloading">Offloading</label>
                             <i triggers="mouseenter:mouseleave" placement="right"
                                triggers="mouseenter:mouseleave" popoverTitle="Info"
@@ -161,17 +178,18 @@
                                                                                               formControlName="maximumRedeliveries" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-control-label" for="field_redeliverydelay">Redelivery
-                                Delay</label> <i triggers="mouseenter:mouseleave" placement="right"
-                                                 triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                                 [popover]="redeliveryDelayPopover" class="fa fa-info-circle"></i>
-                            <input min="0" max="1000" size="0" maxlength="4" type="number"
-                                   name="redeliveryDelay" class="form-control" id="redeliveryDelay"
-                                   *ngIf="flow" formControlName="redeliveryDelay" required>
+                            <label class="form-control-label" for="field_parallelprocessing">Parallel Processing</label>
+                            <i triggers="mouseenter:mouseleave" placement="right"
+                               triggers="mouseenter:mouseleave" popoverTitle="Info"
+                               [popover]="parallelProcessingPopover" class="fa fa-info-circle"></i> <select
+                            type="text" class="form-control" id="field_parallelprocessing"
+                            *ngIf="flow" formControlName="parallelProcessing">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-control-label" for="field_logLevel">Log
-                                Level</label> <i triggers="mouseenter:mouseleave" placement="right"
+                            <label class="form-control-label" for="field_logLevel">Log Level</label> <i triggers="mouseenter:mouseleave" placement="right"
                                                  triggers="mouseenter:mouseleave" popoverTitle="Info"
                                                  [popover]="logLevelPopover" class="fa fa-info-circle"></i> <select
                             class="form-control" name="logLevel" formControlName="logLevel"
@@ -194,7 +212,6 @@
                     </div>
                 </div>
             </div>
-
 
             <div class="d-flex">
                 <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
