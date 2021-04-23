@@ -83,7 +83,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     namePopoverMessage: string;
     autoStartPopoverMessage: string;
+    assimblyHeadersPopoverMessage: string;
     offloadingPopoverMessage: string;
+    parallelProcessingPopoverMessage: string;
     maximumRedeliveriesPopoverMessage: string;
     redeliveryDelayPopoverMessage: string;
     logLevelPopoverMessage: string;
@@ -96,7 +98,6 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     selectedComponentType: string;
     selectedOptions: Array<Array<any>> = [[]];
-    selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
     customOptions: Array<any> = [];
 
@@ -312,6 +313,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                     this.flow = new Flow();
                     this.flow.autoStart = false;
                     this.flow.offLoading = false;
+                    this.flow.parallelProcessing = true;
+                    this.flow.assimblyHeaders = true;
                     this.flow.maximumRedeliveries = 0;
                     this.flow.redeliveryDelay = 3000;
                     this.flow.logLevel = LogLevelType.OFF;
@@ -503,8 +506,10 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     setPopoverMessages() {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
+        this.assimblyHeadersPopoverMessage = `If true then message headers like timestamp, uri, flowid and correlationid are set. These headers start with Assimbly and can be used for logging purposes. `;
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
                                          This endpoint is configured at <i>Settings --> Offloading</i>.`;
+        this.parallelProcessingPopoverMessage = `If true then to endpoints are processed in parallel.`;
         this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
         this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
         this.logLevelPopoverMessage = `Sets the log level of flow (default=OFF). This logs incoming and outgoing messages in the flow`;
@@ -567,8 +572,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.editFlowForm = new FormGroup({
             id: new FormControl(flow.id),
             name: new FormControl(flow.name, Validators.required),
+            notes: new FormControl(flow.notes),
             autoStart: new FormControl(flow.autoStart),
+            assimblyHeaders: new FormControl(flow.assimblyHeaders),
             offloading: new FormControl(flow.offLoading),
+            parallelProcessing: new FormControl(flow.parallelProcessing),
             maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
             redeliveryDelay: new FormControl(flow.redeliveryDelay),
             logLevel: new FormControl(flow.logLevel),
@@ -617,8 +625,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.editFlowForm.patchValue({
             id: flow.id,
             name: flow.name,
+            notes: flow.notes,
             autoStart: flow.autoStart,
+            assimblyHeaders: flow.assimblyHeaders,
             offloading: flow.offLoading,
+            parallelProcessing: flow.parallelProcessing,
             maximumRedeliveries: flow.maximumRedeliveries,
             redeliveryDelay: flow.redeliveryDelay,
             logLevel: flow.logLevel,
@@ -1200,8 +1211,11 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
         this.flow.id = flowControls.id.value;
         this.flow.name = flowControls.name.value;
+        this.flow.notes = flowControls.notes.value;
         this.flow.autoStart = flowControls.autoStart.value;
+        this.flow.assimblyHeaders = flowControls.assimblyHeaders.value;
         this.flow.offLoading = flowControls.offloading.value;
+        this.flow.parallelProcessing = flowControls.parallelProcessing.value;
         this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
         this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;
         this.flow.logLevel = flowControls.logLevel.value;

@@ -235,11 +235,25 @@ public class DBExportXMLConfiguration {
 		name.appendChild(doc.createTextNode(flowName));
 		flow.appendChild(name);
 
+        // set notes
+        String flowNotes = flowDB.getNotes();
+        if(flowNotes!=null){
+            Element notes = doc.createElement("notes");
+            notes.appendChild(doc.createTextNode(flowNotes));
+            flow.appendChild(notes);
+        }
+
 		// set autostart
 		String flowAutostart = flowDB.isAutoStart().toString();
 		Element autostart = doc.createElement("autostart");
 		autostart.appendChild(doc.createTextNode(flowAutostart));
 		flow.appendChild(autostart);
+
+        // set assimblyHeaders
+        String flowAssimblyHeaders = flowDB.isAssimblyHeaders().toString();
+        Element isAssimblyHeaders = doc.createElement("assimblyHeaders");
+        isAssimblyHeaders.appendChild(doc.createTextNode(flowAssimblyHeaders));
+        flow.appendChild(isAssimblyHeaders);
 
 		// set offloading
 		String flowOffloading = flowDB.isOffLoading().toString();
@@ -247,7 +261,13 @@ public class DBExportXMLConfiguration {
 		isOffloading.appendChild(doc.createTextNode(flowOffloading));
 		flow.appendChild(isOffloading);
 
-		// set maximumRedeliveries
+        // set parallelProcessing
+        String flowParallelProcessing = flowDB.isParallelProcessing().toString();
+        Element isParallelProcessing = doc.createElement("parallelProcessing");
+        isParallelProcessing.appendChild(doc.createTextNode(flowParallelProcessing));
+        flow.appendChild(isParallelProcessing);
+
+        // set maximumRedeliveries
 		String flowMaximumRedeliveries = Integer.toString(flowDB.getMaximumRedeliveries());
 		Element maximumRedeliveries = doc.createElement("maximumRedeliveries");
 		maximumRedeliveries.appendChild(doc.createTextNode(flowMaximumRedeliveries));
