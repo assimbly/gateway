@@ -8,12 +8,14 @@ import { Gateway } from 'app/shared/model/gateway.model';
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
-import { Service } from 'app/shared/model/service.model';
 import { IHeader } from 'app/shared/model/header.model';
+import { Service } from 'app/shared/model/service.model';
+import { Route } from 'app/shared/model/route.model';
 
 import { EndpointService } from '../endpoint/';
 import { ServiceService } from '../service';
 import { HeaderService } from '../header';
+import { RouteService } from '../route';
 import { GatewayService } from '../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -23,6 +25,7 @@ import { Services } from '../../shared/camel/service-connections';
 import { map } from 'rxjs/operators';
 
 import { HeaderDialogComponent, HeaderPopupService } from 'app/entities/header';
+import { RouteDialogComponent, RoutePopupService } from 'app/entities/route';
 import { ServiceDialogComponent, ServicePopupService } from 'app/entities/service';
 import * as moment from 'moment';
 
@@ -33,8 +36,9 @@ import * as moment from 'moment';
 })
 export class FlowEditAllComponent implements OnInit, OnDestroy {
     flow: IFlow;
-    services: Service[];
     headers: IHeader[];
+    routes: Route[];
+    services: Service[];
 
     endpointsOptions: Array<Array<Option>> = [[]];
     URIList: Array<Array<Endpoint>> = [[]];
@@ -56,6 +60,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     panelCollapsed: any = 'uno';
     public isCollapsed = true;
     active;
+    active2;
     disabled = true;
     activeEndpoint: any;
 
@@ -78,10 +83,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     createRoute: number;
     predicate: any;
     reverse: any;
-    serviceCreated: boolean;
+
     headerCreated: boolean;
+    routeCreated: boolean;
+    serviceCreated: boolean;
 
     namePopoverMessage: string;
+    notesPopoverMessage: string;
     autoStartPopoverMessage: string;
     assimblyHeadersPopoverMessage: string;
     offloadingPopoverMessage: string;
@@ -93,6 +101,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
     headerPopoverMessage: string;
+    routePopoverMessage: string;
     servicePopoverMessage: string;
     popoverMessage: string;
 
@@ -144,8 +153,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         private gatewayService: GatewayService,
         private flowService: FlowService,
         private endpointService: EndpointService,
-        private serviceService: ServiceService,
         private headerService: HeaderService,
+        private routeService: RouteService,
+        private serviceService: ServiceService,
         private jhiAlertService: JhiAlertService,
         private route: ActivatedRoute,
         private router: Router,
@@ -153,6 +163,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         public components: Components,
         private modalService: NgbModal,
         private headerPopupService: HeaderPopupService,
+        private routePopupService: RoutePopupService,
         private servicePopupService: ServicePopupService
     ) {}
 
@@ -176,24 +187,28 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
     }
 
     load(id, isCloning?: boolean) {
-        forkJoin(
+        forkJoin([
             this.flowService.getWikiDocUrl(),
             this.flowService.getCamelDocUrl(),
-            this.serviceService.getAllServices(),
             this.headerService.getAllHeaders(),
+            this.routeService.getAllRoutes(),
+            this.serviceService.getAllServices(),
             this.gatewayService.query(),
             this.endpointService.query(),
             this.flowService.getGatewayName()
-        ).subscribe(([wikiDocUrl, camelDocUrl, services, headers, gateways, allendpoints, gatewayName]) => {
+        ]).subscribe(([wikiDocUrl, camelDocUrl, headers, routes, services, gateways, allendpoints, gatewayName]) => {
             this.wikiDocUrl = wikiDocUrl.body;
 
             this.camelDocUrl = camelDocUrl.body;
 
-            this.services = services.body;
-            this.serviceCreated = this.services.length > 0;
-
             this.headers = headers.body;
             this.headerCreated = this.headers.length > 0;
+
+            this.routes = routes.body;
+            this.routeCreated = this.routes.length > 0;
+
+            this.services = services.body;
+            this.serviceCreated = this.services.length > 0;
 
             this.gateways = gateways.body;
             this.singleGateway = this.gateways.length === 1;
@@ -261,7 +276,8 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                                         endpoint.responseId,
                                         endpoint.flowId,
                                         endpoint.serviceId,
-                                        endpoint.headerId
+                                        endpoint.headerId,
+                                        endpoint.routeId
                                     );
 
                                     this.endpoints.push(endpoint);
@@ -311,6 +327,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 setTimeout(() => {
                     //create new flow object
                     this.flow = new Flow();
+                    this.flow.notes = '';
                     this.flow.autoStart = false;
                     this.flow.offLoading = false;
                     this.flow.parallelProcessing = true;
@@ -443,6 +460,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             endpoint.componentType = e;
             endpoint.uri = null;
             endpoint.headerId = '';
+            endpoint.routeId = '';
             endpoint.serviceId = '';
 
             let i;
@@ -457,8 +475,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
                 key: null,
                 value: null
             });
-            endpointForm.controls.service.patchValue(endpoint.serviceId);
             endpointForm.controls.header.patchValue(endpoint.headerId);
+            endpointForm.controls.service.patchValue(endpoint.routeId);
+            endpointForm.controls.service.patchValue(endpoint.serviceId);
         } else if (!endpoint.componentType) {
             endpoint.componentType = ComponentType.FILE;
         }
@@ -505,6 +524,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
     setPopoverMessages() {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
+        this.notesPopoverMessage = `Notes to documentatie your flow`;
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
         this.assimblyHeadersPopoverMessage = `If true then message headers like timestamp, uri, flowid and correlationid are set. These headers start with Assimbly and can be used for logging purposes. `;
         this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
@@ -512,12 +532,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         this.parallelProcessingPopoverMessage = `If true then to endpoints are processed in parallel.`;
         this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
         this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
-        this.logLevelPopoverMessage = `Sets the log level of flow (default=OFF). This logs incoming and outgoing messages in the flow`;
+        this.logLevelPopoverMessage = `Sets the log level (default=OFF). This logs incoming and outgoing messages in the flow`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
         this.optionsPopoverMessage = ``;
         this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
+        this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
         this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit services.`;
         this.popoverMessage = `Destination`;
@@ -544,12 +565,14 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         if (endpointForm.controls.componentType.value === 'WASTEBIN') {
             endpointForm.controls.uri.disable();
             endpointForm.controls.options.disable();
-            endpointForm.controls.service.disable();
             endpointForm.controls.header.disable();
+            endpointForm.controls.route.disable();
+            endpointForm.controls.service.disable();
         } else if (endpointForm.controls.componentType.value === 'WASTEBIN') {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();
             endpointForm.controls.header.enable();
+            endpointForm.controls.route.enable();
             if (this.embeddedBroker) {
                 endpointForm.controls.service.disable();
             } else {
@@ -559,11 +582,13 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();
             endpointForm.controls.header.enable();
+            endpointForm.controls.route.enable();
             endpointForm.controls.service.enable();
         } else {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();
             endpointForm.controls.header.enable();
+            endpointForm.controls.route.enable();
             endpointForm.controls.service.disable();
         }
     }
@@ -592,6 +617,7 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             uri: new FormControl(endpoint.uri),
             options: new FormArray([this.initializeOption()]),
             header: new FormControl(endpoint.headerId),
+            route: new FormControl(endpoint.routeId),
             service: new FormControl(endpoint.serviceId, Validators.required)
         });
     }
@@ -643,8 +669,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
             endpointType: endpoint.endpointType,
             componentType: endpoint.componentType,
             uri: endpoint.uri,
-            service: endpoint.serviceId,
             header: endpoint.headerId,
+            route: endpoint.routeId,
+            service: endpoint.serviceId,
             responseId: endpoint.responseId
         });
     }
@@ -1012,6 +1039,37 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         }
     }
 
+    createOrEditRoute(endpoint, formRoute: FormControl) {
+        endpoint.routeId = formRoute.value;
+
+        if (typeof endpoint.routeId === 'undefined' || endpoint.routeId === null || !endpoint.routeId) {
+            let modalRef = this.routePopupService.open(RouteDialogComponent as Component);
+            modalRef.then(res => {
+                res.result.then(
+                    result => {
+                        this.setRoute(endpoint, result.id, formRoute);
+                    },
+                    reason => {
+                        this.setRoute(endpoint, reason.id, formRoute);
+                    }
+                );
+            });
+        } else {
+            const modalRef = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId);
+            modalRef.then(res => {
+                // Success
+                res.result.then(
+                    result => {
+                        this.setRoute(endpoint, result.id, formRoute);
+                    },
+                    reason => {
+                        this.setRoute(endpoint, reason.id, formRoute);
+                    }
+                );
+            });
+        }
+    }
+
     createOrEditService(endpoint, serviceType: string, formService: FormControl) {
         endpoint.serviceId = formService.value;
 
@@ -1054,6 +1112,22 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
 
                 if (formHeader.value === null) {
                     formHeader.patchValue(id);
+                }
+                endpoint = null;
+            },
+            res => this.onError(res.body)
+        );
+    }
+
+    setRoute(endpoint, id, formRoute: FormControl) {
+        this.routeService.getAllRoutes().subscribe(
+            res => {
+                this.routes = res.body;
+                this.routeCreated = this.routes.length > 0;
+                endpoint.routeId = id;
+
+                if (formRoute.value === null) {
+                    formRoute.patchValue(id);
                 }
                 endpoint = null;
             },
@@ -1233,8 +1307,9 @@ export class FlowEditAllComponent implements OnInit, OnDestroy {
         endpoint.id = formEndpointData.id.value;
         endpoint.componentType = formEndpointData.componentType.value;
         endpoint.uri = formEndpointData.uri.value;
-        endpoint.serviceId = formEndpointData.service.value;
         endpoint.headerId = formEndpointData.header.value;
+        endpoint.routeId = formEndpointData.route.value;
+        endpoint.serviceId = formEndpointData.service.value;
     }
 
     setVersion() {

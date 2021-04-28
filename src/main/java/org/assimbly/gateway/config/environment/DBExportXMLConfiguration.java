@@ -1,13 +1,11 @@
 package org.assimbly.gateway.config.environment;
 
+import com.jayway.jsonpath.Criteria;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
-import org.assimbly.gateway.repository.FlowRepository;
-import org.assimbly.gateway.repository.GatewayRepository;
-import org.assimbly.gateway.repository.WireTapEndpointRepository;
+import org.assimbly.gateway.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +15,7 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 @Service
@@ -37,7 +36,10 @@ public class DBExportXMLConfiguration {
 	@Autowired
 	private FlowRepository flowRepository;
 
-	@Autowired
+    @Autowired
+    private RouteRepository routeRepository;
+
+    @Autowired
 	private WireTapEndpointRepository wireTapEndpointRepository;
 
 	@Autowired
@@ -51,11 +53,13 @@ public class DBExportXMLConfiguration {
 	private Element flows;
 	private Element services;
 	private Element headers;
+    private Element routes;
 	private Element flow;
 	public String connectorId;
 
 	private List<String> servicesList;
 	private List<String> headersList;
+    private List<String> routesList;
 
 	public String configuration;
 
@@ -201,16 +205,19 @@ public class DBExportXMLConfiguration {
 		flows = doc.createElement("flows");
 		services = doc.createElement("services");
 		headers = doc.createElement("headers");
+        routes = doc.createElement("routes");
 		environmentVariablesList = doc.createElement("environmentVariables");
 
 		connector.appendChild(offloading);
 		connector.appendChild(flows);
 		connector.appendChild(services);
 		connector.appendChild(headers);
+        connector.appendChild(routes);
 		connector.appendChild(environmentVariablesList);
 
 		servicesList = new ArrayList<String>();
 		headersList = new ArrayList<String>();
+		routesList = new  ArrayList<String>();
 
 		setXMLOffloadingPropertiesFromDB(connectorId);
 
@@ -423,8 +430,10 @@ public class DBExportXMLConfiguration {
 		for (Endpoint endpointDB : endpointsDB) {
 
 			String confId = Long.toString(endpointDB.getId());
+			String flowId = Long.toString(endpointDB.getFlow().getId());
 			String confUri = endpointDB.getUri();
             Integer confResponseId = endpointDB.getResponseId();
+            Integer confRouteId = endpointDB.getRouteId();
 			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
 			String confComponentType = endpointDB.getComponentType().getEndpoint();
 			String confOptions = endpointDB.getOptions();
@@ -448,6 +457,12 @@ public class DBExportXMLConfiguration {
                     Element resonseId = doc.createElement("response_id");
                     resonseId.setTextContent(Integer.toString(confResponseId));
                     endpoint.appendChild(resonseId);
+                }
+
+                if (confRouteId != null) {
+                    Element routeId = doc.createElement("route_id");
+                    routeId.setTextContent(Integer.toString(confRouteId));
+                    endpoint.appendChild(routeId);
                 }
 
                 Element uri = doc.createElement("uri");
@@ -489,6 +504,11 @@ public class DBExportXMLConfiguration {
 					headerId.setTextContent(confHeaderId);
 					setXMLHeaderFromDB(confHeaderId, confEndpointType, confHeader);
 				}
+
+                if (confRouteId != null) {
+                    setXMLRouteFromDB(confRouteId,flowId,confId);
+                }
+
 				if (confResponseId != null) {
 
 				    Element responseId = doc.createElement("response_id");
@@ -496,6 +516,7 @@ public class DBExportXMLConfiguration {
 				    endpoint.appendChild(responseId);
 				    responseId.setTextContent(Integer.toString(confResponseId));
                 }
+
 			}else if(confComponentType.equalsIgnoreCase("wastebin")) {
 
 				Element endpoint = doc.createElement("endpoint");
@@ -600,7 +621,39 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setXMLOffloadingPropertiesFromDB(String connectorId) throws Exception {
+    public void setXMLRouteFromDB(Integer routeid, String flowId, String endpointId) throws Exception {
+
+        Long routIdAsLong = routeid.longValue();
+        String routIdAsString = routeid.toString();
+
+        Optional<Route> routeOptional = routeRepository.findById(routIdAsLong);
+
+        if(routeOptional.isPresent()){
+            Route route = routeRepository.findById(routIdAsLong).get();
+
+            if (!routesList.contains(routIdAsString)) {
+
+                routesList.add(routIdAsString);
+
+                String routeContent = route.getContent();
+
+                routeContent = StringUtils.replace(routeContent,"<route>","<route id=\"" + routIdAsString + "\">");
+
+                DocumentBuilderFactory dbFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = dbFactory.newDocumentBuilder();
+                Document doc2 = builder.parse(new ByteArrayInputStream(routeContent.getBytes()));
+
+                Node node = doc.importNode(doc2.getDocumentElement(), true);
+                routes.appendChild(node);
+
+            }
+
+        }
+
+
+    }
+
+    public void setXMLOffloadingPropertiesFromDB(String connectorId) throws Exception {
 
 		List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll();
 
