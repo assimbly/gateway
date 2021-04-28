@@ -16,6 +16,7 @@ import { RouteService } from './route.service';
 })
 export class RouteUpdateComponent implements OnInit {
     isSaving = false;
+    showType = false;
 
     editForm = this.fb.group({
         id: [],
@@ -57,8 +58,8 @@ export class RouteUpdateComponent implements OnInit {
 
     setFileData(event: Event, field: string, isImage: boolean): void {
         this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: JhiFileLoadError) => {
-            //this.eventManager.broadcast(				
-                //new JhiEventWithContent<AlertError>('gatewayApp.error', { message: err.message })
+            //this.eventManager.broadcast(
+            //new JhiEventWithContent<AlertError>('gatewayApp.error', { message: err.message })
             //);
         });
     }

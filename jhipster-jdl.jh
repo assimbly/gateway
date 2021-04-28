@@ -32,6 +32,7 @@ entity Endpoint {
 	compponentType ComponentType,
 	uri TextBlob,
     options TextBlob,
+    routeId Integer
     responseId Integer
 }
 

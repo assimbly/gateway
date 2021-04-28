@@ -6,6 +6,7 @@ import { GatewaySharedModule } from '../../shared';
 import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
+import { GatewayRouteModule } from '../../entities/route/route.module';
 import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
 import { GatewaySecurityModule } from '../../entities/security/security.module';
 import { AceModule } from 'ngx-ace-wrapper';
@@ -44,6 +45,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
         GatewayServiceModule,
         GatewaySecurityModule,
         GatewayHeaderModule,
+        GatewayRouteModule,
         GatewayMaintenanceModule,
         AceEditorModule,
         AceModule,

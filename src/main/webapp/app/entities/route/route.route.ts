@@ -10,6 +10,7 @@ import { RouteService } from './route.service';
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
+import { HeaderDeletePopupComponent, HeaderPopupComponent, HeaderResolve } from 'app/entities/header';
 
 @Injectable({ providedIn: 'root' })
 export class RouteResolve implements Resolve<IRoute> {
@@ -78,5 +79,41 @@ export const routeRoute: Routes = [
             pageTitle: 'Routes'
         },
         canActivate: [UserRouteAccessService]
+    }
+];
+
+export const routePopupRoute: Routes = [
+    {
+        path: 'route-new',
+        component: HeaderPopupComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Headers'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'route/:id/edit',
+        component: HeaderPopupComponent,
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Headers'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'route/:id/delete',
+        component: HeaderDeletePopupComponent,
+        resolve: {
+            header: HeaderResolve
+        },
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Headers'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
     }
 ];

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared/util/request-util';
-import { IRoute } from 'app/shared/model/route.model';
+import { IRoute, Route } from 'app/shared/model/route.model';
 
 type EntityResponseType = HttpResponse<IRoute>;
 type EntityArrayResponseType = HttpResponse<IRoute[]>;
@@ -34,5 +34,9 @@ export class RouteService {
 
     delete(id: number): Observable<HttpResponse<{}>> {
         return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    }
+
+    getAllRoutes(): Observable<EntityArrayResponseType> {
+        return this.http.get<Route[]>(`${this.resourceUrl}/getallroutes`, { observe: 'response' });
     }
 }

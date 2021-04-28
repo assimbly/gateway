@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-8">
-			<!--         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+		<form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
             <h2 id="jhi-route-heading">Create or edit a Route</h2>
 
             <div>
@@ -16,18 +16,19 @@
                            formControlName="name"/>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" *ngIf="showType">
                     <label class="form-control-label" for="field_type">Type</label>
-                    <input type="text" class="form-control" name="type" id="field_type"
-                           formControlName="type"/>
+                    <select type="text" class="form-control" name="type" id="field_type" formControlName="type">
+                        <option value="xml">xml</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_content">Content</label>
                     <textarea class="form-control" name="content" id="field_content"
-                              formControlName="content"></textarea>
+                              formControlName="content" rows="10"></textarea>
                 </div>
-            </div> 
+            </div>
 
             <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
@@ -38,6 +39,6 @@
                     <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
                 </button>
             </div>
-        </form>-->
+        </form>
     </div>
 </div>

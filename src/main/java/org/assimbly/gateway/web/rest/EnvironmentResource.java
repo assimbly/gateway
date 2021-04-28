@@ -22,10 +22,10 @@ import java.net.URISyntaxException;
 public class EnvironmentResource {
 
     private final Logger log = LoggerFactory.getLogger(EnvironmentResource.class);
-	
+
 	@Autowired
     private DBConfiguration DBConfiguration;
-    
+
 	private String configuration;
 
 	/**
@@ -47,9 +47,9 @@ public class EnvironmentResource {
        		log.error("Import of configuration failed: " + e.getMessage());
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
    		}
-    	
-    }    
-    
+
+    }
+
     /**
      * Get  /getconfiguration : get XML configuration for gateway.
      *
@@ -64,16 +64,16 @@ public class EnvironmentResource {
 			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType,isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				log.error("Failed to get configuration: " + configuration);
-				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
+				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getGatewayConfiguration", configuration);
 			}
-			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
-       		
+			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getGatewayConfiguration", configuration, true);
+
    		} catch (Exception e) {
    			log.error("Failed to get configuration: " + e.getMessage());
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", e.getMessage());
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getGatewayConfiguration", e.getMessage());
    		}
 
-    }    
+    }
 
     /**
      * Get  /getconfiguration : get XML configuration for gateway by list of flow ids.
@@ -88,16 +88,16 @@ public class EnvironmentResource {
        	try {
 			configuration = DBConfiguration.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids, isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
-				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", configuration);
+				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfigurationByFlowids", configuration);
 			}
-			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
-       		
+			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getConfigurationByFlowids", configuration, true);
+
    		} catch (Exception e) {
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfiguration", e.getMessage());
+   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfigurationByFlowids", e.getMessage());
    		}
 
     }
-    
+
     /**
      * POST  /setflowconfiguration : Set configuration from XML.
      *
@@ -105,7 +105,7 @@ public class EnvironmentResource {
      * @param configuration as XML / if empty get from db (for the time being)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
-     */ 
+     */
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> setFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
         try {
@@ -114,7 +114,7 @@ public class EnvironmentResource {
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setFlowConfiguration", e.getMessage());
    		}
-    }    
+    }
 
     /**
      * Get  /getconfiguration : get XML configuration for gateway.
@@ -127,7 +127,7 @@ public class EnvironmentResource {
     public ResponseEntity<String> getFlowConfiguration(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {
             configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType, isPlaceholderReplacement);
-            
+
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", configuration);
 			}
@@ -135,8 +135,8 @@ public class EnvironmentResource {
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", e.getMessage());
    		}
-    } 
-    
+    }
+
     /**
      * Get  /getlog : get tail of log file for the webapplication.
      *
@@ -146,7 +146,7 @@ public class EnvironmentResource {
      */
     @GetMapping(path = "/environment/{gatewayid}/log/{lines}", produces = {"text/plain"})
     public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
-    	
+
        	try {
         	File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
        		String log = LogUtil.tail(file, lines);
@@ -155,5 +155,5 @@ public class EnvironmentResource {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
    		}
     }
-    
+
 }

@@ -3,7 +3,7 @@ export const enum EndpointType {
     TO = 'TO',
     ERROR = 'ERROR',
     RESPONSE = 'RESPONSE',
-	WIRETAP = 'WIRETAP'
+    WIRETAP = 'WIRETAP'
 }
 
 export const enum ComponentType {
@@ -23,26 +23,28 @@ export const enum ComponentType {
 
 export interface IEndpoint {
     id?: number;
-	endpointType?: EndpointType;
+    endpointType?: EndpointType;
     componentType?: ComponentType;
     uri?: string;
     options?: string;
     responseId?: number;
-	flowId?: number;
+    flowId?: number;
     serviceId?: number;
     headerId?: number;
+    routeId?: number;
 }
 
 export class Endpoint implements IEndpoint {
     constructor(
         public id?: number,
-		public endpointType?: EndpointType,        
-		public componentType?: ComponentType,
+        public endpointType?: EndpointType,
+        public componentType?: ComponentType,
         public uri?: string,
         public options?: string,
-		public responseId?: number,        
-		public flowId?: number,
+        public responseId?: number,
+        public flowId?: number,
         public serviceId?: number,
-        public headerId?: number
+        public headerId?: number,
+        public routeId?: number
     ) {}
 }

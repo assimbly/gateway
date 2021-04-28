@@ -9,6 +9,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -47,7 +48,7 @@ public class RouteResource {
             throw new BadRequestAlertException("A new route cannot already have an ID", ENTITY_NAME, "idexists");
         }
         RouteDTO result = routeService.save(routeDTO);
-              
+
         return ResponseEntity.created(new URI("/api/routes/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("gateway", false, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -83,6 +84,15 @@ public class RouteResource {
     public List<RouteDTO> getAllRoutes() {
         log.debug("REST request to get all Routes");
         return routeService.findAll();
+    }
+
+
+    @GetMapping("/routes/getallroutes")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<RouteDTO>> getAllServices2() {
+        log.debug("REST request to get all Routes 2");
+        List<RouteDTO> routesList = routeService.findAll();
+        return ResponseEntity.ok().body(routesList);
     }
 
     /**
