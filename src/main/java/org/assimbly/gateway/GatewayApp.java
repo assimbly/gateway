@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway"})
+@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway","org.assimbly.brokerrest"})
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class})
 public class GatewayApp {
 
@@ -125,7 +125,7 @@ public class GatewayApp {
                 "External URL: \t\t{}://{}:{}{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
                 "Java WorkingDir: \t{}\n\t" +
-                "Apache Camel version: \t3.7.3 \n\t" +
+                "Apache Camel version: \t3.7.4 \n\t" +
                 "Profile(s): \t\t{}\n----------------------------------------------------------",
             applicationName,
             applicationVersion,

@@ -86,7 +86,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     getbrokerStatus(id: number) {
-        this.brokerService.getBrokerStatus(id).subscribe(response => {
+        this.brokerService.getBrokerStatus(id, this.broker.type).subscribe(response => {
             this.setbrokerStatus(response.body);
         });
     }
@@ -148,7 +148,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     getBrokerInfo(id: number) {
-        this.brokerService.getBrokerInfo(id).subscribe(res => {
+        this.brokerService.getBrokerInfo(id, this.broker.type).subscribe(res => {
             this.setBrokerInfo(res.body);
         });
     }
@@ -173,7 +173,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <b>Broker type:</b> ${type}<br/>
                <b>Broker version:</b> ${version}<br/>
                <b>Broker Node ID:</b> ${nodeId}<br/>
-               <br/>               
+               <br/>
                <b>Broker state:</b> ${state}<br/>
                <b>Broker uptime:</b> ${uptime}<br/>
                <br/>
@@ -188,7 +188,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
-        this.brokerService.start(this.broker.id).subscribe(
+        this.brokerService.start(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
                 if (response.status === 200) {
                     this.setbrokerStatus('started');
@@ -209,7 +209,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
-        this.brokerService.restart(this.broker.id).subscribe(
+        this.brokerService.restart(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
                 if (response.status === 200) {
                     this.setbrokerStatus('restarted');
@@ -230,7 +230,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
-        this.brokerService.stop(this.broker.id).subscribe(
+        this.brokerService.stop(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
                 if (response.status === 200) {
                     this.setbrokerStatus('stopped');
@@ -248,7 +248,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     getBrokerDetails() {
         this.brokerDetails = `
-        
+
                 <b>ID:</b> ${this.broker.id}<br/>
                 <b>Name:</b> ${this.broker.name}<br/>
                 <b>Type:</b> ${this.broker.type}<br/>
