@@ -1,10 +1,8 @@
 package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
-import org.assimbly.gateway.config.environment.BrokerManager;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
-import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -13,7 +11,6 @@ import org.assimbly.gateway.service.dto.GatewayDTO;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.quartz.*;
-import org.quartz.impl.StdScheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
@@ -24,16 +21,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
-
-import javax.annotation.PostConstruct;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
-import static org.quartz.TriggerBuilder.newTrigger;
+
 
 /**
  * REST controller for managing Gateway.

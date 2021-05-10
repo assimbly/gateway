@@ -40,37 +40,64 @@ export class BrokerService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
+    start(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.resourceUrl}/${id}/start`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+        });
     }
 
-    restart(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/restart`, { observe: 'response', responseType: 'text' });
+    restart(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.resourceUrl}/${id}/restart`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+        });
     }
 
-    stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
+    stop(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.resourceUrl}/${id}/stop`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+        });
     }
 
-    getBrokerStatus(id: number): Observable<any> {
-        return this.http.get(`${this.resourceUrl}/${id}/status`, { observe: 'response', responseType: 'text' });
+    getBrokerStatus(id: number, brokerType: string): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${id}/status`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType }
+        });
     }
 
-    getBrokerInfo(id: number): Observable<any> {
-        return this.http.get(`${this.resourceUrl}/${id}/info`, { observe: 'response', responseType: 'text' });
+    getBrokerType(id: number): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${id}/type`, { observe: 'response', responseType: 'text' });
     }
 
-    getBrokerConfiguration(id: number): Observable<any> {
-        return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, { observe: 'response', responseType: 'text' });
+    getBrokerInfo(id: number, brokerType: string): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${id}/info`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType }
+        });
     }
 
-    setBrokerConfiguration(id: number, brokerConfiguration: String): Observable<HttpResponse<any>> {
-        const options = {
-            headers: new HttpHeaders({ observe: 'response', responseType: 'text', Accept: 'text/plain' })
-        };
+    getBrokerConfiguration(id: number, brokerType: string): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, {
+            observe: 'response',
+            responseType: 'text',
+            params: { brokerType: brokerType }
+        });
+    }
+
+    setBrokerConfiguration(id: number, brokerType: string, brokerConfiguration: String): Observable<HttpResponse<any>> {
+        const options = {};
         return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
             observe: 'response',
-            responseType: 'text'
+            responseType: 'text',
+            params: { brokerType: brokerType }
         });
     }
 }
