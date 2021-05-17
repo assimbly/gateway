@@ -62,6 +62,8 @@ public final class CommandsUtil {
                 }else {
                     baseDirectoryParam = userHomeDir + "/.assimbly";
                 }
+        }else{
+            System.setProperty("user.home",baseDirectoryParam);
         }
 
         if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){

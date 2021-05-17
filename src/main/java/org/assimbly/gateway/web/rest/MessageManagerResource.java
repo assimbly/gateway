@@ -2,10 +2,13 @@ package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
 import org.assimbly.connector.Connector;
+import org.assimbly.connectorrest.ConnectorResource;
+
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.repository.ServiceRepository;
+import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,6 @@ public class MessageManagerResource {
 
     private final Logger log = LoggerFactory.getLogger(MessageManagerResource.class);
 
-    @Autowired
     private ConnectorResource connectorResource;
 
     @Autowired
@@ -42,6 +44,11 @@ public class MessageManagerResource {
     DBConfiguration assimblyDBConfiguration;
 
     Connector connector;
+
+    public MessageManagerResource(ConnectorResource connectorResource) {
+        this.connectorResource = connectorResource;
+    }
+
 
     /**
      * POST  /connector/{connectorId}/send : Send messages to an endpoint (fire and forget).

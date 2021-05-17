@@ -75,20 +75,25 @@ export class BrokerUpdateComponent implements OnInit {
     save() {
         this.brokerConfigurationFailed = '';
 
+        console.log('brokerConfiguration=' + this.broker.configurationType);
+
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
+            console.log('1');
             this.isSaving = true;
             this.brokerService.update(this.broker).subscribe(
                 response => {
-                    this.brokerService.setBrokerConfiguration(this.broker.id, this.broker.type, this.brokerConfiguration).subscribe(
-                        response => {
-                            this.isSaving = false;
-                            this.previousState();
-                        },
-                        err => {
-                            this.isSaving = false;
-                            this.brokerConfigurationFailed = err.error;
-                        }
-                    );
+                    this.brokerService
+                        .setBrokerConfiguration(this.broker.id, this.broker.type, this.broker.configurationType, this.brokerConfiguration)
+                        .subscribe(
+                            response => {
+                                this.isSaving = false;
+                                this.previousState();
+                            },
+                            err => {
+                                this.isSaving = false;
+                                this.brokerConfigurationFailed = err.error;
+                            }
+                        );
                 },
                 err => {
                     this.isSaving = false;
@@ -96,9 +101,11 @@ export class BrokerUpdateComponent implements OnInit {
                 }
             );
         } else if (this.broker.configurationType === 'file') {
+            console.log('2');
             this.isSaving = true;
             this.subscribeToCreateResponse(this.brokerService.create(this.broker));
         } else {
+            console.log('3');
             this.isSaving = true;
             if (this.broker.id !== undefined) {
                 this.subscribeToSaveResponse(this.brokerService.update(this.broker));
@@ -151,16 +158,18 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     protected onCreateSuccess(createdBroker) {
-        this.brokerService.setBrokerConfiguration(createdBroker.id, createdBroker.type, this.brokerConfiguration).subscribe(
-            response => {
-                this.isSaving = false;
-                this.previousState();
-            },
-            err => {
-                this.isSaving = false;
-                this.brokerConfigurationFailed = err.error;
-            }
-        );
+        this.brokerService
+            .setBrokerConfiguration(createdBroker.id, createdBroker.type, createdBroker.configurationType, this.brokerConfiguration)
+            .subscribe(
+                response => {
+                    this.isSaving = false;
+                    this.previousState();
+                },
+                err => {
+                    this.isSaving = false;
+                    this.brokerConfigurationFailed = err.error;
+                }
+            );
     }
 
     protected onCreateError() {

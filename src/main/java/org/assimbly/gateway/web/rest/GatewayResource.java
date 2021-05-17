@@ -1,13 +1,21 @@
 package org.assimbly.gateway.web.rest;
 
 import io.swagger.annotations.ApiParam;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
+import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
+
+import javax.annotation.PostConstruct;
+import org.assimbly.connector.Connector;
+import org.assimbly.connectorrest.ConnectorResource;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.quartz.*;
@@ -34,10 +42,24 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 @RequestMapping("/api")
 public class GatewayResource {
 
+    private ConnectorResource connectorResource;
+
     @Autowired
     private DBConfiguration DBConfiguration;
 
+    @Autowired
+    FlowRepository flowRepository;
+
+    @Autowired
+    EncryptionProperties encryptionProperties;
+
     private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
+
+    private final ApplicationProperties applicationProperties;
+
+    private Connector connector;
+
+    private boolean connectorIsStarting = false;
 
     private static final String ENTITY_NAME = "gateway";
 
@@ -48,10 +70,13 @@ public class GatewayResource {
 	private String gatewayType;
 	private boolean ran = false;
 
-    public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository) throws SchedulerException {
+    public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository, ApplicationProperties applicationProperties, ConnectorResource connectorResource) throws SchedulerException {
         this.gatewayService = gatewayService;
         this.gatewayRepository = gatewayRepository;
+        this.applicationProperties = applicationProperties;
+        this.connectorResource = connectorResource;
     }
+
 
     /**
      * POST  /gateways : Create a new gateway.
@@ -195,6 +220,77 @@ public class GatewayResource {
 
         gatewayRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    public void init() throws Exception {
+
+        connector = connectorResource.getConnector();
+
+        if(!connector.isStarted() && !connectorIsStarting){
+            try {
+
+                ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
+
+                String applicationBaseDirectory = gateway.getBaseDirectory();
+                boolean applicationTracing = gateway.getTracing();
+                boolean applicationDebugging = gateway.getDebugging();
+
+                if (!applicationBaseDirectory.equals("default")) {
+                    connector.setBaseDirectory(applicationBaseDirectory);
+                }
+
+                connectorIsStarting = true;
+                connector.setEncryptionProperties(encryptionProperties.getProperties());
+                //connector.addEventNotifier(failureListener);
+                connector.setTracing(applicationTracing);
+                connector.setDebugging(applicationDebugging);
+
+                connector.start();
+
+                int count = 1;
+
+                while (!connector.isStarted() && count < 300) {
+                    Thread.sleep(100);
+                    count++;
+                }
+
+                connectorIsStarting = false;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    @PostConstruct
+    private void initConnector() {
+
+        try {
+            init();
+        } catch (Exception e) {
+            log.error("Initialization of connector failed");
+            e.printStackTrace();
+        }
+
+        //start flows with autostart
+        List<Flow> flows = flowRepository.findAll();
+
+        try {
+            for(Flow flow : flows) {
+                if(flow.isAutoStart()) {
+                    String configuration;
+                    log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
+                    configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application",true);
+                    connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+                    connector.startFlow(flow.getId().toString());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Autostart of flow failed (check configuration)");
+            e.printStackTrace();
+        }
+
     }
 
 }

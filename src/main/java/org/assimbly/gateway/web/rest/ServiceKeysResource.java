@@ -2,13 +2,14 @@ package org.assimbly.gateway.web.rest;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.connector.Connector;
-import org.assimbly.connector.impl.CamelConnector;
+import org.assimbly.connectorrest.ConnectorResource;
+import org.assimbly.util.EncryptionUtil;
+
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.ServiceKeysService;
 import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +34,17 @@ public class ServiceKeysResource {
 
     private final ServiceKeysService serviceKeysService;
 
-    private final Connector connector = new CamelConnector();
+    private Connector connector;
+
+   // @Autowired
+    private ConnectorResource connectorResource;
 
     @Autowired
     private EncryptionProperties encryptionProperties;
 
-    public ServiceKeysResource(ServiceKeysService serviceKeysService) {
+    public ServiceKeysResource(ServiceKeysService serviceKeysService, ConnectorResource connectorResource) {
         this.serviceKeysService = serviceKeysService;
+        this.connectorResource = connectorResource;
     }
 
     /**
@@ -121,6 +126,7 @@ public class ServiceKeysResource {
 
     private ServiceKeysDTO encryptPassword(ServiceKeysDTO serviceKeysDTO) {
         if (serviceKeysDTO.getKey().equals("password")) {
+            connector = connectorResource.getConnector();
             connector.setEncryptionProperties(encryptionProperties.getProperties());
             EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
             serviceKeysDTO.setValue(encryptionUtil.encrypt(serviceKeysDTO.getValue()));
