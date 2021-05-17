@@ -1,6 +1,8 @@
 package org.assimbly.gateway.web.rest;
 
 import org.assimbly.connector.Connector;
+import org.assimbly.connectorrest.ConnectorResource;
+
 import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.service.SecurityService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -52,8 +54,9 @@ public class SecurityResource {
 
     private final SecurityService securityService;
 
-    public SecurityResource(SecurityService securityService) {
+    public SecurityResource(SecurityService securityService, ConnectorResource connectorResource) {
         this.securityService = securityService;
+        this.connectorResource = connectorResource;
     }
 
     /**

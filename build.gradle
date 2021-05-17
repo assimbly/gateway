@@ -309,8 +309,7 @@ dependencies {
     implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
 	// custom dependencies (non-jhipster)
-    implementation group: "org.assimbly", name: "connectorModule", version: "3.5.0", changing: true
-    //implementation group: "org.assimbly", name: "brokerModule", version: "3.5.0", changing: true
+    implementation group: "org.assimbly", name: "connectorRestModule", version: "3.5.0", changing: true
     implementation group: "org.assimbly", name: "brokerRestModule", version: "3.5.0", changing: true
 	implementation "io.github.assimbly:docconverter:1.4.0"
 	implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"

@@ -92,12 +92,17 @@ export class BrokerService {
         });
     }
 
-    setBrokerConfiguration(id: number, brokerType: string, brokerConfiguration: String): Observable<HttpResponse<any>> {
+    setBrokerConfiguration(
+        id: number,
+        brokerType: string,
+        brokerConfigurationType: string,
+        brokerConfiguration: String
+    ): Observable<HttpResponse<any>> {
         const options = {};
         return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
         });
     }
 }

@@ -1,7 +1,7 @@
 package org.assimbly.gateway.web.rest;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import org.assimbly.brokerrest.BrokerManager;
+import org.assimbly.brokerrest.ManagedBroker;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -32,7 +32,7 @@ public class BrokerResource {
     private final BrokerService brokerService;
 
     @Autowired
-    private BrokerManager brokermanager;
+    private ManagedBroker managedBroker;
 
     public BrokerResource(BrokerService brokerService) {
         this.brokerService = brokerService;
@@ -114,7 +114,6 @@ public class BrokerResource {
         log.debug("REST request to get Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
         return ResponseUtil.wrapOrNotFound(brokerDTO);
-
     }
 
     /**
@@ -132,10 +131,8 @@ public class BrokerResource {
         return brokerType;
     }
 
-
-
-    public BrokerManager getBrokerManager(){
-        return brokermanager;
+    public ManagedBroker getBrokerManager(){
+        return managedBroker;
     }
 
 
@@ -150,7 +147,7 @@ public class BrokerResource {
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
-                brokermanager.start(brokerType, brokerConfigurationType);
+                managedBroker.start(brokerType, brokerConfigurationType);
             }
         }
     }
