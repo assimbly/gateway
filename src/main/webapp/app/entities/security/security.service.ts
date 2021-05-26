@@ -76,6 +76,21 @@ export class SecurityService {
         });
     }
 
+    uploadP12Certificate(certificate, fileType, password): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            fileType: fileType,
+            password: password
+        });
+
+        console.log('uploading p12 certificate');
+
+        return this.http.post(`${this.resourceUrl}/uploadp12certificate`, certificate, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
     protected convertDateFromClient(security: ISecurity): ISecurity {
         const copy: ISecurity = Object.assign({}, security, {
             certificateExpiry:

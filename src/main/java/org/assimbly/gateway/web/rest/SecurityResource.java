@@ -324,8 +324,10 @@ public class SecurityResource {
         	Connector connector = connectorResource.getConnector();
 
             Certificate cert;
-            if(fileType.equalsIgnoreCase("pem")){
+            if(fileType.equalsIgnoreCase("pem")) {
                 cert = convertPemToX509Certificate(certificate);
+            }else if(fileType.equalsIgnoreCase("p12")){
+                return ResponseUtil.createFailureResponse(1L, mediaType,"/securities/uploadcertificate","use the p12 uploader");
             }else{
                 //create certificate from String
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -371,6 +373,36 @@ public class SecurityResource {
    		}
 
     }
+
+
+    @PostMapping(path = "/securities/uploadp12certificate", consumes = {"text/plain"}, produces = {"text/plain","application/xml", "application/json"})
+    public ResponseEntity<String> uploadP12Certificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestHeader("password") String password, @RequestBody String certificate) throws Exception {
+
+        log.info("Uploaded P12 certificate: 0");
+
+        try {
+
+            log.info("Uploaded P12 certificate: 1");
+
+            //get connector
+            Connector connector = connectorResource.getConnector();
+
+            log.info("Uploaded P12 certificate: 2");
+
+            connector.importP12Certificate(certificate,password);
+
+            log.info("Uploaded P12 certificate: 3");
+
+            log.debug("Uploaded P12 certificate: ");
+
+            return ResponseUtil.createSuccessResponse(1L, mediaType,"/securities/uploadcertificate","Certification File uploaded");
+        } catch (Exception e) {
+            log.debug("Uploaded certificate failed: ", e.getMessage());
+            return ResponseUtil.createFailureResponse(1L, mediaType,"/securities/uploadcertificate",e.getMessage());
+        }
+
+    }
+
 
 
     protected static String convertX509CertificateToPem(X509Certificate certificate) throws CertificateEncodingException {

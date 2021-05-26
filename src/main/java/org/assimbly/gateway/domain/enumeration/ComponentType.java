@@ -737,7 +737,10 @@ public enum ComponentType {
 
 	VERTX("VERTX"),
 
-	VM("VM"),
+    @JsonProperty("VERTX-HTTP")
+    VERTXHTTP("VERTX-HTTP"),
+
+    VM("VM"),
 
 	WASTEBIN("WASTEBIN"),
 
