@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { SecurityService } from './security.service';
@@ -8,20 +9,28 @@ import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityPopupService } from 'app/entities/security';
 
 @Component({
-    selector: 'jhi-security-upload-dialog',
-    templateUrl: './security-upload-dialog.component.html'
+    selector: 'jhi-security-uploadp12-dialog',
+    templateUrl: './security-uploadp12-dialog.component.html'
 })
-export class SecurityUploadDialogComponent implements AfterContentInit {
+export class SecurityUploadP12DialogComponent implements OnInit, AfterContentInit {
     securityId: number;
     securities: Array<ISecurity> = [];
+
+    importForm: FormGroup;
     certificateFile: any;
     fileName = 'Choose file';
     fileType: string;
-    password: string;
+    password2: string;
     uploadError = false;
     uploadErrorMessage: String;
 
     constructor(private eventManager: JhiEventManager, private securityService: SecurityService, public activeModal: NgbActiveModal) {}
+
+    ngOnInit() {
+        this.importForm = new FormGroup({
+            password: new FormControl({ value: '' })
+        });
+    }
 
     ngAfterContentInit() {
         this.securityService.query().subscribe(res => {
@@ -39,14 +48,16 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
         reader.onload = () => {
             this.certificateFile = reader.result;
         };
-        reader.readAsBinaryString(event.target.files[0]);
+        reader.readAsDataURL(event.target.files[0]);
 
         this.fileName = event.target.files[0].name;
         this.fileType = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
     }
 
-    uploadCertificate() {
-        this.securityService.uploadCertificate(this.certificateFile, this.fileType).subscribe(
+    uploadP12Certificate() {
+        let password = <FormGroup>this.importForm.controls['password'].value;
+
+        this.securityService.uploadP12Certificate(this.certificateFile, this.fileType, password).subscribe(
             data => {
                 this.uploadError = false;
                 this.activeModal.dismiss(true);
@@ -65,14 +76,14 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     selector: 'jhi-security-upload-popup',
     template: ''
 })
-export class SecurityUploadPopupComponent implements OnInit, OnDestroy {
+export class SecurityUploadP12PopupComponent implements OnInit, OnDestroy {
     routeSub: any;
 
     constructor(protected route: ActivatedRoute, protected securityPopupService: SecurityPopupService) {}
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(() => {
-            this.securityPopupService.open(SecurityUploadDialogComponent as Component);
+            this.securityPopupService.open(SecurityUploadP12DialogComponent as Component);
         });
     }
 

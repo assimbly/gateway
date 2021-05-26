@@ -308,6 +308,7 @@ export enum ComponentType {
     VALIDATOR = 'VALIDATOR',
     VELOCITY = 'VELOCITY',
     VERTX = 'VERTX',
+    VERTXHTTP = 'VERTX-HTTP',
     VM = 'VM',
     WASTEBIN = 'WASTEBIN',
     WEATHER = 'WEATHER',
@@ -4272,6 +4273,26 @@ export const typesLinks = [
     `
     },
     {
+        name: 'VERTX-HTTP',
+        assimblyTypeLink: `/component-vertx-http`,
+        camelTypeLink: `/vertx-http-component.html`,
+        uriPlaceholder: 'hostname[:port][/resourceUri]',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Sets the hostname of the url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The http port<br/>
+        <b>Required</b>: not <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: The url extension<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
         camelTypeLink: `/vm-component.html`,
@@ -4976,6 +4997,7 @@ export class Components {
         'VALIDATOR',
         'VELOCITY',
         'VERTX',
+        'VERTX-HTTP',
         'VM',
         'WASTEBIN',
         'WEATHER',

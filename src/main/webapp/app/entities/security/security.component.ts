@@ -101,6 +101,11 @@ export class SecurityComponent implements OnInit, OnDestroy {
         this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
     }
 
+    uploadP12Certificate() {
+        console.log('upload P12 certificate');
+        this.router.navigate(['/', { outlets: { popup: ['uploadp12'] } }]);
+    }
+
     protected paginateSecurities(data: ISecurity[], headers: HttpHeaders) {
         this.links = this.parseLinks.parse(headers.get('link'));
         this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
