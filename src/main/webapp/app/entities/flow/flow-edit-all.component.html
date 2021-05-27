@@ -109,11 +109,11 @@
                                     <div class="d-flex">
                                         <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
                                             <ng-container *ngFor="let endpoint of endpoints; index as index">
-                                                <li ngbNavItem="{{index}}" [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px' }" novalidate>
+                                                <li ngbNavItem="{{index}}" [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px', 'text-align': 'left' }" novalidate>
                                                     <a ngbNavLink>{{endpoint.endpointType}}</a>
                                                     <ng-template ngbNavContent>
 
-                                                        <div  class="col-12" style="padding-left: 20px;" [formGroupName]="index" id="{{ 'tab' + index }}">
+                                                        <div  class="col-12" style="padding-left: 20px; text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
                                                             <div class="input-group">
                                                                 <a class="col-10"></a>
                                                                 <a class="col-2">
@@ -319,8 +319,22 @@
                                     </ng-template>
                                 <br/>
                                 <div class="container">
-                                    <div  class="col-12" style="padding-left: 20px; padding-right: 452px;">
-                                            <div class="form-group">
+                                    <div  class="col-12" style="padding-left: 20px; padding-right: 452px; padding-bottom: 130px">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="field_logLevel" style="float: left; text-align: left;">Log Level</label> <i triggers="mouseenter:mouseleave" placement="right"
+                                                                                                                                                               triggers="mouseenter:mouseleave" popoverTitle="Info"
+                                                                                                                                                               [popover]="logLevelPopover" class="fa fa-info-circle"></i> <select
+                                            class="form-control" name="logLevel" formControlName="logLevel"
+                                            id="field_logLevel">
+
+                                            <option *ngFor="let logLevel of logLevelListType"
+                                                    [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+                                                {{logLevel}}</option>
+
+
+                                        </select>
+                                        </div>
+                                        <div class="form-group">
                                                 <label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
                                                 <i triggers="mouseenter:mouseleave" placement="right"
                                                    popoverTitle="Info" [popover]="autoStartPopover"
@@ -340,20 +354,6 @@
                                             *ngIf="flow" formControlName="parallelProcessing">
                                             <option value="true">true</option>
                                             <option value="false">false</option>
-                                        </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="field_logLevel" style="float: left; text-align: left;">Log Level</label> <i triggers="mouseenter:mouseleave" placement="right"
-                                                                                                                        triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                                                                                                        [popover]="logLevelPopover" class="fa fa-info-circle"></i> <select
-                                            class="form-control" name="logLevel" formControlName="logLevel"
-                                            id="field_logLevel">
-
-                                            <option *ngFor="let logLevel of logLevelListType"
-                                                    [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
-                                                {{logLevel}}</option>
-
-
                                         </select>
                                         </div>
                                         <div class="form-group">
@@ -404,12 +404,12 @@
                                 <ng-template #notesPopover let-message="message">
                                     <div [innerHtml]="notesPopoverMessage"></div>
                                 </ng-template>
-                                <div  class="col-lg-12" style="padding-left: 20px; padding-right: 20px;">
+                                <div  class="col-lg-12" style="padding-left: 20px; padding-right: 20px; padding-top: 20px;">
                                     <div class="form-group">
                                         <!--<i triggers="mouseenter:mouseleave" placement="right"
                                            popoverTitle="Info" [popover]="notesPopover"
                                            class="fa fa-info-circle"></i>-->
-                                        <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="20" cols="70"></textarea>
+                                        <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="25" cols="70"></textarea>
                                     </div>
                                 </div>
                             </ng-template>
