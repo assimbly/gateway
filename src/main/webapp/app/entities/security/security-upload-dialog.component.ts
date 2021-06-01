@@ -6,16 +6,20 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { SecurityService } from './security.service';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityPopupService } from 'app/entities/security';
+import { DATE_TIME_FORMAT } from 'app/shared';
+import * as moment from 'moment';
 
 @Component({
     selector: 'jhi-security-upload-dialog',
     templateUrl: './security-upload-dialog.component.html'
 })
 export class SecurityUploadDialogComponent implements AfterContentInit {
+    security: ISecurity;
     securityId: number;
     securities: Array<ISecurity> = [];
     certificateFile: any;
     fileName = 'Choose file';
+    fileNameWithoutExtension: string;
     fileType: string;
     password: string;
     uploadError = false;
@@ -42,15 +46,41 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
         reader.readAsBinaryString(event.target.files[0]);
 
         this.fileName = event.target.files[0].name;
+        this.fileNameWithoutExtension = this.fileName
+            .split('.')
+            .slice(0, -1)
+            .join('.');
         this.fileType = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
     }
 
     uploadCertificate() {
         this.securityService.uploadCertificate(this.certificateFile, this.fileType).subscribe(
             data => {
-                this.uploadError = false;
-                this.activeModal.dismiss(true);
-                this.eventManager.broadcast({ name: 'securityListModification', content: 'OK' });
+                let json = JSON.parse(data.body);
+
+                let certificate = json.certificates.certificate[0];
+
+                this.security.certificateName = certificate.certificateName;
+
+                console.log('this.security.certificateName=' + this.security.certificateName);
+
+                this.security.certificateFile = certificate.certificateFile;
+                this.security.certificateName = certificate.certificateName;
+                this.security.certificateExpiry = moment(certificate.certificateExpiry, DATE_TIME_FORMAT);
+                this.security.url = 'Generic (' + this.fileNameWithoutExtension + ')';
+
+                this.securityService.create(this.security).subscribe(
+                    res => {
+                        this.uploadError = false;
+                        this.activeModal.dismiss(true);
+                        this.eventManager.broadcast({ name: 'securityListModification', content: 'OK' });
+                    },
+                    err => {
+                        this.uploadError = true;
+                        this.uploadErrorMessage = err.error;
+                        console.log(err);
+                    }
+                );
             },
             err => {
                 this.uploadError = true;

@@ -126,7 +126,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     ngAfterViewInit() {
         this.finished = true;
-        this.securityService.syncTrustore().subscribe(res => {});
+        //this.securityService.syncTrustore().subscribe(res => {});
     }
 
     ngOnDestroy() {

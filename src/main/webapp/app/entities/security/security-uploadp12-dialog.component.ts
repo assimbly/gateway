@@ -7,18 +7,22 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { SecurityService } from './security.service';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityPopupService } from 'app/entities/security';
+import { DATE_TIME_FORMAT } from 'app/shared';
+import * as moment from 'moment';
 
 @Component({
     selector: 'jhi-security-uploadp12-dialog',
     templateUrl: './security-uploadp12-dialog.component.html'
 })
 export class SecurityUploadP12DialogComponent implements OnInit, AfterContentInit {
+    security: ISecurity;
     securityId: number;
     securities: Array<ISecurity> = [];
 
     importForm: FormGroup;
     certificateFile: any;
     fileName = 'Choose file';
+    fileNameWithoutExtension: string;
     fileType: string;
     password2: string;
     uploadError = false;
@@ -51,6 +55,10 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
         reader.readAsDataURL(event.target.files[0]);
 
         this.fileName = event.target.files[0].name;
+        this.fileNameWithoutExtension = this.fileName
+            .split('.')
+            .slice(0, -1)
+            .join('.');
         this.fileType = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
     }
 
@@ -59,9 +67,33 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
 
         this.securityService.uploadP12Certificate(this.certificateFile, this.fileType, password).subscribe(
             data => {
-                this.uploadError = false;
-                this.activeModal.dismiss(true);
-                this.eventManager.broadcast({ name: 'securityListModification', content: 'OK' });
+                let json = JSON.parse(data.body);
+
+                console.log('json=' + json);
+
+                let certificate = json.certificates.certificate[0];
+
+                this.security.certificateName = certificate.certificateName;
+
+                console.log('this.security.certificateName=' + this.security.certificateName);
+
+                this.security.certificateFile = this.certificateFile;
+                this.security.certificateName = certificate.certificateName;
+                this.security.certificateExpiry = moment(certificate.certificateExpiry, DATE_TIME_FORMAT);
+                this.security.url = 'P12 (' + this.fileNameWithoutExtension + ')';
+
+                this.securityService.create(this.security).subscribe(
+                    res => {
+                        this.uploadError = false;
+                        this.activeModal.dismiss(true);
+                        this.eventManager.broadcast({ name: 'securityListModification', content: 'OK' });
+                    },
+                    err => {
+                        this.uploadError = true;
+                        this.uploadErrorMessage = err.error;
+                        console.log(err);
+                    }
+                );
             },
             err => {
                 this.uploadError = true;

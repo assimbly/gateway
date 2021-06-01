@@ -15,6 +15,7 @@ type EntityArrayResponseType = HttpResponse<ISecurity[]>;
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
     public resourceUrl = SERVER_API_URL + 'api/securities';
+    public resourceCertificateUrl = SERVER_API_URL + 'api/certificates';
 
     constructor(protected http: HttpClient) {}
 
@@ -38,6 +39,14 @@ export class SecurityService {
             .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
     }
 
+    findAll(): Observable<HttpResponse<any>> {
+        return this.http.get<any>(`${this.resourceUrl}/all`, { observe: 'response' });
+    }
+
+    findByUrl(url: string): Observable<HttpResponse<any>> {
+        return this.http.post<any>(`${this.resourceUrl}/byurl`, url, { observe: 'response' });
+    }
+
     query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
         return this.http
@@ -57,19 +66,31 @@ export class SecurityService {
         return this.http.get(`${this.resourceUrl}/details/${certificateName}`, { observe: 'response', responseType: 'text' });
     }
 
+    /*
     syncTrustore(): Observable<HttpResponse<any>> {
+         const options = new HttpHeaders({
+            keystoreName: "keystore.jks",
+            keystorePassword: "supersecret"
+        });
         return this.http.post(`${this.resourceUrl}/syncTrustore`, '', { observe: 'response', responseType: 'text' });
-    }
+    }*/
 
-    updateTrustore(url: string): Observable<HttpResponse<any>> {
-        return this.http.post(`${this.resourceUrl}/updateTrustore`, url, { observe: 'response', responseType: 'text' });
+    updateTruststore(url: string): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            keystoreName: 'keystore.jks',
+            keystorePassword: 'supersecret'
+        });
+
+        return this.http.post(`${this.resourceCertificateUrl}/update`, url, { observe: 'response', responseType: 'text' });
     }
 
     uploadCertificate(certificate, fileType): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
+            keystoreName: 'keystore.jks',
+            keystorePassword: 'supersecret',
             fileType: fileType
         });
-        return this.http.post(`${this.resourceUrl}/uploadcertificate`, certificate, {
+        return this.http.post(`${this.resourceCertificateUrl}/upload`, certificate, {
             headers: options,
             observe: 'response',
             responseType: 'text'
@@ -78,13 +99,41 @@ export class SecurityService {
 
     uploadP12Certificate(certificate, fileType, password): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
+            keystoreName: 'keystore.jks',
+            keystorePassword: 'supersecret',
             fileType: fileType,
             password: password
         });
 
         console.log('uploading p12 certificate');
 
-        return this.http.post(`${this.resourceUrl}/uploadp12certificate`, certificate, {
+        return this.http.post(`${this.resourceCertificateUrl}/uploadp12`, certificate, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    importCertificate(url, keystoreName): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            keystoreName: keystoreName,
+            keystorePassword: 'supersecret'
+        });
+
+        return this.http.post(`${this.resourceCertificateUrl}/import`, url, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    deleteCertificate(certificateName: String): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            keystoreName: 'keystore.jks',
+            keystorePassword: 'supersecret'
+        });
+
+        return this.http.get(`${this.resourceCertificateUrl}/delete/${certificateName}`, {
             headers: options,
             observe: 'response',
             responseType: 'text'
