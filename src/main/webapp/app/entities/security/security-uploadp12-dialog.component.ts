@@ -24,7 +24,6 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
     fileName = 'Choose file';
     fileNameWithoutExtension: string;
     fileType: string;
-    password2: string;
     uploadError = false;
     uploadErrorMessage: String;
 
@@ -32,7 +31,13 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
 
     ngOnInit() {
         this.importForm = new FormGroup({
-            password: new FormControl({ value: '' })
+            password: new FormControl({ value: '' }),
+            certificateStore: new FormControl({ value: 'truststore' })
+        });
+
+        this.importForm.patchValue({
+            password: '',
+            certificateStore: 'truststore'
         });
     }
 
@@ -64,8 +69,9 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
 
     uploadP12Certificate() {
         let password = <FormGroup>this.importForm.controls['password'].value;
+        let certificateStore = <FormGroup>this.importForm.controls['certificateStore'].value;
 
-        this.securityService.uploadP12Certificate(this.certificateFile, this.fileType, password).subscribe(
+        this.securityService.uploadP12Certificate(certificateStore + '.jks', this.certificateFile, this.fileType, password).subscribe(
             data => {
                 let json = JSON.parse(data.body);
 
@@ -75,10 +81,13 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
 
                 this.security.certificateName = certificate.certificateName;
 
+                this.security.certificateStore = certificate.certificateStore;
                 console.log('this.security.certificateName=' + this.security.certificateName);
+                console.log('this.security.certificateStore=' + this.security.certificateStore);
 
                 this.security.certificateFile = this.certificateFile;
                 this.security.certificateName = certificate.certificateName;
+                this.security.certificateStore = certificateStore + '.jks';
                 this.security.certificateExpiry = moment(certificate.certificateExpiry, DATE_TIME_FORMAT);
                 this.security.url = 'P12 (' + this.fileNameWithoutExtension + ')';
 

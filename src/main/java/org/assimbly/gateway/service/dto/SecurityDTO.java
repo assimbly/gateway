@@ -16,6 +16,8 @@ public class SecurityDTO implements Serializable {
 
     private String certificateName;
 
+    private String certificateStore;
+
     private Instant certificateExpiry;
 
     @Lob
@@ -43,6 +45,14 @@ public class SecurityDTO implements Serializable {
 
     public void setCertificateName(String certificateName) {
         this.certificateName = certificateName;
+    }
+
+    public String getCertificateStore() {
+        return certificateStore;
+    }
+
+    public void setCertificateStore(String certificateStore) {
+        this.certificateStore = certificateStore;
     }
 
     public Instant getCertificateExpiry() {
@@ -88,6 +98,7 @@ public class SecurityDTO implements Serializable {
             "id=" + getId() +
             ", url='" + getUrl() + "'" +
             ", certificateName='" + getCertificateName() + "'" +
+            ", certificateStore='" + getCertificateStore() + "'" +
             ", certificateExpiry='" + getCertificateExpiry() + "'" +
             ", certificateFile='" + getCertificateFile() + "'" +
             "}";

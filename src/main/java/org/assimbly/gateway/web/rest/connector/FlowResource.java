@@ -1,5 +1,11 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
+import org.assimbly.connector.Connector;
+import org.assimbly.connectorrest.ConnectorResource;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -8,6 +14,8 @@ import org.assimbly.gateway.service.dto.FlowDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,10 +24,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * REST controller for managing flow.
@@ -29,13 +39,36 @@ import java.util.Optional;
 public class FlowResource {
 
     private final Logger log = LoggerFactory.getLogger(FlowResource.class);
-    	
+
     private static final String ENTITY_NAME = "flow";
 
     private final FlowService flowService;
 
-    public FlowResource(FlowService flowService) {
+    @Autowired
+    private org.assimbly.gateway.config.environment.DBConfiguration DBConfiguration;
+
+    @Autowired
+    FlowRepository flowRepository;
+
+    @Autowired
+    EncryptionProperties encryptionProperties;
+
+    @Value("${server.port}")
+    private int serverPort;
+
+    private final ApplicationProperties applicationProperties;
+
+    private Connector connector;
+
+    private ConnectorResource connectorResource;
+
+    private boolean connectorIsStarting = false;
+
+    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, ConnectorResource connectorResource) {
         this.flowService = flowService;
+        this.applicationProperties = applicationProperties;
+        this.connectorResource = connectorResource;
+
     }
 
     /**
@@ -105,22 +138,22 @@ public class FlowResource {
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
-    
+
     /*
     @GetMapping("/flows/bygatewayid/{gatewayid}")
     public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
     	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
         List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
         flows.sort(Comparator.comparing(Flow::getName));
-        
+
         for(Flow flow : flows) {
         	System.out.println("Tname=" + flow.getName());
         }
-        
+
        return flowMapper.toDto(flows);
     }
 	*/
-    
+
     /**
      * GET  /flows/:id : get the "id" flow.
      *
@@ -131,7 +164,7 @@ public class FlowResource {
     public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
         log.debug("REST request to get Flow : {}", id);
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
-        
+
         return ResponseUtil.wrapOrNotFound(flowDTO);
     }
 
@@ -147,4 +180,37 @@ public class FlowResource {
         flowService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    @PostConstruct
+    private void initConnector() throws Exception {
+
+        ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
+
+        connectorResource.setConnector(encryptionProperties.getProperties());
+
+        connectorResource.initConnector();
+
+        connector = connectorResource.getConnector();
+
+        //start flows with autostart
+        List<Flow> flows = flowRepository.findAll();
+
+        try {
+            for(Flow flow : flows) {
+                if(flow.isAutoStart()) {
+                    String configuration;
+                    log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
+                    configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application",true);
+
+                    connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+                    connector.startFlow(flow.getId().toString());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Autostart of flow failed (check configuration)");
+            e.printStackTrace();
+        }
+
+    }
+
 }

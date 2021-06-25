@@ -14,6 +14,7 @@ export enum ComponentType {
     AMQP = 'AMQP',
     AMQPS = 'AMQPS',
     APNS = 'APNS',
+    ARANGODB = 'ARANGODB',
     AS2 = 'AS2',
     ASTERISK = 'ASTERISK',
     ATMOS = 'ATMOS',
@@ -25,28 +26,32 @@ export enum ComponentType {
     ATOMIXQUEUE = 'ATOMIX-QUEUE',
     ATOMIXSET = 'ATOMIX-SET',
     ATOMIXVALUE = 'ATOMIX-VALUE',
+    ATLASMAP = 'ATLASMAP',
     AVRO = 'AVRO',
-    AWSCW = 'AWS-CW',
-    AWSDDB = 'AWS-DDB',
-    AWSDDBSTREAM = 'AWS-DDBSTREAM',
-    AWSEC2 = 'AWS-EC2',
-    AWSECS = 'AWS-ECS',
-    AWSEKS = 'AWS-EKS',
-    AWSKMS = 'AWS-KMS',
-    AWSKINESIS = 'AWS-KINESIS',
-    AWSKINESISFIREHOSE = 'AWS-KINESIS-FIREHOSE',
-    AWSLAMBDA = 'AWS-LAMBDA',
-    AWSMQ = 'AWS-MQ',
-    AWSMSK = 'AWS-MSK',
-    AWSS3 = 'AWS-S3',
-    AWSSDB = 'AWS-SDB',
-    AWSSES = 'AWS-SES',
-    AWSSNS = 'AWS-SNS',
-    AWSSQS = 'AWS-SQS',
-    AWSSWF = 'AWS-SWF',
-    AWSTRANSLATE = 'AWS-TRANSLATE',
-    AZUREBLOB = 'AZURE-BLOB',
-    AZUREQUEUE = 'AZURE-QUEUE',
+    AWS2ATHENA = 'AWS2-ATHENA',
+    AWS2CW = 'AWS2-CW',
+    AWS2DDB = 'AWS2-DDB',
+    AWS2DDBSTREAM = 'AWS2-DDBSTREAM',
+    AWS2EC2 = 'AWS2-EC2',
+    AWS2ECS = 'AWS2-ECS',
+    AWS2EKS = 'AWS2-EKS',
+    AWS2EVENTBRIDGE = 'AWS2-EVENTBRIDGE',
+    AWS2IAM = 'AWS2-IAM',
+    AWS2KMS = 'AWS2-KMS',
+    AWS2KINESIS = 'AWS2-KINESIS',
+    AWS2KINESISFIREHOSE = 'AWS2-KINESIS-FIREHOSE',
+    AWS2LAMBDA = 'AWS2-LAMBDA',
+    AWS2MSK = 'AWS2-MSK',
+    AWS2MQ = 'AWS2-MQ',
+    AWS2S3 = 'AWS2-S3',
+    AWS2SECRETSMANAGER = 'AWS2-SECRETS-MANAGER',
+    AWS2STS = 'AWS2-STS',
+    AWS2SNS = 'AWS2-SNS',
+    AWS2SQS = 'AWS2-SQS',
+    AWS2TRANSLATE = 'AWS2-TRANSLATE',
+    AZUREEVENTHUBS = 'AZURE-EVENTHUBS',
+    AZURESTORAGEBLOB = 'AZURE-STORAGE-BLOB',
+    AZURESTORAGEQUEUE = 'AZURE-STORAGE-QUEUE',
     BEANVALIDATOR = 'BEAN-VALIDATOR',
     BEAN = 'BEAN',
     CLASS = 'CLASS',
@@ -86,6 +91,7 @@ export enum ComponentType {
     DIRECTVM = 'DIRECT-VM',
     DISRUPTOR = 'DISRUPTOR',
     DISRUPTORVM = 'DISRUPTOR-VM',
+    DJL = 'DJL',
     DNS = 'DNS',
     DOCKER = 'DOCKER',
     DOZER = 'DOZER',
@@ -178,6 +184,7 @@ export enum ComponentType {
     JOOQ = 'JOOQ',
     JPA = 'JPA',
     JSLT = 'JSLT',
+    JSONATA = 'JSONATA',
     JSONVALIDATOR = 'JSON-VALIDATOR',
     JT400 = 'JT400',
     KAFKA = 'KAFKA',
@@ -212,6 +219,7 @@ export enum ComponentType {
     MILOCLIENT = 'MILO-CLIENT',
     MILOSERVER = 'MILO-SERVER',
     MINA = 'MINA',
+    MINIO = 'MINIO',
     MLLP = 'MLLP',
     MOCK = 'MOCK',
     MONGODB = 'MONGODB',
@@ -227,6 +235,7 @@ export enum ComponentType {
     NETTYHTTP = 'NETTY-HTTP',
     NITRITE = 'NITRITE',
     NSQ = 'NSQ',
+    OAIPMH = 'OAI-PMH',
     OLINGO2 = 'OLINGO2',
     OLINGO4 = 'OLINGO4',
     OPENSTACKCINDER = 'OPENSTACK-CINDER',
@@ -252,7 +261,9 @@ export enum ComponentType {
     REACTIVESTREAMS = 'REACTIVE-STREAMS',
     REF = 'REF',
     REST = 'REST',
+    RESTLET = 'RESTLET',
     RESTAPI = 'REST-API',
+    RESTEASY = 'RESTEASY',
     RESTOPENAPI = 'REST-OPENAPI',
     RESTSWAGGER = 'REST-SWAGGER',
     RSS = 'RSS',
@@ -282,6 +293,7 @@ export enum ComponentType {
     SPARK = 'SPARK',
     SPARKREST = 'SPARK-REST',
     SPLUNK = 'SPLUNK',
+    SPLUNKHEC = 'SPLUNK-HEC',
     SPRINGBATCH = 'SPRING-BATCH',
     SPRINGINTEGRATION = 'SPRING-INTEGRATION',
     SPRINGLDAP = 'SPRING-LDAP',
@@ -309,6 +321,8 @@ export enum ComponentType {
     VELOCITY = 'VELOCITY',
     VERTX = 'VERTX',
     VERTXHTTP = 'VERTX-HTTP',
+    VERTXKAFKA = 'VERTX-KAFKA',
+    VERTXWEBSOCKET = 'VERTX-WEBSOCKET',
     VM = 'VM',
     WASTEBIN = 'WASTEBIN',
     WEATHER = 'WEATHER',
@@ -474,7 +488,202 @@ export const typesLinks = [
     `
     },
     {
-        name: 'AWS-S3',
+        name: 'AWS2-ATHENA',
+        assimblyTypeLink: `/component-aws2-athena`,
+        camelTypeLink: `/aws2-athena-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: MyLabel<br/>
+    `
+    },
+    {
+        name: 'AWS2-CW',
+        assimblyTypeLink: `/component-aws2-cw`,
+        camelTypeLink: `/aws2-cw-component.html`,
+        uriPlaceholder: 'Namespace',
+        uriPopoverMessage: `
+        <b>Name</b>: Namespace<br/>
+        <b>Description</b>: The metric namespace.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: Namespace<br/>
+    `
+    },
+    {
+        name: 'AWS2-DDB',
+        assimblyTypeLink: `/component-aws2-ddb`,
+        camelTypeLink: `/aws2-ddb-component.html`,
+        uriPlaceholder: 'tableName',
+        uriPopoverMessage: `
+        <b>Name</b>: tableName<br/>
+        <b>Description</b>: The name of the table currently worked with..<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: domainName<br/>
+    `
+    },
+    {
+        name: 'AWS2-DDBSTREAMS',
+        assimblyTypeLink: `/component-aws2-ddbstream`,
+        camelTypeLink: `/aws2-ddbstream-component.html`,
+        uriPlaceholder: 'table-name[',
+        uriPopoverMessage: `
+        <b>Name</b>: table-name[<br/>
+        <b>Description</b>: Name of the dynamodb table.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-EC2',
+        assimblyTypeLink: `/component-aws2-ec2`,
+        camelTypeLink: `/aws2-ec2-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-ECS',
+        assimblyTypeLink: `/component-aws2-ecs`,
+        camelTypeLink: `/aws2-ecs-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-EKS',
+        assimblyTypeLink: `/component-aws2-eks`,
+        camelTypeLink: `/aws2-eks-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-EVENTBRIDGE',
+        assimblyTypeLink: `/component-aws2-eventbridge`,
+        camelTypeLink: `/aws2-eventbridge-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-IAM',
+        assimblyTypeLink: `/component-aws2-iam`,
+        camelTypeLink: `/aws2-iam-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-KMS',
+        assimblyTypeLink: `/component-aws2-kms`,
+        camelTypeLink: `/aws2-kms-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-KINESIS',
+        assimblyTypeLink: `/component-aws2-kinesis`,
+        camelTypeLink: `/aws2-kinesis-component.html`,
+        uriPlaceholder: 'stream-name',
+        uriPopoverMessage: `
+        <b>Name</b>: stream-name<br/>
+        <b>Description</b>: Name of the stream.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: streamName<br/>
+    `
+    },
+    {
+        name: 'AWS2-KINESIS-FIREHOSE',
+        assimblyTypeLink: `/component-aws2-kinesis-firehose`,
+        camelTypeLink: `/aws2-kinesis-firehose-component.html`,
+        uriPlaceholder: 'delivery-stream-name',
+        uriPopoverMessage: `
+        <b>Name</b>: delivery-stream-name<br/>
+        <b>Description</b>: Name of the stream.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: streamName<br/>
+    `
+    },
+    {
+        name: 'AWS2-LAMBDA',
+        assimblyTypeLink: `/component-aws2-lambda`,
+        camelTypeLink: `/aws2-lambda-component.html`,
+        uriPlaceholder: 'functionName',
+        uriPopoverMessage: `
+        <b>Name</b>: functionName<br/>
+        <b>Description</b>: Name of the Lambda function.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: functionX<br/>
+    `
+    },
+    {
+        name: 'AWS2-MSK',
+        assimblyTypeLink: `/component-aws2-msk`,
+        camelTypeLink: `/aws2-msk-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+		`
+    },
+    {
+        name: 'AWS2-MQ',
+        assimblyTypeLink: `/component-aws2-mq`,
+        camelTypeLink: `/aws2-mq-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+		`
+    },
+    {
+        name: 'AWS2-S3',
         assimblyTypeLink: `/component-amazons3`,
         camelTypeLink: `/aws-s3-component.html`,
         uriPlaceholder: 'bucketNameOrArn',
@@ -485,6 +694,71 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
         <b>Example</b>: MyBucket<br/>
     `
+    },
+    {
+        name: 'AWS-SECRETS-MANAGER',
+        assimblyTypeLink: `/component-aws-secrets-manager`,
+        camelTypeLink: `/aws-secrets-manager-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+		`
+    },
+    {
+        name: 'AWS2-STS',
+        assimblyTypeLink: `/component-aws2-sts`,
+        camelTypeLink: `/aws2-sts-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+    `
+    },
+    {
+        name: 'AWS2-SNS',
+        assimblyTypeLink: `/component-aws2-sns`,
+        camelTypeLink: `/aws2-sns-component.html`,
+        uriPlaceholder: 'topicNameOrArn',
+        uriPopoverMessage: `
+        <b>Name</b>: topicNameOrArn<br/>
+        <b>Description</b>: Topic name or ARN.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: MyTopic<br/>
+    `
+    },
+    {
+        name: 'AWS2-SQS',
+        assimblyTypeLink: `/component-aws2-sqs`,
+        camelTypeLink: `/aws2-sqs-component.html`,
+        uriPlaceholder: 'Topic name or ARN',
+        uriPopoverMessage: `
+        <b>Name</b>: Topic name or ARN<br/>
+        <b>Description</b>: Queue name or ARN.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: MyQueue<br/>
+    `
+    },
+    {
+        name: 'AWS2-TRANSLATE',
+        assimblyTypeLink: `/component-aws2-translate`,
+        camelTypeLink: `/aws2-translate-component.html`,
+        uriPlaceholder: 'label',
+        uriPopoverMessage: `
+        <b>Name</b>: label<br/>
+        <b>Description</b>: Logical name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <b>Example</b>: label<br/>
+	`
     },
     {
         name: 'ASTERISK',
@@ -514,6 +788,18 @@ export const typesLinks = [
         <b>Description</b>: Operation to perform. The value can be one of: put, del, search, get, move. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: AtmosOperation<br/>
+    `
+    },
+    {
+        name: 'ARANGODB',
+        assimblyTypeLink: `/component-arangodb`,
+        camelTypeLink: `/arangodb-component.html`,
+        uriPlaceholder: 'database',
+        uriPopoverMessage: `
+        <b>Name</b>: database<br/>
+        <b>Description</b>: Database name. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
     `
     },
     {
@@ -613,6 +899,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'ATLASMAP',
+        assimblyTypeLink: `/component-atlasmap`,
+        camelTypeLink: `/atlasmap-component.html`,
+        uriPlaceholder: 'mappingName',
+        uriPopoverMessage: `
+        <b>Name</b>: mappingName<br/>
+        <b>Description</b>: The classpath-local URI of the AtlasMap mapping definition, either ADM archive file or mapping definition JSON file to process. Path to the resource. You can prefix with: classpath, file, http, ref, or bean. classpath, file and http loads the resource using these protocols (classpath is default). ref will lookup the resource in the registry. bean will call a method on a bean to be used as the resource. For bean you can specify the method name after dot, eg bean:myBean.myMethod. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
         name: 'AVRO',
         assimblyTypeLink: `/component-avro`,
         camelTypeLink: `/atomix-avro.html`,
@@ -631,7 +929,55 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: int<br/>
         <b>Name</b>: messageName<br/>
-        <b>Description</b>: The name of the message to send. <br/>
+        <b>Description</b>: The name of the message to send.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'AZURE-EVENTHUBS',
+        assimblyTypeLink: `/azure-eventhub`,
+        camelTypeLink: `/azure-eventhubs-component.html`,
+        uriPlaceholder: '[namespace/eventHubName]',
+        uriPopoverMessage: `
+        <b>Name</b>: namespace<br/>
+        <b>Description</b>: EventHubs namespace created in Azure Portal<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+         <b>Name</b>: eventHubName<br/>
+        <b>Description</b>: EventHubs name under a specific namcespace.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'AZURE-STORAGE-BLOB',
+        assimblyTypeLink: `/azure-storage-blob`,
+        camelTypeLink: `/azure-storage-blob-component.html`,
+        uriPlaceholder: 'accountName[/containerName]',
+        uriPopoverMessage: `
+        <b>Name</b>: accountName<br/>
+        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+         <b>Name</b>: containerName<br/>
+        <b>Description</b>: The blob container name <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'AZURE-STORAGE-QUEUE',
+        assimblyTypeLink: `/azure-storage-queue`,
+        camelTypeLink: `/azure-storage-queue-component.html`,
+        uriPlaceholder: 'accountName[/queueName]',
+        uriPopoverMessage: `
+        <b>Name</b>: storageAccount<br/>
+        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+         <b>Name</b>: queueName<br/>
+        <b>Description</b>: The queue resource name<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
     `
@@ -1156,6 +1502,18 @@ export const typesLinks = [
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
         <b>Description</b>: Name of queue.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'DJL',
+        assimblyTypeLink: `/component-djl`,
+        camelTypeLink: `/djl-component.html`,
+        uriPlaceholder: 'application',
+        uriPopoverMessage: `
+        <b>Name</b>: application<br/>
+        <b>Description</b>: Application name.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `
@@ -2417,6 +2775,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'JSONATA',
+        assimblyTypeLink: `/component-jsonata`,
+        camelTypeLink: `/jsonata-component.html`,
+        uriPlaceholder: 'specName',
+        uriPopoverMessage: `
+        <b>Name</b>: specName<br/>
+        <b>Description</b>: The classpath-local URI of the specification to invoke; or the complete URL of the remote specification.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'JSON-VALIDATOR',
         assimblyTypeLink: `/component-json-validator`,
         camelTypeLink: `/json-validator-component.html`,
@@ -2835,6 +3205,19 @@ export const typesLinks = [
     `
     },
     {
+        name: 'MINIO',
+        assimblyTypeLink: `/component-mino`,
+        camelTypeLink: `/minio-component.html`,
+        uriPlaceholder: 'bucketName',
+        uriPopoverMessage: `
+        <b>Name</b>: bucketName<br/>
+        <b>Description</b>: Bucket name.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
         name: 'MLLP',
         assimblyTypeLink: `/component-mllp`,
         camelTypeLink: `/mllp-component.html`,
@@ -3061,6 +3444,19 @@ export const typesLinks = [
         <b>Description</b>: The NSQ topic. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'OAIPMH',
+        assimblyTypeLink: `/component-oai-pmh`,
+        camelTypeLink: `/oaipmh-component.html`,
+        uriPlaceholder: 'url',
+        uriPopoverMessage: `
+        <b>Name</b>: url<br/>
+        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: Olingo2ApiName<br/>
         <br/>
     `
     },
@@ -3497,6 +3893,42 @@ export const typesLinks = [
         `
     },
     {
+        name: 'RESTEASY',
+        assimblyTypeLink: `/component-resteasy`,
+        camelTypeLink: `/resteasy-component.html`,
+        uriPlaceholder: 'httpUri',
+        uriPopoverMessage: `
+        <b>Name</b>: httpUri<br/>
+        <b>Description</b>: The url of the HTTP endpoint to call.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
+        name: 'RESTLET',
+        assimblyTypeLink: `/component-restlet`,
+        camelTypeLink: `/restlet-component.html`,
+        uriPlaceholder: 'protocol://hostname[:port][/resourcePattern]',
+        uriPopoverMessage: `
+        <b>Name</b>: protocol<br/>
+        <b>Description</b>: The protocol to use which is http or https.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: host<br/>
+        <b>Description</b>: The hostname of the restlet service.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The port number of the restlet service.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: uriPattern<br/>
+        <b>Description</b>: The resource pattern such as /customer/id.<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String<br/><br/>
+        `
+    },
+    {
         name: 'REST-OPENAPI',
         assimblyTypeLink: `/component-rest-openapi`,
         camelTypeLink: `/rest-openapi-component.html`,
@@ -3908,6 +4340,22 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SPLUNK-HEC',
+        assimblyTypeLink: `/component-splunk-hec`,
+        camelTypeLink: `/splunk-hec-component.html`,
+        uriPlaceholder: '[endpoint]/[token]',
+        uriPopoverMessage: `
+        <b>Name</b>: endpoint<br/>
+        <b>Description</b>: Splunk Host URL<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: token<br/>
+        <b>Description</b>: Splunk authorization token<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
         name: 'SPRING-BATCH',
         assimblyTypeLink: `/component-spring-batch`,
         camelTypeLink: `/spring-batch-component.html`,
@@ -4293,6 +4741,38 @@ export const typesLinks = [
     `
     },
     {
+        name: 'VERTX-KAFKA',
+        assimblyTypeLink: `/component-vertx-kafka`,
+        camelTypeLink: `/vertx-kafka-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: Name of the topic to use. On the consumer you can use comma to separate multiple topics. A producer can only send a message to a single topic.. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'VERTX-WEBSOCKET',
+        assimblyTypeLink: `/component-vertx-websocket`,
+        camelTypeLink: `/vertx-websocket-component.html`,
+        uriPlaceholder: 'hostname[:port][/resourceUri]',
+        uriPopoverMessage: `
+        <b>Name</b>: hostname<br/>
+        <b>Description</b>: Sets the hostname of the url. <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+        <b>Name</b>: port<br/>
+        <b>Description</b>: The http port<br/>
+        <b>Required</b>: not <br/>
+        <b>Data Type</b>: Integer <br/><br/>
+        <b>Name</b>: resourceUri<br/>
+        <b>Description</b>: The url extension<br/>
+        <b>Required</b>: no <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
         name: 'VM',
         assimblyTypeLink: `/component-vm`,
         camelTypeLink: `/vm-component.html`,
@@ -4570,7 +5050,10 @@ export class Components {
         'AMQPS',
         'APNS',
         'AS2',
-        'AWS-S3',
+        'AWS2DDBSTREAM',
+        'AWS2KINESIS',
+        'AWS2S3',
+        'AWS2SQS',
         'ASTERISK',
         'ATMOS',
         'ATMOSPHERE-WEBSOCKET',
@@ -4581,6 +5064,9 @@ export class Components {
         'ATOMIX-SET',
         'ATOMIX-VALUE',
         'AVRO',
+        'AZURE-EVENTHUBS',
+        'AZURE-STORAGE-BLOB',
+        'AZURE-STORAGE-QUEUE',
         'BEANSTALK',
         'BOX',
         'BRAINTREE',
@@ -4672,6 +5158,7 @@ export class Components {
         'MILO-CLIENT',
         'MILO-SERVER',
         'MINA',
+        'MINIO',
         'MLLP',
         'MONGODB',
         'MONGODB-GRIDFS',
@@ -4681,6 +5168,7 @@ export class Components {
         'NETTY4',
         'NETTY-HTTP',
         'NSQ',
+        'OAI-PMH',
         'OLINGO2',
         'OLINGO4',
         'OPTAPLANNER',
@@ -4697,7 +5185,9 @@ export class Components {
         'REACTIVE-STREAMS',
         'REF',
         'REST',
+        'RESTLET',
         'REST-API',
+        'RESTEASY',
         'RSS',
         'SCHEDULER',
         'SEDA',
@@ -4733,6 +5223,8 @@ export class Components {
         'TWITTER-SEARCH',
         'TWITTER-TIMELINE',
         'VERTX',
+        'VERTX-KAFKA',
+        'VERTX-WEBSOCKET',
         'VM',
         'WEATHER',
         'WEB3J',
@@ -4755,8 +5247,27 @@ export class Components {
         'AMQP',
         'AMQPS',
         'APNS',
+        'ARANGODB',
         'AS2',
-        'AWS-S3',
+        'AWS2ATHENA',
+        'AWS2CW',
+        'AWS2DDB',
+        'AWS2EC2',
+        'AWS2ECS',
+        'AWS2EKS',
+        'AWS2EVENTBRIDGE',
+        'AWS2IAM',
+        'AWS2KMS',
+        'AWS2KINESIS',
+        'AWS2KINESISFIREHOSE',
+        'AWS2LAMBDA',
+        'AWS2MSK',
+        'AWS2MQ',
+        'AWS2S3',
+        'AWS2STS',
+        'AWS2SNS',
+        'AWS2SQS',
+        'AWS2TRANSLATE',
         'ASTERISK',
         'ATMOS',
         'ATMOSPHERE-WEBSOCKET',
@@ -4766,7 +5277,11 @@ export class Components {
         'ATOMIX-QUEUE',
         'ATOMIX-SET',
         'ATOMIX-VALUE',
+        'ATLASMAP',
         'AVRO',
+        'AZURE-EVENTHUBS',
+        'AZURE-STORAGE-BLOB',
+        'AZURE-STORAGE-QUEUE',
         'BEAN',
         'BEAN-VALIDATOR',
         'BEANSTALK',
@@ -4797,6 +5312,7 @@ export class Components {
         'DATASET-TEST',
         'DIGITALOCEAN',
         'DISRUPTOR',
+        'DJL',
         'DNS',
         'DOZER',
         'DIRECT',
@@ -4883,6 +5399,7 @@ export class Components {
         'JOOQ',
         'JPA',
         'JSLT',
+        'JSONATA',
         'JSON-VALIDATOR',
         'JT400',
         'KUBERNETES-CONFIG-MAPS',
@@ -4911,6 +5428,7 @@ export class Components {
         'MILO-CLIENT',
         'MILO-SERVER',
         'MINA',
+        'MINIO',
         'MLLP',
         'MOCK',
         'MONGODB',
@@ -4925,6 +5443,7 @@ export class Components {
         'NETTY4',
         'NETTY-HTTP',
         'NITRITE',
+        'OAI-PMH',
         'OLINGO2',
         'OLINGO4',
         'OPENSHIFT-BUILD-CONFIGS',
@@ -4948,7 +5467,9 @@ export class Components {
         'REACTIVE-STREAMS',
         'REF',
         'REST',
+        'RESTLET',
         'REST-OPENAPI',
+        'RESTEASY',
         'REST-SWAGGER',
         'SAGA',
         'SCHEDULER',
@@ -4973,6 +5494,7 @@ export class Components {
         'SOROUSH',
         'SPARK',
         'SPLUNK',
+        'SPLUNK-HEC',
         'SPRING-BATCH',
         'SPRING-EVENT',
         'SPRING-INTEGRATION',
@@ -4998,6 +5520,8 @@ export class Components {
         'VELOCITY',
         'VERTX',
         'VERTX-HTTP',
+        'VERTX-KAFKA',
+        'VERTX-WEBSOCKET',
         'VM',
         'WASTEBIN',
         'WEATHER',

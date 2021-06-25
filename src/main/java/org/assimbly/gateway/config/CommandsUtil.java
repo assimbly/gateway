@@ -58,13 +58,14 @@ public final class CommandsUtil {
 
         if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
                 if(isWindows()) {
-                    baseDirectoryParam = userHomeDir + "\\.assimbly";
+                    baseDirectoryParam = userHomeDir;
                 }else {
-                    baseDirectoryParam = userHomeDir + "/.assimbly";
+                    baseDirectoryParam = userHomeDir;
                 }
-        }else{
-            System.setProperty("user.home",baseDirectoryParam);
         }
+
+        System.setProperty("user.home",baseDirectoryParam);
+
 
         if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
             clean(baseDirectoryParam);

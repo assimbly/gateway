@@ -16,12 +16,14 @@ import {
     brokerRoute,
     brokerPopupRoute
 } from './';
+import { FlowComponent } from 'app/entities/flow';
 
 const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
     imports: [GatewaySharedModule, AceEditorModule, AceModule, RouterModule.forChild(ENTITY_STATES)],
+    exports: [BrokerComponent],
     declarations: [BrokerComponent, BrokerDetailComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
     entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
