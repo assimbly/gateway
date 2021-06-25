@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import org.assimbly.gateway.domain.Security;
 import org.assimbly.gateway.service.SecurityService;
@@ -11,6 +11,7 @@ import org.assimbly.util.CertificatesUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+//import org.assimbly.connector.Connector;
+
 import javax.annotation.PostConstruct;
+
+import static org.assimbly.util.CertificatesUtil.convertPemToX509Certificate;
 
 
 /**
@@ -37,6 +42,9 @@ public class SecurityResource {
     private final Logger log = LoggerFactory.getLogger(SecurityResource.class);
 
     private static final String ENTITY_NAME = "security";
+
+    //@Autowired
+    //private ConnectorResource connectorResource;
 
     private final SecurityService securityService;
 
@@ -174,7 +182,7 @@ public class SecurityResource {
 
         CertificatesUtil util = new CertificatesUtil();
 
-        X509Certificate real = util.convertPemToX509Certificate(certificateFile);
+        X509Certificate real = convertPemToX509Certificate(certificateFile);
 
         String certificateString = "Type=" + real.getType() + ";Signing Algorithm=" + real.getSigAlgName() + ";IssuerDN Principal=" + real.getIssuerX500Principal() + ";SubjectDN Principal=" + real.getSubjectX500Principal();
 
@@ -258,7 +266,7 @@ public class SecurityResource {
             String certificateFile  = security.getCertificateFile();
 
             CertificatesUtil util = new CertificatesUtil();
-            X509Certificate real = util.convertPemToX509Certificate(security.getCertificateFile());
+            X509Certificate real = convertPemToX509Certificate(security.getCertificateFile());
 
             Instant certificateExpiry = real.getNotAfter().toInstant();
 
@@ -278,6 +286,8 @@ public class SecurityResource {
 
     }
 
+    //used for sync database with keystores
+    // This methode Should be moved to "web.rest/connector"
     /*
     @PostConstruct
     private void init() throws Exception {
@@ -288,10 +298,15 @@ public class SecurityResource {
 
         if(certificates.size()>0) {
         	for (Security certificate : certificates) {
+
             	String certificateName = certificate.getCertificateName();
             	String certificateFile = certificate.getCertificateFile();
-            	X509Certificate real = convertPemToX509Certificate(certificateFile);
-            	connector.importCertificateInTruststore(certificateName,real, "keystore.jks");
+            	String certificateStore = certificate.getCertificateStore();
+
+            	if(!certificateName.startsWith("P12")){
+                    X509Certificate real = convertPemToX509Certificate(certificateFile);
+                    connector.importCertificateInKeystore(certificateStore,"supersecret",certificateName,real);
+                }
             }
         }
 

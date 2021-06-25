@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
 import org.assimbly.gateway.domain.Endpoint;
 import org.assimbly.gateway.repository.EndpointRepository;

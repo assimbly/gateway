@@ -1,22 +1,24 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.broker;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import org.assimbly.brokerrest.ManagedBroker;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import org.assimbly.brokerrest.ManagedBroker;
+
+import javax.annotation.PostConstruct;
 
 /**
  * REST controller for managing Broker.
@@ -131,11 +133,6 @@ public class BrokerResource {
         return brokerType;
     }
 
-    public ManagedBroker getBrokerManager(){
-        return managedBroker;
-    }
-
-
     @PostConstruct
     private void init() throws Exception {
 
@@ -151,7 +148,5 @@ public class BrokerResource {
             }
         }
     }
-
-
 
 }

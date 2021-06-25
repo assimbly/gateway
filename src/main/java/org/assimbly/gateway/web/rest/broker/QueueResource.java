@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.broker;
 
 import org.assimbly.gateway.service.QueueService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -9,11 +9,9 @@ import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

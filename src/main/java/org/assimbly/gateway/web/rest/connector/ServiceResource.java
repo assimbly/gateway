@@ -1,15 +1,17 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
+import org.assimbly.gateway.domain.Service;
+import org.assimbly.gateway.domain.ServiceKeys;
+import org.assimbly.gateway.repository.ServiceRepository;
 import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.FlowDTO;
-import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +24,8 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * REST controller for managing Service.
@@ -35,6 +39,9 @@ public class ServiceResource {
     private static final String ENTITY_NAME = "service";
 
     private final ServiceService serviceService;
+
+    @Autowired
+    ServiceRepository serviceRepository;
 
     public ServiceResource(ServiceService serviceService) {
         this.serviceService = serviceService;
@@ -90,9 +97,9 @@ public class ServiceResource {
         log.debug("REST request to get all Services");
         Page<ServiceDTO> page = serviceService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/services");
-        return ResponseEntity.ok().headers(headers).body(page.getContent());        
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
-    
+
     @GetMapping("/services/getallservices")
     @Transactional(readOnly = true)
     public ResponseEntity<List<ServiceDTO>> getAllServices() {
@@ -114,6 +121,21 @@ public class ServiceResource {
         return ResponseUtil.wrapOrNotFound(serviceDTO);
     }
 
+
+    /**
+     * GET  /services/:id/keys : get the keys for a service with "id".
+     *
+     * @param id the id of the servicesKeys to retrieve
+     * @return the Treemap (JSON Object)
+     */
+    @GetMapping("/services/{id}/keys")
+    public TreeMap<String, String> getServiceKeys(@PathVariable Long id) {
+        log.debug("REST request to get Header : {}", id);
+        String idAsString = Long.toString(id);
+        TreeMap<String, String> serviceMap = getKeys(idAsString);
+        return serviceMap;
+    }
+
     /**
      * DELETE  /services/:id : delete the "id" service.
      *
@@ -126,4 +148,26 @@ public class ServiceResource {
         serviceService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+
+    private TreeMap<String, String> getKeys(String serviceId){
+
+        TreeMap<String, String> serviceMap = new TreeMap<>();
+
+        Long serviceIdLong =  Long.valueOf(serviceId);
+        Optional<Service> service = serviceRepository.findById(serviceIdLong);
+
+        if(service.isPresent()){
+            Set<ServiceKeys> serviceKeys = service.get().getServiceKeys();
+
+            for (ServiceKeys serviceKey : serviceKeys) {
+                String key = "service." + serviceId + "." +  serviceKey.getKey();
+                String value = serviceKey.getValue();
+                serviceMap.put(key, value);
+            }
+        }
+
+        return serviceMap;
+    }
+
 }

@@ -1,16 +1,18 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
+import org.assimbly.gateway.domain.Header;
+import org.assimbly.gateway.domain.HeaderKeys;
+import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.GatewayDTO;
 import org.assimbly.gateway.service.dto.HeaderDTO;
-import org.assimbly.gateway.service.dto.ServiceDTO;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -20,11 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * REST controller for managing Header.
@@ -38,6 +36,9 @@ public class HeaderResource {
     private static final String ENTITY_NAME = "header";
 
     private final HeaderService headerService;
+
+    @Autowired
+    HeaderRepository headerRepository;
 
     public HeaderResource(HeaderService headerService) {
         this.headerService = headerService;
@@ -93,7 +94,7 @@ public class HeaderResource {
         log.debug("REST request to get all Headers");
         Page<HeaderDTO> page = headerService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/headers");
-        return ResponseEntity.ok().headers(headers).body(page.getContent());        
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
@@ -101,8 +102,8 @@ public class HeaderResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of headers in body
      */
-        
-    
+
+
     @GetMapping("/headers/getallheaders")
     @Transactional(readOnly = true)
     public ResponseEntity<List<HeaderDTO>> getAllHeaders() {
@@ -110,7 +111,7 @@ public class HeaderResource {
         List<HeaderDTO> headersList = headerService.getAll();
         return ResponseEntity.ok().body(headersList);
     }
-    
+
     /**
      * GET  /headers/:id : get the "id" header.
      *
@@ -136,4 +137,43 @@ public class HeaderResource {
         headerService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+
+    /**
+     * GET  /headers/:id/keys : get the "id" header.
+     *
+     * @param id the id of the headerKeys to retrieve
+     * @return the Treemap (JSON Object)
+     */
+    @GetMapping("/headers/{id}/keys")
+    public TreeMap<String, Object> getHeaderKeys(@PathVariable Long id) {
+        log.debug("REST request to get Header : {}", id);
+        String idAsString = Long.toString(id);
+        TreeMap<String, Object> headerMap = getKeys(idAsString);
+        return headerMap;
+    }
+
+
+    private TreeMap<String, Object> getKeys(String headerId){
+
+        TreeMap<String, Object> headerMap = new TreeMap<>();
+
+        Long headerIdLong =  Long.valueOf(headerId);
+        Optional<Header> header = headerRepository.findById(headerIdLong);
+
+        if(header.isPresent()){
+            Set<HeaderKeys> headerKeys = header.get().getHeaderKeys();
+
+            for (HeaderKeys headerKey : headerKeys) {
+                String key = headerKey.getKey();
+                String value= headerKey.getType() + "(" + headerKey.getValue() + ")";
+
+                headerMap.put(key, value);
+            }
+        }
+
+        return headerMap;
+    }
+
+
 }

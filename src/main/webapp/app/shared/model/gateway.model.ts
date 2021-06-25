@@ -2,10 +2,9 @@ import { IFlow } from 'app/shared/model//flow.model';
 import { IEnvironmentVariables } from 'app/shared/model//environment-variables.model';
 
 export const enum GatewayType {
-    ADAPTER = 'ADAPTER',
-    BROKER = 'BROKER',
-    ARTEMIS = 'ARTEMIS',
-    SOAP = 'SOAP'
+    FULL = 'FULL',
+    CONNECTOR = 'CONNECTOR',
+    BROKER = 'BROKER'
 }
 
 export const enum EnvironmentType {
