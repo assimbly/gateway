@@ -46,7 +46,9 @@ public class HeaderKeysResource {
         if (headerKeysDTO.getId() != null) {
             throw new BadRequestAlertException("A new headerKeys cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         HeaderKeysDTO result = headerKeysService.save(headerKeysDTO);
+
         return ResponseEntity.created(new URI("/api/header-keys/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);

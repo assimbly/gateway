@@ -185,12 +185,16 @@ public class FlowResource {
     private void initConnector() throws Exception {
 
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
+        boolean isDebuggging = gateway.getDebugging();
+        boolean isTracing = gateway.getTracing();
 
         connectorResource.setConnector(encryptionProperties.getProperties());
 
         connectorResource.initConnector();
 
         connector = connectorResource.getConnector();
+        connector.setDebugging(isDebuggging);
+        connector.setTracing(isTracing);
 
         //start flows with autostart
         List<Flow> flows = flowRepository.findAll();

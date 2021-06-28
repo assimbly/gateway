@@ -66,19 +66,20 @@ public final class CommandsUtil {
 
         System.setProperty("user.home",baseDirectoryParam);
 
+        String assimblyDirectory = baseDirectoryParam + "/.assimbly";
 
         if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
-            clean(baseDirectoryParam);
+            clean(assimblyDirectory);
             return false;
         }
 
         if(backupDirectoryParam!=null){
-            backup(baseDirectoryParam, backupDirectoryParam);
+            backup(assimblyDirectory, backupDirectoryParam);
             return false;
         }
 
         if(restoreDirectoryParam!=null){
-            restore(restoreDirectoryParam, baseDirectoryParam);
+            restore(restoreDirectoryParam, assimblyDirectory);
             return false;
         }
 
