@@ -51,13 +51,15 @@ public class ServiceKeysResource {
     public ResponseEntity<ServiceKeysDTO> createServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
         log.debug("REST request to save ServiceKeys : {}", serviceKeysDTO);
         if (serviceKeysDTO.getId() != null) {
-            throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "id already exists");
         }
 
         if (serviceKeysDTO.getKey().equals("password")) {
             String encryptedValue = encryptValue(serviceKeysDTO.getValue());
             serviceKeysDTO.setValue(encryptedValue);
         }
+
+        serviceKeysService.save(serviceKeysDTO);
 
         return ResponseEntity.created(new URI("/api/service-keys/" + serviceKeysDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
