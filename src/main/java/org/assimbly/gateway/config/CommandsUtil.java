@@ -2,6 +2,7 @@ package org.assimbly.gateway.config;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.GatewayApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,12 @@ public final class CommandsUtil {
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
 
+        String[] arguments = getArguments(args);
+
         try {
-            cmd = parser.parse(options, args);
+            cmd = parser.parse(options, arguments, true);
         } catch (ParseException e) {
-        	return true;
+            //
         }
 
         String baseDirectoryParam = cmd.getOptionValue("application.gateway.base-directory");
@@ -57,27 +60,29 @@ public final class CommandsUtil {
         String restoreDirectoryParam = cmd.getOptionValue("restore");
 
         if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
-                if(isWindows()) {
-                    baseDirectoryParam = userHomeDir + "\\.assimbly";
-                }else {
-                    baseDirectoryParam = userHomeDir + "/.assimbly";
-                }
-        }else{
-            System.setProperty("user.home",baseDirectoryParam);
+            if(isWindows()) {
+                baseDirectoryParam = userHomeDir;
+            }else {
+                baseDirectoryParam = userHomeDir;
+            }
         }
 
+        System.setProperty("user.home",baseDirectoryParam);
+
+        String assimblyDirectory = baseDirectoryParam + "/.assimbly";
+
         if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
-            clean(baseDirectoryParam);
+            clean(assimblyDirectory);
             return false;
         }
 
         if(backupDirectoryParam!=null){
-            backup(baseDirectoryParam, backupDirectoryParam);
+            backup(assimblyDirectory, backupDirectoryParam);
             return false;
         }
 
         if(restoreDirectoryParam!=null){
-            restore(restoreDirectoryParam, baseDirectoryParam);
+            restore(restoreDirectoryParam, assimblyDirectory);
             return false;
         }
 
@@ -87,9 +92,14 @@ public final class CommandsUtil {
     private static void clean(String sourceDirectory) {
         try{
             File sourceDirectoryFile = new File(sourceDirectory);
-            FileUtils.deleteDirectory(sourceDirectoryFile);
-            log.info("Deleted Gateway base-directory.");
-            log.info("Base-Directory=" + sourceDirectory);
+            File databaseDirectory = new File(sourceDirectory + "/db");
+
+            //only delete when directory contains an existing assimbly database
+            if(databaseDirectory.exists()) {
+                FileUtils.deleteDirectory(sourceDirectoryFile);
+                log.info("Deleted Gateway base-directory.");
+                log.info("Base-Directory=" + sourceDirectory);
+            }
         }catch (IOException e) {
             log.error("Error clean gateway: " + e.getCause());
         }
@@ -127,5 +137,51 @@ public final class CommandsUtil {
         String OS = System.getProperty("os.name");
         return OS.startsWith("Windows");
     }
+
+    private static String[] getArguments(String[] args) {
+
+        String[] arguments = null;
+        String argumentList = null;
+
+        for(String arg: args) {
+            if(arg.startsWith("-d=")|| arg.startsWith("--application.gateway.base-directory=")) {
+                if(argumentList==null) {
+                    argumentList= arg;
+                }else {
+                    argumentList= argumentList + ","  +  arg;
+                }
+            }else if(arg.startsWith("-c=")|| arg.startsWith("--clean=")) {
+                if(argumentList==null) {
+                    argumentList= arg;
+                }else {
+                    argumentList= argumentList + ","  +  arg;
+                }
+            }else if(arg.startsWith("-b=")|| arg.startsWith("--backup=")) {
+                if(argumentList==null) {
+                    argumentList= arg;
+                }else {
+                    argumentList= argumentList + ","  +  arg;
+                }
+            }else if(arg.startsWith("-r=")|| arg.startsWith("--restore=")) {
+                if(argumentList==null) {
+                    argumentList= arg;
+                }else {
+                    argumentList= argumentList + ","  +  arg;
+                }
+            }
+        }
+
+        if(argumentList!=null) {
+            if(argumentList.contains(",")) {
+                arguments = argumentList.split(",");
+            }else {
+                arguments =  new String [] {argumentList};
+            }
+        }
+
+        return arguments;
+
+    }
+
 
 }

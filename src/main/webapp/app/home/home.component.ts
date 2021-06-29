@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
+import { TYPE } from 'app/app.constants';
 
 import { LoginModalService, AccountService, Account } from 'app/core';
 
@@ -12,12 +13,15 @@ import { LoginModalService, AccountService, Account } from 'app/core';
 export class HomeComponent implements OnInit {
     account: Account;
     modalRef: NgbModalRef;
+    type: string;
 
     constructor(
         private accountService: AccountService,
         private loginModalService: LoginModalService,
         private eventManager: JhiEventManager
-    ) {}
+    ) {
+        this.type = TYPE;
+    }
 
     ngOnInit() {
         this.accountService.identity().then(account => {

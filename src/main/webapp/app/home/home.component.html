@@ -1,6 +1,11 @@
 <div [ngSwitch]="isAuthenticated()" class="background-parent">
 	<div *ngSwitchCase="true">
-		 <jhi-flow>Loading routes...</jhi-flow>
+        <div *ngIf="type==='CONNECTOR' || type==='FULL'">
+            <jhi-flow>Loading flows...</jhi-flow>
+        </div>
+        <div *ngIf="type==='BROKER'">
+            <jhi-broker>Loading broker...</jhi-broker>
+        </div>
 	</div>
 	<div *ngSwitchCase="false">
 		<picture class="background">
@@ -18,7 +23,7 @@
 						class="btn btn-lg"
 						id="login">Sign in
 					</button>
-				</p>				
+				</p>
 			</div>
 		</div>
 	</div>

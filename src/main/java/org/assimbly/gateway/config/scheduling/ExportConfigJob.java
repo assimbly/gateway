@@ -1,20 +1,15 @@
 package org.assimbly.gateway.config.scheduling;
 
 import org.assimbly.gateway.config.environment.DBConfiguration;
-import org.assimbly.gateway.web.rest.GatewayResource;
+import org.assimbly.gateway.web.rest.gateway.GatewayResource;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Component
 public class ExportConfigJob implements Job {

@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
 import io.swagger.annotations.ApiParam;
 

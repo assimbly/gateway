@@ -59,6 +59,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     requestOptions: string;
     requestServiceId: string;
     requestHeaderId: string;
+    requestServiceKeys: string;
+    requestHeaderKeys: string;
     requestBody: string;
 
     responseBody: string;
@@ -439,8 +441,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
         let index = 0;
 
-        console.log('endpointOptions=' + JSON.stringify(endpointOptions));
-
         endpointOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
@@ -660,14 +660,51 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.isAlert = true;
         this.setRequest();
 
+        if (this.requestHeaderId && this.requestServiceId) {
+            forkJoin(
+                this.serviceService.getServiceKeys(parseInt(this.requestServiceId)),
+                this.headerService.getHeaderKeys(parseInt(this.requestHeaderId))
+            ).subscribe(([res, res2]) => {
+                const serviceKeys = JSON.stringify(res.body);
+                const headerKeys = JSON.stringify(res2.body);
+
+                this.sendMessage(serviceKeys, headerKeys);
+            });
+        } else if (this.requestHeaderId) {
+            this.headerService.getHeaderKeys(parseInt(this.requestHeaderId)).subscribe(
+                res => {
+                    const headerKeys = JSON.stringify(res.body);
+                    this.sendMessage('', headerKeys);
+                },
+                res => {
+                    this.handleSendError(res.error);
+                }
+            );
+        } else if (this.requestServiceId) {
+            this.serviceService.getServiceKeys(parseInt(this.requestServiceId)).subscribe(
+                res => {
+                    const serviceKeys = JSON.stringify(res.body);
+                    this.sendMessage(serviceKeys, '');
+                },
+                res => {
+                    this.handleSendError(res.error);
+                }
+            );
+        } else {
+            this.sendMessage('', '');
+        }
+    }
+
+    sendMessage(requestServiceKeys, requestHeaderKeys) {
         if (this.requestExchangePattern === 'FireAndForget') {
             this.flowService
                 .send(
                     1,
                     this.requestUri,
                     this.requestEndpointId,
-                    this.requestHeaderId,
                     this.requestServiceId,
+                    requestServiceKeys,
+                    requestHeaderKeys,
                     this.requestNumberOfTimes,
                     this.requestBody
                 )
@@ -681,7 +718,15 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                 );
         } else if (this.requestExchangePattern === 'RequestAndReply') {
             this.flowService
-                .sendRequest(1, this.requestUri, this.requestEndpointId, this.requestHeaderId, this.requestServiceId, this.requestBody)
+                .sendRequest(
+                    1,
+                    this.requestUri,
+                    this.requestEndpointId,
+                    this.requestServiceId,
+                    requestServiceKeys,
+                    requestHeaderKeys,
+                    this.requestBody
+                )
                 .subscribe(
                     res => {
                         this.handleSendResponse(res.body, true);

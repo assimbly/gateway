@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.ApplicationProperties.Documentation;
@@ -37,12 +37,12 @@ public class ApplicationInfoResource {
         Gateway gateway = applicationProperties.getGateway();
         return gateway.getName();
     }
-    
+
     @GetMapping("/gateway-base-directory")
     public String getGatewayBaseDirectory() {
         Gateway gateway = applicationProperties.getGateway();
         return gateway.getBaseDirectory();
     }
-    
-    
+
+
 }

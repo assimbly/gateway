@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
@@ -42,7 +42,7 @@ public class ProfileInfoResource {
         String propertyUrl = documentation.getCamelUrl();
         return propertyUrl;
     }
-    
+
     private String getRibbonEnv(String[] activeProfiles) {
     	/*
         String[] displayOnActiveProfiles = jHipsterProperties.

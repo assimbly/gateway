@@ -1,8 +1,6 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.connector;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import org.assimbly.connector.Connector;
-import org.assimbly.connectorrest.ConnectorResource;
 import org.assimbly.util.EncryptionUtil;
 
 import org.assimbly.gateway.config.EncryptionProperties;
@@ -20,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * REST controller for managing ServiceKeys.
@@ -34,17 +33,11 @@ public class ServiceKeysResource {
 
     private final ServiceKeysService serviceKeysService;
 
-    private Connector connector;
-
-   // @Autowired
-    private ConnectorResource connectorResource;
-
     @Autowired
     private EncryptionProperties encryptionProperties;
 
-    public ServiceKeysResource(ServiceKeysService serviceKeysService, ConnectorResource connectorResource) {
+    public ServiceKeysResource(ServiceKeysService serviceKeysService) {
         this.serviceKeysService = serviceKeysService;
-        this.connectorResource = connectorResource;
     }
 
     /**
@@ -58,12 +51,19 @@ public class ServiceKeysResource {
     public ResponseEntity<ServiceKeysDTO> createServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
         log.debug("REST request to save ServiceKeys : {}", serviceKeysDTO);
         if (serviceKeysDTO.getId() != null) {
-            throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "id already exists");
         }
-        ServiceKeysDTO result = serviceKeysService.save(encryptPassword(serviceKeysDTO));
-        return ResponseEntity.created(new URI("/api/service-keys/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
-            .body(result);
+
+        if (serviceKeysDTO.getKey().equals("password")) {
+            String encryptedValue = encryptValue(serviceKeysDTO.getValue());
+            serviceKeysDTO.setValue(encryptedValue);
+        }
+
+        serviceKeysService.save(serviceKeysDTO);
+
+        return ResponseEntity.created(new URI("/api/service-keys/" + serviceKeysDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
+            .body(serviceKeysDTO);
     }
 
     /**
@@ -81,10 +81,14 @@ public class ServiceKeysResource {
         if (serviceKeysDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        ServiceKeysDTO result = serviceKeysService.save(encryptPassword(serviceKeysDTO));
+
+        if (serviceKeysDTO.getKey().equals("password")) {
+            String encryptedValue = encryptValue(serviceKeysDTO.getValue());
+            serviceKeysDTO.setValue(encryptedValue);
+        }
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
-            .body(result);
+            .body(serviceKeysDTO);
     }
 
     /**
@@ -124,14 +128,16 @@ public class ServiceKeysResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    private ServiceKeysDTO encryptPassword(ServiceKeysDTO serviceKeysDTO) {
-        if (serviceKeysDTO.getKey().equals("password")) {
-            connector = connectorResource.getConnector();
-            connector.setEncryptionProperties(encryptionProperties.getProperties());
-            EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
-            serviceKeysDTO.setValue(encryptionUtil.encrypt(serviceKeysDTO.getValue()));
-        }
-        return serviceKeysDTO;
+    private String encryptValue(String  value) {
+
+        Properties properties = encryptionProperties.getProperties();
+        String password = properties.getProperty("password");
+        String algorithm = properties.getProperty("algorithm");
+
+        EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
+        String encryptedValue = encryptionUtil.encrypt(value);
+
+        return encryptedValue;
     }
 
 }
