@@ -14,53 +14,42 @@
 
     <jhi-alert></jhi-alert>
 
-    <div class="alert alert-warning" id="no-result" *ngIf="queues?.length === 0">
+    <div class="alert alert-warning" id="no-result" *ngIf="addresses?.length === 0">
         <span>No queues found</span>
     </div>
 
-    <div class="table-responsive" id="entities" *ngIf="queues?.length > 0">
+    <div class="alert alert-warning">
+        <span>Number of Queues: {{addresses}}</span>
+    </div>
+
+    <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
+        <div class="col-3">
+            <input type="text" align="left" style="margin-left: 0.3em"
+                   [(ngModel)]="searchText"
+                   id="searchTextId" name="searchText"
+                   placeholder="Filter By Queue Name"/>
+        </div>
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
-                    <th scope="col"  jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="itemsOnPage"><span>Items On Page</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="refreshInterval"><span>Refresh Interval</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="selectedColumn"><span>Selected Column</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="orderColumn"><span>Order Column</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"></th>
+<!--                    <th scope="col"  jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <th scope="col"  jhiSortBy="itemsOnPage"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="refreshInterval"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="selectedColumn"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
+<!--                    <th scope="col"  jhiSortBy="selectedColumn"><span>Size</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <th scope="col"  jhiSortBy="orderColumn"><span>Actions</span></th>
+<!--                    <th scope="col"></th>-->
                 </tr>
             </thead>
-            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-                <tr *ngFor="let queue of queues ;trackBy: trackId">
-                    <td><a [routerLink]="['/queue', queue.id, 'view']">{{ queue.id }}</a></td>
-                    <td>{{ queue.itemsOnPage }}</td>
-                    <td>{{ queue.refreshInterval }}</td>
-                    <td>{{ queue.selectedColumn }}</td>
-                    <td>{{ queue.orderColumn }}</td>
-                    <td class="text-right">
-                        <div class="btn-group">
-                            <button type="submit"
-                                    [routerLink]="['/queue', queue.id, 'view']"
-                                    class="btn btn-info btn-sm">
-                                <fa-icon icon="eye"></fa-icon>
-                                <span class="d-none d-md-inline">View</span>
-                            </button>
 
-                            <button type="submit"
-                                    [routerLink]="['/queue', queue.id, 'edit']"
-                                    class="btn btn-primary btn-sm">
-                                <fa-icon icon="pencil-alt"></fa-icon>
-                                <span class="d-none d-md-inline">Edit</span>
-                            </button>
-
-                            <button type="submit" (click)="delete(queue)"
-                                    class="btn btn-danger btn-sm">
-                                <fa-icon icon="times"></fa-icon>
-                                <span class="d-none d-md-inline">Delete</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+            <tbody *ngIf="addresses" infinite-scroll
+                   (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)"
+                   [infiniteScrollDisabled]="page >= links['last']"
+                   [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
+            <tr jhi-queue-row
+                *ngFor="let address of  (addresses | QueueSearchByName: searchText) ;trackBy: trackId"
+                [address]="address" [isAdmin]="isAdmin"
+                ng-init="$last && finished()"></tr>
             </tbody>
         </table>
     </div>
