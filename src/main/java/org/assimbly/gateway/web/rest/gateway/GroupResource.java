@@ -1,10 +1,9 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import org.assimbly.gateway.domain.Group;
 import org.assimbly.gateway.repository.GroupRepository;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.GroupService;
 import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
 
@@ -37,7 +36,7 @@ public class GroupResource {
     private final GroupMapper groupMapper;
 
 	private JpaRepository<Group, Long> groupService;
-    
+
     public GroupResource(GroupRepository groupRepository, GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
@@ -83,7 +82,7 @@ public class GroupResource {
         Group group = groupMapper.toEntity(groupDTO);
         group = groupRepository.save(group);
         GroupDTO result = groupMapper.toDto(group);
-        
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, groupDTO.getId().toString()))
             .body(result);

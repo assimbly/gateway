@@ -141,7 +141,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             if (!this.gatewayExists) {
                 this.gateway = new Object();
                 this.gateway.name = gatewayName.body;
-                this.gateway.type = GatewayType.ADAPTER;
+                this.gateway.type = GatewayType.FULL;
                 this.gateway.environmentName = 'Dev1';
                 this.gateway.stage = EnvironmentType.DEVELOPMENT;
                 this.gateway.defaultFromComponentType = ComponentType.FILE;

@@ -31,7 +31,7 @@ public class GatewayApp {
 
     private final static String userHomeDir = System.getProperty("user.home");
 
-	private static long vmStartTime;
+    private static long vmStartTime;
 
     private final Environment env;
 
@@ -79,7 +79,7 @@ public class GatewayApp {
 
     private static void logApplicationStartup(Environment env) {
 
-    	String protocol = "http";
+        String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
@@ -109,11 +109,13 @@ public class GatewayApp {
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
         if(applicationBaseDirectory.equals("default")) {
-        	if(isWindows()) {
-        		applicationBaseDirectory = userHomeDir + "\\.assimbly";
-        	}else {
-        		applicationBaseDirectory = userHomeDir + "/.assimbly";
-        	}
+            if(isWindows()) {
+                applicationBaseDirectory = userHomeDir + "\\.assimbly";
+            }else {
+                applicationBaseDirectory = userHomeDir + "/.assimbly";
+            }
+        }else {
+            applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
         }
 
         log.info("\n----------------------------------------------------------\n\t" +
@@ -145,10 +147,10 @@ public class GatewayApp {
 
     }
 
-     public static boolean isWindows()
-     {
-    	String OS = System.getProperty("os.name");
+    public static boolean isWindows()
+    {
+        String OS = System.getProperty("os.name");
         return OS.startsWith("Windows");
-     }
+    }
 
 }

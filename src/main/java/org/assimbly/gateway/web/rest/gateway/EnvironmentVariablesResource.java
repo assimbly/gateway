@@ -1,8 +1,6 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import org.assimbly.connector.Connector;
-import org.assimbly.connector.impl.CamelConnector;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
@@ -23,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 ;
 
@@ -34,14 +33,11 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class EnvironmentVariablesResource {
 
-
     private final Logger log = LoggerFactory.getLogger(EnvironmentVariablesResource.class);
 
     private static final String ENTITY_NAME = "environmentVariables";
 
     private final EnvironmentVariablesService environmentVariablesService;
-
-    private final Connector connector = new CamelConnector();
 
     @Autowired
     private EncryptionProperties encryptionProperties;
@@ -64,7 +60,12 @@ public class EnvironmentVariablesResource {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        EnvironmentVariablesDTO result = environmentVariablesService.save(encryptValue(environmentVariablesDTO));
+        if (environmentVariablesDTO.isEncrypted()) {
+            String encryptedValue = encryptValue(environmentVariablesDTO.getValue());
+            environmentVariablesDTO.setValue(encryptedValue);
+        }
+
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
         return ResponseEntity.created(new URI("/api/environment-variables/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -85,10 +86,15 @@ public class EnvironmentVariablesResource {
         if (environmentVariablesDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        EnvironmentVariablesDTO result = environmentVariablesService.save(encryptValue(environmentVariablesDTO));
+
+        if (environmentVariablesDTO.isEncrypted()) {
+            String encryptedValue = encryptValue(environmentVariablesDTO.getValue());
+            environmentVariablesDTO.setValue(encryptedValue);
+        }
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, environmentVariablesDTO.getId().toString()))
-            .body(result);
+            .body(environmentVariablesDTO);
     }
 
     /**
@@ -132,12 +138,17 @@ public class EnvironmentVariablesResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    private EnvironmentVariablesDTO encryptValue(EnvironmentVariablesDTO environmentVariablesDTO) {
-        if (environmentVariablesDTO.isEncrypted()) {
-            connector.setEncryptionProperties(encryptionProperties.getProperties());
-            EncryptionUtil encryptionUtil = connector.getEncryptionUtil();
-            environmentVariablesDTO.setValue(encryptionUtil.encrypt(environmentVariablesDTO.getValue()));
-        }
-        return environmentVariablesDTO;
+
+    private String encryptValue(String  value) {
+
+            Properties properties = encryptionProperties.getProperties();
+            String password = properties.getProperty("password");
+            String algorithm = properties.getProperty("algorithm");
+
+            EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
+            String encryptedValue = encryptionUtil.encrypt(value);
+
+            return encryptedValue;
     }
+
 }

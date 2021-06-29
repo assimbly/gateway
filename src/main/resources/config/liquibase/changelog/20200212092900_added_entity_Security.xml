@@ -22,6 +22,9 @@
             <column name="certificate_name" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="certificate_store" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="certificate_file" type="longblob">
                 <constraints nullable="true" />
             </column>
@@ -57,6 +60,7 @@
             <column name="id" type="numeric"/>
             <column name="url" type="string"/>
             <column name="certificate_name" type="string"/>
+            <column name="certificate_store" type="string"/>
             <column name="certificate_file" type="blob"/>
             <column name="certificate_file_content_type" type="string"/>
             <column name="certificate_expiry" type="datetime"/>

@@ -180,16 +180,18 @@ export class FlowService {
         gatewayId: number,
         uri: string,
         endpointId: string,
-        headerId: string,
         serviceId: string,
+        serviceKeys: string,
+        headerKeys: string,
         numberOfTimes: string,
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
             uri: uri,
             endpointId: endpointId,
-            headerid: headerId,
             serviceid: serviceId,
+            serviceKeys: serviceKeys,
+            headerKeys: headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
@@ -204,15 +206,17 @@ export class FlowService {
         gatewayId: number,
         uri: string,
         endpointId: string,
-        headerId: string,
         serviceId: string,
+        serviceKeys: string,
+        headerKeys: string,
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
             uri: uri,
             endpointId: endpointId,
-            headerid: headerId,
             serviceid: serviceId,
+            serviceKeys: serviceKeys,
+            headerKeys: headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
