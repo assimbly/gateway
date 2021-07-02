@@ -9,16 +9,16 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-    templateUrl: './queue-delete-dialog.component.html'
+    templateUrl: './queue-clear-dialog.component.html'
 })
-export class QueueDeleteDialogComponent {
+export class QueueClearDialogComponent {
     queue?: IQueue;
     address?: IAddress;
 
     brokerType: string = '';
     brokers: IBroker[];
 
-    message = 'Are you sure you want to delete this queue?';
+    message = 'Are you sure you want to clear this queue?';
     disableDelete: boolean;
 
     constructor(
@@ -37,15 +37,12 @@ export class QueueDeleteDialogComponent {
         this.activeModal.dismiss();
     }
 
-    confirmDelete(name: string): void {
+    confirmClear(name: string): void {
         if (this.address.numberOfConsumers > 0) {
-            this.message = 'Cannot delete queue because there is at least one active consumer';
-            this.disableDelete = true;
-        } else if (this.address.numberOfMessages > 0) {
-            this.message = 'Cannot delete queue because there is at least one message on the queue. Please purge the queue before deleting';
+            this.message = 'Cannot clear queue because there is at least one active consumer';
             this.disableDelete = true;
         } else {
-            this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
+            this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
                 this.router.navigate(['/queue']).then(() => {
                     window.location.reload();

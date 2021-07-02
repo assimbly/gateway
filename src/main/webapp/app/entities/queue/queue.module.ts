@@ -12,6 +12,7 @@ import { queueRoute } from './queue.route';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
+import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
 @NgModule({
     imports: [GatewaySharedModule, RouterModule.forChild(queueRoute), ReactiveFormsModule],
@@ -21,8 +22,9 @@ import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
         QueueUpdateComponent,
         QueueDeleteDialogComponent,
         QueueSearchByNamePipe,
-        QueueRowComponent
+        QueueRowComponent,
+        QueueClearDialogComponent
     ],
-    entryComponents: [QueueDeleteDialogComponent]
+    entryComponents: [QueueDeleteDialogComponent, QueueClearDialogComponent]
 })
 export class GatewayQueueModule {}
