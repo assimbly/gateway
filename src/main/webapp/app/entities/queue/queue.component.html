@@ -18,10 +18,6 @@
         <span>No queues found</span>
     </div>
 
-    <div class="alert alert-warning">
-        <span>Number of Queues: {{addresses}}</span>
-    </div>
-
     <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
         <div class="col-3">
             <input type="text" align="left" style="margin-left: 0.3em"
@@ -32,13 +28,11 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
-<!--                    <th scope="col"  jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>-->
-                    <th scope="col"  jhiSortBy="itemsOnPage"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="refreshInterval"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
-                    <th scope="col"  jhiSortBy="selectedColumn"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
-<!--                    <th scope="col"  jhiSortBy="selectedColumn"><span>Size</span> <fa-icon icon="sort"></fa-icon></th>-->
-                    <th scope="col"  jhiSortBy="orderColumn"><span>Actions</span></th>
-<!--                    <th scope="col"></th>-->
+                    <th scope="col"  jhiSortBy="name"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
+<!--                    <th scope="col"  jhiSortBy="size"><span>Size</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <th scope="col" ><span>Actions</span></th>
                 </tr>
             </thead>
 
@@ -47,7 +41,7 @@
                    [infiniteScrollDisabled]="page >= links['last']"
                    [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
             <tr jhi-queue-row
-                *ngFor="let address of  (addresses | QueueSearchByName: searchText) ;trackBy: trackId"
+                *ngFor="let address of  (addresses | QueueSearchByName: searchText : ascending : predicate) ;trackBy: trackId"
                 [address]="address" [isAdmin]="isAdmin"
                 ng-init="$last && finished()"></tr>
             </tbody>

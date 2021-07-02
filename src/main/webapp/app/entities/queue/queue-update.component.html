@@ -1,40 +1,46 @@
 <div class="row justify-content-center">
     <div class="col-8">
-    	<!-- 
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-            <h2 id="jhi-queue-heading">Create or edit a Queue</h2>
+            <h2 id="jhi-queue-heading">Create a new Queue</h2>
 
             <div>
                 <jhi-alert-error></jhi-alert-error>
 
-                <div class="form-group" [hidden]="!editForm.get('id')!.value">
-                    <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
-                </div>
+<!--                <div class="form-group">-->
+<!--                    <label class="form-control-label" for="field_address">Address</label>-->
+<!--                    <input type="text" class="form-control" name="address" id="field_address"-->
+<!--                           formControlName="address"/>-->
+<!--                </div>-->
 
                 <div class="form-group">
-                    <label class="form-control-label" for="field_itemsOnPage">Items On Page</label>
-                    <input type="number" class="form-control" name="itemsOnPage" id="field_itemsOnPage"
-                           formControlName="itemsOnPage"/>
+                    <label class="form-control-label" for="field_name">Name</label>
+                    <input type="text" class="form-control" name="name" id="field_name"
+                           formControlName="name"/>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-control-label" for="field_refreshInterval">Refresh Interval</label>
-                    <input type="number" class="form-control" name="refreshInterval" id="field_refreshInterval"
-                           formControlName="refreshInterval"/>
-                </div>
+<!--                <div class="form-group">-->
+<!--                    <label class="form-control-label" for="field_numberOfConsumers">Number of Consumers</label>-->
+<!--                    <input type="number" class="form-control" name="numberOfConsumers" id="field_numberOfConsumers"-->
+<!--                           formControlName="numberOfConsumers"/>-->
+<!--                </div>-->
 
-                <div class="form-group">
-                    <label class="form-control-label" for="field_selectedColumn">Selected Column</label>
-                    <input type="text" class="form-control" name="selectedColumn" id="field_selectedColumn"
-                           formControlName="selectedColumn"/>
-                </div>
+<!--                <div class="form-group">-->
+<!--                    <label class="form-control-label" for="field_numberOfMessages">Number of Messages</label>-->
+<!--                    <input type="number" class="form-control" name="numberOfMessages" id="field_numberOfMessages"-->
+<!--                           formControlName="numberOfMessages"/>-->
+<!--                </div>-->
 
-                <div class="form-group">
-                    <label class="form-control-label" for="field_orderColumn">Order Column</label>
-                    <input type="text" class="form-control" name="orderColumn" id="field_orderColumn"
-                           formControlName="orderColumn"/>
-                </div>
+<!--                <div class="form-group">-->
+<!--                    <label class="form-control-label" for="field_size">Size</label>-->
+<!--                    <input type="number" class="form-control" name="size" id="field_size"-->
+<!--                           formControlName="size"/>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label class="form-control-label" for="field_temporary">Name</label>-->
+<!--                    <input type="checkbox" class="form-control" name="temporary" id="field_temporary"-->
+<!--                           formControlName="temporary"/>-->
+<!--                </div>-->
             </div>
 
             <div>
@@ -46,6 +52,6 @@
                     <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
                 </button>
             </div>
-        </form> -->
+        </form>
     </div>
 </div>

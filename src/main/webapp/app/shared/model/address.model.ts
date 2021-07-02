@@ -1,9 +1,9 @@
-export interface Welcome3 {
+export interface IRootAddress {
     queues: IAddresses;
 }
 
 export interface IAddresses {
-    queues: IAddress[];
+    queue: Address[];
 }
 
 export interface IAddress {
