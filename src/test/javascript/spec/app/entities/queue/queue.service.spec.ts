@@ -2,6 +2,7 @@ import { TestBed, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { QueueService } from 'app/entities/queue/queue.service';
 import { IQueue, Queue } from 'app/shared/model/queue.model';
+import { IRootAddress, IAddress } from 'app/shared/model/address.model';
 
 describe('Service Tests', () => {
     describe('Queue Service', () => {
@@ -9,7 +10,8 @@ describe('Service Tests', () => {
         let service: QueueService;
         let httpMock: HttpTestingController;
         let elemDefault: IQueue;
-        let expectedResult: IQueue | IQueue[] | boolean | null;
+        let elemDefIRootAddress: IRootAddress;
+        let expectedResult: IQueue | IQueue[] | IRootAddress | IAddress | IAddress[] | boolean | null;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -71,7 +73,7 @@ describe('Service Tests', () => {
                 expect(expectedResult).toMatchObject(expected);
             });
 
-            it('should return a list of Queue', () => {
+            it('should return a IRootAddress with a list of queues', () => {
                 const returnedFromService = Object.assign(
                     {
                         itemsOnPage: 1,
@@ -79,7 +81,7 @@ describe('Service Tests', () => {
                         selectedColumn: 'BBBBBB',
                         orderColumn: 'BBBBBB'
                     },
-                    elemDefault
+                    elemDefIRootAddress
                 );
 
                 const expected = Object.assign({}, returnedFromService);

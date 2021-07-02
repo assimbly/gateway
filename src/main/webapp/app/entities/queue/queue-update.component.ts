@@ -7,6 +7,8 @@ import { Observable } from 'rxjs';
 
 import { IQueue, Queue } from 'app/shared/model/queue.model';
 import { QueueService } from './queue.service';
+import { Address, IAddress } from 'app/shared/model/address.model';
+import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
     selector: 'jhi-queue-update',
@@ -16,28 +18,36 @@ export class QueueUpdateComponent implements OnInit {
     isSaving = false;
 
     editForm = this.fb.group({
-        id: [],
-        itemsOnPage: [],
-        refreshInterval: [],
-        selectedColumn: [],
-        orderColumn: []
+        address: [],
+        name: [],
+        numberOfConsumers: [],
+        numberOfMessages: [],
+        size: [],
+        temporary: []
     });
 
-    constructor(protected queueService: QueueService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {}
+    brokerType: string = '';
+    brokers: IBroker[];
 
-    ngOnInit(): void {
-        this.activatedRoute.data.subscribe(({ queue }) => {
-            this.updateForm(queue);
-        });
+    constructor(protected queueService: QueueService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {
+        this.brokers = [];
     }
 
-    updateForm(queue: IQueue): void {
+    ngOnInit(): void {
+        this.activatedRoute.data.subscribe(({ address }) => {
+            this.updateForm(address);
+        });
+        this.getBrokerType();
+    }
+
+    updateForm(address: IAddress): void {
         this.editForm.patchValue({
-            id: queue.id,
-            itemsOnPage: queue.itemsOnPage,
-            refreshInterval: queue.refreshInterval,
-            selectedColumn: queue.selectedColumn,
-            orderColumn: queue.orderColumn
+            address: address.address,
+            name: address.name,
+            numberOfConsumers: address.numberOfConsumers,
+            numberOfMessages: address.numberOfMessages,
+            size: address.size,
+            temporary: address.temporary
         });
     }
 
@@ -47,26 +57,23 @@ export class QueueUpdateComponent implements OnInit {
 
     save(): void {
         this.isSaving = true;
-        const queue = this.createFromForm();
-        if (queue.id !== undefined) {
-            this.subscribeToSaveResponse(this.queueService.update(queue));
-        } else {
-            this.subscribeToSaveResponse(this.queueService.create(queue));
-        }
+        const address = this.createFromForm();
+        this.subscribeToSaveResponse(this.queueService.createQueue(address.name, this.brokerType));
     }
 
-    private createFromForm(): IQueue {
+    private createFromForm(): IAddress {
         return {
-            ...new Queue(),
-            id: this.editForm.get(['id'])!.value,
-            itemsOnPage: this.editForm.get(['itemsOnPage'])!.value,
-            refreshInterval: this.editForm.get(['refreshInterval'])!.value,
-            selectedColumn: this.editForm.get(['selectedColumn'])!.value,
-            orderColumn: this.editForm.get(['orderColumn'])!.value
+            ...new Address(),
+            address: this.editForm.get(['address'])!.value,
+            name: this.editForm.get(['name'])!.value,
+            numberOfConsumers: this.editForm.get(['numberOfConsumers'])!.value,
+            numberOfMessages: this.editForm.get(['numberOfMessages'])!.value,
+            size: this.editForm.get(['size'])!.value,
+            temporary: this.editForm.get(['temporary'])!.value
         };
     }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<IQueue>>): void {
+    protected subscribeToSaveResponse(result: Observable<HttpResponse<any>>): void {
         result.subscribe(
             () => this.onSaveSuccess(),
             () => this.onSaveError()
@@ -80,5 +87,19 @@ export class QueueUpdateComponent implements OnInit {
 
     protected onSaveError(): void {
         this.isSaving = false;
+    }
+
+    getBrokerType(): void {
+        this.queueService.getBrokers().subscribe(
+            data => {
+                if (data) {
+                    for (let i = 0; i < data.body.length; i++) {
+                        this.brokers.push(data.body[i]);
+                        this.brokerType = this.brokers[0].type;
+                    }
+                }
+            },
+            error => console.log(error)
+        );
     }
 }

@@ -13,45 +13,45 @@
         </button>
 
         <button type="submit"
-                class="btn btn-primary btn-sm">
+                class="btn btn-primary btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                [routerLink]="['../flow', 'message-sender' ]">
             <span class="fa fa-envelope"></span>
             <span class="d-none d-md-inline">Send</span>
         </button>
 
-        <div ngbDropdown class="d-inline-block" placement="bottom-left">
-            <a class="btn" id="dropdownBasic1" ngbDropdownToggle>Other<i class="fa fa-angle-down"></i></a>
-            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                <!--                                    <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">-->
-                <!--                                        <span>Camel Documentation</span>-->
-                <!--                                    </a>-->
-                <!--                                    <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">-->
-                <!--                                        <span>Assimbly Documentation</span>-->
-                <!--                                    </a>-->
-                <!--                                    <a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">-->
-                <!--                                        <span>Test Connection</span>-->
-                <!--                                    </a>-->
-                <a ngbDropdownItem role="button">
-                    <span><i class="fa fa-times"></i> Delete</span>
-                </a>
-                <a ngbDropdownItem role="button">
-                    <span><i class="fa fa-trash"></i> Clear</span>
-                </a>
-                <a ngbDropdownItem role="button">
-                    <span><i class="fa fa-save"></i> Save</span>
-                </a>
-                <a ngbDropdownItem role="button">
-                    <span><i class="fa fa-info"></i> Details</span>
-                </a>
-            </div>
-        </div>
+        <button type="submit"
+                class="btn btn-danger btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                (click)="delete(address)">
+            <span class="fa fa-times"></span>
+            <span class="d-none d-md-inline">Delete</span>
+        </button>
 
-        <!--                            <button type="submit" (click)="delete(queue)"-->
-        <!--                                    class="btn btn-danger btn-sm">-->
-        <!--                                <fa-icon icon="times"></fa-icon>-->
-        <!--                                <span class="d-none d-md-inline">Delete</span>-->
-        <!--                            </button>-->
-    </div>
-    <div class="">
+        <button type="submit"
+                class="btn btn-warning btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                (click)="clear(address)">
+            <span class="fa fa-trash"></span>
+            <span class="d-none d-md-inline">Clear</span>
+        </button>
 
+<!--        <div ngbDropdown class="d-inline-block" placement="bottom-left" [hidden]="true">-->
+<!--            <a class="btn" id="dropdownBasic1" ngbDropdownToggle>Other<i class="fa fa-angle-down"></i></a>-->
+<!--            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">-->
+<!--                <a ngbDropdownItem role="button" (click)="delete(address)">-->
+<!--                    <span><i class="fa fa-times"></i> Delete</span>-->
+<!--                </a>-->
+<!--                <a ngbDropdownItem role="button">-->
+<!--                    <span><i class="fa fa-trash"></i> Clear</span>-->
+<!--                </a>-->
+<!--                <a ngbDropdownItem role="button" [hidden]="true">-->
+<!--                    <span><i class="fa fa-save"></i> Save</span>-->
+<!--                </a>-->
+<!--                <a ngbDropdownItem role="button" [hidden]="true">-->
+<!--                    <span><i class="fa fa-info"></i> Details</span>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </td>

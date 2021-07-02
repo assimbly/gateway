@@ -11,6 +11,9 @@ import { NavigationEnd, Router } from '@angular/router';
 import * as moment from 'moment';
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dialog.component';
+import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
+import { FlowDeleteDialogComponent } from 'app/entities/flow';
 
 enum Status {
     active = 'active',
@@ -69,107 +72,22 @@ export class QueueRowComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnInit() {
-        //         this.setFlowStatusDefaults();
-        //         this.getStatus(this.flow.id);
-        //         this.endpoints = this.flow.endpoints;
-        //         this.getEndpoints();
-        //
-        //         this.registerTriggeredAction();
+    ngOnInit() {}
+
+    ngOnDestroy() {}
+
+    subscribe(type) {}
+
+    unsubscribe() {}
+
+    delete(address: IAddress): void {
+        const modalRef = this.modalService.open(QueueDeleteDialogComponent as any);
+        modalRef.componentInstance.address = address;
     }
 
-    ngAfterViewInit() {
-        //         this.connection = this.flowService.connectionStomp();
-        //         this.stompClient = this.flowService.client();
-        //         this.subscribe('alert');
-        //         this.subscribe('event');
-        //         this.receive().subscribe(data => {
-        //             const data2 = data.split(':');
-        //
-        //             if (Array.isArray(data2) || data2.length) {
-        //                 if (data2[0] === 'event') {
-        //                     this.setFlowStatus(data2[1]);
-        //                 } else if (data2[0] === 'alert') {
-        //                     const alertId = Number(data2[1]);
-        //                     if (this.flow.id === alertId) {
-        //                         this.getFlowNumberOfAlerts(alertId);
-        //                     }
-        //                 }
-        //             }
-        //         });
-    }
-
-    ngOnDestroy() {
-        //         this.flowService.unsubscribe();
-        //         if (this.mySubscription) {
-        //             this.mySubscription.unsubscribe();
-        //         }
-    }
-    //
-    //     navigateToFlow(action: string) {
-    //         switch (action) {
-    //             case 'edit':
-    //                 this.isAdmin
-    //                     ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'edit' }])
-    //                     : this.router.navigate(['../flow', this.flow.id]);
-    //                 break;
-    //             case 'clone':
-    //                 this.isAdmin
-    //                     ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'clone' }])
-    //                     : this.router.navigate(['../flow', this.flow.id]);
-    //                 break;
-    //             case 'delete':
-    //                 if (this.isAdmin) {
-    //                     let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-    //                     if (typeof FlowDeleteDialogComponent as Component) {
-    //                         modalRef.componentInstance.flow = this.flow;
-    //                         modalRef.result.then(
-    //                             result => {
-    //                                 this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-    //                                 modalRef = null;
-    //                             },
-    //                             reason => {
-    //                                 this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-    //                                 modalRef = null;
-    //                             }
-    //                         );
-    //                     }
-    //                 } else {
-    //                     this.router.navigate(['../flow', this.flow.id]);
-    //                 }
-    //
-    //                 //this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :
-    //                 //this.router.navigate(['../flow', this.flow.id]);
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //     }
-
-    //     navigateToEndpoint(endpoint: Endpoint) {
-    //         this.isAdmin
-    //             ? this.router.navigate(['../../flow/edit-all', this.flow.id], { queryParams: { mode: 'edit', endpointid: endpoint.id } })
-    //             : this.router.navigate(['../flow', this.flow.id]);
-    //     }
-
-    subscribe(type) {
-        //         const topic = '/topic/' + this.flow.id + '/' + type;
-        //
-        //         this.connection.then(() => {
-        //             this.subscriber = this.stompClient.subscribe(topic, data => {
-        //                 if (!this.listenerObserver) {
-        //                     this.listener = this.createListener();
-        //                 }
-        //                 this.listenerObserver.next(data.body);
-        //             });
-        //         });
-    }
-
-    unsubscribe() {
-        //         if (this.subscriber !== null) {
-        //             this.subscriber.unsubscribe();
-        //         }
-        //         this.listener = this.createListener();
+    clear(address: IAddress): void {
+        const modalRef = this.modalService.open(QueueClearDialogComponent as any);
+        modalRef.componentInstance.address = address;
     }
 
     private createListener(): Observable<any> {
