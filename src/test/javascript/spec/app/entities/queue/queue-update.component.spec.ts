@@ -7,6 +7,7 @@ import { GatewayTestModule } from '../../../test.module';
 import { QueueUpdateComponent } from 'app/entities/queue/queue-update.component';
 import { QueueService } from 'app/entities/queue/queue.service';
 import { Queue } from 'app/shared/model/queue.model';
+import { Address } from 'app/shared/model/address.model';
 
 describe('Component Tests', () => {
     describe('Queue Management Update Component', () => {
@@ -31,7 +32,7 @@ describe('Component Tests', () => {
         describe('save', () => {
             it('Should call update service on save for existing entity', fakeAsync(() => {
                 // GIVEN
-                const entity = new Queue(123);
+                const entity = new Address();
                 spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
                 comp.updateForm(entity);
                 // WHEN
@@ -45,7 +46,7 @@ describe('Component Tests', () => {
 
             it('Should call create service on save for new entity', fakeAsync(() => {
                 // GIVEN
-                const entity = new Queue();
+                const entity = new Address();
                 spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
                 comp.updateForm(entity);
                 // WHEN

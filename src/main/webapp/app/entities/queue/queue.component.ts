@@ -7,11 +7,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccountService } from 'app/core';
 
 import { IQueue } from 'app/shared/model/queue.model';
-import { IAddresses, IAddress, Address } from 'app/shared/model/address.model';
+import { IRootAddress, IAddress, Address } from 'app/shared/model/address.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
+import { QueueClearDialogComponent } from './queue-clear-dialog.component';
+import { IBroker } from 'app/shared/model/broker.model';
+import { BrokerService } from 'app/entities/broker';
+import { IFlow } from 'app/shared/model/flow.model';
 
 @Component({
     selector: 'jhi-queue',
@@ -21,6 +25,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     public isAdmin: boolean;
     queues: IQueue[];
     addresses: IAddress[];
+    brokers: IBroker[];
     eventSubscriber?: Subscription;
     currentAccount: any;
     itemsPerPage: number;
@@ -33,9 +38,11 @@ export class QueueComponent implements OnInit, OnDestroy {
     dummy: any;
 
     searchText: string = '';
+    brokerType: string = '';
 
     constructor(
         protected queueService: QueueService,
+        protected brokerService: BrokerService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected modalService: NgbModal,
@@ -43,37 +50,24 @@ export class QueueComponent implements OnInit, OnDestroy {
         protected accountService: AccountService
     ) {
         this.queues = [];
+        this.brokers = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
         this.page = 0;
         this.links = {
             last: 0
         };
-        this.predicate = 'id';
-        this.ascending = true;
+        this.predicate = 'name';
+        this.ascending = false;
     }
 
     loadAll(): void {
-        alert('test');
-
-        this.queueService.getAllQueues('classic').subscribe(
-            (res: HttpResponse<any>) => this.onSuccess(res.body, res.headers),
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
-
-        this.queueService
-            .query({
-                page: this.page,
-                size: this.itemsPerPage,
-                sort: this.sort()
-            })
-            .subscribe((res: HttpResponse<IQueue[]>) => this.paginateQueues(res.body, res.headers));
-
-        //         this.addresses = this.parseXmlToAddresses("hello");
+        this.brokerType = this.getBrokerType();
+        // this.addresses = this.getAllQueues(this.brokerType);
     }
 
     reset(): void {
         this.page = 0;
-        this.queues = [];
+        this.addresses = [];
         this.loadAll();
     }
 
@@ -83,6 +77,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        // this.loadBrokers();
         this.loadAll();
         this.registerChangeInQueues();
         this.accountService.identity().then(account => {
@@ -114,52 +109,76 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     sort(): string[] {
         const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-        if (this.predicate !== 'id') {
-            result.push('id');
+        if (this.predicate !== 'name') {
+            result.push('name');
         }
         return result;
     }
 
-    protected paginateQueues(data: IQueue[] | null, headers: HttpHeaders): void {
+    getAllQueues(brokerType: string): IAddress[] {
+        let addresses: Address[] = [];
+
+        this.queueService.getAllQueues(brokerType).subscribe(
+            data => {
+                if (data) {
+                    for (let i = 0; i < data.body.queues.queue.length; i++) {
+                        addresses.push(data.body.queues.queue[i]);
+                    }
+                }
+            },
+            error => console.log(error)
+        );
+        return addresses;
+    }
+
+    getBrokerType(): string {
+        this.queueService.getBrokers().subscribe(
+            data => {
+                if (data) {
+                    for (let i = 0; i < data.body.length; i++) {
+                        this.brokers.push(data.body[i]);
+                    }
+                    this.addresses = this.getAllQueues(this.brokers[0].type);
+                }
+            },
+            error => console.log(error)
+        );
+        return this.brokers[0].type;
+    }
+
+    protected paginateQueues(data: IRootAddress | null, headers: HttpHeaders): void {
         const headersLink = headers.get('link');
-        this.links = this.parseLinks.parse(headersLink ? headersLink : '');
-        if (data) {
-            for (let i = 0; i < data.length; i++) {
-                this.queues.push(data[i]);
-            }
-        }
-    }
-
-    protected parseXmlToAddresses(xmlInput: string): IAddress[] {
-        let addressList: IAddress[] = [];
-        addressList.push(new Address(1, 'hoi', 'hallo', 2, 3, 4));
-        addressList.push(new Address(2, 'doei', 'dag', 5, 6, 7));
-
-        return addressList;
-    }
-
-    private onSuccess(data, headers) {
-        //         if (this.gateways.length === 1) {
-        //             this.links = this.parseLinks.parse(headers.get('link'));
-        //         }
-
-        this.dummy = data;
-
-        alert('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + this.dummy);
 
         this.addresses = new Array<IAddress>();
-        for (let i = 0; i < data.queues.length; i++) {
-            this.addresses.push(data.queues[i]);
+
+        if (data) {
+            for (let i = 0; i < data.queues.queue.length; i++) {
+                this.addresses.push(data.queues.queue[i]);
+            }
         }
 
-        let str = JSON.stringify(data, null, 4);
-        console.log('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + str);
-        alert('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + str);
+        // this.links = this.parseLinks.parse(headersLink ? headersLink : '');
+    }
+
+    private onSuccess(data: IRootAddress, headers) {
+        this.addresses = new Array<IAddress>();
+        for (let i = 0; i < data.queues.queue.length; i++) {
+            this.addresses.push(data.queues.queue[i]);
+        }
+
+        this.totalItems = headers.get('X-Total-Count');
+    }
+
+    private onSuccessBroker(data: IBroker[], headers) {
+        for (let i = 0; i < data.length; i++) {
+            this.brokers.push(data[i]);
+        }
+        //Currently, only one broker is configured so brokerType = this.brokers[0].brokerType. In futere, use something like selectedBroker
+        this.brokerType = this.brokers[0].type;
         this.totalItems = headers.get('X-Total-Count');
     }
 
     protected onError(errorMessage: string) {
-        alert('ERRORRRRRRRRRRRRRRRRRR   ');
-        this.jhiAlertService.error('ERRORRRRRRRRRRRRRRRRRR' + errorMessage, null, null);
+        this.jhiAlertService.error(errorMessage, null, null);
     }
 }
