@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiParseLinks } from 'ng-jhipster';
+import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { AccountService } from 'app/core';
+
 import { IQueue } from 'app/shared/model/queue.model';
+import { IAddresses, IAddress, Address } from 'app/shared/model/address.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { QueueService } from './queue.service';
@@ -15,19 +18,29 @@ import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
     templateUrl: './queue.component.html'
 })
 export class QueueComponent implements OnInit, OnDestroy {
+    public isAdmin: boolean;
     queues: IQueue[];
+    addresses: IAddress[];
     eventSubscriber?: Subscription;
+    currentAccount: any;
     itemsPerPage: number;
     links: any;
     page: number;
     predicate: string;
+    totalItems: number = -1;
     ascending: boolean;
+
+    dummy: any;
+
+    searchText: string = '';
 
     constructor(
         protected queueService: QueueService,
+        protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected modalService: NgbModal,
-        protected parseLinks: JhiParseLinks
+        protected parseLinks: JhiParseLinks,
+        protected accountService: AccountService
     ) {
         this.queues = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -40,6 +53,13 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
 
     loadAll(): void {
+        alert('test');
+
+        this.queueService.getAllQueues('classic').subscribe(
+            (res: HttpResponse<any>) => this.onSuccess(res.body, res.headers),
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+
         this.queueService
             .query({
                 page: this.page,
@@ -47,6 +67,8 @@ export class QueueComponent implements OnInit, OnDestroy {
                 sort: this.sort()
             })
             .subscribe((res: HttpResponse<IQueue[]>) => this.paginateQueues(res.body, res.headers));
+
+        //         this.addresses = this.parseXmlToAddresses("hello");
     }
 
     reset(): void {
@@ -63,6 +85,11 @@ export class QueueComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.loadAll();
         this.registerChangeInQueues();
+        this.accountService.identity().then(account => {
+            this.currentAccount = account;
+            this.queueService.connect();
+        });
+        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
     }
 
     ngOnDestroy(): void {
@@ -101,5 +128,38 @@ export class QueueComponent implements OnInit, OnDestroy {
                 this.queues.push(data[i]);
             }
         }
+    }
+
+    protected parseXmlToAddresses(xmlInput: string): IAddress[] {
+        let addressList: IAddress[] = [];
+        addressList.push(new Address(1, 'hoi', 'hallo', 2, 3, 4));
+        addressList.push(new Address(2, 'doei', 'dag', 5, 6, 7));
+
+        return addressList;
+    }
+
+    private onSuccess(data, headers) {
+        //         if (this.gateways.length === 1) {
+        //             this.links = this.parseLinks.parse(headers.get('link'));
+        //         }
+
+        this.dummy = data;
+
+        alert('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + this.dummy);
+
+        this.addresses = new Array<IAddress>();
+        for (let i = 0; i < data.queues.length; i++) {
+            this.addresses.push(data.queues[i]);
+        }
+
+        let str = JSON.stringify(data, null, 4);
+        console.log('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + str);
+        alert('BLAAAAAAAAAAAAAAAAAAAAAAAAAAAT   ' + str);
+        this.totalItems = headers.get('X-Total-Count');
+    }
+
+    protected onError(errorMessage: string) {
+        alert('ERRORRRRRRRRRRRRRRRRRR   ');
+        this.jhiAlertService.error('ERRORRRRRRRRRRRRRRRRRR' + errorMessage, null, null);
     }
 }
