@@ -34,6 +34,10 @@ public final class CommandsUtil {
         clean.setRequired(false);
         options.addOption(clean);
 
+        Option cleandb = new Option("cdb", "cleandb", true, "If true deletes the assimbly base directory (you may create a backup or export first)");
+        clean.setRequired(false);
+        options.addOption(cleandb);
+
         Option backup = new Option("b", "backup", true, "backup dir file path");
         backup.setRequired(false);
         options.addOption(backup);
@@ -56,6 +60,7 @@ public final class CommandsUtil {
 
         String baseDirectoryParam = cmd.getOptionValue("application.gateway.base-directory");
         String cleanParam = cmd.getOptionValue("clean");
+        String cleandbParam = cmd.getOptionValue("cleandb");
         String backupDirectoryParam = cmd.getOptionValue("backup");
         String restoreDirectoryParam = cmd.getOptionValue("restore");
 
@@ -73,6 +78,11 @@ public final class CommandsUtil {
 
         if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
             clean(assimblyDirectory);
+            return false;
+        }
+
+        if(cleandbParam!=null && cleandbParam.equalsIgnoreCase("true")){
+            cleandb(assimblyDirectory);
             return false;
         }
 
@@ -102,6 +112,21 @@ public final class CommandsUtil {
             }
         }catch (IOException e) {
             log.error("Error clean gateway: " + e.getCause());
+        }
+    }
+
+    private static void cleandb(String sourceDirectory) {
+        try{
+            File databaseDirectory = new File(sourceDirectory + "/db");
+
+            //only delete when directory contains an existing assimbly database
+            if(databaseDirectory.exists()) {
+                FileUtils.deleteDirectory(databaseDirectory);
+                log.info("Deleted Gateway database.");
+                log.info("Base-Directory=" + sourceDirectory);
+            }
+        }catch (IOException e) {
+            log.error("Error clean gateway database: " + e.getCause());
         }
     }
 
@@ -182,6 +207,5 @@ public final class CommandsUtil {
         return arguments;
 
     }
-
 
 }
