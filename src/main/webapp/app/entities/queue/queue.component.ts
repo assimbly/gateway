@@ -173,7 +173,7 @@ export class QueueComponent implements OnInit, OnDestroy {
         for (let i = 0; i < data.length; i++) {
             this.brokers.push(data[i]);
         }
-        //Currently, only one broker is configured so brokerType = this.brokers[0].brokerType. In futere, use something like selectedBroker
+        //Currently, only one broker is configured so brokerType = this.brokers[0].brokerType. In future, use something like selectedBroker
         this.brokerType = this.brokers[0].type;
         this.totalItems = headers.get('X-Total-Count');
     }

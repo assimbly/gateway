@@ -7,7 +7,10 @@
 <td class="text-left">
     <div class="btn-group">
         <button type="submit"
-                class="btn btn-info btn-sm">
+                class="btn btn-info btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                disabled="true"
+                title="Coming soon">
             <fa-icon icon="eye"></fa-icon>
             <span class="d-none d-md-inline">Browse</span>
         </button>
@@ -15,7 +18,8 @@
         <button type="submit"
                 class="btn btn-primary btn-sm"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'"
-                [routerLink]="['../flow', 'message-sender' ]">
+                disabled="true"
+                title="Coming soon">
             <span class="fa fa-envelope"></span>
             <span class="d-none d-md-inline">Send</span>
         </button>
@@ -34,6 +38,15 @@
                 (click)="clear(address)">
             <span class="fa fa-trash"></span>
             <span class="d-none d-md-inline">Clear</span>
+        </button>
+
+        <button type="submit"
+                class="btn btn-secondary btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                disabled="true"
+                title="Coming soon">
+            <span class="fa fa-floppy-o"></span>
+            <span class="d-none d-md-inline">Save Messages</span>
         </button>
 
 <!--        <div ngbDropdown class="d-inline-block" placement="bottom-left" [hidden]="true">-->

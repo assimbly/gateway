@@ -2,12 +2,13 @@ import org.gradle.internal.os.OperatingSystem
 
 buildscript {
     repositories {
-        maven{ url "file://D:\\Users\\thoma\\maven-repository"}
         mavenLocal()
         mavenCentral()
+//        //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
+//        gradlePluginPortal()
         maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
-        gradlePluginPortal()
-        //maven { url "https://repo.spring.io/plugins-release" }
+        gradlePluginPortal{ url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.spring.io/plugins-release" }
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
@@ -15,8 +16,8 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.1"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
-
 }
+
 
 plugins {
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
