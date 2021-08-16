@@ -49,6 +49,7 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     private subscription: Subscription;
 
     modalRef: NgbModalRef | null;
+    changeText: boolean;
 
     constructor(
         private queueService: QueueService,
