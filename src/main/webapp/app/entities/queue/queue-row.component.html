@@ -6,16 +6,12 @@
 <td>{{ address.numberOfMessages }}</td>
 <td class="text-left">
     <div class="btn-group">
-        <button type="submit"
-                class="btn btn-info btn-sm">
+        <button type="submit" class="btn btn-info btn-sm" (click)="navigateToMessageBrowser(address.name)">
             <fa-icon icon="eye"></fa-icon>
             <span class="d-none d-md-inline">Browse</span>
         </button>
 
-        <button type="submit"
-                class="btn btn-primary btn-sm"
-                *jhiHasAnyAuthority="'ROLE_ADMIN'"
-                [routerLink]="['../flow', 'message-sender' ]">
+        <button type="submit" class="btn btn-primary btn-sm" (click)="navigateToMessageSender(address.name)">
             <span class="fa fa-envelope"></span>
             <span class="d-none d-md-inline">Send</span>
         </button>

@@ -1,0 +1,99 @@
+<div class="row mt-3" style="margin-left: 0.3em">
+    <h2>Messages</h2><br/>
+</div>
+
+<div class="row">
+    <div class="col-3">
+        <h3 style="margin-left: 0.1em">{{endpointType}}={{endpointName}}</h3>
+    </div>
+    <div class="col-9">
+    </div>
+</div>
+
+<!-- uncomment for adding searching to the table
+<div class="row">
+    <div class="col-3">
+        <input type="text" align="left" style="margin-left: 0.3em"
+               [(ngModel)]="searchText"
+               id="searchTextId" name="searchText"
+               placeholder="Filter By Messages Name"/>
+    </div>
+    <div class="col-9">
+    </div>
+</div>-->
+
+<br />
+
+<div *ngIf="messages?.length == 0">
+    <div class="card-block pt-4">
+        <blockquote class="card-blockquote">
+            <br />
+            <p class="tab" style="margin-left: 0.3em">No Messages</p>
+        </blockquote>
+    </div>
+</div>
+
+<div class="container-fluid" *ngIf="messages?.length > 0">
+    <div class="row">
+        <div class="col-6">
+            <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
+                <table class="table table-striped table-condensed">
+                    <thead class="transparant">
+                    <tr>
+                        <th [style.display]="'none'"><span>ID</span></th>
+                        <th><span>No.</span></th>
+                        <th class="border-bottom-none" (click)="sortByTimestamp()"><span>Timestamp</span>
+                            <span class="fa fa-sort"></span></th>
+                        <th><span>MessageID</span></th>
+                        <th class="border-bottom-none">
+                    </tr>
+                    </thead>
+                    <tbody *ngIf="messages" infinite-scroll
+                           (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)"
+                           [infiniteScrollDisabled]="page >= links['last']"
+                           [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
+                    <tr jhi-broker-message-browser-row (click)="showMessage(message)" [ngClass]="{'highlight': message.messageid === selectedHighlight  }"
+                        *ngFor="let message of  (messages | MessageSearchByMessageId: searchText) ;trackBy: trackTimestamp"
+                        [message]="message"  ng-init="$last && finished()"></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-6">
+            <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="horizontal">
+                <li ngbNavItem="0">
+                    <a ngbNavLink>Body</a>
+                    <ng-template ngbNavContent>
+                        <br/>
+                        <ace-editor #editor [(text)]="selectedMessage.body" [mode]="'text'" [theme]="'eclipse'" contenteditable="false" style="min-height: 600px; width: 96%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+                    </ng-template>
+                </li>
+                <li ngbNavItem="1">
+                    <a ngbNavLink>Headers</a>
+                    <ng-template ngbNavContent>
+                        <br/>
+                        <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
+                            <table class="table table-striped table-condensed">
+                                <thead class="transparant">
+                                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
+                                    [callback]="reset.bind(this)">
+                                    <th jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
+                                    <th><span>Value</span></th>
+                                    <th class="border-bottom-none">
+                                </tr>
+                                </thead>
+                                <tbody infinite-scroll>
+                                    <tr *ngFor="let key of objectKeys(selectedMessage.headers)">
+                                        <td id="headerRowKey" class="text-nowrap">{{key}}</td>
+                                        <td id="headerRowValue">{{selectedMessage.headers[key]}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </ng-template>
+                </li>
+            </ul>
+            <div [ngbNavOutlet]="nav" class="ml-4"></div>
+        </div>
+    </div>
+</div>
