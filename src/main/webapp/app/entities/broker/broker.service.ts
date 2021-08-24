@@ -105,4 +105,25 @@ export class BrokerService {
             params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
         });
     }
+
+    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<any> {
+        return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
+            observe: 'response',
+            responseType: 'text',
+            params: { messageHeaders: messageHeaders }
+        });
+    }
+
+    browseMessage(brokerType: string, endpointName: string, messageid: string): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${brokerType}/message/${endpointName}/browse/${messageid}`, {
+            observe: 'response'
+        });
+    }
+
+    browseMessages(brokerType: string, endpointName: string, page: number, numberOfMessages: number): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${brokerType}/messages/${endpointName}/browse`, {
+            observe: 'response',
+            params: { page: page.toString(), numberOfMessages: numberOfMessages.toString() }
+        });
+    }
 }
