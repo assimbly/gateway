@@ -1,0 +1,159 @@
+<div class="container">
+    <div class="row">
+        <ng-template #destinationPopover let-message="message">
+            <div [innerHtml]="destinationPopoverMessage"></div>
+        </ng-template>
+        <ng-template #exchangePatternPopover let-message="message">
+            <div [innerHtml]="exchangePatternPopoverMessage"></div>
+        </ng-template>
+        <ng-template #numberOfTimesPopover let-message="message">
+            <div [innerHtml]="numberOfTimesPopoverMessage"></div>
+        </ng-template>
+
+        <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="row col-12">
+                        <label class="form-control-label"
+                               for="field_destination">Destination</label>
+                        <i triggers="mouseenter:mouseleave"
+                           popoverTitle="Info"
+                           [popover]="destinationPopover"
+                           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+                        <input name="destination"
+                               class="form-control"
+                               id="destination"
+                               formControlName="destination"
+                               required>
+                    </div>
+                    <!--
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-control-label"
+                                   for="field_exchangepattern">Exchange Pattern  </label>
+                            <i triggers="mouseenter:mouseleave"
+                               popoverTitle="Info"
+                               [popover]="exchangePatternPopover"
+                               class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+                            <select type="text"
+                                    class="form-control"
+                                    id="field_exchangepattern"
+                                    formControlName="exchangepattern">
+                                <option value="FireAndForget">FireAndForget</option>
+                                <option value="RequestAndReply">RequestAndReply</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-control-label"
+                                   for="field_numberOfTimes">Number of times  </label>
+                            <i triggers="mouseenter:mouseleave"
+                               popoverTitle="Info"
+                               [popover]="numberOfTimesPopover"
+                               class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+                            <input min="0"
+                                   max="1000"
+                                   size="0"
+                                   maxlength="4"
+                                   type="number"
+                                   name="numberOfMessages"
+                                   class="form-control"
+                                   id="numberOfTimes"
+                                   formControlName="numberoftimes"
+                                   required>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical">
+                        <li ngbNavItem="0">
+                            <a ngbNavLink>Body</a>
+                            <ng-template ngbNavContent>
+                                 <ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
+                            </ng-template>
+                        </li>
+                        <li ngbNavItem="1">
+                            <a ngbNavLink>Headers</a>
+                            <ng-template ngbNavContent>
+                                <div class="form-group">
+                                    <div class="form-row" formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index;">
+                                        <div [formGroupName]="i">
+                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
+                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
+                                            <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader()"><span class="fa fa-plus"></span></button>
+                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader(i)"><span class="fa fa-remove"></span></button>
+                                            <button title="" type="button" class="col-1 left-border-radius-0 btn btn-secondary" *ngIf="i === 0" disabled><span class="fa fa-remove"></span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </li>
+
+                        <!-- in case of using the RequestReply pattern
+                        <li ngbNavItem="2">
+                                <a ngbNavLink>Response</a>
+                                <ng-template ngbNavContent>
+                                    <div class="container">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <ace-editor #editor [(text)]="responseBody" [mode]="responseEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </ng-template>
+                        </li>
+                        -->
+                </ul>
+                <div [ngbNavOutlet]="nav" class="ml-4"></div>
+            </div>
+
+            <br/>
+
+           <br/>
+
+            <div class="float-right"
+                 style="margin-right: 14px;">
+                <button type="button"
+                        class="btn btn-secondary"
+                        (click)="cancel()">
+                    <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
+                </button>
+                <button type="button"
+                        (click)="send(false)" [disabled]="messageSenderForm.invalid || isSending"
+                        class="btn btn-primary">
+                    <span class="fa fa-paper-plane" *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending">Send</span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"></span> <span *ngIf="isSending">Send</span>
+                </button>
+                <button type="button"
+                        (click)="send(true)" [disabled]="messageSenderForm.invalid || isSending"
+                        class="btn btn-primary">
+                    <span class="fa fa-paper-plane"></span>&nbsp; <span>Send and return</span>
+                </button>
+            </div>
+            <br/>
+            <div *ngIf="savingFlowFailed">
+                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+            </div>
+            <div *ngIf="savingFlowSuccess">
+                <span class="text-success">*{{savingFlowSuccessMessage}}</span>
+            </div>
+            <div *ngIf="!!invalidUriMessage">
+                <span class="text-danger">*{{invalidUriMessage}}</span>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-3">
+                    <span></span>
+                </div>
+                <div class="col-9" >
+                    <jhi-alert *ngIf="isAlert"></jhi-alert>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>

@@ -6,11 +6,20 @@ import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
 import { AceEditorModule } from 'ng2-ace-editor';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PopoverModule } from 'ngx-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';
+
 import { GatewaySharedModule } from 'app/shared';
 import {
     BrokerComponent,
     BrokerDetailComponent,
     BrokerUpdateComponent,
+    BrokerMessageSenderComponent,
+    BrokerMessageBrowserComponent,
+    BrokerMessageBrowserRowComponent,
     BrokerDeletePopupComponent,
     BrokerDeleteDialogComponent,
     brokerRoute,
@@ -22,9 +31,29 @@ const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
-    imports: [GatewaySharedModule, AceEditorModule, AceModule, RouterModule.forChild(ENTITY_STATES)],
+    imports: [
+        GatewaySharedModule,
+        AceEditorModule,
+        AceModule,
+        RouterModule.forChild(ENTITY_STATES),
+        NgbModule,
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PopoverModule.forRoot()
+    ],
     exports: [BrokerComponent],
-    declarations: [BrokerComponent, BrokerDetailComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
+    declarations: [
+        BrokerComponent,
+        BrokerDetailComponent,
+        BrokerUpdateComponent,
+        BrokerDeleteDialogComponent,
+        BrokerDeletePopupComponent,
+        BrokerMessageSenderComponent,
+        BrokerMessageBrowserComponent,
+        BrokerMessageBrowserRowComponent,
+        MessageSearchByMessageIdPipe
+    ],
     entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     providers: [

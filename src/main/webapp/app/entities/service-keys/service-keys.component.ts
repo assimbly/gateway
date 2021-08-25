@@ -26,7 +26,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     requiredServiceKey: Array<RequiredServiceKey> = [];
     private requiredType: RequiredServiceKey;
     driversList: Array<String> = this.services.driversList;
-    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
 
     constructor(
         protected serviceKeysService: ServiceKeysService,
