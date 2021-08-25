@@ -106,6 +106,7 @@
                                 <a ngbNavLink>ENDPOINTS</a>
                                 <ng-template ngbNavContent>
                                     <br/>
+                                    <hr />
                                     <div class="d-flex">
                                         <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
                                             <ng-container *ngFor="let endpoint of endpoints; index as index">
@@ -318,8 +319,9 @@
                                         <div [innerHtml]="logLevelPopoverMessage"></div>
                                     </ng-template>
                                 <br/>
+                                <hr />
                                 <div class="container">
-                                    <div  class="col-12" style="padding-left: 20px; padding-right: 452px; padding-bottom: 130px">
+                                    <div  class="col-12" style="padding-left: 20px; padding-right: 452px; padding-bottom: 220px">
                                         <div class="form-group">
                                             <label class="form-control-label" for="field_logLevel" style="float: left; text-align: left;">Log Level</label> <i triggers="mouseenter:mouseleave" placement="right"
                                                                                                                                                                triggers="mouseenter:mouseleave" popoverTitle="Info"
@@ -404,12 +406,14 @@
                                 <ng-template #notesPopover let-message="message">
                                     <div [innerHtml]="notesPopoverMessage"></div>
                                 </ng-template>
+                                <br />
+                                <hr />
                                 <div  class="col-lg-12" style="padding-left: 20px; padding-right: 20px; padding-top: 20px;">
                                     <div class="form-group">
                                         <!--<i triggers="mouseenter:mouseleave" placement="right"
                                            popoverTitle="Info" [popover]="notesPopover"
                                            class="fa fa-info-circle"></i>-->
-                                        <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="25" cols="70"></textarea>
+                                        <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="24" cols="70"></textarea>
                                     </div>
                                 </div>
                             </ng-template>

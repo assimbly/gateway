@@ -24,7 +24,7 @@ export class ServiceUpdateComponent implements OnInit {
     serviceKeysKeys: Array<String> = [];
 
     public driversList: Array<String> = this.services.driversList;
-    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
 
     public disableType: boolean;
 

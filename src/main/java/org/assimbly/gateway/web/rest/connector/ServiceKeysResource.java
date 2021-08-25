@@ -49,7 +49,9 @@ public class ServiceKeysResource {
      */
     @PostMapping("/service-keys")
     public ResponseEntity<ServiceKeysDTO> createServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
+
         log.debug("REST request to save ServiceKeys : {}", serviceKeysDTO);
+
         if (serviceKeysDTO.getId() != null) {
             throw new BadRequestAlertException("A new serviceKeys cannot already have an ID", ENTITY_NAME, "id already exists");
         }
@@ -59,7 +61,7 @@ public class ServiceKeysResource {
             serviceKeysDTO.setValue(encryptedValue);
         }
 
-        serviceKeysService.save(serviceKeysDTO);
+        serviceKeysDTO = serviceKeysService.save(serviceKeysDTO);
 
         return ResponseEntity.created(new URI("/api/service-keys/" + serviceKeysDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
@@ -86,6 +88,7 @@ public class ServiceKeysResource {
             String encryptedValue = encryptValue(serviceKeysDTO.getValue());
             serviceKeysDTO.setValue(encryptedValue);
         }
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
             .body(serviceKeysDTO);

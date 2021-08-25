@@ -139,6 +139,7 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.checkGatewayType(this.gateways, gatewayName.body);
 
             if (!this.gatewayExists) {
+                console.log('Creating gateway');
                 this.gateway = new Object();
                 this.gateway.name = gatewayName.body;
                 this.gateway.type = GatewayType.FULL;
@@ -149,6 +150,7 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.gateway.defaultErrorComponentType = ComponentType.FILE;
 
                 this.gatewayService.create(this.gateway).subscribe(gateway => {
+                    console.log('gateway created');
                     this.gateway = gateway.body;
                     this.gateways.push(this.gateway);
                     this.gatewayExists = true;
