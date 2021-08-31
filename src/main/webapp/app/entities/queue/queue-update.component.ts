@@ -5,7 +5,6 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { IQueue, Queue } from 'app/shared/model/queue.model';
 import { QueueService } from './queue.service';
 import { Address, IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
@@ -93,9 +92,9 @@ export class QueueUpdateComponent implements OnInit {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let i = 0; i < data.body.length; i++) {
-                        this.brokers.push(data.body[i]);
-                        this.brokerType = this.brokers[0].type;
+                    for (let broker of data.body) {
+                        this.brokers.push(broker);
+                        this.brokerType = broker.type;
                     }
                 }
             },
