@@ -47,11 +47,12 @@ export class QueueDeleteDialogComponent {
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
-                this.router.navigate(['/queue']).then(() => {
-                    window.location.reload();
-                });
-                // this.activeModal.close();
-                this.activeModal.close();
+                this.router.navigate(['/queue']);
+                // .then(() => {
+                //     window.location.reload();
+                // });
+                // this.activeModal.close()
+                this.activeModal.dismiss(true);
             });
         }
     }
@@ -60,9 +61,9 @@ export class QueueDeleteDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let i = 0; i < data.body.length; i++) {
-                        this.brokers.push(data.body[i]);
-                        this.brokerType = this.brokers[0].type;
+                    for (let broker of data.body) {
+                        this.brokers.push(broker);
+                        this.brokerType = broker.type;
                     }
                 }
             },

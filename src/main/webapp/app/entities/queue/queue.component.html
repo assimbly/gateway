@@ -1,29 +1,41 @@
 <div>
-    <h2 id="page-heading">
-        <span>Queues</span>
+    <div class="row mt-3" style="margin-left: 0.3em">
+        <h2>Queues</h2><br/>
+    </div>
 
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-queue" [routerLink]="['/queue/new']">
-            <fa-icon icon="plus"></fa-icon>
-            <span>
-            Create a new Queue
-            </span>
-        </button>
-    </h2>
-
-    <jhi-alert-error></jhi-alert-error>
-
-    <jhi-alert></jhi-alert>
+    <div class="row">
+        <div class="col-3">
+        </div>
+        <div class="col-8 text-right">
+            <button class="btn btn-primary" type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/queue/new']">
+                <span class="fa fa-plus"></span> <span>Create a new Queue</span>
+            </button>
+            <button class="btn btn-primary" type="submit"
+                    (click)="reset()"
+                     style="margin-right:-2em">
+                <span class="fa fa-refresh"></span> <span>Refresh</span>
+            </button>
+        </div>
+        <div class="col-1">
+        </div>
+    </div>
 
     <div class="alert alert-warning" id="no-result" *ngIf="addresses?.length === 0">
         <span>No queues found</span>
     </div>
 
     <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
-        <div class="col-3">
-            <input type="text" align="left" style="margin-left: 0.3em"
-                   [(ngModel)]="searchText"
-                   id="searchTextId" name="searchText"
-                   placeholder="Filter By Queue Name"/>
+        <div class="row">
+            <div class="col-3">
+                <input type="text" align="left" style="margin-left: 0.3em"
+                       [(ngModel)]="searchText"
+                       id="searchTextId" name="searchText"
+                       placeholder="Filter By Queue Name"/>
+            </div>
+            <div class="col-1">
+            </div>
         </div>
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>

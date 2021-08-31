@@ -35,28 +35,11 @@
         <button type="submit"
                 class="btn btn-secondary btn-sm"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                (click)="downloadMessages()"
                 disabled="true"
                 title="Coming soon">
             <span class="fa fa-floppy-o"></span>
             <span class="d-none d-md-inline">Save Messages</span>
         </button>
-
-<!--        <div ngbDropdown class="d-inline-block" placement="bottom-left" [hidden]="true">-->
-<!--            <a class="btn" id="dropdownBasic1" ngbDropdownToggle>Other<i class="fa fa-angle-down"></i></a>-->
-<!--            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">-->
-<!--                <a ngbDropdownItem role="button" (click)="delete(address)">-->
-<!--                    <span><i class="fa fa-times"></i> Delete</span>-->
-<!--                </a>-->
-<!--                <a ngbDropdownItem role="button">-->
-<!--                    <span><i class="fa fa-trash"></i> Clear</span>-->
-<!--                </a>-->
-<!--                <a ngbDropdownItem role="button" [hidden]="true">-->
-<!--                    <span><i class="fa fa-save"></i> Save</span>-->
-<!--                </a>-->
-<!--                <a ngbDropdownItem role="button" [hidden]="true">-->
-<!--                    <span><i class="fa fa-info"></i> Details</span>-->
-<!--                </a>-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
 </td>

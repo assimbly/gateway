@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { IQueue } from 'app/shared/model/queue.model';
 import { QueueService } from './queue.service';
@@ -19,7 +19,7 @@ export class QueueClearDialogComponent {
     brokers: IBroker[];
 
     message = 'Are you sure you want to clear this queue?';
-    disableDelete: boolean;
+    disableClear: boolean;
 
     constructor(
         protected queueService: QueueService,
@@ -30,7 +30,7 @@ export class QueueClearDialogComponent {
     ) {
         this.brokers = [];
         this.getBrokerType();
-        this.disableDelete = false;
+        this.disableClear = false;
     }
 
     cancel(): void {
@@ -40,15 +40,13 @@ export class QueueClearDialogComponent {
     confirmClear(name: string): void {
         if (this.address.numberOfConsumers > 0) {
             this.message = 'Cannot clear queue because there is at least one active consumer';
-            this.disableDelete = true;
+            this.disableClear = true;
         } else {
             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
-                this.router.navigate(['/queue']).then(() => {
-                    window.location.reload();
-                });
-                // this.activeModal.close();
-                this.activeModal.close();
+                this.address.numberOfMessages = 0;
+                this.router.navigate(['/queue']);
+                this.activeModal.dismiss(true);
             });
         }
     }
@@ -57,9 +55,9 @@ export class QueueClearDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let i = 0; i < data.body.length; i++) {
-                        this.brokers.push(data.body[i]);
-                        this.brokerType = this.brokers[0].type;
+                    for (let broker of data.body) {
+                        this.brokers.push(broker);
+                        this.brokerType = broker.type;
                     }
                 }
             },

@@ -1,5 +1,4 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Queue, IQueue } from 'app/shared/model/queue.model';
 import { Address, IAddress, IAddresses } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
@@ -13,7 +12,6 @@ import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dialog.component';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
-import { FlowDeleteDialogComponent } from 'app/entities/flow';
 
 enum Status {
     active = 'active',
@@ -82,8 +80,18 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     unsubscribe() {}
 
     delete(address: IAddress): void {
-        const modalRef = this.modalService.open(QueueDeleteDialogComponent as any);
+        let modalRef = this.modalService.open(QueueDeleteDialogComponent as any);
         modalRef.componentInstance.address = address;
+        modalRef.result.then(
+            result => {
+                this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+                modalRef = null;
+            },
+            reason => {
+                this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+                modalRef = null;
+            }
+        );
     }
 
     clear(address: IAddress): void {
@@ -104,4 +112,6 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     navigateToMessageBrowser(addressName: string) {
         this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'queue' }]);
     }
+
+    downloadMessages() {}
 }

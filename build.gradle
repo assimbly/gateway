@@ -262,7 +262,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-    //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
+    maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     jcenter()
     //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
