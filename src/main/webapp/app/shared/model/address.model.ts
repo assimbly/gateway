@@ -6,6 +6,14 @@ export interface IAddresses {
     queue: Address[];
 }
 
+export interface IRootTopicAddresses {
+    topics: ITopicAddresses;
+}
+
+export interface ITopicAddresses {
+    topic: Address[];
+}
+
 export interface IAddress {
     address?: string;
     name?: string;

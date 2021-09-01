@@ -7,6 +7,7 @@ import { GatewayTestModule } from '../../../test.module';
 import { TopicUpdateComponent } from 'app/entities/topic/topic-update.component';
 import { TopicService } from 'app/entities/topic/topic.service';
 import { Topic } from 'app/shared/model/topic.model';
+import { Address } from 'app/shared/model/address.model';
 
 describe('Component Tests', () => {
     describe('Topic Management Update Component', () => {
@@ -31,7 +32,7 @@ describe('Component Tests', () => {
         describe('save', () => {
             it('Should call update service on save for existing entity', fakeAsync(() => {
                 // GIVEN
-                const entity = new Topic(123);
+                const entity = new Address();
                 spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
                 comp.updateForm(entity);
                 // WHEN
@@ -45,7 +46,7 @@ describe('Component Tests', () => {
 
             it('Should call create service on save for new entity', fakeAsync(() => {
                 // GIVEN
-                const entity = new Topic();
+                const entity = new Address();
                 spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
                 comp.updateForm(entity);
                 // WHEN
