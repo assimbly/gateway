@@ -42,14 +42,15 @@ export class QueueClearDialogComponent {
             this.message = 'Cannot clear queue because there is at least one active consumer';
             this.disableDelete = true;
         } else {
-            this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
-                this.router.navigate(['/queue']).then(() => {
-                    window.location.reload();
-                });
-                // this.activeModal.close();
-                this.activeModal.close();
-            });
+            this.queueService.clearQueue(name, this.brokerType).subscribe(
+                res => {
+                    this.eventManager.broadcast('queueListModification');
+                },
+                res => {
+                    console.log(res);
+                }
+            );
+            this.activeModal.close();
         }
     }
 
