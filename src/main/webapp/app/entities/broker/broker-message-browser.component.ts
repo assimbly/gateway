@@ -1,14 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { IMessage } from 'app/shared/model/messsage.model';
 import { AccountService } from 'app/core';
-
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { BrokerService } from 'app/entities/broker/broker.service';
+
+import { saveAs } from 'file-saver/FileSaver';
 
 @Component({
     selector: 'jhi-broker-message-browser',
@@ -19,37 +21,48 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     message: IMessage;
     selectedMessage: IMessage = {};
     selectedHighlight: string;
+    allMessages: any;
     headers: any;
 
     brokerType: string;
     endpointName: string;
     endpointType: string;
+    targetEndpointName: string;
 
     public isAdmin: boolean;
     currentAccount: any;
     eventSubscriber: Subscription;
     itemsPerPage: number;
     links: any;
-    page: any;
+
     predicate: any;
-    queryCount: any;
     reverse: any;
     totalItems: number = -1;
-    numberOfMessages: number = 100;
-    finished = false;
 
+    page: any;
+    numberOfMessages: number = 100;
+    messagesCount: number;
+    fileExtension: string;
+    isLoading: boolean = false;
+    finished = false;
     test: any;
     searchText: string = '';
     active: string = '0';
     descending: boolean = false;
+    subtitle: string;
+
     objectKeys = Object.keys;
+
+    modalRef: NgbModalRef | null;
 
     constructor(
         private brokerService: BrokerService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected parseLinks: JhiParseLinks,
+        private modalService: NgbModal,
         protected accountService: AccountService,
+        private router: Router,
         private route: ActivatedRoute
     ) {
         this.messages = [];
@@ -66,6 +79,12 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
+
+        this.route.params.subscribe(params => {
+            this.endpointType = params['endpointType'];
+            this.endpointName = params['endpointName'];
+        });
+
         this.loadMessages();
         this.finished = true;
         this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
@@ -81,11 +100,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     loadMessages() {
-        this.route.params.subscribe(params => {
-            this.endpointType = params['endpointType'];
-            this.endpointName = params['endpointName'];
-        });
-
+        this.isLoading = true;
         this.brokerService.getBrokerType(1).subscribe(
             data => {
                 if (data) {
@@ -93,6 +108,12 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
                 } else {
                     this.brokerType = 'classic';
                 }
+
+                this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
+                    (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
+                    (res: HttpErrorResponse) => this.onError(res.message)
+                );
+
                 this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages).subscribe(
                     (res: HttpResponse<IMessage[]>) => this.onSuccess(res.body, res.headers),
                     (res: HttpErrorResponse) => this.onError(res.message)
@@ -103,51 +124,101 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     private onSuccess(data, headers) {
+        this.isLoading = false;
         this.messages = new Array<IMessage>();
+        this.allMessages = data;
 
-        let itemNumber = 0;
+        if (data.messages.message) {
+            let itemNumber = 0;
 
-        for (var i = data.messages.message.length - 1; i > -1; i--) {
-            this.message = {};
-
-            itemNumber = itemNumber + 1;
-            this.message.number = itemNumber;
-            this.message.messageid = data.messages.message[i].JMSMessageID;
-            this.message.timestamp = data.messages.message[i].JMSTimestamp;
-
-            this.messages.push(this.message);
-
-            if (i === data.messages.message.length - 1) {
-                this.showMessage(this.message);
+            if (this.page > 1) {
+                itemNumber = (this.page - 1) * this.numberOfMessages;
             }
-        }
 
-        this.totalItems = this.numberOfMessages;
+            for (var i = data.messages.message.length - 1; i > -1; i--) {
+                this.message = {};
+
+                itemNumber = itemNumber + 1;
+                this.message.number = itemNumber;
+                this.message.messageid = data.messages.message[i].messageid;
+                this.message.timestamp = data.messages.message[i].timestamp;
+
+                this.messages.push(this.message);
+
+                if (i === data.messages.message.length - 1) {
+                    this.showMessage(this.message);
+                }
+            }
+
+            this.totalItems = this.numberOfMessages;
+        }
+    }
+
+    private onSuccessCount(data, headers) {
+        this.messagesCount = parseInt(data);
+
+        if (this.messagesCount === 0) {
+            this.subtitle = '0 messages on ' + this.endpointType + ' ' + this.endpointName;
+        } else if (this.messagesCount === 1) {
+            this.subtitle = '1 message on ' + this.endpointType + ' ' + this.endpointName;
+        } else {
+            this.subtitle = this.messagesCount.toString() + ' messages on ' + this.endpointType + ' ' + this.endpointName;
+        }
     }
 
     private onSuccessBrowse(data, headers) {
         if (data.messages.message) {
             for (var i = 0; i < data.messages.message.length; i++) {
+                const message = data.messages.message[i];
+
                 this.selectedMessage = {};
-                this.selectedMessage.body = data.messages.message[i].Text;
-                this.selectedMessage.headers = data.messages.message[i].headers;
+                this.selectedMessage.messageid = message.messageid;
+                this.selectedMessage.timestamp = message.timestamp;
+                this.selectedMessage.headers = message.headers;
+                this.selectedMessage.jmsHeaders = message.jmsHeaders;
+                this.selectedMessage.body = this.getBody(message);
+                this.selectedMessage.fileType = this.getFileType(this.selectedMessage.body);
             }
         }
     }
 
+    getBody(message: any) {
+        let body: string = '';
+
+        if (message.body) {
+            body = message.body;
+        } else if (message.BodyPreview) {
+            // Convert to byte array
+            let data = new Uint8Array(message.BodyPreview);
+            // Decode with TextDecoder
+            body = new TextDecoder('shift-jis').decode(data.buffer);
+            body = 'Bytes message preview:\n\n' + body;
+        }
+
+        return body;
+    }
+
+    /*
+    getJMSHeaders(message: any){
+
+        const jmsHeaders = Object.keys(message).filter(key => key.startsWith('JMS'))
+            .reduce((obj, key) => {
+                obj[key] = message[key];
+                return obj;
+            }, {});
+
+        return jmsHeaders;
+
+    }*/
+
     private onError(errorMessage: string) {
+        this.isLoading = false;
         this.jhiAlertService.error(errorMessage, null, null);
     }
 
     reset() {
         this.page = 0;
         this.messages = [];
-        this.loadMessages();
-    }
-
-    loadPage(page) {
-        this.page = 1; // page;
-        this.itemsPerPage = this.itemsPerPage + 5;
         this.loadMessages();
     }
 
@@ -175,11 +246,100 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
     }
 
+    refreshMessages() {
+        this.loadMessages();
+    }
+
+    deleteMessage(message: IMessage) {
+        this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+            (res: HttpResponse<any>) => {
+                this.loadMessages();
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+    }
+
+    moveMessage(message: IMessage) {
+        this.brokerService.moveMessage(this.brokerType, this.endpointName, this.targetEndpointName, message.messageid).subscribe(
+            (res: HttpResponse<any>) => {
+                this.loadMessages();
+                this.cancelModal();
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+    }
+
+    saveMessage(message: IMessage, bodyOnly: boolean) {
+        if (message.fileType) {
+            this.fileExtension = message.fileType;
+        } else {
+            this.fileExtension = 'txt';
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        if (bodyOnly) {
+            const blob = new Blob([message.body], { type: 'application/' + this.fileExtension });
+            saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.${this.fileExtension}`);
+        } else {
+            this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+                (res: HttpResponse<any>) => {
+                    const exportMessage = JSON.stringify(res.body);
+                    const blob = new Blob([exportMessage], { type: 'application/json' });
+                    saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.json`);
+                },
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
+        }
+    }
+
+    saveAllMessages() {
+        const exportMessage = JSON.stringify(this.allMessages);
+        const blob = new Blob([exportMessage], { type: 'application/json' });
+        const today = new Date().toISOString().slice(0, 10);
+        saveAs(blob, `${today}-${this.endpointName}.json`);
+    }
+
     showMessage(message: IMessage) {
         this.selectedHighlight = message.messageid;
         this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
             (res: HttpResponse<IMessage[]>) => this.onSuccessBrowse(res.body, res.headers),
             (res: HttpErrorResponse) => this.onError(res.message)
         );
+    }
+
+    previousPage() {
+        this.page = this.page - 1;
+        this.loadMessages();
+    }
+
+    nextPage() {
+        this.page = this.page + 1;
+        this.loadMessages();
+    }
+
+    openModal(templateRef: TemplateRef<any>) {
+        this.modalRef = this.modalService.open(templateRef);
+    }
+
+    cancelModal(): void {
+        if (this.modalRef) {
+            this.modalRef.dismiss();
+            this.modalRef = null;
+        }
+    }
+
+    getFileType(doc) {
+        try {
+            //try to parse via json
+            let a = JSON.parse(doc);
+            return 'json';
+        } catch (e) {
+            //try xml parsing
+            let parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(doc, 'application/xml');
+            if (xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
+            else return 'xml';
+        }
     }
 }

@@ -57,23 +57,19 @@ export class QueueComponent implements OnInit, OnDestroy {
         this.predicate = 'name';
         this.ascending = false;
     }
-
-    loadAll(): void {
-        this.brokerType = this.getBrokerType();
-        this.addresses = this.getAllQueues(this.brokerType);
-    }
-
     reset(): void {
-        this.addresses = [];
-        this.loadAll();
+        this.page = 0;
+        this.getBrokerType();
     }
 
     loadPage(page: number): void {
         this.page = page;
-        this.loadAll();
+        this.getBrokerType();
     }
 
     ngOnInit(): void {
+        this.getBrokerType();
+        this.registerChangeInQueues();
         this.accountService.identity().then(account => {
             this.currentAccount = account;
             this.queueService.connect();
@@ -83,11 +79,10 @@ export class QueueComponent implements OnInit, OnDestroy {
         this.registerChangeInQueues();
         this.registerDeletedQueues();
         this.poll();
-        this.loadAll();
     }
 
     ngAfterViewInit() {
-        this.loadAll();
+        this.getBrokerType();
         this.registerChangeInQueues();
     }
 
@@ -142,35 +137,34 @@ export class QueueComponent implements OnInit, OnDestroy {
         return result;
     }
 
-    getAllQueues(brokerType: string): IAddress[] {
-        let addresses: Address[] = [];
+    getBrokerType() {
+        this.queueService.getBrokers().subscribe(
+            data => {
+                if (data) {
+                    for (let i = 0; i < data.body.length; i++) {
+                        this.brokers.push(data.body[i]);
+                    }
+                    this.brokerType = this.brokers[0].type;
+                    this.getAllQueues(this.brokerType);
+                }
+            },
+            error => console.log(error)
+        );
+    }
+
+    getAllQueues(brokerType: string) {
+        this.addresses = [];
 
         this.queueService.getAllQueues(brokerType).subscribe(
             data => {
                 if (data) {
-                    for (let address of data.body.queues.queue) {
-                        addresses.push(address);
+                    for (let i = 0; i < data.body.queues.queue.length; i++) {
+                        this.addresses.push(data.body.queues.queue[i]);
                     }
                 }
             },
             error => console.log(error)
         );
-        return addresses;
-    }
-
-    getBrokerType(): string {
-        this.queueService.getBrokers().subscribe(
-            data => {
-                if (data) {
-                    for (let broker of data.body) {
-                        this.brokers.push(broker);
-                    }
-                    this.addresses = this.getAllQueues(this.brokers[0].type);
-                }
-            },
-            error => console.log(error)
-        );
-        return this.brokers[0].type;
     }
 
     protected onError(errorMessage: string) {
