@@ -60,25 +60,18 @@ export class QueueComponent implements OnInit, OnDestroy {
         this.ascending = false;
     }
 
-    loadAll(): void {
-        this.brokerType = this.getBrokerType();
-        // this.addresses = this.getAllQueues(this.brokerType);
-    }
-
     reset(): void {
         this.page = 0;
-        this.addresses = [];
-        this.loadAll();
+        this.getBrokerType();
     }
 
     loadPage(page: number): void {
         this.page = page;
-        this.loadAll();
+        this.getBrokerType();
     }
 
     ngOnInit(): void {
-        // this.loadBrokers();
-        this.loadAll();
+        this.getBrokerType();
         this.registerChangeInQueues();
         this.accountService.identity().then(account => {
             this.currentAccount = account;
@@ -115,35 +108,34 @@ export class QueueComponent implements OnInit, OnDestroy {
         return result;
     }
 
-    getAllQueues(brokerType: string): IAddress[] {
-        let addresses: Address[] = [];
-
-        this.queueService.getAllQueues(brokerType).subscribe(
-            data => {
-                if (data) {
-                    for (let i = 0; i < data.body.queues.queue.length; i++) {
-                        addresses.push(data.body.queues.queue[i]);
-                    }
-                }
-            },
-            error => console.log(error)
-        );
-        return addresses;
-    }
-
-    getBrokerType(): string {
+    getBrokerType() {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
                     for (let i = 0; i < data.body.length; i++) {
                         this.brokers.push(data.body[i]);
                     }
-                    this.addresses = this.getAllQueues(this.brokers[0].type);
+                    this.brokerType = this.brokers[0].type;
+                    this.getAllQueues(this.brokerType);
                 }
             },
             error => console.log(error)
         );
-        return this.brokers[0].type;
+    }
+
+    getAllQueues(brokerType: string) {
+        this.addresses = [];
+
+        this.queueService.getAllQueues(brokerType).subscribe(
+            data => {
+                if (data) {
+                    for (let i = 0; i < data.body.queues.queue.length; i++) {
+                        this.addresses.push(data.body.queues.queue[i]);
+                    }
+                }
+            },
+            error => console.log(error)
+        );
     }
 
     protected paginateQueues(data: IRootAddress | null, headers: HttpHeaders): void {

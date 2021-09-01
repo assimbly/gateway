@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared';
 import { IBroker } from 'app/shared/model/broker.model';
-import { HttpHeaders } from '@angular/common/http';
 
 type EntityResponseType = HttpResponse<IBroker>;
 type EntityArrayResponseType = HttpResponse<IBroker[]>;
@@ -106,11 +105,16 @@ export class BrokerService {
         });
     }
 
-    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<any> {
-        return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
+    countMessages(brokerType: string, endpointName: string): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${brokerType}/messages/${endpointName}/count`, {
+            observe: 'response'
+        });
+    }
+
+    browseMessages(brokerType: string, endpointName: string, page: number, numberOfMessages: number): Observable<any> {
+        return this.http.get(`${this.resourceUrl}/${brokerType}/messages/${endpointName}/browse`, {
             observe: 'response',
-            responseType: 'text',
-            params: { messageHeaders: messageHeaders }
+            params: { page: page.toString(), numberOfMessages: numberOfMessages.toString() }
         });
     }
 
@@ -120,10 +124,23 @@ export class BrokerService {
         });
     }
 
-    browseMessages(brokerType: string, endpointName: string, page: number, numberOfMessages: number): Observable<any> {
-        return this.http.get(`${this.resourceUrl}/${brokerType}/messages/${endpointName}/browse`, {
+    deleteMessage(brokerType: string, endpointName: string, messageid: string): Observable<any> {
+        return this.http.delete<any>(`${this.resourceUrl}/${brokerType}/message/${endpointName}/${messageid}`, {
+            observe: 'response'
+        });
+    }
+
+    moveMessage(brokerType: string, endpointName: string, targetEndpointName: string, messageid: string): Observable<any> {
+        return this.http.post<any>(`${this.resourceUrl}/${brokerType}/message/${endpointName}/${targetEndpointName}/${messageid}`, '', {
+            observe: 'response'
+        });
+    }
+
+    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<any> {
+        return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
             observe: 'response',
-            params: { page: page.toString(), numberOfMessages: numberOfMessages.toString() }
+            responseType: 'text',
+            params: { messageHeaders: messageHeaders }
         });
     }
 }
