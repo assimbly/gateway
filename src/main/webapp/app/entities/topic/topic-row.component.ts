@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Address, IAddress, IAddresses } from 'app/shared/model/address.model';
+import { Address, IAddress, IQueueAddresses } from 'app/shared/model/address.model';
 
 import { TopicService } from './topic.service';
 import { SecurityService } from '../security';
@@ -112,6 +112,4 @@ export class TopicRowComponent implements OnInit, OnDestroy {
     navigateToMessageBrowser(addressName: string) {
         this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'topic' }]);
     }
-
-    downloadMessages() {}
 }

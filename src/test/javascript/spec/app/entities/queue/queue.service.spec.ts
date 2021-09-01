@@ -2,7 +2,7 @@ import { TestBed, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { QueueService } from 'app/entities/queue/queue.service';
 import { IQueue, Queue } from 'app/shared/model/queue.model';
-import { IRootAddress, IAddress } from 'app/shared/model/address.model';
+import { IRootQueueAddress, IAddress } from 'app/shared/model/address.model';
 
 describe('Service Tests', () => {
     describe('Queue Service', () => {
@@ -10,8 +10,8 @@ describe('Service Tests', () => {
         let service: QueueService;
         let httpMock: HttpTestingController;
         let elemDefault: IQueue;
-        let elemDefIRootAddress: IRootAddress;
-        let expectedResult: IQueue | IQueue[] | IRootAddress | IAddress | IAddress[] | boolean | null;
+        let elemDefIRootAddress: IRootQueueAddress;
+        let expectedResult: IQueue | IQueue[] | IRootQueueAddress | IAddress | IAddress[] | boolean | null;
 
         beforeEach(() => {
             TestBed.configureTestingModule({

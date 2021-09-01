@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription, interval } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccountService } from 'app/core';
 
 import { ITopic } from 'app/shared/model/topic.model';
-import { IAddress, Address, IRootTopicAddresses } from 'app/shared/model/address.model';
+import { IAddress } from 'app/shared/model/address.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { TopicService } from './topic.service';
@@ -59,37 +58,30 @@ export class TopicComponent implements OnInit, OnDestroy {
         this.ascending = false;
     }
 
-    loadAll(): void {
-        this.brokerType = this.getBrokerType();
-        this.addresses = this.getAllTopics(this.brokerType);
-    }
-
     reset(): void {
-        this.addresses = [];
-        this.loadAll();
+        this.page = 0;
+        this.getBrokerType();
     }
 
     loadPage(page: number): void {
         this.page = page;
-        this.loadAll();
+        this.getBrokerType();
     }
 
     ngOnInit(): void {
+        this.registerChangeInTopics();
+        this.registerDeletedTopics();
+
         this.accountService.identity().then(account => {
             this.currentAccount = account;
             this.topicService.connect();
         });
         this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
-
-        this.registerChangeInTopics();
-        this.registerDeletedTopics();
-        this.poll();
-        this.loadAll();
     }
 
     ngAfterViewInit() {
-        this.loadAll();
-        this.registerChangeInTopics();
+        this.getBrokerType();
+        this.poll();
     }
 
     ngOnDestroy(): void {
@@ -117,16 +109,14 @@ export class TopicComponent implements OnInit, OnDestroy {
             .subscribe(
                 _ => {
                     this.eventManager.broadcast('topicListModification');
-                    // this.addresses = res.body.queues.queue
-                    // this.reset();
                 },
                 err => console.log('HTTP Error', err)
             );
     }
 
     registerDeletedTopics() {
-        this.eventManager.subscribe('queueDeleted', res => {
-            this.reset();
+        this.eventManager.subscribe('topicDeleted', res => {
+            this.getBrokerType();
         });
     }
 
@@ -143,48 +133,33 @@ export class TopicComponent implements OnInit, OnDestroy {
         return result;
     }
 
-    getAllTopics(brokerType: string): IAddress[] {
-        let addresses: Address[] = [];
-
-        this.topicService.getAllTopics(brokerType).subscribe(
-            data => {
-                if (data) {
-                    for (let address of data.body.topics.topic) {
-                        addresses.push(address);
-                    }
-                }
-            },
-            error => console.log(error)
-        );
-        return addresses;
-    }
-
-    getBrokerType(): string {
+    getBrokerType() {
         this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
-                        this.brokers.push(broker);
+                    for (let i = 0; i < data.body.length; i++) {
+                        this.brokers.push(data.body[i]);
                     }
-                    this.addresses = this.getAllTopics(this.brokers[0].type);
+                    this.brokerType = this.brokers[0].type;
+                    this.getAllTopics();
                 }
             },
             error => console.log(error)
         );
-        return this.brokers[0].type;
     }
 
-    protected paginateTopics(data: IRootTopicAddresses | null, headers: HttpHeaders): void {
-        const headersLink = headers.get('link');
+    getAllTopics() {
+        this.addresses = [];
 
-        this.addresses = new Array<IAddress>();
-
-        if (data) {
-            for (let address of data.topics.topic) {
-                this.addresses.push(address);
-            }
-        }
-
-        // this.links = this.parseLinks.parse(headersLink ? headersLink : '');
+        this.topicService.getAllTopics(this.brokerType).subscribe(
+            data => {
+                if (data) {
+                    for (let address of data.body.topics.topic) {
+                        this.addresses.push(address);
+                    }
+                }
+            },
+            error => console.log(error)
+        );
     }
 }

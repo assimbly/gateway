@@ -4,8 +4,6 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-//        //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
-//        gradlePluginPortal()
         maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
         gradlePluginPortal{ url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/plugins-release" }

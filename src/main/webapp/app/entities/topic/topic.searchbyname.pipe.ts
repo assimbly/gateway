@@ -15,6 +15,10 @@ export class TopicSearchByNamePipe implements PipeTransform {
         } else if (predicate == 'address') {
             addresses = addresses.sort((a, b) => (a.address <= b.address ? asc : asc * -1));
         }
-        return addresses.filter(address => address.name.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1);
+        return addresses.filter(
+            address =>
+                address.name.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1 ||
+                address.address.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1
+        );
     }
 }

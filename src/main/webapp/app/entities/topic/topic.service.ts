@@ -75,10 +75,12 @@ export class TopicService {
     }
 
     getAllTopics(brokerType: string): Observable<HttpResponse<IRootTopicAddresses>> {
-        return this.http.get<IRootTopicAddresses>(`${this.brokersResourceUrl}/${brokerType}/topics`, {
-            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
-            observe: 'response'
-        });
+        if (brokerType != null && brokerType != '') {
+            return this.http.get<IRootTopicAddresses>(`${this.brokersResourceUrl}/${brokerType}/topics`, {
+                headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
+                observe: 'response'
+            });
+        }
     }
 
     getBrokers(): Observable<HttpResponse<IBroker[]>> {
