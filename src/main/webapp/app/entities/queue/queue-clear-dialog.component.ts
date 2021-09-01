@@ -42,12 +42,24 @@ export class QueueClearDialogComponent {
             this.message = 'Cannot clear queue because there is at least one active consumer';
             this.disableClear = true;
         } else {
-            this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
-                this.address.numberOfMessages = 0;
-                this.router.navigate(['/queue']);
-                this.activeModal.dismiss(true);
-            });
+            // <<<<<<< HEAD
+            //             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
+            //                 this.eventManager.broadcast('queueListModification');
+            //                 this.address.numberOfMessages = 0;
+            //                 this.router.navigate(['/queue']);
+            //                 this.activeModal.dismiss(true);
+            //             });
+            // =======
+            this.queueService.clearQueue(name, this.brokerType).subscribe(
+                res => {
+                    this.eventManager.broadcast('queueListModification');
+                },
+                res => {
+                    console.log(res);
+                }
+            );
+            this.activeModal.close();
+            // >>>>>>> 96fcc86f18b40371b170edf32978ba78cee39009
         }
     }
 

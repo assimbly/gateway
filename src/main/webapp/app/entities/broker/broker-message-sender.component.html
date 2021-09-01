@@ -1,4 +1,35 @@
-<div class="container">
+<div class="row mt-3" style="margin-left: 0.3em">
+    <h2>Send Messages</h2><br/>
+</div>
+
+<div class="row">
+    <div class="col-9">
+        <h4 style="margin-left: 0.3em"><b><i>{{subtitle}}</i></b></h4>
+    </div>
+    <div class="col-2-5">
+
+        <div ngbDropdown class="d-inline-block">
+            <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px;">Actions</button>
+            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                <button ngbDropdownItem (click)="send(false)">Send</button>
+                <button ngbDropdownItem (click)="send(true)">Send and Return</button>
+            </div>
+        </div>
+
+        <div ngbDropdown class="d-inline-block">
+            <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px;">Upload</button>
+            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                <label ngbDropdownItem class="btn btn-default">File<input type="file" hidden (change)='openFile($event)'></label>
+                <label ngbDropdownItem class="btn btn-default">Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)='openDirectory($event)'></label>
+            </div>
+        </div>
+    </div>
+    <div class="col-0-5"></div>
+</div>
+
+<br/>
+
+<div class="container-fluid">
     <div class="row">
         <ng-template #destinationPopover let-message="message">
             <div [innerHtml]="destinationPopoverMessage"></div>
@@ -12,84 +43,103 @@
 
         <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
 
-            <div class="form-group">
-                <div class="form-group">
-                    <div class="row col-12">
-                        <label class="form-control-label"
-                               for="field_destination">Destination</label>
-                        <i triggers="mouseenter:mouseleave"
-                           popoverTitle="Info"
-                           [popover]="destinationPopover"
-                           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-                        <input name="destination"
-                               class="form-control"
-                               id="destination"
-                               formControlName="destination"
-                               required>
-                    </div>
-                    <!--
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="form-control-label"
-                                   for="field_exchangepattern">Exchange Pattern  </label>
-                            <i triggers="mouseenter:mouseleave"
-                               popoverTitle="Info"
-                               [popover]="exchangePatternPopover"
-                               class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-                            <select type="text"
-                                    class="form-control"
-                                    id="field_exchangepattern"
-                                    formControlName="exchangepattern">
-                                <option value="FireAndForget">FireAndForget</option>
-                                <option value="RequestAndReply">RequestAndReply</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-control-label"
-                                   for="field_numberOfTimes">Number of times  </label>
-                            <i triggers="mouseenter:mouseleave"
-                               popoverTitle="Info"
-                               [popover]="numberOfTimesPopover"
-                               class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-                            <input min="0"
-                                   max="1000"
-                                   size="0"
-                                   maxlength="4"
-                                   type="number"
-                                   name="numberOfMessages"
-                                   class="form-control"
-                                   id="numberOfTimes"
-                                   formControlName="numberoftimes"
-                                   required>
-                        </div>
-                    </div>-->
-                </div>
-            </div>
 
-            <div class="d-flex">
-                <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical">
+            <!-- Uncomment to get extra options on the message sender
+<div class="form-group">
+<div class="row col-12">
+    <label class="form-control-label"
+           for="field_destination">Destination</label>
+    <i triggers="mouseenter:mouseleave"
+       popoverTitle="Info"
+       [popover]="destinationPopover"
+       class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+    <input name="destination"
+           class="form-control"
+           id="destination"
+           formControlName="destination"
+           required>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <label class="form-control-label"
+               for="field_exchangepattern">Exchange Pattern  </label>
+        <i triggers="mouseenter:mouseleave"
+           popoverTitle="Info"
+           [popover]="exchangePatternPopover"
+           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+        <select type="text"
+                class="form-control"
+                id="field_exchangepattern"
+                formControlName="exchangepattern">
+            <option value="FireAndForget">FireAndForget</option>
+            <option value="RequestAndReply">RequestAndReply</option>
+        </select>
+    </div>
+    <div class="col-6">
+        <label class="form-control-label"
+               for="field_numberOfTimes">Number of times  </label>
+        <i triggers="mouseenter:mouseleave"
+           popoverTitle="Info"
+           [popover]="numberOfTimesPopover"
+           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
+        <input min="0"
+               max="1000"
+               size="0"
+               maxlength="4"
+               type="number"
+               name="numberOfMessages"
+               class="form-control"
+               id="numberOfTimes"
+               formControlName="numberoftimes"
+               required>
+    </div>
+</div>
+            </div>-->
+            <div class="col-8" style="position: fixed; left: 10%; width: 100%;">
+                <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="horizontal">
                         <li ngbNavItem="0">
                             <a ngbNavLink>Body</a>
-                            <ng-template ngbNavContent>
-                                 <ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
-                            </ng-template>
+                            <br/>
+                                <ng-template ngbNavContent>
+                                     <ace-editor #editor [formControl]="messageSenderForm.controls['requestbody']" [(text)]="requestBody" [mode]="requestEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 760px; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
+                                </ng-template>
                         </li>
                         <li ngbNavItem="1">
                             <a ngbNavLink>Headers</a>
+                            <br/>
                             <ng-template ngbNavContent>
-                                <div class="form-group">
+                                <div class="form-group" style="min-height: 484px; min-width: 760px;">
                                     <div class="form-row" formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index;">
                                         <div [formGroupName]="i">
                                             <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
                                             <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
-                                            <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader()"><span class="fa fa-plus"></span></button>
-                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader(i)"><span class="fa fa-remove"></span></button>
+                                            <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('headers')"><span class="fa fa-plus"></span></button>
+                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader('headers',i)"><span class="fa fa-remove"></span></button>
                                             <button title="" type="button" class="col-1 left-border-radius-0 btn btn-secondary" *ngIf="i === 0" disabled><span class="fa fa-remove"></span></button>
                                         </div>
                                     </div>
                                 </div>
                             </ng-template>
                         </li>
+
+                    <li ngbNavItem="2">
+                        <a ngbNavLink>JMS Headers</a>
+                        <br/>
+                        <ng-template ngbNavContent>
+                            <div class="form-group" style="min-height: 484px; min-width: 760px;">
+                                <div class="form-row" formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index;">
+                                    <div [formGroupName]="i">
+                                        <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
+                                        <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
+                                        <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('jmsHeaders')"><span class="fa fa-plus"></span></button>
+                                        <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader('jmsHeaders',i)"><span class="fa fa-remove"></span></button>
+                                        <button title="" type="button" class="col-1 left-border-radius-0 btn btn-secondary" *ngIf="i === 0" disabled><span class="fa fa-remove"></span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
 
                         <!-- in case of using the RequestReply pattern
                         <li ngbNavItem="2">
@@ -109,51 +159,45 @@
                 </ul>
                 <div [ngbNavOutlet]="nav" class="ml-4"></div>
             </div>
+            <div class="col-4" style="width: 100%;  height: 540px;"></div>
 
-            <br/>
-
-           <br/>
-
-            <div class="float-right"
-                 style="margin-right: 14px;">
-                <button type="button"
-                        class="btn btn-secondary"
-                        (click)="cancel()">
-                    <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
-                </button>
-                <button type="button"
-                        (click)="send(false)" [disabled]="messageSenderForm.invalid || isSending"
-                        class="btn btn-primary">
-                    <span class="fa fa-paper-plane" *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending">Send</span>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"></span> <span *ngIf="isSending">Send</span>
-                </button>
-                <button type="button"
-                        (click)="send(true)" [disabled]="messageSenderForm.invalid || isSending"
-                        class="btn btn-primary">
-                    <span class="fa fa-paper-plane"></span>&nbsp; <span>Send and return</span>
-                </button>
-            </div>
-            <br/>
-            <div *ngIf="savingFlowFailed">
-                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
-            </div>
-            <div *ngIf="savingFlowSuccess">
-                <span class="text-success">*{{savingFlowSuccessMessage}}</span>
-            </div>
-            <div *ngIf="!!invalidUriMessage">
-                <span class="text-danger">*{{invalidUriMessage}}</span>
-            </div>
-            <br/>
-            <div class="row">
-                <div class="col-3">
-                    <span></span>
-                </div>
-                <div class="col-9" >
-                    <jhi-alert *ngIf="isAlert"></jhi-alert>
-                </div>
-            </div>
-
+    <!--
+    <div class="float-right"
+         style="margin-right: 14px;">
+        <button type="button"
+                class="btn btn-secondary"
+                (click)="cancel()">
+            <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
+        </button>
+        <button type="button"
+                (click)="send(false)" [disabled]="messageSenderForm.invalid || isSending"
+                class="btn btn-primary">
+            <span class="fa fa-paper-plane" *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending">Send</span>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"></span> <span *ngIf="isSending">Send</span>
+        </button>
+        <button type="button"
+                (click)="send(true)" [disabled]="messageSenderForm.invalid || isSending"
+                class="btn btn-primary">
+            <span class="fa fa-paper-plane"></span>&nbsp; <span>Send and return</span>
+        </button>
+    </div>
+       -->
         </form>
 
     </div>
+
+    <br/>
+
+    <div class="row" style="margin: 30px auto 0;">
+            <div class="col-1"></div>
+            <div class="col-5">
+                <div class="alert alert-secondary" *ngIf="isSending" role="alert">Sending {{sendingMessages}}</div>
+                <div class="alert alert-success" role="alert" *ngIf="!isSending && isSuccessful">Send succesful {{successfulMessages}}</div>
+                <div class="alert alert-danger" role="alert" *ngIf="!isSending && isFailed">Send failed {{failedMessages}}</div>
+            </div>
+            <div class="col-6">
+            </div>
+    </div>
+
 </div>
+
