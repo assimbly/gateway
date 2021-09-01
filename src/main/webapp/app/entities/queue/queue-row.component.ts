@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Address, IAddress, IAddresses } from 'app/shared/model/address.model';
+import { Address, IAddress, IQueueAddresses } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
 import { SecurityService } from '../security';
@@ -112,6 +112,4 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     navigateToMessageBrowser(addressName: string) {
         this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'queue' }]);
     }
-
-    downloadMessages() {}
 }

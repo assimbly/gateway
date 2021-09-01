@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccountService } from 'app/core';
 
 import { IQueue } from 'app/shared/model/queue.model';
-import { IAddress, Address } from 'app/shared/model/address.model';
+import { IAddress } from 'app/shared/model/address.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { QueueService } from './queue.service';
@@ -57,6 +57,7 @@ export class QueueComponent implements OnInit, OnDestroy {
         this.predicate = 'name';
         this.ascending = false;
     }
+
     reset(): void {
         this.page = 0;
         this.getBrokerType();
@@ -68,22 +69,18 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.getBrokerType();
         this.registerChangeInQueues();
+        this.registerDeletedQueues();
         this.accountService.identity().then(account => {
             this.currentAccount = account;
             this.queueService.connect();
         });
         this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
-
-        this.registerChangeInQueues();
-        this.registerDeletedQueues();
-        this.poll();
     }
 
     ngAfterViewInit() {
         this.getBrokerType();
-        this.registerChangeInQueues();
+        this.poll();
     }
 
     ngOnDestroy(): void {
@@ -111,8 +108,6 @@ export class QueueComponent implements OnInit, OnDestroy {
             .subscribe(
                 _ => {
                     this.eventManager.broadcast('queueListModification');
-                    // this.addresses = res.body.queues.queue
-                    // this.reset();
                 },
                 err => console.log('HTTP Error', err)
             );
@@ -120,7 +115,7 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     registerDeletedQueues() {
         this.eventManager.subscribe('queueDeleted', res => {
-            this.reset();
+            this.getBrokerType();
         });
     }
 
@@ -145,17 +140,19 @@ export class QueueComponent implements OnInit, OnDestroy {
                         this.brokers.push(data.body[i]);
                     }
                     this.brokerType = this.brokers[0].type;
-                    this.getAllQueues(this.brokerType);
+                    if (this.brokerType != null) {
+                        this.getAllQueues();
+                    }
                 }
             },
             error => console.log(error)
         );
     }
 
-    getAllQueues(brokerType: string) {
+    getAllQueues() {
         this.addresses = [];
 
-        this.queueService.getAllQueues(brokerType).subscribe(
+        this.queueService.getAllQueues(this.brokerType).subscribe(
             data => {
                 if (data) {
                     for (let i = 0; i < data.body.queues.queue.length; i++) {

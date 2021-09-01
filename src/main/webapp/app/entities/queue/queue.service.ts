@@ -10,7 +10,7 @@ import { WindowRef } from 'app/shared';
 import { saveAs } from 'file-saver/FileSaver';
 
 import { IQueue } from 'app/shared/model/queue.model';
-import { Address, IAddress, IAddresses, IRootAddress } from 'app/shared/model/address.model';
+import { Address, IAddress, IQueueAddresses, IRootQueueAddress } from 'app/shared/model/address.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
@@ -22,7 +22,7 @@ import { IGateway } from 'app/shared/model/gateway.model';
 type EntityResponseType = HttpResponse<IQueue>;
 type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
-type AddressesEntityResponseType = HttpResponse<IAddresses>;
+type AddressesEntityResponseType = HttpResponse<IQueueAddresses>;
 type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
@@ -77,11 +77,15 @@ export class QueueService {
         return this.http.delete(`${this.queuesResourceUrl}/${id}`, { observe: 'response' });
     }
 
-    getAllQueues(brokerType: string): Observable<HttpResponse<IRootAddress>> {
-        return this.http.get<IRootAddress>(`${this.brokersResourceUrl}/${brokerType}/queues`, {
-            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
-            observe: 'response'
-        });
+    getAllQueues(brokerType: string): Observable<HttpResponse<IRootQueueAddress>> {
+        if (brokerType != null && brokerType != '') {
+            return this.http.get<IRootQueueAddress>(`${this.brokersResourceUrl}/${brokerType}/queues`, {
+                headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
+                observe: 'response'
+            });
+        } else {
+            return null;
+        }
     }
 
     getBrokers(): Observable<HttpResponse<IBroker[]>> {
