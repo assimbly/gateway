@@ -10,6 +10,7 @@ import { TopicService } from './topic.service';
 import { TopicComponent } from './topic.component';
 import { TopicDetailComponent } from './topic-detail.component';
 import { TopicUpdateComponent } from './topic-update.component';
+import { TopicDeletePopupComponent } from './topic-delete-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class TopicResolve implements Resolve<ITopic> {
@@ -78,5 +79,21 @@ export const topicRoute: Routes = [
             pageTitle: 'Topics'
         },
         canActivate: [UserRouteAccessService]
+    }
+];
+
+export const topicPopupRoute: Routes = [
+    {
+        path: 'topic/:id/delete',
+        component: TopicDeletePopupComponent,
+        resolve: {
+            topic: TopicResolve
+        },
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Topics'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
     }
 ];

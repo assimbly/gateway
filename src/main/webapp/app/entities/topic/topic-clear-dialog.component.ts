@@ -3,26 +3,26 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 
-import { IQueue } from 'app/shared/model/queue.model';
-import { QueueService } from './queue.service';
+import { ITopic } from 'app/shared/model/topic.model';
+import { TopicService } from './topic.service';
 import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-    templateUrl: './queue-clear-dialog.component.html'
+    templateUrl: './topic-clear-dialog.component.html'
 })
-export class QueueClearDialogComponent {
-    queue?: IQueue;
+export class TopicClearDialogComponent {
+    topic?: ITopic;
     address?: IAddress;
 
     brokerType: string = '';
     brokers: IBroker[];
 
-    message = 'Are you sure you want to clear this queue?';
+    message = 'Are you sure you want to clear this topic?';
     disableClear: boolean;
 
     constructor(
-        protected queueService: QueueService,
+        protected topicService: TopicService,
         public activeModal: NgbActiveModal,
         protected eventManager: JhiEventManager,
         protected jhiAlertService: JhiAlertService,
@@ -39,32 +39,20 @@ export class QueueClearDialogComponent {
 
     confirmClear(name: string): void {
         if (this.address.numberOfConsumers > 0) {
-            this.message = 'Cannot clear queue because there is at least one active consumer';
+            this.message = 'Cannot clear topic because there is at least one active consumer';
             this.disableClear = true;
         } else {
-            // <<<<<<< HEAD
-            //             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-            //                 this.eventManager.broadcast('queueListModification');
-            //                 this.address.numberOfMessages = 0;
-            //                 this.router.navigate(['/queue']);
-            //                 this.activeModal.dismiss(true);
-            //             });
-            // =======
-            this.queueService.clearQueue(name, this.brokerType).subscribe(
-                res => {
-                    this.eventManager.broadcast('queueListModification');
-                },
-                res => {
-                    console.log(res);
-                }
-            );
-            this.activeModal.close();
-            // >>>>>>> 96fcc86f18b40371b170edf32978ba78cee39009
+            this.topicService.clearTopic(name, this.brokerType).subscribe(() => {
+                this.eventManager.broadcast('topicListModification');
+                this.address.numberOfMessages = 0;
+                this.router.navigate(['/topic']);
+                this.activeModal.dismiss(true);
+            });
         }
     }
 
     getBrokerType(): void {
-        this.queueService.getBrokers().subscribe(
+        this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
                     for (let broker of data.body) {

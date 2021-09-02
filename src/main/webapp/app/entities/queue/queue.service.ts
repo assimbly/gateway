@@ -7,27 +7,28 @@ import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared';
+import { saveAs } from 'file-saver/FileSaver';
 
 import { IQueue } from 'app/shared/model/queue.model';
-import { Address, IAddress, IAddresses, IRootAddress } from 'app/shared/model/address.model';
+import { Address, IAddress, IQueueAddresses, IRootQueueAddress } from 'app/shared/model/address.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 import { CSRFService } from 'app/core';
 import { BrokerService } from 'app/entities/broker';
 import { IBroker } from 'app/shared/model/broker.model';
+import { IGateway } from 'app/shared/model/gateway.model';
 
 type EntityResponseType = HttpResponse<IQueue>;
 type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
-type AddressesEntityResponseType = HttpResponse<IAddresses>;
+type AddressesEntityResponseType = HttpResponse<IQueueAddresses>;
 type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
-    public resourceUrl = SERVER_API_URL + 'api/queues';
-    public queueManagerResourceUrl = SERVER_API_URL + 'api/brokers';
-    public brokerResourceUrl = SERVER_API_URL + '';
+    public queuesResourceUrl = SERVER_API_URL + 'api/queues';
+    public brokersResourceUrl = SERVER_API_URL + 'api/brokers';
 
     stompClient = null;
     subscriber = null;
@@ -56,56 +57,60 @@ export class QueueService {
     }
 
     create(queue: IQueue): Observable<EntityResponseType> {
-        return this.http.post<IQueue>(this.resourceUrl, queue, { observe: 'response' });
+        return this.http.post<IQueue>(this.queuesResourceUrl, queue, { observe: 'response' });
     }
 
     update(queue: IQueue): Observable<EntityResponseType> {
-        return this.http.put<IQueue>(this.resourceUrl, queue, { observe: 'response' });
+        return this.http.put<IQueue>(this.queuesResourceUrl, queue, { observe: 'response' });
     }
 
     find(id: number): Observable<EntityResponseType> {
-        return this.http.get<IQueue>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+        return this.http.get<IQueue>(`${this.queuesResourceUrl}/${id}`, { observe: 'response' });
     }
 
     query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get<IQueue[]>(this.resourceUrl, { params: options, observe: 'response' });
+        return this.http.get<IQueue[]>(this.queuesResourceUrl, { params: options, observe: 'response' });
     }
 
     delete(id: number): Observable<HttpResponse<{}>> {
-        return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+        return this.http.delete(`${this.queuesResourceUrl}/${id}`, { observe: 'response' });
     }
 
-    getAllQueues(brokerType: string): Observable<HttpResponse<IRootAddress>> {
-        return this.http.get<IRootAddress>(`${this.queueManagerResourceUrl}/${brokerType}/queues`, {
-            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
-            observe: 'response'
-        });
+    getAllQueues(brokerType: string): Observable<HttpResponse<IRootQueueAddress>> {
+        if (brokerType != null && brokerType != '') {
+            return this.http.get<IRootQueueAddress>(`${this.brokersResourceUrl}/${brokerType}/queues`, {
+                headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
+                observe: 'response'
+            });
+        } else {
+            return null;
+        }
     }
 
     getBrokers(): Observable<HttpResponse<IBroker[]>> {
-        return this.http.get<IBroker[]>(`${this.queueManagerResourceUrl}`, {
+        return this.http.get<IBroker[]>(`${this.brokersResourceUrl}`, {
             headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
             observe: 'response'
         });
     }
 
     createQueue(name: string, brokerType: string): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.queueManagerResourceUrl}/${brokerType}/queue/${name}`, null, {
+        return this.http.post(`${this.brokersResourceUrl}/${brokerType}/queue/${name}`, null, {
             observe: 'response',
             responseType: 'text'
         });
     }
 
     deleteQueue(name: string, brokerType: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.queueManagerResourceUrl}/${brokerType}/queue/${name}`, {
+        return this.http.delete(`${this.brokersResourceUrl}/${brokerType}/queue/${name}`, {
             observe: 'response',
             responseType: 'text'
         });
     }
 
     clearQueue(name: string, brokerType: string): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.queueManagerResourceUrl}/${brokerType}/queue/${name}/clear`, null, {
+        return this.http.post(`${this.brokersResourceUrl}/${brokerType}/queue/${name}/clear`, null, {
             observe: 'response',
             responseType: 'text'
         });
