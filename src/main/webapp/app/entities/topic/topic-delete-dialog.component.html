@@ -1,4 +1,4 @@
-<form *ngIf="topic" name="deleteForm" (ngSubmit)="confirmDelete(topic.id!)">
+<form *ngIf="address" name="deleteForm" (ngSubmit)="confirmDelete(address.name!)">
     <div class="modal-header">
         <h4 class="modal-title">Confirm delete operation</h4>
 
@@ -9,7 +9,7 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-topic-heading">Are you sure you want to delete this Topic?</p>
+        <p id="jhi-delete-topic-heading">{{message}}</p>
     </div>
 
     <div class="modal-footer">
@@ -17,7 +17,7 @@
             <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
 
-        <button id="jhi-confirm-delete-topic" type="submit" class="btn btn-danger">
+        <button id="jhi-confirm-delete-topic" type="submit" class="btn btn-danger" [disabled]="disableDelete">
             <fa-icon icon="times"></fa-icon>&nbsp;<span>Delete</span>
         </button>
     </div>

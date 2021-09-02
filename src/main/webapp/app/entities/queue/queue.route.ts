@@ -10,6 +10,7 @@ import { QueueService } from './queue.service';
 import { QueueComponent } from './queue.component';
 import { QueueDetailComponent } from './queue-detail.component';
 import { QueueUpdateComponent } from './queue-update.component';
+import { QueueDeletePopupComponent } from './queue-delete-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class QueueResolve implements Resolve<IQueue> {
@@ -78,5 +79,21 @@ export const queueRoute: Routes = [
             pageTitle: 'Queues'
         },
         canActivate: [UserRouteAccessService]
+    }
+];
+
+export const queuePopupRoute: Routes = [
+    {
+        path: 'queue/:id/delete',
+        component: QueueDeletePopupComponent,
+        resolve: {
+            queue: QueueResolve
+        },
+        data: {
+            authorities: ['ROLE_ADMIN'],
+            pageTitle: 'Queues'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
     }
 ];

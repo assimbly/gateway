@@ -1,9 +1,17 @@
-export interface IRootAddress {
-    queues: IAddresses;
+export interface IRootQueueAddress {
+    queues: IQueueAddresses;
 }
 
-export interface IAddresses {
+export interface IQueueAddresses {
     queue: Address[];
+}
+
+export interface IRootTopicAddresses {
+    topics: ITopicAddresses;
+}
+
+export interface ITopicAddresses {
+    topic: Address[];
 }
 
 export interface IAddress {

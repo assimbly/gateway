@@ -5,8 +5,9 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { ITopic, Topic } from 'app/shared/model/topic.model';
+import { Address, IAddress } from 'app/shared/model/address.model';
 import { TopicService } from './topic.service';
+import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
     selector: 'jhi-topic-update',
@@ -16,28 +17,36 @@ export class TopicUpdateComponent implements OnInit {
     isSaving = false;
 
     editForm = this.fb.group({
-        id: [],
-        itemsOnPage: [],
-        refreshInterval: [],
-        selectedColumn: [],
-        orderColumn: []
+        address: [],
+        name: [],
+        numberOfConsumers: [],
+        numberOfMessages: [],
+        size: [],
+        temporary: []
     });
 
-    constructor(protected topicService: TopicService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {}
+    brokerType: string = '';
+    brokers: IBroker[];
+
+    constructor(protected topicService: TopicService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {
+        this.brokers = [];
+    }
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ topic }) => {
             this.updateForm(topic);
         });
+        this.getBrokerType();
     }
 
-    updateForm(topic: ITopic): void {
+    updateForm(address: IAddress): void {
         this.editForm.patchValue({
-            id: topic.id,
-            itemsOnPage: topic.itemsOnPage,
-            refreshInterval: topic.refreshInterval,
-            selectedColumn: topic.selectedColumn,
-            orderColumn: topic.orderColumn
+            address: address.address,
+            name: address.name,
+            numberOfConsumers: address.numberOfConsumers,
+            numberOfMessages: address.numberOfMessages,
+            size: address.size,
+            temporary: address.temporary
         });
     }
 
@@ -47,26 +56,23 @@ export class TopicUpdateComponent implements OnInit {
 
     save(): void {
         this.isSaving = true;
-        const topic = this.createFromForm();
-        if (topic.id !== undefined) {
-            this.subscribeToSaveResponse(this.topicService.update(topic));
-        } else {
-            this.subscribeToSaveResponse(this.topicService.create(topic));
-        }
+        const address = this.createFromForm();
+        this.subscribeToSaveResponse(this.topicService.createTopic(address.name, this.brokerType));
     }
 
-    private createFromForm(): ITopic {
+    private createFromForm(): IAddress {
         return {
-            ...new Topic(),
-            id: this.editForm.get(['id'])!.value,
-            itemsOnPage: this.editForm.get(['itemsOnPage'])!.value,
-            refreshInterval: this.editForm.get(['refreshInterval'])!.value,
-            selectedColumn: this.editForm.get(['selectedColumn'])!.value,
-            orderColumn: this.editForm.get(['orderColumn'])!.value
+            ...new Address(),
+            address: this.editForm.get(['address'])!.value,
+            name: this.editForm.get(['name'])!.value,
+            numberOfConsumers: this.editForm.get(['numberOfConsumers'])!.value,
+            numberOfMessages: this.editForm.get(['numberOfMessages'])!.value,
+            size: this.editForm.get(['size'])!.value,
+            temporary: this.editForm.get(['temporary'])!.value
         };
     }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<ITopic>>): void {
+    protected subscribeToSaveResponse(result: Observable<HttpResponse<any>>): void {
         result.subscribe(
             () => this.onSaveSuccess(),
             () => this.onSaveError()
@@ -80,5 +86,19 @@ export class TopicUpdateComponent implements OnInit {
 
     protected onSaveError(): void {
         this.isSaving = false;
+    }
+
+    getBrokerType(): void {
+        this.topicService.getBrokers().subscribe(
+            data => {
+                if (data) {
+                    for (let broker of data.body) {
+                        this.brokers.push(broker);
+                        this.brokerType = broker.type;
+                    }
+                }
+            },
+            error => console.log(error)
+        );
     }
 }

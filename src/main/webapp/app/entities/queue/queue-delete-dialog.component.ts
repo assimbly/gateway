@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -47,11 +47,12 @@ export class QueueDeleteDialogComponent {
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
-                this.router.navigate(['/queue']).then(() => {
-                    window.location.reload();
-                });
-                // this.activeModal.close();
-                this.activeModal.close();
+                this.router.navigate(['/queue']);
+                // .then(() => {
+                //     window.location.reload();
+                // });
+                // this.activeModal.close()
+                this.activeModal.dismiss(true);
             });
         }
     }
@@ -60,13 +61,46 @@ export class QueueDeleteDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let i = 0; i < data.body.length; i++) {
-                        this.brokers.push(data.body[i]);
-                        this.brokerType = this.brokers[0].type;
+                    for (let broker of data.body) {
+                        this.brokers.push(broker);
+                        this.brokerType = broker.type;
                     }
                 }
             },
             error => console.log(error)
         );
+    }
+}
+
+@Component({
+    selector: 'jhi-queue-delete-popup',
+    template: ''
+})
+export class QueueDeletePopupComponent implements OnInit, OnDestroy {
+    protected ngbModalRef: NgbModalRef;
+
+    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
+
+    ngOnInit() {
+        this.activatedRoute.data.subscribe(({ queue }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(QueueDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.queue = queue;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
+        });
+    }
+
+    ngOnDestroy() {
+        this.ngbModalRef = null;
     }
 }

@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Address, IAddress, IQueueAddresses } from 'app/shared/model/address.model';
 
-import { QueueService } from './queue.service';
+import { TopicService } from './topic.service';
 import { SecurityService } from '../security';
 import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService } from 'app/core';
@@ -10,8 +10,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import * as moment from 'moment';
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dialog.component';
-import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
+import { TopicDeleteDialogComponent } from 'app/entities/topic/topic-delete-dialog.component';
+import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
 enum Status {
     active = 'active',
@@ -20,10 +20,10 @@ enum Status {
     inactiveError = 'inactiveError'
 }
 @Component({
-    selector: '[jhi-queue-row]',
-    templateUrl: './queue-row.component.html'
+    selector: '[jhi-topic-row]',
+    templateUrl: './topic-row.component.html'
 })
-export class QueueRowComponent implements OnInit, OnDestroy {
+export class TopicRowComponent implements OnInit, OnDestroy {
     sslUrl: any;
     mySubscription: Subscription;
 
@@ -32,7 +32,7 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     public clickButton = false;
     public showNumberOfItems: number;
 
-    queueRowID: string;
+    topicRowID: string;
 
     intervalTime: any;
 
@@ -50,7 +50,7 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     changeText: boolean;
 
     constructor(
-        private queueService: QueueService,
+        private topicService: TopicService,
         private securityService: SecurityService,
         private loginModalService: LoginModalService,
         private modalService: NgbModal,
@@ -80,22 +80,22 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     unsubscribe() {}
 
     delete(address: IAddress): void {
-        let modalRef = this.modalService.open(QueueDeleteDialogComponent as any);
+        let modalRef = this.modalService.open(TopicDeleteDialogComponent as any);
         modalRef.componentInstance.address = address;
         modalRef.result.then(
             result => {
-                this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+                this.eventManager.broadcast({ name: 'topicDeleted', content: this.address });
                 modalRef = null;
             },
             reason => {
-                this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+                this.eventManager.broadcast({ name: 'topicDeleted', content: this.address });
                 modalRef = null;
             }
         );
     }
 
     clear(address: IAddress): void {
-        const modalRef = this.modalService.open(QueueClearDialogComponent as any);
+        const modalRef = this.modalService.open(TopicClearDialogComponent as any);
         modalRef.componentInstance.address = address;
     }
 
@@ -106,10 +106,10 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     }
 
     navigateToMessageSender(addressName: string) {
-        this.router.navigate(['../broker/message-sender', { endpointName: addressName, endpointType: 'queue' }]);
+        this.router.navigate(['../broker/message-sender', { endpointName: addressName, endpointType: 'topic' }]);
     }
 
     navigateToMessageBrowser(addressName: string) {
-        this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'queue' }]);
+        this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'topic' }]);
     }
 }
