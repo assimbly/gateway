@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Address, IAddress, IQueueAddresses } from 'app/shared/model/address.model';
+import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { TopicService } from './topic.service';
 import { SecurityService } from '../security';
@@ -7,47 +7,29 @@ import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService } from 'app/core';
 
 import { NavigationEnd, Router } from '@angular/router';
-import * as moment from 'moment';
-import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
+import { Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TopicDeleteDialogComponent } from 'app/entities/topic/topic-delete-dialog.component';
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
-enum Status {
-    active = 'active',
-    paused = 'paused',
-    inactive = 'inactive',
-    inactiveError = 'inactiveError'
-}
 @Component({
     selector: '[jhi-topic-row]',
     templateUrl: './topic-row.component.html'
 })
 export class TopicRowComponent implements OnInit, OnDestroy {
-    sslUrl: any;
     mySubscription: Subscription;
 
     @Input() address: Address;
     @Input() isAdmin: boolean;
-    public clickButton = false;
-    public showNumberOfItems: number;
+    @Input() brokerType: string;
 
     topicRowID: string;
 
-    intervalTime: any;
-
-    stompClient = null;
-    subscriber = null;
     connection: Promise<any>;
-    connectedPromise: any;
     listener: Observable<any>;
     listenerObserver: Observer<any>;
 
-    alreadyConnectedOnce = false;
-    private subscription: Subscription;
-
     modalRef: NgbModalRef | null;
-    changeText: boolean;
 
     constructor(
         private topicService: TopicService,
@@ -106,10 +88,16 @@ export class TopicRowComponent implements OnInit, OnDestroy {
     }
 
     navigateToMessageSender(addressName: string) {
-        this.router.navigate(['../broker/message-sender', { endpointName: addressName, endpointType: 'topic' }]);
+        this.router.navigate([
+            '../broker/message-sender',
+            { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }
+        ]);
     }
 
     navigateToMessageBrowser(addressName: string) {
-        this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'topic' }]);
+        this.router.navigate([
+            '../broker/message-browser',
+            { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }
+        ]);
     }
 }

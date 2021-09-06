@@ -1,3 +1,8 @@
+<ng-template #namePopover let-message="message">
+    <div [innerHtml]="namePopoverMessage"></div>
+</ng-template>
+
+
 <div class="row justify-content-center">
     <div class="col-8">
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
@@ -8,6 +13,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_name">Name</label>
+                    <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+                       [popover]="namePopover" container="body" placement="right"
+                       class="fa fa-info-circle"></i>
                     <input type="text" class="form-control" name="name" id="field_name"
                            formControlName="name"/>
                 </div>

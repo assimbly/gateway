@@ -42,12 +42,12 @@ export class QueueDeleteDialogComponent {
             this.message = 'Cannot delete queue because there is at least one active consumer';
             this.disableDelete = true;
         } else if (this.address.numberOfMessages > 0) {
-            this.message = 'Cannot delete queue because there is at least one message on the queue. Please purge the queue before deleting';
+            this.message = 'Cannot delete queue because there is at least one message on the queue. Please clear the queue before deleting';
             this.disableDelete = true;
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
-                this.router.navigate(['/queue']);
+                //this.router.navigate(['/queue']);
                 // .then(() => {
                 //     window.location.reload();
                 // });

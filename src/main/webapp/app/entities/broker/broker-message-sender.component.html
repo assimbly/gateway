@@ -3,10 +3,10 @@
 </div>
 
 <div class="row">
-    <div class="col-9">
+    <div class="col-8">
         <h4 style="margin-left: 0.3em"><b><i>{{subtitle}}</i></b></h4>
     </div>
-    <div class="col-2-5">
+    <div class="col-3-5 text-right">
 
         <div ngbDropdown class="d-inline-block">
             <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px;">Actions</button>
@@ -192,7 +192,7 @@
             <div class="col-1"></div>
             <div class="col-5">
                 <div class="alert alert-secondary" *ngIf="isSending" role="alert">Sending {{sendingMessages}}</div>
-                <div class="alert alert-success" role="alert" *ngIf="!isSending && isSuccessful">Send succesful {{successfulMessages}}</div>
+                <div class="alert alert-success" role="alert" *ngIf="!isSending && isSuccessful">Send successful {{successfulMessages}}</div>
                 <div class="alert alert-danger" role="alert" *ngIf="!isSending && isFailed">Send failed {{failedMessages}}</div>
             </div>
             <div class="col-6">

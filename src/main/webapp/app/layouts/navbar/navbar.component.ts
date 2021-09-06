@@ -37,7 +37,6 @@ export class NavbarComponent implements OnInit {
             this.inProduction = profileInfo.inProduction;
             this.swaggerEnabled = profileInfo.swaggerEnabled;
         });
-        console.log('this.type=' + this.type);
     }
 
     collapseNavbar() {

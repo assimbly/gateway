@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from 'app/shared/shared.module';
 import { TopicComponent } from './topic.component';
 import { TopicDetailComponent } from './topic-detail.component';
@@ -16,7 +16,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(topicRoute), ReactiveFormsModule],
+    imports: [GatewaySharedModule, RouterModule.forChild(topicRoute), ReactiveFormsModule, PopoverModule.forRoot()],
     declarations: [
         TopicComponent,
         TopicDetailComponent,

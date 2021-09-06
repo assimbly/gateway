@@ -12,8 +12,6 @@ import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
-import { BrokerService } from 'app/entities/broker';
-import { startWith, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-queue',
@@ -30,18 +28,14 @@ export class QueueComponent implements OnInit, OnDestroy {
     links: any;
     page: number;
     predicate: string;
-    totalItems: number = -1;
     ascending: boolean;
     timeInterval: Subscription;
-
-    dummy: any;
 
     searchText: string = '';
     brokerType: string = '';
 
     constructor(
         protected queueService: QueueService,
-        protected brokerService: BrokerService,
         protected jhiAlertService: JhiAlertService,
         protected eventManager: JhiEventManager,
         protected modalService: NgbModal,
@@ -60,7 +54,7 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     reset(): void {
         this.page = 0;
-        this.getBrokerType();
+        this.updateAllQueues();
     }
 
     loadPage(page: number): void {
@@ -100,17 +94,9 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
 
     poll(): void {
-        this.timeInterval = interval(5000)
-            .pipe(
-                startWith(0),
-                switchMap(() => this.queueService.getAllQueues(this.brokerType))
-            )
-            .subscribe(
-                _ => {
-                    this.eventManager.broadcast('queueListModification');
-                },
-                err => console.log('HTTP Error', err)
-            );
+        this.timeInterval = interval(10000).subscribe(x => {
+            this.updateAllQueues();
+        });
     }
 
     registerDeletedQueues() {
@@ -154,10 +140,29 @@ export class QueueComponent implements OnInit, OnDestroy {
 
         this.queueService.getAllQueues(this.brokerType).subscribe(
             data => {
-                if (data) {
+                if (data && data.body.queues.queue) {
                     for (let i = 0; i < data.body.queues.queue.length; i++) {
-                        this.addresses.push(data.body.queues.queue[i]);
+                        if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                            this.addresses.push(data.body.queues.queue[i]);
+                        }
                     }
+                }
+            },
+            error => console.log(error)
+        );
+    }
+
+    updateAllQueues() {
+        this.queueService.getAllQueues(this.brokerType).subscribe(
+            data => {
+                if (data && data.body.queues.queue) {
+                    for (let i = 0; i < data.body.queues.queue.length; i++) {
+                        //exclude temporary queues
+                        if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                            this.addresses.splice(i, 1, data.body.queues.queue[i]);
+                        }
+                    }
+                    this.addresses = [...this.addresses];
                 }
             },
             error => console.log(error)

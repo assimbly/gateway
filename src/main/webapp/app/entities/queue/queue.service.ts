@@ -1,29 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, Observer, Subscription } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 
 import { SERVER_API_URL } from 'app/app.constants';
 import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared';
-import { saveAs } from 'file-saver/FileSaver';
 
 import { IQueue } from 'app/shared/model/queue.model';
-import { Address, IAddress, IQueueAddresses, IRootQueueAddress } from 'app/shared/model/address.model';
+import { IRootQueueAddress } from 'app/shared/model/address.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 import { CSRFService } from 'app/core';
 import { BrokerService } from 'app/entities/broker';
 import { IBroker } from 'app/shared/model/broker.model';
-import { IGateway } from 'app/shared/model/gateway.model';
 
 type EntityResponseType = HttpResponse<IQueue>;
 type EntityArrayResponseType = HttpResponse<IQueue[]>;
-
-type AddressesEntityResponseType = HttpResponse<IQueueAddresses>;
-type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
@@ -31,16 +26,10 @@ export class QueueService {
     public brokersResourceUrl = SERVER_API_URL + 'api/brokers';
 
     stompClient = null;
-    subscriber = null;
     connection: Promise<any>;
     connectedPromise: any;
     listener: Observable<any>;
     listenerObserver: Observer<any>;
-    alreadyConnectedOnce = false;
-    private subscription: Subscription;
-
-    private gatewayid = 1;
-    private brokerid = 1;
 
     brokerType: string;
 

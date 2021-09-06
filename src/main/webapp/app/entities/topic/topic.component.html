@@ -13,7 +13,7 @@
                 <span class="fa fa-plus"></span> <span>Create a new Topic</span>
             </button>
             <button class="btn btn-primary" type="submit"
-                    (click)="reset()"
+                    (click)="updateAllTopics()"
                     style="margin-right:-2em">
                 <span class="fa fa-refresh"></span> <span>Refresh</span>
             </button>
@@ -55,7 +55,7 @@
                    [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
             <tr jhi-topic-row
                 *ngFor="let address of  (addresses | TopicSearchByName: searchText : ascending : predicate) ;trackBy: trackId"
-                [address]="address" [isAdmin]="isAdmin"
+                [address]="address" [isAdmin]="isAdmin" [brokerType]="brokerType"
                 ng-init="$last && finished()"></tr>
             </tbody>
         </table>

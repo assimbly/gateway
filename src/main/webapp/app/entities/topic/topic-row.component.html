@@ -30,7 +30,8 @@
                 *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 (click)="clear(address)">
             <span class="fa fa-trash"></span>
-            <span class="d-none d-md-inline">Clear</span>
+            <span class="d-none d-md-inline" *ngIf="brokerType==='classic'">Reset</span>
+            <span class="d-none d-md-inline" *ngIf="brokerType==='artemis'">Clear</span>
         </button>
     </div>
 </td>

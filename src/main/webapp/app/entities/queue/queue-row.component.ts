@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Address, IAddress, IQueueAddresses } from 'app/shared/model/address.model';
+import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
 import { SecurityService } from '../security';
@@ -7,47 +7,29 @@ import { JhiEventManager } from 'ng-jhipster';
 import { LoginModalService } from 'app/core';
 
 import { NavigationEnd, Router } from '@angular/router';
-import * as moment from 'moment';
-import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
+import { Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dialog.component';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
-enum Status {
-    active = 'active',
-    paused = 'paused',
-    inactive = 'inactive',
-    inactiveError = 'inactiveError'
-}
 @Component({
     selector: '[jhi-queue-row]',
     templateUrl: './queue-row.component.html'
 })
 export class QueueRowComponent implements OnInit, OnDestroy {
-    sslUrl: any;
-    mySubscription: Subscription;
-
     @Input() address: Address;
     @Input() isAdmin: boolean;
-    public clickButton = false;
-    public showNumberOfItems: number;
+    @Input() brokerType: string;
+
+    mySubscription: Subscription;
 
     queueRowID: string;
 
-    intervalTime: any;
-
-    stompClient = null;
-    subscriber = null;
     connection: Promise<any>;
-    connectedPromise: any;
     listener: Observable<any>;
     listenerObserver: Observer<any>;
 
-    alreadyConnectedOnce = false;
-    private subscription: Subscription;
-
     modalRef: NgbModalRef | null;
-    changeText: boolean;
 
     constructor(
         private queueService: QueueService,
@@ -106,10 +88,16 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     }
 
     navigateToMessageSender(addressName: string) {
-        this.router.navigate(['../broker/message-sender', { endpointName: addressName, endpointType: 'queue' }]);
+        this.router.navigate([
+            '../broker/message-sender',
+            { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }
+        ]);
     }
 
     navigateToMessageBrowser(addressName: string) {
-        this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'queue' }]);
+        this.router.navigate([
+            '../broker/message-browser',
+            { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }
+        ]);
     }
 }
