@@ -5,6 +5,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
 import { IMessage } from 'app/shared/model/messsage.model';
+import { IBroker } from 'app/shared/model/broker.model';
 
 import { GatewayService } from './../gateway';
 import { BrokerService } from './../broker';
@@ -17,6 +18,7 @@ import * as moment from 'moment';
 import * as ace from 'ace-builds';
 import 'brace';
 import 'brace/mode/text';
+import 'brace/mode/json';
 import 'brace/theme/eclipse';
 
 @Component({
@@ -29,9 +31,12 @@ export class BrokerMessageSenderComponent implements OnInit {
     messages: IMessage[];
     message: IMessage;
 
+    brokers: IBroker[];
     brokerType: string;
+
     endpointName: string;
     endpointType: string;
+
     headers: FormArray;
     jmsHeaders: FormArray;
 
@@ -81,6 +86,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     upload: any;
     fileName: string;
     subtitle: string;
+    dateTime: string;
 
     modalRef: NgbModalRef | null;
 
@@ -97,56 +103,18 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     ngOnInit() {
         this.initializeForm();
-        this.setBrokerType();
         this.load();
+        this.setBrokerType();
         this.setPopoverMessages();
 
         this.finished = true;
     }
 
-    /*
-    ngAfterViewChecked(){
-        console.log('after checked');
-        const aceEditor = ace.edit(this.editor.nativeElement);
-        aceEditor.focus();
-        aceEditor.moveCursorTo(1,1);
-        aceEditor.setValue('blabla',1);
-    }
-
-    ngAfterContentInit() {
-        console.log('after init');
-
-        setTimeout(() => {
-            console.log('maybe');
-
-        }, 10000);
-
-    }
-     */
-
     public ngAfterViewInit(): void {
-        console.log('after view');
-
         this.editor.nativeElement.focus();
         const aceEditor = ace.edit(this.editor.nativeElement);
         aceEditor.focus();
         aceEditor.moveCursorTo(1, 1);
-
-        /*
-        let self = this;
-        window.onload = function(){
-            self.editor.nativeElement.focus();
-        }
-        */
-
-        /*
-        //this.element.nativeElement.querySelector('#ace-editor').focus();
-        //this.element.nativeElement.querySelector('#editor').focus();
-        const aceEditor = ace.edit(this.editor.nativeElement);
-        aceEditor.focus();
-        aceEditor.moveCursorTo(1,1);
-
-         */
     }
 
     load() {
@@ -159,6 +127,7 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.route.params.subscribe(params => {
             this.endpointType = params['endpointType'];
             this.endpointName = params['endpointName'];
+            this.brokerType = params['brokerType'];
             this.messageSenderForm.controls.destination.setValue(this.endpointName);
         });
 
@@ -270,14 +239,11 @@ export class BrokerMessageSenderComponent implements OnInit {
                 : this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
             this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        console.log('body=' + this.messageSenderForm.controls.requestbody.value + 'X');
         this.requestBody = this.messageSenderForm.controls.requestbody.value;
 
         if (!this.requestBody) {
             this.requestBody = ' ';
         }
-
-        console.log('body=' + this.messageSenderForm.controls.requestbody.value + 'X');
 
         const headersJson = this.formArrayToJson(this.headers);
         const jmsHeadersJson = this.formArrayToJson(this.jmsHeaders);
@@ -312,7 +278,7 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     sendMessage(close: boolean) {
         if (this.requestExchangePattern === 'FireAndForget') {
-            this.brokerService.sendMessage('classic', this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
+            this.brokerService.sendMessage(this.brokerType, this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
                 res => {
                     this.handleSendResponse(res.body, false);
                     if (close) {
@@ -324,7 +290,7 @@ export class BrokerMessageSenderComponent implements OnInit {
                 }
             );
         } else if (this.requestExchangePattern === 'RequestAndReply') {
-            this.brokerService.sendMessage('classic', this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
+            this.brokerService.sendMessage(this.brokerType, this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
                 res => {
                     this.handleSendResponse(res.body, true);
                 },
@@ -350,9 +316,13 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
+        let now = moment();
+        this.dateTime = new Date().toLocaleString();
+
         this.isSuccessful = true;
         this.numberOfSuccesfulMessages = this.numberOfSuccesfulMessages + 1;
-        this.successfulMessages = this.numberOfSuccesfulMessages + ' of ' + this.numberOfMessages;
+        this.successfulMessages =
+            ' | Messages: ' + this.numberOfSuccesfulMessages + ' of ' + this.numberOfMessages + ' | Last time: ' + this.dateTime;
         this.isSending = false;
 
         /* uncomment when using responses
@@ -366,10 +336,12 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     handleSendError(body: any) {
+        this.dateTime = new Date().toLocaleString();
         this.isSending = false;
         this.isFailed = true;
         this.numberOfFailedMessages = this.numberOfFailedMessages + 1;
-        this.failedMessages = this.numberOfFailedMessages + ' of ' + this.numberOfMessages;
+        this.failedMessages =
+            ' | Messages: ' + this.numberOfFailedMessages + ' of ' + this.numberOfMessages + ' | Last time: ' + this.dateTime;
     }
 
     setVersion() {
@@ -377,16 +349,23 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     setBrokerType() {
-        this.brokerService.getBrokerType(1).subscribe(
-            data => {
-                if (data) {
-                    this.brokerType = data.body;
-                } else {
-                    this.brokerType = 'classic';
-                }
-            },
-            error => console.log(error)
-        );
+        if (!this.brokerType) {
+            this.brokerService.getBrokers().subscribe(
+                data => {
+                    if (data) {
+                        for (let i = 0; i < data.body.length; i++) {
+                            this.brokers.push(data.body[i]);
+                        }
+                        this.brokerType = this.brokers[0].type;
+                        if (this.brokerType == null) {
+                            console.log('Unknown broker: set brokertype to artemis');
+                            this.brokerType = 'artemis';
+                        }
+                    }
+                },
+                error => console.log(error)
+            );
+        }
     }
 
     //Get currrent scroll position
@@ -478,9 +457,12 @@ export class BrokerMessageSenderComponent implements OnInit {
 
             if (data.messages.message) {
                 if (data.messages.message.length === 1) {
-                    this.messageSenderForm.controls.requestbody.setValue(data.messages.message[0].body);
-
+                    const body = data.messages.message[0].body;
                     const headers = data.messages.message[0].headers;
+                    const jmsHeaders = data.messages.message[0].jmsHeaders;
+
+                    this.messageSenderForm.controls.requestbody.setValue(body);
+                    this.requestEditorMode = this.getFileType(body);
 
                     for (var key in headers) {
                         if (headers.hasOwnProperty(key)) {
@@ -492,8 +474,6 @@ export class BrokerMessageSenderComponent implements OnInit {
                     if (Object.keys(headers).length > 0) {
                         this.removeHeader('headers', 0);
                     }
-
-                    const jmsHeaders = data.messages.message[0].jmsHeaders;
 
                     for (var key in jmsHeaders) {
                         if (jmsHeaders.hasOwnProperty(key)) {
@@ -527,6 +507,7 @@ export class BrokerMessageSenderComponent implements OnInit {
             }
         } catch (e) {
             this.messageSenderForm.controls.requestbody.setValue(this.upload);
+            this.requestEditorMode = this.getFileType(this.upload);
         }
     }
 
@@ -536,11 +517,15 @@ export class BrokerMessageSenderComponent implements OnInit {
             let a = JSON.parse(doc);
             return 'json';
         } catch (e) {
-            //try xml parsing
-            let parser = new DOMParser();
-            var xmlDoc = parser.parseFromString(doc, 'application/xml');
-            if (xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
-            else return 'xml';
+            try {
+                //try xml parsing
+                let parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(doc, 'application/xml');
+                if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
+                else return 'xml';
+            } catch (e) {
+                return 'txt';
+            }
         }
     }
 }

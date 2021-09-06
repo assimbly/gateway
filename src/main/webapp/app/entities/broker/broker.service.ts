@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { SERVER_API_URL } from 'app/app.constants';
@@ -63,6 +63,13 @@ export class BrokerService {
         });
     }
 
+    getBrokers(): Observable<HttpResponse<IBroker[]>> {
+        return this.http.get<IBroker[]>(`${this.resourceUrl}`, {
+            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
+            observe: 'response'
+        });
+    }
+
     getBrokerStatus(id: number, brokerType: string): Observable<any> {
         return this.http.get(`${this.resourceUrl}/${id}/status`, {
             observe: 'response',
@@ -111,10 +118,16 @@ export class BrokerService {
         });
     }
 
-    browseMessages(brokerType: string, endpointName: string, page: number, numberOfMessages: number): Observable<any> {
+    browseMessages(
+        brokerType: string,
+        endpointName: string,
+        page: number,
+        numberOfMessages: number,
+        excludeBody: boolean
+    ): Observable<any> {
         return this.http.get(`${this.resourceUrl}/${brokerType}/messages/${endpointName}/browse`, {
             observe: 'response',
-            params: { page: page.toString(), numberOfMessages: numberOfMessages.toString() }
+            params: { page: page.toString(), numberOfMessages: numberOfMessages.toString(), excludeBody: excludeBody.toString() }
         });
     }
 

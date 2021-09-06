@@ -101,17 +101,9 @@ export class TopicComponent implements OnInit, OnDestroy {
     }
 
     poll(): void {
-        this.timeInterval = interval(5000)
-            .pipe(
-                startWith(0),
-                switchMap(() => this.topicService.getAllTopics(this.brokerType))
-            )
-            .subscribe(
-                _ => {
-                    this.eventManager.broadcast('topicListModification');
-                },
-                err => console.log('HTTP Error', err)
-            );
+        this.timeInterval = interval(10000).subscribe(x => {
+            this.updateAllTopics();
+        });
     }
 
     registerDeletedTopics() {
@@ -153,10 +145,28 @@ export class TopicComponent implements OnInit, OnDestroy {
 
         this.topicService.getAllTopics(this.brokerType).subscribe(
             data => {
-                if (data) {
+                if (data && data.body.topics.topic) {
                     for (let address of data.body.topics.topic) {
-                        this.addresses.push(address);
+                        if (address.temporary.toString() === 'false') {
+                            this.addresses.push(address);
+                        }
                     }
+                }
+            },
+            error => console.log(error)
+        );
+    }
+
+    updateAllTopics() {
+        this.topicService.getAllTopics(this.brokerType).subscribe(
+            data => {
+                if (data && data.body.topics.topic) {
+                    for (let i = 0; i < data.body.topics.topic.length; i++) {
+                        if (data.body.topics.topic[i].temporary.toString() === 'false') {
+                            this.addresses.splice(i, 1, data.body.topics.topic[i]);
+                        }
+                    }
+                    this.addresses = [...this.addresses];
                 }
             },
             error => console.log(error)

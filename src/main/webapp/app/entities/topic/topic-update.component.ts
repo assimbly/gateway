@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -15,28 +16,44 @@ import { IBroker } from 'app/shared/model/broker.model';
 })
 export class TopicUpdateComponent implements OnInit {
     isSaving = false;
+    isClose: boolean;
 
-    editForm = this.fb.group({
-        address: [],
-        name: [],
-        numberOfConsumers: [],
-        numberOfMessages: [],
-        size: [],
-        temporary: []
-    });
+    editForm: FormGroup;
 
+    namePopoverMessage: string;
     brokerType: string = '';
     brokers: IBroker[];
 
-    constructor(protected topicService: TopicService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {
+    constructor(
+        protected topicService: TopicService,
+        protected activatedRoute: ActivatedRoute,
+        private router: Router,
+        private formBuilder: FormBuilder
+    ) {
         this.brokers = [];
     }
 
     ngOnInit(): void {
-        this.activatedRoute.data.subscribe(({ topic }) => {
-            this.updateForm(topic);
+        this.activatedRoute.data.subscribe(({ address }) => {
+            this.initForm();
+            if (address) {
+                this.updateForm(address);
+            }
         });
         this.getBrokerType();
+        this.namePopoverMessage = 'Name of the topic. Use a comma-separated list to add multiple queues';
+    }
+
+    initForm() {
+        this.editForm = this.formBuilder.group({
+            address: new FormControl(''),
+            name: new FormControl(''),
+            numberOfConsumers: new FormControl(''),
+            numberoftimes: new FormControl(''),
+            numberOfMessages: new FormControl(''),
+            size: new FormControl(''),
+            temporary: new FormControl('')
+        });
     }
 
     updateForm(address: IAddress): void {
@@ -57,7 +74,23 @@ export class TopicUpdateComponent implements OnInit {
     save(): void {
         this.isSaving = true;
         const address = this.createFromForm();
-        this.subscribeToSaveResponse(this.topicService.createTopic(address.name, this.brokerType));
+
+        const queueNames = address.name.split(',');
+
+        if (queueNames) {
+            for (let i = 0; i < queueNames.length; i++) {
+                if (i === queueNames.length - 1) {
+                    this.isClose = true;
+                    this.subscribeToSaveResponse(this.topicService.createTopic(queueNames[i], this.brokerType));
+                } else {
+                    this.isClose = false;
+                    this.subscribeToSaveResponse(this.topicService.createTopic(queueNames[i], this.brokerType));
+                }
+            }
+        } else {
+            this.isClose = true;
+            this.subscribeToSaveResponse(this.topicService.createTopic(address.name, this.brokerType));
+        }
     }
 
     private createFromForm(): IAddress {
@@ -80,8 +113,10 @@ export class TopicUpdateComponent implements OnInit {
     }
 
     protected onSaveSuccess(): void {
-        this.isSaving = false;
-        this.previousState();
+        if (this.isClose) {
+            this.isSaving = false;
+            this.router.navigate(['/topic']);
+        }
     }
 
     protected onSaveError(): void {

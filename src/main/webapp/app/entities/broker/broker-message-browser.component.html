@@ -30,10 +30,10 @@
 </div>
 
 <div class="row">
-    <div class="col-9">
+    <div class="col-8">
         <h4 style="margin-left: 0.3em"><b><i>{{subtitle}}</i></b></h4>
     </div>
-    <div class="col-2-5">
+    <div class="col-3-5 text-right">
         <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0" >
             <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px;">Actions</button>
             <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
@@ -104,9 +104,10 @@
                     </tbody>
                 </table>
             </div>
-            <button type="button" class="btn btn-outline-primary" *ngIf="page > 1"  (click)="previousPage()">Previous</button>
+            <button type="button" class="btn btn-outline-primary" style="margin-bottom: 0.3em" *ngIf="page > 1"  (click)="previousPage()">Previous</button>
             <div style="width:3px; height:auto; display:inline-block;" *ngIf="page > 1"></div>
-            <button type="button" class="btn btn-primary" *ngIf="messagesCount > (page * 3)" (click)="nextPage()">Next</button>
+            <button type="button" class="btn btn-primary" style="margin-bottom: 0.3em" *ngIf="messagesCount > (page * 100)" (click)="nextPage()">Next</button>
+            <br/>
         </div>
         <div class="col-6" style="position: fixed; left: 50%; width: 100%;" >
             <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="horizontal">

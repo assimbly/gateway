@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { PopoverModule } from 'ngx-bootstrap';
 import { GatewaySharedModule } from 'app/shared/shared.module';
 import { QueueComponent } from './queue.component';
 import { QueueDetailComponent } from './queue-detail.component';
@@ -15,7 +15,7 @@ import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(queueRoute), ReactiveFormsModule],
+    imports: [GatewaySharedModule, RouterModule.forChild(queueRoute), ReactiveFormsModule, PopoverModule.forRoot()],
     declarations: [
         QueueComponent,
         QueueDetailComponent,

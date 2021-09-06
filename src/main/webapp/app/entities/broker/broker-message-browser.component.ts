@@ -11,6 +11,12 @@ import { ITEMS_PER_PAGE } from 'app/shared';
 import { BrokerService } from 'app/entities/broker/broker.service';
 
 import { saveAs } from 'file-saver/FileSaver';
+import { IBroker } from 'app/shared/model/broker.model';
+
+import 'brace';
+import 'brace/mode/text';
+import 'brace/mode/json';
+import 'brace/theme/eclipse';
 
 @Component({
     selector: 'jhi-broker-message-browser',
@@ -24,6 +30,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     allMessages: any;
     headers: any;
 
+    brokers: IBroker[];
     brokerType: string;
     endpointName: string;
     endpointType: string;
@@ -83,6 +90,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.route.params.subscribe(params => {
             this.endpointType = params['endpointType'];
             this.endpointName = params['endpointName'];
+            this.brokerType = params['brokerType'];
         });
 
         this.loadMessages();
@@ -101,25 +109,39 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     loadMessages() {
         this.isLoading = true;
-        this.brokerService.getBrokerType(1).subscribe(
-            data => {
-                if (data) {
-                    this.brokerType = data.body;
-                } else {
-                    this.brokerType = 'classic';
-                }
+        if (this.brokerType) {
+            this.getMessages();
+        } else {
+            this.brokerService.getBrokers().subscribe(
+                data => {
+                    if (data) {
+                        for (let i = 0; i < data.body.length; i++) {
+                            this.brokers.push(data.body[i]);
+                        }
+                        this.brokerType = this.brokers[0].type;
+                        if (this.brokerType != null) {
+                            this.getMessages();
+                        } else {
+                            console.log('Unknown broker: set brokertype to artemis');
+                            this.brokerType = 'artemis';
+                            this.getMessages();
+                        }
+                    }
+                },
+                error => console.log(error)
+            );
+        }
+    }
 
-                this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
-                    (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
-                    (res: HttpErrorResponse) => this.onError(res.message)
-                );
+    getMessages() {
+        this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
+            (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
 
-                this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages).subscribe(
-                    (res: HttpResponse<IMessage[]>) => this.onSuccess(res.body, res.headers),
-                    (res: HttpErrorResponse) => this.onError(res.message)
-                );
-            },
-            error => console.log(error)
+        this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages, true).subscribe(
+            (res: HttpResponse<IMessage[]>) => this.onSuccess(res.body, res.headers),
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
 
@@ -310,11 +332,13 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     previousPage() {
         this.page = this.page - 1;
+        this.messages = new Array<IMessage>();
         this.loadMessages();
     }
 
     nextPage() {
         this.page = this.page + 1;
+        this.messages = new Array<IMessage>();
         this.loadMessages();
     }
 
@@ -335,11 +359,15 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
             let a = JSON.parse(doc);
             return 'json';
         } catch (e) {
-            //try xml parsing
-            let parser = new DOMParser();
-            var xmlDoc = parser.parseFromString(doc, 'application/xml');
-            if (xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
-            else return 'xml';
+            try {
+                //try xml parsing
+                let parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(doc, 'application/xml');
+                if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
+                else return 'xml';
+            } catch (e) {
+                return 'txt';
+            }
         }
     }
 }

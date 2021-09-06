@@ -42,11 +42,11 @@ export class TopicDeleteDialogComponent {
             this.message = 'Cannot delete topic because there is at least one active consumer';
             this.disableDelete = true;
         } else if (this.address.numberOfMessages > 0) {
-            this.message = 'Cannot delete topic because there is at least one message on the queue. Please clear the topic before deleting';
+            this.message = 'Cannot delete topic because there is at least one message on the topic. Please clear the topic before deleting';
             this.disableDelete = true;
         } else {
             this.topicService.deleteTopic(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
+                this.eventManager.broadcast('topicListModification');
                 this.router.navigate(['/topic']);
                 this.activeModal.dismiss(true);
             });
@@ -69,7 +69,7 @@ export class TopicDeleteDialogComponent {
 }
 
 @Component({
-    selector: 'jhi-queue-delete-popup',
+    selector: 'jhi-topic-delete-popup',
     template: ''
 })
 export class TopicDeletePopupComponent implements OnInit, OnDestroy {
