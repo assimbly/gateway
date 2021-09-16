@@ -6,17 +6,37 @@
         </button>
     </div>
     <div class="modal-body">
-        <div class="row">
-            <label style="float: left; text-align: left;">Source:</label>
-            <div style="width:3px; height:auto; display:inline-block;"></div>
-            <input id="sourceEndpoint" [(ngModel)]="endpointName" disabled/>
-        </div>
-        <br/>
-        <div class="row">
-            <label style="float: left; text-align: left;">Target:</label>
-            <div style="width:5px; height:auto; display:inline-block;"></div>
-            <input id="targetEndpoint" [(ngModel)]="targetEndpointName"/>
-        </div>
+        <form role="form" method="POST" action="">
+            <input type="hidden" name="_token" value="">
+            <div class="form-group">
+                <label class="control-label">Source</label>
+                <div>
+                    <input type="text" class="form-control input-lg" name="Source" [(ngModel)]="endpointName" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Target</label>
+                <div>
+                    <input type="txt" class="form-control input-lg" name="Target" [(ngModel)]="targetEndpointName">
+                </div>
+            </div>
+        </form>
+
+
+        <!--
+        <div class="form-group">
+            <div class="form-group row">
+                <label style="float: left; text-align: left;">Source:</label>
+
+                <input id="sourceEndpoint" [(ngModel)]="endpointName"  style="padding:5em;" disabled/>
+            </div>
+            <br/>
+            <div class="row">
+                <label style="float: left; text-align: left;">Target:</label>
+                <div style="width:5px; height:auto; display:inline-block;"></div>
+                <input id="targetEndpoint" type="text" aria-label="Default" aria-describedby="inputGroup-sizing-default"  style="margin:5em;"/>
+            </div>
+        </div>-->
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary"  (click)="cancelModal()">Close</button>
@@ -44,8 +64,8 @@
         <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0" >
             <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px;">Save</button>
             <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-                <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)" *ngIf="messages?.length > 0">Message</button>
                 <button ngbDropdownItem (click)="saveMessage(selectedMessage, true)" *ngIf="messages?.length > 0">Body</button>
+                <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)" *ngIf="messages?.length > 0">Message</button>
                 <button ngbDropdownItem (click)="saveAllMessages()" *ngIf="messages?.length > 0">All Messages</button>
             </div>
         </div>

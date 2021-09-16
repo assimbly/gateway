@@ -30,11 +30,9 @@ export class TopicComponent implements OnInit, OnDestroy {
     links: any;
     page: number;
     predicate: string;
-    totalItems: number = -1;
     ascending: boolean;
     timeInterval: Subscription;
-
-    dummy: any;
+    isBroker: boolean;
 
     searchText: string = '';
     brokerType: string = '';
@@ -132,8 +130,13 @@ export class TopicComponent implements OnInit, OnDestroy {
                     for (let i = 0; i < data.body.length; i++) {
                         this.brokers.push(data.body[i]);
                     }
-                    this.brokerType = this.brokers[0].type;
-                    this.getAllTopics();
+                    if (this.brokers[0]) {
+                        this.isBroker = true;
+                        this.brokerType = this.brokers[0].type;
+                        this.getAllTopics();
+                    } else {
+                        this.isBroker = false;
+                    }
                 }
             },
             error => console.log(error)
@@ -143,33 +146,43 @@ export class TopicComponent implements OnInit, OnDestroy {
     getAllTopics() {
         this.addresses = [];
 
-        this.topicService.getAllTopics(this.brokerType).subscribe(
-            data => {
-                if (data && data.body.topics.topic) {
-                    for (let address of data.body.topics.topic) {
-                        if (address.temporary.toString() === 'false') {
-                            this.addresses.push(address);
+        if (this.isBroker) {
+            this.topicService.getAllTopics(this.brokerType).subscribe(
+                data => {
+                    if (data && data.body.topics.topic) {
+                        for (let address of data.body.topics.topic) {
+                            if (address.temporary.toString() === 'false') {
+                                this.addresses.push(address);
+                            }
                         }
                     }
+                },
+                error => {
+                    console.log(error);
+                    this.isBroker = false;
                 }
-            },
-            error => console.log(error)
-        );
+            );
+        }
     }
 
     updateAllTopics() {
-        this.topicService.getAllTopics(this.brokerType).subscribe(
-            data => {
-                if (data && data.body.topics.topic) {
-                    for (let i = 0; i < data.body.topics.topic.length; i++) {
-                        if (data.body.topics.topic[i].temporary.toString() === 'false') {
-                            this.addresses.splice(i, 1, data.body.topics.topic[i]);
+        if (this.isBroker) {
+            this.topicService.getAllTopics(this.brokerType).subscribe(
+                data => {
+                    if (data && data.body.topics.topic) {
+                        for (let i = 0; i < data.body.topics.topic.length; i++) {
+                            if (data.body.topics.topic[i].temporary.toString() === 'false') {
+                                this.addresses.splice(i, 1, data.body.topics.topic[i]);
+                            }
                         }
+                        this.addresses = [...this.addresses];
                     }
-                    this.addresses = [...this.addresses];
+                },
+                error => {
+                    console.log(error);
+                    this.isBroker = false;
                 }
-            },
-            error => console.log(error)
-        );
+            );
+        }
     }
 }

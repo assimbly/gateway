@@ -30,6 +30,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     predicate: string;
     ascending: boolean;
     timeInterval: Subscription;
+    isBroker: boolean;
 
     searchText: string = '';
     brokerType: string = '';
@@ -125,9 +126,16 @@ export class QueueComponent implements OnInit, OnDestroy {
                     for (let i = 0; i < data.body.length; i++) {
                         this.brokers.push(data.body[i]);
                     }
-                    this.brokerType = this.brokers[0].type;
-                    if (this.brokerType != null) {
-                        this.getAllQueues();
+
+                    if (this.brokers[0]) {
+                        this.isBroker = true;
+
+                        this.brokerType = this.brokers[0].type;
+                        if (this.brokerType != null) {
+                            this.getAllQueues();
+                        }
+                    } else {
+                        this.isBroker = false;
                     }
                 }
             },
@@ -138,35 +146,45 @@ export class QueueComponent implements OnInit, OnDestroy {
     getAllQueues() {
         this.addresses = [];
 
-        this.queueService.getAllQueues(this.brokerType).subscribe(
-            data => {
-                if (data && data.body.queues.queue) {
-                    for (let i = 0; i < data.body.queues.queue.length; i++) {
-                        if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                            this.addresses.push(data.body.queues.queue[i]);
+        if (this.isBroker) {
+            this.queueService.getAllQueues(this.brokerType).subscribe(
+                data => {
+                    if (data && data.body.queues) {
+                        for (let i = 0; i < data.body.queues.queue.length; i++) {
+                            if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                                this.addresses.push(data.body.queues.queue[i]);
+                            }
                         }
                     }
+                },
+                error => {
+                    console.log(error);
+                    this.isBroker = false;
                 }
-            },
-            error => console.log(error)
-        );
+            );
+        }
     }
 
     updateAllQueues() {
-        this.queueService.getAllQueues(this.brokerType).subscribe(
-            data => {
-                if (data && data.body.queues.queue) {
-                    for (let i = 0; i < data.body.queues.queue.length; i++) {
-                        //exclude temporary queues
-                        if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                            this.addresses.splice(i, 1, data.body.queues.queue[i]);
+        if (this.isBroker) {
+            this.queueService.getAllQueues(this.brokerType).subscribe(
+                data => {
+                    if (data && data.body.queues) {
+                        for (let i = 0; i < data.body.queues.queue.length; i++) {
+                            //exclude temporary queues
+                            if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                                this.addresses.splice(i, 1, data.body.queues.queue[i]);
+                            }
                         }
+                        this.addresses = [...this.addresses];
                     }
-                    this.addresses = [...this.addresses];
+                },
+                error => {
+                    console.log(error);
+                    this.isBroker = false;
                 }
-            },
-            error => console.log(error)
-        );
+            );
+        }
     }
 
     protected onError(errorMessage: string) {

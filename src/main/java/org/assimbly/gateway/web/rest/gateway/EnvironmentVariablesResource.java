@@ -146,6 +146,7 @@ public class EnvironmentVariablesResource {
             String algorithm = properties.getProperty("algorithm");
 
             EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
+
             String encryptedValue = encryptionUtil.encrypt(value);
 
             return encryptedValue;

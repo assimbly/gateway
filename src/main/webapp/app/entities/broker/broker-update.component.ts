@@ -75,10 +75,7 @@ export class BrokerUpdateComponent implements OnInit {
     save() {
         this.brokerConfigurationFailed = '';
 
-        console.log('brokerConfiguration=' + this.broker.configurationType);
-
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
-            console.log('1');
             this.isSaving = true;
             this.brokerService.update(this.broker).subscribe(
                 response => {
@@ -101,11 +98,9 @@ export class BrokerUpdateComponent implements OnInit {
                 }
             );
         } else if (this.broker.configurationType === 'file') {
-            console.log('2');
             this.isSaving = true;
             this.subscribeToCreateResponse(this.brokerService.create(this.broker));
         } else {
-            console.log('3');
             this.isSaving = true;
             if (this.broker.id !== undefined) {
                 this.subscribeToSaveResponse(this.brokerService.update(this.broker));
@@ -116,7 +111,6 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     onTypeChange(brokerType) {
-        console.log('brokerType=' + brokerType);
         if (brokerType === 'classic') {
             this.artemisConfiguration = this.brokerConfiguration;
             this.brokerConfiguration = this.activemqConfiguration;

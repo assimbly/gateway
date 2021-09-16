@@ -99,7 +99,7 @@
                 </div>
             </div>
 
-            <div class="card text-center">
+            <div class="card text-center" style="width: 52rem;">
                 <div class="card-header">
                     <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active2" orientation="horizontal">
                             <li ngbNavItem="ENDPOINTS" novalidate>
@@ -114,7 +114,7 @@
                                                     <a ngbNavLink>{{endpoint.endpointType}}</a>
                                                     <ng-template ngbNavContent>
 
-                                                        <div  class="col-12" style="padding-left: 20px; text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
+                                                        <div  class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
                                                             <div class="input-group">
                                                                 <a class="col-10"></a>
                                                                 <a class="col-2">
@@ -162,17 +162,17 @@
                                                                     <h5>URI&ensp;</h5>
                                                                     <i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
                                                                 </div>
-                                                                <div class="row mx-0 mb-1">
-                                                                    <ng-select  *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                    <ng-select  *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                    <ng-select  *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                    <ng-select  *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                    <span style="display:inline-block; width: 14px;"></span>
-                                                                    <a>:</a>
-                                                                    <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
-                                                                    <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
-                                                                        <span class="fa fa-pencil padding-button"></span>&nbsp;
-                                                                    </button>
+                                                                <div class="row mx-0 mb-1 flex-nowrap">
+                                                                        <ng-select  *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                                        <ng-select  *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                                        <ng-select  *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                                        <ng-select  *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                                                        <span style="display:inline-block; width: 14px;"></span>
+                                                                        <a>:</a>
+                                                                        <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+                                                                        <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
+                                                                            <span class="fa fa-pencil padding-button"></span>&nbsp;
+                                                                        </button>
                                                                 </div>
                                                             </div>
                                                             <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
@@ -184,7 +184,7 @@
                                                             <div class="form-group" formArrayName="options">
                                                                 <label class="form-control-label" for="field_options">Options</label>
                                                                 <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
-                                                                <div class="row mx-0 mb-1" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
+                                                                <div class="row mx-0 mb-1 flex-nowrap" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
                                                                     <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
                                                                         <ng-template ng-option-tmp let-item="item">
                                                                             <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
@@ -436,6 +436,7 @@
                     <span class="fa fa-save"></span>&nbsp; <span>Save</span>
                 </button>
             </div>
+            <br />
             <div *ngIf="savingFlowSuccess">
                 <span class="text-success">*{{savingFlowSuccessMessage}}</span>
             </div>
@@ -448,6 +449,7 @@
             <div *ngIf="!!notUniqueUriMessage">
                 <span class="text-danger">*{{notUniqueUriMessage}}</span>
             </div>
+            <br />
         </form>
     </div>
 </div>

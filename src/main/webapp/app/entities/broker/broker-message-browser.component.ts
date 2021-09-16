@@ -316,10 +316,16 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     saveAllMessages() {
-        const exportMessage = JSON.stringify(this.allMessages);
-        const blob = new Blob([exportMessage], { type: 'application/json' });
-        const today = new Date().toISOString().slice(0, 10);
-        saveAs(blob, `${today}-${this.endpointName}.json`);
+        this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages, false).subscribe(
+            (res: HttpResponse<IMessage[]>) => {
+                this.allMessages = res.body;
+                const exportMessage = JSON.stringify(this.allMessages);
+                const blob = new Blob([exportMessage], { type: 'application/json' });
+                const today = new Date().toISOString().slice(0, 10);
+                saveAs(blob, `${today}-${this.endpointName}.json`);
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
     }
 
     showMessage(message: IMessage) {

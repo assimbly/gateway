@@ -1,6 +1,7 @@
 package org.assimbly.gateway.web.rest.connector;
 
 import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.util.EncryptionUtil;
 
 import org.assimbly.gateway.config.EncryptionProperties;
@@ -88,6 +89,8 @@ public class ServiceKeysResource {
             String encryptedValue = encryptValue(serviceKeysDTO.getValue());
             serviceKeysDTO.setValue(encryptedValue);
         }
+
+        serviceKeysService.save(serviceKeysDTO);
 
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))

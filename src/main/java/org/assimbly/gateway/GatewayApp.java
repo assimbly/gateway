@@ -6,6 +6,7 @@ import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -87,6 +88,9 @@ public class GatewayApp {
 
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
+        EncryptionUtil.key = env.getProperty("encryption.jasypt.password");
+        EncryptionUtil.algorithm = env.getProperty("encryption.jasypt.algorithm");
+
         if (StringUtils.isBlank(contextPath)) {
             contextPath = "/";
         }
@@ -127,7 +131,6 @@ public class GatewayApp {
                 "External URL: \t\t{}://{}:{}{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
                 "Java WorkingDir: \t{}\n\t" +
-                "Apache Camel version: \t3.7.4 \n\t" +
                 "Profile(s): \t\t{}\n----------------------------------------------------------",
             applicationName,
             applicationVersion,

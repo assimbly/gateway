@@ -4,9 +4,14 @@
     </div>
 
     <div class="row">
-        <div class="col-3">
+        <div class="col-11-5 text-right" *ngIf="isBroker && addresses?.length === 0">
+            <button class="btn btn-primary" type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/topic/new']">
+                <span class="fa fa-plus"></span> <span>Create a new Topic</span>
+            </button>
         </div>
-        <div class="col-8 text-right">
+        <div class="col-11-5 text-right"  *ngIf="isBroker && addresses?.length > 0">
             <button class="btn btn-primary" type="submit"
                     *jhiHasAnyAuthority="'ROLE_ADMIN'"
                     [routerLink]="['/topic/new']">
@@ -18,9 +23,10 @@
                 <span class="fa fa-refresh"></span> <span>Refresh</span>
             </button>
         </div>
-        <div class="col-1">
+        <div class="col-0-5">
         </div>
     </div>
+
 
     <div>
         <div class="col-4" style="margin-bottom: 15px">
@@ -33,7 +39,11 @@
         </div>
     </div>
 
-    <div class="alert alert-warning" id="no-result" *ngIf="addresses?.length === 0">
+    <div class="alert alert-warning" id="no-result" *ngIf="!isBroker">
+        <span>No running broker found</span>
+    </div>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="isBroker && addresses?.length === 0">
         <span>No topics found</span>
     </div>
 
