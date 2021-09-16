@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
+        //mavenCentral()
         maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
         gradlePluginPortal{ url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/plugins-release" }
@@ -76,11 +76,12 @@ if (project.hasProperty("gae")) {
     apply plugin: 'org.springframework.boot.experimental.thin-launcher'
     apply plugin: 'io.spring.dependency-management'
 
+    /*
     dependencyManagement {
         imports {
-            mavenBom 'io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}'
+           mavenBom 'io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}'
         }
-    }
+    }*/
     appengineStage.dependsOn thinResolve
 }
 
@@ -253,6 +254,14 @@ configurations {
             // Inherited version from Spring Boot can't be used because of regressions:
             // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
             force 'org.liquibase:liquibase-core:3.6.3'
+            force 'org.apache.activemq:artemis-server:2.18.0'
+            force 'org.apache.activemq:artemis-commons:2.18.0'
+            force 'org.apache.activemq:artemis-jms-client-all:2.18.0'
+            force 'org.apache.activemq:artemis-core-client:2.18.0'
+            force 'org.apache.activemq:artemis-journal:2.18.0'
+            force 'org.apache.activemq:artemis-amqp-protocol:2.18.0'
+            //force 'org.apache.activemq:artemis-mqtt-protocol:2.18.0'
+            force 'org.apache.activemq:artemis-stomp-protocol:2.18.0'
         }
     }
 }
@@ -268,8 +277,12 @@ repositories {
 dependencies {
     // import JHipster dependencies BOM
     if (!project.hasProperty("gae")) {
-        implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
+        //implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
     }
+
+    implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.4.0';
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.3'
+    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
@@ -349,6 +362,16 @@ dependencies {
         implementation group: "org.assimbly", name: "brokerRestModule", version: "3.5.0", changing: true
     }
 
+    implementation group: "org.apache.activemq", name: "artemis-server", version: "2.18.0"
+    implementation group: "org.apache.activemq", name: "artemis-commons", version: "2.18.0"
+    implementation group: "org.apache.activemq", name: "artemis-jms-client-all", version: "2.18.0"
+    implementation group: "org.apache.activemq", name: "artemis-core-client", version: "2.18.0"
+    implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.18.0'
+    implementation group: "org.apache.activemq", name: "artemis-amqp-protocol", version: "2.18.0"
+    //implementation group: "org.apache.activemq", name: "artemis-mqtt-protocol", version: "2.18.0"
+    implementation group: "org.apache.activemq", name: "artemis-stomp-protocol", version: "2.18.0"
+
+
     implementation "io.github.assimbly:docconverter:1.4.0"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -356,7 +379,7 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
     //implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.6.0'
     implementation "org.jdom:jdom2:2.0.6"
-    //implementation "io.hawt:hawtio-springboot:2.12.1"
+    implementation "io.hawt:hawtio-springboot:2.13.6"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'

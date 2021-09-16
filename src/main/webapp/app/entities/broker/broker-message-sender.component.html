@@ -44,58 +44,6 @@
         <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
 
 
-            <!-- Uncomment to get extra options on the message sender
-<div class="form-group">
-<div class="row col-12">
-    <label class="form-control-label"
-           for="field_destination">Destination</label>
-    <i triggers="mouseenter:mouseleave"
-       popoverTitle="Info"
-       [popover]="destinationPopover"
-       class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-    <input name="destination"
-           class="form-control"
-           id="destination"
-           formControlName="destination"
-           required>
-</div>
-
-<div class="row">
-    <div class="col-6">
-        <label class="form-control-label"
-               for="field_exchangepattern">Exchange Pattern  </label>
-        <i triggers="mouseenter:mouseleave"
-           popoverTitle="Info"
-           [popover]="exchangePatternPopover"
-           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-        <select type="text"
-                class="form-control"
-                id="field_exchangepattern"
-                formControlName="exchangepattern">
-            <option value="FireAndForget">FireAndForget</option>
-            <option value="RequestAndReply">RequestAndReply</option>
-        </select>
-    </div>
-    <div class="col-6">
-        <label class="form-control-label"
-               for="field_numberOfTimes">Number of times  </label>
-        <i triggers="mouseenter:mouseleave"
-           popoverTitle="Info"
-           [popover]="numberOfTimesPopover"
-           class="fa fa-info-circle" style="margin-left: 0.5em;"></i>
-        <input min="0"
-               max="1000"
-               size="0"
-               maxlength="4"
-               type="number"
-               name="numberOfMessages"
-               class="form-control"
-               id="numberOfTimes"
-               formControlName="numberoftimes"
-               required>
-    </div>
-</div>
-            </div>-->
             <div class="col-8" style="position: fixed; left: 10%; width: 100%;">
                 <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="horizontal">
                         <li ngbNavItem="0">
@@ -115,8 +63,7 @@
                                             <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
                                             <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
                                             <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('headers')"><span class="fa fa-plus"></span></button>
-                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader('headers',i)"><span class="fa fa-remove"></span></button>
-                                            <button title="" type="button" class="col-1 left-border-radius-0 btn btn-secondary" *ngIf="i === 0" disabled><span class="fa fa-remove"></span></button>
+                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeHeader('headers',i)"><span class="fa fa-remove"></span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -133,8 +80,7 @@
                                         <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
                                         <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
                                         <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('jmsHeaders')"><span class="fa fa-plus"></span></button>
-                                        <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" *ngIf="i > 0" (click)="removeHeader('jmsHeaders',i)"><span class="fa fa-remove"></span></button>
-                                        <button title="" type="button" class="col-1 left-border-radius-0 btn btn-secondary" *ngIf="i === 0" disabled><span class="fa fa-remove"></span></button>
+                                        <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeHeader('jmsHeaders',i)"><span class="fa fa-remove"></span></button>
                                     </div>
                                 </div>
                             </div>

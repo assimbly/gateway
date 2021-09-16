@@ -82,6 +82,8 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     messageSenderForm: FormGroup;
 
+    messageFromFile = false;
+
     serviceType: Array<string> = [];
     upload: any;
     fileName: string;
@@ -183,7 +185,18 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     removeHeader(headerType: string, index) {
         this.headers = this.messageSenderForm.get(headerType) as FormArray;
-        this.headers.removeAt(index);
+        if (index === 0) {
+            this.headers
+                .at(index)
+                .get('key')
+                .patchValue('');
+            this.headers
+                .at(index)
+                .get('value')
+                .patchValue('');
+        } else {
+            this.headers.removeAt(index);
+        }
     }
 
     createHeader(): FormGroup {
@@ -257,21 +270,38 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     setRequestFromArray(message: IMessage) {
-        this.headers = message.headers == null ? {} : message.headers;
-        this.jmsHeaders = message.jmsHeaders == null ? {} : message.jmsHeaders;
+        let allHeadersJson = {};
+
+        if (this.messageFromFile) {
+            this.headers = message.headers == null ? {} : message.headers;
+            this.jmsHeaders = message.jmsHeaders == null ? {} : message.jmsHeaders;
+
+            allHeadersJson = {
+                ...this.headers,
+                ...this.jmsHeaders
+            };
+        } else {
+            this.headers = this.messageSenderForm.get('headers') as FormArray;
+            this.jmsHeaders = this.messageSenderForm.get('jmsHeaders') as FormArray;
+
+            const headersJson = this.formArrayToJson(this.headers);
+            const jmsHeadersJson = this.formArrayToJson(this.jmsHeaders);
+
+            allHeadersJson = {
+                ...headersJson,
+                ...jmsHeadersJson
+            };
+        }
+
         this.requestDestination = this.messageSenderForm.controls.destination.value;
+
         this.requestExchangePattern =
             this.messageSenderForm.controls.exchangepattern.value == null
                 ? 'FireAndForget'
                 : this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
             this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        this.requestBody = message.body;
-
-        const allHeadersJson = {
-            ...this.headers,
-            ...this.jmsHeaders
-        };
+        this.requestBody = message.body == null ? ' ' : message.body;
 
         this.requestHeaders = JSON.stringify(allHeadersJson);
     }
@@ -430,6 +460,7 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     openDirectory(event) {
         this.messages = [];
+        this.messageFromFile = false;
 
         for (var i = 0; i < event.target.files.length; i++) {
             let reader = new FileReader();
@@ -449,6 +480,8 @@ export class BrokerMessageSenderComponent implements OnInit {
         //reset the form
         this.initializeForm();
         this.load();
+
+        this.messageFromFile = true;
 
         //set the uploaded messages
         try {

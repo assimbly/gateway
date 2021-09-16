@@ -55,21 +55,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
         };
     }
 
-    loadAll() {
-        this.brokerService.query().subscribe(
-            (res: HttpResponse<IBroker[]>) => {
-                this.brokers = res.body;
-                this.broker = this.brokers[0];
-                if (this.broker) {
-                    this.getbrokerStatus(this.broker.id);
-                } else {
-                    this.setbrokerStatus('unconfigured');
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
-    }
-
     ngOnInit() {
         this.setBrokerStatusDefaults();
 
@@ -83,6 +68,21 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+    }
+
+    loadAll() {
+        this.brokerService.query().subscribe(
+            (res: HttpResponse<IBroker[]>) => {
+                this.brokers = res.body;
+                this.broker = this.brokers[0];
+                if (this.broker) {
+                    this.getbrokerStatus(this.broker.id);
+                } else {
+                    this.setbrokerStatus('unconfigured');
+                }
+            },
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
     }
 
     getbrokerStatus(id: number) {
@@ -132,10 +132,13 @@ export class BrokerComponent implements OnInit, OnDestroy {
             `;
                 break;
             default:
+                this.isBrokerStarted = this.isBrokerPaused = false;
+                this.isBrokerStopped = this.isBrokerRestarted = this.isBrokerResumed = true;
                 this.brokerStatusButton = `
-                            Last action: ${this.brokerStatus} <br/>
+                            Message: ${status} <br/>
                             Status: Stopped after error
               `;
+                this.brokerStatus = 'inactiveError';
                 break;
         }
     }
@@ -184,35 +187,39 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     start() {
-        this.brokerStatus = 'Starting';
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
         this.brokerService.start(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
+                console.log(response);
                 if (response.status === 200) {
-                    this.setbrokerStatus('started');
+                    this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
             },
             err => {
                 //this.getFlowLastError(this.broker.id, 'Start', err.error);
                 this.isBrokerStatusOK = false;
-                this.brokerStatusError = `Flow with id=${this.broker.id} is not started.`;
+                this.brokerStatusError = `Broker with id=${this.broker.id} is not started.`;
                 this.disableActionBtns = false;
+                this.setbrokerStatus(err.body);
             }
         );
     }
 
     restart() {
-        this.brokerStatus = 'Restarting';
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
         this.brokerService.restart(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
                 if (response.status === 200) {
-                    this.setbrokerStatus('restarted');
+                    if (response.body === 'started') {
+                        this.setbrokerStatus('restarted');
+                    } else {
+                        this.setbrokerStatus(response.body);
+                    }
                 }
                 this.disableActionBtns = false;
             },
@@ -221,19 +228,19 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not restarted.`;
                 this.disableActionBtns = false;
+                this.setbrokerStatus(err.body);
             }
         );
     }
 
     stop() {
-        this.brokerStatus = 'Stopping';
         this.isBrokerStatusOK = true;
         this.disableActionBtns = true;
 
         this.brokerService.stop(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
                 if (response.status === 200) {
-                    this.setbrokerStatus('stopped');
+                    this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
             },

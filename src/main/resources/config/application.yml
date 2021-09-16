@@ -18,6 +18,8 @@ management:
   endpoints:
     web:
       base-path: /management
+      path-mapping:
+        hawtio: /hawtio/console
       exposure:
         include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump','hawtio','jolokia']
   endpoint:
@@ -26,6 +28,8 @@ management:
       roles: 'ROLE_ADMIN'
     jhimetrics:
       enabled: true
+    jolokia:
+      sensitive: false
   info:
     git:
       mode: full
@@ -148,3 +152,4 @@ application:
     debugging: false
 hawtio:
   authenticationEnabled:  false
+  offline: true
