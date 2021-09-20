@@ -150,11 +150,16 @@ export class QueueComponent implements OnInit, OnDestroy {
             this.queueService.getAllQueues(this.brokerType).subscribe(
                 data => {
                     if (data && data.body.queues) {
-                        for (let i = 0; i < data.body.queues.queue.length; i++) {
-                            if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                                this.addresses.push(data.body.queues.queue[i]);
+                        this.isBroker = true;
+                        if (data.body.queues.queue) {
+                            for (let i = 0; i < data.body.queues.queue.length; i++) {
+                                if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                                    this.addresses.push(data.body.queues.queue[i]);
+                                }
                             }
                         }
+                    } else {
+                        this.isBroker = false;
                     }
                 },
                 error => {
@@ -170,13 +175,18 @@ export class QueueComponent implements OnInit, OnDestroy {
             this.queueService.getAllQueues(this.brokerType).subscribe(
                 data => {
                     if (data && data.body.queues) {
-                        for (let i = 0; i < data.body.queues.queue.length; i++) {
-                            //exclude temporary queues
-                            if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                                this.addresses.splice(i, 1, data.body.queues.queue[i]);
+                        this.isBroker = true;
+                        if (data.body.queues.queue) {
+                            for (let i = 0; i < data.body.queues.queue.length; i++) {
+                                //exclude temporary queues
+                                if (data.body.queues.queue[i].temporary.toString() === 'false') {
+                                    this.addresses.splice(i, 1, data.body.queues.queue[i]);
+                                }
                             }
+                            this.addresses = [...this.addresses];
                         }
-                        this.addresses = [...this.addresses];
+                    } else {
+                        this.isBroker = false;
                     }
                 },
                 error => {

@@ -183,9 +183,9 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.headers.push(this.initializeHeader(null, null));
     }
 
-    removeHeader(headerType: string, index) {
+    removeHeader(headerType: string, index, force: boolean) {
         this.headers = this.messageSenderForm.get(headerType) as FormArray;
-        if (index === 0) {
+        if (index === 0 && !force) {
             this.headers
                 .at(index)
                 .get('key')
@@ -371,7 +371,14 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.isFailed = true;
         this.numberOfFailedMessages = this.numberOfFailedMessages + 1;
         this.failedMessages =
-            ' | Messages: ' + this.numberOfFailedMessages + ' of ' + this.numberOfMessages + ' | Last time: ' + this.dateTime;
+            ' | Messages: ' +
+            this.numberOfFailedMessages +
+            ' of ' +
+            this.numberOfMessages +
+            ' | Last time: ' +
+            this.dateTime +
+            '| Error: ' +
+            body;
     }
 
     setVersion() {
@@ -505,7 +512,7 @@ export class BrokerMessageSenderComponent implements OnInit {
                     }
 
                     if (Object.keys(headers).length > 0) {
-                        this.removeHeader('headers', 0);
+                        this.removeHeader('headers', 0, true);
                     }
 
                     for (var key in jmsHeaders) {
@@ -516,7 +523,7 @@ export class BrokerMessageSenderComponent implements OnInit {
                     }
 
                     if (Object.keys(jmsHeaders).length) {
-                        this.removeHeader('jmsHeaders', 0);
+                        this.removeHeader('jmsHeaders', 0, true);
                     }
                 } else {
                     this.messages = [];

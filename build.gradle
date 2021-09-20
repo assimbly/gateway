@@ -260,7 +260,7 @@ configurations {
             force 'org.apache.activemq:artemis-core-client:2.18.0'
             force 'org.apache.activemq:artemis-journal:2.18.0'
             force 'org.apache.activemq:artemis-amqp-protocol:2.18.0'
-            //force 'org.apache.activemq:artemis-mqtt-protocol:2.18.0'
+            force 'org.apache.activemq:artemis-mqtt-protocol:2.18.0'
             force 'org.apache.activemq:artemis-stomp-protocol:2.18.0'
         }
     }
@@ -368,7 +368,7 @@ dependencies {
     implementation group: "org.apache.activemq", name: "artemis-core-client", version: "2.18.0"
     implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.18.0'
     implementation group: "org.apache.activemq", name: "artemis-amqp-protocol", version: "2.18.0"
-    //implementation group: "org.apache.activemq", name: "artemis-mqtt-protocol", version: "2.18.0"
+    implementation group: "org.apache.activemq", name: "artemis-mqtt-protocol", version: "2.18.0"
     implementation group: "org.apache.activemq", name: "artemis-stomp-protocol", version: "2.18.0"
 
 

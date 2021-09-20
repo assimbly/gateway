@@ -58,12 +58,29 @@
                             <br/>
                             <ng-template ngbNavContent>
                                 <div class="form-group" style="min-height: 484px; min-width: 760px;">
-                                    <div class="form-row" formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index;">
-                                        <div [formGroupName]="i">
-                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
-                                            <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
-                                            <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('headers')"><span class="fa fa-plus"></span></button>
-                                            <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeHeader('headers',i)"><span class="fa fa-remove"></span></button>
+                                    <!--<div class="row">
+
+                                        <label class="col-10 form-control-label" for="headerValue"><b>Value</b></label>
+                                    </div>-->
+                                    <div formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index;">
+                                        <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
+                                            <div class="col-3">
+                                                <label class="form-control-label" for="headerKey" *ngIf="i===0"><b>Key</b></label>
+                                                <input type="text" class="rounded-0 d-inline-block form-control" id="headerKey" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
+                                            </div>
+                                            <div class="col-3">
+                                                <label class="form-control-label" for="headerValue" *ngIf="i===0"><b>Value</b></label>
+                                                <input type="text" class="rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="row" *ngIf="i===0">
+                                                    <label class="form-control-label" for="addHeader">Add/Remove</label>
+                                                </div>
+                                                <div class="row">
+                                                    <button title="Add option" type="button" id="addHeader" class="right-border-radius-0 btn btn-primary" (click)="addHeader('headers')"><span class="fa fa-plus"></span></button>
+                                                    <button title="Remove option" type="button" id="removeHeader" class="left-border-radius-0 btn btn-danger" style="margin-left: -4px" (click)="removeHeader('headers',i,false)"><span class="fa fa-remove"></span></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -75,59 +92,41 @@
                         <br/>
                         <ng-template ngbNavContent>
                             <div class="form-group" style="min-height: 484px; min-width: 760px;">
-                                <div class="form-row" formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index;">
-                                    <div [formGroupName]="i">
-                                        <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderName" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
-                                        <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="jmsHeaderValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
-                                        <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addHeader('jmsHeaders')"><span class="fa fa-plus"></span></button>
-                                        <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeHeader('jmsHeaders',i)"><span class="fa fa-remove"></span></button>
+                                <div formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index;">
+                                    <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
+                                        <div class="col-3">
+                                            <label class="form-control-label" for="jmsHeaderKey" *ngIf="i===0"><b>Key</b></label>
+                                            <select  type="text" class="rounded-0 d-inline-block form-control" id="jmsHeaderKey" formControlName="key" data-toggle="tooltip" title="Name of the header.">
+                                                <option value="JMSCorrelationID">JMSCorrelationID</option>
+                                                <option value="JMSReplyTo">JMSReplyTo</option>
+                                                <option value="JMSType">JMSType</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label class="form-control-label" for="jmsHeaderValue" *ngIf="i===0"><b>Value</b></label>
+                                            <input type="text" class="rounded-0 d-inline-block form-control" id="jmsHeaderValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="row" *ngIf="i===0">
+                                                <label class="form-control-label" for="addJMSHeader">Add/Remove</label>
+                                            </div>
+                                            <div class="row">
+                                                <button title="Add option" type="button" id="addJMSHeader" class="right-border-radius-0 btn btn-primary" (click)="addHeader('jmsHeaders')"><span class="fa fa-plus"></span></button>
+                                                <button title="Remove option" type="button" id="removeJMSHeader"  class="left-border-radius-0 btn btn-danger" style="margin-left: -4px" (click)="removeHeader('jmsHeaders',i,false)"><span class="fa fa-remove"></span></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </ng-template>
                     </li>
 
-                        <!-- in case of using the RequestReply pattern
-                        <li ngbNavItem="2">
-                                <a ngbNavLink>Response</a>
-                                <ng-template ngbNavContent>
-                                    <div class="container">
-                                        <div class="form-group">
-                                            <div class="row">
-                                                <ace-editor #editor [(text)]="responseBody" [mode]="responseEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                </ng-template>
-                        </li>
-                        -->
                 </ul>
                 <div [ngbNavOutlet]="nav" class="ml-4"></div>
             </div>
             <div class="col-4" style="width: 100%;  height: 540px;"></div>
 
-    <!--
-    <div class="float-right"
-         style="margin-right: 14px;">
-        <button type="button"
-                class="btn btn-secondary"
-                (click)="cancel()">
-            <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
-        </button>
-        <button type="button"
-                (click)="send(false)" [disabled]="messageSenderForm.invalid || isSending"
-                class="btn btn-primary">
-            <span class="fa fa-paper-plane" *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending">Send</span>
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"></span> <span *ngIf="isSending">Send</span>
-        </button>
-        <button type="button"
-                (click)="send(true)" [disabled]="messageSenderForm.invalid || isSending"
-                class="btn btn-primary">
-            <span class="fa fa-paper-plane"></span>&nbsp; <span>Send and return</span>
-        </button>
-    </div>
-       -->
         </form>
 
     </div>

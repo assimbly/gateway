@@ -75,16 +75,18 @@ export class TopicUpdateComponent implements OnInit {
         this.isSaving = true;
         const address = this.createFromForm();
 
-        const queueNames = address.name.split(',');
+        const topicNames = address.name.split(',');
 
-        if (queueNames) {
-            for (let i = 0; i < queueNames.length; i++) {
-                if (i === queueNames.length - 1) {
+        if (topicNames) {
+            for (let i = 0; i < topicNames.length; i++) {
+                if (i === topicNames.length - 1) {
                     this.isClose = true;
-                    this.subscribeToSaveResponse(this.topicService.createTopic(queueNames[i], this.brokerType));
+                    const topic = topicNames[i].trim();
+                    this.subscribeToSaveResponse(this.topicService.createTopic(topic, this.brokerType));
                 } else {
                     this.isClose = false;
-                    this.subscribeToSaveResponse(this.topicService.createTopic(queueNames[i], this.brokerType));
+                    const topic = topicNames[i].trim();
+                    this.subscribeToSaveResponse(this.topicService.createTopic(topic, this.brokerType));
                 }
             }
         } else {
