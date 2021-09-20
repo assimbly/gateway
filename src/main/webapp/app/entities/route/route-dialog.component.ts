@@ -26,7 +26,12 @@ export class RouteDialogComponent implements OnInit {
         id: [null],
         name: ['', Validators.required],
         type: ['xml'],
-        content: ['<route>\n' + '        <from uri="direct:generated"/>\n' + '</route>']
+        content: [
+            '<route>\n' +
+                '        <!-- Please do not remove the from statement. -->\n' +
+                '        <from uri="direct:generated"/>\n' +
+                '</route>'
+        ]
     });
 
     constructor(

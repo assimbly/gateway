@@ -13,7 +13,8 @@ enum Status {
     active = 'active',
     paused = 'paused',
     inactive = 'inactive',
-    inactiveError = 'inactiveError'
+    inactiveError = 'inactiveError',
+    activeError = 'activeError'
 }
 @Component({
     selector: 'jhi-broker',
@@ -101,6 +102,16 @@ export class BrokerComponent implements OnInit, OnDestroy {
                             Last action: - <br/>
                             Status: Stopped<br/>
             `;
+
+                break;
+            case 'started with errors':
+                this.brokerStatus = Status.activeError;
+                this.isBrokerPaused = this.isBrokerStopped = this.isBrokerRestarted = false;
+                this.isBrokerStarted = this.isBrokerResumed = true;
+                this.brokerStatusButton = `
+                            Last action: Start <br/>
+                            Status: Started with error (check logs)
+                        `;
 
                 break;
             case 'started':
@@ -192,7 +203,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
         this.brokerService.start(this.broker.id, this.broker.type, this.broker.configurationType).subscribe(
             response => {
-                console.log(response);
                 if (response.status === 200) {
                     this.setbrokerStatus(response.body);
                 }
@@ -259,6 +269,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 <b>ID:</b> ${this.broker.id}<br/>
                 <b>Name:</b> ${this.broker.name}<br/>
                 <b>Type:</b> ${this.broker.type}<br/>
+                <b>Autostart:</b> ${this.broker.autoStart}<br/>
                 <b>Configuration Type:</b> ${this.broker.configurationType}<br/>
         `;
     }

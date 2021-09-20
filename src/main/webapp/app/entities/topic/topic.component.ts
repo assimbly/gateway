@@ -133,7 +133,9 @@ export class TopicComponent implements OnInit, OnDestroy {
                     if (this.brokers[0]) {
                         this.isBroker = true;
                         this.brokerType = this.brokers[0].type;
-                        this.getAllTopics();
+                        if (this.brokerType != null) {
+                            this.getAllTopics();
+                        }
                     } else {
                         this.isBroker = false;
                     }
@@ -149,12 +151,17 @@ export class TopicComponent implements OnInit, OnDestroy {
         if (this.isBroker) {
             this.topicService.getAllTopics(this.brokerType).subscribe(
                 data => {
-                    if (data && data.body.topics.topic) {
-                        for (let address of data.body.topics.topic) {
-                            if (address.temporary.toString() === 'false') {
-                                this.addresses.push(address);
+                    if (data && data.body.topics) {
+                        this.isBroker = true;
+                        if (data.body.topics.topic) {
+                            for (let address of data.body.topics.topic) {
+                                if (address.temporary.toString() === 'false') {
+                                    this.addresses.push(address);
+                                }
                             }
                         }
+                    } else {
+                        this.isBroker = false;
                     }
                 },
                 error => {
@@ -169,13 +176,16 @@ export class TopicComponent implements OnInit, OnDestroy {
         if (this.isBroker) {
             this.topicService.getAllTopics(this.brokerType).subscribe(
                 data => {
-                    if (data && data.body.topics.topic) {
-                        for (let i = 0; i < data.body.topics.topic.length; i++) {
-                            if (data.body.topics.topic[i].temporary.toString() === 'false') {
-                                this.addresses.splice(i, 1, data.body.topics.topic[i]);
+                    if (data && data.body.topics) {
+                        this.isBroker = true;
+                        if (data.body.topics.topic) {
+                            for (let i = 0; i < data.body.topics.topic.length; i++) {
+                                if (data.body.topics.topic[i].temporary.toString() === 'false') {
+                                    this.addresses.splice(i, 1, data.body.topics.topic[i]);
+                                }
                             }
+                            this.addresses = [...this.addresses];
                         }
-                        this.addresses = [...this.addresses];
                     }
                 },
                 error => {

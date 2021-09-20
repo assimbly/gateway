@@ -82,10 +82,12 @@ export class QueueUpdateComponent implements OnInit {
             for (let i = 0; i < queueNames.length; i++) {
                 if (i === queueNames.length - 1) {
                     this.isClose = true;
-                    this.subscribeToSaveResponse(this.queueService.createQueue(queueNames[i], this.brokerType));
+                    const queue = queueNames[i].trim();
+                    this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
                 } else {
                     this.isClose = false;
-                    this.subscribeToSaveResponse(this.queueService.createQueue(queueNames[i], this.brokerType));
+                    const queue = queueNames[i].trim();
+                    this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
                 }
             }
         } else {
