@@ -34,7 +34,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     timeInterval: Subscription;
     isBroker: boolean;
 
-    searchText: string = '';
+    searchTopicText: string;
     brokerType: string = '';
 
     constructor(
@@ -58,11 +58,19 @@ export class TopicComponent implements OnInit, OnDestroy {
 
     reset(): void {
         this.page = 0;
+        this.searchTopicText = localStorage.getItem('searchTopicText');
         this.getBrokerType();
     }
 
     loadPage(page: number): void {
         this.page = page;
+
+        this.searchTopicText = localStorage.getItem('searchTopicText');
+
+        if (!this.searchTopicText) {
+            this.searchTopicText = '';
+        }
+
         this.getBrokerType();
     }
 
@@ -78,6 +86,10 @@ export class TopicComponent implements OnInit, OnDestroy {
     }
 
     ngAfterViewInit() {
+        this.searchTopicText = localStorage.getItem('searchTopicText');
+        if (!this.searchTopicText) {
+            this.searchTopicText = '';
+        }
         this.getBrokerType();
         this.poll();
     }

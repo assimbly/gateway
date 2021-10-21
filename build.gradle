@@ -246,22 +246,29 @@ nohttp {
     source.include "build.gradle", "README.md"
 }
 
+
+
 configurations {
     providedRuntime
     implementation.exclude module: "spring-boot-starter-tomcat"
+    compile { transitive = false }
     all {
         resolutionStrategy {
             // Inherited version from Spring Boot can't be used because of regressions:
             // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
             force 'org.liquibase:liquibase-core:3.6.3'
-            force 'org.apache.activemq:artemis-server:2.18.0'
-            force 'org.apache.activemq:artemis-commons:2.18.0'
-            force 'org.apache.activemq:artemis-jms-client-all:2.18.0'
-            force 'org.apache.activemq:artemis-core-client:2.18.0'
-            force 'org.apache.activemq:artemis-journal:2.18.0'
-            force 'org.apache.activemq:artemis-amqp-protocol:2.18.0'
-            force 'org.apache.activemq:artemis-mqtt-protocol:2.18.0'
-            force 'org.apache.activemq:artemis-stomp-protocol:2.18.0'
+
+            eachDependency { DependencyResolveDetails details ->
+                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
+                    details.useVersion("2.18.0")
+                }
+                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
+                    details.useVersion("5.16.3")
+                }
+                if (details.requested.group == 'io.netty' ) {
+                    details.useVersion("4.1.66.Final")
+                }
+            }
         }
     }
 }
@@ -281,7 +288,7 @@ dependencies {
     }
 
     implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.4.0';
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.3'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
@@ -295,6 +302,7 @@ dependencies {
     implementation "io.dropwizard.metrics:metrics-jvm"
     implementation "io.dropwizard.metrics:metrics-servlet"
     implementation "io.dropwizard.metrics:metrics-servlets"
+    implementation "io.dropwizard.metrics:metrics-annotation"
     implementation "io.prometheus:simpleclient"
     // compile "io.prometheus:simpleclient_dropwizard"
     // compile "io.prometheus:simpleclient_servlet"
@@ -305,7 +313,6 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    implementation group: 'io.dropwizard.metrics', name: 'metrics-annotation', version: '4.1.2'
     // compile "com.ryantenney.metrics:metrics-spring"
     implementation "javax.cache:cache-api"
     implementation "org.hibernate:hibernate-core"
@@ -337,7 +344,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.zalando:problem-spring-web:0.24.0-RC.0"
-    implementation "org.springframework.boot:spring-boot-starter-cloud-connectors"
+    implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
     implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"
     implementation "org.springframework:spring-messaging"
@@ -362,25 +369,16 @@ dependencies {
         implementation group: "org.assimbly", name: "brokerRestModule", version: "3.5.0", changing: true
     }
 
-    implementation group: "org.apache.activemq", name: "artemis-server", version: "2.18.0"
-    implementation group: "org.apache.activemq", name: "artemis-commons", version: "2.18.0"
-    implementation group: "org.apache.activemq", name: "artemis-jms-client-all", version: "2.18.0"
-    implementation group: "org.apache.activemq", name: "artemis-core-client", version: "2.18.0"
-    implementation group: 'org.apache.activemq', name: 'artemis-journal', version: '2.18.0'
-    implementation group: "org.apache.activemq", name: "artemis-amqp-protocol", version: "2.18.0"
-    implementation group: "org.apache.activemq", name: "artemis-mqtt-protocol", version: "2.18.0"
-    implementation group: "org.apache.activemq", name: "artemis-stomp-protocol", version: "2.18.0"
-
+    //implementation fileTree(dir: 'lib', include: ['*.jar'])
 
     implementation "io.github.assimbly:docconverter:1.4.0"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
-    //implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.6.0'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.4"
     implementation "org.jdom:jdom2:2.0.6"
-    implementation "io.hawt:hawtio-springboot:2.13.6"
-    implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
+    //implementation "io.hawt:hawtio-springboot:2.13.6"
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
 
@@ -430,7 +428,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "6.2.2"
+    gradleVersion = "6.9.1"
 }
 
 

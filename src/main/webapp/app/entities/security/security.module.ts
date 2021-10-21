@@ -14,6 +14,8 @@ import {
     SecurityUploadDialogComponent,
     SecurityUploadP12PopupComponent,
     SecurityUploadP12DialogComponent,
+    SecuritySelfSignPopupComponent,
+    SecuritySelfSignDialogComponent,
     securityRoute,
     securityPopupRoute,
     SecurityPopupService
@@ -32,7 +34,9 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
         SecurityUploadPopupComponent,
         SecurityUploadDialogComponent,
         SecurityUploadP12PopupComponent,
-        SecurityUploadP12DialogComponent
+        SecurityUploadP12DialogComponent,
+        SecuritySelfSignPopupComponent,
+        SecuritySelfSignDialogComponent
     ],
     entryComponents: [
         SecurityComponent,
@@ -42,7 +46,9 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
         SecurityUploadPopupComponent,
         SecurityUploadDialogComponent,
         SecurityUploadP12PopupComponent,
-        SecurityUploadP12DialogComponent
+        SecurityUploadP12DialogComponent,
+        SecuritySelfSignPopupComponent,
+        SecuritySelfSignDialogComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

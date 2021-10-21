@@ -10,7 +10,7 @@ export class LogViewerService {
     constructor(protected http: HttpClient) {}
 
     getLogs(lines: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${SERVER_API_URL}/api/environment/${this.gatewayid}/log/${lines}`, {
+        return this.http.get(`${SERVER_API_URL}/api/logs/${this.gatewayid}/log/${lines}`, {
             observe: 'response',
             responseType: 'text'
         });

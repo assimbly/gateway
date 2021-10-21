@@ -64,6 +64,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.accountService.identity().then(account => {
             this.currentAccount = account;
         });
+
         this.registerChangeInBrokers();
     }
 
@@ -75,8 +76,9 @@ export class BrokerComponent implements OnInit, OnDestroy {
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
                 this.brokers = res.body;
-                this.broker = this.brokers[0];
-                if (this.broker) {
+
+                if (this.brokers[0]) {
+                    this.broker = this.brokers[0];
                     this.getbrokerStatus(this.broker.id);
                 } else {
                     this.setbrokerStatus('unconfigured');

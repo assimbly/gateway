@@ -1,17 +1,17 @@
 <h1>Log viewer</h1>
 <hr>
 
-<div class="form-group">
+<div class="form-group" contenteditable="true">
 	<code contenteditable="true" *ngFor="let logLine of (logLines | SearchByName: searchText)">
 		<div>
 			  <span *ngIf="logLine.includes('ERROR') else logLineWarning" style="color: red">{{logLine}}</span>
 		</div>
 		<ng-template #logLineWarning>
 			<span *ngIf="logLine.includes('WARN') else logLineDefault" style="color: orange">{{logLine}}</span>
-		</ng-template>	
+		</ng-template>
 		<ng-template #logLineDefault>
 			<span style="color: green">{{logLine}}</span>
-		</ng-template>	
+		</ng-template>
 	</code>
 </div>
 
@@ -24,10 +24,10 @@
                 </div>
                 <input type="text" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"></input>
             </div>
-		</div>	
+		</div>
         <div class="col-auto">
             <label class="sr-only" for="lines">Lines</label>
-            <div class="input-group mb-2" data-toggle="tooltip" 
+            <div class="input-group mb-2" data-toggle="tooltip"
                 title="The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail).">
                 <div class="input-group-prepend">
                     <div class="input-group-text">Lines:</div>
@@ -36,7 +36,7 @@
                     [(ngModel)]="lines" id="lines" min="1" max="10000" required>
             </div>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" style="margin-right: 8px">
             <button type="button" (click)="getLogs()" [disabled]="logsForm.form.invalid" class="btn btn-primary mb-2">Refresh</button>
         </div>
     </div>

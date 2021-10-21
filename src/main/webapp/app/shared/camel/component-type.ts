@@ -49,8 +49,10 @@ export enum ComponentType {
     AWS2SNS = 'AWS2-SNS',
     AWS2SQS = 'AWS2-SQS',
     AWS2TRANSLATE = 'AWS2-TRANSLATE',
+    AZURECOSMOSDB = 'AZURE-COSMOSDB',
     AZUREEVENTHUBS = 'AZURE-EVENTHUBS',
     AZURESTORAGEBLOB = 'AZURE-STORAGE-BLOB',
+    AZURESTORAGEDATALAKE = 'AZURE-STORAGE-DATALAKE',
     AZURESTORAGEQUEUE = 'AZURE-STORAGE-QUEUE',
     BEANVALIDATOR = 'BEAN-VALIDATOR',
     BEAN = 'BEAN',
@@ -125,11 +127,13 @@ export enum ComponentType {
     GOOGLECALENDAR = 'GOOGLE-CALENDAR',
     GOOGLECALENDARSTREAM = 'GOOGLE-CALENDAR-STREAM',
     GOOGLEDRIVE = 'GOOGLE-DRIVE',
+    GOOGLEFUNCTIONS = 'GOOGLE-FUNCTIONS',
     GOOGLEMAIL = 'GOOGLE-MAIL',
     GOOGLEMAILSTREAM = 'GOOGLE-MAIL-STREAM',
     GOOGLEPUBSUB = 'GOOGLE-PUBSUB',
     GOOGLESHEETS = 'GOOGLE-SHEETS',
     GOOGLESHEETSSTREAM = 'GOOGLE-SHEETS-STREAM',
+    GOOGLESTORAGE = 'GOOGLE-STORAGE',
     GORA = 'GORA',
     GRAPE = 'GRAPE',
     GRAPHQL = 'GRAPHQL',
@@ -150,6 +154,9 @@ export enum ComponentType {
     HDFS = 'HDFS',
     HTTP = 'HTTP',
     HTTPS = 'HTTPS',
+    HWCLOUDFUNCTIONGRAPH = 'HWCLOUD-FUNCTIONGRAPH',
+    HWCLOUDIAM = 'HWCLOUD-IAM',
+    HWCLOUDSMN = 'HWCLOUD-SMN',
     IBMMQ = 'IBMMQ',
     IEC60870CLIENT = 'IEC60870-CLIENT',
     IEC60870SERVER = 'IEC60870-SERVER',
@@ -174,8 +181,8 @@ export enum ComponentType {
     JCR = 'JCR',
     JDBC = 'JDBC',
     JETTY = 'JETTY',
-    JGROEPS = 'JGROEPS',
-    JGROEPSRAFT = 'JGROEPS-RAFT',
+    JGROUPS = 'JGROUPS',
+    JGROUPSRAFT = 'JGROUPS-RAFT',
     JING = 'JING',
     JIRA = 'JIRA',
     JMS = 'JMS',
@@ -188,6 +195,7 @@ export enum ComponentType {
     JSONVALIDATOR = 'JSON-VALIDATOR',
     JT400 = 'JT400',
     KAFKA = 'KAFKA',
+    KAMELET = 'KAMELET',
     KUBERNETESCONFIGMAPS = 'KUBERNETES-CONFIG-MAPS',
     KUBERNETESDEPLOYMENTS = 'KUBERNETES-DEPLOYMENTS',
     KUBERNETESHPA = 'KUBERNETES-HPA',
@@ -246,7 +254,8 @@ export enum ComponentType {
     OPENSTACKNOVA = 'OPENSTACK-NOVA',
     OPENSTACKSWIFT = 'OPENSTACK-SWIFT',
     OPTAPLANNER = 'OPTAPLANER',
-    PAHTO = 'PAHTO',
+    PAHO = 'PAHO',
+    PAHOMQTT5 = 'PAHO-MQTT5',
     PAXLOGGING = 'PAXLOGGING',
     PDF = 'PDF',
     PGREPLICATIONSLOT = 'PG-REPLICATION-SLOT',
@@ -295,9 +304,11 @@ export enum ComponentType {
     SPLUNK = 'SPLUNK',
     SPLUNKHEC = 'SPLUNK-HEC',
     SPRINGBATCH = 'SPRING-BATCH',
+    SPRINGJDBC = 'SPRING-JDBC',
     SPRINGINTEGRATION = 'SPRING-INTEGRATION',
     SPRINGLDAP = 'SPRING-LDAP',
     SPRINGREDIS = 'SPRING-REDIS',
+    SPRINGRABBITMQ = 'SPRING-RABBITMQ',
     SPRINGWS = 'SPRING-WS',
     SPRINGEVENT = 'SPRING-EVENT',
     SQL = 'SQL',
@@ -305,6 +316,7 @@ export enum ComponentType {
     SSH = 'SSH',
     SONICMQ = 'SONICMQ',
     STAX = 'STAX',
+    STICH = 'STICH',
     STOMP = 'STOMP',
     STREAM = 'STREAM',
     STUB = 'STUB',
@@ -935,6 +947,22 @@ export const typesLinks = [
     `
     },
     {
+        name: 'AZURE-COSMOSDB',
+        assimblyTypeLink: `/azure-cosmosdb`,
+        camelTypeLink: `/azure-cosmosdb-component.html`,
+        uriPlaceholder: '[databaseName][/containerName]',
+        uriPopoverMessage: `
+        <b>Name</b>: databaseName<br/>
+        <b>Description</b>: The name of the database<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+         <b>Name</b>: container<br/>
+        <b>Description</b>: The name of the container.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
         name: 'AZURE-EVENTHUBS',
         assimblyTypeLink: `/azure-eventhub`,
         camelTypeLink: `/azure-eventhubs-component.html`,
@@ -962,6 +990,22 @@ export const typesLinks = [
         <b>Data Type</b>: String<br/>
          <b>Name</b>: containerName<br/>
         <b>Description</b>: The blob container name <br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+    `
+    },
+    {
+        name: 'AZURE-STORAGE-DATALAKE',
+        assimblyTypeLink: `/azure-storage-datalake`,
+        camelTypeLink: `/azure-storage-datalake-component.html`,
+        uriPlaceholder: 'accountName[/fileSystemName]',
+        uriPopoverMessage: `
+        <b>Name</b>: accountName<br/>
+        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+         <b>Name</b>: fileSystemName<br/>
+        <b>Description</b>: Name of the filesystem to be used. <br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/>
     `
@@ -1978,6 +2022,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'GOOGLE-FUNCTIONS',
+        assimblyTypeLink: `/component-google-functions`,
+        camelTypeLink: `/google-functions-component.html`,
+        uriPlaceholder: 'functionName',
+        uriPopoverMessage: `
+        <b>Name</b>: functionName<br/>
+        <b>Description</b>: The user-defined name of the function.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: string <br/>
+    `
+    },
+    {
         name: 'GOOGLE-MAIL',
         assimblyTypeLink: `/component-google-mail`,
         camelTypeLink: `/google-mail-component.html`,
@@ -2056,6 +2112,20 @@ export const typesLinks = [
         <b>Required</b>: no <br/>
         <b>Data Type</b>: String <br/>
         <br/>
+    `
+    },
+    {
+        name: 'GOOGLE-STORAGE',
+        assimblyTypeLink: `/component-google-storage`,
+        camelTypeLink: `/google-storage-component.html`,
+        uriPlaceholder: 'bucketNameOrArn',
+        uriPopoverMessage: `
+        <b>Name</b>: bucketNameOrArn<br/>
+        <b>Description</b>: What kind of operation to perform (see docs).<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: GoogleSheetsApiName <br/>
+        <br/>
+        <b>Example</b>: myCamelBucket <br/>
     `
     },
     {
@@ -2322,6 +2392,42 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: URI <br/><br/>
         <b>Example</b>: servername:443/orders  (without https://)<br/>
+    `
+    },
+    {
+        name: 'HWCLOUD-FUNCTIONGRAPH',
+        assimblyTypeLink: `/component-hwcloud-funcitonsgraph`,
+        camelTypeLink: `/hwcloud-functionsgraph-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation to be performed.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HWCLOUD-IAM',
+        assimblyTypeLink: `/component-hwcloud-iam`,
+        camelTypeLink: `/hwcloud-iam-component.html`,
+        uriPlaceholder: 'operation',
+        uriPopoverMessage: `
+        <b>Name</b>: operation<br/>
+        <b>Description</b>: Operation to be performed.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'HWCLOUD-SMN',
+        assimblyTypeLink: `/component-smn-client`,
+        camelTypeLink: `/hwcloud-smn-component.html`,
+        uriPlaceholder: 'service',
+        uriPopoverMessage: `
+        <b>Name</b>: service<br/>
+        <b>Description</b>: Name of SMN service to invoke.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
     `
     },
     {
@@ -2650,7 +2756,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'JGROEPS',
+        name: 'JGROUPS',
         assimblyTypeLink: `/component-jgroups`,
         camelTypeLink: `/jgroups-component.html`,
         uriPlaceholder: 'clusterName',
@@ -2662,7 +2768,7 @@ export const typesLinks = [
     `
     },
     {
-        name: 'JGROEPSRAFT',
+        name: 'JGROUPSRAFT',
         assimblyTypeLink: `/component-jgroups-raft`,
         camelTypeLink: `/jgroups-raft-component.html`,
         uriPlaceholder: 'clusterName',
@@ -2838,6 +2944,23 @@ export const typesLinks = [
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
         <b>Example</b>: test or test1,test2,test3<br/>
+    `
+    },
+    {
+        name: 'KAMELET',
+        assimblyTypeLink: `/component-kamelet`,
+        camelTypeLink: `/kamelet-component.html`,
+        uriPlaceholder: 'templateId/routeId',
+        uriPopoverMessage: `
+        <b>Name</b>: templeteId<br/>
+        <b>Description</b>:  The Route Template ID.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/>
+        <b>Name</b>: routeID<br/>
+        <b>Description</b>:  The Route ID. Default value notice: The ID will be auto-generated if not provided.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+        <b>Example</b>: setMyBody<br/>
     `
     },
     {
@@ -3638,9 +3761,22 @@ export const typesLinks = [
     `
     },
     {
-        name: 'PAHTO',
-        assimblyTypeLink: `/component-pahto`,
-        camelTypeLink: `/pahto-component.html`,
+        name: 'PAHO',
+        assimblyTypeLink: `/component-paho`,
+        camelTypeLink: `/paho-component.html`,
+        uriPlaceholder: 'topic',
+        uriPopoverMessage: `
+        <b>Name</b>: topic<br/>
+        <b>Description</b>: Name of the topic.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/>
+        <br/>
+    `
+    },
+    {
+        name: 'PAHO-MQTT5',
+        assimblyTypeLink: `/component-paho-mqtt5`,
+        camelTypeLink: `/paho-mqtt5-component.html`,
         uriPlaceholder: 'topic',
         uriPopoverMessage: `
         <b>Name</b>: topic<br/>
@@ -4368,6 +4504,18 @@ export const typesLinks = [
     `
     },
     {
+        name: 'SPRING-JDBC',
+        assimblyTypeLink: `/component-spring-jdbc`,
+        camelTypeLink: `/spring-jdbc-component.html`,
+        uriPlaceholder: 'dataSourceName',
+        uriPopoverMessage: `
+        <b>Name</b>: dataSourceName<br/>
+        <b>Description</b>: Name of DataSource to lookup in the Registry. If the name is dataSource or default, then Camel will attempt to lookup a default DataSource from the registry, meaning if there is a only one instance of DataSource found, then this DataSource will be used.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
         name: 'SPRING-EVENT',
         assimblyTypeLink: `/component-spring-event`,
         camelTypeLink: `/spring-event-component.html`,
@@ -4399,6 +4547,18 @@ export const typesLinks = [
         uriPopoverMessage: `
         <b>Name</b>: templateName<br/>
         <b>Description</b>: Name of the Spring LDAP Template bean.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String<br/><br/>
+    `
+    },
+    {
+        name: 'SPRING-RABBITMQ',
+        assimblyTypeLink: `/component-spring-rabbitmq`,
+        camelTypeLink: `/spring-rabbitmq-component.html`,
+        uriPlaceholder: 'exchangeName',
+        uriPopoverMessage: `
+        <b>Name</b>: exchangeName<br/>
+        <b>Description</b>: he exchange name determines the exchange to which the produced messages will be sent to. In the case of consumers, the exchange name determines the exchange the queue will be bound to. Note: to use default exchange then do not use empty name, but use default instead.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String<br/><br/>
     `
@@ -4493,6 +4653,18 @@ export const typesLinks = [
         uriPopoverMessage: `
         <b>Name</b>: contentHandlerClass<br/>
         <b>Description</b>: The FQN class name for the ContentHandler implementation to use.<br/>
+        <b>Required</b>: yes <br/>
+        <b>Data Type</b>: String <br/><br/>
+    `
+    },
+    {
+        name: 'STICH',
+        assimblyTypeLink: `/component-stich`,
+        camelTypeLink: `/stich-component.html`,
+        uriPlaceholder: '[tableName]',
+        uriPopoverMessage: `
+        <b>Name</b>: [tableName]<br/>
+        <b>Description</b>:The name of the destination table the data is being pushed to. Table names must be unique in each destination schema, or loading issues will occur. Note: The number of characters in the table name should be within the destination’s allowed limits or data will rejected.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `
@@ -5064,8 +5236,10 @@ export class Components {
         'ATOMIX-SET',
         'ATOMIX-VALUE',
         'AVRO',
+        'AZURE-COSMOSDB',
         'AZURE-EVENTHUBS',
         'AZURE-STORAGE-BLOB',
+        'AZURE-STORAGE-DATALAKE',
         'AZURE-STORAGE-QUEUE',
         'BEANSTALK',
         'BOX',
@@ -5108,6 +5282,7 @@ export class Components {
         'GOOGLE-MAIL',
         'GOOGLE-PUBSUB',
         'GOOGLE-SHEETS',
+        'GOOGLE-STORGAGE',
         'GORA',
         'GRPC',
         'GUAVA-EVENTBUS',
@@ -5137,14 +5312,16 @@ export class Components {
         'JCLOUDS',
         'JCR',
         'JETTY',
-        'JGROEPS',
-        'JGROEPSRAFT',
+        'JGROUPS',
+        'JGROUPSRAFT',
         'JIRA',
         'JMS',
         'JMX',
         'JOOQ',
         'JPA',
         'JT400',
+        'KAFKA',
+        'KAMELET',
         'KUBERNETES-DEPLOYMENTS',
         'KUBERNETES-HPA',
         'KUBERNETES-JOB',
@@ -5172,7 +5349,8 @@ export class Components {
         'OLINGO2',
         'OLINGO4',
         'OPTAPLANNER',
-        'PAHTO',
+        'PAHO',
+        'PAHO-MQTT5',
         'PLATFORM-HTTP',
         'PGEVENT',
         'PG-REPLICATION-SLOT',
@@ -5180,7 +5358,6 @@ export class Components {
         'PULSAR',
         'QUARTZ2',
         'QUICKFIX',
-        'KAFKA',
         'RABBITMQ',
         'REACTIVE-STREAMS',
         'REF',
@@ -5209,6 +5386,7 @@ export class Components {
         'SPLUNK',
         'SPRING-EVENT',
         'SPRING-INTEGRATION',
+        'SPRING-RABBITMQ',
         'SPRING-REDIS',
         'SPRING-WS',
         'SQL',
@@ -5279,8 +5457,10 @@ export class Components {
         'ATOMIX-VALUE',
         'ATLASMAP',
         'AVRO',
+        'AZURE-COSMOSDB',
         'AZURE-EVENTHUBS',
         'AZURE-STORAGE-BLOB',
+        'AZURE-STORAGE-DATALAKE',
         'AZURE-STORAGE-QUEUE',
         'BEAN',
         'BEAN-VALIDATOR',
@@ -5343,11 +5523,13 @@ export class Components {
         'GOOGLE-CALENDAR',
         'GOOGLE-CALENDAR-STREAM',
         'GOOGLE-DRIVE',
+        'GOOGLE-FUNCTIONS',
         'GOOGLE-MAIL',
         'GOOGLE-MAIL-STREAM',
         'GOOGLE-PUBSUB',
         'GOOGLE-SHEETS',
         'GOOGLE-SHEETS-STREAM',
+        'GOOGLE-STORGAGE',
         'GORA',
         'GRAPE',
         'GRAPHQL',
@@ -5367,6 +5549,9 @@ export class Components {
         'HDFS',
         'HTTP',
         'HTTPS',
+        'HWCLOUD-FUNCTIONGRAPH',
+        'HWCLOUD-IAM',
+        'HWCLOUD-SMN',
         'IBMMQ',
         'IEC60870-CLIENT',
         'IEC60870-SERVER',
@@ -5390,8 +5575,8 @@ export class Components {
         'JCR',
         'JDBC',
         'JETTY',
-        'JGROEPS',
-        'JGROEPSRAFT',
+        'JGROUPS',
+        'JGROUPSRAFT',
         'JING',
         'JIRA',
         'JMS',
@@ -5402,6 +5587,8 @@ export class Components {
         'JSONATA',
         'JSON-VALIDATOR',
         'JT400',
+        'KAFKA',
+        'KAMELET',
         'KUBERNETES-CONFIG-MAPS',
         'KUBERNETES-DEPLOYMENTS',
         'KUBERNETES-HPA',
@@ -5455,14 +5642,14 @@ export class Components {
         'OPENSTACK-NOVA',
         'OPENSTACK-SWIFT',
         'OPTAPLANNER',
-        'PAHTO',
+        'PAHO',
+        'PAHO-MQTT5',
         'PDF',
         'PGEVENT',
         'PUBNUB',
         'PULSAR',
         'QUICKFIX',
         'NSQ',
-        'KAFKA',
         'RABBITMQ',
         'REACTIVE-STREAMS',
         'REF',
@@ -5496,14 +5683,17 @@ export class Components {
         'SPLUNK',
         'SPLUNK-HEC',
         'SPRING-BATCH',
+        'SPRING-JDBC',
         'SPRING-EVENT',
         'SPRING-INTEGRATION',
         'SPRING-LDAP',
+        'SPRING-RABBITMQ',
         'SPRING-REDIS',
         'SPRING-WS',
         'SQL',
         'SQL-STORED',
         'STAX',
+        'STICH',
         'STOMP',
         'STUB',
         'STREAM',
