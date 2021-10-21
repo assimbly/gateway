@@ -10,7 +10,7 @@ import { SecurityComponent } from './security.component';
 import { SecurityDetailComponent } from './security-detail.component';
 import { SecurityUpdateComponent } from './security-update.component';
 import { SecurityDeletePopupComponent } from './security-delete-dialog.component';
-import { SecurityUploadP12PopupComponent, SecurityUploadPopupComponent } from 'app/entities/security';
+import { SecuritySelfSignPopupComponent, SecurityUploadP12PopupComponent, SecurityUploadPopupComponent } from 'app/entities/security';
 import { ISecurity } from 'app/shared/model/security.model';
 
 @Injectable({ providedIn: 'root' })
@@ -107,6 +107,19 @@ export const securityPopupRoute: Routes = [
     {
         path: 'uploadp12',
         component: SecurityUploadP12PopupComponent,
+        resolve: {
+            security: SecurityResolve
+        },
+        data: {
+            authorities: ['ROLE_USER'],
+            pageTitle: 'Securities'
+        },
+        canActivate: [UserRouteAccessService],
+        outlet: 'popup'
+    },
+    {
+        path: 'self-sign',
+        component: SecuritySelfSignPopupComponent,
         resolve: {
             security: SecurityResolve
         },

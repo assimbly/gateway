@@ -141,8 +141,11 @@ public class BrokerResource {
         for(BrokerDTO broker : brokers) {
 
             if(broker.isAutoStart()) {
+
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
+
+                log.debug("Autostart broker: " + brokerType);
 
                 managedBroker.start(brokerType, brokerConfigurationType);
             }

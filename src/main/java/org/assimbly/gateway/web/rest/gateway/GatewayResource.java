@@ -12,6 +12,7 @@ import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
 
 import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -205,5 +207,25 @@ public class GatewayResource {
         gatewayRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    /**
+     * Get  /getlog : get tail of log file for the webapplication.
+     *
+     * @param lines (number of lines to return)
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = {"text/plain"})
+    public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
+
+        try {
+            File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
+            String log = LogUtil.tail(file, lines);
+            return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getLog", log, true);
+        } catch (Exception e) {
+            return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
+        }
+    }
+
 
 }

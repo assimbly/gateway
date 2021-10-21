@@ -31,8 +31,8 @@
     <div>
         <div class="col-4" style="margin-bottom: 15px">
             <input type="text" align="left" style="margin-left: 0.3em"
-                   [(ngModel)]="searchText"
-                   id="searchTextId" name="searchText"
+                   [(ngModel)]="searchQueueText"
+                   id="searchTextId" name="searchQueueText"
                    placeholder="Filter By Queue Name"/>
         </div>
     </div>
@@ -61,7 +61,7 @@
                    [infiniteScrollDisabled]="page >= links['last']"
                    [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
             <tr jhi-queue-row
-                *ngFor="let address of  (addresses | QueueSearchByName: searchText : ascending : predicate); trackBy: trackId"
+                *ngFor="let address of  (addresses | QueueSearchByName: searchQueueText : ascending : predicate); trackBy: trackId"
                 [address]="address" [isAdmin]="isAdmin" [brokerType]="brokerType"
                 ng-init="$last && finished()"></tr>
             </tbody>

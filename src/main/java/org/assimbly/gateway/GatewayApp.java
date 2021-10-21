@@ -105,7 +105,7 @@ public class GatewayApp {
 
         long startupTime = ((System.currentTimeMillis() - vmStartTime)/1000);
 
-        String applicationName = "Assimbly " + env.getProperty("spring.application.name");
+        String applicationName = "Assimbly";
         String applicationVersion = env.getProperty("application.info.version");
         String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
         String applicationStartupTime = Long.toString(startupTime);

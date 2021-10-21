@@ -105,9 +105,21 @@ export class SecurityService {
             password: password
         });
 
-        console.log('uploading p12 certificate');
-
         return this.http.post(`${this.resourceCertificateUrl}/uploadp12`, certificate, {
+            headers: options,
+            observe: 'response',
+            responseType: 'text'
+        });
+    }
+
+    generateCertificate(keystoreName, cn): Observable<HttpResponse<any>> {
+        const options = new HttpHeaders({
+            keystoreName: keystoreName,
+            keystorePassword: 'supersecret',
+            cn: cn
+        });
+
+        return this.http.get(`${this.resourceCertificateUrl}/generate`, {
             headers: options,
             observe: 'response',
             responseType: 'text'

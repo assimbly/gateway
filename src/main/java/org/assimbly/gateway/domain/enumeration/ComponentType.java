@@ -128,10 +128,16 @@ public enum ComponentType {
     @JsonProperty("AZURE-EVENTHUBS")
     AZUREEVENTHUBS("AZURE-EVENTHUBS"),
 
+    @JsonProperty("AZURE-COSMOSDB")
+    AZURECOSMOSDB("AZURE-COSMOSDB"),
+
 	@JsonProperty("AZURE-STORAGE-BLOB")
 	AZURESTORAGEBLOB("AZURE-STORAGE-BLOB"),
 
-	@JsonProperty("AZURE-STORAGE-QUEUE")
+    @JsonProperty("AZURE-STORAGE-DATALAKE")
+    AZURESTORAGEDATALAKE("AZURE-STORAGE-DATALAKE"),
+
+    @JsonProperty("AZURE-STORAGE-QUEUE")
 	AZURESTORAGEQUEUE("AZURE-STORAGE-QUEUE"),
 
 	@JsonProperty("BEAN-VALIDATOR")
@@ -297,7 +303,10 @@ public enum ComponentType {
 	@JsonProperty("GOOGLE-DRIVE")
 	GOOGLEDRIVE("GOOGLE-DRIVE"),
 
-	@JsonProperty("GOOGLE-MAIL")
+    @JsonProperty("GOOGLE-FUNCTIONS")
+    GOOGLEFUNCTIONS("GOOGLE-FUNCTIONS"),
+
+    @JsonProperty("GOOGLE-MAIL")
 	GOOGLEMAIL("GOOGLE-MAIL"),
 
 	@JsonProperty("GOOGLE-MAIL-STREAM")
@@ -312,7 +321,10 @@ public enum ComponentType {
 	@JsonProperty("GOOGLE-SHEETS-STREAM")
 	GOOGLESHEETSSTREAM("GOOGLE-SHEETS-STREAM"),
 
-	GORA("GORA"),
+    @JsonProperty("GOOGLE-STORAGE")
+    GOOGLESTORAGE("GOOGLE-STORAGE"),
+
+    GORA("GORA"),
 
 	GRAPE("GRAPE"),
 
@@ -365,6 +377,15 @@ public enum ComponentType {
 	HTTP("HTTP"),
 
 	HTTPS("HTTPS"),
+
+    @JsonProperty("HWCLOUD-FUNCTIONGRAPH")
+    HWCLOUDFUNCTIONGRAPH("HWCLOUD-FUNCTIONGRAPH"),
+
+    @JsonProperty("HWCLOUD-IAM")
+    HWCLOUDIAM("HWCLOUD-IAM"),
+
+    @JsonProperty("HWCLOUD-SMN")
+    HWCLOUDSMN("HWCLOUD-SMN"),
 
     IBMMQ("IBMMQ"),
 
@@ -423,10 +444,10 @@ public enum ComponentType {
 
 	JETTY("JETTY"),
 
-	JGROEPS("JGROEPS"),
+	JGROUPS("JGROUPS"),
 
-	@JsonProperty("JGROEPS-RAFT")
-	JGROEPSRAFT("JGROEPS-RAFT"),
+	@JsonProperty("JGROUPS-RAFT")
+	JGROUPSRAFT("JGROUPS-RAFT"),
 
 	JING("JING"),
 
@@ -451,7 +472,9 @@ public enum ComponentType {
 
     JT400("JT400"),
 
-	KAFKA("KAFKA"),
+    KAMELET("KAMELET"),
+
+    KAFKA("KAFKA"),
 
 	@JsonProperty("KUBERNETES-CONFIG-MAPS")
 	KUBERNETESCONFIGMAPS("KUBERNETES-CONFIG-MAPS"),
@@ -600,7 +623,10 @@ public enum ComponentType {
 
 	OPTAPLANNER("OPTAPLANER"),
 
-	PAHTO("PAHTO"),
+	PAHO("PAHO"),
+
+    @JsonProperty("PAHO-MQTT")
+    PAHOMQTT("PAHO-MQTT"),
 
 	PAXLOGGING("PAXLOGGING"),
 
@@ -708,13 +734,19 @@ public enum ComponentType {
 	@JsonProperty("SPRING-BATCH")
 	SPRINGBATCH("SPRING-BATCH"),
 
-	@JsonProperty("SPRING-INTEGRATION")
+    @JsonProperty("SPRING-JDBC")
+    SPRINGJDBC("SPRING-JDBC"),
+
+    @JsonProperty("SPRING-INTEGRATION")
 	SPRINGINTEGRATION("SPRING-INTEGRATION"),
 
 	@JsonProperty("SPRING-LDAP")
 	SPRINGLDAP("SPRING-LDAP"),
 
-	@JsonProperty("SPRING-REDIS")
+    @JsonProperty("SPRING-RABBITMQ")
+    SPRINGRABBITMQ("SPRING-RABBITMQ"),
+
+    @JsonProperty("SPRING-REDIS")
 	SPRINGREDIS("SPRING-REDIS"),
 
 	@JsonProperty("SPRING-WS")
@@ -733,6 +765,8 @@ public enum ComponentType {
 	SONICMQ("SONICMQ"),
 
 	STAX("STAX"),
+
+    STICH("STICH"),
 
 	STOMP("STOMP"),
 

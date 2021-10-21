@@ -32,7 +32,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     timeInterval: Subscription;
     isBroker: boolean;
 
-    searchText: string = '';
+    searchQueueText: string;
     brokerType: string = '';
 
     constructor(
@@ -55,11 +55,19 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     reset(): void {
         this.page = 0;
+        this.searchQueueText = localStorage.getItem('searchQueueText');
         this.updateAllQueues();
     }
 
     loadPage(page: number): void {
         this.page = page;
+
+        this.searchQueueText = localStorage.getItem('searchQueueText');
+
+        if (!this.searchQueueText) {
+            this.searchQueueText = '';
+        }
+
         this.getBrokerType();
     }
 
@@ -74,6 +82,12 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
 
     ngAfterViewInit() {
+        this.searchQueueText = localStorage.getItem('searchQueueText');
+
+        if (!this.searchQueueText) {
+            this.searchQueueText = '';
+        }
+
         this.getBrokerType();
         this.poll();
     }

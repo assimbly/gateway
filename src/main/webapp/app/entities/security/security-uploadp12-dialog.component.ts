@@ -32,12 +32,12 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
     ngOnInit() {
         this.importForm = new FormGroup({
             password: new FormControl({ value: '' }),
-            certificateStore: new FormControl({ value: 'truststore' })
+            certificateStore: new FormControl({ value: 'keystore' })
         });
 
         this.importForm.patchValue({
             password: '',
-            certificateStore: 'truststore'
+            certificateStore: 'keystore'
         });
     }
 

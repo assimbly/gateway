@@ -163,7 +163,11 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
                 itemNumber = itemNumber + 1;
                 this.message.number = itemNumber;
                 this.message.messageid = data.messages.message[i].messageid;
-                this.message.timestamp = data.messages.message[i].timestamp;
+                if (this.brokerType === 'artemis') {
+                    this.message.timestamp = this.timeConverter(data.messages.message[i].timestamp);
+                } else {
+                    this.message.timestamp = data.messages.message[i].timestamp;
+                }
 
                 this.messages.push(this.message);
 
@@ -214,7 +218,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
             let data = new Uint8Array(message.BodyPreview);
             // Decode with TextDecoder
             body = new TextDecoder('shift-jis').decode(data.buffer);
-            body = 'Bytes message preview:\n\n' + body;
         }
 
         return body;
@@ -375,5 +378,18 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
                 return 'txt';
             }
         }
+    }
+
+    timeConverter(UNIX_timestamp) {
+        var a = new Date(UNIX_timestamp);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var year = a.getFullYear();
+        var month = months[a.getMonth()];
+        var date = a.getDate();
+        var hour = a.getHours();
+        var min = a.getMinutes();
+        var sec = a.getSeconds();
+        var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
+        return time;
     }
 }

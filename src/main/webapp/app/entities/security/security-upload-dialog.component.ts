@@ -18,7 +18,7 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     securityId: number;
     securities: Array<ISecurity> = [];
     certificateFile: any;
-    certificateStore: string = 'keystore';
+    certificateStore: string = 'truststore';
     fileName = 'Choose file';
     fileNameWithoutExtension: string;
     fileType: string;
