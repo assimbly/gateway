@@ -17,6 +17,7 @@ import 'brace';
 import 'brace/mode/text';
 import 'brace/mode/json';
 import 'brace/theme/eclipse';
+import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
 @Component({
     selector: 'jhi-broker-message-browser',
@@ -29,6 +30,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     selectedHighlight: string;
     allMessages: any;
     headers: any;
+    headerKeys: IHeaderKeys[];
 
     brokers: IBroker[];
     brokerType: string;
@@ -56,6 +58,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     searchText: string = '';
     active: string = '0';
     descending: boolean = false;
+    ascending: boolean = true;
     subtitle: string;
 
     objectKeys = Object.keys;
@@ -201,6 +204,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
                 this.selectedMessage.messageid = message.messageid;
                 this.selectedMessage.timestamp = message.timestamp;
                 this.selectedMessage.headers = message.headers;
+                this.selectedMessage.headerKeys = [];
                 this.selectedMessage.jmsHeaders = message.jmsHeaders;
                 this.selectedMessage.body = this.getBody(message);
                 this.selectedMessage.fileType = this.getFileType(this.selectedMessage.body);
