@@ -5,6 +5,7 @@ import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
 import { AceEditorModule } from 'ng2-ace-editor';
+import { CommonModule } from '@angular/common';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap';
@@ -26,6 +27,7 @@ import {
     brokerPopupRoute
 } from './';
 import { FlowComponent } from 'app/entities/flow';
+import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
 
 const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
@@ -40,7 +42,8 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
-        PopoverModule.forRoot()
+        PopoverModule.forRoot(),
+        CommonModule
     ],
     exports: [BrokerComponent],
     declarations: [
@@ -52,7 +55,8 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
         BrokerMessageSenderComponent,
         BrokerMessageBrowserComponent,
         BrokerMessageBrowserRowComponent,
-        MessageSearchByMessageIdPipe
+        MessageSearchByMessageIdPipe,
+        MessageSortByHeaderKeyPipePipe
     ],
     entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],

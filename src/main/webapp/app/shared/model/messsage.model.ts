@@ -1,3 +1,5 @@
+import { HeaderKeys, IHeaderKeys } from 'app/shared/model/header-keys.model';
+
 export interface IRootMessages {
     messages: IMessages;
 }
@@ -15,6 +17,7 @@ export interface IMessage {
     type?: string;
     body?: string;
     headers?: any;
+    headerKeys?: IHeaderKeys[];
     jmsHeaders?: any;
 }
 
@@ -27,6 +30,7 @@ export class Message implements IMessage {
         public messageid?: string,
         public type?: string,
         public headers?: any,
+        public headerKeys?: HeaderKeys[],
         public jmsHeaders?: any
     ) {}
 }
