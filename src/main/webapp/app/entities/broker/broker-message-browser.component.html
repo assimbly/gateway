@@ -142,21 +142,20 @@
                     <a ngbNavLink>Headers</a>
                     <ng-template ngbNavContent>
                         <br/>
-                        <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
+                        <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}" style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 96%">
                             <table class="table table-striped table-condensed">
                                 <thead class="transparant">
-                                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
-                                    [callback]="reset.bind(this)">
-                                    <th jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
-                                    <th><span>Value</span></th>
+                                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
+                                    <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
+                                    <th scope="col" jhisortby="value" ><span>Value</span></th>
                                     <th class="border-bottom-none">
                                 </tr>
                                 </thead>
-                                <tbody infinite-scroll>
-                                    <tr *ngFor="let key of objectKeys(selectedMessage.headers)">
-                                        <td id="headerRowKey" class="text-nowrap">{{key}}</td>
-                                        <td id="headerRowValue">{{selectedMessage.headers[key]}}</td>
-                                    </tr>
+                                <tbody>
+                                <tr jhi-queue-row *ngFor="let header of (this.selectedMessage.headers | keyvalue) | MessageSortByHeaderKeyPipe : ascending : predicate">
+                                    <td>{{header.key}}</td>
+                                    <td>{{header.value}}</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -166,20 +165,19 @@
                     <a ngbNavLink>JMS Headers</a>
                     <ng-template ngbNavContent>
                         <br/>
-                        <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
+                        <div class="table-responsive" [ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}" style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 96%">
                             <table class="table table-striped table-condensed">
                                 <thead class="transparant">
-                                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
-                                    [callback]="reset.bind(this)">
+                                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
                                     <th jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
                                     <th><span>Value</span></th>
                                     <th class="border-bottom-none">
                                 </tr>
                                 </thead>
-                                <tbody infinite-scroll>
-                                <tr *ngFor="let key of objectKeys(selectedMessage.jmsHeaders)">
-                                    <td id="jmsHeaderRowKey" class="text-nowrap">{{key}}</td>
-                                    <td id="jmsHeaderRowValue">{{selectedMessage.jmsHeaders[key]}}</td>
+                                <tbody>
+                                <tr jhi-queue-row *ngFor="let header of (this.selectedMessage.jmsHeaders | keyvalue) | MessageSortByHeaderKeyPipe : ascending : predicate">
+                                    <td>{{header.key}}</td>
+                                    <td>{{header.value}}</td>
                                 </tr>
                                 </tbody>
                             </table>
