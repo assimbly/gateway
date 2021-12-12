@@ -122,9 +122,11 @@ public class AccountResource {
             throw new EmailAlreadyUsedException();
         }
         Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (!user.isPresent()) {
-            throw new InternalServerErrorException("User could not be found");
-        }
+        System.out.println("user login=" + userDTO.getLogin());
+        System.out.println("user first name=" + userDTO.getFirstName());
+        //if (!user.isPresent()) {
+        //    throw new InternalServerErrorException("User could not be found");
+        //}
         userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
             userDTO.getLangKey(), userDTO.getImageUrl());
     }
