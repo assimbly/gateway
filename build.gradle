@@ -3,8 +3,8 @@ import org.gradle.internal.os.OperatingSystem
 buildscript {
     repositories {
         mavenLocal()
-        //mavenCentral()
-        maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
+        mavenCentral()
+        //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
         gradlePluginPortal{ url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/plugins-release" }
     }
@@ -61,6 +61,38 @@ configurations.all {
     exclude module: 'log4j-slf4j-impl'
 }
 
+//Build different jar based on property (connector or broker)
+if (project.hasProperty("connector")){
+
+    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/broker/**'
+            }
+        }
+    }
+}else if (project.hasProperty("broker")) {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=BROKER', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/connector/**'
+            }
+        }
+    }
+}else {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+}
+
+
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
     apply from: "gradle/profile_prod.gradle"
 } else {
@@ -101,38 +133,6 @@ eclipse {
         }
     }
 }
-
-//Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
-
-    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-
-    sourceSets {
-        main {
-            java {
-                exclude 'org/assimbly/gateway/web/rest/broker/**'
-            }
-        }
-    }
-}else if (project.hasProperty("broker")) {
-    ant.replaceregexp(match:'type=(.*)', replace:'type=BROKER', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-    sourceSets {
-        main {
-            java {
-                exclude 'org/assimbly/gateway/web/rest/connector/**'
-            }
-        }
-    }
-}else {
-    ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-}
-
 
 defaultTasks "bootRun"
 
@@ -202,6 +202,12 @@ if (!project.hasProperty("runList")) {
     project.ext.runList = "main"
 }
 
+task getDeps(type: Copy) {
+  from sourceSets.main.runtimeClasspath
+  into 'runtime/'
+}
+
+
 project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
 
 liquibase {
@@ -257,6 +263,8 @@ configurations {
             // Inherited version from Spring Boot can't be used because of regressions:
             // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
             force 'org.liquibase:liquibase-core:3.6.3'
+            
+            force 'org.liquibase:liquibase-core:1.4.2'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
@@ -266,7 +274,7 @@ configurations {
                     details.useVersion("5.16.3")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.66.Final")
+                    details.useVersion("4.1.70.Final")
                 }
             }
         }
@@ -288,8 +296,9 @@ dependencies {
     }
 
     implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.4.0';
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
+	implementation group: 'com.google.guava', name: 'guava', version: '28.2-jre'
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release
@@ -313,7 +322,6 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    // compile "com.ryantenney.metrics:metrics-spring"
     implementation "javax.cache:cache-api"
     implementation "org.hibernate:hibernate-core"
     implementation "com.zaxxer:HikariCP"
@@ -340,7 +348,7 @@ dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: 'spring-boot-starter-tomcat'
     }
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.zalando:problem-spring-web:0.24.0-RC.0"
@@ -359,7 +367,7 @@ dependencies {
     implementation "io.springfox:springfox-bean-validators"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
-    implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+	implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
     // custom dependencies (non-jhipster)
     if (!project.hasProperty("broker")) {
@@ -371,13 +379,13 @@ dependencies {
 
     //implementation fileTree(dir: 'lib', include: ['*.jar'])
 
-    implementation "io.github.assimbly:docconverter:1.4.0"
+    implementation "io.github.assimbly:docconverter:1.5.0"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.4"
-    implementation "org.jdom:jdom2:2.0.6"
-    //implementation "io.hawt:hawtio-springboot:2.13.6"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
+    implementation "org.jdom:jdom2:2.0.6.1"
+    //implementation "io.hawt:hawtio-springboot:2.14.2"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
@@ -421,6 +429,37 @@ if (project.hasProperty("gae")) {
         }
     }
     bootJar.dependsOn = [createPom]
+}
+
+//Build different jar based on property (connector or broker)
+if (project.hasProperty("connector")){
+
+    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/broker/**'
+            }
+        }
+    }
+}else if (project.hasProperty("broker")) {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=BROKER', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/connector/**'
+            }
+        }
+    }
+}else {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
 }
 
 task cleanResources(type: Delete) {

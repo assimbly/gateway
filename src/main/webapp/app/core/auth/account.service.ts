@@ -14,25 +14,22 @@ export class AccountService {
     constructor(private http: HttpClient) {}
 
     fetch(): Observable<HttpResponse<Account>> {
-		console.log('api/account fetch');
         return this.http.get<Account>(SERVER_API_URL + 'api/account', { observe: 'response' });
     }
 
     save(account: any): Observable<HttpResponse<any>> {
-			console.log('api/account save');
         return this.http.post(SERVER_API_URL + 'api/account', account, { observe: 'response' });
     }
 
     authenticate(identity) {
-		console.log('authenticatye');
         this.userIdentity = identity;
         this.authenticated = identity !== null;
         this.authenticationState.next(this.userIdentity);
     }
 
     hasAnyAuthority(authorities: string[]): boolean {
-			console.log('hasAuthority1');
         if (!this.authenticated || !this.userIdentity || !this.userIdentity.authorities) {
+            console.log('hasAuthority1=false');
             return false;
         }
 
@@ -46,7 +43,6 @@ export class AccountService {
     }
 
     hasAuthority(authority: string): Promise<boolean> {
-		console.log('hasAuthority2');
         if (!this.authenticated) {
             return Promise.resolve(false);
         }
@@ -62,7 +58,6 @@ export class AccountService {
     }
 
     identity(force?: boolean): Promise<any> {
-		console.log('identity1');
         if (force) {
             this.userIdentity = undefined;
         }

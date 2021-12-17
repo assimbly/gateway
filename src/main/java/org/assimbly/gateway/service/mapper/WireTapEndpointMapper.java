@@ -11,12 +11,14 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {ServiceMapper.class, HeaderMapper.class})
 public interface WireTapEndpointMapper extends EntityMapper<WireTapEndpointDTO, WireTapEndpoint> {
 
-    @Mapping(source = "service.id", target = "serviceId")
-    @Mapping(source = "header.id", target = "headerId")
+	@Mapping(source = "service.id", target = "serviceId")
+	@Mapping(source = "header.id", target = "headerId")
     WireTapEndpointDTO toDto(WireTapEndpoint wireTapEndpoint);
 
-    @Mapping(source = "serviceId", target = "service")
-    @Mapping(source = "headerId", target = "header")
+	@Mappings({
+	    @Mapping(source = "serviceId", target = "service"),
+	    @Mapping(source = "headerId", target = "header")
+	})
     WireTapEndpoint toEntity(WireTapEndpointDTO wireTapEndpointDTO);
 
     default WireTapEndpoint fromId(Long id) {
