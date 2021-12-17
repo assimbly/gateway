@@ -10,6 +10,7 @@ import org.assimbly.gateway.service.UserService;
 import org.assimbly.gateway.service.dto.PasswordChangeDTO;
 import org.assimbly.gateway.service.dto.UserDTO;
 import org.assimbly.gateway.web.rest.errors.*;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
 
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -102,16 +104,18 @@ public class AccountResource {
      */
     @GetMapping("/account")
     public UserDTO getAccount() {
-        return userService.getUserWithAuthorities()
-            .map(UserDTO::new)
-            .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
+    	Optional<Object> user = userService.getUserWithAuthorities().map(UserDTO::new);
+    	if(!user.isPresent()) {
+    		throw new UnknownUserException();    		
+    	}else {    		
+    		return (UserDTO) user.get();    	}   
     }
 
     /**
      * POST  /account : update the current user information.
      *
      * @param userDTO the current user information
-     * @throws EmailAlreadyUsedException 400 (Bad Request) if the email is already used
+     * @throws EmailAlreadyUsedException 400 (Bad Request) if the email is already useduserDTO.setFirstName("anonymous");
      * @throws RuntimeException 500 (Internal Server Error) if the user login wasn't found
      */
     @PostMapping("/account")
@@ -121,12 +125,7 @@ public class AccountResource {
         if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
         }
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        System.out.println("user login=" + userDTO.getLogin());
-        System.out.println("user first name=" + userDTO.getFirstName());
-        //if (!user.isPresent()) {
-        //    throw new InternalServerErrorException("User could not be found");
-        //}
+        Optional<User> user = userRepository.findOneByLogin(userLogin);        
         userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
             userDTO.getLangKey(), userDTO.getImageUrl());
     }

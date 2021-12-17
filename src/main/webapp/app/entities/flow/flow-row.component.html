@@ -87,17 +87,17 @@
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID">
 </td>
 <td class="text-right">
-    <div class="float-left" >
+    <div class="float-right" style="margin-right: 30px;">
         <ng-template #statusFlowButtonTemplate let-message="message">
             <div [innerHtml]="flowStatusButton"></div>
         </ng-template>
         <!-- <p style="margin-top: 27px;">-->
-        <h4 class="float-left">
+        <h4 class="float-right">
             <ng-template #alertsFlowButtonTemplate let-message="message">
                 <div [innerHtml]="flowAlertsButton"></div>
             </ng-template>
         </h4>
-        <h5 class="float-left" style="margin-left: 10px; vertical-align: top;">
+        <h5 class="float-right" style="margin-left: 10px; vertical-align: top;">
                 <span class="badge badge-warning fa fa-exclamation-triangle" *ngIf="flowAlerts === 'true'" (mouseenter)="p!=p" placement="left" on-mouseover='getFlowAlerts(flow.id)' triggers="mouseenter" popoverTitle="Show last alerts" [ngbPopover]="alertsFlowButtonTemplate" [autoClose]="'outside'">
                         <span *ngIf="numberOfAlerts > 1">{{numberOfAlerts}} Alerts</span>
                         <span *ngIf="numberOfAlerts == 1">1 Alert</span>
