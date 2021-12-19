@@ -1,6 +1,6 @@
 <div>
 	<div class="row">
-		<div class="col-10">
+		<div class="col-9">
 			<h2>
 				<span>Environment Variables</span>
 			</h2>
@@ -16,6 +16,7 @@
 					alt="assibmly-logo"> </picture>
 			</a>
 		</div>
+		<div class="col-1"></div>
 	</div>
 	<br />
 	<div class="row">
@@ -43,7 +44,7 @@
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= last" [infiniteScrollDistance]="0">
 				<tr
 					*ngFor="let environmentVariables of environmentVariables ;trackBy: trackId">
 					<td [style.display]="'none'"><a

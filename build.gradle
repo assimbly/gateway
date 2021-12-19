@@ -58,7 +58,12 @@ apply plugin: 'eclipse'
 
 
 configurations.all {
-    exclude module: 'log4j-slf4j-impl'
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'    
+  	exclude group: "org.slf4j", module: "slf4j-nop"
+  	exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
+    exclude module: 'netty-tcnative-classes'
 }
 
 //Build different jar based on property (connector or broker)
@@ -274,7 +279,7 @@ configurations {
                     details.useVersion("5.16.3")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.70.Final")
+                    details.useVersion("4.1.72.Final")
                 }
             }
         }
@@ -284,7 +289,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
+    //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     jcenter()
     //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
