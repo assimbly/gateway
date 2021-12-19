@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
@@ -20,6 +20,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     predicate: any;
     reverse: any;
     page: any;
+    last: any = 100;
 
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
@@ -40,10 +41,23 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
             })
             .subscribe(
                 (res: HttpResponse<IEnvironmentVariables[]>) => {
-                    this.environmentVariables = res.body;
+                    if (this.environmentVariables) {
+                        this.environmentVariables.push(...res.body);
+                    } else {
+                        this.environmentVariables = res.body;
+                    }
+
+                    if (res.body.length < 20) {
+                        this.last = this.page;
+                    }
                 },
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
+    }
+
+    loadPage(page: number) {
+        this.page = page;
+        this.loadAll();
     }
 
     ngOnInit() {
