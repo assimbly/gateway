@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col-10">
 			<h2>
-				<span>Security (TLS whitelist)</span>
+				<span>Certificate Store</span>
 			</h2>
 		</div>
 		<div class="col-2">
@@ -20,20 +20,25 @@
 	<br />
 	<div class="row">
 		<div class="col-8"></div>
-		<div class="col-4">
-			<button id="uploadCertificate" class="btn btn-primary float-right"
-				style="margin-left: 20px;" type="button"
-				(click)="uploadCertificate()">
-				<fa-icon [icon]="'save'"></fa-icon>
-				<span> Upload certificate</span>
-			</button>
-			<button id="jh-create-entity"
-				class="btn btn-primary float-right jh-create-entity create-security"
-				[routerLink]="['/security/new']">
-				<fa-icon [icon]="'plus'"></fa-icon>
-				<span> Manage Whitelist</span>
-			</button>
-		</div>
+        <div class="col-3-5 text-right">
+
+            <div ngbDropdown class="d-inline-block">
+                <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px;">Actions</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                    <button ngbDropdownItem [routerLink]="['/security/new']">Manage Whitelist</button>
+                    <button ngbDropdownItem (click)="generateCertificate()">Self-Sign</button>
+                </div>
+            </div>
+
+            <div ngbDropdown class="d-inline-block">
+                <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px;">Upload</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                    <button ngbDropdownItem (click)="uploadCertificate()">Client Certificate (.cer)</button>
+                    <button ngbDropdownItem (click)="uploadP12Certificate()">Server Certificate (.p12)</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-0-5"></div>
 	</div>
 	<br />
 	<div class="table-responsive" *ngIf="securities">
@@ -68,12 +73,11 @@
 								<fa-icon [icon]="'eye'"></fa-icon>
 								<span class="d-none d-md-inline">View</span>
 							</button>
-							<!-- <button type="submit"
-                                [routerLink]="['/security', security.id, 'edit']"
-                                class="btn btn-primary btn-sm">
-                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button> -->
+                            <button (click)="exportCertificate(security.id)"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon [icon]="faDownload"></fa-icon>
+                                <span class="d-none d-md-inline">Export</span>
+                            </button>
 							<button type="submit"
 								[routerLink]="['/', { outlets: { popup: 'security/'+ security.id + '/delete'} }]"
 								replaceUrl="true" queryParamsHandling="merge"

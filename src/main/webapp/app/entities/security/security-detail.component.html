@@ -9,6 +9,10 @@
                 <dd>
                     <span>{{security.url}}</span>
                 </dd>
+                <dt><span>Certificate Store</span></dt>
+                <dd>
+                    <span>{{security.certificateStore}}</span>
+                </dd>
                 <dt><span>Certificate Name</span></dt>
                 <dd>
                     <span>{{security.certificateName}}</span>
@@ -29,7 +33,7 @@
                 </dd>
                 <dd>
                     <span>{{SubjectDNPrincipal}}</span>
-                </dd>                
+                </dd>
             </dl>
             <button type="submit"
                     (click)="previousState()"

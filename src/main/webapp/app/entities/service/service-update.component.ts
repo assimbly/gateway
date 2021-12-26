@@ -24,7 +24,7 @@ export class ServiceUpdateComponent implements OnInit {
     serviceKeysKeys: Array<String> = [];
 
     public driversList: Array<String> = this.services.driversList;
-    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'AMQ'];
+    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
 
     public disableType: boolean;
 
@@ -137,8 +137,8 @@ export class ServiceUpdateComponent implements OnInit {
 
     protected onSaveSuccess(result: IService) {
         this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK' });
-        this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
-        this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
+        //this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
+        //this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
         this.isSaving = false;
 
         this.serviceKeysRemoveList.forEach(skrl => {

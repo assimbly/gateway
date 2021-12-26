@@ -28,7 +28,7 @@ public interface HeaderService {
      * @return the list of entities
      */
     Page<HeaderDTO> findAll(Pageable pageable);
-    
+
     /**
      * Get all the headers.
      *
@@ -43,6 +43,14 @@ public interface HeaderService {
      * @return the entity
      */
     Optional<HeaderDTO> findOne(Long id);
+
+    /**
+     * Get the header by name.
+     *
+     * @param name the name of the entity
+     * @return the entity
+     */
+    Optional<HeaderDTO> findByName(String name);
 
     /**
      * Delete the "id" header.

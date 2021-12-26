@@ -4,11 +4,19 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
     </div>
     <div class="modal-body">
-    	<div class="alert alert-danger" *ngIf="uploadError">  
-            <strong>Upload error!</strong>{{uploadErrorMessage}} 
+    	<div class="alert alert-danger" *ngIf="uploadError">
+            <strong>Upload error!</strong>{{uploadErrorMessage}}
         </div>
         <div class="form-group">
-            <label class="form-control-label font-weight-bold">Certificate file:</label>
+            <label class="form-control-label font-weight-bold" for="certificate_store">Certificatie Store</label>
+            <select
+                type="text" id="field_certificateStore" class="form-control" [(ngModel)]="certificateStore">
+                <option value="keystore">keystore</option>
+                <option value="truststore">truststore</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label font-weight-bold">Certificate File</label>
             <div class="custom-file">
                 <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
                 <label for="file" class="custom-file-label">{{fileName}}</label>

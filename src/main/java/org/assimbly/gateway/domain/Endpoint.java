@@ -43,6 +43,9 @@ public class Endpoint implements Serializable {
     @Column(name = "responseId")
     private Integer responseId;
 
+    @Column(name = "routeId")
+    private Integer routeId;
+
     @ManyToOne
     @JsonIgnoreProperties("endpoints")
     private Flow flow;
@@ -114,6 +117,19 @@ public class Endpoint implements Serializable {
 
     public void setOptions(String options) {
         this.options = options;
+    }
+
+    public Integer getRouteId() {
+        return routeId;
+    }
+
+    public Endpoint routeId(Integer routeId) {
+        this.routeId = routeId;
+        return this;
+    }
+
+    public void setRouteId(Integer routeId) {
+        this.routeId = routeId;
     }
 
     public Integer getResponseId() {

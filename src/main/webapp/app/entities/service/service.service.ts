@@ -32,6 +32,10 @@ export class ServiceService {
         return this.http.get<IService[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
+    getServiceKeys(id: number): Observable<HttpResponse<any>> {
+        return this.http.get<any>(`${this.resourceUrl}/${id}/keys`, { observe: 'response' });
+    }
+
     getAllServices(): Observable<EntityArrayResponseType> {
         return this.http.get<IService[]>(`${this.resourceUrl}/getallservices`, { observe: 'response' });
     }

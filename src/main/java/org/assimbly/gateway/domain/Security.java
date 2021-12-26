@@ -29,6 +29,9 @@ public class Security implements Serializable {
     @Column(name = "certificate_name")
     private String certificateName;
 
+    @Column(name = "certificate_store")
+    private String certificateStore;
+
     @Column(name = "certificate_expiry")
     private Instant certificateExpiry;
 
@@ -64,6 +67,19 @@ public class Security implements Serializable {
 
     public Security certificateName(String certificateName) {
         this.certificateName = certificateName;
+        return this;
+    }
+
+    public void setCertificateStore(String certificateStore) {
+        this.certificateStore = certificateStore;
+    }
+
+    public String getCertificateStore() {
+        return certificateStore;
+    }
+
+    public Security certificateStore(String certificateStore) {
+        this.certificateStore = certificateStore;
         return this;
     }
 
@@ -124,6 +140,7 @@ public class Security implements Serializable {
             "id=" + getId() +
             ", url='" + getUrl() + "'" +
             ", certificateName='" + getCertificateName() + "'" +
+            ", certificateStore='" + getCertificateStore() + "'" +
             ", certificateExpiry='" + getCertificateExpiry() + "'" +
             ", certificateFile='" + getCertificateFile() + "'" +
             "}";

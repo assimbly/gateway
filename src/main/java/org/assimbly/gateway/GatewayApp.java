@@ -6,6 +6,7 @@ import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway"})
+@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway","org.assimbly.brokerrest","org.assimbly.connectorrest"})
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class})
 public class GatewayApp {
 
@@ -31,7 +32,7 @@ public class GatewayApp {
 
     private final static String userHomeDir = System.getProperty("user.home");
 
-	private static long vmStartTime;
+    private static long vmStartTime;
 
     private final Environment env;
 
@@ -79,7 +80,7 @@ public class GatewayApp {
 
     private static void logApplicationStartup(Environment env) {
 
-    	String protocol = "http";
+        String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
@@ -87,6 +88,9 @@ public class GatewayApp {
 
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
+        EncryptionUtil.key = env.getProperty("encryption.jasypt.password");
+        EncryptionUtil.algorithm = env.getProperty("encryption.jasypt.algorithm");
+
         if (StringUtils.isBlank(contextPath)) {
             contextPath = "/";
         }
@@ -101,7 +105,7 @@ public class GatewayApp {
 
         long startupTime = ((System.currentTimeMillis() - vmStartTime)/1000);
 
-        String applicationName = "Assimbly " + env.getProperty("spring.application.name");
+        String applicationName = "Assimbly";
         String applicationVersion = env.getProperty("application.info.version");
         String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
         String applicationStartupTime = Long.toString(startupTime);
@@ -109,11 +113,13 @@ public class GatewayApp {
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
         if(applicationBaseDirectory.equals("default")) {
-        	if(isWindows()) {
-        		applicationBaseDirectory = userHomeDir + "\\.assimbly";
-        	}else {
-        		applicationBaseDirectory = userHomeDir + "/.assimbly";
-        	}
+            if(isWindows()) {
+                applicationBaseDirectory = userHomeDir + "\\.assimbly";
+            }else {
+                applicationBaseDirectory = userHomeDir + "/.assimbly";
+            }
+        }else {
+            applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
         }
 
         log.info("\n----------------------------------------------------------\n\t" +
@@ -125,7 +131,6 @@ public class GatewayApp {
                 "External URL: \t\t{}://{}:{}{}\n\t" +
                 "Java Version: \t\t{}\n\t" +
                 "Java WorkingDir: \t{}\n\t" +
-                "Apache Camel version: \t3.7.3 \n\t" +
                 "Profile(s): \t\t{}\n----------------------------------------------------------",
             applicationName,
             applicationVersion,
@@ -145,10 +150,10 @@ public class GatewayApp {
 
     }
 
-     public static boolean isWindows()
-     {
-    	String OS = System.getProperty("os.name");
+    public static boolean isWindows()
+    {
+        String OS = System.getProperty("os.name");
         return OS.startsWith("Windows");
-     }
+    }
 
 }

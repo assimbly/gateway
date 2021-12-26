@@ -11,14 +11,14 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {ServiceMapper.class, HeaderMapper.class, FlowMapper.class})
 public interface EndpointMapper extends EntityMapper<EndpointDTO, Endpoint> {
 
-    @Mapping(source = "service.id", target = "serviceId")
-    @Mapping(source = "header.id", target = "headerId")
-    @Mapping(source = "flow.id", target = "flowId")
+	@Mapping(source = "service.id", target = "serviceId")
+	@Mapping(source = "header.id", target = "headerId")
+	@Mapping(source = "flow.id", target = "flowId")
     EndpointDTO toDto(Endpoint endpoint);
 
-    @Mapping(source = "serviceId", target = "service")
-    @Mapping(source = "headerId", target = "header")
-    @Mapping(source = "flowId", target = "flow")
+	@Mapping(source = "serviceId", target = "service")
+	@Mapping(source = "headerId", target = "header")
+	@Mapping(source = "flowId", target = "flow")
     Endpoint toEntity(EndpointDTO endpointDTO);
 
     default Endpoint fromId(Long id) {

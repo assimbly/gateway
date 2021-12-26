@@ -1,6 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GatewaySharedModule } from 'app/shared';
 import {
@@ -11,6 +12,10 @@ import {
     SecurityDeleteDialogComponent,
     SecurityUploadPopupComponent,
     SecurityUploadDialogComponent,
+    SecurityUploadP12PopupComponent,
+    SecurityUploadP12DialogComponent,
+    SecuritySelfSignPopupComponent,
+    SecuritySelfSignDialogComponent,
     securityRoute,
     securityPopupRoute,
     SecurityPopupService
@@ -19,7 +24,7 @@ import {
 const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
 
 @NgModule({
-    imports: [GatewaySharedModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
+    imports: [GatewaySharedModule, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         SecurityComponent,
         SecurityDetailComponent,
@@ -27,7 +32,11 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
         SecurityDeleteDialogComponent,
         SecurityDeletePopupComponent,
         SecurityUploadPopupComponent,
-        SecurityUploadDialogComponent
+        SecurityUploadDialogComponent,
+        SecurityUploadP12PopupComponent,
+        SecurityUploadP12DialogComponent,
+        SecuritySelfSignPopupComponent,
+        SecuritySelfSignDialogComponent
     ],
     entryComponents: [
         SecurityComponent,
@@ -35,7 +44,11 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
         SecurityDeleteDialogComponent,
         SecurityDeletePopupComponent,
         SecurityUploadPopupComponent,
-        SecurityUploadDialogComponent
+        SecurityUploadDialogComponent,
+        SecurityUploadP12PopupComponent,
+        SecurityUploadP12DialogComponent,
+        SecuritySelfSignPopupComponent,
+        SecuritySelfSignDialogComponent
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

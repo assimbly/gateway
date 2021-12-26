@@ -8,9 +8,11 @@ import { GatewayHeaderModule } from './header/header.module';
 import { GatewayHeaderKeysModule } from './header-keys/header-keys.module';
 import { GatewayEndpointModule } from './endpoint/endpoint.module';
 import { GatewayMaintenanceModule } from './maintenance/maintenance.module';
+import { GatewayRouteModule } from './route/route.module';
 import { GatewaySecurityModule } from './security/security.module';
 import { GatewayBrokerModule } from './broker/broker.module';
-
+import { GatewayQueueModule } from './queue/queue.module';
+import { GatewayTopicModule } from './topic/topic.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
@@ -30,7 +32,10 @@ import { DeploymentService } from 'app/admin';
         GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
+        GatewayRouteModule,
         GatewayBrokerModule,
+		GatewayQueueModule,
+		GatewayTopicModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
@@ -46,7 +51,10 @@ import { DeploymentService } from 'app/admin';
         GatewayEndpointModule,
         GatewayMaintenanceModule,
         GatewaySecurityModule,
+        GatewayRouteModule,
         GatewayBrokerModule,
+		GatewayQueueModule,
+		GatewayTopicModule,
         GatewayGroupModule,
         GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */

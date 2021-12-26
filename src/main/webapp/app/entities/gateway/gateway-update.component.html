@@ -4,6 +4,9 @@
         	<ng-template #generalPopover let-message="message">
 					<div [innerHtml]="generalPopoverMessage"></div>
 				</ng-template>
+                <ng-template #typePopover let-message="message">
+                    <div [innerHtml]="typePopoverMessage"></div>
+                </ng-template>
 				<ng-template #environmentPopover let-message="message">
 					<div [innerHtml]="environmentPopoverMessage"></div>
 				</ng-template>
@@ -17,31 +20,38 @@
 					<i placement="right" triggers="mouseenter:mouseleave"
 						popoverTitle="Info"
 						data-placement="bottom"
-						 [popover]="generalPopover" 
+						 [popover]="generalPopover"
 						class="fa fa-info-circle"></i>
-					</h4>	        
+					</h4>
 			        <div class="form-group" [hidden]="!gateway.id">
 			            <label for="id" class="font-weight-bold">ID</label>
-			            <input type="text" class="form-control" id="id" name="id"
-			                   [(ngModel)]="gateway.id" readonly />
+			            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="gateway.id" readonly />
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_name">Name</label>
 			            <input type="text" class="form-control" name="name" id="field_name"
 			                [(ngModel)]="gateway.name" />
 			        </div>
-			        <div [style.display]="'none'" class="form-group">
+			        <div class="form-group">
+                      <!--  <h4>
+                        <i placement="right" triggers="mouseenter:mouseleave"
+                           popoverTitle="Info"
+                           [popover]="typePopover"
+                           class="fa fa-info-circle"></i>
+                        </h4>-->
 			            <label class="form-control-label font-weight-bold" for="field_type">Type</label>
+                        <input type="text" class="form-control" name="type" id="type" [(ngModel)]="gateway.type" readonly/>
+                        <!--
 			            <select class="form-control" name="type" [(ngModel)]="gateway.type" id="field_type" (change)="setTypeGateway()">
 			                <option *ngFor="let gatewayType of gatewayListType" [ngValue]="gatewayType">{{gatewayType}}</option>
-			            </select>
+			            </select>-->
 			        </div>
 			        <h4>Environment
 					<i placement="right" triggers="mouseenter:mouseleave"
 						popoverTitle="Info"
-						 [popover]="environmentPopover" 
+						 [popover]="environmentPopover"
 						class="fa fa-info-circle"></i>
-					</h4>	
+					</h4>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_environmentName">Name</label>
 			            <input type="text" class="form-control" name="environmentName" id="field_environmentName" [(ngModel)]="gateway.environmentName" />
@@ -55,9 +65,9 @@
 			        <h4>Default components
 					<i placement="right" triggers="mouseenter:mouseleave"
 						popoverTitle="Info"
-						 [popover]="defaultPopover" 
+						 [popover]="defaultPopover"
 						class="fa fa-info-circle"></i>
-					</h4>	        
+					</h4>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">From</label>
 			            <select class="form-control" name="type"  name="defaultFromComponentType" id="field_defaultFromComponentType" [(ngModel)]="gateway.defaultFromComponentType">
@@ -76,7 +86,7 @@
 			                <option *ngFor="let errorType of components.errorTypes" [ngValue]="errorType">{{errorType}}</option>
 			            </select>
 			        </div>
-			
+
 			    </div>
                 <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">

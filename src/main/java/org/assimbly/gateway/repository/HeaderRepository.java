@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HeaderRepository extends JpaRepository<Header, Long> {
 
-	Optional<Header> findByName(String fromHeaderName);
+	Optional<Header> findByName(String name);
+
+    Optional<Header> findById(Long id);
 
 }

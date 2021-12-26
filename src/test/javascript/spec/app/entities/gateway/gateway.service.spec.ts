@@ -24,7 +24,7 @@ describe('Service Tests', () => {
             elemDefault = new Gateway(
                 0,
                 'AAAAAAA',
-                GatewayType.ADAPTER,
+                GatewayType.FULL,
                 'AAAAAAA',
                 EnvironmentType.DEVELOPMENT,
                 ConnectorType.CAMEL,

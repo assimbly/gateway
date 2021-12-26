@@ -45,7 +45,7 @@ export class BrokerUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ broker }) => {
             this.broker = broker;
             if (this.broker.id !== undefined) {
-                this.brokerService.getBrokerConfiguration(this.broker.id).subscribe(brokerConfiguration => {
+                this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type).subscribe(brokerConfiguration => {
                     if (this.broker.type === 'artemis') {
                         this.artemisConfiguration = brokerConfiguration.body;
                         this.brokerConfiguration = brokerConfiguration.body;
@@ -79,16 +79,18 @@ export class BrokerUpdateComponent implements OnInit {
             this.isSaving = true;
             this.brokerService.update(this.broker).subscribe(
                 response => {
-                    this.brokerService.setBrokerConfiguration(this.broker.id, this.brokerConfiguration).subscribe(
-                        response => {
-                            this.isSaving = false;
-                            this.previousState();
-                        },
-                        err => {
-                            this.isSaving = false;
-                            this.brokerConfigurationFailed = err.error;
-                        }
-                    );
+                    this.brokerService
+                        .setBrokerConfiguration(this.broker.id, this.broker.type, this.broker.configurationType, this.brokerConfiguration)
+                        .subscribe(
+                            response => {
+                                this.isSaving = false;
+                                this.previousState();
+                            },
+                            err => {
+                                this.isSaving = false;
+                                this.brokerConfigurationFailed = err.error;
+                            }
+                        );
                 },
                 err => {
                     this.isSaving = false;
@@ -109,7 +111,6 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     onTypeChange(brokerType) {
-        console.log('brokerType=' + brokerType);
         if (brokerType === 'classic') {
             this.artemisConfiguration = this.brokerConfiguration;
             this.brokerConfiguration = this.activemqConfiguration;
@@ -151,16 +152,18 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     protected onCreateSuccess(createdBroker) {
-        this.brokerService.setBrokerConfiguration(createdBroker.id, this.brokerConfiguration).subscribe(
-            response => {
-                this.isSaving = false;
-                this.previousState();
-            },
-            err => {
-                this.isSaving = false;
-                this.brokerConfigurationFailed = err.error;
-            }
-        );
+        this.brokerService
+            .setBrokerConfiguration(createdBroker.id, createdBroker.type, createdBroker.configurationType, this.brokerConfiguration)
+            .subscribe(
+                response => {
+                    this.isSaving = false;
+                    this.previousState();
+                },
+                err => {
+                    this.isSaving = false;
+                    this.brokerConfigurationFailed = err.error;
+                }
+            );
     }
 
     protected onCreateError() {

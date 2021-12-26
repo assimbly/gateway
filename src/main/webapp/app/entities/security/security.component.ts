@@ -10,6 +10,10 @@ import { AccountService } from 'app/core';
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { SecurityService } from './security.service';
 
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+
+import { saveAs } from 'file-saver/FileSaver';
+
 @Component({
     selector: 'jhi-security',
     templateUrl: './security.component.html'
@@ -22,9 +26,9 @@ export class SecurityComponent implements OnInit, OnDestroy {
     links: any;
     page: any;
     predicate: any;
-    queryCount: any;
     reverse: any;
     totalItems: number;
+    faDownload = faDownload;
 
     constructor(
         protected securityService: SecurityService,
@@ -97,8 +101,38 @@ export class SecurityComponent implements OnInit, OnDestroy {
     }
 
     uploadCertificate() {
-        console.log('upload certificate');
+        console.log('Upload certificate');
         this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
+    }
+
+    uploadP12Certificate() {
+        console.log('Upload P12 certificate');
+        this.router.navigate(['/', { outlets: { popup: ['uploadp12'] } }]);
+    }
+
+    generateCertificate() {
+        console.log('Generate self-signed certificate');
+        this.router.navigate(['/', { outlets: { popup: ['self-sign'] } }]);
+    }
+
+    exportCertificate(id) {
+        console.log('Export certificate');
+        this.securityService.find(id).subscribe(data => {
+            const certificate = data.body;
+            let exportFileName = 'certificate';
+
+            if (certificate.certificateName.startsWith('Generic') || certificate.certificateName.startsWith('Self-Signed')) {
+                exportFileName = certificate.certificateName.substring(
+                    certificate.certificateName.indexOf('(') + 1,
+                    certificate.certificateName.lastIndexOf(')')
+                );
+            } else {
+                exportFileName = certificate.certificateName;
+            }
+
+            const blob = new Blob([certificate.certificateFile], { type: 'plain/text' });
+            saveAs(blob, `${exportFileName}.cer`);
+        });
     }
 
     protected paginateSecurities(data: ISecurity[], headers: HttpHeaders) {

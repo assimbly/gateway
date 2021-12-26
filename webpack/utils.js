@@ -5,6 +5,7 @@ const tsconfig = require('../tsconfig.json');
 
 module.exports = {
     parseVersion,
+    parseType,
     root,
 	mapTypescriptAliasToWebpackAlias,
     isExternalLib
@@ -15,6 +16,12 @@ function parseVersion() {
     const versionRegex = /^version\s*=\s*[',"]([^',"]*)[',"]/gm; // Match and group the version number
     const buildGradle = fs.readFileSync('build.gradle', 'utf8');
     return versionRegex.exec(buildGradle)[1];
+}
+
+function parseType() {
+    const typeRegex = /(?<=type=).*/gm; // Match and group the version number
+    const gradleProperties = fs.readFileSync('gradle.properties', 'utf8');
+    return typeRegex.exec(gradleProperties)[0];
 }
 
 const _root = path.resolve(__dirname, '..');

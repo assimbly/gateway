@@ -4,11 +4,11 @@
   			<div class="row">
   			   <div class="col-10">
              		<h2 id="jhi-broker-heading">Create or edit a Broker</h2>
-  			   </div>               		
+  			   </div>
   			   <div class="col-2">
 	  			 	<a role="button" class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img" href="http://activemq.apache.org/" title="ActiveMQ Website" target="_blank"></a>
-  			   </div>   			
-  			</div>  			
+  			   </div>
+  			</div>
             <div>
                 <jhi-alert-error></jhi-alert-error>
 
@@ -29,12 +29,12 @@
 				</ng-template>
                	<ng-template #brokerErrorConfigurationPopover let-message="message">
                		<div class="row">
-               			<div class="col-12 alert alert-secondary" role="alert">		
+               			<div class="col-12 alert alert-secondary" role="alert">
 							<div [innerHtml]="brokerConfigurationFailed"></div>
 						</div>
 					</div>
 				</ng-template>
-				
+
                 <div class="form-group" [style.display]="'none'" [hidden]="!broker.id">
                     <label for="id">ID</label>
                     <input type="text" class="form-control" id="id" name="id"
@@ -43,23 +43,23 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_name">Name</label>
-					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
+					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Info" [ngbPopover]="namePopover" #p="ngbPopover"></i>
                     <input type="text" class="form-control" name="name" id="field_name" required minlength="3"
                         [(ngModel)]="broker.name" />
                 </div>
 				<div class="form-group">
 					<label class="form-control-label" for="field_autoStart">Autostart</label>
-					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
+					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Info" [ngbPopover]="autostartPopover" #p="ngbPopover"></i>
 					<select type="text" class="form-control" id="field_autostart" id="field_autoStart" name="autoStart" [(ngModel)]="broker.autoStart">
 						<option value="true">true</option>
 						<option value="false">false</option>
 					</select>
-				</div>                
+				</div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_type">Type</label>
-					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
+					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Info" [ngbPopover]="typePopover" #p="ngbPopover"></i>
                		<select type="text" class="form-control" id="field_type" name="type" [(ngModel)]="broker.type" (ngModelChange)="onTypeChange($event)">
 						<option value="classic">ActiveMQ Classic</option>
@@ -68,25 +68,25 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_type">Configuration Type</label>
-					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
-							popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"></i>                    
+					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
+							popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"></i>
                		<select type="text" class="form-control" id="field_configuration_type" name="configurationType" [(ngModel)]="broker.configurationType" >
 						<option value="embedded">Embedded</option>
 						<option value="file">File</option>
 					</select>
-                </div> 
+                </div>
        			<div class="form-group" *ngIf="broker.configurationType == 'file' ">
        				<label class="form-control-label" for="field_type">Configuration</label>
        				<!-- <div *ngIf="brokerConfigurationFailed" class="alert alert-secondary" role="alert">{{brokerConfigurationFailed}}</div> -->
-					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right" 
+					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"></i>
 					<span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
-					<i class="fa fa-exclamation-circle" popoverClass="increase-popover-width" triggers="mouseenter:mouseleave" placement="right" 
+					<i class="fa fa-exclamation-circle" popoverClass="increase-popover-width" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Error" [ngbPopover]="brokerErrorConfigurationPopover" #p="ngbPopover"></i>
 					</span>
-					<ace-editor #editor [(text)]="brokerConfiguration" [mode]="'xml'" [theme]="'eclipse'" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
+					<ace-editor #editor [(text)]="brokerConfiguration" [mode]="'xml'" [theme]="'eclipse'" contenteditable="true" style="min-height: 350px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>
 				</div>
-	
+
 			</div>
 
             <div>
@@ -97,6 +97,7 @@
                     <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
                 </button>
             </div>
+            <br/>
         </form>
     </div>
 </div>
