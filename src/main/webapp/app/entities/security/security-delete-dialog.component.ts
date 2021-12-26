@@ -21,12 +21,14 @@ export class SecurityDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.securityService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'securityListModification',
-                content: 'Deleted an security'
+        this.securityService.deleteCertificate(this.security.certificateName).subscribe(res => {
+            this.securityService.delete(id).subscribe(response => {
+                this.eventManager.broadcast({
+                    name: 'securityListModification',
+                    content: 'Deleted an security'
+                });
+                this.activeModal.dismiss(true);
             });
-            this.activeModal.dismiss(true);
         });
     }
 }

@@ -68,17 +68,19 @@ export class FlowService {
 
     getConfiguration(flowid: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, {
-            headers: new HttpHeaders({ PlaceholderReplacement: 'true' }),
-            observe: 'response'
+            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
+            observe: 'response',
+            responseType: 'text'
         });
     }
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
         if (!!header) {
-            const options = {
-                headers: new HttpHeaders({ observe: 'response', responseType: 'text', Accept: 'application/xml' })
-            };
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, options);
+            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+                headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
+                observe: 'response',
+                responseType: 'text'
+            });
         } else {
             return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
                 observe: 'response',
@@ -178,16 +180,18 @@ export class FlowService {
         gatewayId: number,
         uri: string,
         endpointId: string,
-        headerId: string,
         serviceId: string,
+        serviceKeys: string,
+        headerKeys: string,
         numberOfTimes: string,
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
             uri: uri,
             endpointId: endpointId,
-            headerid: headerId,
             serviceid: serviceId,
+            serviceKeys: serviceKeys,
+            headerKeys: headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
@@ -202,15 +206,17 @@ export class FlowService {
         gatewayId: number,
         uri: string,
         endpointId: string,
-        headerId: string,
         serviceId: string,
+        serviceKeys: string,
+        headerKeys: string,
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
             uri: uri,
             endpointId: endpointId,
-            headerid: headerId,
             serviceid: serviceId,
+            serviceKeys: serviceKeys,
+            headerKeys: headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });

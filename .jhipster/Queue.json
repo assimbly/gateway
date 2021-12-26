@@ -1,0 +1,32 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "itemsOnPage",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "refreshInterval",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "selectedColumn",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "orderColumn",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20210421134428",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceImpl",
+    "entityTableName": "queue",
+    "databaseType": "sql",
+    "readOnly": false,
+    "jpaMetamodelFiltering": false,
+    "pagination": "infinite-scroll"
+}

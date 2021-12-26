@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 
@@ -38,36 +39,90 @@ export class SecurityUpdateComponent implements OnInit {
         this.isSaving = true;
 
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-        if (this.security.id !== undefined) {
-            this.subscribeToAddResponse(this.securityService.update(this.security));
-        } else {
-            this.subscribeToAddResponse(this.securityService.create(this.security));
-        }
+
+        this.securityService.importCertificate(this.security.url, 'keystore.jks').subscribe(
+            res => {
+                let json = JSON.parse(res.body);
+
+                for (let i = 0; i < json.certificates.certificate.length; i++) {
+                    let certificate = json.certificates.certificate[i];
+                    this.security.certificateName = certificate.certificateName;
+                    this.security.certificateFile = certificate.certificateFile;
+                    this.security.certificateExpiry = moment(certificate.certificateExpiry, DATE_TIME_FORMAT);
+                    if (this.security.id !== undefined) {
+                        this.subscribeToAddResponse(this.securityService.update(this.security));
+                    } else {
+                        this.subscribeToAddResponse(this.securityService.create(this.security));
+                    }
+                }
+            },
+            err => console.log(err)
+        );
     }
 
     remove() {
         this.isSaving = true;
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-        this.subscribeToRemoveResponse(this.securityService.remove(this.security.url));
+
+        this.securityService.findByUrl(this.security.url).subscribe(
+            res => {
+                let json = res.body;
+
+                let observables: Observable<any>[] = [];
+
+                for (let i = 0; i < json.certificates.certificate.length; i++) {
+                    let certificate = json.certificates.certificate[i];
+
+                    observables.push(this.securityService.deleteCertificate(certificate.certificateName));
+                }
+
+                forkJoin(observables).subscribe(dataArray => {
+                    // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
+                });
+
+                this.subscribeToRemoveResponse(this.securityService.remove(this.security.url));
+            },
+            err => console.log(err)
+        );
     }
 
     renew() {
         this.isSaving = true;
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-        this.securityService
-            .remove(this.security.url)
-            .subscribe(
-                (res: HttpResponse<ISecurity>) => this.subscribeToAddResponse(this.securityService.create(this.security)),
-                (res: HttpErrorResponse) => this.onSaveError()
-            );
+        this.securityService.findByUrl(this.security.url).subscribe(
+            res => {
+                let json = res.body;
+
+                let observables: Observable<any>[] = [];
+
+                for (let i = 0; i < json.certificates.certificate.length; i++) {
+                    let certificate = json.certificates.certificate[i];
+
+                    observables.push(this.securityService.deleteCertificate(certificate.certificateName));
+                }
+
+                forkJoin(observables).subscribe(dataArray => {
+                    this.securityService.remove(this.security.url).subscribe(res2 => {
+                        this.add();
+                    });
+                });
+            },
+            err => console.log(err)
+        );
     }
 
     protected subscribeToAddResponse(result: Observable<HttpResponse<ISecurity>>) {
-        result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<ISecurity>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected subscribeToRemoveResponse(result: Observable<HttpResponse<ISecurity>>) {
-        result.subscribe((res: HttpResponse<ISecurity>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<ISecurity>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {

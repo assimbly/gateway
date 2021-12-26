@@ -20,6 +20,8 @@ public class EndpointDTO implements Serializable {
 
     private String options;
 
+    private Integer routeId;
+
     private Integer responseId;
 
     private Long flowId;
@@ -66,6 +68,14 @@ public class EndpointDTO implements Serializable {
 
     public void setOptions(String options) {
         this.options = options;
+    }
+
+    public Integer getRouteId() {
+        return routeId;
+    }
+
+    public void setRouteId(Integer routeId) {
+        this.routeId = routeId;
     }
 
     public Integer getResponseId() {

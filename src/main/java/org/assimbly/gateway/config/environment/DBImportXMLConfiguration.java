@@ -126,6 +126,17 @@ public class DBImportXMLConfiguration {
 				gateway = gatewayOptional.get();
 			}
 
+            if (type == null || type.isEmpty()) {
+                type = "CONNECTOR";
+            }else {
+                try {
+                    GatewayType.valueOf(type);
+                }catch (Exception e){
+                    type = "CONNECTOR";
+                }
+            }
+
+
 			gateway.setId(connectorId);
 			gateway.setName(name);
 			gateway.setEnvironmentName(environmentName);
@@ -175,8 +186,11 @@ public class DBImportXMLConfiguration {
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
 		String flowName = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/name", doc);
+        String flowNotes = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/notes", doc);
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
+        String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/assimblyHeaders", doc);
 		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
+        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/parallelProcessing", doc);
 
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/redeliveryDelay", doc);
@@ -214,19 +228,37 @@ public class DBImportXMLConfiguration {
 				flow.setName(flowName);
 			}
 
+            if (flowNotes == null || flowNotes.isEmpty()) {
+                flow.setNotes(null);
+            } else {
+                flow.setNotes(flowNotes);
+            }
+
 			if (flowAutostart != null && flowAutostart.equals("true")) {
 				flow.setAutoStart(true);
 			} else {
 				flow.setAutoStart(false);
 			}
 
-			if (flowOffloading != null && flowOffloading.equals("true")) {
+            if (flowAssimblyHeaders != null && flowAssimblyHeaders.equals("true")) {
+                flow.setAssimblyHeaders(true);
+            } else {
+                flow.setAssimblyHeaders(false);
+            }
+
+            if (flowOffloading != null && flowOffloading.equals("true")) {
 				flow.setOffLoading(true);
 			} else {
 				flow.setOffLoading(false);
 			}
 
-			if (flowMaximumRedeliveries != null) {
+            if (flowParallelProcessing != null && flowParallelProcessing.equals("true")) {
+                flow.setParallelProcessing(true);
+            } else {
+                flow.setParallelProcessing(false);
+            }
+
+            if (flowMaximumRedeliveries != null) {
 				flow.setMaximumRedeliveries(Integer.parseInt(flowMaximumRedeliveries));
 			} else {
 				flow.setMaximumRedeliveries(0);
@@ -392,17 +424,13 @@ public class DBImportXMLConfiguration {
 
             Long serviceIdLong = Long.parseLong(serviceId, 10);
 
-            System.out.println("1. serviceidlong" + serviceIdLong);
-
             String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
-
-            System.out.println("2. name" + serviceName);
 
             Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
 
 			if(serviceOptional.isPresent()) {
                 service = serviceOptional.get();
-			}else {
+            }else {
                 service = null;
 			}
 		} catch (NumberFormatException nfe) {
@@ -565,7 +593,7 @@ public class DBImportXMLConfiguration {
             //update service_id to generated service_id
             if(!serviceId.equals(generatedServiceId)) {
 
-                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
 
                 for (int i = 0; i < servicesIdNodes.getLength(); i++) {
                     servicesIdNodes.item(i).setTextContent("id" + generatedServiceId);
@@ -579,7 +607,7 @@ public class DBImportXMLConfiguration {
 
         }
 
-        NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/service_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*/service_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < servicesIdNodes.getLength(); i++) {
             String updateId =  servicesIdNodes.item(i).getTextContent();
@@ -701,7 +729,7 @@ public class DBImportXMLConfiguration {
                 NodeList headerNodes = (NodeList) xPath.compile("/connectors/connector/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
                 headerNodes.item(0).setTextContent("id" + generatedHeaderId);
 
-                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
 
                 for (int i = 0; i < servicesIdNodes.getLength(); i++) {
                     servicesIdNodes.item(i).setTextContent("id" + generatedHeaderId);
@@ -712,7 +740,7 @@ public class DBImportXMLConfiguration {
         }
 
 
-        NodeList headersIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/header_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList headersIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*/header_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < headersIdNodes.getLength(); i++) {
             String updateId =  headersIdNodes.item(i).getTextContent();

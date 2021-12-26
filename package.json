@@ -1,6 +1,6 @@
 {
     "name": "gateway",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "description": "A message gateway based on Apache camel",
     "private": true,
     "license": "Apache License 2.0",
@@ -40,7 +40,7 @@
         "npm": "6.14.8",
         "reflect-metadata": "0.1.13",
         "rxjs": "6.5.3",
-        "sockjs-client": "1.4.0",
+        "sockjs-client": "1.5.2",
         "swagger-ui-dist": "3.24.3",
         "tether": "1.4.0",
         "tslib": "1.10.0",

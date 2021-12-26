@@ -126,7 +126,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     ngAfterViewInit() {
         this.finished = true;
-        this.securityService.syncTrustore().subscribe(res => {});
+        //this.securityService.syncTrustore().subscribe(res => {});
     }
 
     ngOnDestroy() {
@@ -139,9 +139,10 @@ export class FlowComponent implements OnInit, OnDestroy {
             this.checkGatewayType(this.gateways, gatewayName.body);
 
             if (!this.gatewayExists) {
+                console.log('Creating gateway');
                 this.gateway = new Object();
                 this.gateway.name = gatewayName.body;
-                this.gateway.type = GatewayType.ADAPTER;
+                this.gateway.type = GatewayType.FULL;
                 this.gateway.environmentName = 'Dev1';
                 this.gateway.stage = EnvironmentType.DEVELOPMENT;
                 this.gateway.defaultFromComponentType = ComponentType.FILE;
@@ -149,6 +150,7 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.gateway.defaultErrorComponentType = ComponentType.FILE;
 
                 this.gatewayService.create(this.gateway).subscribe(gateway => {
+                    console.log('gateway created');
                     this.gateway = gateway.body;
                     this.gateways.push(this.gateway);
                     this.gatewayExists = true;

@@ -27,6 +27,8 @@ public enum ComponentType {
 
     APNS("APNS"),
 
+    ARANGODB("ARANGODB"),
+
     AS2("AS2"),
 
     ASTERISK("ASTERISK"),
@@ -56,70 +58,87 @@ public enum ComponentType {
     @JsonProperty("ATOMIX-VALUE")
     ATOMIXVALUE("ATOMIX-VALUE"),
 
+    ATLASMAP("ATLASMAP"),
+
     AVRO("AVRO"),
 
-    @JsonProperty("AWS-CW")
-    AWSCW("AWS-CW"),
+    @JsonProperty("AWS2-ATHENA")
+    AWS2ATHENA("AWS2-ATHENA"),
 
-	@JsonProperty("AWS-DDB")
-	AWSDDB("AWS-DDB"),
+    @JsonProperty("AWS2-CW")
+    AWS2CW("AWS2-CW"),
 
-	@JsonProperty("AWS-DDBSTREAM")
-	AWSDDBSTREAM("AWS-DDBSTREAM"),
+    @JsonProperty("AWS2-DDB")
+    AWS2DDB("AWS2-DDB"),
 
-	@JsonProperty("AWS-EC2")
-	AWSEC2("AWS-EC2"),
+    @JsonProperty("AWS2-DDBSTREAM")
+    AWS2DDBSTREAM("AWS2-DDBSTREAM"),
 
-	@JsonProperty("AWS-ECS")
-	AWSECS("AWS-ECS"),
+    @JsonProperty("AWS2-EC2")
+    AWS2EC2("AWS2-EC2"),
 
-	@JsonProperty("AWS-EKS")
-	AWSEKS("AWS-EKS"),
+    @JsonProperty("AWS2-ECS")
+    AWS2ECS("AWS2-ECS"),
 
-	@JsonProperty("AWS-KMS")
-	AWSKMS("AWS-KMS"),
+    @JsonProperty("AWS2-EKS")
+    AWS2EKS("AWS2-EKS"),
 
-	@JsonProperty("AWS-KINESIS")
-	AWSKINESIS("AWS-KINESIS"),
+    @JsonProperty("AWS2-EVENTBRIDGE")
+    AWS2EVENTBRIDGE("AWS2-EVENTBRIDGE"),
 
-	@JsonProperty("AWS-KINESIS-FIREHOSE")
-	AWSKINESISFIREHOSE("AWS-KINESIS-FIREHOSE"),
+    @JsonProperty("AWS2-IAM")
+    AWS2IAM("AWS2-IAM"),
 
-	@JsonProperty("AWS-LAMBDA")
-	AWSLAMBDA("AWS-LAMBDA"),
+    @JsonProperty("AWS2-KMS")
+    AWS2KMS("AWS2-KMS"),
 
-	@JsonProperty("AWS-MQ")
-	AWSMQ("AWS-MQ"),
+    @JsonProperty("AWS2-KINESIS")
+    AWS2KINESIS("AWS2-KINESIS"),
 
-    @JsonProperty("AWS-MSK")
-    AWSMSK("AWS-MSK"),
+    @JsonProperty("AWS2-KINESIS-FIREHOSE")
+    AWS2KINESISFIREHOSE("AWS2-KINESIS-FIREHOSE"),
 
-    @JsonProperty("AWS-S3")
-    AWSS3("AWS-S3"),
+    @JsonProperty("AWS2-LAMBDA")
+    AWS2LAMBDA("AWS2-LAMBDA"),
 
-    @JsonProperty("AWS-SDB")
-    AWSSDB("AWS-SDB"),
+    @JsonProperty("AWS2-MSK")
+    AWS2MSK("AWS2-MSK"),
 
-    @JsonProperty("AWS-SES")
-    AWSSES("AWS-SES"),
+    @JsonProperty("AWS2-MQ")
+    AWS2MQ("AWS2-MQ"),
 
-    @JsonProperty("AWS-SNS")
-    AWSSNS("AWS-SNS"),
+    @JsonProperty("AWS2-S3")
+    AWS2S3("AWS2-S3"),
 
-    @JsonProperty("AWS-SQS")
-    AWSSQS("AWS-SQS"),
+    @JsonProperty("AWS-SECRETS-MANAGER")
+    AWSSECRETSMANAGER("AWS-SECRETS-MANAGER"),
 
-    @JsonProperty("AWS-SWF")
-    AWSSWF("AWS-SWF"),
+    @JsonProperty("AWS2-STS")
+    AWS2STS("AWS2-STS"),
 
-	@JsonProperty("AWS-TRANSLATE")
-	AWSTRANSLATE("AWS-TRANSLATE"),
+    @JsonProperty("AWS2-SNS")
+    AWS2SNS("AWS2-SNS"),
 
-	@JsonProperty("AZURE-BLOB")
-	AZUREBLOB("AZURE-BLOB"),
+    @JsonProperty("AWS2-SQS")
+    AWS2SQS("AWS2-SQS"),
 
-	@JsonProperty("AZURE-QUEUE")
-	AZUREQUEUE("AZURE-QUEUE"),
+    @JsonProperty("AWS2-TRANSLATE")
+    AWS2TRANSLATE("AWS2-TRANSLATE"),
+
+    @JsonProperty("AZURE-EVENTHUBS")
+    AZUREEVENTHUBS("AZURE-EVENTHUBS"),
+
+    @JsonProperty("AZURE-COSMOSDB")
+    AZURECOSMOSDB("AZURE-COSMOSDB"),
+
+	@JsonProperty("AZURE-STORAGE-BLOB")
+	AZURESTORAGEBLOB("AZURE-STORAGE-BLOB"),
+
+    @JsonProperty("AZURE-STORAGE-DATALAKE")
+    AZURESTORAGEDATALAKE("AZURE-STORAGE-DATALAKE"),
+
+    @JsonProperty("AZURE-STORAGE-QUEUE")
+	AZURESTORAGEQUEUE("AZURE-STORAGE-QUEUE"),
 
 	@JsonProperty("BEAN-VALIDATOR")
 	BEANVALIDATOR("BEAN-VALIDATOR"),
@@ -211,7 +230,9 @@ public enum ComponentType {
 	@JsonProperty("DISRUPTOR-VM")
 	DISRUPTORVM("DISRUPTOR-VM"),
 
-	DNS("DNS"),
+    DJL("DJL"),
+
+    DNS("DNS"),
 
 	DOCKER("DOCKER"),
 
@@ -282,7 +303,10 @@ public enum ComponentType {
 	@JsonProperty("GOOGLE-DRIVE")
 	GOOGLEDRIVE("GOOGLE-DRIVE"),
 
-	@JsonProperty("GOOGLE-MAIL")
+    @JsonProperty("GOOGLE-FUNCTIONS")
+    GOOGLEFUNCTIONS("GOOGLE-FUNCTIONS"),
+
+    @JsonProperty("GOOGLE-MAIL")
 	GOOGLEMAIL("GOOGLE-MAIL"),
 
 	@JsonProperty("GOOGLE-MAIL-STREAM")
@@ -297,7 +321,10 @@ public enum ComponentType {
 	@JsonProperty("GOOGLE-SHEETS-STREAM")
 	GOOGLESHEETSSTREAM("GOOGLE-SHEETS-STREAM"),
 
-	GORA("GORA"),
+    @JsonProperty("GOOGLE-STORAGE")
+    GOOGLESTORAGE("GOOGLE-STORAGE"),
+
+    GORA("GORA"),
 
 	GRAPE("GRAPE"),
 
@@ -350,6 +377,15 @@ public enum ComponentType {
 	HTTP("HTTP"),
 
 	HTTPS("HTTPS"),
+
+    @JsonProperty("HWCLOUD-FUNCTIONGRAPH")
+    HWCLOUDFUNCTIONGRAPH("HWCLOUD-FUNCTIONGRAPH"),
+
+    @JsonProperty("HWCLOUD-IAM")
+    HWCLOUDIAM("HWCLOUD-IAM"),
+
+    @JsonProperty("HWCLOUD-SMN")
+    HWCLOUDSMN("HWCLOUD-SMN"),
 
     IBMMQ("IBMMQ"),
 
@@ -408,10 +444,10 @@ public enum ComponentType {
 
 	JETTY("JETTY"),
 
-	JGROEPS("JGROEPS"),
+	JGROUPS("JGROUPS"),
 
-	@JsonProperty("JGROEPS-RAFT")
-	JGROEPSRAFT("JGROEPS-RAFT"),
+	@JsonProperty("JGROUPS-RAFT")
+	JGROUPSRAFT("JGROUPS-RAFT"),
 
 	JING("JING"),
 
@@ -432,9 +468,13 @@ public enum ComponentType {
 	@JsonProperty("JSON-VALIDATOR")
 	JSONVALIDATOR("JSON-VALIDATOR"),
 
-	JT400("JT400"),
+    JSONATA("JSONATA"),
 
-	KAFKA("KAFKA"),
+    JT400("JT400"),
+
+    KAMELET("KAMELET"),
+
+    KAFKA("KAFKA"),
 
 	@JsonProperty("KUBERNETES-CONFIG-MAPS")
 	KUBERNETESCONFIGMAPS("KUBERNETES-CONFIG-MAPS"),
@@ -509,6 +549,7 @@ public enum ComponentType {
 	@JsonProperty("MICROPROFILE-METRICS")
 	MICROPROFILEMETRICS("MICROPROFILE-METRICS"),
 
+    //OPC UA Server
 	@JsonProperty("MILO-CLIENT")
 	MILOCLIENT("MILO-CLIENT"),
 
@@ -516,6 +557,8 @@ public enum ComponentType {
 	MILOSERVER("MILO-SERVER"),
 
 	MINA("MINA"),
+
+    MINIO("MINIO"),
 
 	MLLP("MLLP"),
 
@@ -550,6 +593,9 @@ public enum ComponentType {
 
 	NSQ("NSQ"),
 
+    @JsonProperty("OAI-PMH")
+    OAIPMH("OAI-PMH"),
+
 	OLINGO2("OLINGO2"),
 
 	OLINGO4("OLINGO4"),
@@ -577,7 +623,10 @@ public enum ComponentType {
 
 	OPTAPLANNER("OPTAPLANER"),
 
-	PAHTO("PAHTO"),
+	PAHO("PAHO"),
+
+    @JsonProperty("PAHO-MQTT")
+    PAHOMQTT("PAHO-MQTT"),
 
 	PAXLOGGING("PAXLOGGING"),
 
@@ -610,10 +659,14 @@ public enum ComponentType {
 
 	REST("REST"),
 
+    RESTLET("RESTLET"),
+
 	@JsonProperty("REST-API")
 	RESTAPI("REST-API"),
 
-	@JsonProperty("REST-OPENAPI")
+    RESTEASY("RESTEASY"),
+
+    @JsonProperty("REST-OPENAPI")
 	RESTOPENAPI("REST-OPENAPI"),
 
 	@JsonProperty("REST-SWAGGER")
@@ -675,16 +728,25 @@ public enum ComponentType {
 
 	SPLUNK("SPLUNK"),
 
+    @JsonProperty("SPLUNK-HEC")
+    SPLUNKHEC("SPLUNK-HEC"),
+
 	@JsonProperty("SPRING-BATCH")
 	SPRINGBATCH("SPRING-BATCH"),
 
-	@JsonProperty("SPRING-INTEGRATION")
+    @JsonProperty("SPRING-JDBC")
+    SPRINGJDBC("SPRING-JDBC"),
+
+    @JsonProperty("SPRING-INTEGRATION")
 	SPRINGINTEGRATION("SPRING-INTEGRATION"),
 
 	@JsonProperty("SPRING-LDAP")
 	SPRINGLDAP("SPRING-LDAP"),
 
-	@JsonProperty("SPRING-REDIS")
+    @JsonProperty("SPRING-RABBITMQ")
+    SPRINGRABBITMQ("SPRING-RABBITMQ"),
+
+    @JsonProperty("SPRING-REDIS")
 	SPRINGREDIS("SPRING-REDIS"),
 
 	@JsonProperty("SPRING-WS")
@@ -703,6 +765,8 @@ public enum ComponentType {
 	SONICMQ("SONICMQ"),
 
 	STAX("STAX"),
+
+    STICH("STICH"),
 
 	STOMP("STOMP"),
 
@@ -737,7 +801,16 @@ public enum ComponentType {
 
 	VERTX("VERTX"),
 
-	VM("VM"),
+    @JsonProperty("VERTX-HTTP")
+    VERTXHTTP("VERTX-HTTP"),
+
+    @JsonProperty("VERTX-KAFKA")
+    VERTXKAFKA("VERTX-KAFKA"),
+
+    @JsonProperty("VERTX-WEBSOCKET")
+    VERTXWEBSOCKET("VERTX-WEBSOCKET"),
+
+    VM("VM"),
 
 	WASTEBIN("WASTEBIN"),
 

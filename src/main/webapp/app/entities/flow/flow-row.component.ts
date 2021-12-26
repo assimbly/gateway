@@ -674,11 +674,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         this.flowService.getConfiguration(this.flow.id).subscribe(
             data => {
-                this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
+                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
                     this.flowService.start(this.flow.id).subscribe(
                         response => {
                             if (response.status === 200) {
-                                // this.setFlowStatus('started');
+                                //this.setFlowStatus('started');
                             }
                             this.disableActionBtns = false;
                         },
@@ -728,7 +728,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         this.flowService.getConfiguration(this.flow.id).subscribe(
             data => {
-                this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
+                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
                     this.flowService.resume(this.flow.id).subscribe(
                         response => {
                             if (response.status === 200) {
@@ -759,7 +759,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         this.flowService.getConfiguration(this.flow.id).subscribe(
             data => {
-                this.flowService.setConfiguration(this.flow.id, data.body).subscribe(data2 => {
+                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
                     this.flowService.restart(this.flow.id).subscribe(
                         response => {
                             if (response.status === 200) {

@@ -113,6 +113,13 @@ export class HeaderUpdateComponent implements OnInit {
         }
     }
 
+    clearHeaderKeysIds() {
+        this.headerKeys.forEach((element, index) => {
+            this.headerKeys[index].headerId = null;
+            this.headerKeys[index].id = null;
+        });
+    }
+
     navigateToHeader() {
         this.router.navigate(['/header']);
     }
@@ -136,7 +143,11 @@ export class HeaderUpdateComponent implements OnInit {
         if (this.header.id) {
             this.headerKeysService.query({ filter: 'headerid.equals=1' }).subscribe(res => {
                 this.headerKeys = res.body.filter(headerkeys => headerkeys.headerId === this.header.id);
-                this.header.id = cloneHeader ? null : this.header.id;
+                if (cloneHeader) {
+                    this.header.id = null;
+                    this.header.name = null;
+                    this.clearHeaderKeysIds();
+                }
             });
         } else {
             let hk = new HeaderKeys();

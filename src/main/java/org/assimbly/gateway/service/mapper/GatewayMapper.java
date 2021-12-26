@@ -14,11 +14,12 @@ public interface GatewayMapper extends EntityMapper<GatewayDTO, Gateway> {
     @Mapping(source = "wiretapEndpoint.id", target = "wiretapEndpointId")
     GatewayDTO toDto(Gateway gateway);
 
-    @Mapping(source = "wiretapEndpointId", target = "wiretapEndpoint")
-    @Mapping(target = "flows", ignore = true)
-    @Mapping(target = "removeFlow", ignore = true)
-    @Mapping(target = "environmentVariables", ignore = true)
-    @Mapping(target = "removeEnvironmentVariables", ignore = true)
+    
+	@Mapping(source = "wiretapEndpointId", target = "wiretapEndpoint")
+	@Mapping(target = "flows", ignore = true)
+	@Mapping(target = "removeFlow", ignore = true)
+	@Mapping(target = "environmentVariables", ignore = true)
+	@Mapping(target = "removeEnvironmentVariables", ignore = true)
     Gateway toEntity(GatewayDTO gatewayDTO);
 
     default Gateway fromId(Long id) {

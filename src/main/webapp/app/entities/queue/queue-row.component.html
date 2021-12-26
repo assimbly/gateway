@@ -1,0 +1,35 @@
+<td id="queueRowID" [hidden]="!queueRowID"><a
+	[routerLink]="['../queue', address.id ]">{{address.id}}</a>
+</td>
+<td>{{ address.name }}</td>
+<td>{{ address.numberOfConsumers }}</td>
+<td>{{ address.numberOfMessages }}</td>
+<td class="text-right">
+    <div class="btn-group">
+        <button type="submit" class="btn btn-info btn-sm" (click)="navigateToMessageBrowser(address.name)">
+            <fa-icon icon="eye"></fa-icon>
+            <span class="d-none d-md-inline">Browse</span>
+        </button>
+
+        <button type="submit" class="btn btn-primary btn-sm" (click)="navigateToMessageSender(address.name)">
+            <span class="fa fa-envelope"></span>
+            <span class="d-none d-md-inline">Send</span>
+        </button>
+
+        <button type="submit"
+                class="btn btn-danger btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                (click)="delete(address)">
+            <span class="fa fa-times"></span>
+            <span class="d-none d-md-inline">Delete</span>
+        </button>
+
+        <button type="submit"
+                class="btn btn-warning btn-sm"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                (click)="clear(address)">
+            <span class="fa fa-trash"></span>
+            <span class="d-none d-md-inline">Clear</span>
+        </button>
+    </div>
+</td>

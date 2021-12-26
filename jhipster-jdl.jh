@@ -12,12 +12,15 @@ entity Gateway {
 entity Flow {
 	name String,
 	type String,
+	notes TextBlob,
 	autoStart Boolean,
 	offLoading Boolean,
 	maximumRedeliveries Integer,
 	redeliveryDelay Integer,
 	loadBalancing Boolean,
+	parallelProcessing Boolean,
 	logLevel LogLevelType,
+	assimblyHeaders Boolean,
 	instances Integer,
 	version Integer,
 	created Instant,
@@ -29,6 +32,7 @@ entity Endpoint {
 	compponentType ComponentType,
 	uri TextBlob,
     options TextBlob,
+    routeId Integer
     responseId Integer
 }
 
@@ -51,6 +55,12 @@ entity HeaderKeys {
 	key String,
 	value TextBlob,
 	type String
+}
+
+entity Route {
+	name String,
+	type String,
+	content TextBlob
 }
 
 entity EnvironmentVariables {
@@ -78,6 +88,20 @@ entity Broker {
 	autoStart Boolean,
 	type String,
 	configuration String,
+}
+
+entity Queue {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
+}
+
+entity Topic {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
 }
 
 enum GatewayType {

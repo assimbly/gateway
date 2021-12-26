@@ -19,10 +19,11 @@ export class GatewayUpdateComponent implements OnInit {
     gateway: IGateway;
     isSaving: boolean;
 
-    public gatewayListType = [GatewayType.ADAPTER, GatewayType.BROKER, GatewayType.ARTEMIS];
+    public gatewayListType = [GatewayType.FULL, GatewayType.BROKER, GatewayType.CONNECTOR];
     public gatewayListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
 
     generalPopoverMessage: string;
+    typePopoverMessage: string;
     environmentPopoverMessage: string;
     defaultPopoverMessage: string;
     wiretapEndpoints: IWireTapEndpoint[];
@@ -43,7 +44,7 @@ export class GatewayUpdateComponent implements OnInit {
         });
         this.setPopoverMessages();
         if (typeof this.gateway.id === 'undefined') {
-            this.gateway.type = GatewayType.ADAPTER;
+            this.gateway.type = GatewayType.FULL;
             this.gateway.stage = EnvironmentType.DEVELOPMENT;
             this.gateway.defaultFromComponentType = ComponentType.FILE;
             this.gateway.defaultToComponentType = ComponentType.FILE;
@@ -84,7 +85,10 @@ export class GatewayUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IGateway>>) {
-        result.subscribe((res: HttpResponse<IGateway>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IGateway>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {
@@ -124,7 +128,9 @@ export class GatewayUpdateComponent implements OnInit {
         this.generalPopoverMessage = `General settings of the gateway<br></br><b>Name: </b>
                     Name of the gateway. Usually this is the name of the default source or destination,
                         like an application or system.<br/><br/>
-                     <b>Type: </b>If BROKER is chosen as the gateway type then an embedded ActiveMQ broker is started. <br/><br/>Default is ADAPTER.`;
+                     <b>Type: </b>The type of gateway: Connector or Broker. Full supports both. <br/><br/>Default is FULL.`;
+        this.environmentPopoverMessage = `Type of gateway <br/></br>
+                    <b/>Type: </b>The type of gateway: Connector or Broker. Full supports both. <br/><br/>Default is FULL.`;
         this.environmentPopoverMessage = `Environment settings of the gateway <br/></br>
                     <b/>Name: </b>Name to indicate the stage. Default="Dev1".
                     <b>Stage: </b>The role of the environment: development, test, acceptance or production. Default=Development`;

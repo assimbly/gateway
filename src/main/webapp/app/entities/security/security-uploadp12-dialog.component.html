@@ -1,0 +1,40 @@
+<form name="importForm" [formGroup]="importForm">
+    <div class="modal-header">
+        <h4 class="modal-title" id="myGatewayLabel">Upload P12 certificate (PKCS12)</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+    	<div class="alert alert-danger" *ngIf="uploadError">
+            <strong>Upload error!</strong>{{uploadErrorMessage}}
+        </div>
+        <div class="form-group">
+            <label class="form-control-label font-weight-bold" for="certificate_store">Certificatie Store</label>
+            <select
+                type="text" id="field_certificateStore" class="form-control" formControlName="certificateStore">
+                <option value="keystore">keystore</option>
+                <option value="truststore">truststore</option>
+            </select>
+        </div>
+        <div class="form-group" style="padding-left: 5px; padding-right: 5px;">
+            <label for="password" class="form-control-label font-weight-bold">Password</label>
+            <input type="password" id="password" formControlName="password" class="form-control" placeholder="Password">
+            <!--<input type="text" id="password" [(ngModel)]="password">-->
+            <br/>
+            <label class="form-control-label font-weight-bold">Certificate File</label>
+            <div class="custom-file">
+                <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
+                <label for="file" class="custom-file-label">{{fileName}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;
+            <span>Cancel</span>
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="!certificateFile" (click)="uploadP12Certificate()">
+            <span class="fa fa-upload"></span>&nbsp;
+            <span>Upload</span>
+        </button>
+    </div>
+</form>

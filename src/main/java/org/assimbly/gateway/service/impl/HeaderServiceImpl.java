@@ -51,7 +51,7 @@ public class HeaderServiceImpl implements HeaderService {
         header = headerRepository.save(header);
         return headerMapper.toDto(header);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<HeaderDTO> findAll(Pageable pageable) {
@@ -59,7 +59,7 @@ public class HeaderServiceImpl implements HeaderService {
         return headerRepository.findAll(pageable)
             .map(headerMapper::toDto);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<HeaderDTO> getAll() {
@@ -68,8 +68,8 @@ public class HeaderServiceImpl implements HeaderService {
                 .map(headerMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }
-    
-    
+
+
 
     /**
      * Get one header by id.
@@ -84,6 +84,23 @@ public class HeaderServiceImpl implements HeaderService {
         return headerRepository.findById(id)
             .map(headerMapper::toDto);
     }
+
+
+
+    /**
+     * Get one header by id.
+     *
+     * @param name the name of the header
+     * @return the entity
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<HeaderDTO> findByName(String name) {
+        log.debug("Request to get Header by Name : {}", name);
+        return headerRepository.findByName(name)
+            .map(headerMapper::toDto);
+    }
+
 
     /**
      * Delete the header by id.

@@ -1,0 +1,70 @@
+<div>
+    <div class="row mt-3" style="margin-left: 0.3em">
+        <h2>Queues ({{brokerType}})</h2><br/>
+    </div>
+
+    <div class="row">
+        <div class="col-11-5 text-right" *ngIf="isBroker && addresses?.length === 0">
+            <button class="btn btn-primary"
+                    type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/queue/new']">
+                <span class="fa fa-plus"></span> <span>Create a new Queue</span>
+            </button>
+        </div>
+        <div class="col-11-5 text-right"  *ngIf="isBroker && addresses?.length > 0">
+            <button class="btn btn-primary"
+                    type="submit"
+                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                    [routerLink]="['/queue/new']">
+                <span class="fa fa-plus"></span> <span>Create a new Queue</span>
+            </button>
+            <button class="btn btn-primary" type="submit"
+                    (click)="updateAllQueues()">
+                <span class="fa fa-refresh"></span> <span>Refresh</span>
+            </button>
+        </div>
+        <div class="col-0-5">
+        </div>
+    </div>
+
+    <div>
+        <div class="col-4" style="margin-bottom: 15px">
+            <input type="text" align="left" style="margin-left: 0.3em"
+                   [(ngModel)]="searchQueueText"
+                   id="searchTextId" name="searchQueueText"
+                   placeholder="Filter By Queue Name"/>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="!isBroker">
+        <span>No running broker found</span>
+    </div>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="isBroker && addresses?.length === 0">
+        <span>No queues found</span>
+    </div>
+
+    <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
+        <table class="table table-striped" aria-describedby="page-heading">
+            <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
+                    <th scope="col"  jhiSortBy="name"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col" class="text-right" ><span>Actions</span></th>
+                </tr>
+            </thead>
+
+            <tbody *ngIf="addresses" infinite-scroll
+                   (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)"
+                   [infiniteScrollDisabled]="page >= links['last']"
+                   [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
+            <tr jhi-queue-row
+                *ngFor="let address of  (addresses | QueueSearchByName: searchQueueText : ascending : predicate); trackBy: trackId"
+                [address]="address" [isAdmin]="isAdmin" [brokerType]="brokerType"
+                ng-init="$last && finished()"></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

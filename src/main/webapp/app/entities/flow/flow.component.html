@@ -1,4 +1,4 @@
-<div>
+<div style="padding: 2.0em;">
 
 	<div class="row mt-3" style="margin-left: 0.3em">
 		<h2>Flows</h2><br/>
@@ -47,8 +47,8 @@
 		</div>
 	</div>
 	<div class="table-responsive" *ngIf="flows?.length > 0"
-		[ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}">
-		<table class="table table-striped table-condensed">
+		[ngStyle]="{'visibility':finished ? 'visible' : 'hidden'}" style="overflow-x: auto;overflow-y : hidden;">
+		<table class="table table-striped table-sm" style="word-wrap: break-word; table-layout:fixed; width: 100%;">
 			<thead class="transparant">
 				<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
 					[callback]="reset.bind(this)">
@@ -56,24 +56,8 @@
 					<th jhiSortBy="name" class="border-bottom-none"><span></span>
 						<span class="fa fa-sort"></span></th>
 					<th [style.display]="'none'"><span>Gateway</span></th>
-					<!-- <th class="border-bottom-none">
-                           <span>To</span>
-                       </th> -->
 					<th [style.display]="'none'"><span>Error</span></th>
-					<th class="border-bottom-none">
-						<!-- <th class="row border-bottom-none">
-	                   	<div class="col-7"> </div>
-
-                       	<div  class="input-group float-right col-5">
-						 	<ng-select [items]="flowActions" id="field_header" [(ngModel)]="selectedAction" [hideSelected]=true></ng-select>
-							<div class="input-group-append">
-								<button type="button" class="btn btn btn-sm"
-									(click)="trigerAction(selectedAction)">
-									<span>All</span>
-								</button>
-							</div>
-						</div>-->
-					</th>
+					<th class="border-bottom-none"></th>
 				</tr>
 			</thead>
 			<tbody *ngIf="flows" infinite-scroll

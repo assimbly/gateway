@@ -29,6 +29,7 @@ export class AccountService {
 
     hasAnyAuthority(authorities: string[]): boolean {
         if (!this.authenticated || !this.userIdentity || !this.userIdentity.authorities) {
+            console.log('hasAuthority1=false');
             return false;
         }
 

@@ -1,0 +1,59 @@
+<div>
+    <h2 id="page-heading">
+        <span>Routes</span>
+
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-route" [routerLink]="['/route/new']">
+            <fa-icon icon="plus"></fa-icon>
+            <span>
+            Create a new Route
+            </span>
+        </button>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <div class="table-responsive" id="entities" *ngIf="routes?.length > 0">
+        <table class="table table-striped" aria-describedby="page-heading">
+            <thead>
+                <tr>
+                    <th scope="col" ><span>ID</span></th>
+                    <th scope="col" ><span>Name</span></th>
+                    <th scope="col" ><span>Type</span></th>
+                    <th scope="col" ><span>Content</span></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let route of routes ;trackBy: trackId">
+                    <td><a [routerLink]="['/route', route.id, 'view']">{{ route.id }}</a></td>
+                    <td>{{ route.name }}</td>
+                    <td>{{ route.type }}</td>
+                    <td>{{ route.content }}</td>
+                    <td class="text-right">
+                        <div class="btn-group">
+                            <button type="submit"
+                                    [routerLink]="['/route', route.id, 'view']"
+                                    class="btn btn-info btn-sm">
+                                <fa-icon icon="eye"></fa-icon>
+                                <span class="d-none d-md-inline">View</span>
+                            </button>
+
+                            <button type="submit"
+                                    [routerLink]="['/route', route.id, 'edit']"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon icon="pencil-alt"></fa-icon>
+                                <span class="d-none d-md-inline">Edit</span>
+                            </button>
+
+                            <button type="submit" (click)="delete(route)"
+                                    class="btn btn-danger btn-sm">
+                                <fa-icon icon="times"></fa-icon>
+                                <span class="d-none d-md-inline">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
