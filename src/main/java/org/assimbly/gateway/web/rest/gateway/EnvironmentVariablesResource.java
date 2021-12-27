@@ -92,8 +92,10 @@ public class EnvironmentVariablesResource {
             environmentVariablesDTO.setValue(encryptedValue);
         }
 
+        EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
+        
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, environmentVariablesDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
             .body(environmentVariablesDTO);
     }
 
