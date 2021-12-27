@@ -19,6 +19,7 @@ buildscript {
 
 plugins {
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
+    id "application"
     id "java"
     id "maven-publish"
     id "idea"
@@ -64,6 +65,7 @@ configurations.all {
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
+	//exclude group: 'org.elasticsearch.client', module: 'elasticsearch-rest-client-sniffer'
 }
 
 //Build different jar based on property (connector or broker)
@@ -142,7 +144,7 @@ eclipse {
 defaultTasks "bootRun"
 
 springBoot {
-    mainClassName = 'org.assimbly.gateway.GatewayApp'
+ 	mainClassName = "org.assimbly.gateway.GatewayApp"
 }
 
 /*
@@ -273,7 +275,7 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.18.0")
+                    details.useVersion("2.20.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.16.3")
@@ -300,7 +302,7 @@ dependencies {
         //implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
     }
 
-    implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.4.0';
+    implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.9.1';
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 	implementation group: 'com.google.guava', name: 'guava', version: '28.2-jre'

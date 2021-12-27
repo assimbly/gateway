@@ -25,12 +25,6 @@ logging:
         io.github.jhipster: INFO
 
 spring:
-    profiles:
-        active: prod
-        include:
-            - swagger
-            # Uncomment to activate TLS for the dev profile
-            #- tls
     devtools:
         restart:
             enabled: false

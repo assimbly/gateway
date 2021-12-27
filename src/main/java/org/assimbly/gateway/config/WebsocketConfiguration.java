@@ -45,13 +45,11 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
      
         registry.addEndpoint("/websocket/alert")
             .setHandshakeHandler(defaultHandshakeHandler())
-            .setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
 
         registry.addEndpoint("/topic/alert")
         .setHandshakeHandler(defaultHandshakeHandler())
-        .setAllowedOrigins(allowedOrigins)
         .withSockJS()
         .setInterceptors(httpSessionHandshakeInterceptor());
     

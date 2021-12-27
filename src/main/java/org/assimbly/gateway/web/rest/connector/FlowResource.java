@@ -194,7 +194,7 @@ public class FlowResource {
 
         connector = connectorResource.getConnector();
         connector.setDebugging(isDebuggging);
-        connector.setTracing(isTracing);
+        //connector.setTracing(isTracing, "default");
 
         //start flows with autostart
         List<Flow> flows = flowRepository.findAll();
