@@ -89,7 +89,7 @@ if (project.hasProperty("connector")){
     sourceSets {
         main {
             java {
-                exclude 'org/assimbly/gateway/web/rest/connector/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
             }
         }
     }
@@ -377,11 +377,13 @@ dependencies {
 	implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
 
     // custom dependencies (non-jhipster)
-    if (!project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "connectorRestModule", version: "3.5.0", changing: true
-    }
-    if (!project.hasProperty("connector")) {
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.5.0", changing: true
+    if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+    }else if (project.hasProperty("broker")) {
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+    }else{
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true        
     }
 
     //implementation fileTree(dir: 'lib', include: ['*.jar'])

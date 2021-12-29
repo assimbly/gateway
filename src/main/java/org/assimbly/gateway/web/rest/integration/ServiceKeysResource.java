@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.connector;
+package org.assimbly.gateway.web.rest.integration;
 
 import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.service.dto.ServiceDTO;

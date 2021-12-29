@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.connector;
+package org.assimbly.gateway.web.rest.integration;
 
 import org.assimbly.gateway.service.WireTapEndpointService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;

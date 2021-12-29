@@ -1459,7 +1459,7 @@ export const typesLinks = [
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Description</b>: Unique name for the endpoint. Attempting to register again with the same name will fail.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `
@@ -1471,7 +1471,7 @@ export const typesLinks = [
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Description</b>: Unique name for the endpoint. Attempting to register again with the same name will fail.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `
@@ -1483,7 +1483,7 @@ export const typesLinks = [
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Description</b>: Unique name for the endpoint. Attempting to register again with the same name will fail.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `
@@ -1495,7 +1495,7 @@ export const typesLinks = [
         uriPlaceholder: 'name',
         uriPopoverMessage: `
         <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
+        <b>Description</b>: Unique name for the endpoint. Attempting to register again with the same name will fail.<br/>
         <b>Required</b>: yes <br/>
         <b>Data Type</b>: String <br/><br/>
     `

@@ -25,8 +25,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-//import org.assimbly.connector.Connector;
-
 import javax.annotation.PostConstruct;
 
 import static org.assimbly.util.CertificatesUtil.convertPemToX509Certificate;
@@ -42,9 +40,6 @@ public class SecurityResource {
     private final Logger log = LoggerFactory.getLogger(SecurityResource.class);
 
     private static final String ENTITY_NAME = "security";
-
-    //@Autowired
-    //private ConnectorResource connectorResource;
 
     private final SecurityService securityService;
 
@@ -286,14 +281,14 @@ public class SecurityResource {
 
     }
 
-    //used for sync database with keystores
-    // This methode Should be moved to "web.rest/connector"
+    //old: used for sync database with keystores
+    // This methode Should be moved to "web.rest/integration"
     /*
     @PostConstruct
     private void init() throws Exception {
 
     	log.debug("REST request to sync all certificates with truststore");
-        Connector connector = connectorResource.getConnector();
+        Integration integration = integrationResource.getIntegration();
         List<Security> certificates = securityService.findAll();
 
         if(certificates.size()>0) {
@@ -305,7 +300,7 @@ public class SecurityResource {
 
             	if(!certificateName.startsWith("P12")){
                     X509Certificate real = convertPemToX509Certificate(certificateFile);
-                    connector.importCertificateInKeystore(certificateStore,"supersecret",certificateName,real);
+                    integration.importCertificateInKeystore(certificateStore,"supersecret",certificateName,real);
                 }
             }
         }

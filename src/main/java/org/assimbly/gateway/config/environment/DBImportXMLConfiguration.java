@@ -73,7 +73,7 @@ public class DBImportXMLConfiguration {
 
 	private Header header;
 	public String xmlConfiguration;
-	public String connectorId;
+	public String integrationId;
 
 	public String configuration;
 
@@ -95,17 +95,17 @@ public class DBImportXMLConfiguration {
 
 	private Flow flow;
 
-	public void setGatewayFromXML(Document doc, Long connectorId) throws Exception {
+	public void setGatewayFromXML(Document doc, Long integrationId) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String gatewayId = xPath.evaluate("//connectors/connector/id", doc);
-		String name = xPath.evaluate("//connectors/connector/name", doc);
-		String type = xPath.evaluate("//connectors/connector/type", doc);
-		String environmentName = xPath.evaluate("//connectors/connector/environmentName", doc);
-		String stage = xPath.evaluate("//connectors/connector/stage", doc);
-		String defaultFromComponentType = xPath.evaluate("//connectors/connector/defaultFromComponentType", doc);
-		String defaultToComponentType = xPath.evaluate("//connectors/connector/defaultToComponentType", doc);
-		String defaultErrorComponentType = xPath.evaluate("//connectors/connector/defaultErrorComponentType", doc);
+		String gatewayId = xPath.evaluate("//integrations/integration/id", doc);
+		String name = xPath.evaluate("//integrations/integration/name", doc);
+		String type = xPath.evaluate("//integrations/integration/type", doc);
+		String environmentName = xPath.evaluate("//integrations/integration/environmentName", doc);
+		String stage = xPath.evaluate("//integrations/integration/stage", doc);
+		String defaultFromComponentType = xPath.evaluate("//integrations/integration/defaultFromComponentType", doc);
+		String defaultToComponentType = xPath.evaluate("//integrations/integration/defaultToComponentType", doc);
+		String defaultErrorComponentType = xPath.evaluate("//integrations/integration/defaultErrorComponentType", doc);
 
         if (defaultFromComponentType.isEmpty()) {defaultFromComponentType = "FILE";};
         if (defaultToComponentType.isEmpty()) {defaultToComponentType = "FILE";};
@@ -118,7 +118,7 @@ public class DBImportXMLConfiguration {
 
 			log.info("Importing gateway: " + name);
 
-			gatewayOptional = gatewayRepository.findById(connectorId);
+			gatewayOptional = gatewayRepository.findById(integrationId);
 
 			if (!gatewayOptional.isPresent()) {
 				gateway = new Gateway();
@@ -137,7 +137,7 @@ public class DBImportXMLConfiguration {
             }
 
 
-			gateway.setId(connectorId);
+			gateway.setId(integrationId);
 			gateway.setName(name);
 			gateway.setEnvironmentName(environmentName);
 			gateway.setType(GatewayType.valueOf(type));
@@ -147,7 +147,7 @@ public class DBImportXMLConfiguration {
 			gateway.setDefaultErrorComponentType(defaultErrorComponentType);
 
 			// create environment variables
-			setEnvironmentVariablesFromXML(doc, connectorId, gateway);
+			setEnvironmentVariablesFromXML(doc, integrationId, gateway);
 
 			gatewayRepository.save(gateway);
 
@@ -155,7 +155,7 @@ public class DBImportXMLConfiguration {
 			setServicesAndHeadersFromXML(doc);
 
 			// create flows
-			setFlowsFromXML(doc, connectorId);
+			setFlowsFromXML(doc, integrationId);
 
 			log.info("Importing gateway finished");
 
@@ -165,14 +165,14 @@ public class DBImportXMLConfiguration {
 		}
 	}
 
-	private String setFlowsFromXML(Document doc, Long connectorId) throws Exception {
+	private String setFlowsFromXML(Document doc, Long integrationId) throws Exception {
 
-		List<String> flowIds = getList(doc, "/connectors/connector/flows/flow/id/text()");
+		List<String> flowIds = getList(doc, "/integrations/integration/flows/flow/id/text()");
 
 		for (String flowId : flowIds) {
 			Long id = Long.parseLong(flowId, 10);
 
-			setFlowFromXML(doc, connectorId, id);
+			setFlowFromXML(doc, integrationId, id);
 		}
 
 		String result = "ok";
@@ -181,7 +181,7 @@ public class DBImportXMLConfiguration {
 
 	}
 
-	public String setFlowFromXML(Document doc, Long connectorId, Long id) throws Exception {
+	public String setFlowFromXML(Document doc, Long integrationId, Long id) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		String flowId = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/id", doc);
@@ -203,7 +203,7 @@ public class DBImportXMLConfiguration {
 			log.info("Importing flow: " + flowName);
 
 			flowOptional = flowRepository.findByName(flowName);
-			gatewayOptional = gatewayRepository.findById(connectorId);
+			gatewayOptional = gatewayRepository.findById(integrationId);
 
 			if (!flowOptional.isPresent()) {
 				flow = new Flow();
@@ -327,11 +327,11 @@ public class DBImportXMLConfiguration {
 	public void setServicesAndHeadersFromXML(Document doc) throws Exception {
 
 		// create services
-		List<String> serviceIds = getList(doc, "/connectors/connector/services/service/id/text()");
+		List<String> serviceIds = getList(doc, "/integrations/integration/services/service/id/text()");
 		setServicesFromXML(doc, serviceIds);
 
 		// create headers
-		List<String> headerIds = getList(doc, "/connectors/connector/headers/header/id/text()");
+		List<String> headerIds = getList(doc, "/integrations/integration/headers/header/id/text()");
 		setHeadersFromXML(doc, headerIds);
 	}
 
@@ -375,7 +375,7 @@ public class DBImportXMLConfiguration {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String endpointXPath = "/connectors/connector/flows/flow[id='" + id + "']/endpoints/endpoint[" + index + "]/";
+		String endpointXPath = "/integrations/integration/flows/flow[id='" + id + "']/endpoints/endpoint[" + index + "]/";
 
 		String type = xPath.evaluate(endpointXPath + "type", doc);
 		String uri = xPath.evaluate(endpointXPath + "uri", doc);
@@ -424,7 +424,7 @@ public class DBImportXMLConfiguration {
 
             Long serviceIdLong = Long.parseLong(serviceId, 10);
 
-            String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceIdLong + "]/name",doc);
+            String serviceName = xPath.evaluate("/integrations/integration/services/service[id=" + serviceIdLong + "]/name",doc);
 
             Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
 
@@ -442,7 +442,7 @@ public class DBImportXMLConfiguration {
 		try {
 
 			Long headerIdLong = Long.parseLong(headerId, 10);
-			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerIdLong + "]/name",doc);
+			String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerIdLong + "]/name",doc);
 			Optional<Header> headerOptional = headerOptional = headerRepository.findByName(headerName);
 			if(headerOptional.isPresent()) {
 				header = headerOptional.get();
@@ -493,8 +493,8 @@ public class DBImportXMLConfiguration {
 
 		for (String serviceId : serviceIds) {
 
-			String serviceName = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/name",doc);
-			String serviceType = xPath.evaluate("/connectors/connector/services/service[id=" + serviceId + "]/type",doc);
+			String serviceName = xPath.evaluate("/integrations/integration/services/service[id=" + serviceId + "]/name",doc);
+			String serviceType = xPath.evaluate("/integrations/integration/services/service[id=" + serviceId + "]/type",doc);
 
 			log.info("Importing service: " + serviceName);
 
@@ -531,7 +531,7 @@ public class DBImportXMLConfiguration {
 
 			}
 
-			Map<String, String> serviceMap = getMap(doc,"/connectors/connector/services/service[id=" + serviceId + "]/keys/*");
+			Map<String, String> serviceMap = getMap(doc,"/integrations/integration/services/service[id=" + serviceId + "]/keys/*");
 			Map<String, ServiceKeys> map = new HashMap<>();
 			for (ServiceKeys s : serviceKeys) {
 				map.put(s.getKey(), s);
@@ -593,13 +593,13 @@ public class DBImportXMLConfiguration {
             //update service_id to generated service_id
             if(!serviceId.equals(generatedServiceId)) {
 
-                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[service_id=" + serviceId + "]/service_id").evaluate(doc, XPathConstants.NODESET);
 
                 for (int i = 0; i < servicesIdNodes.getLength(); i++) {
                     servicesIdNodes.item(i).setTextContent("id" + generatedServiceId);
                 }
 
-                NodeList servicesNodes = (NodeList) xPath.compile("/connectors/connector/services/service[id=" + serviceId + "]/id").evaluate(doc, XPathConstants.NODESET);
+                NodeList servicesNodes = (NodeList) xPath.compile("/integrations/integration/services/service[id=" + serviceId + "]/id").evaluate(doc, XPathConstants.NODESET);
 
                 servicesNodes.item(0).setTextContent("id" + generatedServiceId);
 
@@ -607,14 +607,14 @@ public class DBImportXMLConfiguration {
 
         }
 
-        NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*/service_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*/service_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < servicesIdNodes.getLength(); i++) {
             String updateId =  servicesIdNodes.item(i).getTextContent();
             servicesIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        NodeList servicesNodes = (NodeList) xPath.compile("/connectors/connector/services/*/id").evaluate(doc, XPathConstants.NODESET);
+        NodeList servicesNodes = (NodeList) xPath.compile("/integrations/integration/services/*/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < servicesNodes.getLength(); i++) {
             String updateId =  servicesNodes.item(i).getTextContent();
@@ -633,7 +633,7 @@ public class DBImportXMLConfiguration {
 
 		for (String headerId : headerIds) {
 
-			String headerName = xPath.evaluate("/connectors/connector/headers/header[id=" + headerId + "]/name", doc);
+			String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerId + "]/name", doc);
 
 			try {
 				headerIdLong = Long.parseLong(headerId, 10);
@@ -668,7 +668,7 @@ public class DBImportXMLConfiguration {
 			}
 
 			// Create XPath object
-			XPathExpression expr = xPath.compile("/connectors/connector/headers/header[id=" + headerId + "]/keys/*");
+			XPathExpression expr = xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/keys/*");
 
 			NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 			for (int i = 0; i < nodes.getLength(); i++) {
@@ -726,10 +726,10 @@ public class DBImportXMLConfiguration {
             //update header_id to generated header_id
             if(!headerId.equals(generatedHeaderId)) {
 
-                NodeList headerNodes = (NodeList) xPath.compile("/connectors/connector/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
+                NodeList headerNodes = (NodeList) xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
                 headerNodes.item(0).setTextContent("id" + generatedHeaderId);
 
-                NodeList servicesIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+                NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
 
                 for (int i = 0; i < servicesIdNodes.getLength(); i++) {
                     servicesIdNodes.item(i).setTextContent("id" + generatedHeaderId);
@@ -740,14 +740,14 @@ public class DBImportXMLConfiguration {
         }
 
 
-        NodeList headersIdNodes = (NodeList) xPath.compile("/connectors/connector/flows/flow/*/*/header_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList headersIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*/header_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < headersIdNodes.getLength(); i++) {
             String updateId =  headersIdNodes.item(i).getTextContent();
             headersIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        NodeList headersNodes = (NodeList) xPath.compile("/connectors/connector/headers/*/id").evaluate(doc, XPathConstants.NODESET);
+        NodeList headersNodes = (NodeList) xPath.compile("/integrations/integration/headers/*/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < headersNodes.getLength(); i++) {
             String updateId =  headersNodes.item(i).getTextContent();
@@ -758,7 +758,7 @@ public class DBImportXMLConfiguration {
 
 	}
 
-	public void setEnvironmentVariablesFromXML(Document doc, Long connectorId, Gateway gateway) throws Exception {
+	public void setEnvironmentVariablesFromXML(Document doc, Long integrationId, Gateway gateway) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -769,7 +769,7 @@ public class DBImportXMLConfiguration {
 			map.put(s.getKey(), s);
 		}
 
-		XPathExpression expr = xPath.compile("/connectors/connector/environmentVariables/*");
+		XPathExpression expr = xPath.compile("/integrations/integration/environmentVariables/*");
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
 		for (int i = 0; i < nodes.getLength(); i++) {
