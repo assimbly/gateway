@@ -38,7 +38,7 @@ public class DBExportProperties {
 	private Header header;
 	public String xmlConfiguration;
 	private Flow flow;
-	public String connectorId;
+	public String integrationId;
 
 	public String configuration;
 

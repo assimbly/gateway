@@ -253,8 +253,6 @@ public class CertificateResource {
 
     }
 
-    //Moved from connectorimpl
-
     public Certificate[] getCertificates(String url) {
         try {
             CertificatesUtil util = new CertificatesUtil();

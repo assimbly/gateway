@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway","org.assimbly.brokerrest","org.assimbly.connectorrest"})
+@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway","org.assimbly.brokerrest","org.assimbly.integrationrest"})
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class})
 public class GatewayApp {
 

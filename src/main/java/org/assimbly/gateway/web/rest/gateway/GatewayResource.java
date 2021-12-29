@@ -140,7 +140,7 @@ public class GatewayResource {
      * POST  /updatebackup : updates the backup frequency
      *
      * @param gatewayid
-     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping connector failed
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping gateway failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping(path = "/gateways/{gatewayid}/updatebackup/{frequency}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
