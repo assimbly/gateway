@@ -2,7 +2,6 @@ package org.assimbly.gateway.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.assimbly.gateway.domain.enumeration.ComponentType;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
 /**
@@ -14,7 +13,7 @@ public class EndpointDTO implements Serializable {
 
     private EndpointType endpointType;
 
-    private ComponentType componentType;
+    private String componentType;
 
     private String uri;
 
@@ -46,11 +45,11 @@ public class EndpointDTO implements Serializable {
         this.endpointType = endpointType;
     }
 
-    public ComponentType getComponentType() {
+    public String getComponentType() {
         return componentType;
     }
 
-    public void setComponentType(ComponentType componentType) {
+    public void setComponentType(String componentType) {
         this.componentType = componentType;
     }
 

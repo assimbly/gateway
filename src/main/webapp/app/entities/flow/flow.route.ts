@@ -9,9 +9,9 @@ import { FlowService } from './flow.service';
 import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
-import { FlowEditAllComponent } from './flow-edit-all.component';
+import { FlowEditorComponent } from './editor/flow-editor.component';
 import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
-import { FlowMessageSenderComponent } from 'app/entities/flow/flow-message-sender.component';
+import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
 
 @Injectable({ providedIn: 'root' })
 export class FlowResolve implements Resolve<IFlow> {
@@ -50,7 +50,7 @@ export const flowRoute: Routes = [
     },
     {
         path: 'flow/edit-all',
-        component: FlowEditAllComponent,
+        component: FlowEditorComponent,
         data: {
             authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
@@ -59,7 +59,7 @@ export const flowRoute: Routes = [
     },
     {
         path: 'flow/edit-all/:id',
-        component: FlowEditAllComponent,
+        component: FlowEditorComponent,
         data: {
             authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
@@ -68,7 +68,7 @@ export const flowRoute: Routes = [
     },
     {
         path: 'flow/edit-all/:id/:clone',
-        component: FlowEditAllComponent,
+        component: FlowEditorComponent,
         data: {
             authorities: ['ROLE_ADMIN'],
             pageTitle: 'Flows'
