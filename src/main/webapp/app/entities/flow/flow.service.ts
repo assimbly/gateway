@@ -21,7 +21,7 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 @Injectable({ providedIn: 'root' })
 export class FlowService {
     public resourceUrl = SERVER_API_URL + 'api/flows';
-    public connectorUrl = SERVER_API_URL + 'api/connector';
+    public integrationUrl = SERVER_API_URL + 'api/integration';
     public environmentUrl = SERVER_API_URL + 'api/environment';
 
     stompClient = null;
@@ -76,13 +76,13 @@ export class FlowService {
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
         if (!!header) {
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+            return this.http.post(`${this.integrationUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
                 headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
                 observe: 'response',
                 responseType: 'text'
             });
         } else {
-            return this.http.post(`${this.connectorUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+            return this.http.post(`${this.integrationUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
                 observe: 'response',
                 responseType: 'text'
             });
@@ -96,58 +96,61 @@ export class FlowService {
         return this.http.post<any>(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
     }
 
-    validateFlowsUri(connectorId: number, uri: string): Observable<EntityResponseType> {
+    validateFlowsUri(integrationId: number, uri: string): Observable<EntityResponseType> {
         const options = {
             headers: new HttpHeaders({ Accept: 'application/xml' })
         };
-        return this.http.get<any>(`${this.connectorUrl}/${connectorId}/flow/validateUri`, options);
+        return this.http.get<any>(`${this.integrationUrl}/${integrationId}/flow/validateUri`, options);
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     pause(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     resume(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     restart(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowStatus(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowAlerts(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response', responseType: 'text' });
     }
 
     getFlowNumberOfAlerts(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, {
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, {
             observe: 'response',
             responseType: 'text'
         });
     }
 
     getFlowLastError(id: number): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/flow/lasterror/${id}`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/lasterror/${id}`, {
+            observe: 'response',
+            responseType: 'text'
+        });
     }
 
     getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
+        return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
     }
 
     getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
-        return this.http.get(`${this.connectorUrl}/${gatewayid}/flow/schema/` + componentType, { observe: 'response' });
+        return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/schema/` + componentType, { observe: 'response' });
     }
 
     getWikiDocUrl(): Observable<HttpResponse<any>> {
@@ -163,14 +166,14 @@ export class FlowService {
     }
 
     setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
-        return this.http.post(`${this.connectorUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, {
+        return this.http.post(`${this.integrationUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, {
             observe: 'response',
             responseType: 'text'
         });
     }
 
     testConnection(gatewayid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
+        return this.http.get(`${this.integrationUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
             observe: 'response',
             responseType: 'text'
         });
@@ -195,7 +198,7 @@ export class FlowService {
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
-        return this.http.post(`${this.connectorUrl}/${gatewayId}/send/${numberOfTimes}`, messageBody, {
+        return this.http.post(`${this.integrationUrl}/${gatewayId}/send/${numberOfTimes}`, messageBody, {
             headers: options,
             observe: 'response',
             responseType: 'text'
@@ -220,7 +223,7 @@ export class FlowService {
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
-        return this.http.post(`${this.connectorUrl}/${gatewayId}/sendrequest`, messageBody, {
+        return this.http.post(`${this.integrationUrl}/${gatewayId}/sendrequest`, messageBody, {
             headers: options,
             observe: 'response',
             responseType: 'text'

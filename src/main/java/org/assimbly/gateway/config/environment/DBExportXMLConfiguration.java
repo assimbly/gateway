@@ -48,14 +48,14 @@ public class DBExportXMLConfiguration {
 	private Set<Endpoint> endpoints;
 
 	public String xmlConfiguration;
-	private Element rootElement;
+	private Element integrations;
 	private Document doc;
 	private Element flows;
 	private Element services;
 	private Element headers;
     private Element routes;
 	private Element flow;
-	public String connectorId;
+	public String integrationId;
 
 	private List<String> servicesList;
 	private List<String> headersList;
@@ -152,54 +152,54 @@ public class DBExportXMLConfiguration {
 	// set methods
 	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
 
-		connectorId = gatewayId.toString();
+		integrationId = gatewayId.toString();
 		Gateway gateway = gatewayRepository.findById(gatewayId).get();
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		doc = docBuilder.newDocument();
 
-		rootElement = doc.createElement("connectors");
-		doc.appendChild(rootElement);
+		integrations = doc.createElement("integrations");
+		doc.appendChild(integrations);
 
         Element version = doc.createElement("version");
         version.setTextContent(applicationProperties.getInfo().getVersion());
-        rootElement.appendChild(version);
+        integrations.appendChild(version);
 
-		Element connector = doc.createElement("connector");
-		rootElement.appendChild(connector);
+		Element integration = doc.createElement("integration");
+		integrations.appendChild(integration);
 
 		Element id = doc.createElement("id");
-		id.appendChild(doc.createTextNode(connectorId));
-		connector.appendChild(id);
+		id.appendChild(doc.createTextNode(integrationId));
+		integration.appendChild(id);
 
 		Element name = doc.createElement("name");
 		name.appendChild(doc.createTextNode(gateway.getName()));
-		connector.appendChild(name);
+		integration.appendChild(name);
 
 		Element type = doc.createElement("type");
 		type.appendChild(doc.createTextNode(gateway.getType().toString()));
-		connector.appendChild(type);
+		integration.appendChild(type);
 
 		Element environmentName = doc.createElement("environmentName");
 		environmentName.appendChild(doc.createTextNode(gateway.getEnvironmentName()));
-		connector.appendChild(environmentName);
+		integration.appendChild(environmentName);
 
 		Element stage = doc.createElement("stage");
 		stage.appendChild(doc.createTextNode(gateway.getStage().toString()));
-		connector.appendChild(stage);
+		integration.appendChild(stage);
 
 		Element defaultFromComponentType = doc.createElement("defaultFromComponentType");
 		defaultFromComponentType.appendChild(doc.createTextNode(gateway.getDefaultFromComponentType()));
-		connector.appendChild(defaultFromComponentType);
+		integration.appendChild(defaultFromComponentType);
 
 		Element defaultToComponentType = doc.createElement("defaultToComponentType");
 		defaultToComponentType.appendChild(doc.createTextNode(gateway.getDefaultToComponentType()));
-		connector.appendChild(defaultToComponentType);
+		integration.appendChild(defaultToComponentType);
 
 		Element defaultErrorComponentType = doc.createElement("defaultErrorComponentType");
 		defaultErrorComponentType.appendChild(doc.createTextNode(gateway.getDefaultErrorComponentType()));
-		connector.appendChild(defaultErrorComponentType);
+		integration.appendChild(defaultErrorComponentType);
 
 		offloading = doc.createElement("offloading");
 		flows = doc.createElement("flows");
@@ -208,20 +208,20 @@ public class DBExportXMLConfiguration {
         routes = doc.createElement("routes");
 		environmentVariablesList = doc.createElement("environmentVariables");
 
-		connector.appendChild(offloading);
-		connector.appendChild(flows);
-		connector.appendChild(services);
-		connector.appendChild(headers);
-        connector.appendChild(routes);
-		connector.appendChild(environmentVariablesList);
+		integration.appendChild(offloading);
+		integration.appendChild(flows);
+		integration.appendChild(services);
+		integration.appendChild(headers);
+        integration.appendChild(routes);
+		integration.appendChild(environmentVariablesList);
 
 		servicesList = new ArrayList<String>();
 		headersList = new ArrayList<String>();
 		routesList = new  ArrayList<String>();
 
-		setXMLOffloadingPropertiesFromDB(connectorId);
+		setXMLOffloadingPropertiesFromDB(integrationId);
 
-		setXMLEnvironmentVariablesFromDB(connectorId);
+		setXMLEnvironmentVariablesFromDB(integrationId);
 
 	}
 
@@ -321,7 +321,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
-		String confComponentType = wireTapEndpointDB.getType().getEndpoint();
+		String confComponentType = wireTapEndpointDB.getType();
 		String confOptions = wireTapEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
 		Header confHeader = wireTapEndpointDB.getHeader();
@@ -409,7 +409,7 @@ public class DBExportXMLConfiguration {
 
         for (Endpoint endpointDB : endpointsDB) {
 
-            String confComponentType = endpointDB.getComponentType().getEndpoint();
+            String confComponentType = endpointDB.getComponentType();
 
             if(!componentsList.contains(confComponentType)){
                 componentsList.add(confComponentType);
@@ -435,7 +435,7 @@ public class DBExportXMLConfiguration {
             Integer confResponseId = endpointDB.getResponseId();
             Integer confRouteId = endpointDB.getRouteId();
 			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
-			String confComponentType = endpointDB.getComponentType().getEndpoint();
+			String confComponentType = endpointDB.getComponentType();
 			String confOptions = endpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();
@@ -653,7 +653,7 @@ public class DBExportXMLConfiguration {
 
     }
 
-    public void setXMLOffloadingPropertiesFromDB(String connectorId) throws Exception {
+    public void setXMLOffloadingPropertiesFromDB(String integrationId) throws Exception {
 
 		List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll();
 
@@ -678,7 +678,7 @@ public class DBExportXMLConfiguration {
 		}
 	}
 
-	public void setXMLEnvironmentVariablesFromDB(String connectorId) throws Exception {
+	public void setXMLEnvironmentVariablesFromDB(String integrationId) throws Exception {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
 

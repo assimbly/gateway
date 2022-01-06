@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.connector;
+package org.assimbly.gateway.web.rest.integration;
 
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
