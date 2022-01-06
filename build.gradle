@@ -65,7 +65,6 @@ configurations.all {
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
-	//exclude group: 'org.elasticsearch.client', module: 'elasticsearch-rest-client-sniffer'
 }
 
 //Build different jar based on property (connector or broker)
@@ -305,7 +304,7 @@ dependencies {
     implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.9.1';
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
-	implementation group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
     // Use ", version: jhipster_dependencies_version, changing: true" if you want
     // to use a SNAPSHOT release instead of a stable release

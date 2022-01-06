@@ -14,7 +14,6 @@ import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.domain.Endpoint;
-import org.assimbly.gateway.domain.enumeration.ComponentType;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
@@ -388,11 +387,10 @@ public class DBImportXMLConfiguration {
         // get type
 		String[] uriSplitted = uri.split(":", 2);
 
-        String componentTypeAsString = uriSplitted[0].toUpperCase();
+        String componentType = uriSplitted[0].toUpperCase();
 
-        componentTypeAsString = componentTypeAsString.replace("-", "");
+        componentType = componentType.replace("-", "");
 
-        ComponentType componentType = ComponentType.valueOf(componentTypeAsString);
         EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
 
         // get uri

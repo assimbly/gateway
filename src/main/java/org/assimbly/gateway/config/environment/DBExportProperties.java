@@ -153,7 +153,7 @@ public class DBExportProperties {
 		for (Endpoint endpoint : endpoints) {
 
 			endpointType = endpoint.getEndpointType().name();
-			componentType = endpoint.getComponentType().name();
+			componentType = endpoint.getComponentType();
 			uri = endpoint.getUri();
 			options = endpoint.getOptions();
 
@@ -217,8 +217,7 @@ public class DBExportProperties {
 
 	private String setDefaultComponentType(String componentType) {
 
-		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp")
-				|| componentType.equals("ftps")) {
+		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp") || componentType.equals("ftps")) {
 			componentType = componentType + "://";
 		} else {
 			componentType = componentType + ":";

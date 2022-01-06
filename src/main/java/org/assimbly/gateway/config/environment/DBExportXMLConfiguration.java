@@ -321,7 +321,7 @@ public class DBExportXMLConfiguration {
 	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
 
 		String confUri = wireTapEndpointDB.getUri();
-		String confComponentType = wireTapEndpointDB.getType().getEndpoint();
+		String confComponentType = wireTapEndpointDB.getType();
 		String confOptions = wireTapEndpointDB.getOptions();
 		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
 		Header confHeader = wireTapEndpointDB.getHeader();
@@ -409,7 +409,7 @@ public class DBExportXMLConfiguration {
 
         for (Endpoint endpointDB : endpointsDB) {
 
-            String confComponentType = endpointDB.getComponentType().getEndpoint();
+            String confComponentType = endpointDB.getComponentType();
 
             if(!componentsList.contains(confComponentType)){
                 componentsList.add(confComponentType);
@@ -435,7 +435,7 @@ public class DBExportXMLConfiguration {
             Integer confResponseId = endpointDB.getResponseId();
             Integer confRouteId = endpointDB.getRouteId();
 			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
-			String confComponentType = endpointDB.getComponentType().getEndpoint();
+			String confComponentType = endpointDB.getComponentType();
 			String confOptions = endpointDB.getOptions();
 			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
 			Header confHeader = endpointDB.getHeader();

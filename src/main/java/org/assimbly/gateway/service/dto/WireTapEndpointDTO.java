@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
-import org.assimbly.gateway.domain.enumeration.ComponentType;
+
 
 /**
  * A DTO for the WireTapEndpoint entity.
@@ -14,7 +14,7 @@ public class WireTapEndpointDTO implements Serializable {
 
     private Long id;
 
-    private ComponentType type;
+    private String type;
 
     private String uri;
 
@@ -32,11 +32,11 @@ public class WireTapEndpointDTO implements Serializable {
         this.id = id;
     }
 
-    public ComponentType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(ComponentType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

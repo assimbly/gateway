@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.assimbly.gateway.domain.enumeration.ComponentType;
+import org.assimbly.gateway.domain.enumeration.ComponentTypeOLD;
 /**
  * Test class for the EndpointResource REST controller.
  *
@@ -44,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.ComponentType;
 @SpringBootTest(classes = GatewayApp.class)
 public class EndpointResourceIntTest {
 
-    private static final ComponentType DEFAULT_TYPE = ComponentType.ACTIVEMQ;
-    private static final ComponentType UPDATED_TYPE = ComponentType.FILE;
+    private static final ComponentTypeOLD DEFAULT_TYPE = ComponentTypeOLD.ACTIVEMQ;
+    private static final ComponentTypeOLD UPDATED_TYPE = ComponentTypeOLD.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
