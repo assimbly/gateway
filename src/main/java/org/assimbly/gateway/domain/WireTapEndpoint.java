@@ -9,8 +9,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.assimbly.gateway.domain.enumeration.ComponentType;
-
 /**
  * A WireTapEndpoint.
  */
@@ -25,9 +23,8 @@ public class WireTapEndpoint implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private ComponentType type;
+    private String type;
 
     @Column(name = "uri")
     private String uri;
@@ -52,16 +49,16 @@ public class WireTapEndpoint implements Serializable {
         this.id = id;
     }
 
-    public ComponentType getType() {
+    public String getType() {
         return type;
     }
 
-    public WireTapEndpoint type(ComponentType type) {
+    public WireTapEndpoint type(String type) {
         this.type = type;
         return this;
     }
 
-    public void setType(ComponentType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

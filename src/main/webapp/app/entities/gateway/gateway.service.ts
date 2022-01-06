@@ -13,16 +13,16 @@ type EntityArrayResponseType = HttpResponse<IGateway[]>;
 export class GatewayService {
     public resourceUrl = SERVER_API_URL + 'api/gateways';
     public environmentUrl = SERVER_API_URL + 'api/environment';
-    public connectorUrl = SERVER_API_URL + 'api/connector';
+    public integrationUrl = SERVER_API_URL + 'api/integration';
 
     constructor(protected http: HttpClient) {}
 
     stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
     }
 
     create(gateway: IGateway): Observable<EntityResponseType> {

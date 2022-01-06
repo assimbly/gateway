@@ -6,22 +6,22 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from './flow.service';
+import { FlowService } from '../flow.service';
 
-import { Option, TypeLinks } from './flow-edit-all.component';
+import { Option, TypeLinks } from '../editor/flow-editor.component';
 
 import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
 import { Service } from 'app/shared/model/service.model';
 import { IHeader } from 'app/shared/model/header.model';
 
-import { EndpointService } from '../endpoint/';
-import { ServiceService } from '../service';
-import { HeaderService } from '../header';
-import { GatewayService } from '../gateway';
+import { EndpointService } from '../../endpoint/';
+import { ServiceService } from '../../service';
+import { HeaderService } from '../../header';
+import { GatewayService } from '../../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Components, ComponentType, typesLinks } from '../../shared/camel/component-type';
-import { Services } from '../../shared/camel/service-connections';
+import { Components, ComponentType, typesLinks } from 'app/shared/camel/component-type';
+import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
 

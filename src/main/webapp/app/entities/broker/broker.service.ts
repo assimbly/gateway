@@ -12,7 +12,6 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
     public resourceUrl = SERVER_API_URL + 'api/brokers';
-    public connectorUrl = SERVER_API_URL + 'api/connector';
 
     private gatewayid = 1;
 

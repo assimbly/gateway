@@ -14,11 +14,10 @@ import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
-
+import { FlowEditorComponent } from './';
+import { FlowMessageSenderComponent } from './';
 import {
     FlowComponent,
-    FlowEditAllComponent,
-    FlowMessageSenderComponent,
     FlowDetailComponent,
     FlowUpdateComponent,
     FlowDeletePopupComponent,
@@ -60,7 +59,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
     declarations: [
         FlowComponent,
         FlowUpdateComponent,
-        FlowEditAllComponent,
+        FlowEditorComponent,
         FlowMessageSenderComponent,
         FlowDetailComponent,
         FlowDeleteDialogComponent,
@@ -71,7 +70,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
     entryComponents: [
         FlowComponent,
         FlowUpdateComponent,
-        FlowEditAllComponent,
+        FlowEditorComponent,
         FlowMessageSenderComponent,
         FlowDeleteDialogComponent,
         FlowDeleteDialogComponent,

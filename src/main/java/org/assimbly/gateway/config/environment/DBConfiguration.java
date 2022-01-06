@@ -39,7 +39,7 @@ public class DBConfiguration {
 
 	private String output;
 
-	// exports connector to object (List of treemaps)
+	// exports gateway to object (List of treemaps)
 	public List<TreeMap<String, String>> convertDBToConfiguration(Long gatewayId) throws Exception {
 
 		propertiesList = new ArrayList<>();
@@ -59,7 +59,7 @@ public class DBConfiguration {
 
 	}
 
-	// exports connector to XML, JSON or YAML format
+	// exports gateway to XML, JSON or YAML format
 	public String convertDBToConfiguration(Long gatewayId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
 		xmlConfiguration = dbExportXML.getXMLConfiguration(gatewayId);
@@ -80,7 +80,7 @@ public class DBConfiguration {
 		return configuration;
 	}
 
-	// exports connector by flowids to XML, JSON or YAML format
+	// exports gateway by flowids to XML, JSON or YAML format
 	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids, boolean isPlaceHolderReplacement) throws Exception {
 
 		xmlConfiguration = dbExportXML.getXMLConfigurationByIds(gatewayId, flowids);
@@ -123,7 +123,7 @@ public class DBConfiguration {
 
 	}
 
-	// imports connector configuration (complete configuration file)
+	// imports gateway configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
 
 		// get the configuration as XML Document

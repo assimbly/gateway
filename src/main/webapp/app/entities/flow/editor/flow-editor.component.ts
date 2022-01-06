@@ -6,21 +6,21 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
-import { FlowService } from './flow.service';
+import { FlowService } from '../flow.service';
 import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
 import { IHeader } from 'app/shared/model/header.model';
 import { Service } from 'app/shared/model/service.model';
 import { Route } from 'app/shared/model/route.model';
 
-import { EndpointService } from '../endpoint/';
-import { ServiceService } from '../service';
-import { HeaderService } from '../header';
-import { RouteService } from '../route';
-import { GatewayService } from '../gateway';
+import { EndpointService } from '../../endpoint/';
+import { ServiceService } from '../../service';
+import { HeaderService } from '../../header';
+import { RouteService } from '../../route';
+import { GatewayService } from '../../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Components, ComponentType, typesLinks } from '../../shared/camel/component-type';
-import { Services } from '../../shared/camel/service-connections';
+import { Components, ComponentType, typesLinks } from 'app/shared/camel/component-type';
+import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
 
@@ -30,11 +30,11 @@ import { ServiceDialogComponent, ServicePopupService } from 'app/entities/servic
 import * as moment from 'moment';
 
 @Component({
-    selector: 'jhi-flow-edit-all',
-    templateUrl: './flow-edit-all.component.html',
+    selector: 'jhi-flow-editor',
+    templateUrl: './flow-editor.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class FlowEditAllComponent implements OnInit, OnDestroy {
+export class FlowEditorComponent implements OnInit, OnDestroy {
     flow: IFlow;
     headers: IHeader[];
     routes: Route[];

@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.connector;
+package org.assimbly.gateway.web.rest.integration;
 
 import io.swagger.annotations.ApiParam;
 
@@ -42,7 +42,7 @@ public class EnvironmentResource {
        	try {
        		log.info("Importing configuration into database");
         	DBConfiguration.convertConfigurationToDB(gatewayid, contentType, configuration);
-        	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Connector configuration set");
+        	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Gateway configuration set");
    		} catch (Exception e) {
        		log.error("Import of configuration failed: " + e.getMessage());
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());

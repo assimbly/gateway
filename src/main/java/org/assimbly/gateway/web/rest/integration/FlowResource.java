@@ -1,7 +1,7 @@
-package org.assimbly.gateway.web.rest.connector;
+package org.assimbly.gateway.web.rest.integration;
 
-import org.assimbly.connector.Connector;
-import org.assimbly.connectorrest.ConnectorResource;
+import org.assimbly.integration.Integration;
+import org.assimbly.integrationrest.IntegrationResource;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.domain.Flow;
@@ -58,16 +58,16 @@ public class FlowResource {
 
     private final ApplicationProperties applicationProperties;
 
-    private Connector connector;
+    private Integration integration;
 
-    private ConnectorResource connectorResource;
+    private IntegrationResource integrationResource;
 
-    private boolean connectorIsStarting = false;
+    private boolean integrationIsStarting = false;
 
-    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, ConnectorResource connectorResource) {
+    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
         this.flowService = flowService;
         this.applicationProperties = applicationProperties;
-        this.connectorResource = connectorResource;
+        this.integrationResource = integrationResource;
 
     }
 
@@ -182,19 +182,19 @@ public class FlowResource {
     }
 
     @PostConstruct
-    private void initConnector() throws Exception {
+    private void initIntegration() throws Exception {
 
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         boolean isDebuggging = gateway.getDebugging();
         boolean isTracing = gateway.getTracing();
 
-        connectorResource.setConnector(encryptionProperties.getProperties());
+        integrationResource.setIntegration(encryptionProperties.getProperties());
 
-        connectorResource.initConnector();
+        integrationResource.initIntegration();
 
-        connector = connectorResource.getConnector();
-        connector.setDebugging(isDebuggging);
-        //connector.setTracing(isTracing, "default");
+        integration =integrationResource.getIntegration();
+        integration.setDebugging(isDebuggging);
+        //integration.setTracing(isTracing, "default");
 
         //start flows with autostart
         List<Flow> flows = flowRepository.findAll();
@@ -206,8 +206,8 @@ public class FlowResource {
                     log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
                     configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application",true);
 
-                    connector.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
-                    connector.startFlow(flow.getId().toString());
+                    integration.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+                    integration.startFlow(flow.getId().toString());
                 }
             }
         } catch (Exception e) {
