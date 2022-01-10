@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
@@ -11,7 +11,7 @@ import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
 
-import io.github.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -144,7 +144,7 @@ public class GatewayResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping(path = "/gateways/{gatewayid}/updatebackup/{frequency}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> updateBackup(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable String frequency, @RequestBody String url) throws Exception {
+    public ResponseEntity<String> updateBackup(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable String frequency, @RequestBody String url) throws Exception {
         if(!ran) {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
@@ -216,7 +216,7 @@ public class GatewayResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = {"text/plain"})
-    public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
+    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
 
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");

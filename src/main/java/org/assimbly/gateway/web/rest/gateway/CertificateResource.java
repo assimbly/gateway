@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.util.BaseDirectory;
 import org.assimbly.util.CertificatesUtil;
 import org.assimbly.util.rest.ResponseUtil;
@@ -45,7 +45,7 @@ public class CertificateResource {
      * @throws Exception
      */
     @PostMapping(path = "/certificates/import", produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> importCertificates(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestBody String url, @RequestHeader String keystoreName, @RequestHeader String keystorePassword) throws Exception {
+    public ResponseEntity<String> importCertificates(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestBody String url, @RequestHeader String keystoreName, @RequestHeader String keystorePassword) throws Exception {
 
         log.debug("REST request to import certificates for url: {}", url);
 
@@ -67,7 +67,7 @@ public class CertificateResource {
 
 
     @PostMapping(path = "/certificates/upload", consumes = {"text/plain"}, produces = {"text/plain","application/xml", "application/json"})
-    public ResponseEntity<String> uploadCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @RequestBody String certificate) throws Exception {
+    public ResponseEntity<String> uploadCertificate(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType,@Parameter(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @RequestBody String certificate) throws Exception {
 
         try {
 
@@ -104,7 +104,7 @@ public class CertificateResource {
     }
 
     @PostMapping(path = "/certificates/uploadp12", consumes = {"text/plain"}, produces = {"text/plain","application/xml", "application/json"})
-    public ResponseEntity<String> uploadP12Certificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,@ApiParam(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @RequestHeader("password") String password, @RequestBody String certificate) throws Exception {
+    public ResponseEntity<String> uploadP12Certificate(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType,@Parameter(hidden = true) @RequestHeader("Content-Type") String contentType, @RequestHeader("FileType") String fileType, @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @RequestHeader("password") String password, @RequestBody String certificate) throws Exception {
 
         try {
 
@@ -123,7 +123,7 @@ public class CertificateResource {
     }
 
     @GetMapping(path = "/certificates/generate", produces = {"text/plain","application/xml", "application/json"})
-    public ResponseEntity<String> generateCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("cn") String cn, @RequestHeader String keystoreName, @RequestHeader String keystorePassword) throws Exception {
+    public ResponseEntity<String> generateCertificate(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("cn") String cn, @RequestHeader String keystoreName, @RequestHeader String keystorePassword) throws Exception {
 
         try {
 
@@ -164,7 +164,7 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @GetMapping(path = "/certificates/delete/{certificateName}", produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> deleteCertificate(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType,  @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @PathVariable String certificateName) throws Exception {
+    public ResponseEntity<String> deleteCertificate(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType,  @RequestHeader String keystoreName, @RequestHeader String keystorePassword, @PathVariable String certificateName) throws Exception {
         log.debug("REST request to delete certificate : {}", certificateName);
 
         try {

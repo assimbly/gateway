@@ -39,7 +39,7 @@ spring:
         hikari:
             auto-commit: false
     jpa:
-        database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+        database-platform: tech.jhipster.domain.util.FixedH2Dialect
         database: H2
         show-sql: false
         properties:
@@ -106,15 +106,14 @@ jhipster:
     mail: # specific JHipster mail property, for standard properties see MailProperties
         from: gateway@localhost
         base-url: http://my-server-url-to-change # Modify according to your server's URL
-    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
+    # metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         #jmx:
             #enabled: true
 
-        logs: # Reports Dropwizard metrics in the logs
-            enabled: false
-            report-frequency: 60 # in seconds
+        #logs: # Reports Dropwizard metrics in the logs
+            #enabled: false
+            #report-frequency: 60 # in seconds
     logging:
-
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false
             host: localhost

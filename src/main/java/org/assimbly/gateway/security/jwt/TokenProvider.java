@@ -1,6 +1,6 @@
 package org.assimbly.gateway.security.jwt;
 
-import io.github.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipsterProperties;
 
 import java.util.*;
 import java.util.stream.Collectors;

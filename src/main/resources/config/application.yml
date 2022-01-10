@@ -67,7 +67,7 @@ spring:
         # Otherwise, it will be filled in by gradle when building the WAR file
         # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
         active: #spring.profiles.active#
-    jpa:
+    jpa:    
         open-in-view: false
         properties:
             hibernate.jdbc.time_zone: UTC
@@ -83,6 +83,9 @@ spring:
             enabled: true
     thymeleaf:
         mode: HTML
+
+springdoc:
+  show-actuator: true
 
 server:
     servlet:
@@ -118,17 +121,19 @@ jhipster:
         #max-age: 1800
     mail:
         from: gateway@localhost
-    swagger:
-        default-include-pattern: /api/.*
-        title: gateway API
-        description: gateway API documentation
-        version: 0.8.0
-        terms-of-service-url:
-        contact-name:
-        contact-url:
-        contact-email:
-        license:
-        license-url:
+    api-docs:
+      default-include-pattern: /api/**
+      management-include-pattern: /management/**
+      title: Assimbly API
+      description: Assimbly Gateway Application API documentation
+      version: 3.6.0
+      terms-of-service-url:
+      contact-name:
+      contact-url:
+      contact-email:
+      license: unlicensed
+      license-url:    
+
 
 # ===================================================================
 # Application specific properties
