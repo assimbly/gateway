@@ -2,7 +2,7 @@ package org.assimbly.gateway.service;
 
 import org.assimbly.gateway.domain.User;
 
-import io.github.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;

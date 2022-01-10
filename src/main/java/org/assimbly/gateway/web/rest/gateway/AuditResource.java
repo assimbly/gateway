@@ -3,7 +3,7 @@ package org.assimbly.gateway.web.rest.gateway;
 import org.assimbly.gateway.service.AuditEventService;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
 
-import io.github.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.ResponseUtil;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

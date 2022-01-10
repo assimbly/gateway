@@ -12,7 +12,7 @@ import org.assimbly.gateway.web.rest.errors.EmailAlreadyUsedException;
 import org.assimbly.gateway.web.rest.errors.LoginAlreadyUsedException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import io.github.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.ResponseUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -49,7 +49,7 @@ spring:
         console:
             enabled: false
     jpa:
-        database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+        database-platform: tech.jhipster.domain.util.FixedH2Dialect
         database: H2
         show-sql: true
         properties:
@@ -106,12 +106,12 @@ jhipster:
     mail: # specific JHipster mail property, for standard properties see MailProperties
         from: gateway@localhost
         base-url: http://127.0.0.1:8080
-    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
+    # metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         #jmx:
             #enabled: true
-        logs: # Reports Dropwizard metrics in the logs
-            enabled: false
-            report-frequency: 60 # in seconds
+        # logs: # Reports Dropwizard metrics in the logs
+            #enabled: false
+            #report-frequency: 60 # in seconds
     logging:
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false

@@ -37,7 +37,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '3.5.0'
+version = '3.6.0'
 
 description = ""
 
@@ -146,6 +146,8 @@ springBoot {
  	mainClassName = "org.assimbly.gateway.GatewayApp"
 }
 
+
+// Below are common ways to use native images
 /*
 
 //https://github.com/palantir/gradle-graal (com.palantir.graal)
@@ -216,6 +218,7 @@ task getDeps(type: Copy) {
 
 project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
 
+
 liquibase {
     activities {
         main {
@@ -268,9 +271,7 @@ configurations {
         resolutionStrategy {
             // Inherited version from Spring Boot can't be used because of regressions:
             // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
-            force 'org.liquibase:liquibase-core:3.6.3'
-            
-            force 'org.liquibase:liquibase-core:1.4.2'
+            force 'org.liquibase:liquibase-core:4.6.2'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
@@ -292,35 +293,24 @@ repositories {
     mavenCentral()
     //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     jcenter()
-    //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
 
 dependencies {
-    // import JHipster dependencies BOM
-    if (!project.hasProperty("gae")) {
-        //implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
-    }
 
-    implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.9.1';
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
-    // Use ", version: jhipster_dependencies_version, changing: true" if you want
-    // to use a SNAPSHOT release instead of a stable release
-    implementation group: "io.github.jhipster", name: "jhipster-framework"
+    implementation group: "tech.jhipster", name: "jhipster-framework"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.micrometer:micrometer-registry-prometheus"
-    // compile "io.dropwizard.metrics:metrics-jcache"
     implementation "io.dropwizard.metrics:metrics-json"
     implementation "io.dropwizard.metrics:metrics-jvm"
     implementation "io.dropwizard.metrics:metrics-servlet"
     implementation "io.dropwizard.metrics:metrics-servlets"
     implementation "io.dropwizard.metrics:metrics-annotation"
     implementation "io.prometheus:simpleclient"
-    // compile "io.prometheus:simpleclient_dropwizard"
-    // compile "io.prometheus:simpleclient_servlet"
     implementation "net.logstash.logback:logstash-logback-encoder"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
@@ -339,11 +329,12 @@ dependencies {
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate:hibernate-envers"
     implementation "org.hibernate.validator:hibernate-validator"
+        
     implementation "org.liquibase:liquibase-core"
-    // compile "com.mattbertolini:liquibase-slf4j"
     liquibaseRuntime "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
-    liquibaseRuntime sourceSets.main.compileClasspath
+    liquibaseRuntime sourceSets.main.compileClasspath    
+    
     implementation "org.springframework.boot:spring-boot-loader-tools"
     implementation "org.springframework.boot:spring-boot-starter-mail"
     implementation "org.springframework.boot:spring-boot-starter-logging"
@@ -357,7 +348,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.zalando:problem-spring-web:0.24.0-RC.0"
+	implementation "org.zalando:problem-spring-web:0.27.0"
     implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
     implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"
@@ -367,13 +358,11 @@ dependencies {
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
     implementation "io.jsonwebtoken:jjwt:0.9.1"
-    implementation ("io.springfox:springfox-swagger2") {
-        exclude module: 'mapstruct'
-    }
-    implementation "io.springfox:springfox-bean-validators"
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
-	implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+    implementation "org.mapstruct:mapstruct:${mapstruct_version}"
+    implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
 
     // custom dependencies (non-jhipster)
     if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
@@ -396,7 +385,7 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.2"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
-    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
 
     //java 9+
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'

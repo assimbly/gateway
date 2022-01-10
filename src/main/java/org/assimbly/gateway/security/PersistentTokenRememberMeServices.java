@@ -6,8 +6,8 @@ import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.service.util.RandomUtil;
 
 
-import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.security.PersistentTokenCache;
+import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.security.PersistentTokenCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

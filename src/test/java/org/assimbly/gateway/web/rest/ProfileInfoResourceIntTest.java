@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
-import io.github.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipsterProperties;
 import org.assimbly.gateway.GatewayApp;
 import org.junit.Before;
 import org.junit.Test;
