@@ -34,7 +34,7 @@ public class ProfileInfoResource {
     @GetMapping("/profile-info")
     public ProfileInfoVM getActiveProfiles() {
         String[] activeProfiles = DefaultProfileUtil.getActiveProfiles(env);
-        return new ProfileInfoVM(activeProfiles, getRibbonEnv(activeProfiles));
+        return new ProfileInfoVM(activeProfiles);
     }
 
     @GetMapping("/documentation/url")
@@ -43,39 +43,17 @@ public class ProfileInfoResource {
         return propertyUrl;
     }
 
-    private String getRibbonEnv(String[] activeProfiles) {
-    	/*
-        String[] displayOnActiveProfiles = jHipsterProperties.
-        		.getRibbon().getDisplayOnActiveProfiles();
-        if (displayOnActiveProfiles == null) {
-            return null;
-        }
-        List<String> ribbonProfiles = new ArrayList<>(Arrays.asList(displayOnActiveProfiles));
-        List<String> springBootProfiles = Arrays.asList(activeProfiles);
-        ribbonProfiles.retainAll(springBootProfiles);
-        if (!ribbonProfiles.isEmpty()) {
-            return ribbonProfiles.get(0);
-        }*/
-        return null;
-    }
-
     class ProfileInfoVM {
 
         private String[] activeProfiles;
 
-        private String ribbonEnv;
-
-        ProfileInfoVM(String[] activeProfiles, String ribbonEnv) {
+        ProfileInfoVM(String[] activeProfiles) {
             this.activeProfiles = activeProfiles;
-            this.ribbonEnv = ribbonEnv;
         }
 
         public String[] getActiveProfiles() {
             return activeProfiles;
         }
 
-        public String getRibbonEnv() {
-            return ribbonEnv;
-        }
     }
 }

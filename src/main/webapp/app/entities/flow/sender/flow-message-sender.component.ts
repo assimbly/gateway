@@ -20,7 +20,7 @@ import { HeaderService } from '../../header';
 import { GatewayService } from '../../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Components, ComponentType, typesLinks } from 'app/shared/camel/component-type';
+import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
@@ -108,6 +108,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
 
+    consumerComponentsNames: Array<any> = [];
+    producerComponentsNames: Array<any> = [];
+
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
     componentTypeCamelLinks: Array<string> = new Array<string>();
     uriPlaceholders: Array<string> = new Array<string>();
@@ -160,6 +163,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.createRoute = 0;
         this.setPopoverMessages();
 
+        this.setComponents();
+
         this.subscription = this.route.params.subscribe(params => {
             this.load();
         });
@@ -194,8 +199,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
             this.requestEndpoint = new Endpoint();
             this.requestEndpoint.endpointType = EndpointType.TO;
-            this.requestEndpoint.componentType = ComponentType['file'];
-            this.requestComponentType = 'FILE';
+            this.requestEndpoint.componentType = 'file';
+            this.requestComponentType = 'file';
 
             (<FormArray>this.messageSenderForm.controls.endpointsData).push(this.initializeEndpointData(this.requestEndpoint));
 
@@ -216,15 +221,31 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
     }
 
+    setComponents() {
+        let producerComponents = this.components.types.filter(function(component) {
+            return component.consumerOnly === false;
+        });
+
+        let consumerComponents = this.components.types.filter(function(component) {
+            return component.producerOnly === false;
+        });
+
+        this.producerComponentsNames = producerComponents.map(component => component.name);
+        this.producerComponentsNames.sort();
+
+        this.consumerComponentsNames = consumerComponents.map(component => component.name);
+        this.consumerComponentsNames.sort();
+    }
+
     setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
         const endpointForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.endpointsData).controls[endpointFormIndex];
 
         if (typeof e !== 'undefined') {
             endpoint.componentType = e;
-            this.requestComponentType = endpoint.componentType.toString();
+            this.requestComponentType = endpoint.componentType;
         } else {
-            endpoint.componentType = 'FILE';
-            this.requestComponentType = 'FILE';
+            endpoint.componentType = 'file';
+            this.requestComponentType = 'file';
         }
 
         let type;
@@ -232,22 +253,22 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         let componentType;
         let camelComponentType;
 
-        componentType = endpoint.componentType.toString().toLowerCase();
+        componentType = endpoint.componentType.toLowerCase();
 
         camelComponentType = this.components.getCamelComponentType(componentType);
 
-        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
-        camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
+        type = this.components.types.find(x => x.name === endpoint.componentType.toString());
+        camelType = this.components.types.find(x => x.name === camelComponentType.toUpperCase());
 
         endpointForm.controls.componentType.patchValue(endpoint.componentType);
         endpointForm.controls.service.setValue('');
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
-        this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
-        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + camelType.camelTypeLink;
+        this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
 
-        this.uriPlaceholders[endpointFormIndex] = type.uriPlaceholder;
-        this.uriPopoverMessages[endpointFormIndex] = type.uriPopoverMessage;
+        this.uriPlaceholders[endpointFormIndex] = type.syntax;
+        this.uriPopoverMessages[endpointFormIndex] = type.description;
 
         // set options keys
         this.getComponentOptions(camelComponentType).subscribe(data => {
@@ -284,20 +305,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     enableFields(endpointForm) {
         let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
 
-        if (endpointForm.controls.componentType.value === 'WASTEBIN') {
+        if (endpointForm.controls.componentType.value === 'wastebin') {
             endpointForm.controls.uri.disable();
             endpointForm.controls.options.disable();
             endpointForm.controls.service.disable();
             endpointForm.controls.header.disable();
-        } else if (endpointForm.controls.componentType.value === 'WASTEBIN') {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.header.enable();
-            if (this.embeddedBroker) {
-                endpointForm.controls.service.disable();
-            } else {
-                endpointForm.controls.service.enable();
-            }
         } else if (componentHasService) {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();

@@ -14,7 +14,6 @@ import { GatewayBrokerModule } from './broker/broker.module';
 import { GatewayQueueModule } from './queue/queue.module';
 import { GatewayTopicModule } from './topic/topic.module';
 import { GatewayGroupModule } from './group/group.module';
-import { GatewayWireTapEndpointModule } from './wire-tap-endpoint/wire-tap-endpoint.module';
 import { GatewayFlowModule } from './flow/flow.module';
 import { DeploymentService } from 'app/admin';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
@@ -37,7 +36,6 @@ import { DeploymentService } from 'app/admin';
 		GatewayQueueModule,
 		GatewayTopicModule,
         GatewayGroupModule,
-        GatewayWireTapEndpointModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     exports: [
@@ -53,10 +51,9 @@ import { DeploymentService } from 'app/admin';
         GatewaySecurityModule,
         GatewayRouteModule,
         GatewayBrokerModule,
-		GatewayQueueModule,
-		GatewayTopicModule,
-        GatewayGroupModule,
-        GatewayWireTapEndpointModule
+        GatewayQueueModule,
+        GatewayTopicModule,
+        GatewayGroupModule
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
     declarations: [],

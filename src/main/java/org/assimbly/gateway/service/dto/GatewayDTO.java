@@ -27,8 +27,6 @@ public class GatewayDTO implements Serializable {
 
     private String defaultErrorComponentType;
 
-    private Long wiretapEndpointId;
-
 	private ConnectorType connectorType;
 
     public Long getId() {
@@ -103,14 +101,6 @@ public class GatewayDTO implements Serializable {
         this.defaultErrorComponentType = defaultErrorComponentType;
     }
 
-    public Long getWiretapEndpointId() {
-        return wiretapEndpointId;
-    }
-
-    public void setWiretapEndpointId(Long wireTapEndpointId) {
-        this.wiretapEndpointId = wireTapEndpointId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -144,7 +134,6 @@ public class GatewayDTO implements Serializable {
             ", defaultFromComponentType='" + getDefaultFromComponentType() + "'" +
             ", defaultToComponentType='" + getDefaultToComponentType() + "'" +
             ", defaultErrorComponentType='" + getDefaultErrorComponentType() + "'" +
-            ", wiretapEndpoint=" + getWiretapEndpointId() +
             "}";
     }
 }

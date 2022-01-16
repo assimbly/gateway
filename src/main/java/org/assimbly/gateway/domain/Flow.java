@@ -35,9 +35,6 @@ public class Flow implements Serializable {
     @Column(name = "auto_start")
     private Boolean autoStart;
 
-    @Column(name = "off_loading")
-    private Boolean offLoading;
-
     @Column(name = "maximum_redeliveries")
     private Integer maximumRedeliveries;
 
@@ -134,19 +131,6 @@ public class Flow implements Serializable {
 
     public void setAutoStart(Boolean autoStart) {
         this.autoStart = autoStart;
-    }
-
-    public Boolean isOffLoading() {
-        return offLoading;
-    }
-
-    public Flow offLoading(Boolean offLoading) {
-        this.offLoading = offLoading;
-        return this;
-    }
-
-    public void setOffLoading(Boolean offLoading) {
-        this.offLoading = offLoading;
     }
     
     public Boolean isParallelProcessing() {
@@ -357,7 +341,6 @@ public class Flow implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", autoStart='" + isAutoStart() + "'" +
-            ", offLoading='" + isOffLoading() + "'" +
             ", maximumRedeliveries=" + getMaximumRedeliveries() +
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +

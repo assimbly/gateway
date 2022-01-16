@@ -117,7 +117,6 @@ public class FlowResourceIntTest {
         Flow flow = new Flow()
             .name(DEFAULT_NAME)
             .autoStart(DEFAULT_AUTO_START)
-            .offLoading(DEFAULT_OFF_LOADING)
             .maximumRedeliveries(DEFAULT_MAXIMUM_REDELIVERIES)
             .redeliveryDelay(DEFAULT_REDELIVERY_DELAY)
             .type(DEFAULT_TYPE)
@@ -149,7 +148,6 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(DEFAULT_AUTO_START);
-        assertThat(testFlow.isOffLoading()).isEqualTo(DEFAULT_OFF_LOADING);
         assertThat(testFlow.getMaximumRedeliveries()).isEqualTo(DEFAULT_MAXIMUM_REDELIVERIES);
         assertThat(testFlow.getRedeliveryDelay()).isEqualTo(DEFAULT_REDELIVERY_DELAY);
         assertThat(testFlow.getType()).isEqualTo(DEFAULT_TYPE);
@@ -190,7 +188,6 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
-            .andExpect(jsonPath("$.[*].offLoading").value(hasItem(DEFAULT_OFF_LOADING.booleanValue())))
             .andExpect(jsonPath("$.[*].maximumRedeliveries").value(hasItem(DEFAULT_MAXIMUM_REDELIVERIES)))
             .andExpect(jsonPath("$.[*].redeliveryDelay").value(hasItem(DEFAULT_REDELIVERY_DELAY)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
@@ -211,7 +208,6 @@ public class FlowResourceIntTest {
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
-            .andExpect(jsonPath("$.offLoading").value(DEFAULT_OFF_LOADING.booleanValue()))
             .andExpect(jsonPath("$.maximumRedeliveries").value(DEFAULT_MAXIMUM_REDELIVERIES))
             .andExpect(jsonPath("$.redeliveryDelay").value(DEFAULT_REDELIVERY_DELAY))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
@@ -242,7 +238,6 @@ public class FlowResourceIntTest {
         updatedFlow
             .name(UPDATED_NAME)
             .autoStart(UPDATED_AUTO_START)
-            .offLoading(UPDATED_OFF_LOADING)
             .maximumRedeliveries(UPDATED_MAXIMUM_REDELIVERIES)
             .redeliveryDelay(UPDATED_REDELIVERY_DELAY)
             .type(UPDATED_TYPE)
@@ -261,7 +256,6 @@ public class FlowResourceIntTest {
         Flow testFlow = flowList.get(flowList.size() - 1);
         assertThat(testFlow.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testFlow.isAutoStart()).isEqualTo(UPDATED_AUTO_START);
-        assertThat(testFlow.isOffLoading()).isEqualTo(UPDATED_OFF_LOADING);
         assertThat(testFlow.getMaximumRedeliveries()).isEqualTo(UPDATED_MAXIMUM_REDELIVERIES);
         assertThat(testFlow.getRedeliveryDelay()).isEqualTo(UPDATED_REDELIVERY_DELAY);
         assertThat(testFlow.getType()).isEqualTo(UPDATED_TYPE);

@@ -188,7 +188,6 @@ public class DBImportXMLConfiguration {
         String flowNotes = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/notes", doc);
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/autostart", doc);
         String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/assimblyHeaders", doc);
-		String flowOffloading = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/offloading", doc);
         String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/parallelProcessing", doc);
 
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id.toString() + "']/maximumRedeliveries", doc);
@@ -244,12 +243,6 @@ public class DBImportXMLConfiguration {
             } else {
                 flow.setAssimblyHeaders(false);
             }
-
-            if (flowOffloading != null && flowOffloading.equals("true")) {
-				flow.setOffLoading(true);
-			} else {
-				flow.setOffLoading(false);
-			}
 
             if (flowParallelProcessing != null && flowParallelProcessing.equals("true")) {
                 flow.setParallelProcessing(true);

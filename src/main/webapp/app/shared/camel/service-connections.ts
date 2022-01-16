@@ -223,21 +223,21 @@ export class Services {
     ];
 
     getServiceType(componentType: any) {
-        if (componentType === 'ACTIVEMQ') {
+        if (componentType === 'activemq') {
             return 'ActiveMQ Connection';
-        } else if (componentType === 'AMAZONMQ') {
+        } else if (componentType === 'amazonmq') {
             return 'AmazonMQ Connection';
-        } else if (componentType === 'AMQP') {
+        } else if (componentType === 'amqp') {
             return 'AMQP Connection';
-        } else if (componentType === 'AMQPS') {
+        } else if (componentType === 'amqps') {
             return 'AMQP Connection';
-        } else if (componentType === 'IBMMQ') {
+        } else if (componentType === 'ibmmq') {
             return 'IBMMQ Connection';
-        } else if (componentType === 'SONICMQ') {
+        } else if (componentType === 'sonicmq') {
             return 'SonicMQ Connection';
-        } else if (componentType === 'SQL') {
+        } else if (componentType === 'sql') {
             return 'JDBC Connection';
-        } else if (componentType === 'SJMS') {
+        } else if (componentType === 'sjms') {
             return 'MQ Connection';
         } else {
             return '';
@@ -245,21 +245,21 @@ export class Services {
     }
 
     hasService(componentType: any) {
-        if (componentType === 'ACTIVEMQ') {
+        if (componentType === 'activemq') {
             return true;
-        } else if (componentType === 'AMAZONMQ') {
+        } else if (componentType === 'amazonmq') {
             return true;
-        } else if (componentType === 'AMQP') {
+        } else if (componentType === 'amqp') {
             return true;
-        } else if (componentType === 'AMQPS') {
+        } else if (componentType === 'amqps') {
             return true;
-        } else if (componentType === 'IBMMQ') {
+        } else if (componentType === 'ibmmq') {
             return true;
-        } else if (componentType === 'SONICMQ') {
+        } else if (componentType === 'sonicmq') {
             return true;
-        } else if (componentType === 'SQL') {
+        } else if (componentType === 'sql') {
             return true;
-        } else if (componentType === 'SJMS') {
+        } else if (componentType === 'sjms') {
             return true;
         } else {
             return false;

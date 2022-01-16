@@ -71,7 +71,6 @@ public class CacheConfiguration {
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".gateways", jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".users", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.WireTapEndpoint.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Broker.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Route.class.getName(), jcacheConfiguration);
             cm.createCache(org.assimbly.gateway.domain.Queue.class.getName(), jcacheConfiguration);

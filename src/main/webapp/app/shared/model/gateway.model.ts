@@ -30,7 +30,6 @@ export interface IGateway {
     defaultFromComponentType?: string;
     defaultToComponentType?: string;
     defaultErrorComponentType?: string;
-    wiretapEndpointId?: number;
     flows?: IFlow[];
     environmentVariables?: IEnvironmentVariables[];
 }
@@ -46,7 +45,6 @@ export class Gateway implements IGateway {
         public defaultFromComponentType?: string,
         public defaultToComponentType?: string,
         public defaultErrorComponentType?: string,
-        public wiretapEndpointId?: number,
         public flows?: IFlow[],
         public environmentVariables?: IEnvironmentVariables[]
     ) {}
