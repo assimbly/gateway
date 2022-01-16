@@ -11,7 +11,7 @@ import { GatewayService } from '../gateway';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 
-import { ComponentType, typesLinks } from '../../shared/camel/component-type';
+import { Components } from 'app/shared/camel/component-type';
 import { JhiEventManager } from 'ng-jhipster';
 import { Subscription } from 'rxjs';
 
@@ -45,7 +45,8 @@ export class FlowDetailComponent implements OnInit {
         protected endpointService: EndpointService,
         protected eventManager: JhiEventManager,
         protected flowService: FlowService,
-        protected activatedRoute: ActivatedRoute
+        protected activatedRoute: ActivatedRoute,
+        public components: Components
     ) {
         tabsetConfig.justify = 'fill';
     }
@@ -105,9 +106,14 @@ export class FlowDetailComponent implements OnInit {
 
     private setTypeLinks(endpoint: any) {
         let type;
+        let componentType;
+        let camelComponentType;
 
-        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
-        this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + type.assimblyTypeLink;
-        this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + type.camelTypeLink;
+        componentType = endpoint.componentType.toString();
+        camelComponentType = this.components.getCamelComponentType(componentType);
+        type = this.components.types.find(x => x.name === endpoint.componentType.toString());
+
+        this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
     }
 }

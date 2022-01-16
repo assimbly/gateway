@@ -25,7 +25,7 @@
         <ng-template #timeoutPopover let-message="message">
             <div [innerHtml]="timeoutPopoverMessage"></div>
         </ng-template>
-
+		
         <ng-template #testConnectionModal>
             <div class="modal-header">
                 <h4 class="modal-title">Test Connection</h4>
@@ -114,32 +114,16 @@
                                                     <a ngbNavLink>{{endpoint.endpointType}}</a>
                                                     <ng-template ngbNavContent>
 
-                                                        <div  class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
-                                                            <div class="input-group">
-                                                                <a class="col-10"></a>
-                                                                <a class="col-2">
-                                                                    <div ngbDropdown class="d-inline-block" placement="bottom-right">
-                                                                        <a class="btn" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-bars"></i> Docs</a>
-                                                                        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                                                            <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
-                                                                                <span>Camel Documentation</span>
-                                                                            </a>
-                                                                            <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">
-                                                                                <span>Assimbly Documentation</span>
-                                                                            </a>
-                                                                            <a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
-                                                                                <span>Test Connection</span>
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
+                                                        <div  class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">															
                                                             <div class="form-group" [style.display]="'none'">
                                                                 <label for="id">ID</label>
                                                                 <input type="text" class="form-control" id="id" formControlName="id" readonly />
                                                             </div>
                                                             <ng-template #uriPopover let-message="message">
                                                                 <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
+                                                            </ng-template>
+															 <ng-template #pathPopover let-message="message">
+                                                                <div style="min-width:300px;">{{uriPlaceholders[index]}}</div>
                                                             </ng-template>
                                                             <ng-template #uriEditor>
                                                                 <div class="modal-header">
@@ -156,36 +140,60 @@
                                                                 </div>
                                                             </ng-template>
 
-
+                                                            <div class="border-bottom my-3"><h5>URI</h5></div>
                                                             <div class="form-group">
-                                                                <div class="input-group border-bottom my-3">
-                                                                    <h5>URI&ensp;</h5>
-                                                                    <i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
+                                                                <div class="input-group">
+																	<label class="form-control-label" for="field_component_type">Component</label>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" class="fa fa-info-circle" style="margin-left: 6px;"></i>
+	                                                                <div class="container">
+																		<div class="row">
+																			<ng-select *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block'}" [items]="consumerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<div ngbDropdown class="col-2" placement="bottom-right" >
+																				<a class="btn btn-primary left-border-radius-0" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-16px'}" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-bars"></i> Docs</a>
+																				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+																					<a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+																						<span>Camel Documentation</span>
+																					</a>
+																					<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+																						<span>Assimbly Documentation</span>
+																					</a>
+																					<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+																						<span>Test Connection</span>
+																					</a>
+																				</div>
+																			</div>
+																		</div>	
+																	</div>
+																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
+																		<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
+																	</div>
                                                                 </div>
-                                                                <div class="row mx-0 mb-1 flex-nowrap">
-                                                                        <ng-select  *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.fromTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                        <ng-select  *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                        <ng-select  *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.errorTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                        <ng-select  *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block', 'width': '138px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                                                        <span style="display:inline-block; width: 14px;"></span>
-                                                                        <a>:</a>
-                                                                        <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" class="col-7" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}"  [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
-                                                                        <button type="button" class="btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)" style="margin-left : -16px; width : 90px; float : left;">
-                                                                            <span class="fa fa-pencil padding-button"></span>&nbsp;
-                                                                        </button>
+															</div>	
+															<div class="form-group">	
+																<div class="input-group">
+																	<label class="form-control-label" for="field_uri">Path</label>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" class="fa fa-info-circle" style="margin-left: 6px;"></i>
+	                                                                <div class="container">
+																		<div class="row">
+																			<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+																			<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">
+																				<span class="fa fa-pencil padding-button"></span>&nbsp;
+																			</button>																	
+																		</div>	
+																	</div>		
                                                                 </div>
-                                                            </div>
-                                                            <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
-                                                                <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
-                                                            </div>
-                                                            <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
-                                                                <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
+																<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
+																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
+																</div>
                                                             </div>
                                                             <div class="form-group" formArrayName="options">
                                                                 <label class="form-control-label" for="field_options">Options</label>
                                                                 <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
                                                                 <div class="row mx-0 mb-1 flex-nowrap" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
-                                                                    <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '280px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
+                                                                    <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '300px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
                                                                         <ng-template ng-option-tmp let-item="item">
                                                                             <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
                                                                             <ng-template #optionTooltip>
@@ -199,19 +207,9 @@
                                                                     <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
                                                                     <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
                                                                     <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><span class="fa fa-remove"></span></button>
-                                                                    <!--<div class="col-5 d-inline-block px-0">
-                                                                        <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.touched)">
-                                                                            <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].key.errors.required" class="invalid-field-message">Option key is required.</div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-5 d-inline-block px-0">
-                                                                        <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.touched)">
-                                                                            <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].value.errors.required" class="invalid-field-message">Option value is required.</div>
-                                                                        </div>
-                                                                    </div>-->
                                                                 </div>
                                                             </div>
-                                                            <br/>
+															
                                                             <div class="border-bottom my-3"><h5>Header</h5></div>
                                                             <div class="form-group">
                                                                 <div class="input-group">
@@ -256,6 +254,7 @@
                                                                     </button>
                                                                 </div>
                                                             </div>
+
                                                             <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.touched)">
                                                                 <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
                                                             </div>
@@ -303,10 +302,7 @@
                                     <ng-template #assimblyHeadersPopover let-message="message">
                                         <div [innerHtml]="assimblyHeadersPopoverMessage"></div>
                                     </ng-template>
-                                    <ng-template #offloadingPopover let-message="message">
-                                        <div [innerHtml]="offloadingPopoverMessage"></div>
-                                    </ng-template>
-                                    <ng-template #parallelProcessingPopover let-message="message">
+                                     <ng-template #parallelProcessingPopover let-message="message">
                                         <div [innerHtml]="parallelProcessingPopoverMessage"></div>
                                     </ng-template>
                                     <ng-template #maximumRedeliveriesPopover let-message="message">
@@ -323,71 +319,49 @@
                                 <div class="container">
                                     <div  class="col-12" style="padding-left: 20px; padding-right: 452px; padding-bottom: 220px">
                                         <div class="form-group">
-                                            <label class="form-control-label" for="field_logLevel" style="float: left; text-align: left;">Log Level</label> <i triggers="mouseenter:mouseleave" placement="right"
-                                                                                                                                                               triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                                                                                                                                               [popover]="logLevelPopover" class="fa fa-info-circle"></i> <select
-                                            class="form-control" name="logLevel" formControlName="logLevel"
-                                            id="field_logLevel">
-
-                                            <option *ngFor="let logLevel of logLevelListType"
-                                                    [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
-                                                {{logLevel}}</option>
-
-
-                                        </select>
+                                            <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                                                [popover]="logLevelPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i> 
+											<select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+												<option *ngFor="let logLevel of logLevelListType"
+														[ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+													{{logLevel}}</option>
+											</select>
                                         </div>
                                         <div class="form-group">
-                                                <label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
-                                                <i triggers="mouseenter:mouseleave" placement="right"
-                                                   popoverTitle="Info" [popover]="autoStartPopover"
-                                                   class="fa fa-info-circle"></i> <select type="text"
-                                                                                          class="form-control" id="field_autostart" *ngIf="flow"
-                                                                                          formControlName="autoStart">
-                                                <option value="true">true</option>
-                                                <option value="false">false</option>
-                                            </select>
-                                            </div>
+											<label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
+											<i triggers="mouseenter:mouseleave" placement="right"
+											   popoverTitle="Info" [popover]="autoStartPopover"
+											   class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i> 
+											<select type="text" class="form-control" id="field_autostart" *ngIf="flow" formControlName="autoStart">
+												<option value="true">true</option>
+												<option value="false">false</option>
+											</select>
+                                        </div>
                                         <div class="form-group">
                                             <label class="form-control-label" for="field_parallelprocessing" style="float: left; text-align: left;">Parallel Processing</label>
-                                            <i triggers="mouseenter:mouseleave" placement="right"
-                                               triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                               [popover]="parallelProcessingPopover" class="fa fa-info-circle"></i> <select
-                                            type="text" class="form-control" id="field_parallelprocessing"
-                                            *ngIf="flow" formControlName="parallelProcessing">
-                                            <option value="true">true</option>
-                                            <option value="false">false</option>
-                                        </select>
+                                            <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                                               [popover]="parallelProcessingPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;">
+											</i> 
+											<select type="text" class="form-control" id="field_parallelprocessing" *ngIf="flow" formControlName="parallelProcessing">
+												<option value="true">true</option>
+												<option value="false">false</option>
+											</select>
                                         </div>
                                         <div class="form-group">
                                                 <label class="form-control-label" for="field_assimbly_headers" style="float: left; text-align: left;">Assimbly Headers</label>
                                                 <i triggers="mouseenter:mouseleave" placement="right"
-                                                   triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                                   [popover]="assimblyHeadersPopover" class="fa fa-info-circle"></i> <select
-                                                type="text" class="form-control" id="field_assimbly_headers"
-                                                *ngIf="flow" formControlName="assimblyHeaders">
-                                                <option value="true">true</option>
-                                                <option value="false">false</option>
-                                            </select>
+                                                   popoverTitle="Info" [popover]="assimblyHeadersPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;">
+												</i> 
+												<select type="text" class="form-control" id="field_assimbly_headers" *ngIf="flow" formControlName="assimblyHeaders">
+													<option value="true">true</option>
+													<option value="false">false</option>
+												</select>
                                             </div>
-                                          <!--  <div class="form-group" >
-                                                <label class="form-control-label" for="field_offloading" style="float: left; text-align: left;">Offloading</label>
-                                                <i triggers="mouseenter:mouseleave" placement="right"
-                                                   triggers="mouseenter:mouseleave" popoverTitle="Info"
-                                                   [popover]="offloadingPopover" class="fa fa-info-circle"></i> <select
-                                                type="text" class="form-control" id="field_offloading"
-                                                *ngIf="flow" formControlName="offloading">
-                                                <option value="true">true</option>
-                                                <option value="false">false</option>
-                                            </select>
-                                            </div>-->
-                                    <div class="form-group">
-                                                <label class="form-control-label" for="field_maximumRedeliveries" style="float: left; text-align: left;">Maximum Redeliveries</label> <i triggers="mouseenter:mouseleave"
-                                                                            placement="right" triggers="mouseenter:mouseleave"
-                                                                            popoverTitle="Info" [popover]="maximumRedeliveriesPopover"
-                                                                            class="fa fa-info-circle"></i> <input min="0" max="1000" size="0"
-                                                                                                                  maxlength="4" type="number" name="maximumRedeliveries"
-                                                                                                                  class="form-control" id="maximumRedeliveries" *ngIf="flow"
-                                                                                                                  formControlName="maximumRedeliveries" required>
+                                     <div class="form-group">
+                                            <label class="form-control-label" for="field_maximumRedeliveries" style="float: left; text-align: left;">Maximum Redeliveries</label> 
+											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="maximumRedeliveriesPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i>
+											<input min="0" max="1000" size="0" maxlength="4" type="number" name="maximumRedeliveries" class="form-control" id="maximumRedeliveries" *ngIf="flow" formControlName="maximumRedeliveries" required>
                                             </div>
                                             <div class="form-group" *ngIf="!singleGateway">
                                                 <label class="form-control-label" for="field_gateway" style="float: left; text-align: left;">Gateway</label>

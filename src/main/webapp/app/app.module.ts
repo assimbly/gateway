@@ -22,7 +22,7 @@ import * as moment from 'moment';
 
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent, ErrorComponent } from './layouts';
+import { JhiMainComponent, NavbarComponent, FooterComponent, ErrorComponent } from './layouts';
 
 @NgModule({
     imports: [
@@ -45,7 +45,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
         PopoverModule.forRoot()
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
-    declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],
+    declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, FooterComponent],
     providers: [
         HttpClientModule,
         {

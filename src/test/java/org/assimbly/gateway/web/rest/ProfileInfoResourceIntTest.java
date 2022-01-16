@@ -40,10 +40,6 @@ public class ProfileInfoResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         String mockProfile[] = { "test" };
-        //JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
-        //ribbon.setDisplayOnActiveProfiles(mockProfile);
-        //when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
-
         String activeProfiles[] = {"test"};
         when(environment.getDefaultProfiles()).thenReturn(activeProfiles);
         when(environment.getActiveProfiles()).thenReturn(activeProfiles);
@@ -52,24 +48,6 @@ public class ProfileInfoResourceIntTest {
         this.restProfileMockMvc = MockMvcBuilders
             .standaloneSetup(profileInfoResource)
             .build();
-    }
-
-    @Test
-    public void getProfileInfoWithRibbon() throws Exception {
-        restProfileMockMvc.perform(get("/api/profile-info"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
-    }
-
-    @Test
-    public void getProfileInfoWithoutRibbon() throws Exception {
-        //JHipsterProperties.Ribbon ribbon = new JHipsterProperties.Ribbon();
-        //ribbon.setDisplayOnActiveProfiles(null);
-        //when(jHipsterProperties.getRibbon()).thenReturn(ribbon);
-
-        restProfileMockMvc.perform(get("/api/profile-info"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
     }
 
     @Test

@@ -37,12 +37,6 @@
                 <dd>
                     <span>{{gateway.defaultErrorComponentType}}</span>
                 </dd>
-                <dt><span>Wiretap Endpoint</span></dt>
-                <dd>
-                    <div *ngIf="gateway.wiretapEndpointId">
-                        <a [routerLink]="['/wire-tap-endpoint', gateway.wiretapEndpointId, 'view']">{{gateway.wiretapEndpointId}}</a>
-                    </div>
-                </dd>
             </dl>
 
             <button type="submit"

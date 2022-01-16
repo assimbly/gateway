@@ -3,7 +3,6 @@ import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/ht
 import { Subscription, forkJoin } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
-import { ComponentType } from '../../shared/camel/component-type';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { AccountService } from 'app/core';
@@ -145,9 +144,9 @@ export class FlowComponent implements OnInit, OnDestroy {
                 this.gateway.type = GatewayType.FULL;
                 this.gateway.environmentName = 'Dev1';
                 this.gateway.stage = EnvironmentType.DEVELOPMENT;
-                this.gateway.defaultFromComponentType = ComponentType.FILE;
-                this.gateway.defaultToComponentType = ComponentType.FILE;
-                this.gateway.defaultErrorComponentType = ComponentType.FILE;
+                this.gateway.defaultFromComponentType = 'file';
+                this.gateway.defaultToComponentType = 'file';
+                this.gateway.defaultErrorComponentType = 'file';
 
                 this.gatewayService.create(this.gateway).subscribe(gateway => {
                     console.log('gateway created');

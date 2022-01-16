@@ -83,6 +83,8 @@ spring:
             enabled: true
     thymeleaf:
         mode: HTML
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 
 springdoc:
   show-actuator: true
@@ -94,11 +96,6 @@ server:
             cookie:
                 http-only: true
                 max-age: 28800
-
-# Properties to be exposed on the /info management endpoint
-info:
-    # Comma separated list of profiles that will trigger the ribbon to show
-    display-ribbon-on-profiles: "dev"
 
 # ===================================================================
 # JHipster specific properties
@@ -146,7 +143,7 @@ jhipster:
 
 application:
   info:
-    version: 3.5.0
+    version: 3.6.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest

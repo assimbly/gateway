@@ -71,19 +71,19 @@
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">From</label>
 			            <select class="form-control" name="type"  name="defaultFromComponentType" id="field_defaultFromComponentType" [(ngModel)]="gateway.defaultFromComponentType">
-			                <option *ngFor="let fromType of components.fromTypes" [ngValue]="fromType">{{fromType}}</option>
+			                <option *ngFor="let fromType of consumerComponentsNames" [ngValue]="fromType">{{fromType}}</option>
 			            </select>
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultToComponentType">To</label>
 			            <select class="form-control" name="type"  name="defaultToComponentType" id="field_defaultToComponentType" [(ngModel)]="gateway.defaultToComponentType">
-			                <option *ngFor="let toType of components.toTypes" [ngValue]="toType">{{toType}}</option>
+			                <option *ngFor="let toType of producerComponentsNames" [ngValue]="toType">{{toType}}</option>
 			            </select>
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultErrorComponentType">Error</label>
 			            <select class="form-control" name="type" name="defaultErrorComponentType" id="field_defaultErrorComponentType" [(ngModel)]="gateway.defaultErrorComponentType" >
-			                <option *ngFor="let errorType of components.errorTypes" [ngValue]="errorType">{{errorType}}</option>
+			                <option *ngFor="let errorType of producerComponentsNames" [ngValue]="errorType">{{errorType}}</option>
 			            </select>
 			        </div>
 

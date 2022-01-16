@@ -19,7 +19,7 @@ import { RouteService } from '../../route';
 import { GatewayService } from '../../gateway';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Components, ComponentType, typesLinks } from 'app/shared/camel/component-type';
+import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
@@ -92,7 +92,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     notesPopoverMessage: string;
     autoStartPopoverMessage: string;
     assimblyHeadersPopoverMessage: string;
-    offloadingPopoverMessage: string;
     parallelProcessingPopoverMessage: string;
     maximumRedeliveriesPopoverMessage: string;
     redeliveryDelayPopoverMessage: string;
@@ -114,6 +113,9 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     componentTypeCamelLinks: Array<string> = new Array<string>();
     uriPlaceholders: Array<string> = new Array<string>();
     uriPopoverMessages: Array<string> = new Array<string>();
+
+    consumerComponentsNames: Array<any> = [];
+    producerComponentsNames: Array<any> = [];
 
     typesLinks: Array<TypeLinks>;
     editFlowForm: FormGroup;
@@ -174,6 +176,8 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         this.setPopoverMessages();
 
         this.activeEndpoint = this.route.snapshot.queryParamMap.get('endpointid');
+
+        this.setComponents();
 
         this.subscription = this.route.params.subscribe(params => {
             if (params['mode'] === 'clone') {
@@ -329,7 +333,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     this.flow = new Flow();
                     this.flow.notes = '';
                     this.flow.autoStart = false;
-                    this.flow.offLoading = false;
                     this.flow.parallelProcessing = true;
                     this.flow.assimblyHeaders = true;
                     this.flow.maximumRedeliveries = 0;
@@ -348,7 +351,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     //create new from endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.FROM;
-                    this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultFromComponentType];
+                    this.endpoint.componentType = this.gateways[this.indexGateway].defaultFromComponentType;
 
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[0] = [new Option()];
@@ -356,10 +359,10 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     //set documentation links
                     this.setTypeLinks(this.endpoint, 0);
 
-                    let componentType = this.endpoint.componentType.toString().toLowerCase();
+                    let componentType = this.endpoint.componentType.toLowerCase();
                     let camelComponentType = this.components.getCamelComponentType(componentType);
 
-                    //get list of options (from Camel Catalog
+                    //get list of options (from CamelCatalog)
                     this.setComponentOptions(this.endpoint, camelComponentType);
 
                     this.numberOfFromEndpoints = 1;
@@ -373,12 +376,12 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     //create new to endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.TO;
-                    this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
+                    this.endpoint.componentType = this.gateways[this.indexGateway].defaultToComponentType;
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[1] = [new Option()];
 
                     this.setTypeLinks(this.endpoint, 1);
-                    componentType = this.endpoint.componentType.toString().toLowerCase();
+                    componentType = this.endpoint.componentType.toLowerCase();
                     camelComponentType = this.components.getCamelComponentType(componentType);
 
                     this.setComponentOptions(this.endpoint, camelComponentType);
@@ -394,12 +397,12 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     //create new error endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.ERROR;
-                    this.endpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultErrorComponentType];
+                    this.endpoint.componentType = this.gateways[this.indexGateway].defaultErrorComponentType;
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[2] = [new Option()];
                     this.setTypeLinks(this.endpoint, 2);
 
-                    componentType = this.endpoint.componentType.toString().toLowerCase();
+                    componentType = this.endpoint.componentType.toLowerCase();
                     camelComponentType = this.components.getCamelComponentType(componentType);
                     this.setComponentOptions(this.endpoint, camelComponentType);
 
@@ -416,6 +419,22 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
             this.active = '0';
         });
+    }
+
+    setComponents() {
+        let producerComponents = this.components.types.filter(function(component) {
+            return component.consumerOnly === false;
+        });
+
+        let consumerComponents = this.components.types.filter(function(component) {
+            return component.producerOnly === false;
+        });
+
+        this.producerComponentsNames = producerComponents.map(component => component.name);
+        this.producerComponentsNames.sort();
+
+        this.consumerComponentsNames = consumerComponents.map(component => component.name);
+        this.consumerComponentsNames.sort();
     }
 
     clone() {
@@ -479,7 +498,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             endpointForm.controls.service.patchValue(endpoint.routeId);
             endpointForm.controls.service.patchValue(endpoint.serviceId);
         } else if (!endpoint.componentType) {
-            endpoint.componentType = ComponentType.FILE;
+            endpoint.componentType = 'file';
         }
 
         let type;
@@ -488,20 +507,21 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         let camelComponentType;
 
         this.selectedComponentType = endpoint.componentType.toString();
-        componentType = endpoint.componentType.toString().toLowerCase();
 
+        componentType = endpoint.componentType.toString();
         camelComponentType = this.components.getCamelComponentType(componentType);
 
-        type = typesLinks.find(x => x.name === endpoint.componentType.toString());
-        camelType = typesLinks.find(x => x.name === camelComponentType.toUpperCase());
+        type = this.components.types.find(x => x.name === endpoint.componentType.toString());
+
+        camelType = this.components.types.find(x => x.name === camelComponentType);
 
         this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 
-        this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + type.assimblyTypeLink;
-        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + camelType.camelTypeLink;
+        this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
 
-        this.uriPlaceholders[endpointFormIndex] = type.uriPlaceholder;
-        this.uriPopoverMessages[endpointFormIndex] = type.uriPopoverMessage;
+        this.uriPlaceholders[endpointFormIndex] = type.syntax;
+        this.uriPopoverMessages[endpointFormIndex] = type.description;
 
         // set options keys
         if (typeof e !== 'undefined') {
@@ -515,7 +535,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             });
         }
 
-        endpointForm.patchValue({ componentType: componentType.toUpperCase() });
+        endpointForm.patchValue({ string: componentType });
 
         this.enableFields(endpointForm);
 
@@ -527,8 +547,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         this.notesPopoverMessage = `Notes to documentatie your flow`;
         this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
         this.assimblyHeadersPopoverMessage = `If true then message headers like timestamp, uri, flowid and correlationid are set. These headers start with Assimbly and can be used for logging purposes. `;
-        this.offloadingPopoverMessage = `If true then the flow sends a copy of every message to the wiretap endpoint.<br/><br/>
-                                         This endpoint is configured at <i>Settings --> Offloading</i>.`;
         this.parallelProcessingPopoverMessage = `If true then to endpoints are processed in parallel.`;
         this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
         this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
@@ -553,31 +571,23 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         let tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
-            if (this.selectedComponentType === endpoint.componentType) {
+            if (this.selectedComponentType === endpoint.componentType.toLowerCase()) {
                 this.URIList[index].push(endpoint);
             }
         });
+
+        this.URIList.sort();
     }
 
     enableFields(endpointForm) {
         let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
 
-        if (endpointForm.controls.componentType.value === 'WASTEBIN') {
+        if (endpointForm.controls.componentType.value === 'wastebin') {
             endpointForm.controls.uri.disable();
             endpointForm.controls.options.disable();
             endpointForm.controls.header.disable();
             endpointForm.controls.route.disable();
             endpointForm.controls.service.disable();
-        } else if (endpointForm.controls.componentType.value === 'WASTEBIN') {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.header.enable();
-            endpointForm.controls.route.enable();
-            if (this.embeddedBroker) {
-                endpointForm.controls.service.disable();
-            } else {
-                endpointForm.controls.service.enable();
-            }
         } else if (componentHasService) {
             endpointForm.controls.uri.enable();
             endpointForm.controls.options.enable();
@@ -600,7 +610,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             notes: new FormControl(flow.notes),
             autoStart: new FormControl(flow.autoStart),
             assimblyHeaders: new FormControl(flow.assimblyHeaders),
-            offloading: new FormControl(flow.offLoading),
             parallelProcessing: new FormControl(flow.parallelProcessing),
             maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
             redeliveryDelay: new FormControl(flow.redeliveryDelay),
@@ -654,7 +663,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             notes: flow.notes,
             autoStart: flow.autoStart,
             assimblyHeaders: flow.assimblyHeaders,
-            offloading: flow.offLoading,
             parallelProcessing: flow.parallelProcessing,
             maximumRedeliveries: flow.maximumRedeliveries,
             redeliveryDelay: flow.redeliveryDelay,
@@ -713,7 +721,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             endpoint.options = '';
         }
 
-        let componentType = endpoint.componentType.toString().toLowerCase();
+        let componentType = endpoint.componentType.toLowerCase();
         let camelComponentType = this.components.getCamelComponentType(componentType);
 
         this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
@@ -829,13 +837,11 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             const customOption = new Option();
             customOption.key = selectedOption;
 
-            let componentType = endpoint.componentType.toString().toLowerCase();
+            let componentType = endpoint.componentType.toLowerCase();
             let camelComponentType = this.components.getCamelComponentType(componentType);
 
             let optionArray: Array<string> = [];
             optionArray.splice(optionIndex, 0, customOption.key);
-
-            console.log('add to custom options cameltype X=' + JSON.stringify(this.selectedOptions[index]));
 
             this.componentOptions[index].push({
                 name: selectedOption,
@@ -889,7 +895,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         const newEndpoint = this.endpoints.find((e, i) => i === newIndex);
 
         newEndpoint.endpointType = endpoint.endpointType;
-        newEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
+        newEndpoint.componentType = this.gateways[this.indexGateway].defaultToComponentType;
 
         (<FormArray>this.editFlowForm.controls.endpointsData).insert(newIndex, this.initializeEndpointData(newEndpoint));
 
@@ -930,7 +936,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         const newEndpoint = this.endpoints.find((e, i) => i === responseIndex);
 
         newEndpoint.endpointType = EndpointType.RESPONSE;
-        newEndpoint.componentType = ComponentType[this.gateways[this.indexGateway].defaultToComponentType];
+        newEndpoint.componentType = this.gateways[this.indexGateway].defaultToComponentType;
 
         (<FormArray>this.editFlowForm.controls.endpointsData).insert(responseIndex, this.initializeEndpointData(newEndpoint));
 
@@ -1288,7 +1294,6 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         this.flow.notes = flowControls.notes.value;
         this.flow.autoStart = flowControls.autoStart.value;
         this.flow.assimblyHeaders = flowControls.assimblyHeaders.value;
-        this.flow.offLoading = flowControls.offloading.value;
         this.flow.parallelProcessing = flowControls.parallelProcessing.value;
         this.flow.maximumRedeliveries = flowControls.maximumRedeliveries.value;
         this.flow.redeliveryDelay = flowControls.redeliveryDelay.value;

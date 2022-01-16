@@ -207,7 +207,7 @@
                                             <i triggers="mouseenter:mouseleave" popoverTitle="Info" container="body" [popover]="uriPopover" class="fa fa-info-circle"></i>
                                         </div>
                                         <div class="row mx-0 mb-1 flex-nowrap">
-                                            <ng-select  *ngIf="requestEndpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '124px', 'align-left': '-14px'}" [items]="components.toTypes" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(requestEndpoint, 0, $event)"></ng-select>
+                                            <ng-select  *ngIf="requestEndpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block', 'width': '124px', 'align-left': '-14px'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(requestEndpoint, 0, $event)"></ng-select>
                                             <span style="display:inline-block; width: 14px;"></span>
                                             <a>:</a>
                                             <ng-select [items]="URIList" [addTag]="true" bindLabel="uri" bindValue="uri" class="col-7"  [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[0]}}"  [(ngModel)]="requestEndpoint.uri" dropdownPosition="bottom"></ng-select>

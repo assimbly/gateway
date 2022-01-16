@@ -45,13 +45,7 @@
                             <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
                             <span>Services</span>
                         </a>
-                    </li>
-                    <!--<li *jhiHasAnyAuthority="'ROLE_ADMIN'">
-                        <a class="dropdown-item" routerLink="wire-tap-endpoint" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
-                            <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
-                            <span>Offloading</span>
-                        </a>
-                    </li>-->
+                    </li>                  
                 </ul>
             </li>
             <li *ngIf="type==='BROKER' || type==='FULL'"  routerLinkActive="active" ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">

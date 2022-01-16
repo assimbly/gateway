@@ -39,9 +39,6 @@ public class DBExportXMLConfiguration {
     @Autowired
     private RouteRepository routeRepository;
 
-    @Autowired
-	private WireTapEndpointRepository wireTapEndpointRepository;
-
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
@@ -62,8 +59,6 @@ public class DBExportXMLConfiguration {
     private List<String> routesList;
 
 	public String configuration;
-
-	private Element offloading;
 
 	private Node environmentVariablesList;
 
@@ -201,14 +196,12 @@ public class DBExportXMLConfiguration {
 		defaultErrorComponentType.appendChild(doc.createTextNode(gateway.getDefaultErrorComponentType()));
 		integration.appendChild(defaultErrorComponentType);
 
-		offloading = doc.createElement("offloading");
 		flows = doc.createElement("flows");
 		services = doc.createElement("services");
 		headers = doc.createElement("headers");
         routes = doc.createElement("routes");
 		environmentVariablesList = doc.createElement("environmentVariables");
 
-		integration.appendChild(offloading);
 		integration.appendChild(flows);
 		integration.appendChild(services);
 		integration.appendChild(headers);
@@ -218,8 +211,6 @@ public class DBExportXMLConfiguration {
 		servicesList = new ArrayList<String>();
 		headersList = new ArrayList<String>();
 		routesList = new  ArrayList<String>();
-
-		setXMLOffloadingPropertiesFromDB(integrationId);
 
 		setXMLEnvironmentVariablesFromDB(integrationId);
 
@@ -261,12 +252,6 @@ public class DBExportXMLConfiguration {
         Element isAssimblyHeaders = doc.createElement("assimblyHeaders");
         isAssimblyHeaders.appendChild(doc.createTextNode(flowAssimblyHeaders));
         flow.appendChild(isAssimblyHeaders);
-
-		// set offloading
-		String flowOffloading = flowDB.isOffLoading().toString();
-		Element isOffloading = doc.createElement("offloading");
-		isOffloading.appendChild(doc.createTextNode(flowOffloading));
-		flow.appendChild(isOffloading);
 
         // set parallelProcessing
         String flowParallelProcessing = flowDB.isParallelProcessing().toString();
@@ -317,88 +302,6 @@ public class DBExportXMLConfiguration {
 		setEndpointsFromDB(endpoints);
 
 	}
-
-	public void setXMLWireTapEndpointFromDB(WireTapEndpoint wireTapEndpointDB) throws Exception {
-
-		String confUri = wireTapEndpointDB.getUri();
-		String confComponentType = wireTapEndpointDB.getType();
-		String confOptions = wireTapEndpointDB.getOptions();
-		org.assimbly.gateway.domain.Service confService = wireTapEndpointDB.getService();
-		Header confHeader = wireTapEndpointDB.getHeader();
-
-		if (confUri != null) {
-
-			Element uri = doc.createElement("uri");
-			offloading.appendChild(uri);
-
-			componentType = setDefaultComponentType(confComponentType.toLowerCase());
-
-			if (componentType.equals("sql")) {
-				String confServiceId = confService.getId().toString();
-				if (confOptions.isEmpty() || confOptions == null) {
-					confOptions = "dataSource=" + confServiceId;
-				} else if (!confOptions.contains("dataSource")) {
-					confOptions = "&dataSource=" + confServiceId;
-				}
-			}
-
-			confUri = componentType + confUri;
-			uri.setTextContent(confUri);
-			offloading.appendChild(uri);
-
-			if (confOptions != null && !confOptions.isEmpty()) {
-
-				Element options = doc.createElement("options");
-				offloading.appendChild(options);
-
-				String[] confOptionsSplitted = confOptions.split("&");
-
-				if (confOptionsSplitted.length > 1) {
-
-					for (String confOption : confOptionsSplitted) {
-						String confOptionKey = confOption.split("=")[0];
-						String confOptionValue = StringUtils.substringAfter(confOption, "=");
-
-						Element option = doc.createElement(confOptionKey);
-						option.setTextContent(confOptionValue);
-						options.appendChild(option);
-					}
-				} else {
-
-					String confOptionKey = confOptions.split("=")[0];
-					String confOptionValue = StringUtils.substringAfter(confOptions, "=");
-
-					Element option = doc.createElement(confOptionKey);
-					option.setTextContent(confOptionValue);
-					options.appendChild(option);
-
-				}
-			}
-
-			if (confService != null) {
-				String confServiceId = confService.getId().toString();
-				Element serviceId = doc.createElement("service_id");
-
-				serviceId.setTextContent(confServiceId);
-				offloading.appendChild(serviceId);
-
-				setXMLServiceFromDB(confServiceId, "wireTap", confService);
-
-			}
-
-			if (confHeader != null) {
-				String confHeaderId = confHeader.getId().toString();
-				Element headerId = doc.createElement("header_id");
-
-				offloading.appendChild(headerId);
-				headerId.setTextContent(confHeaderId);
-
-				setXMLHeaderFromDB(confHeaderId, "wireTap", confHeader);
-			}
-
-		}
-	}
-
 
     public void setComponentFromDB(Set<Endpoint> endpointsDB) throws Exception {
 
@@ -652,31 +555,6 @@ public class DBExportXMLConfiguration {
 
 
     }
-
-    public void setXMLOffloadingPropertiesFromDB(String integrationId) throws Exception {
-
-		List<WireTapEndpoint> wiretapEndpoints = wireTapEndpointRepository.findAll();
-
-		if (wiretapEndpoints.size() > 0) {
-
-			WireTapEndpoint wiretapEndpoint = wiretapEndpoints.get(0);
-
-			// set id
-			String offloadingId = wiretapEndpoint.getId().toString();
-			Element id = doc.createElement("id");
-			id.appendChild(doc.createTextNode(offloadingId));
-			offloading.appendChild(id);
-
-			// set name
-			String offloadingName = "offloading";
-			Element name = doc.createElement("name");
-			name.appendChild(doc.createTextNode(offloadingName));
-			offloading.appendChild(name);
-
-			setXMLWireTapEndpointFromDB(wiretapEndpoint);
-
-		}
-	}
 
 	public void setXMLEnvironmentVariablesFromDB(String integrationId) throws Exception {
 
