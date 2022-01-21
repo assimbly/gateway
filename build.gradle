@@ -447,9 +447,9 @@ wrapper {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "${node_version}"
-        npmVersion = "${npm_version}"
-        yarnVersion = "${yarn_version}"
+        version = "16.13.1"
+        npmVersion = "8.3.0"
+        yarnVersion = "1.22.17"
         download = true
     }
 }
