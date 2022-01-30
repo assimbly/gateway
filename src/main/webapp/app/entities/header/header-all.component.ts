@@ -55,7 +55,7 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     }
 
     private loadAllHeaders() {
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();

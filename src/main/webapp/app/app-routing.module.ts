@@ -12,7 +12,7 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
                 ...LAYOUT_ROUTES,
                 {
                     path: 'admin',
-                    loadChildren: () => import('./admin/admin.module').then(m => m.GatewayAdminModule)
+                    loadChildren: () => import('./admin/admin-routing.module').then(m => m.AdminRoutingModule)
                 }
             ],
             { useHash: true, enableTracing: DEBUG_INFO_ENABLED }

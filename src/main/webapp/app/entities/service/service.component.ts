@@ -60,7 +60,7 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         if (this.serviceKey !== undefined) {

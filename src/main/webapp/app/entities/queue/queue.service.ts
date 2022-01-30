@@ -13,7 +13,9 @@ import { IRootQueueAddress } from 'app/shared/model/address.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
+
 import { CSRFService } from 'app/core';
+
 import { BrokerService } from 'app/entities/broker';
 import { IBroker } from 'app/shared/model/broker.model';
 

@@ -112,12 +112,12 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.getGateways();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
             this.flowService.connect();
         });
         this.finished = true;
-        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
+        this.isAdmin = this.accountService.isAdmin();
         this.registerChangeInFlows();
         this.registerChangeCreatedGateway();
         this.registerDeletedFlows();

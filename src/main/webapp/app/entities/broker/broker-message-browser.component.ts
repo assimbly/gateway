@@ -86,7 +86,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
 
@@ -98,7 +98,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
         this.loadMessages();
         this.finished = true;
-        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
+        this.isAdmin = this.accountService.isAdmin();
         this.registerChangeInFlows();
     }
 

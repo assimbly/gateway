@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { LogViewerService } from './log-viewer.service';
+import { LogViewerService } from './logviewer.service';
 
 @Component({
-    selector: 'jhi-log-viewer',
-    templateUrl: './log-viewer.component.html'
+    selector: 'jhi-logviewer',
+    templateUrl: './logviewer.component.html'
 })
 export class LogViewerComponent implements OnInit {
     @ViewChild('logArea', { static: false }) private logArea: ElementRef;
@@ -11,7 +11,7 @@ export class LogViewerComponent implements OnInit {
     public logLines: string[];
     public lines: number;
     searchText: string = '';
-    
+
     constructor(private logViewerService: LogViewerService) {}
 
     ngOnInit() {
@@ -24,7 +24,7 @@ export class LogViewerComponent implements OnInit {
         this.logViewerService.getLogs(this.lines).subscribe(res => {
             this.log = res.body;
             this.logLines = this.log.split(/\r?\n/);
-            
+
             setTimeout(() => {
                 try {
                     this.logArea.nativeElement.scrollTop = this.logArea.nativeElement.scrollHeight;

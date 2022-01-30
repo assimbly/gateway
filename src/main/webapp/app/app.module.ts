@@ -15,14 +15,19 @@ import { GatewaySharedModule } from 'app/shared';
 import { GatewayCoreModule } from 'app/core';
 import { GatewayAppRoutingModule } from './app-routing.module';
 import { GatewayHomeModule } from 'app/home';
-import { GatewayAccountModule } from './account/account.module';
+import { AccountModule } from './account/account.module';
 import { GatewayEntityModule } from './entities/entity.module';
 import * as moment from 'moment';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
+import { MainComponent } from './layouts/main/main.component';
+import { NavbarComponent } from './layouts/navbar/navbar.component';
+import { FooterComponent } from './layouts/footer/footer.component';
+import { PageRibbonComponent } from './layouts/profiles/page-ribbon.component';
+import { ActiveMenuDirective } from './layouts/navbar/active-menu.directive';
+import { ErrorComponent } from './layouts/error/error.component';
 
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { JhiMainComponent, NavbarComponent, FooterComponent, ErrorComponent } from './layouts';
 
 @NgModule({
     imports: [
@@ -38,14 +43,14 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, ErrorComponent } fr
         GatewaySharedModule.forRoot(),
         GatewayCoreModule,
         GatewayHomeModule,
-        GatewayAccountModule,
+        AccountModule,
         GatewayEntityModule,
         NgSelectModule,
         FormsModule,
         PopoverModule.forRoot()
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
-    declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, FooterComponent],
+    declarations: [MainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, ActiveMenuDirective, FooterComponent],
     providers: [
         HttpClientModule,
         {
@@ -64,7 +69,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, ErrorComponent } fr
             multi: true
         }
     ],
-    bootstrap: [JhiMainComponent]
+    bootstrap: [MainComponent]
 })
 export class GatewayAppModule {
     constructor(private dpConfig: NgbDatepickerConfig) {
