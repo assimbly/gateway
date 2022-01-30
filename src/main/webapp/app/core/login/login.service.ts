@@ -1,34 +1,21 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 
-import { AccountService } from '../auth/account.service';
-import { AuthServerProvider } from '../auth/auth-session.service';
+import { Account } from 'app/core/user/account.model';
+import { AccountService } from 'app/core/auth/account.service';
+import { AuthServerProvider } from 'app/core/auth/auth-jwt.service';
+import { Login } from './login.model';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
     constructor(private accountService: AccountService, private authServerProvider: AuthServerProvider) {}
 
-    login(credentials, callback?) {
-        const cb = callback || function() {};
-
-        return new Promise((resolve, reject) => {
-            this.authServerProvider.login(credentials).subscribe(
-                data => {
-                    this.accountService.identity(true).then(account => {
-                        resolve(data);
-                    });
-                    return cb();
-                },
-                err => {
-                    this.logout();
-                    reject(err);
-                    return cb(err);
-                }
-            );
-        });
+    login(credentials: Login): Observable<Account | null> {
+        return this.authServerProvider.login(credentials).pipe(flatMap(() => this.accountService.identity(true)));
     }
 
-    logout() {
-        this.authServerProvider.logout().subscribe();
-        this.accountService.authenticate(null);
+    logout(): void {
+        this.authServerProvider.logout().subscribe(null, null, () => this.accountService.authenticate(null));
     }
 }

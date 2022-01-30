@@ -839,12 +839,14 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     //Get currrent scroll position
     findPos(obj) {
         var curtop = 0;
+
         if (obj.offsetParent) {
             do {
                 curtop += obj.offsetTop;
             } while ((obj = obj.offsetParent));
-            return curtop;
         }
+
+        return curtop;
     }
 
     goBack() {
@@ -861,12 +863,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     formatUri(endpointOptions, endpoint, formEndpoint): string {
         if (formEndpoint.controls.componentType.value === null) {
             return;
+        } else {
+            let formOptions = <FormArray>formEndpoint.controls.options;
+            this.setEndpointOptions(endpointOptions, endpoint, formOptions);
+            return `${formEndpoint.controls.componentType.value.toLowerCase()}`;
         }
-        let formOptions = <FormArray>formEndpoint.controls.options;
-        this.setEndpointOptions(endpointOptions, endpoint, formOptions);
-        return `${formEndpoint.controls.componentType.value.toLowerCase()}://${formEndpoint.controls.uri.value}${
-            !endpoint.options ? '' : endpoint.options
-        }`;
     }
 
     validateTypeAndUri(endpoint: FormGroup) {

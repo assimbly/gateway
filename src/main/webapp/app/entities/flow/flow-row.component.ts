@@ -623,9 +623,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     endpointTooltip(type, uri, options): string {
         if (type === null) {
             return;
+        } else {
+            const opt = options === '' ? '' : `?${options}`;
+            return `${type.toLowerCase()}://${uri}${opt}`;
         }
-        const opt = options === '' ? '' : `?${options}`;
-        return `${type.toLowerCase()}://${uri}${opt}`;
     }
 
     curentDateTime(): string {
