@@ -28,10 +28,12 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
+	id 'de.undercouch.download' version '5.0.1'
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
+
 
 group = "org.assimbly.gateway"
 version = '3.6.0'
@@ -42,6 +44,7 @@ sourceCompatibility=11
 targetCompatibility=11
 assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
+apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'

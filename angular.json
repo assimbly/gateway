@@ -3,37 +3,34 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "gateway": {
+        "jhipster-gradle-sample-application": {
             "root": "",
             "sourceRoot": "src/main/webapp",
             "projectType": "application",
+            "schematics": {
+                "@schematics/angular:component": {
+                    "skipTests": true,
+                    "style": "scss"
+                },
+                "@schematics/angular:directive": {
+                    "skipTests": true
+                },
+                "@schematics/angular:guard": {
+                    "skipTests": true
+                },
+                "@schematics/angular:pipe": {
+                    "skipTests": true
+                },
+                "@schematics/angular:service": {
+                    "skipTests": true
+                }
+            },
+            "prefix": "jhi",
             "architect": {}
         }
     },
-    "defaultProject": "gateway",
+    "defaultProject": "jhipster-gradle-sample-application",
     "cli": {
-        "packageManager": "yarn"
-    },
-    "schematics": {
-        "@schematics/angular:component": {
-            "inlineStyle": true,
-            "inlineTemplate": false,
-            "spec": false,
-            "prefix": "jhi",
-            "styleExt": "scss"
-        },
-        "@schematics/angular:directive": {
-            "spec": false,
-            "prefix": "jhi"
-        },
-        "@schematics/angular:guard": {
-            "spec": false
-        },
-        "@schematics/angular:pipe": {
-            "spec": false
-        },
-        "@schematics/angular:service": {
-            "spec": false
-        }
+        "packageManager": "npm"
     }
 }

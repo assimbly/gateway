@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { PopoverModule } from 'ngx-bootstrap';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 import { GatewaySharedModule } from 'app/shared/shared.module';
 import { QueueComponent } from './queue.component';
 import { QueueDetailComponent } from './queue-detail.component';

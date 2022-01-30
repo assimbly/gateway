@@ -4,25 +4,10 @@ const path = require('path');
 const tsconfig = require('../tsconfig.json');
 
 module.exports = {
-    parseVersion,
-    parseType,
-    root,
-	mapTypescriptAliasToWebpackAlias,
-    isExternalLib
+  root,
+  parseType,
+  mapTypescriptAliasToWebpackAlias
 };
-
-// Returns the second occurrence of the version number from `build.gradle` file
-function parseVersion() {
-    const versionRegex = /^version\s*=\s*[',"]([^',"]*)[',"]/gm; // Match and group the version number
-    const buildGradle = fs.readFileSync('build.gradle', 'utf8');
-    return versionRegex.exec(buildGradle)[1];
-}
-
-function parseType() {
-    const typeRegex = /(?<=type=).*/gm; // Match and group the version number
-    const gradleProperties = fs.readFileSync('gradle.properties', 'utf8');
-    return typeRegex.exec(gradleProperties)[0];
-}
 
 const _root = path.resolve(__dirname, '..');
 
@@ -31,12 +16,10 @@ function root(args) {
   return path.join.apply(path, [_root].concat(args));
 }
 
-function isExternalLib(module, check = /node_modules/) {
-    const req = module.userRequest;
-    if (typeof req !== 'string') {
-        return false;
-    }
-    return req.search(check) >= 0;
+function parseType() {
+    const typeRegex = /(?<=type=).*/gm; // Match and group the version number
+    const gradleProperties = fs.readFileSync('gradle.properties', 'utf8');
+    return typeRegex.exec(gradleProperties)[0];
 }
 
 function mapTypescriptAliasToWebpackAlias(alias = {}) {

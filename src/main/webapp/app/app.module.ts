@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
 import { NgxWebstorageModule } from 'ngx-webstorage';
-import { PopoverModule } from 'ngx-bootstrap';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 import { NgJhipsterModule } from 'ng-jhipster';
 
 import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
