@@ -1,25 +1,30 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "commonjs",
+        "module": "esnext",
         "moduleResolution": "node",
         "sourceMap": true,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": false,
         "experimentalDecorators": true,
         "removeComments": false,
+        "strict": true,
+        "strictNullChecks": false,
+        "noImplicitReturns": true,
         "noImplicitAny": false,
-        "skipLibCheck": true,
+        "noFallthroughCasesInSwitch": true,
         "suppressImplicitAnyIndexErrors": true,
+        "skipLibCheck": true,
         "outDir": "build/resources/main/static/app",
         "lib": ["es7", "dom"],
-        "typeRoots": ["node_modules/@types"],
         "baseUrl": "./",
         "paths": {
             "app/*": ["src/main/webapp/app/*"]
         },
-        "importHelpers": true,
-        "allowJs": true
+        "importHelpers": true
     },
-    "include": ["src/main/webapp/app", "src/test/javascript/"],
-    "exclude": ["node_modules"]
+    "angularCompilerOptions": {
+        "genDir": "build/resources/main/aot",
+        "fullTemplateTypeCheck": true,
+        "preserveWhitespaces": true
+    }
 }

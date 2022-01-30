@@ -8,7 +8,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import { CommonModule } from '@angular/common';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { PopoverModule } from 'ngx-bootstrap';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';

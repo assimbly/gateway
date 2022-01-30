@@ -1,12 +1,5 @@
-configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-}
-
 dependencies {
-    developmentOnly "org.springframework.boot:spring-boot-devtools"
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${spring_boot_version}"
     implementation "com.h2database:h2"
 }
 
@@ -27,25 +20,34 @@ springBoot {
 }
 
 bootRun {
-    if (project.hasProperty('args')) {
-        args project.args.split(',')
-    }else{
-        args = []
-    }
+    args = []
 }
 
-task webpack(type: YarnTask) {
-	inputs.files("yarn.lock")
-	inputs.files("build.gradle")
+task webapp(type: NpmTask) {
+    inputs.property('appVersion', project.version)
+    inputs.files("package-lock.json")
+        .withPropertyName('package-lock')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files("build.gradle")
+        .withPropertyName('build.gradle')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files("angular.json")
+        .withPropertyName('angular.json')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files("tsconfig.json", "tsconfig.base.json")
+        .withPropertyName("tsconfig")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("webpack/")
+        .withPropertyName("webpack/")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("src/main/webapp/")
-
-    def webpackDevFiles = fileTree("webpack//")
-    webpackDevFiles.exclude("webpack.prod.js")
-    inputs.files(webpackDevFiles)
-
+        .withPropertyName("webapp-source-dir")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
     outputs.dir("build/resources/main/static/")
+        .withPropertyName("webapp-build-dir")
 
-	dependsOn yarn_install
+    dependsOn npmInstall
+
     args = ["run", "webpack:build"]
     environment = [APP_VERSION: project.version]
 }
@@ -63,5 +65,5 @@ processResources {
     }
 }
 
-processResources.dependsOn webpack
+processResources.dependsOn webapp
 bootJar.dependsOn processResources
