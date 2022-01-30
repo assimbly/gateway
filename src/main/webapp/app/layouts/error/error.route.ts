@@ -8,7 +8,7 @@ export const errorRoute: Routes = [
         component: ErrorComponent,
         data: {
             authorities: [],
-            pageTitle: 'gateway'
+            pageTitle: 'error.title'
         }
     },
     {
@@ -16,8 +16,21 @@ export const errorRoute: Routes = [
         component: ErrorComponent,
         data: {
             authorities: [],
-            pageTitle: 'gateway',
-            error403: true
+            pageTitle: 'error.title',
+            errorMessage: 'error.http.403'
         }
+    },
+    {
+        path: '404',
+        component: ErrorComponent,
+        data: {
+            authorities: [],
+            pageTitle: 'error.title',
+            errorMessage: 'error.http.404'
+        }
+    },
+    {
+        path: '**',
+        redirectTo: '/404'
     }
 ];

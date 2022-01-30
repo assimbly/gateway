@@ -15,7 +15,7 @@ import { GatewayQueueModule } from './queue/queue.module';
 import { GatewayTopicModule } from './topic/topic.module';
 import { GatewayGroupModule } from './group/group.module';
 import { GatewayFlowModule } from './flow/flow.module';
-import { DeploymentService } from 'app/admin';
+import { DeploymentService } from 'app/admin/deployment/deployment.service';
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({

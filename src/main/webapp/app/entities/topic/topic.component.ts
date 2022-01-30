@@ -78,11 +78,11 @@ export class TopicComponent implements OnInit, OnDestroy {
         this.registerChangeInTopics();
         this.registerDeletedTopics();
 
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
             this.topicService.connect();
         });
-        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
+        this.isAdmin = this.accountService.isAdmin();
     }
 
     ngAfterViewInit() {

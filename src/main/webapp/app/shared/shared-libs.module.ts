@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgJhipsterModule } from 'ng-jhipster';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { CookieModule } from 'ngx-cookie';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { TranslateModule } from '@ngx-translate/core';
 import {
     faUser,
     faSort,
@@ -45,7 +46,16 @@ import {
 
 @NgModule({
     imports: [NgbModule, InfiniteScrollModule, CookieModule.forRoot(), FontAwesomeModule],
-    exports: [FormsModule, CommonModule, NgbModule, NgJhipsterModule, InfiniteScrollModule, FontAwesomeModule]
+    exports: [
+        FormsModule,
+        CommonModule,
+        NgbModule,
+        NgJhipsterModule,
+        InfiniteScrollModule,
+        FontAwesomeModule,
+        ReactiveFormsModule,
+        TranslateModule
+    ]
 })
 export class GatewaySharedLibsModule {
     static forRoot() {

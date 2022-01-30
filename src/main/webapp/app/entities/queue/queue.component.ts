@@ -74,11 +74,11 @@ export class QueueComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.registerChangeInQueues();
         this.registerDeletedQueues();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
             this.queueService.connect();
         });
-        this.accountService.hasAuthority('ROLE_ADMIN').then(r => (this.isAdmin = r));
+        this.isAdmin = this.accountService.isAdmin();
     }
 
     ngAfterViewInit() {

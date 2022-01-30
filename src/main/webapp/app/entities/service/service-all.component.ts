@@ -44,7 +44,7 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     }
 
     private loadAllServices() {
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.isAdmin = this.accountService.isAdmin();

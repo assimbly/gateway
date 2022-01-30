@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 
-import { GatewaySharedLibsModule, JhiAlertComponent, JhiAlertErrorComponent } from './';
+import { GatewaySharedLibsModule, AlertComponent, AlertErrorComponent } from './';
 
 @NgModule({
     imports: [GatewaySharedLibsModule],
-    declarations: [JhiAlertComponent, JhiAlertErrorComponent],
-    exports: [GatewaySharedLibsModule, JhiAlertComponent, JhiAlertErrorComponent]
+    declarations: [AlertComponent, AlertErrorComponent],
+    exports: [GatewaySharedLibsModule, AlertComponent, AlertErrorComponent]
 })
 export class GatewaySharedCommonModule {}

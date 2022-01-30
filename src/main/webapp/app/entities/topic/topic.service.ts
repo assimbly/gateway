@@ -7,13 +7,14 @@ import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared';
+import { CSRFService } from 'app/core';
 
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress, IRootTopicAddresses, ITopicAddresses } from 'app/shared/model/address.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
-import { CSRFService } from 'app/core';
+
 import { BrokerService } from 'app/entities/broker';
 import { IBroker } from 'app/shared/model/broker.model';
 
@@ -75,12 +76,10 @@ export class TopicService {
     }
 
     getAllTopics(brokerType: string): Observable<HttpResponse<IRootTopicAddresses>> {
-        if (brokerType != null && brokerType != '') {
-            return this.http.get<IRootTopicAddresses>(`${this.brokersResourceUrl}/${brokerType}/topics`, {
-                headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
-                observe: 'response'
-            });
-        }
+        return this.http.get<IRootTopicAddresses>(`${this.brokersResourceUrl}/${brokerType}/topics`, {
+            headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
+            observe: 'response'
+        });
     }
 
     getBrokers(): Observable<HttpResponse<IBroker[]>> {

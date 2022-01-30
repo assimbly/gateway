@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 import { TYPE } from 'app/app.constants';
 
@@ -12,7 +11,6 @@ import { LoginModalService, AccountService, Account } from 'app/core';
 })
 export class HomeComponent implements OnInit {
     account: Account;
-    modalRef: NgbModalRef;
     type: string;
 
     constructor(
@@ -24,7 +22,7 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.account = account;
 
             if (!this.isAuthenticated()) {
@@ -36,7 +34,7 @@ export class HomeComponent implements OnInit {
 
     registerAuthenticationSuccess() {
         this.eventManager.subscribe('authenticationSuccess', message => {
-            this.accountService.identity().then(account => {
+            this.accountService.identity().subscribe(account => {
                 this.account = account;
             });
         });
@@ -47,6 +45,6 @@ export class HomeComponent implements OnInit {
     }
 
     login() {
-        this.modalRef = this.loginModalService.open();
+        this.loginModalService.open();
     }
 }

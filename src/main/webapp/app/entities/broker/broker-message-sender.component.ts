@@ -412,8 +412,8 @@ export class BrokerMessageSenderComponent implements OnInit {
             do {
                 curtop += obj.offsetTop;
             } while ((obj = obj.offsetParent));
-            return curtop;
         }
+        return curtop;
     }
 
     goBack() {

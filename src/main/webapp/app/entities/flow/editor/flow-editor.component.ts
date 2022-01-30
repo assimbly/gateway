@@ -1356,7 +1356,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
     formatUri(endpointOptions, endpoint, formEndpoint): string {
         if (formEndpoint.controls.componentType.value === null) {
-            return;
+            return '';
         } else {
             let formOptions = <FormArray>formEndpoint.controls.options;
             this.setEndpointOptions(endpointOptions, endpoint, formOptions);

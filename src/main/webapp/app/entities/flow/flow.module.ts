@@ -12,7 +12,7 @@ import { GatewaySecurityModule } from '../../entities/security/security.module';
 import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
-import { AceEditorModule } from 'ng2-ace-editor';
+//import { AceEditorModule } from 'ng2-ace-editor';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowEditorComponent } from './';
 import { FlowMessageSenderComponent } from './';
@@ -46,7 +46,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
         GatewayHeaderModule,
         GatewayRouteModule,
         GatewayMaintenanceModule,
-        AceEditorModule,
+        //AceEditorModule,
         AceModule,
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
