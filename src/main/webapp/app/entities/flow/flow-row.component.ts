@@ -29,7 +29,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     mySubscription: Subscription;
 
     @Input() flow: Flow;
-    //@Input() fromEndpoints: Endpoint[];
+    // @Input() fromEndpoints: Endpoint[];
     @Input() isAdmin: boolean;
 
     endpoints: Array<Endpoint> = [new Endpoint()];
@@ -256,7 +256,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             let alertStartItem;
             let alertEndItem;
 
-            let flowAlertsList = flowAlertsItems.split(',');
+            const flowAlertsList = flowAlertsItems.split(',');
             if (flowAlertsList.length < 4) {
                 this.showNumberOfItems = flowAlertsList.length;
                 alertStartItem = flowAlertsList.length - 1;
@@ -287,7 +287,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     setFlowNumberOfAlerts(numberOfAlerts: string): void {
-        let numberOfAlerts2 = parseInt(numberOfAlerts, 10);
+        const numberOfAlerts2 = parseInt(numberOfAlerts, 10);
         if (numberOfAlerts2 === 0) {
             this.flowAlerts = `false`;
             this.numberOfAlerts = `0`;
@@ -335,8 +335,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                     this.router.navigate(['../flow', this.flow.id]);
                 }
 
-                //this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :
-                //this.router.navigate(['../flow', this.flow.id]);
+                // this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :
+                // this.router.navigate(['../flow', this.flow.id]);
                 break;
             default:
                 break;
@@ -377,7 +377,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     getFlowStats(flow: IFlow) {
         this.startGetFlowStats(flow);
 
-        //refresh every 5 seconds
+        // refresh every 5 seconds
         this.intervalTime = setInterval(() => {
             this.startGetFlowStats(flow);
         }, 5000);
@@ -387,7 +387,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowStatistic = ``;
         this.statsTableRows = [];
 
-        for (let endpoint of flow.endpoints) {
+        for (const endpoint of flow.endpoints) {
             if (endpoint.endpointType === EndpointType.FROM) {
                 this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
                     this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
@@ -540,7 +540,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     checkDate(r) {
-        if (!!r) {
+        if (r) {
             return moment(r).format('YYYY-MM-DD HH:mm:ss');
         } else {
             return '-';
@@ -571,7 +571,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
 
     getSSLUrl(type: String, uri: String, options: String) {
-        var hostname;
+        let hostname;
 
         switch (type) {
             case 'FTPS':
@@ -678,7 +678,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                     this.flowService.start(this.flow.id).subscribe(
                         response => {
                             if (response.status === 200) {
-                                //this.setFlowStatus('started');
+                                // this.setFlowStatus('started');
                             }
                             this.disableActionBtns = false;
                         },

@@ -42,7 +42,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/start`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -50,7 +50,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/restart`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -58,7 +58,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/stop`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -73,7 +73,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/status`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -85,7 +85,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/info`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -93,7 +93,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -107,7 +107,7 @@ export class BrokerService {
         return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -152,7 +152,7 @@ export class BrokerService {
         return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
             observe: 'response',
             responseType: 'text',
-            params: { messageHeaders: messageHeaders }
+            params: { messageHeaders }
         });
     }
 }

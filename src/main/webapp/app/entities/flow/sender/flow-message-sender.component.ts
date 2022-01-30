@@ -64,7 +64,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     requestBody: string;
 
     responseBody: string;
-    responseEditorMode: string = 'text';
+    responseEditorMode = 'text';
 
     panelCollapsed: any = 'uno';
     public isCollapsed = true;
@@ -212,7 +212,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    //this filters services not of the correct type
+    // this filters services not of the correct type
     filterServices(endpoint: any, formService: FormControl) {
         this.serviceType[0] = this.servicesList.getServiceType(endpoint.componentType);
         this.filterService[0] = this.services.filter(f => f.type === this.serviceType[0]);
@@ -222,11 +222,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setComponents() {
-        let producerComponents = this.components.types.filter(function(component) {
+        const producerComponents = this.components.types.filter(function(component) {
             return component.consumerOnly === false;
         });
 
-        let consumerComponents = this.components.types.filter(function(component) {
+        const consumerComponents = this.components.types.filter(function(component) {
             return component.producerOnly === false;
         });
 
@@ -272,7 +272,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
         // set options keys
         this.getComponentOptions(camelComponentType).subscribe(data => {
-            let componentOptions = data.properties;
+            const componentOptions = data.properties;
 
             this.componentOptions[0] = Object.keys(componentOptions).map(key => ({ ...componentOptions[key], ...{ name: key } }));
             this.componentOptions[0].sort(function(a, b) {
@@ -303,7 +303,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     enableFields(endpointForm) {
-        let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+        const componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
 
         if (endpointForm.controls.componentType.value === 'wastebin') {
             endpointForm.controls.uri.disable();
@@ -326,7 +326,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setURIlist() {
         this.URIList = [];
 
-        let tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
+        const tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
             if (this.requestComponentType === endpoint.componentType) {
@@ -376,7 +376,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     updateForm() {
         this.updateTemplateData();
-        let endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
+        const endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
         this.endpoints.forEach((endpoint, i) => {
             this.updateEndpointData(endpoint, endpointsData.controls[i] as FormControl);
         });
@@ -476,7 +476,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     removeOption(options: Array<Option>, option: Option, endpointIndex) {
         const index = options.indexOf(option);
-        let formOptions = this.selectOptions(endpointIndex);
+        const formOptions = this.selectOptions(endpointIndex);
         formOptions.removeAt(index);
         options.splice(index, 1);
     }
@@ -499,8 +499,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     changeOptionSelection(selectedOption, index, optionIndex) {
-        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
-        let defaultValue = componentOption[0].defaultValue;
+        const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        const defaultValue = componentOption[0].defaultValue;
 
         const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
         const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
@@ -557,7 +557,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         endpoint.headerId = formHeader.value;
 
         if (endpoint.headerId === null || typeof endpoint.headerId === 'undefined' || !endpoint.headerId) {
-            let modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
+            const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
             modalRef.then(res => {
                 res.result.then(
                     result => {
@@ -833,12 +833,12 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setVersion() {
-        let now = moment();
+        const now = moment();
     }
 
-    //Get currrent scroll position
+    // Get currrent scroll position
     findPos(obj) {
-        var curtop = 0;
+        let curtop = 0;
 
         if (obj.offsetParent) {
             do {
@@ -864,7 +864,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         if (formEndpoint.controls.componentType.value === null) {
             return '';
         } else {
-            let formOptions = <FormArray>formEndpoint.controls.options;
+            const formOptions = <FormArray>formEndpoint.controls.options;
             this.setEndpointOptions(endpointOptions, endpoint, formOptions);
             return `${formEndpoint.controls.componentType.value.toLowerCase()}`;
         }
@@ -902,9 +902,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     readFile(file: File) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = () => {
-            //console.log(reader.result);
+            // console.log(reader.result);
             this.requestBody = reader.result.toString();
         };
         reader.readAsText(file);

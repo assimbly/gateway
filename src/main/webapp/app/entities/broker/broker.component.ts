@@ -173,7 +173,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         if (info.startsWith('no info')) {
             this.brokerInfo = `Currently there are no statistics for this flow.`;
         } else {
-            var infoSplitted = info.split(',');
+            const infoSplitted = info.split(',');
 
             const uptime = infoSplitted[0].split('=').pop();
             const totalConnections = infoSplitted[1].split('=').pop();
@@ -211,7 +211,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Start', err.error);
+                // this.getFlowLastError(this.broker.id, 'Start', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Broker with id=${this.broker.id} is not started.`;
                 this.disableActionBtns = false;
@@ -236,7 +236,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Restart', err.error);
+                // this.getFlowLastError(this.broker.id, 'Restart', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not restarted.`;
                 this.disableActionBtns = false;
@@ -257,7 +257,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Stop', err.error);
+                // this.getFlowLastError(this.broker.id, 'Stop', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not stopped.`;
                 this.disableActionBtns = false;

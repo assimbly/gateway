@@ -16,7 +16,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
 
-    //sorting
+    // sorting
     predicate: any;
     reverse: any;
     page: any;

@@ -15,7 +15,7 @@ export class TopicDeleteDialogComponent {
     topic?: ITopic;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to delete this topic?';
@@ -57,7 +57,7 @@ export class TopicDeleteDialogComponent {
         this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

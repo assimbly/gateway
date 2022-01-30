@@ -110,7 +110,7 @@ export class HeaderDialogComponent implements OnInit {
                 this.headerKeys = res.body.filter(hk => hk.headerId === this.header.id);
             });
         } else {
-            let hk = new HeaderKeys();
+            const hk = new HeaderKeys();
             hk.type = this.typeHeader[0];
             this.headerKeys.push(hk);
             this.header.id = cloneHeader ? null : this.header.id;

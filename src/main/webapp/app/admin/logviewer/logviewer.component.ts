@@ -10,7 +10,7 @@ export class LogViewerComponent implements OnInit {
     public log: string;
     public logLines: string[];
     public lines: number;
-    searchText: string = '';
+    searchText = '';
 
     constructor(private logViewerService: LogViewerService) {}
 
@@ -20,7 +20,7 @@ export class LogViewerComponent implements OnInit {
     }
 
     getLogs() {
-        let tt = this.lines;
+        const tt = this.lines;
         this.logViewerService.getLogs(this.lines).subscribe(res => {
             this.log = res.body;
             this.logLines = this.log.split(/\r?\n/);

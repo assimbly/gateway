@@ -45,7 +45,7 @@ export class RouteDialogComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        //route is injected in the component (see RoutePopupService);
+        // route is injected in the component (see RoutePopupService);
         if (!this.route.id) {
             this.route = this.createFromForm();
         }

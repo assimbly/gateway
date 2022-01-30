@@ -69,7 +69,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
     save(headerKey: IHeaderKeys, i: number) {
         this.isSaving = true;
-        if (!!headerKey.id) {
+        if (headerKey.id) {
             this.subscribeToSaveResponse(this.headerKeysService.update(headerKey), false, i);
         } else {
             headerKey.headerId = this.headerId;
@@ -99,7 +99,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             result.isDisabled = true;
             this.headerKeys.splice(i, 1, result);
         } else {
-            //this.headerKeys.find(k => k.id === result.id).isDisabled = true;
+            // this.headerKeys.find(k => k.id === result.id).isDisabled = true;
         }
         this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK' });
     }

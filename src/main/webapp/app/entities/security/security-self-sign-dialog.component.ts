@@ -22,7 +22,7 @@ export class SecuritySelfSignDialogComponent implements OnInit, AfterContentInit
     importForm: FormGroup;
 
     cn: string;
-    error: boolean = false;
+    error = false;
     errorMessage: String;
     isSaving: boolean;
 
@@ -53,13 +53,13 @@ export class SecuritySelfSignDialogComponent implements OnInit, AfterContentInit
 
     generateCertificate() {
         this.isSaving = true;
-        let certificateStore = <FormGroup>this.importForm.controls['certificateStore'].value;
+        const certificateStore = <FormGroup>this.importForm.controls['certificateStore'].value;
 
         this.securityService.generateCertificate(certificateStore + '.jks', this.cn).subscribe(
             data => {
-                let json = JSON.parse(data.body);
+                const json = JSON.parse(data.body);
 
-                let certificate = json.certificates.certificate[0];
+                const certificate = json.certificates.certificate[0];
 
                 this.security.certificateName = certificate.certificateName;
 

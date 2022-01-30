@@ -83,7 +83,7 @@ export class ServiceDialogComponent implements OnInit {
 
         const requiredServiceKeys = new Array<ServiceKeys>();
         this.requiredType.serviceKeys.forEach(sk => {
-            let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
+            const ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
             if (typeof ersk !== 'undefined') {
                 if (ersk.value !== '') {

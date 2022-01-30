@@ -4,6 +4,6 @@ import { IMessage } from 'app/shared/model/messsage.model';
 @Pipe({ name: 'MessageSearchByMessageId' })
 export class MessageSearchByMessageIdPipe implements PipeTransform {
     transform(messages: IMessage[], searchText: string) {
-        return messages.filter(message => message.messageid.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1);
+        return messages.filter(message => message.messageid.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
     }
 }

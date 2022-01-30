@@ -31,7 +31,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     predicate: any;
     queryCount: any;
     reverse: any;
-    totalItems: number = -1;
+    totalItems = -1;
     gatewayExists: boolean;
     multipleGateways = false;
     finished = false;
@@ -46,7 +46,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
     selectedAction: string;
     test: any;
-    searchText: string = '';
+    searchText = '';
 
     constructor(
         protected flowService: FlowService,
@@ -125,7 +125,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
     ngAfterViewInit() {
         this.finished = true;
-        //this.securityService.syncTrustore().subscribe(res => {});
+        // this.securityService.syncTrustore().subscribe(res => {});
     }
 
     ngOnDestroy() {

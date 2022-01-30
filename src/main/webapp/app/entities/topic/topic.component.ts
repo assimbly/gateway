@@ -35,7 +35,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     isBroker: boolean;
 
     searchTopicText: string;
-    brokerType: string = '';
+    brokerType = '';
 
     constructor(
         protected topicService: TopicService,
@@ -166,7 +166,7 @@ export class TopicComponent implements OnInit, OnDestroy {
                     if (data && data.body.topics) {
                         this.isBroker = true;
                         if (data.body.topics.topic) {
-                            for (let address of data.body.topics.topic) {
+                            for (const address of data.body.topics.topic) {
                                 if (address.temporary.toString() === 'false') {
                                     this.addresses.push(address);
                                 }

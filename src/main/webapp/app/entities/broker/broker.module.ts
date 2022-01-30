@@ -1,10 +1,10 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-//import { AceEditorModule } from 'ng2-ace-editor';
+// import { AceEditorModule } from 'ng2-ace-editor';
 import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
-//import { AceEditorModule } from 'ng2-ace-editor';
+// import { AceEditorModule } from 'ng2-ace-editor';
 import { CommonModule } from '@angular/common';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -35,7 +35,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 @NgModule({
     imports: [
         GatewaySharedModule,
-        //AceEditorModule,
+        // AceEditorModule,
         AceModule,
         RouterModule.forChild(ENTITY_STATES),
         NgbModule,
