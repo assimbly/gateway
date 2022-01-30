@@ -15,7 +15,7 @@ export class QueueClearDialogComponent {
     queue?: IQueue;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to clear this queue?';
@@ -40,7 +40,7 @@ export class QueueClearDialogComponent {
     confirmClear(name: string): void {
         if (this.address.numberOfConsumers > 0) {
             this.message = 'Are you sure this queue has active consumers?';
-            //this.disableClear = true;
+            // this.disableClear = true;
         } else {
             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
@@ -66,7 +66,7 @@ export class QueueClearDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

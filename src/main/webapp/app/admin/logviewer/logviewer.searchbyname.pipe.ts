@@ -6,7 +6,7 @@ export class SearchByNamePipe implements PipeTransform {
 
     transform(logLines: string[], searchText: string) {
         if (logLines instanceof Array) {
-            return logLines.filter(logLine => logLine.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1);
+            return logLines.filter(logLine => logLine.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
         }
         return [];
     }

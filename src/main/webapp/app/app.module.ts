@@ -1,7 +1,7 @@
-import './vendor.ts';
-
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+
+import './vendor';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
 import { NgxWebstorageModule } from 'ngx-webstorage';

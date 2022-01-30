@@ -83,7 +83,7 @@ export class ServiceUpdateComponent implements OnInit {
 
         const requiredServiceKeys = new Array<ServiceKeys>();
         this.requiredType.serviceKeys.forEach(sk => {
-            let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
+            const ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
             if (typeof ersk !== 'undefined') {
                 if (ersk.value !== '') {
@@ -137,8 +137,8 @@ export class ServiceUpdateComponent implements OnInit {
 
     protected onSaveSuccess(result: IService) {
         this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK' });
-        //this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
-        //this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
+        // this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
+        // this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
         this.isSaving = false;
 
         this.serviceKeysRemoveList.forEach(skrl => {

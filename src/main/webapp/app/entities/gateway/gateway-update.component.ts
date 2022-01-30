@@ -109,11 +109,11 @@ export class GatewayUpdateComponent implements OnInit {
     }
 
     setComponents() {
-        let producerComponents = this.components.types.filter(function(component) {
+        const producerComponents = this.components.types.filter(function(component) {
             return component.consumerOnly === false;
         });
 
-        let consumerComponents = this.components.types.filter(function(component) {
+        const consumerComponents = this.components.types.filter(function(component) {
             return component.producerOnly === false;
         });
 

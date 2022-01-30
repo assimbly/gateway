@@ -48,8 +48,8 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     responseBody: string;
 
-    requestEditorMode: string = 'text';
-    responseEditorMode: string = 'text';
+    requestEditorMode = 'text';
+    responseEditorMode = 'text';
 
     alert: string;
     numberOfMessages: number;
@@ -64,8 +64,8 @@ export class BrokerMessageSenderComponent implements OnInit {
     disabled = true;
 
     isSending: boolean;
-    isSuccessful: boolean = false;
-    isFailed: boolean = false;
+    isSuccessful = false;
+    isFailed = false;
     isAlert = false;
     isSaving: boolean;
     finished = false;
@@ -229,7 +229,7 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.numberOfFailedMessages = 0;
 
         if (this.messages && this.messages.length > 1) {
-            for (var i = 0; i < this.messages.length; i++) {
+            for (let i = 0; i < this.messages.length; i++) {
                 this.numberOfMessages = this.messages.length;
                 this.sendingMessages = i + 1 + ' of ' + this.numberOfMessages;
                 this.setRequestFromArray(this.messages[i]);
@@ -332,7 +332,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     formArrayToJson(formArray: FormArray) {
-        let json: any = {};
+        const json: any = {};
 
         formArray.controls.forEach((element, index) => {
             const key = element.get('key').value;
@@ -346,7 +346,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        let now = moment();
+        const now = moment();
         this.dateTime = new Date().toLocaleString();
 
         this.isSuccessful = true;
@@ -382,7 +382,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     setVersion() {
-        let now = moment();
+        const now = moment();
     }
 
     setBrokerType() {
@@ -405,9 +405,9 @@ export class BrokerMessageSenderComponent implements OnInit {
         }
     }
 
-    //Get currrent scroll position
+    // Get currrent scroll position
     findPos(obj) {
-        var curtop = 0;
+        let curtop = 0;
         if (obj.offsetParent) {
             do {
                 curtop += obj.offsetTop;
@@ -442,7 +442,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     readFile(file: File) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = () => {
             this.requestBody = reader.result.toString();
         };
@@ -469,8 +469,8 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.messages = [];
         this.messageFromFile = false;
 
-        for (var i = 0; i < event.target.files.length; i++) {
-            let reader = new FileReader();
+        for (let i = 0; i < event.target.files.length; i++) {
+            const reader = new FileReader();
 
             reader.onload = () => {
                 this.message = {};
@@ -484,16 +484,16 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     setUploadMessages() {
-        //reset the form
+        // reset the form
         this.initializeForm();
         this.load();
 
         this.messageFromFile = true;
 
-        //set the uploaded messages
+        // set the uploaded messages
         try {
-            //try to parse via json
-            let data = JSON.parse(this.upload);
+            // try to parse via json
+            const data = JSON.parse(this.upload);
 
             if (data.messages.message) {
                 if (data.messages.message.length === 1) {
@@ -528,7 +528,7 @@ export class BrokerMessageSenderComponent implements OnInit {
                 } else {
                     this.messages = [];
 
-                    for (var i = 0; i < data.messages.message.length; i++) {
+                    for (let i = 0; i < data.messages.message.length; i++) {
                         this.message = {};
 
                         this.message.headers = data.messages.message[i].headers;
@@ -553,14 +553,14 @@ export class BrokerMessageSenderComponent implements OnInit {
 
     getFileType(doc) {
         try {
-            //try to parse via json
-            let a = JSON.parse(doc);
+            // try to parse via json
+            const a = JSON.parse(doc);
             return 'json';
         } catch (e) {
             try {
-                //try xml parsing
-                let parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(doc, 'application/xml');
+                // try xml parsing
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(doc, 'application/xml');
                 if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
                 else return 'xml';
             } catch (e) {

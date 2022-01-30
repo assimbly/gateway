@@ -18,7 +18,7 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     securityId: number;
     securities: Array<ISecurity> = [];
     certificateFile: any;
-    certificateStore: string = 'truststore';
+    certificateStore = 'truststore';
     fileName = 'Choose file';
     fileNameWithoutExtension: string;
     fileType: string;
@@ -57,9 +57,9 @@ export class SecurityUploadDialogComponent implements AfterContentInit {
     uploadCertificate() {
         this.securityService.uploadCertificate(this.certificateStore + '.jks', this.certificateFile, this.fileType).subscribe(
             data => {
-                let json = JSON.parse(data.body);
+                const json = JSON.parse(data.body);
 
-                let certificate = json.certificates.certificate[0];
+                const certificate = json.certificates.certificate[0];
 
                 this.security.certificateName = certificate.certificateName;
 

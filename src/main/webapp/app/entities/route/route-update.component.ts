@@ -8,7 +8,7 @@ import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } 
 
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
-//import { AlertError } from 'app/shared/alert/alert-error.model';
+// import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
     selector: 'jhi-route-update',
@@ -58,9 +58,9 @@ export class RouteUpdateComponent implements OnInit {
 
     setFileData(event: Event, field: string, isImage: boolean): void {
         this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: JhiFileLoadError) => {
-            //this.eventManager.broadcast(
-            //new JhiEventWithContent<AlertError>('gatewayApp.error', { message: err.message })
-            //);
+            // this.eventManager.broadcast(
+            // new JhiEventWithContent<AlertError>('gatewayApp.error', { message: err.message })
+            // );
         });
     }
 

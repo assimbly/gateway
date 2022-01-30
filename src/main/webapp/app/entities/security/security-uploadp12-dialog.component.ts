@@ -68,16 +68,16 @@ export class SecurityUploadP12DialogComponent implements OnInit, AfterContentIni
     }
 
     uploadP12Certificate() {
-        let password = <FormGroup>this.importForm.controls['password'].value;
-        let certificateStore = <FormGroup>this.importForm.controls['certificateStore'].value;
+        const password = <FormGroup>this.importForm.controls['password'].value;
+        const certificateStore = <FormGroup>this.importForm.controls['certificateStore'].value;
 
         this.securityService.uploadP12Certificate(certificateStore + '.jks', this.certificateFile, this.fileType, password).subscribe(
             data => {
-                let json = JSON.parse(data.body);
+                const json = JSON.parse(data.body);
 
                 console.log('json=' + json);
 
-                let certificate = json.certificates.certificate[0];
+                const certificate = json.certificates.certificate[0];
 
                 this.security.certificateName = certificate.certificateName;
 

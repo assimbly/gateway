@@ -13,8 +13,8 @@ import { ServiceService } from './service.service';
 })
 export class ServiceDeleteDialogComponent {
     service: IService;
-    errorMessage: boolean = false;
-    deleteMode: boolean = true;
+    errorMessage = false;
+    deleteMode = true;
 
     constructor(
         protected serviceService: ServiceService,

@@ -75,7 +75,7 @@ export class FlowService {
     }
 
     setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
-        if (!!header) {
+        if (header) {
             return this.http.post(`${this.integrationUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
                 headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
                 observe: 'response',
@@ -190,11 +190,11 @@ export class FlowService {
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
-            uri: uri,
-            endpointId: endpointId,
+            uri,
+            endpointId,
             serviceid: serviceId,
-            serviceKeys: serviceKeys,
-            headerKeys: headerKeys,
+            serviceKeys,
+            headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });
@@ -215,11 +215,11 @@ export class FlowService {
         messageBody: string
     ): Observable<any> {
         const options = new HttpHeaders({
-            uri: uri,
-            endpointId: endpointId,
+            uri,
+            endpointId,
             serviceid: serviceId,
-            serviceKeys: serviceKeys,
-            headerKeys: headerKeys,
+            serviceKeys,
+            headerKeys,
             'Content-Type': 'text/plain',
             Accept: 'text/plain'
         });

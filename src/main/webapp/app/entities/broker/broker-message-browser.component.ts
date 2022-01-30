@@ -46,19 +46,19 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     predicate: any;
     reverse: any;
-    totalItems: number = -1;
+    totalItems = -1;
 
     page: any;
-    numberOfMessages: number = 100;
+    numberOfMessages = 100;
     messagesCount: number;
     fileExtension: string;
-    isLoading: boolean = false;
+    isLoading = false;
     finished = false;
     test: any;
-    searchText: string = '';
-    active: string = '0';
-    descending: boolean = false;
-    ascending: boolean = true;
+    searchText = '';
+    active = '0';
+    descending = false;
+    ascending = true;
     subtitle: string;
 
     objectKeys = Object.keys;
@@ -160,7 +160,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
                 itemNumber = (this.page - 1) * this.numberOfMessages;
             }
 
-            for (var i = data.messages.message.length - 1; i > -1; i--) {
+            for (let i = data.messages.message.length - 1; i > -1; i--) {
                 this.message = {};
 
                 itemNumber = itemNumber + 1;
@@ -197,7 +197,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     private onSuccessBrowse(data, headers) {
         if (data.messages.message) {
-            for (var i = 0; i < data.messages.message.length; i++) {
+            for (let i = 0; i < data.messages.message.length; i++) {
                 const message = data.messages.message[i];
 
                 this.selectedMessage = {};
@@ -213,13 +213,13 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     getBody(message: any) {
-        let body: string = '';
+        let body = '';
 
         if (message.body) {
             body = message.body;
         } else if (message.BodyPreview) {
             // Convert to byte array
-            let data = new Uint8Array(message.BodyPreview);
+            const data = new Uint8Array(message.BodyPreview);
             // Decode with TextDecoder
             body = new TextDecoder('shift-jis').decode(data.buffer);
         }
@@ -368,14 +368,14 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     getFileType(doc) {
         try {
-            //try to parse via json
-            let a = JSON.parse(doc);
+            // try to parse via json
+            const a = JSON.parse(doc);
             return 'json';
         } catch (e) {
             try {
-                //try xml parsing
-                let parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(doc, 'application/xml');
+                // try xml parsing
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(doc, 'application/xml');
                 if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
                 else return 'xml';
             } catch (e) {
@@ -385,15 +385,15 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
 
     timeConverter(UNIX_timestamp) {
-        var a = new Date(UNIX_timestamp);
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var year = a.getFullYear();
-        var month = months[a.getMonth()];
-        var date = a.getDate();
-        var hour = a.getHours();
-        var min = a.getMinutes();
-        var sec = a.getSeconds();
-        var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
+        const a = new Date(UNIX_timestamp);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const year = a.getFullYear();
+        const month = months[a.getMonth()];
+        const date = a.getDate();
+        const hour = a.getHours();
+        const min = a.getMinutes();
+        const sec = a.getSeconds();
+        const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
         return time;
     }
 }

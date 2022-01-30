@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityService } from './security.service';
 
-//import { faSync } from '@fortawesome/free-solid-svg-icons';
+// import { faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'jhi-security-update',
@@ -42,10 +42,10 @@ export class SecurityUpdateComponent implements OnInit {
 
         this.securityService.importCertificate(this.security.url, 'keystore.jks').subscribe(
             res => {
-                let json = JSON.parse(res.body);
+                const json = JSON.parse(res.body);
 
                 for (let i = 0; i < json.certificates.certificate.length; i++) {
-                    let certificate = json.certificates.certificate[i];
+                    const certificate = json.certificates.certificate[i];
                     this.security.certificateName = certificate.certificateName;
                     this.security.certificateFile = certificate.certificateFile;
                     this.security.certificateExpiry = moment(certificate.certificateExpiry, DATE_TIME_FORMAT);
@@ -66,12 +66,12 @@ export class SecurityUpdateComponent implements OnInit {
 
         this.securityService.findByUrl(this.security.url).subscribe(
             res => {
-                let json = res.body;
+                const json = res.body;
 
-                let observables: Observable<any>[] = [];
+                const observables: Observable<any>[] = [];
 
                 for (let i = 0; i < json.certificates.certificate.length; i++) {
-                    let certificate = json.certificates.certificate[i];
+                    const certificate = json.certificates.certificate[i];
 
                     observables.push(this.securityService.deleteCertificate(certificate.certificateName));
                 }
@@ -91,12 +91,12 @@ export class SecurityUpdateComponent implements OnInit {
         this.security.certificateExpiry = this.certificateExpiry != null ? moment(this.certificateExpiry, DATE_TIME_FORMAT) : null;
         this.securityService.findByUrl(this.security.url).subscribe(
             res => {
-                let json = res.body;
+                const json = res.body;
 
-                let observables: Observable<any>[] = [];
+                const observables: Observable<any>[] = [];
 
                 for (let i = 0; i < json.certificates.certificate.length; i++) {
-                    let certificate = json.certificates.certificate[i];
+                    const certificate = json.certificates.certificate[i];
 
                     observables.push(this.securityService.deleteCertificate(certificate.certificateName));
                 }

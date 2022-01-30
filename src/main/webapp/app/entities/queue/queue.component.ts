@@ -33,7 +33,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     isBroker: boolean;
 
     searchQueueText: string;
-    brokerType: string = '';
+    brokerType = '';
 
     constructor(
         protected queueService: QueueService,
@@ -192,7 +192,7 @@ export class QueueComponent implements OnInit, OnDestroy {
                         this.isBroker = true;
                         if (data.body.queues.queue) {
                             for (let i = 0; i < data.body.queues.queue.length; i++) {
-                                //exclude temporary queues
+                                // exclude temporary queues
                                 if (data.body.queues.queue[i].temporary.toString() === 'false') {
                                     this.addresses.splice(i, 1, data.body.queues.queue[i]);
                                 }

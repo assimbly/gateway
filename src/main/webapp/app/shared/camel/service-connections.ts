@@ -61,7 +61,7 @@ export class Services {
                     placeholder: 'Example tcp://localhost:61616',
                     isRequired: true
                 }
-                /*,
+                /* ,
             {
                 serviceKeyName: 'username',
                 valueType: 'text',

@@ -19,7 +19,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
     flows: IFlow[];
-    //flows: Array<IFlow> = [];
+    // flows: Array<IFlow> = [];
     public hours: number;
     public minutes: number;
     selectedFlows: IFlow[] = [];
@@ -30,7 +30,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     timeLeft: Array<number> = [];
     disableFlows: Array<boolean> = [];
 
-    //sorting
+    // sorting
     page: any;
     predicate: any;
     reverse: any;
@@ -100,7 +100,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
         if (this.minutes === undefined) {
             this.minutes = 0;
         }
-        let time = this.hours * 3600 * 1000 + this.minutes * 60000;
+        const time = this.hours * 3600 * 1000 + this.minutes * 60000;
         const ids = this.selectedFlows.filter(sf => sf !== null).map(f => f.id);
         if (ids.length > 0) {
             this.flowService.setMaintenance(time, ids).subscribe(() => {

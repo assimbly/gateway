@@ -79,7 +79,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             const requiredType = this.requiredServiceKey.find(x => x.name === this.service.type);
             const requiredServiceKeys = new Array<ServiceKeys>();
             requiredType.serviceKeys.forEach(sk => {
-                let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
+                const ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
                 let rsk = new ServiceKeys();
                 if (ersk instanceof ServiceKeys) {
                     rsk = ersk;
@@ -97,7 +97,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     save(serviceKey: ServiceKeys, i: number) {
         this.isSaving = true;
-        if (!!serviceKey.id) {
+        if (serviceKey.id) {
             this.subscribeToSaveResponse(this.serviceKeysService.update(serviceKey), false, i);
         } else {
             serviceKey.serviceId = this.service.id;
@@ -163,7 +163,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             result.isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
         } else {
-            //this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
+            // this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
         this.mapServiceKeysKeys();
         this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });

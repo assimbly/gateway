@@ -13,8 +13,8 @@ import { HeaderService } from './header.service';
 })
 export class HeaderDeleteDialogComponent {
     header: IHeader;
-    errorMessage: boolean = false;
-    deleteMode: boolean = true;
+    errorMessage = false;
+    deleteMode = true;
 
     constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 

@@ -86,9 +86,9 @@ export class SecurityService {
 
     uploadCertificate(keystoreName, certificate, fileType): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
-            keystoreName: keystoreName,
+            keystoreName,
             keystorePassword: 'supersecret',
-            fileType: fileType
+            fileType
         });
         return this.http.post(`${this.resourceCertificateUrl}/upload`, certificate, {
             headers: options,
@@ -99,10 +99,10 @@ export class SecurityService {
 
     uploadP12Certificate(keystoreName, certificate, fileType, password): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
-            keystoreName: keystoreName,
+            keystoreName,
             keystorePassword: 'supersecret',
-            fileType: fileType,
-            password: password
+            fileType,
+            password
         });
 
         return this.http.post(`${this.resourceCertificateUrl}/uploadp12`, certificate, {
@@ -114,9 +114,9 @@ export class SecurityService {
 
     generateCertificate(keystoreName, cn): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
-            keystoreName: keystoreName,
+            keystoreName,
             keystorePassword: 'supersecret',
-            cn: cn
+            cn
         });
 
         return this.http.get(`${this.resourceCertificateUrl}/generate`, {
@@ -128,7 +128,7 @@ export class SecurityService {
 
     importCertificate(url, keystoreName): Observable<HttpResponse<any>> {
         const options = new HttpHeaders({
-            keystoreName: keystoreName,
+            keystoreName,
             keystorePassword: 'supersecret'
         });
 

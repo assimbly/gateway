@@ -46,7 +46,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     endpoints: IEndpoint[] = new Array<Endpoint>();
     endpoint: IEndpoint;
 
-    public endpointTypes = ['FROM', 'TO', 'ERROR']; //Dont include RESPONSE here!
+    public endpointTypes = ['FROM', 'TO', 'ERROR']; // Dont include RESPONSE here!
 
     public logLevelListType = [
         LogLevelType.OFF,
@@ -137,9 +137,9 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     selectedService: Service = new Service();
     closeResult: string;
 
-    numberOfFromEndpoints: number = 0;
-    numberOfToEndpoints: number = 0;
-    numberOfResponseEndpoints: number = 0;
+    numberOfFromEndpoints = 0;
+    numberOfToEndpoints = 0;
+    numberOfResponseEndpoints = 0;
 
     private subscription: Subscription;
     private eventSubscriber: Subscription;
@@ -243,16 +243,16 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                         this.initializeForm(this.flow);
 
                         this.endpointService.findByFlowId(id).subscribe(flowEndpointsData => {
-                            let endpoints = flowEndpointsData.body;
+                            const endpoints = flowEndpointsData.body;
                             let index = 0;
                             this.endpoints = [];
 
                             this.endpointTypes.forEach((endpointType, j) => {
                                 let filteredEndpoints = endpoints.filter(endpoint => endpoint.endpointType === endpointType);
 
-                                let filteredEndpointsWithResponse = new Array<Endpoint>();
+                                const filteredEndpointsWithResponse = new Array<Endpoint>();
 
-                                //add response endpoints
+                                // add response endpoints
                                 filteredEndpoints.forEach(endpoint => {
                                     filteredEndpointsWithResponse.push(endpoint);
                                     if (endpoint.responseId != undefined) {
@@ -286,7 +286,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
                                     this.endpoints.push(endpoint);
 
-                                    let formgroup = this.initializeEndpointData(endpoint);
+                                    const formgroup = this.initializeEndpointData(endpoint);
                                     (<FormArray>this.editFlowForm.controls.endpointsData).insert(index, formgroup);
 
                                     this.setTypeLinks(endpoint, index);
@@ -329,7 +329,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                 });
             } else if (!this.finished) {
                 setTimeout(() => {
-                    //create new flow object
+                    // create new flow object
                     this.flow = new Flow();
                     this.flow.notes = '';
                     this.flow.autoStart = false;
@@ -348,7 +348,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     }
                     this.initializeForm(this.flow);
 
-                    //create new from endpoint
+                    // create new from endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.FROM;
                     this.endpoint.componentType = this.gateways[this.indexGateway].defaultFromComponentType;
@@ -356,24 +356,24 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     (<FormArray>this.editFlowForm.controls.endpointsData).push(this.initializeEndpointData(this.endpoint));
                     this.endpointsOptions[0] = [new Option()];
 
-                    //set documentation links
+                    // set documentation links
                     this.setTypeLinks(this.endpoint, 0);
 
                     let componentType = this.endpoint.componentType.toLowerCase();
                     let camelComponentType = this.components.getCamelComponentType(componentType);
 
-                    //get list of options (from CamelCatalog)
+                    // get list of options (from CamelCatalog)
                     this.setComponentOptions(this.endpoint, camelComponentType);
 
                     this.numberOfFromEndpoints = 1;
 
-                    let optionArrayFrom: Array<string> = [];
+                    const optionArrayFrom: Array<string> = [];
                     optionArrayFrom.splice(0, 0, '');
                     this.selectedOptions.splice(0, 0, optionArrayFrom);
 
                     this.endpoints.push(this.endpoint);
 
-                    //create new to endpoint
+                    // create new to endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.TO;
                     this.endpoint.componentType = this.gateways[this.indexGateway].defaultToComponentType;
@@ -388,13 +388,13 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
                     this.numberOfToEndpoints = 1;
 
-                    let optionArrayTo: Array<string> = [];
+                    const optionArrayTo: Array<string> = [];
                     optionArrayTo.splice(0, 0, '');
                     this.selectedOptions.splice(1, 0, optionArrayTo);
 
                     this.endpoints.push(this.endpoint);
 
-                    //create new error endpoint
+                    // create new error endpoint
                     this.endpoint = new Endpoint();
                     this.endpoint.endpointType = EndpointType.ERROR;
                     this.endpoint.componentType = this.gateways[this.indexGateway].defaultErrorComponentType;
@@ -406,7 +406,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                     camelComponentType = this.components.getCamelComponentType(componentType);
                     this.setComponentOptions(this.endpoint, camelComponentType);
 
-                    let optionArrayError: Array<string> = [];
+                    const optionArrayError: Array<string> = [];
                     optionArrayError.splice(0, 0, '');
                     this.selectedOptions.splice(2, 0, optionArrayError);
 
@@ -422,11 +422,11 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     setComponents() {
-        let producerComponents = this.components.types.filter(function(component) {
+        const producerComponents = this.components.types.filter(function(component) {
             return component.consumerOnly === false;
         });
 
-        let consumerComponents = this.components.types.filter(function(component) {
+        const consumerComponents = this.components.types.filter(function(component) {
             return component.producerOnly === false;
         });
 
@@ -438,7 +438,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     clone() {
-        //reset id and flow name to null
+        // reset id and flow name to null
         this.flow.id = null;
         this.flow.name = null;
         this.flow.endpoints = null;
@@ -449,8 +449,8 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
         this.updateForm();
 
-        let scrollToTop = window.setInterval(() => {
-            let pos = window.pageYOffset;
+        const scrollToTop = window.setInterval(() => {
+            const pos = window.pageYOffset;
             if (pos > 0) {
                 window.scrollTo(0, pos - 20); // how far to scroll on each step
             } else {
@@ -459,7 +459,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         }, 16);
     }
 
-    //this filters services not of the correct type
+    // this filters services not of the correct type
     filterServices(endpoint: any, formService: FormControl) {
         this.serviceType[this.endpoints.indexOf(endpoint)] = this.servicesList.getServiceType(endpoint.componentType);
         this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
@@ -475,7 +475,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
 
         if (typeof e !== 'undefined') {
-            //set componenttype to selected component and clear other fields
+            // set componenttype to selected component and clear other fields
             endpoint.componentType = e;
             endpoint.uri = null;
             endpoint.headerId = '';
@@ -483,7 +483,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             endpoint.serviceId = '';
 
             let i;
-            let numberOfOptions = this.endpointsOptions[endpointFormIndex].length - 1;
+            const numberOfOptions = this.endpointsOptions[endpointFormIndex].length - 1;
             for (i = numberOfOptions; i > 0; i--) {
                 this.endpointsOptions[endpointFormIndex][i] = null;
                 this.removeOption(this.endpointsOptions[endpointFormIndex], this.endpointsOptions[endpointFormIndex][i], endpointFormIndex);
@@ -526,7 +526,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         // set options keys
         if (typeof e !== 'undefined') {
             this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
-                //add custom options if available
+                // add custom options if available
                 this.customOptions.forEach(customOption => {
                     if (customOption.componentType === camelComponentType) {
                         this.componentOptions[endpointFormIndex].push(customOption);
@@ -568,7 +568,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     setURIlist(index) {
         this.URIList[index] = [];
 
-        let tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
+        const tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
             if (this.selectedComponentType === endpoint.componentType.toLowerCase()) {
@@ -580,7 +580,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     enableFields(endpointForm) {
-        let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+        const componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
 
         if (endpointForm.controls.componentType.value === 'wastebin') {
             endpointForm.controls.uri.disable();
@@ -650,7 +650,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     updateForm() {
         this.updateFlowData(this.flow);
 
-        let endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
+        const endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
         this.endpoints.forEach((endpoint, i) => {
             this.updateEndpointData(endpoint, endpointsData.controls[i] as FormControl);
         });
@@ -689,7 +689,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             new Promise((resolve, reject) => {
                 setTimeout(() => {
                     this.getComponentOptions(componentType).subscribe(data => {
-                        let componentOptions = data.properties;
+                        const componentOptions = data.properties;
 
                         this.componentOptions[this.endpoints.indexOf(endpoint)] = Object.keys(componentOptions).map(key => ({
                             ...componentOptions[key],
@@ -715,14 +715,14 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     getOptions(endpoint: Endpoint, endpointForm: any, endpointOptions: Array<Option>, index: number) {
-        let optionArray: Array<string> = [];
+        const optionArray: Array<string> = [];
 
         if (!endpoint.options) {
             endpoint.options = '';
         }
 
-        let componentType = endpoint.componentType.toLowerCase();
-        let camelComponentType = this.components.getCamelComponentType(componentType);
+        const componentType = endpoint.componentType.toLowerCase();
+        const camelComponentType = this.components.getCamelComponentType(componentType);
 
         this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
             const options = endpoint.options.split('&');
@@ -811,13 +811,13 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
     removeOption(options: Array<Option>, option: Option, endpointIndex) {
         const optionIndex = options.indexOf(option);
-        let formOptions: FormArray = this.selectOptions(endpointIndex);
+        const formOptions: FormArray = this.selectOptions(endpointIndex);
 
-        //remove from form
+        // remove from form
         formOptions.removeAt(optionIndex);
         formOptions.updateValueAndValidity();
 
-        //remove from arrays
+        // remove from arrays
         options.splice(optionIndex, 1);
         this.selectedOptions[endpointIndex].splice(optionIndex, 1);
     }
@@ -829,7 +829,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
     changeOptionSelection(selectedOption, index, optionIndex, endpoint) {
         let defaultValue;
-        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
 
         if (componentOption[0]) {
             defaultValue = componentOption[0].defaultValue;
@@ -837,10 +837,10 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             const customOption = new Option();
             customOption.key = selectedOption;
 
-            let componentType = endpoint.componentType.toLowerCase();
-            let camelComponentType = this.components.getCamelComponentType(componentType);
+            const componentType = endpoint.componentType.toLowerCase();
+            const camelComponentType = this.components.getCamelComponentType(componentType);
 
-            let optionArray: Array<string> = [];
+            const optionArray: Array<string> = [];
             optionArray.splice(optionIndex, 0, customOption.key);
 
             this.componentOptions[index].push({
@@ -873,7 +873,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     addOptionTag(name) {
-        return { name: name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
+        return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
     }
 
     addEndpoint(endpoint, index) {
@@ -901,7 +901,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
         this.setTypeLinks(endpoint, newIndex);
 
-        let optionArray: Array<string> = [];
+        const optionArray: Array<string> = [];
         optionArray.splice(0, 0, '');
         this.selectedOptions.splice(newIndex, 0, optionArray);
         this.active = newIndex.toString();
@@ -920,15 +920,15 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         const i = this.endpoints.indexOf(endpoint);
         this.endpoints.splice(i, 1);
         this.endpointsOptions.splice(i, 1);
-        this.editFlowForm.removeControl(endpointDataName); //'endpointData'+index
+        this.editFlowForm.removeControl(endpointDataName); // 'endpointData'+index
         (<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i);
     }
 
     addResponseEndpoint(endpoint) {
         this.numberOfResponseEndpoints = this.numberOfResponseEndpoints + 1;
 
-        let toIndex = this.endpoints.indexOf(endpoint);
-        let responseIndex = toIndex + 1;
+        const toIndex = this.endpoints.indexOf(endpoint);
+        const responseIndex = toIndex + 1;
 
         this.endpoints.splice(responseIndex, 0, new Endpoint());
         this.endpointsOptions.splice(responseIndex, 0, [new Option()]);
@@ -944,7 +944,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
         const newIndex = responseIndex;
 
-        //dummy id's for endpoints
+        // dummy id's for endpoints
         endpoint.id = toIndex;
         newEndpoint.id = responseIndex;
 
@@ -1018,7 +1018,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         endpoint.headerId = formHeader.value;
 
         if (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null || !endpoint.headerId) {
-            let modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
+            const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
             modalRef.then(res => {
                 res.result.then(
                     result => {
@@ -1049,7 +1049,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         endpoint.routeId = formRoute.value;
 
         if (typeof endpoint.routeId === 'undefined' || endpoint.routeId === null || !endpoint.routeId) {
-            let modalRef = this.routePopupService.open(RouteDialogComponent as Component);
+            const modalRef = this.routePopupService.open(RouteDialogComponent as Component);
             modalRef.then(res => {
                 res.result.then(
                     result => {
@@ -1102,7 +1102,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
                         this.setService(endpoint, result.id, formService);
                     },
                     reason => {
-                        //this.setService(endpoint, reason.id, formService);
+                        // this.setService(endpoint, reason.id, formService);
                     }
                 );
             });
@@ -1176,7 +1176,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
         this.savingFlowFailed = false;
         this.savingFlowSuccess = false;
-        let goToOverview = true;
+        const goToOverview = true;
 
         if (!this.editFlowForm.valid) {
             return;
@@ -1186,7 +1186,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (!!this.flow.id) {
+        if (this.flow.id) {
             this.endpoints.forEach(endpoint => {
                 endpoint.flowId = this.flow.id;
             });
@@ -1318,7 +1318,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
     }
 
     setVersion() {
-        let now = moment();
+        const now = moment();
 
         if (this.flow.id) {
             this.flow.version = this.flow.version + 1;
@@ -1330,9 +1330,9 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    //Get currrent scroll position
+    // Get currrent scroll position
     findPos(obj) {
-        var curtop = 0;
+        let curtop = 0;
 
         if (obj.offsetParent) {
             do {
@@ -1358,7 +1358,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
         if (formEndpoint.controls.componentType.value === null) {
             return '';
         } else {
-            let formOptions = <FormArray>formEndpoint.controls.options;
+            const formOptions = <FormArray>formEndpoint.controls.options;
             this.setEndpointOptions(endpointOptions, endpoint, formOptions);
             return `${formEndpoint.controls.componentType.value.toLowerCase()}`;
         }
@@ -1399,7 +1399,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
         if (stack.includes(obj)) return null;
 
-        let s = stack.concat([obj]);
+        const s = stack.concat([obj]);
 
         return Array.isArray(obj)
             ? obj.map(x => this.decycle(x, s))

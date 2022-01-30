@@ -15,7 +15,7 @@ export class QueueDeleteDialogComponent {
     queue?: IQueue;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to delete this queue?';
@@ -47,7 +47,7 @@ export class QueueDeleteDialogComponent {
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
                 this.eventManager.broadcast('queueListModification');
-                //this.router.navigate(['/queue']);
+                // this.router.navigate(['/queue']);
                 // .then(() => {
                 //     window.location.reload();
                 // });
@@ -61,7 +61,7 @@ export class QueueDeleteDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

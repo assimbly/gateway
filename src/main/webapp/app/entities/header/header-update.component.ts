@@ -136,7 +136,7 @@ export class HeaderUpdateComponent implements OnInit {
     }
 
     private loadHeaderKeys(cloneHeader: boolean) {
-        let criteria = {
+        const criteria = {
             'headerId.equals': this.header.id
         };
 
@@ -150,7 +150,7 @@ export class HeaderUpdateComponent implements OnInit {
                 }
             });
         } else {
-            let hk = new HeaderKeys();
+            const hk = new HeaderKeys();
             hk.type = this.typeHeader[0];
             this.headerKeys.push(hk);
             this.header.id = cloneHeader ? null : this.header.id;
