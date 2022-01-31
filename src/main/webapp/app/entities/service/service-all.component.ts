@@ -4,7 +4,7 @@ import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 import { Subscription } from 'rxjs';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
     selector: 'jhi-service-all',

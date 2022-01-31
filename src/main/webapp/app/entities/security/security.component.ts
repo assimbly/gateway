@@ -5,7 +5,7 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 
 import { ISecurity } from 'app/shared/model/security.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SecurityService } from './security.service';

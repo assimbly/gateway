@@ -7,7 +7,7 @@ import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { Service } from 'app/shared/model/service.model';
 import { Subscription } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
-import { ServiceService } from 'app/entities/service';
+import { ServiceService } from 'app/entities/service/service.service';
 
 @Component({
     selector: 'jhi-service-detail',

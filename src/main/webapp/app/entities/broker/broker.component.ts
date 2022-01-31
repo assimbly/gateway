@@ -6,7 +6,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 
 import { IBroker } from 'app/shared/model/broker.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { BrokerService } from './broker.service';
 
 enum Status {

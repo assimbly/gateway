@@ -4,22 +4,27 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GatewaySharedModule } from 'app/shared/shared.module';
-import {
-    SecurityComponent,
-    SecurityDetailComponent,
-    SecurityUpdateComponent,
-    SecurityDeletePopupComponent,
-    SecurityDeleteDialogComponent,
-    SecurityUploadPopupComponent,
-    SecurityUploadDialogComponent,
-    SecurityUploadP12PopupComponent,
-    SecurityUploadP12DialogComponent,
-    SecuritySelfSignPopupComponent,
-    SecuritySelfSignDialogComponent,
-    securityRoute,
-    securityPopupRoute,
-    SecurityPopupService
-} from './';
+
+import { SecurityComponent } from './security.component';
+import { SecurityDetailComponent } from './security-detail.component';
+import { SecurityUpdateComponent } from './security-update.component';
+
+import { SecurityDeletePopupComponent } from './security-delete-dialog.component';
+import { SecurityDeleteDialogComponent } from './security-delete-dialog.component';
+
+import { SecurityUploadPopupComponent } from './security-upload-dialog.component';
+import { SecurityUploadDialogComponent } from './security-upload-dialog.component';
+
+import { SecurityUploadP12PopupComponent } from './security-uploadp12-dialog.component';
+import { SecurityUploadP12DialogComponent } from './security-uploadp12-dialog.component';
+
+import { SecurityPopupService } from './security-popup.service';
+
+import { SecuritySelfSignPopupComponent } from './security-self-sign-dialog.component';
+import { SecuritySelfSignDialogComponent } from './security-self-sign-dialog.component';
+
+import { securityRoute } from './security.route';
+import { securityPopupRoute } from './security.route';
 
 const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
 

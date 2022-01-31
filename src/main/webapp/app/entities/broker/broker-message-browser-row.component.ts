@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
-import { LoginModalService } from 'app/core';
+import { LoginModalService } from 'app/core/login/login-modal.service';
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Message } from 'app/shared/model/messsage.model';

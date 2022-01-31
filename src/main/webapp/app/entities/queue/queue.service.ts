@@ -14,9 +14,9 @@ import { IRootQueueAddress } from 'app/shared/model/address.model';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 
-import { CSRFService } from 'app/core';
+import { CSRFService } from 'app/core/auth/csrf.service';
 
-import { BrokerService } from 'app/entities/broker';
+import { BrokerService } from 'app/entities/broker/broker.service';
 import { IBroker } from 'app/shared/model/broker.model';
 
 type EntityResponseType = HttpResponse<IQueue>;

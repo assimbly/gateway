@@ -3,7 +3,7 @@ import { Subscription, interval } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 import { IQueue } from 'app/shared/model/queue.model';
 import { IAddress } from 'app/shared/model/address.model';

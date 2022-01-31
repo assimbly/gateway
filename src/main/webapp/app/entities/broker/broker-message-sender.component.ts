@@ -7,8 +7,8 @@ import { Gateway } from 'app/shared/model/gateway.model';
 import { IMessage } from 'app/shared/model/messsage.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
-import { GatewayService } from './../gateway';
-import { BrokerService } from './../broker';
+import { GatewayService } from './../gateway/gateway.service';
+import { BrokerService } from 'app/entities/broker/broker.service';
 
 import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Components } from '../../shared/camel/component-type';

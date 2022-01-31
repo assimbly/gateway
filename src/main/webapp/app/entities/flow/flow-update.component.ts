@@ -7,7 +7,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayService } from 'app/entities/gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 
 @Component({
     selector: 'jhi-flow-update',
@@ -17,7 +17,14 @@ export class FlowUpdateComponent implements OnInit {
     flow: IFlow;
     isSaving: boolean;
 
-    public logLevelListType = [LogLevelType.OFF, LogLevelType.INFO, LogLevelType.ERROR, LogLevelType.TRACE,LogLevelType.WARN,LogLevelType.DEBUG];
+    public logLevelListType = [
+        LogLevelType.OFF,
+        LogLevelType.INFO,
+        LogLevelType.ERROR,
+        LogLevelType.TRACE,
+        LogLevelType.WARN,
+        LogLevelType.DEBUG
+    ];
 
     gateways: IGateway[];
 
@@ -39,7 +46,6 @@ export class FlowUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-
     }
 
     previousState() {
@@ -56,7 +62,10 @@ export class FlowUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IFlow>>) {
-        result.subscribe((res: HttpResponse<IFlow>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IFlow>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {
@@ -75,5 +84,4 @@ export class FlowUpdateComponent implements OnInit {
     trackGatewayById(index: number, item: IGateway) {
         return item.id;
     }
-
 }

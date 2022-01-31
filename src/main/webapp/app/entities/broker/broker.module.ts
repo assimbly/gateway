@@ -14,19 +14,19 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';
 
 import { GatewaySharedModule } from 'app/shared/shared.module';
-import {
-    BrokerComponent,
-    BrokerDetailComponent,
-    BrokerUpdateComponent,
-    BrokerMessageSenderComponent,
-    BrokerMessageBrowserComponent,
-    BrokerMessageBrowserRowComponent,
-    BrokerDeletePopupComponent,
-    BrokerDeleteDialogComponent,
-    brokerRoute,
-    brokerPopupRoute
-} from './';
-import { FlowComponent } from 'app/entities/flow';
+
+import { BrokerComponent } from './broker.component';
+import { BrokerDetailComponent } from './broker-detail.component';
+import { BrokerUpdateComponent } from './broker-update.component';
+import { BrokerMessageSenderComponent } from './broker-message-sender.component';
+import { BrokerMessageBrowserComponent } from './broker-message-browser.component';
+import { BrokerMessageBrowserRowComponent } from './broker-message-browser-row.component';
+import { BrokerDeletePopupComponent } from './broker-delete-dialog.component';
+import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
+import { brokerRoute } from './broker.route';
+import { brokerPopupRoute } from './broker.route';
+
+import { FlowComponent } from 'app/entities/flow/flow.component';
 import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
 
 const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];

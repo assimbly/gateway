@@ -3,7 +3,7 @@ import { Subscription, interval } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress } from 'app/shared/model/address.model';
@@ -12,7 +12,7 @@ import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
-import { BrokerService } from 'app/entities/broker';
+import { BrokerService } from 'app/entities/broker/broker.service';
 import { startWith, switchMap } from 'rxjs/operators';
 
 @Component({

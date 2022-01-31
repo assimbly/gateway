@@ -9,7 +9,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { MaintenanceService } from './maintenance.service';
 import { IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from 'app/entities/flow';
+import { FlowService } from 'app/entities/flow/flow.service';
 
 @Component({
     selector: 'jhi-maintenance-update',
@@ -73,7 +73,10 @@ export class MaintenanceUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IMaintenance>>) {
-        result.subscribe((res: HttpResponse<IMaintenance>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IMaintenance>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {

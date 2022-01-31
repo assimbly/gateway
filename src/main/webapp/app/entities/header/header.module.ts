@@ -5,20 +5,22 @@ import { GatewayHeaderKeysModule } from '../../entities/header-keys/header-keys.
 import { GatewaySharedModule } from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import {
-    HeaderComponent,
-    HeaderDetailComponent,
-    HeaderDialogComponent,
-    HeaderUpdateComponent,
-    HeaderDeletePopupComponent,
-    HeaderDeleteDialogComponent,
-    HeaderAllComponent,
-    headerRoute,
-    headerPopupRoute,
-    HeaderPopupService,
-    ForbiddenHeaderNamesValidatorDirective,
-    ForbiddenHeaderKeysValidatorDirective
-} from './';
+import { HeaderComponent } from './header.component';
+import { HeaderDetailComponent } from './header-detail.component';
+import { HeaderDialogComponent } from './header-dialog.component';
+
+import { HeaderUpdateComponent } from './header-update.component';
+import { HeaderDeleteDialogComponent } from './header-delete-dialog.component';
+import { HeaderDeletePopupComponent } from './header-delete-dialog.component';
+
+import { HeaderAllComponent } from './header-all.component';
+import { headerRoute } from './header.route';
+import { headerPopupRoute } from './header.route';
+
+import { HeaderPopupService } from './header-popup.service';
+import { ForbiddenHeaderNamesValidatorDirective } from './header-validation.directive';
+import { ForbiddenHeaderKeysValidatorDirective } from './header-keys-validation.directive';
+
 import { NgSelectModule } from '@ng-select/ng-select';
 import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
 import { HeaderService } from 'app/entities/header/header.service';

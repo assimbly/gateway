@@ -5,7 +5,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Observable } from 'rxjs';
 
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { HeaderKeysService } from './header-keys.service';
 
 @Component({

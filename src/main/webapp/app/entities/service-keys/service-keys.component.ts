@@ -6,7 +6,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { ServiceKeysService } from './service-keys.service';
 import { Services } from '../../shared/camel/service-connections';
 

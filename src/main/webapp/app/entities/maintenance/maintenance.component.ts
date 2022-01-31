@@ -6,9 +6,9 @@ import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { WindowRef } from '../../shared/auth/window.service';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { MaintenanceService } from './maintenance.service';
-import { FlowService } from 'app/entities/flow';
+import { FlowService } from 'app/entities/flow/flow.service';
 
 @Component({
     selector: 'jhi-maintenance',

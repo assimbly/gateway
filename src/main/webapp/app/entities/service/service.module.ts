@@ -7,19 +7,20 @@ import { GatewayServiceKeysModule } from '../../entities/service-keys/service-ke
 
 import { Services } from 'app/shared/camel/service-connections';
 
-import {
-    ServiceComponent,
-    ServiceDetailComponent,
-    ServiceUpdateComponent,
-    ServiceDeletePopupComponent,
-    ServiceDeleteDialogComponent,
-    ServiceDialogComponent,
-    ServiceAllComponent,
-    serviceRoute,
-    servicePopupRoute,
-    ForbiddenServiceNamesValidatorDirective,
-    ForbiddenServiceKeysValidatorDirective
-} from './';
+import { ServiceComponent } from './service.component';
+import { ServiceDetailComponent } from './service-detail.component';
+import { ServiceUpdateComponent } from './service-update.component';
+
+import { ServiceDeletePopupComponent } from './service-delete-dialog.component';
+import { ServiceDeleteDialogComponent } from './service-delete-dialog.component';
+import { ServiceDialogComponent } from './service-dialog.component';
+import { ServiceAllComponent } from './service-all.component';
+
+import { serviceRoute } from './service.route';
+import { servicePopupRoute } from './service.route';
+import { ForbiddenServiceNamesValidatorDirective } from './service-validation.directive';
+import { ForbiddenServiceKeysValidatorDirective } from './service-keys-validation.directive';
+
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ServiceService } from 'app/entities/service/service.service';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';

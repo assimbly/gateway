@@ -11,7 +11,7 @@ import { RoutePopupService } from 'app/entities/route/route-popup.service';
 import { RouteService } from 'app/entities/route/route.service';
 import { RouteDialogComponent, RoutePopupComponent } from 'app/entities/route/route-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route';
+import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route/route-validation.directive';
 
 @NgModule({
     imports: [GatewaySharedModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(routeRoute)],

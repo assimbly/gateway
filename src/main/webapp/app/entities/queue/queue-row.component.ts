@@ -2,9 +2,9 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
-import { SecurityService } from '../security';
+import { SecurityService } from 'app/entities/security/security.service';
 import { JhiEventManager } from 'ng-jhipster';
-import { LoginModalService } from 'app/core';
+import { LoginModalService } from 'app/core/login/login-modal.service';
 
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, Observer, Subscription } from 'rxjs';

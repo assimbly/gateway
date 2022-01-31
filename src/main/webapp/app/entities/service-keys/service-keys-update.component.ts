@@ -7,7 +7,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
 import { IService } from 'app/shared/model/service.model';
-import { ServiceService } from 'app/entities/service';
+import { ServiceService } from 'app/entities/service/service.service';
 
 @Component({
     selector: 'jhi-service-keys-update',
@@ -53,7 +53,10 @@ export class ServiceKeysUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IServiceKeys>>) {
-        result.subscribe((res: HttpResponse<IServiceKeys>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IServiceKeys>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {

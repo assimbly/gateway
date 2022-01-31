@@ -9,7 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { RoutePopupService } from 'app/entities/route';
+import { RoutePopupService } from 'app/entities/route/route-popup.service';
 
 @Component({
     selector: 'jhi-route-dialog',
