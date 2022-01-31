@@ -13,7 +13,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';
 
-import { GatewaySharedModule } from 'app/shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import {
     BrokerComponent,
     BrokerDetailComponent,

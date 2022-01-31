@@ -203,7 +203,7 @@
     },
 	{
       "type": "file",
-      "path": ".husky.rc",
+      "path": ".huskyrc",
       "action": "replace"
     },
 	{
@@ -489,6 +489,26 @@
 		{
 		  "type": "dir",
 		  "path": "app/shared/util",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app.constants.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app.main.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app.module.ts",
+		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app-routing.module.ts",
 		  "action": "replace"
 		},
 		{

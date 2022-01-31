@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { GatewayHeaderKeysModule } from '../../entities/header-keys/header-keys.module';
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {

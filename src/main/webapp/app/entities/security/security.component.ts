@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { ISecurity } from 'app/shared/model/security.model';
 import { AccountService } from 'app/core';
 
-import { ITEMS_PER_PAGE } from 'app/shared';
+import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SecurityService } from './security.service';
 
 import { faDownload } from '@fortawesome/free-solid-svg-icons';

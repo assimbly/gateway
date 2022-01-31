@@ -1,8 +1,9 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../app/shared';
-import { HOME_ROUTE, HomeComponent } from './';
+import { GatewaySharedModule } from 'app/shared/shared.module';
+import { HOME_ROUTE } from './home.route';
+import { HomeComponent } from './home.component';
 import { GatewayEntityModule } from '../../app/entities/entity.module';
 
 @NgModule({
