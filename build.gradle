@@ -294,6 +294,7 @@ dependencies {
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
+	//implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.6.0'
 	implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -352,7 +353,11 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "io.jsonwebtoken:jjwt:0.9.1"
+    //implementation "io.jsonwebtoken:jjwt:0.9.1"
+	//implementation "io.jsonwebtoken:jjwt-api"
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'	
+	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"

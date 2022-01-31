@@ -1,30 +1,30 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "esnext",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "emitDecoratorMetadata": false,
-        "experimentalDecorators": true,
-        "removeComments": false,
-        "strict": true,
-        "strictNullChecks": false,
-        "noImplicitReturns": true,
-        "noImplicitAny": false,
-        "noFallthroughCasesInSwitch": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "skipLibCheck": true,
-        "outDir": "build/resources/main/static/app",
-        "lib": ["es7", "dom"],
-        "baseUrl": "./",
-        "paths": {
-            "app/*": ["src/main/webapp/app/*"]
-        },
-        "importHelpers": true
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "skipLibCheck": true,
+    "outDir": "target/classes/static/app",
+    "lib": ["es7", "dom"],
+    "baseUrl": "./",
+    "paths": {
+      "app/*": ["src/main/webapp/app/*"]
     },
-    "angularCompilerOptions": {
-        "genDir": "build/resources/main/aot",
-        "fullTemplateTypeCheck": true,
-        "preserveWhitespaces": true
-    }
+    "importHelpers": true
+  },
+  "angularCompilerOptions": {
+    "genDir": "target/classes/aot",
+    "fullTemplateTypeCheck": true,
+    "preserveWhitespaces": true
+  }
 }

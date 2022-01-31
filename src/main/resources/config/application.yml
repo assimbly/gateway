@@ -21,7 +21,8 @@ management:
       path-mapping:
         hawtio: /hawtio/console
       exposure:
-        include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump','hawtio','jolokia']
+        include:
+          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump', 'hawtio', 'jolokia']
   endpoint:
     health:
       show-details: when-authorized
@@ -60,42 +61,42 @@ management:
         auto-time-requests: true
 
 spring:
-    application:
-        name: gateway
-    profiles:
-        # The commented value for `active` can be replaced with valid Spring profiles to load.
-        # Otherwise, it will be filled in by gradle when building the WAR file
-        # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-        active: #spring.profiles.active#
-    jpa:    
-        open-in-view: false
-        properties:
-            hibernate.jdbc.time_zone: UTC
-        hibernate:
-            ddl-auto: none
-            naming:                # org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    messages:
-        basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: true
-    thymeleaf:
-        mode: HTML
-    autoconfigure:
-        exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+  application:
+    name: gateway
+  profiles:
+    # The commented value for `active` can be replaced with valid Spring profiles to load.
+    # Otherwise, it will be filled in by gradle when building the WAR file
+    # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
+    active: #spring.profiles.active#
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+    hibernate:
+      ddl-auto: none
+      naming: # org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+  messages:
+    basename: i18n/messages
+  mvc:
+    favicon:
+      enabled: true
+  thymeleaf:
+    mode: HTML
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 
 springdoc:
   show-actuator: true
 
 server:
-    servlet:
-        session:
-            timeout: 28800
-            cookie:
-                http-only: true
-                max-age: 28800
+  servlet:
+    session:
+      timeout: 28800
+      cookie:
+        http-only: true
+        max-age: 28800
 
 # ===================================================================
 # JHipster specific properties
@@ -104,33 +105,34 @@ server:
 # ===================================================================
 
 jhipster:
-    async:
-        core-pool-size: 4
-        max-pool-size: 50
-        queue-capacity: 10000
-    # By default CORS is disabled. Uncomment to enable.
-    #cors:
-        #allowed-origins: "*"
-        #allowed-methods: "*"
-        #allowed-headers: "*"
-        #exposed-headers: "Link,X-Total-Count"
-        #allow-credentials: true
-        #max-age: 1800
-    mail:
-        from: gateway@localhost
-    api-docs:
-      default-include-pattern: /api/**
-      management-include-pattern: /management/**
-      title: Assimbly API
-      description: Assimbly Gateway Application API documentation
-      version: 3.6.0
-      terms-of-service-url:
-      contact-name:
-      contact-url:
-      contact-email:
-      license: unlicensed
-      license-url:    
-
+  clientApp:
+    name: 'gatewayApp'
+  async:
+    core-pool-size: 4
+    max-pool-size: 50
+    queue-capacity: 10000
+  # By default CORS is disabled. Uncomment to enable.
+  #cors:
+  #allowed-origins: "*"
+  #allowed-methods: "*"
+  #allowed-headers: "*"
+  #exposed-headers: "Link,X-Total-Count"
+  #allow-credentials: true
+  #max-age: 1800
+  mail:
+    from: gateway@localhost
+  api-docs:
+    default-include-pattern: /api/**
+    management-include-pattern: /management/**
+    title: Assimbly API
+    description: Assimbly Gateway Application API documentation
+    version: 3.6.0
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license: unlicensed
+    license-url:
 
 # ===================================================================
 # Application specific properties
@@ -153,5 +155,5 @@ application:
     tracing: false
     debugging: false
 hawtio:
-  authenticationEnabled:  false
+  authenticationEnabled: false
   offline: true
