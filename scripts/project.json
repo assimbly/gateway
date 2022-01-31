@@ -108,6 +108,61 @@
     },
 	{
       "type": "file",
+      "path": ".editorconfig",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".eslintignore",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".eslintrc.json",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".gitattributes",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".gitignore",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".huskyrc",
+      "action": "replace"
+    },	
+	{
+      "type": "file",
+      "path": ".lintstagedrc.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".prettierignore",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".prettierrc",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".project",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".yo-rc.json",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
       "path": "angular.json",
       "action": "replace"
     },
@@ -199,21 +254,6 @@
 	{
       "type": "file",
       "path": "tslint.json",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": ".huskyrc",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": ".editorconfig",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": ".lintstagedrc.js",
       "action": "replace"
     }	
   ]
@@ -519,7 +559,7 @@
 		{
 		  "type": "dir",
 		  "path": "content/images",
-		  "action": "replace"
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",
@@ -564,7 +604,7 @@
 		{
 		  "type": "file",
 		  "path": "manifest.webapp",
-		  "action": "replace"
+		  "action": "ignore"
 		},
 		{
 		  "type": "file",

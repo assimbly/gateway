@@ -1,7 +1,7 @@
 package org.assimbly.gateway.security.jwt;
 
-import tech.jhipster.config.JHipsterProperties;
-
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -14,8 +14,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import tech.jhipster.config.JHipsterProperties;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class TokenProvider {
@@ -24,7 +29,7 @@ public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
 
-    private String secretKey;
+    private Key key;
 
     private long tokenValidityInMilliseconds;
 
@@ -38,13 +43,23 @@ public class TokenProvider {
 
     @PostConstruct
     public void init() {
-        this.secretKey =
-            jHipsterProperties.getSecurity().getAuthentication().getJwt().getSecret();
-
+        byte[] keyBytes;
+        String secret = "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo="; //jHipsterProperties.getSecurity().getAuthentication().getJwt().getSecret();
+        if (!StringUtils.isEmpty(secret)) {
+            log.warn("Warning: the JWT key used is not Base64-encoded. " +
+                "We recommend using the `jhipster.security.authentication.jwt.base64-secret` key for optimum security.");
+            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        } else {
+            log.debug("Using a Base64-encoded JWT secret key");	
+			log.debug("Basee64=" + secret);				
+			keyBytes = Decoders.BASE64.decode(secret);
+        }
+        this.key = Keys.hmacShaKeyFor(keyBytes);
         this.tokenValidityInMilliseconds =
             1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
         this.tokenValidityInMillisecondsForRememberMe =
-            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe();
+            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt()
+                .getTokenValidityInSecondsForRememberMe();
     }
 
     public String createToken(Authentication authentication, boolean rememberMe) {
@@ -63,14 +78,14 @@ public class TokenProvider {
         return Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
-            .signWith(SignatureAlgorithm.HS512, secretKey)
+            .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
     }
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parser()
-            .setSigningKey(secretKey)
+            .setSigningKey(key)
             .parseClaimsJws(token)
             .getBody();
 
@@ -86,23 +101,11 @@ public class TokenProvider {
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(key).parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException e) {
-            log.info("Invalid JWT signature.");
-            log.trace("Invalid JWT signature trace: {}", e);
-        } catch (MalformedJwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             log.info("Invalid JWT token.");
-            log.trace("Invalid JWT token trace: {}", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token.");
-            log.trace("Expired JWT token trace: {}", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token.");
-            log.trace("Unsupported JWT token trace: {}", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT token compact of handler are invalid.");
-            log.trace("JWT token compact of handler are invalid trace: {}", e);
+            log.trace("Invalid JWT token trace.", e);
         }
         return false;
     }
