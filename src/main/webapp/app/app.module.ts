@@ -11,10 +11,10 @@ import { NgJhipsterModule } from 'ng-jhipster';
 import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
 import { ErrorHandlerInterceptor } from './blocks/interceptor/errorhandler.interceptor';
 import { NotificationInterceptor } from './blocks/interceptor/notification.interceptor';
-import { GatewaySharedModule } from 'app/shared';
-import { GatewayCoreModule } from 'app/core';
+import { GatewaySharedModule } from 'app/shared/shared.module';
+import { GatewayCoreModule } from 'app/core/core.module';
 import { GatewayAppRoutingModule } from './app-routing.module';
-import { GatewayHomeModule } from 'app/home';
+import { GatewayHomeModule } from './home/home.module';
 import { AccountModule } from './account/account.module';
 import { GatewayEntityModule } from './entities/entity.module';
 import * as moment from 'moment';
@@ -40,7 +40,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
             alertAsToast: false,
             alertTimeout: 5000
         }),
-        GatewaySharedModule.forRoot(),
+        GatewaySharedModule,
         GatewayCoreModule,
         GatewayHomeModule,
         AccountModule,

@@ -3,7 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FlowService } from 'app/entities/flow';
-import { GatewaySharedModule } from 'app/shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import {
     MaintenanceService,
     MaintenanceComponent,

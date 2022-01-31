@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { GatewaySharedModule } from '../../shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';

@@ -27,7 +27,7 @@ tasks.register('upgrade') {
 				
 	}	
 
-	dependsOn('downloadAndUnzipFile')
+	dependsOn('unzipFile')
 	
 	doLast {      
 
@@ -44,7 +44,6 @@ tasks.register('upgrade') {
 }
 
 task deleteTempDir() {
-  //delete tempDir
   ant.delete(dir: tempDir)
 }
 
@@ -53,7 +52,7 @@ task downloadZipFile(dependsOn: deleteTempDir, type: Download) {
 	dest new File(tempZipFile)
 }
 
-task downloadAndUnzipFile(dependsOn: downloadZipFile, type: Copy) {
+task unzipFile(dependsOn: downloadZipFile, type: Copy) {
 	from zipTree(tempZipFile)
 	into tempDir
 }
@@ -93,7 +92,7 @@ def searchAndReplace(tempDir){
 def upgradeProject(tempDir, project){
 
 	def path = rootDir.toString() + project.projectResources.basePath
-	def tempPath = tempDir + "/gateway" + project.projectResources.basePath
+	def tempPath = tempDir + "/" + project.applicationName + project.projectResources.basePath
 	def resources = project.projectResources.resources
 
 	printMessage('upgrade base project:')
@@ -108,8 +107,8 @@ def upgradeBackend(tempDir, project){
 	def path = rootDir.toString() + project.backendResources.basePath + "/"
 	def testPath = rootDir.toString() + project.testBackendReSecources.basePath  + "/"
 	
-	def tempPath = tempDir + "/gateway" + project.backendResources.basePath + "/"
-	def tempTestPath = tempDir + "/gateway" + project.testBackendReSecources.basePath  + "/"
+	def tempPath = tempDir + "/" + project.applicationName + project.backendResources.basePath + "/"
+	def tempTestPath = tempDir + "/" + project.applicationName + project.testBackendReSecources.basePath  + "/"
 	
 	def resources = project.backendResources.resources
 	def testResources = project.testBackendReSecources.resources
@@ -130,8 +129,8 @@ def upgradeFrontend(tempDir, project){
 	def path = rootDir.toString() + project.frontendResources.basePath + "/"
 	def testPath = rootDir.toString() + project.testFrontendResources.basePath + "/"
 
-	def tempPath = tempDir + "/gateway" + project.frontendResources.basePath + "/"
-	def tempTestPath = tempDir + "/gateway" + project.testFrontendResources.basePath + "/"
+	def tempPath = tempDir  + "/" + project.applicationName + project.frontendResources.basePath + "/"
+	def tempTestPath = tempDir  + "/" + project.applicationName + project.testFrontendResources.basePath + "/"
 
 	def resources = project.frontendResources.resources
 	def testResources = project.testFrontendResources.resources	

@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GatewaySharedModule } from 'app/shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
 
 import { Services } from 'app/shared/camel/service-connections';

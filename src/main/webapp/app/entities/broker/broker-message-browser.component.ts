@@ -7,7 +7,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { IMessage } from 'app/shared/model/messsage.model';
 import { AccountService } from 'app/core';
-import { ITEMS_PER_PAGE } from 'app/shared';
+import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
 
 import { saveAs } from 'file-saver/FileSaver';

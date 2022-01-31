@@ -7,7 +7,7 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { SecurityService } from './security.service';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityPopupService } from 'app/entities/security';
-import { DATE_TIME_FORMAT } from 'app/shared';
+import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import * as moment from 'moment';
 
 @Component({

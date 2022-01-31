@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GatewaySharedModule } from 'app/shared';
+import { GatewaySharedModule } from 'app/shared/shared.module';
 import {
     SecurityComponent,
     SecurityDetailComponent,
