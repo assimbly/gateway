@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Service } from 'app/shared/model/service.model';
@@ -12,7 +12,7 @@ import { ServiceUpdateComponent } from './service-update.component';
 import { ServiceDeletePopupComponent } from './service-delete-dialog.component';
 import { IService } from 'app/shared/model/service.model';
 import { ServiceAllComponent } from './service-all.component';
-import { ServicePopupComponent } from 'app/entities/service';
+import { ServicePopupComponent } from 'app/entities/service/service-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class ServiceResolve implements Resolve<IService> {

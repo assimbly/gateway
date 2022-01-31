@@ -6,8 +6,8 @@ import { Endpoint } from 'app/shared/model/endpoint.model';
 import { Gateway } from 'app/shared/model/gateway.model';
 
 import { FlowService } from './flow.service';
-import { EndpointService } from '../endpoint';
-import { GatewayService } from '../gateway';
+import { EndpointService } from '../endpoint/endpoint.service';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 

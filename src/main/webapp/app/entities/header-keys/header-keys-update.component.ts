@@ -7,7 +7,7 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
 import { IHeader } from 'app/shared/model/header.model';
-import { HeaderService } from 'app/entities/header';
+import { HeaderService } from 'app/entities/header/header.service';
 
 @Component({
     selector: 'jhi-header-keys-update',
@@ -53,7 +53,10 @@ export class HeaderKeysUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IHeaderKeys>>) {
-        result.subscribe((res: HttpResponse<IHeaderKeys>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IHeaderKeys>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {

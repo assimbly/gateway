@@ -5,7 +5,7 @@ import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
 import { Subscription } from 'rxjs';
 import { IHeader } from 'app/shared/model/header.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
     selector: 'jhi-header-all',

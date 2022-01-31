@@ -12,11 +12,11 @@ import { IHeader } from 'app/shared/model/header.model';
 import { Service } from 'app/shared/model/service.model';
 import { Route } from 'app/shared/model/route.model';
 
-import { EndpointService } from '../../endpoint/';
-import { ServiceService } from '../../service';
-import { HeaderService } from '../../header';
-import { RouteService } from '../../route';
-import { GatewayService } from '../../gateway';
+import { EndpointService } from '../../endpoint/endpoint.service';
+import { ServiceService } from '../../service/service.service';
+import { HeaderService } from '../../header/header.service';
+import { RouteService } from '../../route/route.service';
+import { GatewayService } from '../../gateway/gateway.service';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Components } from 'app/shared/camel/component-type';
@@ -24,9 +24,14 @@ import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
 
-import { HeaderDialogComponent, HeaderPopupService } from 'app/entities/header';
-import { RouteDialogComponent, RoutePopupService } from 'app/entities/route';
-import { ServiceDialogComponent, ServicePopupService } from 'app/entities/service';
+import { HeaderPopupService } from 'app/entities/header/header-popup.service';
+import { RoutePopupService } from 'app/entities/route/route-popup.service';
+import { ServicePopupService } from 'app/entities/service/service-popup.service';
+
+import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
+import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
+import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
+
 import * as moment from 'moment';
 
 @Component({

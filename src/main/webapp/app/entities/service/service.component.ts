@@ -5,9 +5,10 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { ServiceService } from './service.service';
-import { ServiceKeysComponent, ServiceKeysService } from '../../entities/service-keys';
+import { ServiceKeysComponent } from '../../entities/service-keys/service-keys.component';
+import { ServiceKeysService } from '../../entities/service-keys/service-keys.service';
 import { Services } from '../../shared/camel/service-connections';
 import { Observable } from 'rxjs';
 

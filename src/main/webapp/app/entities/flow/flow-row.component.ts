@@ -1,18 +1,18 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
-
 import { FlowService } from './flow.service';
-import { EndpointService } from '../endpoint';
-import { SecurityService } from '../security';
+import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
+
+import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
+import { EndpointService } from '../endpoint/endpoint.service';
+import { SecurityService } from 'app/entities/security/security.service';
 import { JhiEventManager } from 'ng-jhipster';
-import { LoginModalService } from 'app/core';
+import { LoginModalService } from 'app/core/login/login-modal.service';
 
 import { NavigationEnd, Router } from '@angular/router';
 import * as moment from 'moment';
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FlowDeleteDialogComponent } from 'app/entities/flow';
 
 enum Status {
     active = 'active',

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Gateway } from 'app/shared/model/gateway.model';
@@ -11,7 +11,7 @@ import { GatewayDetailComponent } from './gateway-detail.component';
 import { GatewayUpdateComponent } from './gateway-update.component';
 import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayImportPopupComponent } from 'app/entities/gateway';
+import { GatewayImportPopupComponent } from 'app/entities/gateway/gateway-import-dialog.component';
 import { GatewayExportPopupComponent } from 'app/entities/gateway/gateway-export-dialog.component';
 
 @Injectable({ providedIn: 'root' })

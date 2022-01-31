@@ -6,7 +6,7 @@ import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { GatewayService } from 'app/entities/gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
@@ -40,9 +40,9 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             this.environmentVariables = environmentVariables;
         });
 
-        if(!this.environmentVariables.encrypted){
-			this.environmentVariables.encrypted = false;
-		}		
+        if (!this.environmentVariables.encrypted) {
+            this.environmentVariables.encrypted = false;
+        }
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.environmentVariables.id = null;

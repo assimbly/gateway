@@ -5,7 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 import { GatewayService } from './gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayPopupService } from 'app/entities/gateway';
+import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
 
 @Component({

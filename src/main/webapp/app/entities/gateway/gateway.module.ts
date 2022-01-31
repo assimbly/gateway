@@ -4,21 +4,19 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { Components } from 'app/shared/camel/component-type';
 import { GatewaySharedModule } from 'app/shared/shared.module';
 
-import {
-    GatewayComponent,
-    GatewayService,
-    GatewayDetailComponent,
-    GatewayUpdateComponent,
-    GatewayDeletePopupComponent,
-    GatewayDeleteDialogComponent,
-    GatewayImportPopupComponent,
-    GatewayImportDialogComponent,
-    GatewayExportPopupComponent,
-    GatewayExportDialogComponent,
-    gatewayRoute,
-    gatewayPopupRoute,
-    GatewayPopupService
-} from './';
+import { GatewayComponent } from './gateway.component';
+import { GatewayService } from './gateway.service';
+import { GatewayDetailComponent } from './gateway-detail.component';
+import { GatewayUpdateComponent } from './gateway-update.component';
+import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
+import { GatewayDeleteDialogComponent } from './gateway-delete-dialog.component';
+import { GatewayImportPopupComponent } from './gateway-import-dialog.component';
+import { GatewayImportDialogComponent } from './gateway-import-dialog.component';
+import { GatewayExportPopupComponent } from './gateway-export-dialog.component';
+import { GatewayExportDialogComponent } from './gateway-export-dialog.component';
+import { gatewayRoute } from './gateway.route';
+import { gatewayPopupRoute } from './gateway.route';
+import { GatewayPopupService } from './gateway-popup.service';
 
 const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
 

@@ -5,13 +5,13 @@ import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 
 import { IFlow } from 'app/shared/model/flow.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
-import { GatewayService } from '../gateway';
-import { SecurityService } from '../security';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { SecurityService } from 'app/entities/security/security.service';
 
 @Component({
     selector: 'jhi-flow',

@@ -7,7 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { filter, map } from 'rxjs/operators';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { GatewayService } from '../gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';

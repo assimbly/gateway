@@ -7,8 +7,9 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IGroup } from 'app/shared/model/group.model';
 import { GroupService } from './group.service';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayService } from 'app/entities/gateway';
-import { IUser, UserService } from 'app/core';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { UserService } from 'app/core/user/user.service';
+import { IUser } from 'app/core/user/user.model';
 
 @Component({
     selector: 'jhi-group-update',
@@ -63,7 +64,10 @@ export class GroupUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IGroup>>) {
-        result.subscribe((res: HttpResponse<IGroup>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IGroup>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {

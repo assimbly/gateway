@@ -4,9 +4,9 @@ import { IGateway } from 'app/shared/model/gateway.model';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
-import { GatewayService } from 'app/entities/gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from 'app/entities/flow';
+import { FlowService } from 'app/entities/flow/flow.service';
 
 @Component({
     selector: 'deployment',

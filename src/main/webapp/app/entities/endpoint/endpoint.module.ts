@@ -7,15 +7,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GatewaySharedModule } from 'app/shared/shared.module';
 import { Components } from '../../shared/camel/component-type';
 
-import {
-    EndpointComponent,
-    EndpointDetailComponent,
-    EndpointUpdateComponent,
-    EndpointDeletePopupComponent,
-    EndpointDeleteDialogComponent,
-    endpointRoute,
-    endpointPopupRoute
-} from './';
+import { EndpointComponent } from './endpoint.component';
+import { EndpointDetailComponent } from './endpoint-detail.component';
+import { EndpointUpdateComponent } from './endpoint-update.component';
+
+import { EndpointDeletePopupComponent } from './endpoint-delete-dialog.component';
+import { EndpointDeleteDialogComponent } from './endpoint-delete-dialog.component';
+
+import { endpointRoute } from './endpoint.route';
+import { endpointPopupRoute } from './endpoint.route';
 
 const ENTITY_STATES = [...endpointRoute, ...endpointPopupRoute];
 

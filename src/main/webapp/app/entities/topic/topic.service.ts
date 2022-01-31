@@ -7,7 +7,7 @@ import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared';
-import { CSRFService } from 'app/core';
+import { CSRFService } from 'app/core/auth/csrf.service';
 
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress, IRootTopicAddresses, ITopicAddresses } from 'app/shared/model/address.model';
@@ -15,7 +15,7 @@ import { IAddress, IRootTopicAddresses, ITopicAddresses } from 'app/shared/model
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 
-import { BrokerService } from 'app/entities/broker';
+import { BrokerService } from 'app/entities/broker/broker.service';
 import { IBroker } from 'app/shared/model/broker.model';
 
 type EntityResponseType = HttpResponse<ITopic>;

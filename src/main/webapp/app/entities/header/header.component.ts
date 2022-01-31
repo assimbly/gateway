@@ -6,9 +6,10 @@ import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
 import { IHeader } from 'app/shared/model/header.model';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { HeaderService } from './header.service';
-import { HeaderKeysComponent, HeaderKeysService } from '../../entities/header-keys';
+import { HeaderKeysComponent } from '../../entities/header-keys/header-keys.component';
+import { HeaderKeysService } from '../../entities/header-keys/header-keys.service';
 
 @Component({
     selector: 'jhi-header',

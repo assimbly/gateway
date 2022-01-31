@@ -11,7 +11,7 @@ import { ServiceKeys } from 'app/shared/model/service-keys.model';
 
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
-import { RequiredServiceKey } from '../service-keys';
+import { RequiredServiceKey } from '../service-keys/service-keys.component';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
 import { Services } from '../../shared/camel/service-connections';
 

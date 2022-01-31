@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Security } from 'app/shared/model/security.model';
@@ -10,7 +10,10 @@ import { SecurityComponent } from './security.component';
 import { SecurityDetailComponent } from './security-detail.component';
 import { SecurityUpdateComponent } from './security-update.component';
 import { SecurityDeletePopupComponent } from './security-delete-dialog.component';
-import { SecuritySelfSignPopupComponent, SecurityUploadP12PopupComponent, SecurityUploadPopupComponent } from 'app/entities/security';
+import { SecuritySelfSignPopupComponent } from 'app/entities/security/security-self-sign-dialog.component';
+import { SecurityUploadP12PopupComponent } from 'app/entities/security/security-uploadp12-dialog.component';
+import { SecurityUploadPopupComponent } from 'app/entities/security/security-upload-dialog.component';
+
 import { ISecurity } from 'app/shared/model/security.model';
 
 @Injectable({ providedIn: 'root' })

@@ -11,7 +11,7 @@ import { HeaderService } from './header.service';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { filter } from 'rxjs/operators';
-import { HeaderPopupService } from 'app/entities/header';
+import { HeaderPopupService } from 'app/entities/header/header-popup.service';
 
 @Component({
     selector: 'jhi-header-dialog',

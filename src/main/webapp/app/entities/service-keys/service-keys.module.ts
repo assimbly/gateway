@@ -2,16 +2,15 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Services } from 'app/shared/camel/service-connections';
 import { GatewaySharedModule } from 'app/shared/shared.module';
-import {
-    ServiceKeysComponent,
-    ServiceKeysDetailComponent,
-    ServiceKeysUpdateComponent,
-    ServiceKeysDeletePopupComponent,
-    ServiceKeysDeleteDialogComponent,
-    serviceKeysRoute,
-    serviceKeysPopupRoute,
-    ForbiddenServiceKeysValidatorDirective
-} from './';
+
+import { ServiceKeysComponent } from './service-keys.component';
+import { ServiceKeysDetailComponent } from './service-keys-detail.component';
+import { ServiceKeysUpdateComponent } from './service-keys-update.component';
+import { ServiceKeysDeletePopupComponent } from './service-keys-delete-dialog.component';
+import { ServiceKeysDeleteDialogComponent } from './service-keys-delete-dialog.component';
+import { ForbiddenServiceKeysValidatorDirective } from './service-keys-validation.directive';
+import { serviceKeysRoute } from './service-keys.route';
+import { serviceKeysPopupRoute } from './service-keys.route';
 
 const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
 

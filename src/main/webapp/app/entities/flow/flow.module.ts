@@ -13,20 +13,20 @@ import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
 // import { AceEditorModule } from 'ng2-ace-editor';
+
+import { FlowComponent } from './flow.component';
+import { FlowDetailComponent } from './flow-detail.component';
+import { FlowUpdateComponent } from './flow-update.component';
+import { FlowDeleteDialogComponent } from './flow-delete-dialog.component';
+import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
+import { flowRoute } from './flow.route';
+import { flowPopupRoute } from './flow.route';
+import { FlowPopupService } from './flow-popup.service';
+import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
-import { FlowEditorComponent } from './';
-import { FlowMessageSenderComponent } from './';
-import {
-    FlowComponent,
-    FlowDetailComponent,
-    FlowUpdateComponent,
-    FlowDeletePopupComponent,
-    FlowDeleteDialogComponent,
-    flowRoute,
-    flowPopupRoute,
-    FlowPopupService,
-    FlowRowComponent
-} from './';
+import { FlowEditorComponent } from './editor/flow-editor.component';
+import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
+
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlowService } from 'app/entities/flow/flow.service';

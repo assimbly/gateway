@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({

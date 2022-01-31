@@ -13,7 +13,7 @@ import { IFlow, Flow } from 'app/shared/model/flow.model';
 
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
-import { CSRFService } from 'app/core';
+import { CSRFService } from 'app/core/auth/csrf.service';
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;

@@ -10,7 +10,9 @@ import { RouteService } from './route.service';
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
-import { HeaderDeletePopupComponent, HeaderPopupComponent, HeaderResolve } from 'app/entities/header';
+import { HeaderDeletePopupComponent } from 'app/entities/header/header-delete-dialog.component';
+import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
+import { HeaderResolve } from 'app/entities/header/header.route';
 
 @Injectable({ providedIn: 'root' })
 export class RouteResolve implements Resolve<IRoute> {
