@@ -33,9 +33,10 @@ tasks.register('upgrade') {
 
 		renameSampleprojectFile(tempDir, jhipsterVersion)
 		searchAndReplace(tempDir)
-		upgradeprojectFile(tempDir, projectFile)
-		upgradeBackend(tempDir, projectFile)
-		upgradeFrontend(tempDir, projectFile)
+		upgradeProjectResources(tempDir, projectFile)
+		upgradeBackendResources(tempDir, projectFile)
+		upgradeFrontendResources(tempDir, projectFile)
+		upgradeSpecialResources(tempDir, projectFile)
 		skippedResourcesReport()	
 		
 		printMessage('Upgrade finished')
@@ -90,13 +91,13 @@ def searchAndReplace(tempDir){
 	}
 }
 
-def upgradeprojectFile(tempDir, projectFile){
+def upgradeProjectResources(tempDir, projectFile){
 
 	def path = rootDir.toString() + projectFile.projectResources.basePath
 	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.projectResources.basePath
 	def resources = projectFile.projectResources.resources
 
-	printMessage('upgrade base projectFile:')
+	printMessage('upgrade base resources:')
 	
 	resources.each {
 		applyAction(tempPath, path, it)	
@@ -104,7 +105,22 @@ def upgradeprojectFile(tempDir, projectFile){
 	
 }
 
-def upgradeBackend(tempDir, projectFile){
+def upgradeSpecialResources(tempDir, projectFile){
+
+	def path = rootDir.toString() + projectFile.specialResources.basePath
+	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.specialResources.basePath
+	def resources = projectFile.specialResources.resources
+
+	printMessage('upgrade special resources:')
+	
+	resources.each {
+		applySpecialAction(tempPath, path, it)	
+	}
+	
+}
+
+
+def upgradeBackendResources(tempDir, projectFile){
 	def path = rootDir.toString() + projectFile.backendResources.basePath + "/"
 	def testPath = rootDir.toString() + projectFile.testBackendReSecources.basePath  + "/"
 	
@@ -114,7 +130,7 @@ def upgradeBackend(tempDir, projectFile){
 	def resources = projectFile.backendResources.resources
 	def testResources = projectFile.testBackendReSecources.resources
 	
-	printMessage('Upgrade backend:')
+	printMessage('Upgrade backend resources:')
 		
 	resources.each {
 		applyAction(tempPath, path, it)	
@@ -126,7 +142,7 @@ def upgradeBackend(tempDir, projectFile){
 	
 }
 
-def upgradeFrontend(tempDir, projectFile){
+def upgradeFrontendResources(tempDir, projectFile){
 	def path = rootDir.toString() + projectFile.frontendResources.basePath + "/"
 	def testPath = rootDir.toString() + projectFile.testFrontendResources.basePath + "/"
 
@@ -136,7 +152,7 @@ def upgradeFrontend(tempDir, projectFile){
 	def resources = projectFile.frontendResources.resources
 	def testResources = projectFile.testFrontendResources.resources	
 	
-	printMessage('Upgrade frontend:')
+	printMessage('Upgrade frontend resources:')
 	
 	resources.each {
 		applyAction(tempPath, path, it)	
@@ -151,6 +167,21 @@ def applyAction(tempPath, path, resource){
 
 	def sourcePath = tempPath + resource.path
 	def targetPath = path + resource.path
+	
+	if(resource.action.equals('delete')){
+		deleteResource(targetPath, resource.type)
+	} else if(resource.action.equals('replace')){
+		replaceResource(sourcePath,targetPath, resource.type)
+	} else if(resource.action.equals('skip')){
+		skipResource(targetPath)
+	}
+	
+}
+
+def applySpecialAction(tempPath, path, resource){
+
+	def sourcePath = tempPath + resource.sourcePath
+	def targetPath = path + resource.targetPath
 	
 	if(resource.action.equals('delete')){
 		deleteResource(targetPath, resource.type)
@@ -186,7 +217,6 @@ def replaceResource(sourcePath, targetPath, type){
 	File sourcePathExist = new File(sourcePath)
 	
 	if (!project.hasProperty("dryrun")){
-		println '1'
 		if(sourcePathExist.exists()){
 			if(type.equals('dir')){
 				ant.delete(dir: targetPath)
