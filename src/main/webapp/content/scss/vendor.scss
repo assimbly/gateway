@@ -5,9 +5,9 @@ put Sass variables here:
 eg $input-color: red;
 ****************************/
 // Override Bootstrap variables
-// @import 'bootstrap-variables';
+@import 'bootstrap-variables';
 // Import Bootstrap source files from node_modules
-// @import '~bootstrap/scss/bootstrap';
+@import '~bootstrap/scss/bootstrap';
 @import '~bootstrap/dist/css/bootstrap.min.css';
 @import '~font-awesome/css/font-awesome.css';
 @import '~@ng-select/ng-select/themes/default.theme.css';

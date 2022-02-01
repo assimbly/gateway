@@ -6,17 +6,17 @@ import org.ehcache.config.builders.*;
 import org.ehcache.jsr107.Eh107Configuration;
 
 import org.hibernate.cache.jcache.ConfigSettings;
+import io.github.jhipster.config.JHipsterProperties;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
+import io.github.jhipster.config.cache.PrefixedKeyGenerator;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.*;
-import io.github.jhipster.config.JHipsterProperties;
-//import io.github.jhipster.config.cache.PrefixedKeyGenerator;
 
 @Configuration
 @EnableCaching
@@ -44,46 +44,44 @@ public class CacheConfiguration {
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cm -> {
-            cm.createCache(org.assimbly.gateway.repository.UserRepository.USERS_BY_LOGIN_CACHE, jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.repository.UserRepository.USERS_BY_EMAIL_CACHE, jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.User.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Authority.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.User.class.getName() + ".authorities", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.PersistentToken.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.User.class.getName() + ".persistentTokens", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Gateway.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Gateway.class.getName() + ".flows", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Gateway.class.getName() + ".environmentVariables", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.EnvironmentVariables.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Flow.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Service.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Service.class.getName()+ ".serviceKeys", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.ServiceKeys.class.getName(), jcacheConfiguration);            
-            cm.createCache(org.assimbly.gateway.domain.Header.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Header.class.getName() + ".headerKeys", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.HeaderKeys.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Flow.class.getName() + ".endpoints", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Endpoint.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Maintenance.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Flow.class.getName() + ".maintenances", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Security.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Group.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".gateways", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Group.class.getName() + ".users", jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Broker.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Route.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Queue.class.getName(), jcacheConfiguration);
-            cm.createCache(org.assimbly.gateway.domain.Topic.class.getName(), jcacheConfiguration);
+            createCache(cm, org.assimbly.gateway.repository.UserRepository.USERS_BY_LOGIN_CACHE);
+            createCache(cm, org.assimbly.gateway.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, org.assimbly.gateway.domain.User.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Authority.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".authorities");
+            createCache(cm, org.assimbly.gateway.domain.PersistentToken.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".persistentTokens");
+            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".flows");
+            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".environmentVariables");
+            createCache(cm, org.assimbly.gateway.domain.EnvironmentVariables.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Service.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Service.class.getName()+ ".serviceKeys");
+            createCache(cm, org.assimbly.gateway.domain.ServiceKeys.class.getName());            
+            createCache(cm, org.assimbly.gateway.domain.Header.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Header.class.getName() + ".headerKeys");
+            createCache(cm, org.assimbly.gateway.domain.HeaderKeys.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".endpoints");
+            createCache(cm, org.assimbly.gateway.domain.Endpoint.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows");
+            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".maintenances");
+            createCache(cm, org.assimbly.gateway.domain.Security.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Group.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".gateways");
+            createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".users");
+            createCache(cm, org.assimbly.gateway.domain.Broker.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Route.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Queue.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Topic.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
 
     private void createCache(javax.cache.CacheManager cm, String cacheName) {
         javax.cache.Cache<Object, Object> cache = cm.getCache(cacheName);
-        if (cache != null) {
-            cache.clear();
-        } else {
+        if (cache == null) {
             cm.createCache(cacheName, jcacheConfiguration);
         }
     }
@@ -91,14 +89,14 @@ public class CacheConfiguration {
     public void setGitProperties(GitProperties gitProperties) {
         this.gitProperties = gitProperties;
     }
+
     @Autowired(required = false)
     public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
 	
-	/*
-    @Bean
+	@Bean
     public KeyGenerator keyGenerator() {
         return new PrefixedKeyGenerator(this.gitProperties, this.buildProperties);
-    }*/
+    }
 }

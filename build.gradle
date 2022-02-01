@@ -290,7 +290,7 @@ repositories {
 dependencies {
 
     //implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
-    implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.6.0'
+    implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
