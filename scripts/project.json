@@ -636,7 +636,22 @@
 		{
 		  "type": "dir",
 		  "path": "content/scss",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/_bootstrap-variables.scss",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/global.scss",
 		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/vendor.scss",
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",
