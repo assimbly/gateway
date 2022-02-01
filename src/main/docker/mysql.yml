@@ -1,7 +1,7 @@
 version: '2'
 services:
   gateway-mysql:
-    image: mysql:8.0.19
+    image: mysql:8.0.20
     # volumes:
     #     - ~/volumes/jhipster/gateway/mysql/:/var/lib/mysql/
     environment:

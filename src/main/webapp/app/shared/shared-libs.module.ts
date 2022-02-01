@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgJhipsterModule } from 'ng-jhipster';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { CookieModule } from 'ngx-cookie';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { TranslateModule } from '@ngx-translate/core';
 import {
@@ -41,11 +40,11 @@ import {
   faTrashAlt,
   faAsterisk,
   faTasks,
-  faHome
+  faHome,
 } from '@fortawesome/free-solid-svg-icons';
 
 @NgModule({
-  imports: [NgbModule, InfiniteScrollModule, CookieModule.forRoot(), FontAwesomeModule],
+  imports: [NgbModule, InfiniteScrollModule, FontAwesomeModule],
   exports: [
     FormsModule,
     CommonModule,
@@ -54,8 +53,8 @@ import {
     InfiniteScrollModule,
     FontAwesomeModule,
     ReactiveFormsModule,
-    TranslateModule
-  ]
+    TranslateModule,
+  ],
 })
 export class GatewaySharedLibsModule {
   constructor(library: FaIconLibrary) {

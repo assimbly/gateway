@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
@@ -15,7 +14,7 @@ import { UserManagementDeleteDialogComponent } from './user-management-delete-di
 
 @Component({
   selector: 'jhi-user-mgmt',
-  templateUrl: './user-management.component.html'
+  templateUrl: './user-management.component.html',
 })
 export class UserManagementComponent implements OnInit, OnDestroy {
   currentAccount: Account | null = null;
@@ -25,7 +24,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   itemsPerPage = ITEMS_PER_PAGE;
   page!: number;
   predicate!: string;
-  previousPage!: number;
   ascending!: boolean;
 
   constructor(
@@ -38,22 +36,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.data
-      .pipe(
-        flatMap(
-          () => this.accountService.identity(),
-          (data, account) => {
-            this.page = data.pagingParams.page;
-            this.previousPage = data.pagingParams.page;
-            this.ascending = data.pagingParams.ascending;
-            this.predicate = data.pagingParams.predicate;
-            this.currentAccount = account;
-            this.loadAll();
-            this.userListSubscription = this.eventManager.subscribe('userListModification', () => this.loadAll());
-          }
-        )
-      )
-      .subscribe();
+    this.accountService.identity().subscribe(account => (this.currentAccount = account));
+    this.userListSubscription = this.eventManager.subscribe('userListModification', () => this.loadAll());
+    this.handleNavigation();
   }
 
   ngOnDestroy(): void {
@@ -70,11 +55,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
-  loadPage(page: number): void {
-    if (page !== this.previousPage) {
-      this.previousPage = page;
-      this.transition();
-    }
+  deleteUser(user: User): void {
+    const modalRef = this.modalService.open(UserManagementDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.user = user;
   }
 
   transition(): void {
@@ -82,15 +65,20 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       relativeTo: this.activatedRoute.parent,
       queryParams: {
         page: this.page,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
+        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc'),
+      },
     });
-    this.loadAll();
   }
 
-  deleteUser(user: User): void {
-    const modalRef = this.modalService.open(UserManagementDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.user = user;
+  private handleNavigation(): void {
+    combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap, (data: Data, params: ParamMap) => {
+      const page = params.get('page');
+      this.page = page !== null ? +page : 1;
+      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
+      this.predicate = sort[0];
+      this.ascending = sort[1] === 'asc';
+      this.loadAll();
+    }).subscribe();
   }
 
   private loadAll(): void {
@@ -98,7 +86,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       .query({
         page: this.page - 1,
         size: this.itemsPerPage,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe((res: HttpResponse<User[]>) => this.onSuccess(res.body, res.headers));
   }

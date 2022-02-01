@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
+import { combineLatest } from 'rxjs';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { Audit } from './audit.model';
@@ -9,7 +10,7 @@ import { AuditsService } from './audits.service';
 
 @Component({
   selector: 'jhi-audit',
-  templateUrl: './audits.component.html'
+  templateUrl: './audits.component.html',
 })
 export class AuditsComponent implements OnInit {
   audits?: Audit[];
@@ -17,7 +18,6 @@ export class AuditsComponent implements OnInit {
   itemsPerPage = ITEMS_PER_PAGE;
   page!: number;
   predicate!: string;
-  previousPage!: number;
   ascending!: boolean;
   toDate = '';
   totalItems = 0;
@@ -34,20 +34,7 @@ export class AuditsComponent implements OnInit {
   ngOnInit(): void {
     this.toDate = this.today();
     this.fromDate = this.previousMonth();
-    this.activatedRoute.data.subscribe(data => {
-      this.page = data['pagingParams'].page;
-      this.previousPage = data['pagingParams'].page;
-      this.ascending = data['pagingParams'].ascending;
-      this.predicate = data['pagingParams'].predicate;
-      this.loadData();
-    });
-  }
-
-  loadPage(page: number): void {
-    if (page !== this.previousPage) {
-      this.previousPage = page;
-      this.transition();
-    }
+    this.handleNavigation();
   }
 
   canLoad(): boolean {
@@ -59,10 +46,11 @@ export class AuditsComponent implements OnInit {
       this.router.navigate(['/admin/audits'], {
         queryParams: {
           page: this.page,
-          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-        }
+          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc'),
+          from: this.fromDate,
+          to: this.toDate,
+        },
       });
-      this.loadData();
     }
   }
 
@@ -83,6 +71,23 @@ export class AuditsComponent implements OnInit {
     return this.datePipe.transform(date, this.dateFormat)!;
   }
 
+  private handleNavigation(): void {
+    combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap, (data: Data, params: ParamMap) => {
+      const page = params.get('page');
+      this.page = page !== null ? +page : 1;
+      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
+      this.predicate = sort[0];
+      this.ascending = sort[1] === 'asc';
+      if (params.get('from')) {
+        this.fromDate = this.datePipe.transform(params.get('from'), this.dateFormat)!;
+      }
+      if (params.get('to')) {
+        this.toDate = this.datePipe.transform(params.get('to'), this.dateFormat)!;
+      }
+      this.loadData();
+    }).subscribe();
+  }
+
   private loadData(): void {
     this.auditsService
       .query({
@@ -90,7 +95,7 @@ export class AuditsComponent implements OnInit {
         size: this.itemsPerPage,
         sort: this.sort(),
         fromDate: this.fromDate,
-        toDate: this.toDate
+        toDate: this.toDate,
       })
       .subscribe((res: HttpResponse<Audit[]>) => this.onSuccess(res.body, res.headers));
   }

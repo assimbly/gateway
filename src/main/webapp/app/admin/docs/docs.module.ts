@@ -8,6 +8,6 @@ import { docsRoute } from './docs.route';
 
 @NgModule({
   imports: [GatewaySharedModule, RouterModule.forChild([docsRoute])],
-  declarations: [DocsComponent]
+  declarations: [DocsComponent],
 })
 export class DocsModule {}
