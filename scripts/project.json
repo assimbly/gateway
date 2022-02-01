@@ -699,5 +699,28 @@
 		  "action": "replace"
 		}
 	  ]
+  },
+  "specialResources": {
+  	"basePath": "/",
+	  "resources": [
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/AccountResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/AccountResource.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/AuditResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/AuditResource.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/UserResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/UserResource.java",
+		  "action": "replace"
+		}
+	  ]
   }
 }

@@ -1,23 +1,25 @@
 package org.assimbly.gateway.web.rest;
 
-import java.util.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
 import org.assimbly.gateway.service.MailService;
 import org.assimbly.gateway.service.UserService;
-import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.service.dto.PasswordChangeDTO;
+import org.assimbly.gateway.service.dto.UserDTO;
 import org.assimbly.gateway.web.rest.errors.*;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.*;
 
 /**
  * REST controller for managing the current user's account.
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountResource {
 
     private static class AccountResourceException extends RuntimeException {
-
         private AccountResourceException(String message) {
             super(message);
         }
@@ -42,6 +43,7 @@ public class AccountResource {
     private final MailService mailService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
@@ -58,7 +60,7 @@ public class AccountResource {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
+        if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
@@ -98,10 +100,9 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
-        return userService
-            .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
+    public UserDTO getAccount() {
+        return userService.getUserWithAuthorities()
+            .map(UserDTO::new)
             .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
@@ -113,10 +114,8 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
     @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils
-            .getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+    public void saveAccount(@Valid @RequestBody UserDTO userDTO) {
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
@@ -125,13 +124,8 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("User could not be found");
         }
-        userService.updateUser(
-            userDTO.getFirstName(),
-            userDTO.getLastName(),
-            userDTO.getEmail(),
-            userDTO.getLangKey(),
-            userDTO.getImageUrl()
-        );
+        userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
+            userDTO.getLangKey(), userDTO.getImageUrl());
     }
 
     /**
@@ -142,7 +136,7 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/change-password")
     public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
-        if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
+        if (!checkPasswordLength(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
         userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
@@ -161,7 +155,7 @@ public class AccountResource {
         } else {
             // Pretend the request has been successful to prevent checking which emails really exist
             // but log that an invalid attempt has been made
-            log.warn("Password reset requested for non existing mail");
+            log.warn("Password reset requested for non existing mail '{}'", mail);
         }
     }
 
@@ -174,21 +168,20 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
-        if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
+        if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+        Optional<User> user =
+            userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
 
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this reset key");
         }
     }
 
-    private static boolean isPasswordLengthInvalid(String password) {
-        return (
-            StringUtils.isEmpty(password) ||
-            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
-        );
+    private static boolean checkPasswordLength(String password) {
+        return !StringUtils.isEmpty(password) &&
+            password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
+            password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH;
     }
 }

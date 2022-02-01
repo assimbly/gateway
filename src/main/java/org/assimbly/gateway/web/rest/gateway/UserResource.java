@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.gateway;
+package org.assimbly.gateway.web.rest;
 
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.User;
