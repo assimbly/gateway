@@ -7,7 +7,7 @@ import { ConfigurationComponent } from './configuration.component';
 import { configurationRoute } from './configuration.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([configurationRoute])],
-    declarations: [ConfigurationComponent]
+  imports: [GatewaySharedModule, RouterModule.forChild([configurationRoute])],
+  declarations: [ConfigurationComponent]
 })
 export class ConfigurationModule {}

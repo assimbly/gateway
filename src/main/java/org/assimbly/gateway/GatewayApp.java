@@ -1,6 +1,6 @@
 package org.assimbly.gateway;
 
-import tech.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;

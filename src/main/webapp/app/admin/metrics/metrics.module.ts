@@ -7,7 +7,7 @@ import { MetricsComponent } from './metrics.component';
 import { metricsRoute } from './metrics.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([metricsRoute])],
-    declarations: [MetricsComponent]
+  imports: [GatewaySharedModule, RouterModule.forChild([metricsRoute])],
+  declarations: [MetricsComponent]
 })
 export class MetricsModule {}

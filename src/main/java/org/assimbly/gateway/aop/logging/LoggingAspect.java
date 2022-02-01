@@ -1,5 +1,6 @@
 package org.assimbly.gateway.aop.logging;
 
+import io.github.jhipster.config.JHipsterConstants;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,11 +11,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 import java.util.Arrays;
-
-import org.springframework.core.env.Profiles;
-import tech.jhipster.config.JHipsterConstants;
 
 /**
  * Aspect for logging execution of service and repository Spring components.
@@ -23,8 +22,6 @@ import tech.jhipster.config.JHipsterConstants;
  */
 @Aspect
 public class LoggingAspect {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final Environment env;
 
@@ -46,7 +43,8 @@ public class LoggingAspect {
      * Pointcut that matches all Spring beans in the application's main packages.
      */
     @Pointcut("within(org.assimbly.gateway.repository..*)"+
-        " || within(org.assimbly.gateway.service..*)")
+        " || within(org.assimbly.gateway.service..*)"+
+        " || within(org.assimbly.gateway.web.rest..*)")
     public void applicationPackagePointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
@@ -60,6 +58,7 @@ public class LoggingAspect {
     private Logger logger(JoinPoint joinPoint) {
         return LoggerFactory.getLogger(joinPoint.getSignature().getDeclaringTypeName());
     }
+
     /**
      * Advice that logs methods throwing exceptions.
      *
@@ -71,7 +70,7 @@ public class LoggingAspect {
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             logger(joinPoint)
                 .error(
-                    "Exception in {}() with cause = '{}' and exception = '{}'",
+                    "Exception in {}() with cause = \'{}\' and exception = \'{}\'",
                     joinPoint.getSignature().getName(),
                     e.getCause() != null ? e.getCause() : "NULL",
                     e.getMessage(),
@@ -86,6 +85,7 @@ public class LoggingAspect {
                 );
         }
     }
+
     /**
      * Advice that logs when a method is entered and exited.
      *

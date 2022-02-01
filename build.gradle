@@ -289,12 +289,13 @@ repositories {
 
 dependencies {
 
-    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
+    //implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
+    implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.6.0'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
-    implementation group: "tech.jhipster", name: "jhipster-framework"
-	//implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.6.0'
+    //implementation group: "tech.jhipster", name: "jhipster-framework"
+	
 	implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -344,7 +345,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-	implementation "org.zalando:problem-spring-web:0.27.0"
+	implementation "org.zalando:problem-spring-web:0.26.2"
+	//implementation "org.zalando:problem-spring-web:0.27.0"
     implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
     implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"

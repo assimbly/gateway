@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Swagger UI</title>
+    <title>gateway - Swagger UI</title>
     <link rel="stylesheet" type="text/css" href="./swagger-ui.css">
     <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32"/>
     <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16"/>
@@ -19,16 +19,6 @@
 <script type="text/javascript">
     window.onload = function () {
 
-        function getCSRF() {
-            var name = "XSRF-TOKEN=";
-            var ca = document.cookie.split(';');
-            for(var i=0; i<ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) === ' ') c = c.substring(1);
-                if (c.indexOf(name) !== -1) return c.substring(name.length,c.length);
-            }
-            return "";
-        }
 
         var urls = [];
         axios.get("/swagger-resources").then(function (response) {
@@ -56,8 +46,12 @@
                 plugins: [
                     SwaggerUIBundle.plugins.DownloadUrl
                 ],
-                requestInterceptor: function(req) {
-                    req.headers['X-XSRF-TOKEN'] = getCSRF();
+                requestInterceptor: function (req) {
+                    var authToken = JSON.parse(localStorage.getItem("jhi-authenticationtoken")
+                        || sessionStorage.getItem("jhi-authenticationtoken"));
+                    if (authToken) {
+                        req.headers['Authorization'] = "Bearer " + authToken;
+                    }
                     return req;
                 }
             });

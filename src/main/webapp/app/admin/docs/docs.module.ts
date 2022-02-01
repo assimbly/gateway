@@ -7,7 +7,7 @@ import { DocsComponent } from './docs.component';
 import { docsRoute } from './docs.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([docsRoute])],
-    declarations: [DocsComponent]
+  imports: [GatewaySharedModule, RouterModule.forChild([docsRoute])],
+  declarations: [DocsComponent]
 })
 export class DocsModule {}

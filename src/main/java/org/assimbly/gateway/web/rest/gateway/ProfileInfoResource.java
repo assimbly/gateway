@@ -3,7 +3,7 @@ package org.assimbly.gateway.web.rest.gateway;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 
-import tech.jhipster.config.JHipsterProperties;
+import io.github.jhipster.config.JHipsterProperties;
 
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;

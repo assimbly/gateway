@@ -11,7 +11,7 @@ import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
 
-import tech.jhipster.web.util.ResponseUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

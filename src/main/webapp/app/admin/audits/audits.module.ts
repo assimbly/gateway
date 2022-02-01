@@ -7,7 +7,7 @@ import { AuditsComponent } from './audits.component';
 import { auditsRoute } from './audits.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([auditsRoute])],
-    declarations: [AuditsComponent]
+  imports: [GatewaySharedModule, RouterModule.forChild([auditsRoute])],
+  declarations: [AuditsComponent]
 })
 export class AuditsModule {}

@@ -1,11 +1,9 @@
-const fs = require('fs');
 const path = require('path');
 
 const tsconfig = require('../tsconfig.json');
 
 module.exports = {
   root,
-  parseType,
   mapTypescriptAliasToWebpackAlias
 };
 
@@ -14,12 +12,6 @@ const _root = path.resolve(__dirname, '..');
 function root(args) {
   args = Array.prototype.slice.call(arguments, 0);
   return path.join.apply(path, [_root].concat(args));
-}
-
-function parseType() {
-    const typeRegex = /(?<=type=).*/gm; // Match and group the version number
-    const gradleProperties = fs.readFileSync('gradle.properties', 'utf8');
-    return typeRegex.exec(gradleProperties)[0];
 }
 
 function mapTypescriptAliasToWebpackAlias(alias = {}) {

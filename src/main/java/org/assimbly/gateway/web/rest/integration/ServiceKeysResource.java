@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import tech.jhipster.web.util.ResponseUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.util.EncryptionUtil;
 

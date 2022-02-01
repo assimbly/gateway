@@ -6,39 +6,39 @@ import { HealthService, HealthStatus, Health, HealthKey, HealthDetails } from '.
 import { HealthModalComponent } from './health-modal.component';
 
 @Component({
-    selector: 'jhi-health',
-    templateUrl: './health.component.html'
+  selector: 'jhi-health',
+  templateUrl: './health.component.html'
 })
 export class HealthComponent implements OnInit {
-    health?: Health;
+  health?: Health;
 
-    constructor(private modalService: NgbModal, private healthService: HealthService) {}
+  constructor(private modalService: NgbModal, private healthService: HealthService) {}
 
-    ngOnInit(): void {
-        this.refresh();
+  ngOnInit(): void {
+    this.refresh();
+  }
+
+  getBadgeClass(statusState: HealthStatus): string {
+    if (statusState === 'UP') {
+      return 'badge-success';
+    } else {
+      return 'badge-danger';
     }
+  }
 
-    getBadgeClass(statusState: HealthStatus): string {
-        if (statusState === 'UP') {
-            return 'badge-success';
-        } else {
-            return 'badge-danger';
+  refresh(): void {
+    this.healthService.checkHealth().subscribe(
+      health => (this.health = health),
+      (error: HttpErrorResponse) => {
+        if (error.status === 503) {
+          this.health = error.error;
         }
-    }
+      }
+    );
+  }
 
-    refresh(): void {
-        this.healthService.checkHealth().subscribe(
-            health => (this.health = health),
-            (error: HttpErrorResponse) => {
-                if (error.status === 503) {
-                    this.health = error.error;
-                }
-            }
-        );
-    }
-
-    showHealth(health: { key: HealthKey; value: HealthDetails }): void {
-        const modalRef = this.modalService.open(HealthModalComponent);
-        modalRef.componentInstance.health = health;
-    }
+  showHealth(health: { key: HealthKey; value: HealthDetails }): void {
+    const modalRef = this.modalService.open(HealthModalComponent);
+    modalRef.componentInstance.health = health;
+  }
 }
