@@ -2,7 +2,7 @@
   "applicationName": "gateway",
   "applicationType": "monolithic",
   "version": "3.6.0",
-  "jhipsterVersion": "6.9.1",
+  "jhipsterVersion": "6.10.5",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
   "repositoryName": "gateway",
@@ -379,7 +379,7 @@
 		{
 		  "type": "file",
 		  "path": "config/WebConfigurer.java",
-		  "action": "skip"
+		  "action": "replace"
 		},
 		{
 		  "type": "dir",
