@@ -20,7 +20,7 @@ describe('Component Tests', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [GatewayTestModule],
-        declarations: [UserManagementDeleteDialogComponent]
+        declarations: [UserManagementDeleteDialogComponent],
       })
         .overrideTemplate(UserManagementDeleteDialogComponent, '')
         .compileComponents();

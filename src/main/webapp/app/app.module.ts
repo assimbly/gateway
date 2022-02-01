@@ -41,12 +41,12 @@ import { NotificationInterceptor } from './blocks/interceptor/notification.inter
     NgJhipsterModule.forRoot({
       // set below to true to make alerts look like toast
       alertAsToast: false,
-      alertTimeout: 5000
+      alertTimeout: 5000,
     }),
     PopoverModule.forRoot(),
     // jhipster-needle-angular-add-module JHipster will add new module here
     GatewayEntityModule,
-    GatewayAppRoutingModule
+    GatewayAppRoutingModule,
   ],
   declarations: [MainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, ActiveMenuDirective, FooterComponent],
   providers: [
@@ -54,20 +54,20 @@ import { NotificationInterceptor } from './blocks/interceptor/notification.inter
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthExpiredInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorHandlerInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: NotificationInterceptor,
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  bootstrap: [MainComponent]
+  bootstrap: [MainComponent],
 })
 export class GatewayAppModule {
   constructor(private dpConfig: NgbDatepickerConfig) {

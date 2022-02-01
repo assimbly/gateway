@@ -2,7 +2,7 @@
   "applicationName": "gateway",
   "applicationType": "monolithic",
   "version": "3.6.0",
-  "jhipsterVersion": "6.8.0",
+  "jhipsterVersion": "6.9.1",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
   "repositoryName": "gateway",
@@ -64,7 +64,7 @@
 	{
       "type": "dir",
       "path": "node_modules",
-      "action": "ignore"
+      "action": "delete"
     },
 	{
       "type": "dir",
@@ -104,6 +104,41 @@
 	{
       "type": "dir",
       "path": "webpack",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/logo-jhipster.png",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/logo-jhipster.png",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/utils.js",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.common.js",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.dev.js",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.prod.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.test.js",
       "action": "replace"
     },
 	{
@@ -209,7 +244,7 @@
 	{
       "type": "file",
       "path": "package-lock.json",
-      "action": "ignore"
+      "action": "delete"
     },
 	{
       "type": "file",
@@ -455,7 +490,7 @@
 	  "resources": [
 		{
 		  "type": "file",
-		  "path": "app/polyfill.ts",
+		  "path": "app/polyfills.ts",
 		  "action": "replace"
 		},
 		{

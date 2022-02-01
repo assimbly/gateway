@@ -9,9 +9,9 @@ const utils = require('./utils.js');
 
 module.exports = (options) => ({
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js', '.scss'],
         modules: ['node_modules'],
-        mainFields: [ 'es2015', 'browser', 'module', 'main'],
+        mainFields: ['es2015', 'browser', 'module', 'main'],
         alias: utils.mapTypescriptAliasToWebpackAlias()
     },
     stats: {
@@ -27,16 +27,17 @@ module.exports = (options) => ({
                 test: /\.html$/,
                 loader: 'html-loader',
                 options: {
-                    minimize: true,
-                    caseSensitive: true,
-                    removeAttributeQuotes:false,
-                    minifyJS:false,
-                    minifyCSS:false
+                    minimize: {
+                        caseSensitive: true,
+                        removeAttributeQuotes:false,
+                        minifyJS:false,
+                        minifyCSS:false
+                    }
                 },
-                exclude: /(src\/main\/webapp\/index.html)/
+                exclude: utils.root('src/main/webapp/index.html')
             },
             {
-                test: /\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/i,
+                test: /\.(jpe?g|png|webp|gif|svg|woff2?|ttf|eot)$/i,
                 loader: 'file-loader',
                 options: {
                     digest: 'hex',
@@ -65,6 +66,7 @@ module.exports = (options) => ({
                 BUILD_TIMESTAMP: `'${new Date().getTime()}'`,
                 // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
                 VERSION: `'${process.env.hasOwnProperty('APP_VERSION') ? process.env.APP_VERSION : 'DEV'}'`,
+				TYPE: `'${utils.parseType()}'`,
                 DEBUG_INFO_ENABLED: options.env === 'development',
                 // The root URL for API calls, ending with a '/' - for example: `"https://www.jhipster.tech:8081/myservice/"`.
                 // If this URL is left empty (""), then it will be relative to the current context.
