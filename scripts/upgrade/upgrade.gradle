@@ -186,22 +186,21 @@ def replaceResource(sourcePath, targetPath, type){
 	File sourcePathExist = new File(sourcePath)
 	
 	if (!project.hasProperty("dryrun")){
+		println '1'
 		if(sourcePathExist.exists()){
-	
-		if(type.equals('dir')){
-			ant.delete(dir: targetPath)
-			targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
-			ant.move file: "${sourcePath}", todir: "${targetPath}"
-		}else{
-			ant.delete(file: targetPath)
-			targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
-			ant.move file: "${sourcePath}", todir: "${targetPath}"
-		}	
+			if(type.equals('dir')){
+				ant.delete(dir: targetPath)
+				targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
+				ant.move file: "${sourcePath}", todir: "${targetPath}"
+			}else{
+				ant.delete(file: targetPath)
+				targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
+				ant.move file: "${sourcePath}", todir: "${targetPath}"
+			}	
 		}else{
 			printMessage("warning file doesn't exist: ${sourcePath}")
 		}
-	}
-	
+	}	
 	
 }
 

@@ -1,6 +1,6 @@
 package org.assimbly.gateway.config;
 
-import tech.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterConstants;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;

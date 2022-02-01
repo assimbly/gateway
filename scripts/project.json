@@ -564,6 +564,11 @@
 		  "action": "replace"
 		},
 		{
+		  "type": "dir",
+		  "path": "app/shared/window",
+		  "action": "ignore"
+		},
+		{
 		  "type": "file",
 		  "path": "app/app.constants.ts",
 		  "action": "ignore"

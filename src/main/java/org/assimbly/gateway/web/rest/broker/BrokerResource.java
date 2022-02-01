@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.broker;
 
-import tech.jhipster.web.util.ResponseUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;

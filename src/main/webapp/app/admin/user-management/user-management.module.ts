@@ -9,13 +9,13 @@ import { UserManagementDeleteDialogComponent } from './user-management-delete-di
 import { userManagementRoute } from './user-management.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(userManagementRoute)],
-    declarations: [
-        UserManagementComponent,
-        UserManagementDetailComponent,
-        UserManagementUpdateComponent,
-        UserManagementDeleteDialogComponent
-    ],
-    entryComponents: [UserManagementDeleteDialogComponent]
+  imports: [GatewaySharedModule, RouterModule.forChild(userManagementRoute)],
+  declarations: [
+    UserManagementComponent,
+    UserManagementDetailComponent,
+    UserManagementUpdateComponent,
+    UserManagementDeleteDialogComponent
+  ],
+  entryComponents: [UserManagementDeleteDialogComponent]
 })
 export class UserManagementModule {}

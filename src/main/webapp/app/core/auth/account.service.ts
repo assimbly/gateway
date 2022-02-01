@@ -94,8 +94,4 @@ export class AccountService {
       this.router.navigateByUrl(previousUrl);
     }
   }
-
-  isAdmin(): boolean {
-    return this.userIdentity.authorities.includes('ROLE_ADMIN');
-  }
 }

@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import tech.jhipster.web.util.ResponseUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;

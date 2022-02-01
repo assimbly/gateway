@@ -49,7 +49,7 @@ spring:
     console:
       enabled: false
   jpa:
-    database-platform: tech.jhipster.domain.util.FixedH2Dialect
+    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
     database: H2
     show-sql: true
     properties:

@@ -11,13 +11,13 @@ export type ThreadDump = { threads: Thread[] };
 
 @Injectable({ providedIn: 'root' })
 export class MetricsService {
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    getMetrics(): Observable<Metrics> {
-        return this.http.get<Metrics>(SERVER_API_URL + 'management/jhimetrics');
-    }
+  getMetrics(): Observable<Metrics> {
+    return this.http.get<Metrics>(SERVER_API_URL + 'management/jhimetrics');
+  }
 
-    threadDump(): Observable<ThreadDump> {
-        return this.http.get<ThreadDump>(SERVER_API_URL + 'management/threaddump');
-    }
+  threadDump(): Observable<ThreadDump> {
+    return this.http.get<ThreadDump>(SERVER_API_URL + 'management/threaddump');
+  }
 }

@@ -1,6 +1,6 @@
 package org.assimbly.gateway.config;
 
-import tech.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CloudDatabaseConfiguration extends AbstractCloudConfig {
 
     private final Logger log = LoggerFactory.getLogger(CloudDatabaseConfiguration.class);
-    
-    private final String CLOUD_CONFIGURATION_HIKARI_PREFIX = "spring.datasource.hikari";
+
+    private static final String CLOUD_CONFIGURATION_HIKARI_PREFIX = "spring.datasource.hikari";
 
     @Bean
     @ConfigurationProperties(CLOUD_CONFIGURATION_HIKARI_PREFIX)
