@@ -84,6 +84,8 @@ def searchAndReplace(tempDir){
 		ant.replace(file: it, token: "jhipstersampleapplication", value: "gateway")
 		ant.replace(file: it, token: "jhipster-sample-application", value: "gateway")
 		ant.replace(file: it, token: "io.github.jhipster.sample", value: "org.assimbly.gateway")
+		ant.replace(file: it, token: "io.github.jhipster.sample", value: "org.assimbly.gateway")
+		//ant.replace(file: it, token: "io.github.jhipster.config", value: "org.assimbly.gateway.config")		
 		ant.replace(file: it, token: "io/github/jhipster/sample", value: "org/assimbly.gateway")
 		
 	}
