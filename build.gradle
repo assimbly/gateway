@@ -45,6 +45,7 @@ targetCompatibility=11
 assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
+apply from: "$rootDir/scripts/resources/resources.gradle"
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
