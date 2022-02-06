@@ -450,7 +450,7 @@
 		}	
 	  ]
   },
-  "testBackendReSecources": {
+  "testBackendResources": {
   	"basePath": "/src/test/java/org/assimbly/gateway",
 	"resources": [
 		{
@@ -702,7 +702,7 @@
   },
   "testFrontendResources": {
   	"basePath": "/src/test/javascript",
-	  "resources": [
+	"resources": [
 		{
 		  "type": "dir",
 		  "path": "spec/app/account",
