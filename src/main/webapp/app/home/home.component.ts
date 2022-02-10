@@ -1,47 +1,47 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { LoginModalService } from 'app/core/login/login-modal.service';
 import { AccountService } from 'app/core/auth/account.service';
-import { Account } from 'app/core/user/account.model';
+import { Account } from 'app/core/auth/account.model';
 
 import { TYPE } from 'app/app.constants';
 
 @Component({
-    selector: 'jhi-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['home.scss']
+  selector: 'jhi-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-    account: Account | null = null;
-    authSubscription?: Subscription;
-    type: string;
+  account: Account | null = null;
+  authSubscription?: Subscription;
+  type: string;
 
-    constructor(private accountService: AccountService, private loginModalService: LoginModalService) {
-        this.type = TYPE;
+  constructor(private accountService: AccountService, private router: Router) {
+    this.type = TYPE;
+  }
+
+  ngOnInit(): void {
+    this.authSubscription = this.accountService.getAuthenticationState().subscribe(account => {
+      this.account = account;
+
+      if (!this.isAuthenticated()) {
+        this.login();
+      }
+    });
+  }
+
+  isAuthenticated(): boolean {
+    return this.accountService.isAuthenticated();
+  }
+
+  login(): void {
+    this.router.navigate(['/login']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
-
-    ngOnInit(): void {
-        this.authSubscription = this.accountService.getAuthenticationState().subscribe(account => {
-            this.account = account;
-
-            if (!this.isAuthenticated()) {
-                this.login();
-            }
-        });
-    }
-
-    isAuthenticated(): boolean {
-        return this.accountService.isAuthenticated();
-    }
-
-    login(): void {
-        this.loginModalService.open();
-    }
-
-    ngOnDestroy(): void {
-        if (this.authSubscription) {
-            this.authSubscription.unsubscribe();
-        }
-    }
+  }
 }

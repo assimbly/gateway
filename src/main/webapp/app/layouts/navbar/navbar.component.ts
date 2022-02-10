@@ -1,76 +1,75 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { JhiLanguageService } from 'ng-jhipster';
+import { TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
 import { VERSION, TYPE } from 'app/app.constants';
-import { LANGUAGES } from 'app/core/language/language.constants';
+import { LANGUAGES } from 'app/config/language.constants';
+import { Account } from 'app/core/auth/account.model';
 import { AccountService } from 'app/core/auth/account.service';
-import { LoginModalService } from 'app/core/login/login-modal.service';
-import { LoginService } from 'app/core/login/login.service';
+import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 
 @Component({
-    selector: 'jhi-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrls: ['navbar.scss']
+  selector: 'jhi-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent implements OnInit {
-    inProduction?: boolean;
-    isNavbarCollapsed = true;
-    languages: any[];
-    swaggerEnabled?: boolean;
-    version: string;
-    type: string;
+  inProduction?: boolean;
+  isNavbarCollapsed = true;
+  languages = LANGUAGES;
+  openAPIEnabled?: boolean;
+  version = '';
+  account: Account | null = null;
+  type: string;
 
-    constructor(
-        private loginService: LoginService,
-        private languageService: JhiLanguageService,
-        private sessionStorage: SessionStorageService,
-        private accountService: AccountService,
-        private loginModalService: LoginModalService,
-        private profileService: ProfileService,
-        private router: Router
-    ) {
-        this.version = VERSION ? (VERSION.toLowerCase().startsWith('v') ? VERSION : 'v' + VERSION) : '';
-        this.type = TYPE;
+  constructor(
+    private loginService: LoginService,
+    private translateService: TranslateService,
+    private sessionStorageService: SessionStorageService,
+    private accountService: AccountService,
+    private profileService: ProfileService,
+    private router: Router
+  ) {
+    if (VERSION) {
+      this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : 'v' + VERSION;
     }
+    this.type = TYPE;
+  }
 
-    ngOnInit(): void {
-        this.profileService.getProfileInfo().subscribe(profileInfo => {
-            this.inProduction = profileInfo.inProduction;
-            this.swaggerEnabled = profileInfo.swaggerEnabled;
-        });
-    }
+  ngOnInit(): void {
+    this.profileService.getProfileInfo().subscribe(profileInfo => {
+      this.inProduction = profileInfo.inProduction;
+      this.openAPIEnabled = profileInfo.openAPIEnabled;
+    });
+    this.accountService.getAuthenticationState().subscribe(account => (this.account = account));
+  }
 
-    changeLanguage(languageKey: string): void {
-        this.sessionStorage.store('locale', languageKey);
-        this.languageService.changeLanguage(languageKey);
-    }
+  changeLanguage(languageKey: string): void {
+    this.sessionStorageService.store('locale', languageKey);
+    this.translateService.use(languageKey);
+  }
 
-    collapseNavbar(): void {
-        this.isNavbarCollapsed = true;
-    }
+  collapseNavbar(): void {
+    this.isNavbarCollapsed = true;
+  }
 
-    isAuthenticated(): boolean {
-        return this.accountService.isAuthenticated();
-    }
+  login(): void {
+    this.router.navigate(['/login']);
+  }
 
-    login(): void {
-        this.loginModalService.open();
-    }
+  logout(): void {
+    this.collapseNavbar();
+    this.loginService.logout();
+    this.router.navigate(['']);
+  }
 
-    logout(): void {
-        this.collapseNavbar();
-        this.loginService.logout();
-        this.router.navigate(['']);
-    }
+  toggleNavbar(): void {
+    this.isNavbarCollapsed = !this.isNavbarCollapsed;
+  }
 
-    toggleNavbar(): void {
-        this.isNavbarCollapsed = !this.isNavbarCollapsed;
-    }
-
-    getImageUrl(): string {
-        return this.isAuthenticated() ? this.accountService.getImageUrl() : '';
-    }
+  isAuthenticated(): boolean {
+    return this.accountService.isAuthenticated();
+  }
 }

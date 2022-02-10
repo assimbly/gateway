@@ -1,24 +1,22 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import org.assimbly.gateway.domain.Endpoint;
-import org.assimbly.gateway.repository.EndpointRepository;
-import org.assimbly.gateway.service.EndpointService;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
-import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.dto.EndpointDTO;
-import org.assimbly.gateway.service.mapper.EndpointMapper;
-
-import io.github.jhipster.web.util.ResponseUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.assimbly.gateway.domain.Endpoint;
+import org.assimbly.gateway.repository.EndpointRepository;
+import org.assimbly.gateway.service.EndpointService;
+import org.assimbly.gateway.service.dto.EndpointDTO;
+import org.assimbly.gateway.service.mapper.EndpointMapper;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Endpoint.
@@ -33,9 +31,9 @@ public class EndpointResource {
 
     private final EndpointService endpointService;
 
-	private final EndpointRepository endpointRepository;
+    private final EndpointRepository endpointRepository;
 
-	private final EndpointMapper endpointMapper;
+    private final EndpointMapper endpointMapper;
 
     public EndpointResource(EndpointService endpointService, EndpointRepository endpointRepository, EndpointMapper endpointMapper) {
         this.endpointService = endpointService;
@@ -58,7 +56,8 @@ public class EndpointResource {
         }
 
         EndpointDTO result = endpointService.save(endpointDTO);
-        return ResponseEntity.created(new URI("/api/from-endpoints/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/from-endpoints/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -77,8 +76,7 @@ public class EndpointResource {
         List<Endpoint> endpoints = endpointMapper.toEntity(endpointsDTO);
         endpoints = endpointRepository.saveAll(endpoints);
         List<EndpointDTO> results = endpointMapper.toDto(endpoints);
-        return ResponseEntity.created(new URI("/api/endpoints/"))
-        		.body(results);
+        return ResponseEntity.created(new URI("/api/endpoints/")).body(results);
     }
 
     /**
@@ -97,9 +95,7 @@ public class EndpointResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         EndpointDTO result = endpointService.save(endpointDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, endpointDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, endpointDTO.getId().toString())).body(result);
     }
 
     /**
@@ -175,8 +171,8 @@ public class EndpointResource {
     /**
      * DELETE  /endpoints : delete list of endpoints.
      *
-    * @param list of endpointsDTO's to delete
-      * @return the ResponseEntity with status 200 (OK)
+     * @param list of endpointsDTO's to delete
+     * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/endpoints")
     public ResponseEntity<Void> deleteEndpoints(@RequestBody List<EndpointDTO> endpointsDTO) throws URISyntaxException {
@@ -185,12 +181,10 @@ public class EndpointResource {
 
         ArrayList<String> arrayOfIds = new ArrayList<String>();
         for (Endpoint endpoint : endpoints) {
-        	arrayOfIds.add(endpoint.getId().toString());
+            arrayOfIds.add(endpoint.getId().toString());
         }
 
         endpointRepository.deleteInBatch(endpoints);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, arrayOfIds.toString())).build();
     }
-
-
 }

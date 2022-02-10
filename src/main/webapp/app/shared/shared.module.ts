@@ -1,29 +1,51 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { GatewaySharedLibsModule } from './shared-libs.module';
+import { NgModule } from '@angular/core';
+import { SharedLibsModule } from './shared-libs.module';
 import { FindLanguageFromKeyPipe } from './language/find-language-from-key.pipe';
+import { TranslateDirective } from './language/translate.directive';
 import { AlertComponent } from './alert/alert.component';
 import { AlertErrorComponent } from './alert/alert-error.component';
-import { LoginModalComponent } from './login/login.component';
 import { HasAnyAuthorityDirective } from './auth/has-any-authority.directive';
 
+import { DurationPipe } from './date/duration.pipe';
+import { FormatMediumDatetimePipe } from './date/format-medium-datetime.pipe';
+import { FormatMediumDatePipe } from './date/format-medium-date.pipe';
+import { SortByDirective } from './sort/sort-by.directive';
+import { SortDirective } from './sort/sort.directive';
+import { ItemCountComponent } from './pagination/item-count.component';
+
 import { WindowRef } from '../../app/shared/window/window.service';
-import { CSRFService } from '../../app/core/auth/csrf.service';
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateMomentAdapter } from './util/datepicker-adapter';
 
 @NgModule({
-  imports: [GatewaySharedLibsModule],
-  declarations: [FindLanguageFromKeyPipe, AlertComponent, AlertErrorComponent, LoginModalComponent, HasAnyAuthorityDirective],
-  providers: [WindowRef, CSRFService, { provide: NgbDateAdapter, useClass: NgbDateMomentAdapter }],
-  entryComponents: [LoginModalComponent],
-  exports: [
-    GatewaySharedLibsModule,
+  imports: [SharedLibsModule],
+  declarations: [
     FindLanguageFromKeyPipe,
+    TranslateDirective,
     AlertComponent,
     AlertErrorComponent,
-    LoginModalComponent,
-    HasAnyAuthorityDirective
+    HasAnyAuthorityDirective,
+    DurationPipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatePipe,
+    SortByDirective,
+    SortDirective,
+    ItemCountComponent,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  providers: [WindowRef, { provide: NgbDateAdapter, useClass: NgbDateMomentAdapter }],
+  exports: [
+    SharedLibsModule,
+    FindLanguageFromKeyPipe,
+    TranslateDirective,
+    AlertComponent,
+    AlertErrorComponent,
+    HasAnyAuthorityDirective,
+    DurationPipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatePipe,
+    SortByDirective,
+    SortDirective,
+    ItemCountComponent,
+  ],
 })
-export class GatewaySharedModule {}
+export class SharedModule {}

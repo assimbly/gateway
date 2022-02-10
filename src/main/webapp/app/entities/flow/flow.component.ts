@@ -15,10 +15,9 @@ import { SecurityService } from 'app/entities/security/security.service';
 
 @Component({
   selector: 'jhi-flow',
-  templateUrl: './flow.component.html'
+  templateUrl: './flow.component.html',
 })
 export class FlowComponent implements OnInit, OnDestroy {
-  public isAdmin: boolean;
   gateways: IGateway[];
   gateway: IGateway;
   flows: IFlow[];
@@ -62,7 +61,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 0;
     this.links = {
-      last: 0
+      last: 0,
     };
     this.predicate = 'name';
     this.reverse = true;
@@ -76,7 +75,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         .query({
           page: this.page,
           size: this.itemsPerPage,
-          sort: this.sort()
+          sort: this.sort(),
         })
         .subscribe(
           (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
@@ -85,12 +84,13 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFlowsForSelectedGateway(id) {
+  getFlowsForSelectedGateway(event) {
+    let id = (event.target as HTMLSelectElement).value as string;
     this.flowService
       .getFlowByGatewayId(Number(id), {
         page: this.page,
         size: this.itemsPerPage,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe(
         (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
@@ -117,7 +117,6 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.flowService.connect();
     });
     this.finished = true;
-    this.isAdmin = true; //this.accountService.isAdmin();
     this.registerChangeInFlows();
     this.registerChangeCreatedGateway();
     this.registerDeletedFlows();

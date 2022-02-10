@@ -1,14 +1,19 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import org.assimbly.gateway.domain.Service;
 import org.assimbly.gateway.domain.ServiceKeys;
 import org.assimbly.gateway.repository.ServiceRepository;
 import org.assimbly.gateway.service.ServiceService;
+import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.ServiceDTO;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Service.
@@ -61,7 +59,8 @@ public class ServiceResource {
             throw new BadRequestAlertException("A new service cannot already have an ID", ENTITY_NAME, "idexists");
         }
         ServiceDTO result = serviceService.save(serviceDTO);
-        return ResponseEntity.created(new URI("/api/services/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/services/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -82,9 +81,7 @@ public class ServiceResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         ServiceDTO result = serviceService.save(serviceDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceDTO.getId().toString())).body(result);
     }
 
     /**
@@ -121,7 +118,6 @@ public class ServiceResource {
         return ResponseUtil.wrapOrNotFound(serviceDTO);
     }
 
-
     /**
      * GET  /services/:id/keys : get the keys for a service with "id".
      *
@@ -149,19 +145,17 @@ public class ServiceResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-
-    private TreeMap<String, String> getKeys(String serviceId){
-
+    private TreeMap<String, String> getKeys(String serviceId) {
         TreeMap<String, String> serviceMap = new TreeMap<>();
 
-        Long serviceIdLong =  Long.valueOf(serviceId);
+        Long serviceIdLong = Long.valueOf(serviceId);
         Optional<Service> service = serviceRepository.findById(serviceIdLong);
 
-        if(service.isPresent()){
+        if (service.isPresent()) {
             Set<ServiceKeys> serviceKeys = service.get().getServiceKeys();
 
             for (ServiceKeys serviceKey : serviceKeys) {
-                String key = "service." + serviceId + "." +  serviceKey.getKey();
+                String key = "service." + serviceId + "." + serviceKey.getKey();
                 String value = serviceKey.getValue();
                 serviceMap.put(key, value);
             }
@@ -169,5 +163,4 @@ public class ServiceResource {
 
         return serviceMap;
     }
-
 }

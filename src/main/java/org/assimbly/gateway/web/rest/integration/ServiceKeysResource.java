@@ -1,25 +1,23 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import io.github.jhipster.web.util.ResponseUtil;
-import org.assimbly.gateway.service.dto.ServiceDTO;
-import org.assimbly.util.EncryptionUtil;
-
-import org.assimbly.gateway.config.EncryptionProperties;
-import org.assimbly.gateway.service.ServiceKeysService;
-import org.assimbly.gateway.service.dto.ServiceKeysDTO;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
-import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.service.ServiceKeysService;
+import org.assimbly.gateway.service.dto.ServiceDTO;
+import org.assimbly.gateway.service.dto.ServiceKeysDTO;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
+import org.assimbly.util.EncryptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing ServiceKeys.
@@ -50,7 +48,6 @@ public class ServiceKeysResource {
      */
     @PostMapping("/service-keys")
     public ResponseEntity<ServiceKeysDTO> createServiceKeys(@RequestBody ServiceKeysDTO serviceKeysDTO) throws URISyntaxException {
-
         log.debug("REST request to save ServiceKeys : {}", serviceKeysDTO);
 
         if (serviceKeysDTO.getId() != null) {
@@ -64,7 +61,8 @@ public class ServiceKeysResource {
 
         serviceKeysDTO = serviceKeysService.save(serviceKeysDTO);
 
-        return ResponseEntity.created(new URI("/api/service-keys/" + serviceKeysDTO.getId()))
+        return ResponseEntity
+            .created(new URI("/api/service-keys/" + serviceKeysDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
             .body(serviceKeysDTO);
     }
@@ -92,7 +90,8 @@ public class ServiceKeysResource {
 
         serviceKeysService.save(serviceKeysDTO);
 
-        return ResponseEntity.ok()
+        return ResponseEntity
+            .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, serviceKeysDTO.getId().toString()))
             .body(serviceKeysDTO);
     }
@@ -134,8 +133,7 @@ public class ServiceKeysResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    private String encryptValue(String  value) {
-
+    private String encryptValue(String value) {
         Properties properties = encryptionProperties.getProperties();
         String password = properties.getProperty("password");
         String algorithm = properties.getProperty("algorithm");
@@ -145,5 +143,4 @@ public class ServiceKeysResource {
 
         return encryptedValue;
     }
-
 }

@@ -1,148 +1,207 @@
 <div class="row mt-3" style="margin-left: 0.3em">
-    <h2>Send Messages</h2><br/>
+  <h2>Send Messages</h2>
+  <br />
 </div>
 
 <div class="row">
-    <div class="col-8">
-        <h4 style="margin-left: 0.3em"><b><i>{{subtitle}}</i></b></h4>
+  <div class="col-8">
+    <h4 style="margin-left: 0.3em">
+      <b
+        ><i>{{ subtitle }}</i></b
+      >
+    </h4>
+  </div>
+  <div class="col-3-5 text-right">
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+        <button ngbDropdownItem (click)="send(false)">Send</button>
+        <button ngbDropdownItem (click)="send(true)">Send and Return</button>
+      </div>
     </div>
-    <div class="col-3-5 text-right">
 
-        <div ngbDropdown class="d-inline-block">
-            <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px;">Actions</button>
-            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-                <button ngbDropdownItem (click)="send(false)">Send</button>
-                <button ngbDropdownItem (click)="send(true)">Send and Return</button>
-            </div>
-        </div>
-
-        <div ngbDropdown class="d-inline-block">
-            <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px;">Upload</button>
-            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-                <label ngbDropdownItem class="btn btn-default">File<input type="file" hidden (change)='openFile($event)'></label>
-                <label ngbDropdownItem class="btn btn-default">Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)='openDirectory($event)'></label>
-            </div>
-        </div>
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px">Upload</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+        <label ngbDropdownItem class="btn btn-default">File<input type="file" hidden (change)="openFile($event)" /></label>
+        <label ngbDropdownItem class="btn btn-default"
+          >Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)="openDirectory($event)"
+        /></label>
+      </div>
     </div>
-    <div class="col-0-5"></div>
+  </div>
+  <div class="col-0-5"></div>
 </div>
 
-<br/>
+<br />
 
 <div class="container-fluid">
-    <div class="row">
-        <ng-template #destinationPopover let-message="message">
-            <div [innerHtml]="destinationPopoverMessage"></div>
-        </ng-template>
-        <ng-template #exchangePatternPopover let-message="message">
-            <div [innerHtml]="exchangePatternPopoverMessage"></div>
-        </ng-template>
-        <ng-template #numberOfTimesPopover let-message="message">
-            <div [innerHtml]="numberOfTimesPopoverMessage"></div>
-        </ng-template>
+  <div class="row">
+    <ng-template #destinationPopover let-message="message">
+      <div [innerHtml]="destinationPopoverMessage"></div>
+    </ng-template>
+    <ng-template #exchangePatternPopover let-message="message">
+      <div [innerHtml]="exchangePatternPopoverMessage"></div>
+    </ng-template>
+    <ng-template #numberOfTimesPopover let-message="message">
+      <div [innerHtml]="numberOfTimesPopoverMessage"></div>
+    </ng-template>
 
-        <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
-
-
-            <div class="col-8" style="position: fixed; left: 10%; width: 100%;">
-                <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="horizontal">
-                        <li ngbNavItem="0">
-                            <a ngbNavLink>Body</a>
-                            <br/>
-                                <ng-template ngbNavContent>
+    <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
+      <div class="col-8" style="position: fixed; left: 10%; width: 100%">
+        <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="horizontal">
+          <li ngbNavItem="0">
+            <a ngbNavLink>Body</a>
+            <br />
+            <!-- <ng-template ngbNavContent>
                                      <ace-editor #editor [formControl]="messageSenderForm.controls['requestbody']" [(text)]="requestBody" [mode]="requestEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 760px; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
-                                </ng-template>
-                        </li>
-                        <li ngbNavItem="1">
-                            <a ngbNavLink>Headers</a>
-                            <br/>
-                            <ng-template ngbNavContent>
-                                <div class="form-group" style="min-height: 484px; min-width: 760px;">
-                                    <!--<div class="row">
+                                </ng-template>-->
+          </li>
+          <li ngbNavItem="1">
+            <a ngbNavLink>Headers</a>
+            <br />
+            <ng-template ngbNavContent>
+              <div class="form-group" style="min-height: 484px; min-width: 760px">
+                <!--<div class="row">
 
                                         <label class="col-10 form-control-label" for="headerValue"><b>Value</b></label>
                                     </div>-->
-                                    <div formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index;">
-                                        <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
-                                            <div class="col-3">
-                                                <label class="form-control-label" for="headerKey" *ngIf="i===0"><b>Key</b></label>
-                                                <input type="text" class="rounded-0 d-inline-block form-control" id="headerKey" formControlName="key" data-toggle="tooltip" title="Name of the header."/>
-                                            </div>
-                                            <div class="col-3">
-                                                <label class="form-control-label" for="headerValue" *ngIf="i===0"><b>Value</b></label>
-                                                <input type="text" class="rounded-0 d-inline-block form-control" id="headerValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row" *ngIf="i===0">
-                                                    <label class="form-control-label" for="addHeader">Add/Remove</label>
-                                                </div>
-                                                <div class="row">
-                                                    <button title="Add option" type="button" id="addHeader" class="right-border-radius-0 btn btn-primary" (click)="addHeader('headers')"><span class="fa fa-plus"></span></button>
-                                                    <button title="Remove option" type="button" id="removeHeader" class="left-border-radius-0 btn btn-danger" style="margin-left: -4px" (click)="removeHeader('headers',i,false)"><span class="fa fa-remove"></span></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
+                <div formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index">
+                  <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
+                    <div class="col-3">
+                      <label class="form-control-label" for="headerKey" *ngIf="i === 0"><b>Key</b></label>
+                      <input
+                        type="text"
+                        class="rounded-0 d-inline-block form-control"
+                        id="headerKey"
+                        formControlName="key"
+                        data-toggle="tooltip"
+                        title="Name of the header."
+                      />
+                    </div>
+                    <div class="col-3">
+                      <label class="form-control-label" for="headerValue" *ngIf="i === 0"><b>Value</b></label>
+                      <input
+                        type="text"
+                        class="rounded-0 d-inline-block form-control"
+                        id="headerValue"
+                        formControlName="value"
+                        data-toggle="tooltip"
+                        title="Value of the header."
+                      />
+                    </div>
+                    <div class="col-6">
+                      <div class="row" *ngIf="i === 0">
+                        <label class="form-control-label" for="addHeader">Add/Remove</label>
+                      </div>
+                      <div class="row">
+                        <button
+                          title="Add option"
+                          type="button"
+                          id="addHeader"
+                          class="right-border-radius-0 btn btn-primary"
+                          (click)="addHeader('headers')"
+                        >
+                          <span class="fa fa-plus"></span>
+                        </button>
+                        <button
+                          title="Remove option"
+                          type="button"
+                          id="removeHeader"
+                          class="left-border-radius-0 btn btn-danger"
+                          style="margin-left: -4px"
+                          (click)="removeHeader('headers', i, false)"
+                        >
+                          <span class="fa fa-remove"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </li>
 
-                    <li ngbNavItem="2">
-                        <a ngbNavLink>JMS Headers</a>
-                        <br/>
-                        <ng-template ngbNavContent>
-                            <div class="form-group" style="min-height: 484px; min-width: 760px;">
-                                <div formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index;">
-                                    <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
-                                        <div class="col-3">
-                                            <label class="form-control-label" for="jmsHeaderKey" *ngIf="i===0"><b>Key</b></label>
-                                            <select  type="text" class="rounded-0 d-inline-block form-control" id="jmsHeaderKey" formControlName="key" data-toggle="tooltip" title="Name of the header.">
-                                                <option value="JMSCorrelationID">JMSCorrelationID</option>
-                                                <option value="JMSReplyTo">JMSReplyTo</option>
-                                                <option value="JMSType">JMSType</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-3">
-                                            <label class="form-control-label" for="jmsHeaderValue" *ngIf="i===0"><b>Value</b></label>
-                                            <input type="text" class="rounded-0 d-inline-block form-control" id="jmsHeaderValue" formControlName="value" data-toggle="tooltip" title="Value of the header."/>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="row" *ngIf="i===0">
-                                                <label class="form-control-label" for="addJMSHeader">Add/Remove</label>
-                                            </div>
-                                            <div class="row">
-                                                <button title="Add option" type="button" id="addJMSHeader" class="right-border-radius-0 btn btn-primary" (click)="addHeader('jmsHeaders')"><span class="fa fa-plus"></span></button>
-                                                <button title="Remove option" type="button" id="removeJMSHeader"  class="left-border-radius-0 btn btn-danger" style="margin-left: -4px" (click)="removeHeader('jmsHeaders',i,false)"><span class="fa fa-remove"></span></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </li>
+          <li ngbNavItem="2">
+            <a ngbNavLink>JMS Headers</a>
+            <br />
+            <ng-template ngbNavContent>
+              <div class="form-group" style="min-height: 484px; min-width: 760px">
+                <div formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index">
+                  <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
+                    <div class="col-3">
+                      <label class="form-control-label" for="jmsHeaderKey" *ngIf="i === 0"><b>Key</b></label>
+                      <select
+                        type="text"
+                        class="rounded-0 d-inline-block form-control"
+                        id="jmsHeaderKey"
+                        formControlName="key"
+                        data-toggle="tooltip"
+                        title="Name of the header."
+                      >
+                        <option value="JMSCorrelationID">JMSCorrelationID</option>
+                        <option value="JMSReplyTo">JMSReplyTo</option>
+                        <option value="JMSType">JMSType</option>
+                      </select>
+                    </div>
+                    <div class="col-3">
+                      <label class="form-control-label" for="jmsHeaderValue" *ngIf="i === 0"><b>Value</b></label>
+                      <input
+                        type="text"
+                        class="rounded-0 d-inline-block form-control"
+                        id="jmsHeaderValue"
+                        formControlName="value"
+                        data-toggle="tooltip"
+                        title="Value of the header."
+                      />
+                    </div>
+                    <div class="col-6">
+                      <div class="row" *ngIf="i === 0">
+                        <label class="form-control-label" for="addJMSHeader">Add/Remove</label>
+                      </div>
+                      <div class="row">
+                        <button
+                          title="Add option"
+                          type="button"
+                          id="addJMSHeader"
+                          class="right-border-radius-0 btn btn-primary"
+                          (click)="addHeader('jmsHeaders')"
+                        >
+                          <span class="fa fa-plus"></span>
+                        </button>
+                        <button
+                          title="Remove option"
+                          type="button"
+                          id="removeJMSHeader"
+                          class="left-border-radius-0 btn btn-danger"
+                          style="margin-left: -4px"
+                          (click)="removeHeader('jmsHeaders', i, false)"
+                        >
+                          <span class="fa fa-remove"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="nav" class="ml-4"></div>
+      </div>
+      <div class="col-4" style="width: 100%; height: 540px"></div>
+    </form>
+  </div>
 
+  <br />
 
-                </ul>
-                <div [ngbNavOutlet]="nav" class="ml-4"></div>
-            </div>
-            <div class="col-4" style="width: 100%;  height: 540px;"></div>
-
-        </form>
-
+  <div class="row" style="margin: 30px auto 0">
+    <div class="col-1"></div>
+    <div class="col-5">
+      <div class="alert alert-secondary" *ngIf="isSending" role="alert">Sending {{ sendingMessages }}</div>
+      <div class="alert alert-success" role="alert" *ngIf="!isSending && isSuccessful">Send successful {{ successfulMessages }}</div>
+      <div class="alert alert-danger" role="alert" *ngIf="!isSending && isFailed">Send failed {{ failedMessages }}</div>
     </div>
-
-    <br/>
-
-    <div class="row" style="margin: 30px auto 0;">
-            <div class="col-1"></div>
-            <div class="col-5">
-                <div class="alert alert-secondary" *ngIf="isSending" role="alert">Sending {{sendingMessages}}</div>
-                <div class="alert alert-success" role="alert" *ngIf="!isSending && isSuccessful">Send successful {{successfulMessages}}</div>
-                <div class="alert alert-danger" role="alert" *ngIf="!isSending && isFailed">Send failed {{failedMessages}}</div>
-            </div>
-            <div class="col-6">
-            </div>
-    </div>
-
+    <div class="col-6"></div>
+  </div>
 </div>
-

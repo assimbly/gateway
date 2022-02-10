@@ -121,17 +121,19 @@ jhipster:
   #max-age: 1800
   mail:
     from: gateway@localhost
-  swagger:
-    default-include-pattern: /api/.*
-    title: jhipsterGradleSampleApplication API
-    description: jhipsterGradleSampleApplication API documentation
-    version: 0.0.1
+  api-docs:
+    default-include-pattern: /api/**
+    management-include-pattern: /management/**
+    title: Assimbly API
+    description: Assimbly Gateway Application API documentation
+    version: 3.6.0
     terms-of-service-url:
     contact-name:
     contact-url:
     contact-email:
-    license:
+    license: unlicensed
     license-url:
+
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

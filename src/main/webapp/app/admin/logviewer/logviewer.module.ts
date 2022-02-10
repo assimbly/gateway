@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -12,7 +12,7 @@ import { logViewerRoute } from './logviewer.route';
 import { LogViewerLineValidationDirective } from './logviewer-line-validation.directive';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([logViewerRoute])],
-    declarations: [LogViewerComponent, LogViewerLineValidationDirective, SearchByNamePipe]
+  imports: [SharedModule, RouterModule.forChild([logViewerRoute])],
+  declarations: [LogViewerComponent, LogViewerLineValidationDirective, SearchByNamePipe],
 })
 export class LogViewerModule {}

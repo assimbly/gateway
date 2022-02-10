@@ -1,6 +1,12 @@
 package org.assimbly.gateway;
 
-import io.github.jhipster.config.JHipsterConstants;
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
@@ -15,23 +21,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
-
-import javax.annotation.PostConstruct;
-import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
+import tech.jhipster.config.JHipsterConstants;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = {"org.assimbly.gateway","org.assimbly.brokerrest","org.assimbly.integrationrest"})
-@EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class})
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
+@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayApp.class);
-	
-    private final static String userHomeDir = System.getProperty("user.home");
+
+    private static final String userHomeDir = System.getProperty("user.home");
 
     private static long vmStartTime;
 
@@ -51,13 +50,21 @@ public class GatewayApp {
     @PostConstruct
     public void initApplication() {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-        if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) && activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)) {
-            log.error("You have misconfigured your application! It should not run " +
-                "with both the 'dev' and 'prod' profiles at the same time.");
+        if (
+            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
+            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
+        ) {
+            log.error(
+                "You have misconfigured your application! It should not run " + "with both the 'dev' and 'prod' profiles at the same time."
+            );
         }
-        if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) && activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)) {
-            log.error("You have misconfigured your application! It should not " +
-                "run with both the 'dev' and 'cloud' profiles at the same time.");
+        if (
+            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
+            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)
+        ) {
+            log.error(
+                "You have misconfigured your application! It should not " + "run with both the 'dev' and 'cloud' profiles at the same time."
+            );
         }
     }
 
@@ -67,25 +74,21 @@ public class GatewayApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
         boolean startApplication = CommandsUtil.parseParameters(args);
 
-        if(startApplication){
+        if (startApplication) {
             SpringApplication app = new SpringApplication(GatewayApp.class);
             DefaultProfileUtil.addDefaultProfile(app);
             Environment env = app.run(args).getEnvironment();
             logApplicationStartup(env);
         }
-
     }
 
     private static void logApplicationStartup(Environment env) {
-
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
-
 
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
@@ -104,7 +107,7 @@ public class GatewayApp {
 
         vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
 
-        long startupTime = ((System.currentTimeMillis() - vmStartTime)/1000);
+        long startupTime = ((System.currentTimeMillis() - vmStartTime) / 1000);
 
         String applicationName = "Assimbly";
         String applicationVersion = env.getProperty("application.info.version");
@@ -113,26 +116,27 @@ public class GatewayApp {
         String javaVersion = Runtime.version().toString();
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
-        if(applicationBaseDirectory.equals("default")) {
-            if(isWindows()) {
+        if (applicationBaseDirectory.equals("default")) {
+            if (isWindows()) {
                 applicationBaseDirectory = userHomeDir + "\\.assimbly";
-            }else {
+            } else {
                 applicationBaseDirectory = userHomeDir + "/.assimbly";
             }
-        }else {
+        } else {
             applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
         }
 
-        log.info("\n----------------------------------------------------------\n\t" +
-                "Application '{}' is running! \n\n\t" +
-                "Application Version: \t{}\n\t" +
-                "Application BaseDir: \t{}\n\t" +
-                "Application Startup: \t{} Seconds\n\t" +
-                "Local URL: \t\t{}://localhost:{}{}\n\t" +
-                "External URL: \t\t{}://{}:{}{}\n\t" +
-                "Java Version: \t\t{}\n\t" +
-                "Java WorkingDir: \t{}\n\t" +
-                "Profile(s): \t\t{}\n----------------------------------------------------------",
+        log.info(
+            "\n----------------------------------------------------------\n\t" +
+            "Application '{}' is running! \n\n\t" +
+            "Application Version: \t{}\n\t" +
+            "Application BaseDir: \t{}\n\t" +
+            "Application Startup: \t{} Seconds\n\t" +
+            "Local URL: \t\t{}://localhost:{}{}\n\t" +
+            "External URL: \t\t{}://{}:{}{}\n\t" +
+            "Java Version: \t\t{}\n\t" +
+            "Java WorkingDir: \t{}\n\t" +
+            "Profile(s): \t\t{}\n----------------------------------------------------------",
             applicationName,
             applicationVersion,
             applicationBaseDirectory,
@@ -146,15 +150,12 @@ public class GatewayApp {
             contextPath,
             javaVersion,
             javaWorkingDirectory,
-            env.getActiveProfiles());
-
-
+            env.getActiveProfiles()
+        );
     }
 
-    public static boolean isWindows()
-    {
+    public static boolean isWindows() {
         String OS = System.getProperty("os.name");
         return OS.startsWith("Windows");
     }
-
 }

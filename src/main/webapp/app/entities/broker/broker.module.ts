@@ -1,9 +1,9 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 // import { AceEditorModule } from 'ng2-ace-editor';
-import { AceModule } from 'ngx-ace-wrapper';
-import { ACE_CONFIG } from 'ngx-ace-wrapper';
-import { AceConfigInterface } from 'ngx-ace-wrapper';
+// import { AceModule } from 'ngx-ace-wrapper';
+// import { ACE_CONFIG } from 'ngx-ace-wrapper';
+// import { AceConfigInterface } from 'ngx-ace-wrapper';
 // import { AceEditorModule } from 'ng2-ace-editor';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';
 
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { BrokerComponent } from './broker.component';
 import { BrokerDetailComponent } from './broker-detail.component';
@@ -30,41 +30,35 @@ import { FlowComponent } from 'app/entities/flow/flow.component';
 import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
 
 const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
-const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
+//const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        // AceEditorModule,
-        AceModule,
-        RouterModule.forChild(ENTITY_STATES),
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        PopoverModule.forRoot(),
-        CommonModule
-    ],
-    exports: [BrokerComponent],
-    declarations: [
-        BrokerComponent,
-        BrokerDetailComponent,
-        BrokerUpdateComponent,
-        BrokerDeleteDialogComponent,
-        BrokerDeletePopupComponent,
-        BrokerMessageSenderComponent,
-        BrokerMessageBrowserComponent,
-        BrokerMessageBrowserRowComponent,
-        MessageSearchByMessageIdPipe,
-        MessageSortByHeaderKeyPipePipe
-    ],
-    entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    providers: [
-        {
-            provide: ACE_CONFIG,
-            useValue: DEFAULT_ACE_CONFIG
-        }
-    ]
+  imports: [
+    SharedModule,
+    // AceEditorModule,
+    // AceModule,
+    RouterModule.forChild(ENTITY_STATES),
+    NgbModule,
+    NgSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PopoverModule.forRoot(),
+    CommonModule,
+  ],
+  exports: [BrokerComponent],
+  declarations: [
+    BrokerComponent,
+    BrokerMessageBrowserRowComponent,
+    BrokerDetailComponent,
+    BrokerUpdateComponent,
+    BrokerDeleteDialogComponent,
+    BrokerDeletePopupComponent,
+    BrokerMessageSenderComponent,
+    BrokerMessageBrowserComponent,
+    MessageSearchByMessageIdPipe,
+    MessageSortByHeaderKeyPipePipe,
+  ],
+  entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayBrokerModule {}

@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { SecurityComponent } from './security.component';
 import { SecurityDetailComponent } from './security-detail.component';
@@ -29,32 +29,32 @@ import { securityPopupRoute } from './security.route';
 const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
 
 @NgModule({
-    imports: [GatewaySharedModule, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
-    declarations: [
-        SecurityComponent,
-        SecurityDetailComponent,
-        SecurityUpdateComponent,
-        SecurityDeleteDialogComponent,
-        SecurityDeletePopupComponent,
-        SecurityUploadPopupComponent,
-        SecurityUploadDialogComponent,
-        SecurityUploadP12PopupComponent,
-        SecurityUploadP12DialogComponent,
-        SecuritySelfSignPopupComponent,
-        SecuritySelfSignDialogComponent
-    ],
-    entryComponents: [
-        SecurityComponent,
-        SecurityUpdateComponent,
-        SecurityDeleteDialogComponent,
-        SecurityDeletePopupComponent,
-        SecurityUploadPopupComponent,
-        SecurityUploadDialogComponent,
-        SecurityUploadP12PopupComponent,
-        SecurityUploadP12DialogComponent,
-        SecuritySelfSignPopupComponent,
-        SecuritySelfSignDialogComponent
-    ],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
+  declarations: [
+    SecurityComponent,
+    SecurityDetailComponent,
+    SecurityUpdateComponent,
+    SecurityDeleteDialogComponent,
+    SecurityDeletePopupComponent,
+    SecurityUploadPopupComponent,
+    SecurityUploadDialogComponent,
+    SecurityUploadP12PopupComponent,
+    SecurityUploadP12DialogComponent,
+    SecuritySelfSignPopupComponent,
+    SecuritySelfSignDialogComponent,
+  ],
+  entryComponents: [
+    SecurityComponent,
+    SecurityUpdateComponent,
+    SecurityDeleteDialogComponent,
+    SecurityDeletePopupComponent,
+    SecurityUploadPopupComponent,
+    SecurityUploadDialogComponent,
+    SecurityUploadP12PopupComponent,
+    SecurityUploadP12DialogComponent,
+    SecuritySelfSignPopupComponent,
+    SecuritySelfSignDialogComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewaySecurityModule {}

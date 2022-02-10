@@ -3,55 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { SERVER_API_URL } from 'app/app.constants';
-
-export interface ConfigProps {
-  contexts: Contexts;
-}
-
-export interface Contexts {
-  [key: string]: Context;
-}
-
-export interface Context {
-  beans: Beans;
-  parentId?: any;
-}
-
-export interface Beans {
-  [key: string]: Bean;
-}
-
-export interface Bean {
-  prefix: string;
-  properties: any;
-}
-
-export interface Env {
-  activeProfiles?: string[];
-  propertySources: PropertySource[];
-}
-
-export interface PropertySource {
-  name: string;
-  properties: Properties;
-}
-
-export interface Properties {
-  [key: string]: Property;
-}
-
-export interface Property {
-  value: string;
-  origin?: string;
-}
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { Bean, Beans, ConfigProps, Env, PropertySource } from './configuration.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConfigurationService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
   getBeans(): Observable<Bean[]> {
-    return this.http.get<ConfigProps>(SERVER_API_URL + 'management/configprops').pipe(
+    return this.http.get<ConfigProps>(this.applicationConfigService.getEndpointFor('management/configprops')).pipe(
       map(configProps =>
         Object.values(
           Object.values(configProps.contexts)
@@ -63,6 +23,6 @@ export class ConfigurationService {
   }
 
   getPropertySources(): Observable<PropertySource[]> {
-    return this.http.get<Env>(SERVER_API_URL + 'management/env').pipe(map(env => env.propertySources));
+    return this.http.get<Env>(this.applicationConfigService.getEndpointFor('management/env')).pipe(map(env => env.propertySources));
   }
 }

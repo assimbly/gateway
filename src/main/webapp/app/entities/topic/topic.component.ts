@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -12,15 +12,13 @@ import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
-import { BrokerService } from 'app/entities/broker/broker.service';
 import { startWith, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'jhi-topic',
-  templateUrl: './topic.component.html'
+  templateUrl: './topic.component.html',
 })
 export class TopicComponent implements OnInit, OnDestroy {
-  public isAdmin: boolean;
   topics: ITopic[];
   addresses: IAddress[];
   brokers: IBroker[];
@@ -39,7 +37,6 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   constructor(
     protected topicService: TopicService,
-    protected brokerService: BrokerService,
     protected jhiAlertService: JhiAlertService,
     protected eventManager: JhiEventManager,
     protected modalService: NgbModal,
@@ -50,7 +47,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
     this.links = {
-      last: 0
+      last: 0,
     };
     this.predicate = 'name';
     this.ascending = false;
@@ -82,7 +79,6 @@ export class TopicComponent implements OnInit, OnDestroy {
       this.currentAccount = account;
       this.topicService.connect();
     });
-    this.isAdmin = true; //this.accountService.isAdmin();
   }
 
   ngAfterViewInit() {
@@ -101,8 +97,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.timeInterval.unsubscribe();
   }
 
-  trackId(index: number, item: ITopic): number {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  trackId(index: number, item: IAddress): number {
     return item.id!;
   }
 
@@ -206,5 +201,9 @@ export class TopicComponent implements OnInit, OnDestroy {
         }
       );
     }
+  }
+
+  protected onError(errorMessage: string) {
+    this.jhiAlertService.error(errorMessage, null, null);
   }
 }

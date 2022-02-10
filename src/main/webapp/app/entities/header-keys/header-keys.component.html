@@ -1,98 +1,147 @@
 <div>
-    <h2>
-        <span>Header keys</span>
-    </h2>
-    <jhi-alert></jhi-alert>
-    <br/>
-    <div class="table-responsive" *ngIf="headerKeys">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th [style.display]="'none'">
-                        <span>ID</span>
-                    </th>
-                    <th>
-                        <span>Key</span>
-                    </th>
-                    <th>
-                        <span>Value</span>
-                    </th>
-                    <th>
-                        <span>Type</span>
-                    </th>
-                    <th [style.display]="'none'">
-                        <span>Header</span>
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let headerKey of headerKeys ;trackBy: trackId; let idx = index">
-                    <td [style.display]="'none'">
-                        <a [routerLink]="['../header-keys', headerKey.id ]">{{headerKey.id}}</a>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" [(ngModel)]="headerKey.key" value="headerKey.key" name="headerKeys-key-{{idx}}" id="headerKeys-key-{{idx}}"
-                            required maxlength="255" [jhiExistingHeaderKeys]="headerKeysKeys"
-                            [disabled]="headerKey.isDisabled" #key="ngModel" />
-                        <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                            <span *ngIf="key.errors.required">Key is required.</span>
-                            <span *ngIf="key.errors.existingHeaderKeys">Key already exists.</span>
-                        </div>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" [(ngModel)]="headerKey.value" name="headerKeys-value-{{idx}}" id="headerKeys-value-{{idx}}"
-                            required maxlength="1000" value="headerKey.value" [disabled]="headerKey.isDisabled" #value="ngModel" />
-                        <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
-                            <span *ngIf="value.errors.required">Value is required.</span>
-                        </div>
-                    </td>
-                    <td>
-                        <select class="form-control" id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}" [(ngModel)]="headerKey.type"
-                            [disabled]="headerKey.isDisabled">
-                            <option [ngValue]="type" *ngFor="let type of typeHeader">{{type}}</option>
-                        </select>
-                    </td>
-                    <td [style.display]="'none'">
-                        <div *ngIf="headerKey.headerId">
-                            <a [routerLink]="['../header', headerKey.headerId  ]">{{headerKey.headerId}}</a>
-                            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="headerKey.headerId" readonly />
-                        </div>
-                    </td>
-                    <td>
-                        <div class="btn-group flex-btn-group-container">
-
-                            <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
-                                <span class="fa fa-plus"></span>
-                            </button>
-                            <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
-                                <span class="fa fa-remove"></span>
-                            </button>
-                            <button type="button" title="Save" *ngIf="!headerKey.id" class="btn btn-primary" (click)="save(headerKey, idx)">
-                                <span class="fa fa-save"></span>
-                            </button>
-                            <button type="button" title="View" *ngIf="headerKey.id" class="btn btn-info" [routerLink]="['../header-keys', headerKey.id ]">
-                                <span class="fa fa-eye"></span>
-                            </button>
-                            <button type="button" title="Update" *ngIf="headerKey.id && !headerKey.isDisabled" class="btn btn-primary" (click)="save(headerKey, idx)">
-                                <span class="fa fa-check"></span>
-                            </button>
-                            <button type="button" title="Edit" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-primary"
-                                (click)="editHeaderKey(headerKey)">
-                                <span class="fa fa-pencil"></span>
-                            </button>
-                            <button type="button" title="Clone" *ngIf="headerKey.id && headerKey.isDisabled" replaceUrl="true" queryParamsHandling="merge" class="btn btn-info"
-                                (click)="cloneHeaderKey(headerKey)">
-                                <span class="fa fa-clone"></span>
-                            </button>
-                            <button type="submit" title="Delete" *ngIf="headerKey.id" replaceUrl="true" queryParamsHandling="merge"
-                                class="btn btn-danger" [routerLink]="['/', { outlets: { popup: 'header-keys/'+ headerKey?.id + '/delete'} }]">
-                                <span class="fa fa-trash"></span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  <h2>
+    <span>Header keys</span>
+  </h2>
+  <jhi-alert></jhi-alert>
+  <br />
+  <div class="table-responsive" *ngIf="headerKeys">
+    <table class="table">
+      <thead>
+        <tr>
+          <th [style.display]="'none'">
+            <span>ID</span>
+          </th>
+          <th>
+            <span>Key</span>
+          </th>
+          <th>
+            <span>Value</span>
+          </th>
+          <th>
+            <span>Type</span>
+          </th>
+          <th [style.display]="'none'">
+            <span>Header</span>
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let headerKey of headerKeys; trackBy: trackId; let idx = index">
+          <td [style.display]="'none'">
+            <a [routerLink]="['../header-keys', headerKey.id]">{{ headerKey.id }}</a>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="headerKey.key"
+              value="headerKey.key"
+              name="headerKeys-key-{{ idx }}"
+              id="headerKeys-key-{{ idx }}"
+              required
+              maxlength="255"
+              [jhiExistingHeaderKeys]="headerKeysKeys"
+              [disabled]="headerKey.isDisabled"
+              #key="ngModel"
+            />
+            <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+              <span *ngIf="key.errors.required">Key is required.</span>
+              <span *ngIf="key.errors.existingHeaderKeys">Key already exists.</span>
+            </div>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="headerKey.value"
+              name="headerKeys-value-{{ idx }}"
+              id="headerKeys-value-{{ idx }}"
+              required
+              maxlength="1000"
+              value="headerKey.value"
+              [disabled]="headerKey.isDisabled"
+              #value="ngModel"
+            />
+            <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+              <span *ngIf="value.errors.required">Value is required.</span>
+            </div>
+          </td>
+          <td>
+            <select
+              class="form-control"
+              id="field_header"
+              name="headerKeys-type-{{ idx }}"
+              id="headerKeys-type-{{ idx }}"
+              [(ngModel)]="headerKey.type"
+              [disabled]="headerKey.isDisabled"
+            >
+              <option [ngValue]="type" *ngFor="let type of typeHeader">{{ type }}</option>
+            </select>
+          </td>
+          <td [style.display]="'none'">
+            <div *ngIf="headerKey.headerId">
+              <a [routerLink]="['../header', headerKey.headerId]">{{ headerKey.headerId }}</a>
+              <input type="text" class="form-control" id="id" name="id" [(ngModel)]="headerKey.headerId" readonly />
+            </div>
+          </td>
+          <td>
+            <div class="btn-group flex-btn-group-container">
+              <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
+                <span class="fa fa-plus"></span>
+              </button>
+              <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
+                <span class="fa fa-remove"></span>
+              </button>
+              <button type="button" title="Save" *ngIf="!headerKey.id" class="btn btn-primary" (click)="save(headerKey, idx)">
+                <span class="fa fa-save"></span>
+              </button>
+              <button type="button" title="View" *ngIf="headerKey.id" class="btn btn-info" [routerLink]="['../header-keys', headerKey.id]">
+                <span class="fa fa-eye"></span>
+              </button>
+              <button
+                type="button"
+                title="Update"
+                *ngIf="headerKey.id && !headerKey.isDisabled"
+                class="btn btn-primary"
+                (click)="save(headerKey, idx)"
+              >
+                <span class="fa fa-check"></span>
+              </button>
+              <button
+                type="button"
+                title="Edit"
+                *ngIf="headerKey.id && headerKey.isDisabled"
+                queryParamsHandling="merge"
+                class="btn btn-primary"
+                (click)="editHeaderKey(headerKey)"
+              >
+                <span class="fa fa-pencil"></span>
+              </button>
+              <button
+                type="button"
+                title="Clone"
+                *ngIf="headerKey.id && headerKey.isDisabled"
+                queryParamsHandling="merge"
+                class="btn btn-info"
+                (click)="cloneHeaderKey(headerKey)"
+              >
+                <span class="fa fa-clone"></span>
+              </button>
+              <button
+                type="submit"
+                title="Delete"
+                *ngIf="headerKey.id"
+                queryParamsHandling="merge"
+                class="btn btn-danger"
+                [routerLink]="['/', { outlets: { popup: 'header-keys/' + headerKey?.id + '/delete' } }]"
+              >
+                <span class="fa fa-trash"></span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

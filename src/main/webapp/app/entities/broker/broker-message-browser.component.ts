@@ -21,7 +21,7 @@ import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
 @Component({
   selector: 'jhi-broker-message-browser',
-  templateUrl: './broker-message-browser.component.html'
+  templateUrl: './broker-message-browser.component.html',
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   messages: IMessage[];
@@ -38,7 +38,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   endpointType: string;
   targetEndpointName: string;
 
-  public isAdmin: boolean;
   currentAccount: any;
   eventSubscriber: Subscription;
   itemsPerPage: number;
@@ -79,7 +78,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 1;
     this.links = {
-      last: 0
+      last: 0,
     };
     this.predicate = 'name';
     this.reverse = true;
@@ -98,7 +97,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
     this.loadMessages();
     this.finished = true;
-    this.isAdmin = true; //this.accountService.isAdmin();
     this.registerChangeInFlows();
   }
 

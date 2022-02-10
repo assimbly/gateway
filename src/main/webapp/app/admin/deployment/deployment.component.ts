@@ -9,55 +9,56 @@ import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow/flow.service';
 
 @Component({
-    selector: 'deployment',
-    templateUrl: './deployment.component.html'
+  selector: 'deployment',
+  templateUrl: './deployment.component.html',
 })
 export class DeploymentComponent implements OnInit {
-    gateways: IGateway[] = [];
-    flows: IFlow[];
-    frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
-    selectedFrequency: String = 'Never';
-    gatewayId: number = null;
-    url: String;
-    constructor(
-        private router: Router,
-        protected eventManager: JhiEventManager,
-        protected gatewayService: GatewayService,
-        protected jhiAlertService: JhiAlertService,
-        protected flowService: FlowService
-    ) {}
+  gateways: IGateway[] = [];
+  flows: IFlow[];
+  frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
+  selectedFrequency: String = 'Never';
+  gatewayId: number = null;
+  url: String;
+  constructor(
+    private router: Router,
+    protected eventManager: JhiEventManager,
+    protected gatewayService: GatewayService,
+    protected jhiAlertService: JhiAlertService,
+    protected flowService: FlowService
+  ) {}
 
-    ngOnInit(): void {
-        this.loadAllGateways();
-    }
+  ngOnInit(): void {
+    this.loadAllGateways();
+  }
 
-    updateBackupFrequency(gatewayId, frequency, url) {
-        this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
-            console.log(res);
-        });
-    }
+  updateBackupFrequency(gatewayId, frequency, url) {
+    this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
+      console.log(res);
+    });
+  }
 
-    loadAllGateways() {
-        this.gatewayService.query().subscribe((res: HttpResponse<IGateway[]>) => {
-            this.gateways = res.body;
-        });
-    }
+  loadAllGateways() {
+    this.gatewayService.query().subscribe((res: HttpResponse<IGateway[]>) => {
+      this.gateways = res.body;
+    });
+  }
 
-    exportFlowConfiguration(flow) {
-        this.flowService.exportFlowConfiguration(flow);
-    }
+  exportFlowConfiguration(flow) {
+    this.flowService.exportFlowConfiguration(flow);
+  }
 
-    getFlowsForSelectedGateway(id) {
-        this.flowService.getFlowByGatewayId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
-            this.flows = res.body;
-        });
-    }
+  getFlowsForSelectedGateway(event) {
+    let id = (event.target as HTMLSelectElement).value as string;
+    this.flowService.getFlowByGatewayId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
+      this.flows = res.body;
+    });
+  }
 
-    downloadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
-    }
+  downloadConfiguration() {
+    this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
+  }
 
-    uploadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
-    }
+  uploadConfiguration() {
+    this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
+  }
 }

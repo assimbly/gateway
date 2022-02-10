@@ -1,21 +1,19 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.assimbly.gateway.service.RouteService;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.service.dto.RouteDTO;
-
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Route}.
@@ -49,7 +47,8 @@ public class RouteResource {
         }
         RouteDTO result = routeService.save(routeDTO);
 
-        return ResponseEntity.created(new URI("/api/routes/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/routes/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("gateway", false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -70,7 +69,8 @@ public class RouteResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         RouteDTO result = routeService.save(routeDTO);
-        return ResponseEntity.ok()
+        return ResponseEntity
+            .ok()
             .headers(HeaderUtil.createEntityUpdateAlert("gateway", false, ENTITY_NAME, routeDTO.getId().toString()))
             .body(result);
     }
@@ -85,7 +85,6 @@ public class RouteResource {
         log.debug("REST request to get all Routes");
         return routeService.findAll();
     }
-
 
     @GetMapping("/routes/getallroutes")
     @Transactional(readOnly = true)
@@ -118,6 +117,9 @@ public class RouteResource {
     public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
         log.debug("REST request to delete Route : {}", id);
         routeService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert("gateway", false, ENTITY_NAME, id.toString())).build();
+        return ResponseEntity
+            .noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert("gateway", false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,10 +15,9 @@ import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
   selector: 'jhi-queue',
-  templateUrl: './queue.component.html'
+  templateUrl: './queue.component.html',
 })
 export class QueueComponent implements OnInit, OnDestroy {
-  public isAdmin: boolean;
   queues: IQueue[];
   addresses: IAddress[];
   brokers: IBroker[];
@@ -47,7 +46,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
     this.links = {
-      last: 0
+      last: 0,
     };
     this.predicate = 'name';
     this.ascending = false;
@@ -78,7 +77,6 @@ export class QueueComponent implements OnInit, OnDestroy {
       this.currentAccount = account;
       this.queueService.connect();
     });
-    this.isAdmin = true; //this.accountService.isAdmin();
   }
 
   ngAfterViewInit() {
@@ -99,8 +97,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.timeInterval.unsubscribe();
   }
 
-  trackId(index: number, item: IQueue): number {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  trackId(index: number, item: IAddress): number {
     return item.id!;
   }
 
