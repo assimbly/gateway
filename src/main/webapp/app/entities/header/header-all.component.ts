@@ -9,12 +9,11 @@ import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-header-all',
-  templateUrl: './header-all.component.html'
+  templateUrl: './header-all.component.html',
 })
 export class HeaderAllComponent implements OnInit, OnDestroy {
   public headers: IHeader[] = [];
   public page: any;
-  public isAdmin: boolean;
   private eventSubscriber: Subscription;
   private currentAccount: any;
   predicate: any;
@@ -58,11 +57,10 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
-    this.isAdmin = true; //this.accountService.isAdmin();
     this.headerService
       .query({
         page: this.page,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe(
         res => {

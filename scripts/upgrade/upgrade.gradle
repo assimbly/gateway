@@ -122,13 +122,13 @@ def upgradeSpecialResources(tempDir, projectFile){
 
 def upgradeBackendResources(tempDir, projectFile){
 	def path = rootDir.toString() + projectFile.backendResources.basePath + "/"
-	def testPath = rootDir.toString() + projectFile.testBackendReSecources.basePath  + "/"
+	def testPath = rootDir.toString() + projectFile.testBackendResources.basePath  + "/"
 	
 	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.backendResources.basePath + "/"
-	def tempTestPath = tempDir + "/" + projectFile.applicationName + projectFile.testBackendReSecources.basePath  + "/"
+	def tempTestPath = tempDir + "/" + projectFile.applicationName + projectFile.testBackendResources.basePath  + "/"
 	
 	def resources = projectFile.backendResources.resources
-	def testResources = projectFile.testBackendReSecources.resources
+	def testResources = projectFile.testBackendResources.resources
 	
 	printMessage('Upgrade backend resources:')
 		

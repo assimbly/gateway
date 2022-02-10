@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { Components } from '../../shared/camel/component-type';
 
 import { EndpointComponent } from './endpoint.component';
@@ -20,17 +20,17 @@ import { endpointPopupRoute } from './endpoint.route';
 const ENTITY_STATES = [...endpointRoute, ...endpointPopupRoute];
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES), NgSelectModule, FormsModule, ReactiveFormsModule],
-    exports: [EndpointComponent],
-    declarations: [
-        EndpointComponent,
-        EndpointDetailComponent,
-        EndpointUpdateComponent,
-        EndpointDeleteDialogComponent,
-        EndpointDeletePopupComponent
-    ],
-    entryComponents: [EndpointComponent, EndpointUpdateComponent, EndpointDeleteDialogComponent, EndpointDeletePopupComponent],
-    providers: [Components, EndpointDeletePopupComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, RouterModule.forChild(ENTITY_STATES), NgSelectModule, FormsModule, ReactiveFormsModule],
+  exports: [EndpointComponent],
+  declarations: [
+    EndpointComponent,
+    EndpointDetailComponent,
+    EndpointUpdateComponent,
+    EndpointDeleteDialogComponent,
+    EndpointDeletePopupComponent,
+  ],
+  entryComponents: [EndpointComponent, EndpointUpdateComponent, EndpointDeleteDialogComponent, EndpointDeletePopupComponent],
+  providers: [Components, EndpointDeletePopupComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayEndpointModule {}

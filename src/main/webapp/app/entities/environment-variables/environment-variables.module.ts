@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { EnvironmentVariablesComponent } from './environment-variables.component';
 import { EnvironmentVariablesDetailComponent } from './environment-variables-detail.component';
@@ -15,22 +15,22 @@ import { environmentVariablesPopupRoute } from './environment-variables.route';
 const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopupRoute];
 
 @NgModule({
-    imports: [ReactiveFormsModule, GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
-    declarations: [
-        EnvironmentVariablesComponent,
-        EnvironmentVariablesDetailComponent,
-        EnvironmentVariablesUpdateComponent,
-        EnvironmentVariablesDialogComponent,
-        EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesDeletePopupComponent
-    ],
-    entryComponents: [
-        EnvironmentVariablesComponent,
-        EnvironmentVariablesUpdateComponent,
-        EnvironmentVariablesDialogComponent,
-        EnvironmentVariablesDeleteDialogComponent,
-        EnvironmentVariablesDeletePopupComponent
-    ],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [ReactiveFormsModule, SharedModule, RouterModule.forChild(ENTITY_STATES)],
+  declarations: [
+    EnvironmentVariablesComponent,
+    EnvironmentVariablesDetailComponent,
+    EnvironmentVariablesUpdateComponent,
+    EnvironmentVariablesDialogComponent,
+    EnvironmentVariablesDeleteDialogComponent,
+    EnvironmentVariablesDeletePopupComponent,
+  ],
+  entryComponents: [
+    EnvironmentVariablesComponent,
+    EnvironmentVariablesUpdateComponent,
+    EnvironmentVariablesDialogComponent,
+    EnvironmentVariablesDeleteDialogComponent,
+    EnvironmentVariablesDeletePopupComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayEnvironmentVariablesModule {}

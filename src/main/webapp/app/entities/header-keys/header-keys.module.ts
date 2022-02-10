@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { HeaderKeysComponent } from './header-keys.component';
 import { HeaderKeysDetailComponent } from './header-keys-detail.component';
@@ -16,18 +16,18 @@ import { ForbiddenHeaderKeysValidatorDirective } from './header-keys-validation.
 const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
-    exports: [HeaderKeysComponent],
-    declarations: [
-        HeaderKeysComponent,
-        HeaderKeysDetailComponent,
-        HeaderKeysUpdateComponent,
-        HeaderKeysDeleteDialogComponent,
-        HeaderKeysDeletePopupComponent,
-        ForbiddenHeaderKeysValidatorDirective
-    ],
-    entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
-    providers: [HeaderKeysDeletePopupComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, RouterModule.forChild(ENTITY_STATES)],
+  exports: [HeaderKeysComponent],
+  declarations: [
+    HeaderKeysComponent,
+    HeaderKeysDetailComponent,
+    HeaderKeysUpdateComponent,
+    HeaderKeysDeleteDialogComponent,
+    HeaderKeysDeletePopupComponent,
+    ForbiddenHeaderKeysValidatorDirective,
+  ],
+  entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
+  providers: [HeaderKeysDeletePopupComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayHeaderKeysModule {}

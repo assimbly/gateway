@@ -1,15 +1,12 @@
 package org.assimbly.gateway.config;
 
-import io.github.jhipster.config.JHipsterConstants;
-
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.context.annotation.*;
-
-import javax.sql.DataSource;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
+import tech.jhipster.config.JHipsterConstants;
 
 @Configuration
 @Profile(JHipsterConstants.SPRING_PROFILE_CLOUD)

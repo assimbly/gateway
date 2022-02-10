@@ -1,20 +1,18 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.assimbly.gateway.service.HeaderKeysService;
+import org.assimbly.gateway.service.dto.HeaderKeysDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
-import org.assimbly.gateway.service.dto.HeaderKeysDTO;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing HeaderKeys.
@@ -49,7 +47,8 @@ public class HeaderKeysResource {
 
         HeaderKeysDTO result = headerKeysService.save(headerKeysDTO);
 
-        return ResponseEntity.created(new URI("/api/header-keys/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/header-keys/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -70,9 +69,7 @@ public class HeaderKeysResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         HeaderKeysDTO result = headerKeysService.save(headerKeysDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, headerKeysDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, headerKeysDTO.getId().toString())).body(result);
     }
 
     /**

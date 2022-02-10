@@ -8,12 +8,11 @@ import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-service-all',
-  templateUrl: './service-all.component.html'
+  templateUrl: './service-all.component.html',
 })
 export class ServiceAllComponent implements OnInit, OnDestroy {
   public services: Array<Service> = [];
   public page: any;
-  public isAdmin: boolean;
   private currentAccount: any;
   private eventSubscriber: Subscription;
   predicate: any;
@@ -47,11 +46,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
-    this.isAdmin = true; //this.accountService.isAdmin();
     this.serviceService
       .query({
         page: this.page,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe(
         res => {

@@ -1,10 +1,8 @@
 package org.assimbly.gateway.config;
 
-import org.assimbly.gateway.security.AuthoritiesConstants;
-
 import java.security.Principal;
 import java.util.*;
-
+import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.*;
@@ -19,8 +17,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-
-import io.github.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipsterProperties;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -41,26 +38,34 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        String[] allowedOrigins = Optional.ofNullable(jHipsterProperties.getCors().getAllowedOrigins()).map(origins -> origins.toArray(new String[0])).orElse(new String[0]);
-     
-        registry.addEndpoint("/websocket/alert")
+        String[] allowedOrigins = Optional
+            .ofNullable(jHipsterProperties.getCors().getAllowedOrigins())
+            .map(origins -> origins.toArray(new String[0]))
+            .orElse(new String[0]);
+
+        registry
+            .addEndpoint("/websocket/alert")
             .setHandshakeHandler(defaultHandshakeHandler())
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
 
-        registry.addEndpoint("/topic/alert")
-        .setHandshakeHandler(defaultHandshakeHandler())
-        .withSockJS()
-        .setInterceptors(httpSessionHandshakeInterceptor());
-    
+        registry
+            .addEndpoint("/topic/alert")
+            .setHandshakeHandler(defaultHandshakeHandler())
+            .withSockJS()
+            .setInterceptors(httpSessionHandshakeInterceptor());
     }
 
     @Bean
     public HandshakeInterceptor httpSessionHandshakeInterceptor() {
         return new HandshakeInterceptor() {
-
             @Override
-            public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+            public boolean beforeHandshake(
+                ServerHttpRequest request,
+                ServerHttpResponse response,
+                WebSocketHandler wsHandler,
+                Map<String, Object> attributes
+            ) throws Exception {
                 if (request instanceof ServletServerHttpRequest) {
                     ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
                     System.out.println("request servlet" + servletRequest.getRemoteAddress());
@@ -70,9 +75,12 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             }
 
             @Override
-            public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-
-            }
+            public void afterHandshake(
+                ServerHttpRequest request,
+                ServerHttpResponse response,
+                WebSocketHandler wsHandler,
+                Exception exception
+            ) {}
         };
     }
 
@@ -91,39 +99,39 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
         };
     }
 
-	@Override
-	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void configureClientInboundChannel(ChannelRegistration registration) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void configureClientOutboundChannel(ChannelRegistration registration) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

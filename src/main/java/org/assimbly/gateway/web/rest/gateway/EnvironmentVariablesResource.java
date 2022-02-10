@@ -1,6 +1,10 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.github.jhipster.web.util.ResponseUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
@@ -16,15 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-
-;
-
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing EnvironmentVariables.
@@ -54,7 +50,8 @@ public class EnvironmentVariablesResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/environment-variables")
-    public ResponseEntity<EnvironmentVariablesDTO> createEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
+    public ResponseEntity<EnvironmentVariablesDTO> createEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO)
+        throws URISyntaxException {
         log.debug("REST request to save EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() != null) {
             throw new BadRequestAlertException("A new environmentVariables cannot already have an ID", ENTITY_NAME, "idexists");
@@ -66,7 +63,8 @@ public class EnvironmentVariablesResource {
         }
 
         EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
-        return ResponseEntity.created(new URI("/api/environment-variables/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/environment-variables/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -81,7 +79,8 @@ public class EnvironmentVariablesResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/environment-variables")
-    public ResponseEntity<EnvironmentVariablesDTO> updateEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO) throws URISyntaxException {
+    public ResponseEntity<EnvironmentVariablesDTO> updateEnvironmentVariables(@RequestBody EnvironmentVariablesDTO environmentVariablesDTO)
+        throws URISyntaxException {
         log.debug("REST request to update EnvironmentVariables : {}", environmentVariablesDTO);
         if (environmentVariablesDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -93,8 +92,9 @@ public class EnvironmentVariablesResource {
         }
 
         EnvironmentVariablesDTO result = environmentVariablesService.save(environmentVariablesDTO);
-        
-        return ResponseEntity.ok()
+
+        return ResponseEntity
+            .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, result.getId().toString()))
             .body(environmentVariablesDTO);
     }
@@ -110,9 +110,7 @@ public class EnvironmentVariablesResource {
         Page<EnvironmentVariablesDTO> page = environmentVariablesService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/environment-variables");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
-
     }
-
 
     /**
      * GET  /environment-variables/:id : get the "id" environmentVariables.
@@ -140,18 +138,15 @@ public class EnvironmentVariablesResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
+    private String encryptValue(String value) {
+        Properties properties = encryptionProperties.getProperties();
+        String password = properties.getProperty("password");
+        String algorithm = properties.getProperty("algorithm");
 
-    private String encryptValue(String  value) {
+        EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
 
-            Properties properties = encryptionProperties.getProperties();
-            String password = properties.getProperty("password");
-            String algorithm = properties.getProperty("algorithm");
+        String encryptedValue = encryptionUtil.encrypt(value);
 
-            EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
-
-            String encryptedValue = encryptionUtil.encrypt(value);
-
-            return encryptedValue;
+        return encryptedValue;
     }
-
 }

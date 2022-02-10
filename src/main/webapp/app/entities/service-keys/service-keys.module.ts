@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Services } from 'app/shared/camel/service-connections';
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
 import { ServiceKeysComponent } from './service-keys.component';
 import { ServiceKeysDetailComponent } from './service-keys-detail.component';
@@ -15,18 +15,18 @@ import { serviceKeysPopupRoute } from './service-keys.route';
 const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild(ENTITY_STATES)],
-    exports: [ServiceKeysComponent],
-    declarations: [
-        ServiceKeysComponent,
-        ServiceKeysDetailComponent,
-        ServiceKeysUpdateComponent,
-        ServiceKeysDeleteDialogComponent,
-        ServiceKeysDeletePopupComponent,
-        ForbiddenServiceKeysValidatorDirective
-    ],
-    entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
-    providers: [ServiceKeysDeletePopupComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, RouterModule.forChild(ENTITY_STATES)],
+  exports: [ServiceKeysComponent],
+  declarations: [
+    ServiceKeysComponent,
+    ServiceKeysDetailComponent,
+    ServiceKeysUpdateComponent,
+    ServiceKeysDeleteDialogComponent,
+    ServiceKeysDeletePopupComponent,
+    ForbiddenServiceKeysValidatorDirective,
+  ],
+  entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
+  providers: [ServiceKeysDeletePopupComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayServiceKeysModule {}

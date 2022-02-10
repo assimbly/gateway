@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { GatewaySharedModule } from 'app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
 import { GatewayServiceModule } from '../../entities/service/service.module';
 import { GatewayHeaderModule } from '../../entities/header/header.module';
@@ -13,6 +13,7 @@ import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
 // import { AceEditorModule } from 'ng2-ace-editor';
+import { CommonModule } from '@angular/common';
 
 import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
@@ -38,52 +39,45 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        GatewayEndpointModule,
-        GatewayServiceModule,
-        GatewaySecurityModule,
-        GatewayHeaderModule,
-        GatewayRouteModule,
-        GatewayMaintenanceModule,
-        // AceEditorModule,
-        AceModule,
-        RouterModule.forChild(ENTITY_STATES),
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        PopoverModule.forRoot()
-    ],
-    exports: [FlowComponent],
-    declarations: [
-        FlowComponent,
-        FlowUpdateComponent,
-        FlowEditorComponent,
-        FlowMessageSenderComponent,
-        FlowDetailComponent,
-        FlowDeleteDialogComponent,
-        FlowDeletePopupComponent,
-        FlowRowComponent,
-        FlowSearchByNamePipe
-    ],
-    entryComponents: [
-        FlowComponent,
-        FlowUpdateComponent,
-        FlowEditorComponent,
-        FlowMessageSenderComponent,
-        FlowDeleteDialogComponent,
-        FlowDeleteDialogComponent,
-        FlowDeletePopupComponent
-    ],
-    providers: [
-        FlowService,
-        FlowPopupService,
-        {
-            provide: ACE_CONFIG,
-            useValue: DEFAULT_ACE_CONFIG
-        }
-    ],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [
+    SharedModule,
+    GatewayEndpointModule,
+    GatewayServiceModule,
+    GatewaySecurityModule,
+    GatewayHeaderModule,
+    GatewayRouteModule,
+    GatewayMaintenanceModule,
+    // AceEditorModule,
+    AceModule,
+    RouterModule.forChild(ENTITY_STATES),
+    NgbModule,
+    NgSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CommonModule,
+    PopoverModule.forRoot(),
+  ],
+  exports: [FlowComponent],
+  declarations: [
+    FlowComponent,
+    FlowRowComponent,
+    FlowUpdateComponent,
+    FlowEditorComponent,
+    FlowMessageSenderComponent,
+    FlowDetailComponent,
+    FlowDeleteDialogComponent,
+    FlowDeletePopupComponent,
+    FlowSearchByNamePipe,
+  ],
+  entryComponents: [
+    FlowComponent,
+    FlowUpdateComponent,
+    FlowEditorComponent,
+    FlowMessageSenderComponent,
+    FlowDeleteDialogComponent,
+    FlowDeleteDialogComponent,
+    FlowDeletePopupComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GatewayFlowModule {}

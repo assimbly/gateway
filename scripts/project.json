@@ -2,7 +2,7 @@
   "applicationName": "gateway",
   "applicationType": "monolithic",
   "version": "3.6.0",
-  "jhipsterVersion": "6.10.5",
+  "jhipsterVersion": "7.1.0",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
   "repositoryName": "gateway",
@@ -104,41 +104,6 @@
 	{
       "type": "dir",
       "path": "webpack",
-      "action": "ignore"
-    },
-	{
-      "type": "file",
-      "path": "webpack/logo-jhipster.png",
-      "action": "ignore"
-    },
-	{
-      "type": "file",
-      "path": "webpack/logo-jhipster.png",
-      "action": "ignore"
-    },
-	{
-      "type": "file",
-      "path": "webpack/utils.js",
-      "action": "skip"
-    },
-	{
-      "type": "file",
-      "path": "webpack/webpack.common.js",
-      "action": "skip"
-    },
-	{
-      "type": "file",
-      "path": "webpack/webpack.dev.js",
-      "action": "ignore"
-    },
-	{
-      "type": "file",
-      "path": "webpack/webpack.prod.js",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": "webpack/webpack.test.js",
       "action": "replace"
     },
 	{
@@ -490,13 +455,13 @@
 	  "resources": [
 		{
 		  "type": "file",
-		  "path": "app/polyfills.ts",
+		  "path": "polyfills.ts",
 		  "action": "replace"
 		},
 		{
 		  "type": "file",
 		  "path": "app/vendor.ts",
-		  "action": "replace"
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",

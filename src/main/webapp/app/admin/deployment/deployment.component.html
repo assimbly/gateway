@@ -1,61 +1,61 @@
 <h1 xmlns:C="http://www.w3.org/1999/xhtml">Deployment</h1>
-<hr>
+<hr />
 
 <div class="form-group">
-    <div class="row">
-        <div class="col-12">
-            <h2>Gateways</h2>
-            <button (click)="uploadConfiguration()" class="btn btn-primary btn-sm" type="button">
-                <span class="fa fa-upload"></span>
-                <span class="d-none d-md-inline">Import Configuration (XML)</span>
-            </button>
-            <button (click)="downloadConfiguration()" type="button" class="btn btn-primary btn-sm" >
-                <span class="fa fa-download"></span>
-                <span (click)="downloadConfiguration()" class="d-none d-md-inline">Export Configuration (XML)</span>
-            </button>
-            <h3 class="mt-3">Schedule Exports</h3>
+  <div class="row">
+    <div class="col-12">
+      <h2>Gateways</h2>
+      <button (click)="uploadConfiguration()" class="btn btn-primary btn-sm" type="button">
+        <span class="fa fa-upload"></span>
+        <span class="d-none d-md-inline">Import Configuration (XML)</span>
+      </button>
+      <button (click)="downloadConfiguration()" type="button" class="btn btn-primary btn-sm">
+        <span class="fa fa-download"></span>
+        <span (click)="downloadConfiguration()" class="d-none d-md-inline">Export Configuration (XML)</span>
+      </button>
+      <h3 class="mt-3">Schedule Exports</h3>
 
-            <label class="col-12 col-form-label">Select a gateway to schedule the exports.</label>
-            <select class="form-control w-50" [(ngModel)]="gatewayId">
-                <option [ngValue]="null" [disabled]="true" [hidden]="true" >Choose a gateway</option>
-                <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
-            </select>
+      <label class="col-12 col-form-label">Select a gateway to schedule the exports.</label>
+      <select class="form-control w-50" [(ngModel)]="gatewayId">
+        <option [ngValue]="null" [disabled]="true" [hidden]="true">Choose a gateway</option>
+        <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
+      </select>
 
-            <label class="col-12 col-form-label">Select a time interval to schedule exporting.</label>
-            <select class="form-control w-50" [(ngModel)]="selectedFrequency">
-                <option *ngFor="let frequency of frequencies" value="{{frequency}}">{{frequency}}</option>
-            </select>
+      <label class="col-12 col-form-label">Select a time interval to schedule exporting.</label>
+      <select class="form-control w-50" [(ngModel)]="selectedFrequency">
+        <option *ngFor="let frequency of frequencies" value="{{ frequency }}">{{ frequency }}</option>
+      </select>
 
-            <label class="col-12 col-form-label">Select a location where the configurations have to be saved to.</label>
-            <input [(ngModel)]="url" class="form-control w-50" type="text" placeholder="C:/user/documents/Assimbly/backups/"/>
-            <input class="btn btn-primary mt-2" type="button" value="Save" (click)="updateBackupFrequency(gatewayId, selectedFrequency, url)"/>
-            <hr>
+      <label class="col-12 col-form-label">Select a location where the configurations have to be saved to.</label>
+      <input [(ngModel)]="url" class="form-control w-50" type="text" placeholder="C:/user/documents/Assimbly/backups/" />
+      <input class="btn btn-primary mt-2" type="button" value="Save" (click)="updateBackupFrequency(gatewayId, selectedFrequency, url)" />
+      <hr />
 
-            <h2>Export Flows</h2>
-            <label class="col-12 col-form-label">Select a gateway to see the flows.</label>
-            <select class="form-control w-50" (change)="getFlowsForSelectedGateway($event.target.value)">
-                <option disabled selected hidden>Choose a gateway</option>
-                <option *ngFor="let gateway of gateways" [value]="gateway.id">{{gateway.name}}</option>
-            </select>
-            <hr/>
-            <div *ngIf="flows?.length == 0">
-                <div class="card-block pt-4">
-                    <blockquote class="card-blockquote">
-                        <br />
-                        <p class="tab" style="margin-left: 0.3em">No flows yet. Start creating new flows by going to the flows page.</p>
-                    </blockquote>
-                </div>
-            </div>
-
-            <div class="mt-3" *ngIf="flows?.length > 0">
-                <h3>Flows</h3>
-                <ul class="list-group">
-                    <li class="list-group-item" *ngFor="let flow of flows">
-                        Flow: {{flow.name}}
-                    <button class="btn btn-primary float-right" (click)="exportFlowConfiguration(flow)">Export (XML)</button>
-                    </li>
-                </ul>
-            </div>
+      <h2>Export Flows</h2>
+      <label class="col-12 col-form-label">Select a gateway to see the flows.</label>
+      <select class="form-control w-50" (change)="getFlowsForSelectedGateway($event)">
+        <option disabled selected hidden>Choose a gateway</option>
+        <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
+      </select>
+      <hr />
+      <div *ngIf="flows?.length == 0">
+        <div class="card-block pt-4">
+          <blockquote class="card-blockquote">
+            <br />
+            <p class="tab" style="margin-left: 0.3em">No flows yet. Start creating new flows by going to the flows page.</p>
+          </blockquote>
         </div>
+      </div>
+
+      <div class="mt-3" *ngIf="flows?.length > 0">
+        <h3>Flows</h3>
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let flow of flows">
+            Flow: {{ flow.name }}
+            <button class="btn btn-primary float-right" (click)="exportFlowConfiguration(flow)">Export (XML)</button>
+          </li>
+        </ul>
+      </div>
     </div>
+  </div>
 </div>

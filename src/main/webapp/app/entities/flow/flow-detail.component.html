@@ -1,38 +1,43 @@
 <div class="container" *ngIf="!!flow">
-    <h2><span>Flow {{flow.name}}</span></h2>
-    <jhi-alert-error></jhi-alert-error>
+  <h2>
+    <span>Flow {{ flow.name }}</span>
+  </h2>
+  <jhi-alert-error></jhi-alert-error>
 
-    <div class="table-responsive">
-        <table class="table table-sm">
-            <tbody>
-                <tr>
-                    <th class="detailsTable">ID</th>
-                    <td class="detailsTable">{{flow.id}}</td>
-                </tr>
-                <tr>
-                    <th>Autostart</th>
-                    <td>{{flow.autoStart}}</td>
-                </tr>
-                <tr>
-                    <th>Maximum Redeliveries</th>
-                    <td>{{flow.maximumRedeliveries}}</td>
-                </tr>
-                <tr>
-                    <th>Redelivery Delay</th>
-                    <td>{{flow.redeliveryDelay}}</td>
-                </tr>
-                <tr>
-                    <th>Log Level</th>
-                    <td>{{flow.logLevel}}</td>
-                </tr>
-                <tr>
-                    <th class="lastItemBorder">Gateway name</th>
-                    <td class="lastItemBorder"><a [routerLink]="['/gateway', flow.gatewayId, 'view']" *ngIf="!!gateway">{{gateway.name}}</a></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <tbody>
+        <tr>
+          <th class="detailsTable">ID</th>
+          <td class="detailsTable">{{ flow.id }}</td>
+        </tr>
+        <tr>
+          <th>Autostart</th>
+          <td>{{ flow.autoStart }}</td>
+        </tr>
+        <tr>
+          <th>Maximum Redeliveries</th>
+          <td>{{ flow.maximumRedeliveries }}</td>
+        </tr>
+        <tr>
+          <th>Redelivery Delay</th>
+          <td>{{ flow.redeliveryDelay }}</td>
+        </tr>
+        <tr>
+          <th>Log Level</th>
+          <td>{{ flow.logLevel }}</td>
+        </tr>
+        <tr>
+          <th class="lastItemBorder">Gateway name</th>
+          <td class="lastItemBorder">
+            <a [routerLink]="['/gateway', flow.gatewayId, 'view']" *ngIf="!!gateway">{{ gateway.name }}</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
+  <!--
     <ngb-tabset>
 
         <ngb-tab title="Endpoint ({{endpointIndex+1}})" id="endpointTab{{endpointIndex}}" *ngFor="let endpoint of endpoints; index as endpointIndex">
@@ -84,13 +89,13 @@
             </ng-template>
         </ngb-tab>
 
-    </ngb-tabset>
+    </ngb-tabset>-->
 
-    <div class="float-right">
-        <button type="submit" (click)="previousState()" class="btn btn-info">
-            <span class="fa fa-arrow-left"></span>&nbsp;
-            <span> Back</span>
-        </button>
-    </div>
-    <br/>
+  <div class="float-right">
+    <button type="submit" (click)="previousState()" class="btn btn-info">
+      <span class="fa fa-arrow-left"></span>&nbsp;
+      <span> Back</span>
+    </button>
+  </div>
+  <br />
 </div>

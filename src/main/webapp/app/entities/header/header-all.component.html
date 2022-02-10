@@ -1,75 +1,81 @@
 <div>
-	<div class="row">
-		<div class="col-10">
-			<h2>
-				<span>Header</span>
-			</h2>
-		</div>
-		<div class="col-2">
-			<a role="button"
-				class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
-				href="https://github.com/assimbly/gateway/wiki/Headers"
-				placement="right" title="Assimbly Documentation" target="_blank"> <picture>
-				<source srcset="../../../content/images/assimbly_transparant.webp">
-				<img src="../../../content/images/assimbly_transparant.png"
-					alt="assibmly-logo"> </picture>
-			</a>
-		</div>
-	</div>
-	<br />
-	<div class="row">
-		<div class="col-10"></div>
-		<div class="col-2">
-			<button
-				class="btn btn-primary float-right jh-create-entity create-header"
-				*ngIf="isAdmin" [routerLink]="['/header/new']">
-				<span class="fa fa-plus"></span> <span>Create Header</span>
-			</button>
-		</div>
-	</div>
-	<br />
-	<div class="table-responsive">
-		<table class="table table-striped">
-			<thead>
-				<tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse"
-					[callback]="reset.bind(this)">
-					<th jhiSortBy="name"><span>Header name</span> <span
-						class="fa fa-sort"></span></th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody infinite-scroll>
-				<tr *ngFor="let header of headers">
-					<td>{{header.name}}</td>
-					<td class="text-right">
-						<div class="btn-group flex-btn-group-container">
-							<button type="button" *ngIf="!isAdmin"
-								[routerLink]="['/header', header.id, 'view' ]" replaceUrl="true"
-								queryParamsHandling="merge" class="btn btn-info btn-sm">
-								<span class="fa fa-eye"></span> View details
-							</button>
-							<button type="button" *ngIf="isAdmin"
-								[routerLink]="['/header', header.id, 'edit']" replaceUrl="true"
-								queryParamsHandling="merge" class="btn btn-primary btn-sm">
-								<span class="fa fa-pencil"></span>&nbsp; <span> Edit</span>
-							</button>
-							<button type="button" *ngIf="isAdmin"
-								[routerLink]="['/header', header.id, 'edit']" replaceUrl="true"
-								queryParamsHandling="merge" fragment="clone"
-								class="btn btn-info btn-sm">
-								<span class="fa fa-clone"></span>&nbsp; <span> Clone</span>
-							</button>
-							<button type="button" *ngIf="isAdmin"
-								[routerLink]="['/', { outlets: { popup: 'header/'+ header.id + '/delete'} }]"
-								replaceUrl="true" queryParamsHandling="merge"
-								class="btn btn-danger btn-sm">
-								<span class="fa fa-remove"></span> <span
-									class="d-none d-md-inline">Delete</span>
-							</button>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+  <div class="row">
+    <div class="col-10">
+      <h2>
+        <span>Header</span>
+      </h2>
+    </div>
+    <div class="col-2">
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
+        href="https://github.com/assimbly/gateway/wiki/Headers"
+        placement="right"
+        title="Assimbly Documentation"
+        target="_blank"
+      >
+        <picture>
+          <source srcset="../../../content/images/assimbly_transparant.webp" />
+          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+        </picture>
+      </a>
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-10"></div>
+    <div class="col-2">
+      <button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/header/new']">
+        <span class="fa fa-plus"></span> <span>Create Header</span>
+      </button>
+    </div>
+  </div>
+  <br />
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+          <th jhiSortBy="name"><span>Header name</span> <span class="fa fa-sort"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody infinite-scroll>
+        <tr *ngFor="let header of headers">
+          <td>{{ header.name }}</td>
+          <td class="text-right">
+            <div class="btn-group flex-btn-group-container">
+              <button type="button" [routerLink]="['/header', header.id, 'view']" queryParamsHandling="merge" class="btn btn-info btn-sm">
+                <span class="fa fa-eye"></span> View details
+              </button>
+              <button
+                type="button"
+                [routerLink]="['/header', header.id, 'edit']"
+                queryParamsHandling="merge"
+                class="btn btn-primary btn-sm"
+              >
+                <span class="fa fa-pencil"></span>&nbsp; <span> Edit</span>
+              </button>
+              <button
+                type="button"
+                [routerLink]="['/header', header.id, 'edit']"
+                queryParamsHandling="merge"
+                fragment="clone"
+                class="btn btn-info btn-sm"
+              >
+                <span class="fa fa-clone"></span>&nbsp; <span> Clone</span>
+              </button>
+              <button
+                type="button"
+                [routerLink]="['/', { outlets: { popup: 'header/' + header.id + '/delete' } }]"
+                queryParamsHandling="merge"
+                class="btn btn-danger btn-sm"
+              >
+                <span class="fa fa-remove"></span> <span class="d-none d-md-inline">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
