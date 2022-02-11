@@ -46,4 +46,4 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
   providers: [Components, GatewayService, GatewayPopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayGatewayModule {}
+export class GatewayModule {}

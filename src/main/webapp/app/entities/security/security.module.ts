@@ -57,4 +57,4 @@ const ENTITY_STATES = [...securityRoute, ...securityPopupRoute];
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewaySecurityModule {}
+export class SecurityModule {}

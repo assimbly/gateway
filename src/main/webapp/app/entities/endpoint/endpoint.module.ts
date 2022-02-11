@@ -33,4 +33,4 @@ const ENTITY_STATES = [...endpointRoute, ...endpointPopupRoute];
   providers: [Components, EndpointDeletePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayEndpointModule {}
+export class EndpointModule {}

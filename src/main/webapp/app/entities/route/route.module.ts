@@ -36,4 +36,4 @@ import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route/route-
   providers: [RouteService, RoutePopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayRouteModule {}
+export class RouteModule {}

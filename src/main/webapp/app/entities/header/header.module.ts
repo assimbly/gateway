@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewayHeaderKeysModule } from '../../entities/header-keys/header-keys.module';
+import { HeaderKeysModule } from '../../entities/header-keys/header-keys.module';
 import { SharedModule } from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -27,7 +27,7 @@ import { HeaderService } from 'app/entities/header/header.service';
 const ENTITY_STATES = [...headerRoute, ...headerPopupRoute];
 
 @NgModule({
-  imports: [SharedModule, GatewayHeaderKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, HeaderKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     HeaderComponent,
     HeaderDetailComponent,
@@ -52,4 +52,4 @@ const ENTITY_STATES = [...headerRoute, ...headerPopupRoute];
   providers: [HeaderService, HeaderPopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayHeaderModule {}
+export class HeaderModule {}

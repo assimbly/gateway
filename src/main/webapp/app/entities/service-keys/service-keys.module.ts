@@ -29,4 +29,4 @@ const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
   providers: [ServiceKeysDeletePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayServiceKeysModule {}
+export class ServiceKeysModule {}

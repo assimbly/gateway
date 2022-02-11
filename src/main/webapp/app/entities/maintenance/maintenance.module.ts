@@ -31,4 +31,4 @@ const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
   providers: [MaintenanceService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayMaintenanceModule {}
+export class MaintenanceModule {}
