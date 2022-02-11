@@ -1,4 +1,4 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.json",
   "files": ["src/main/webapp/main.ts", "src/main/webapp/polyfills.ts"]
 }

@@ -104,6 +104,36 @@
 	{
       "type": "dir",
       "path": "webpack",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/environment.js",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "webpack/custom.js",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/logo-jhipster.png",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/proxy.conf.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.custom.js",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": ".browserslistrc",
       "action": "replace"
     },
 	{
@@ -119,7 +149,7 @@
 	{
       "type": "file",
       "path": ".eslintrc.json",
-      "action": "ignore"
+      "action": "replace"
     },
 	{
       "type": "file",
@@ -198,6 +228,11 @@
     },
 	{
       "type": "file",
+      "path": "jest.conf.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
       "path": "LICENSE",
       "action": "ignore"
     },
@@ -253,7 +288,7 @@
     },
 	{
       "type": "file",
-      "path": "tslint.json",
+      "path": "tsconfig.spec.json",
       "action": "replace"
     }	
   ]
@@ -353,6 +388,16 @@
 		},
 		{
 		  "type": "file",
+		  "path": "domain/AbstractAuditingEntity.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "domain/Authority.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
 		  "path": "domain/User.java",
 		  "action": "replace"
 		},
@@ -388,7 +433,15 @@
 		  "action": "replace"
 		},{
 		  "type": "file",
-		  "path": "service/dto/AdminUserDTO.java",
+		  "path": "service/UsernameAlreadyUsedException.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/dto/PasswordChangeDTO.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/dto/UserDTO.java",
 		  "action": "replace"
 		},{
 		  "type": "dir",
@@ -452,17 +505,7 @@
   },
   "frontendResources": {
   	"basePath": "/src/main/webapp",
-	  "resources": [
-		{
-		  "type": "file",
-		  "path": "polyfills.ts",
-		  "action": "replace"
-		},
-		{
-		  "type": "file",
-		  "path": "app/vendor.ts",
-		  "action": "ignore"
-		},
+	  "resources": [		
 		{
 		  "type": "dir",
 		  "path": "app/account",
@@ -505,7 +548,7 @@
 		},
 		{
 		  "type": "dir",
-		  "path": "app/blocks",
+		  "path": "app/config",
 		  "action": "replace"
 		},
 		{
@@ -530,6 +573,11 @@
 		},
 		{
 		  "type": "dir",
+		  "path": "app/layouts/navbar",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
 		  "path": "app/layouts/profiles",
 		  "action": "replace"
 		},
@@ -545,7 +593,7 @@
 		},
 		{
 		  "type": "dir",
-		  "path": "app/shared/constant",
+		  "path": "app/shared/date",
 		  "action": "replace"
 		},
 		{
@@ -560,11 +608,6 @@
 		},
 		{
 		  "type": "dir",
-		  "path": "app/shared/util",
-		  "action": "replace"
-		},
-		{
-		  "type": "dir",
 		  "path": "app/shared/window",
 		  "action": "ignore"
 		},
@@ -572,11 +615,6 @@
 		  "type": "file",
 		  "path": "app/app.constants.ts",
 		  "action": "ignore"
-		},
-		{
-		  "type": "file",
-		  "path": "app/app.main.ts",
-		  "action": "replace"
 		},
 		{
 		  "type": "file",
@@ -616,7 +654,7 @@
 		{
 		  "type": "file",
 		  "path": "content/scss/vendor.scss",
-		  "action": "ignore"
+		  "action": "replace"
 		},
 		{
 		  "type": "dir",
@@ -655,8 +693,17 @@
 		},
 		{
 		  "type": "file",
+		  "path": "main.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
 		  "path": "manifest.webapp",
 		  "action": "ignore"
+		},{
+		  "type": "file",
+		  "path": "polyfills.ts",
+		  "action": "replace"
 		},
 		{
 		  "type": "file",

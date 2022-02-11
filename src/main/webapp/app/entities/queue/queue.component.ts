@@ -8,7 +8,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { IQueue } from 'app/shared/model/queue.model';
 import { IAddress } from 'app/shared/model/address.model';
 
-import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
+import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';

@@ -8,7 +8,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress } from 'app/shared/model/address.model';
 
-import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
+import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';

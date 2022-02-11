@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
 import { combineLatest } from 'rxjs';
 
-import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
+import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { Audit } from './audit.model';
 import { AuditsService } from './audits.service';
 

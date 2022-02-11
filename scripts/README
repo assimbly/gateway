@@ -16,3 +16,13 @@ A file or directory can be upgraded by various actions
 	- replace (replace the file or folder by the one of the new Jhipster version)
 	- skip (no action, but report this in the output)
 	- ignore (no action)
+	
+	
+- Resources
+
+Goal: Create a list of resources in a Jhipster project. This list can be used in a projectfile
+Run: gradlew -q resources 
+
+
+	
+	
