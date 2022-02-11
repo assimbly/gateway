@@ -77,7 +77,7 @@ export class TopicComponent implements OnInit, OnDestroy {
 
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-      this.topicService.connect();
+      //this.topicService.connect();
     });
   }
 

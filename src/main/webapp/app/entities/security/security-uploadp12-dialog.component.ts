@@ -8,7 +8,7 @@ import { SecurityService } from './security.service';
 import { ISecurity } from 'app/shared/model/security.model';
 import { SecurityPopupService } from 'app/entities/security/security-popup.service';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
   selector: 'jhi-security-uploadp12-dialog',

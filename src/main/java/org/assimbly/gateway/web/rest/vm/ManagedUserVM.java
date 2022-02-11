@@ -1,7 +1,7 @@
 package org.assimbly.gateway.web.rest.vm;
 
-import javax.validation.constraints.Size;
 import org.assimbly.gateway.service.dto.AdminUserDTO;
+import javax.validation.constraints.Size;
 
 /**
  * View Model extending the AdminUserDTO, which is meant to be used in the user management UI.

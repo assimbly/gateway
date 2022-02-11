@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
@@ -11,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IEnvironmentVariables[]>;
 
 @Injectable({ providedIn: 'root' })
 export class EnvironmentVariablesService {
-    public resourceUrl = SERVER_API_URL + 'api/environment-variables';
+    public resourceUrl = this.applicationConfigService +'api/environment-variables';
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(environmentVariables: IEnvironmentVariables): Observable<EntityResponseType> {
         return this.http.post<IEnvironmentVariables>(this.resourceUrl, environmentVariables, { observe: 'response' });

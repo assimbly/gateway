@@ -14,7 +14,7 @@ import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.h2.H2ConfigurationHelper;
 
 @Configuration
-@EnableJpaRepositories("org.assimbly.gateway.repository")
+@EnableJpaRepositories({ "org.assimbly.gateway.repository" })
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {

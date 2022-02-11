@@ -1,10 +1,10 @@
-import { Moment } from 'moment';
+import moment from 'moment';
 
 export interface IMaintenance {
     id?: number;
-    startTime?: Moment;
-    endTime?: Moment;
-    duration?: Moment;
+    startTime?: moment.Moment;
+    endTime?: moment.Moment;
+    duration?: moment.Moment;
     frequency?: string;
     flowId?: number;
 }
@@ -12,9 +12,9 @@ export interface IMaintenance {
 export class Maintenance implements IMaintenance {
     constructor(
         public id?: number,
-        public startTime?: Moment,
-        public endTime?: Moment,
-        public duration?: Moment,
+        public startTime?: moment.Moment,
+        public endTime?: moment.Moment,
+        public duration?: moment.Moment,
         public frequency?: string,
         public flowId?: number
     ) {}

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import moment from 'moment';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 
@@ -14,9 +15,9 @@ type EntityArrayResponseType = HttpResponse<IMaintenance[]>;
 
 @Injectable({ providedIn: 'root' })
 export class MaintenanceService {
-  public resourceUrl = SERVER_API_URL + 'api/maintenances';
+  public resourceUrl = this.applicationConfigService +'api/maintenances';
 
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
   create(maintenance: IMaintenance): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(maintenance);

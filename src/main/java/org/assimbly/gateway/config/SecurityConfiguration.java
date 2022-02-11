@@ -2,7 +2,6 @@ package org.assimbly.gateway.config;
 
 import org.assimbly.gateway.security.*;
 import org.assimbly.gateway.security.jwt.*;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -18,21 +17,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
+import tech.jhipster.config.JHipsterProperties;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private final JHipsterProperties jHipsterProperties;
+
     private final TokenProvider tokenProvider;
 
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
+    public SecurityConfiguration(
+        TokenProvider tokenProvider,
+        CorsFilter corsFilter,
+        JHipsterProperties jHipsterProperties,
+        SecurityProblemSupport problemSupport
+    ) {
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
+        this.jHipsterProperties = jHipsterProperties;
     }
 
     @Bean
@@ -42,13 +50,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring()
+        web
+            .ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/app/**/*.{js,html}")
             .antMatchers("/i18n/**")
             .antMatchers("/content/**")
             .antMatchers("/h2-console/**")
-            .antMatchers("/swagger-ui/index.html")
+            .antMatchers("/swagger-ui/**")
             .antMatchers("/test/**")
 			.antMatchers("/management/jolokia/**")
             .antMatchers("/management/hawtio/**")
@@ -67,11 +76,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(problemSupport)
         .and()
             .headers()
-            .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
+            .contentSecurityPolicy(jHipsterProperties.getSecurity().getContentSecurityPolicy())
         .and()
             .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
         .and()
-            .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+            .permissionsPolicy().policy("camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")
         .and()
             .frameOptions()
             .deny()
@@ -87,15 +96,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/account/reset-password/finish").permitAll()
             .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()
-            .antMatchers("/management/jolokia").permitAll()
-            .antMatchers("/management/jolokia/**").permitAll()
-            .antMatchers("/management/hawtio").permitAll()
-            .antMatchers("/management/hawtio/**").permitAll()			
+            .antMatchers("/websocket/**").authenticated()            			
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/health/**").permitAll()
             .antMatchers("/management/info").permitAll()
             .antMatchers("/management/prometheus").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/management/jolokia").permitAll()
+            .antMatchers("/management/jolokia/**").permitAll()
+            .antMatchers("/management/hawtio").permitAll()
+            .antMatchers("/management/hawtio/**").permitAll()
 		.and()
             .httpBasic()
         .and()

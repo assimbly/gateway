@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { IGateway } from 'app/shared/model/gateway.model';
 
@@ -11,11 +12,11 @@ type EntityArrayResponseType = HttpResponse<IGateway[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GatewayService {
-    public resourceUrl = SERVER_API_URL + 'api/gateways';
-    public environmentUrl = SERVER_API_URL + 'api/environment';
-    public integrationUrl = SERVER_API_URL + 'api/integration';
+    public resourceUrl = this.applicationConfigService +'api/gateways';
+    public environmentUrl = this.applicationConfigService +'api/environment';
+    public integrationUrl = this.applicationConfigService +'api/integration';
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     stop(id: number): Observable<HttpResponse<any>> {
         return this.http.get(`${this.integrationUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });

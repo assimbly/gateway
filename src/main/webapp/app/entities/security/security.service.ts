@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+import moment from 'moment';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { ISecurity } from 'app/shared/model/security.model';
 
@@ -14,10 +15,10 @@ type EntityArrayResponseType = HttpResponse<ISecurity[]>;
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
-  public resourceUrl = SERVER_API_URL + 'api/securities';
-  public resourceCertificateUrl = SERVER_API_URL + 'api/certificates';
+  public resourceUrl = this.applicationConfigService +'api/securities';
+  public resourceCertificateUrl = this.applicationConfigService +'api/certificates';
 
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
   create(security: ISecurity): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(security);

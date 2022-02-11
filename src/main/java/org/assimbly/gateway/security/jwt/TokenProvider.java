@@ -1,8 +1,10 @@
 package org.assimbly.gateway.security.jwt;
 
+import org.assimbly.gateway.management.SecurityMetersService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
@@ -25,6 +27,8 @@ public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
 
+    private static final String INVALID_JWT_TOKEN = "Invalid JWT token.";
+
     private final Key key;
 
     private final JwtParser jwtParser;
@@ -33,7 +37,9 @@ public class TokenProvider {
 
     private final long tokenValidityInMillisecondsForRememberMe;
 
-    public TokenProvider(JHipsterProperties jHipsterProperties) {
+    private final SecurityMetersService securityMetersService;
+
+    public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService) {
         byte[] keyBytes;
         String secret = jHipsterProperties.getSecurity().getAuthentication().getJwt().getBase64Secret();
         if (!ObjectUtils.isEmpty(secret)) {
@@ -52,6 +58,8 @@ public class TokenProvider {
         this.tokenValidityInMilliseconds = 1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
         this.tokenValidityInMillisecondsForRememberMe =
             1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe();
+
+        this.securityMetersService = securityMetersService;
     }
 
     public String createToken(Authentication authentication, boolean rememberMe) {
@@ -91,11 +99,28 @@ public class TokenProvider {
     public boolean validateToken(String authToken) {
         try {
             jwtParser.parseClaimsJws(authToken);
+
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token.");
-            log.trace("Invalid JWT token trace.", e);
+        } catch (ExpiredJwtException e) {
+            this.securityMetersService.trackTokenExpired();
+
+            log.trace(INVALID_JWT_TOKEN, e);
+        } catch (UnsupportedJwtException e) {
+            this.securityMetersService.trackTokenUnsupported();
+
+            log.trace(INVALID_JWT_TOKEN, e);
+        } catch (MalformedJwtException e) {
+            this.securityMetersService.trackTokenMalformed();
+
+            log.trace(INVALID_JWT_TOKEN, e);
+        } catch (SignatureException e) {
+            this.securityMetersService.trackTokenInvalidSignature();
+
+            log.trace(INVALID_JWT_TOKEN, e);
+        } catch (IllegalArgumentException e) { // TODO: should we let it bubble (no catch), to avoid defensive programming and follow the fail-fast principle?
+            log.error("Token validation error {}", e.getMessage());
         }
+
         return false;
     }
 }

@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 
@@ -11,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IServiceKeys[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ServiceKeysService {
-    public resourceUrl = SERVER_API_URL + 'api/service-keys';
+    public resourceUrl = this.applicationConfigService + 'api/service-keys';
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(serviceKeys: IServiceKeys): Observable<EntityResponseType> {
         return this.http.post<IServiceKeys>(this.resourceUrl, serviceKeys, { observe: 'response' });

@@ -13,7 +13,7 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Components } from '../../shared/camel/component-type';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import * as ace from 'ace-builds';
 import 'brace';
