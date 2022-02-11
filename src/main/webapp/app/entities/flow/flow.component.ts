@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { IFlow } from 'app/shared/model/flow.model';
 import { AccountService } from 'app/core/auth/account.service';
 
-import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
+import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway/gateway.service';

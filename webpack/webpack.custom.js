@@ -9,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const environment = require('./environment');
+const custom = require('./custom');
 
 const tls = process.env.TLS;
 
@@ -105,7 +106,7 @@ module.exports = (config, options, targetOptions) => {
       // If you use an API server, in `prod` mode, you will need to enable CORS
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
       __SERVER_API_URL__: JSON.stringify(environment.__SERVER_API_URL__),
-      __TYPE__: JSON.stringify(environment.__TYPE__),
+      __TYPE__: JSON.stringify(custom.__TYPE__),
     }),
     new MergeJsonWebpackPlugin({
       output: {
