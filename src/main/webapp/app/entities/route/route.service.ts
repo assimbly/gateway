@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared/util/request-util';
 import { IRoute, Route } from 'app/shared/model/route.model';
 
@@ -11,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IRoute[]>;
 
 @Injectable({ providedIn: 'root' })
 export class RouteService {
-    public resourceUrl = SERVER_API_URL + 'api/routes';
+    public resourceUrl = this.applicationConfigService +'api/routes';
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(route: IRoute): Observable<EntityResponseType> {
         return this.http.post<IRoute>(this.resourceUrl, route, { observe: 'response' });

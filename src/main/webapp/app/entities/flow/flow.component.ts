@@ -114,7 +114,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.getGateways();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-      this.flowService.connect();
     });
     this.finished = true;
     this.registerChangeInFlows();

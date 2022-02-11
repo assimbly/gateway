@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class LogViewerService {
     private gatewayid = 1;
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     getLogs(lines: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${SERVER_API_URL}/api/logs/${this.gatewayid}/log/${lines}`, {
+		const url = this.applicationConfigService + '/api/logs/'+ this.gatewayid + '/log/' + lines;
+        return this.http.get(url, {
             observe: 'response',
             responseType: 'text'
         });

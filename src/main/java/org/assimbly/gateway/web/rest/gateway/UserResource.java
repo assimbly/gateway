@@ -1,11 +1,5 @@
 package org.assimbly.gateway.web.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.Collections;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
@@ -16,6 +10,12 @@ import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.errors.EmailAlreadyUsedException;
 import org.assimbly.gateway.web.rest.errors.LoginAlreadyUsedException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.Collections;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -163,7 +163,7 @@ public class UserResource {
      */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<List<AdminUserDTO>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<List<AdminUserDTO>> getAllUsers(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all User for an admin");
         if (!onlyContainsAllowedProperties(pageable)) {
             return ResponseEntity.badRequest().build();

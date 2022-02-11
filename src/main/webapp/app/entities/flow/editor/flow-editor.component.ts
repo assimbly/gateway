@@ -32,7 +32,7 @@ import { HeaderDialogComponent } from 'app/entities/header/header-dialog.compone
 import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
 import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
   selector: 'jhi-flow-editor',

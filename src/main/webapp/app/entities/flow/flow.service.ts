@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer, Subscription } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 
 import { Router } from '@angular/router';
@@ -11,32 +12,18 @@ import { saveAs } from 'file-saver/FileSaver';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 
-import * as SockJS from 'sockjs-client';
-import * as Stomp from 'webstomp-client';
-
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
 @Injectable({ providedIn: 'root' })
 export class FlowService {
-  public resourceUrl = SERVER_API_URL + 'api/flows';
-  public integrationUrl = SERVER_API_URL + 'api/integration';
-  public environmentUrl = SERVER_API_URL + 'api/environment';
-
-  stompClient = null;
-  subscriber = null;
-  connection: Promise<any>;
-  connectedPromise: any;
-  listener: Observable<any>;
-  listenerObserver: Observer<any>;
-  alreadyConnectedOnce = false;
-  private subscription: Subscription;
+  public resourceUrl = this.applicationConfigService +'api/flows';
+  public integrationUrl = this.applicationConfigService +'api/integration';
+  public environmentUrl = this.applicationConfigService +'api/environment';
 
   private gatewayid = 1;
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef) {
-    this.connection = this.createConnection();
-    this.listener = this.createListener();
+  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService) {        
   }
 
   create(flow: IFlow): Observable<EntityResponseType> {
@@ -153,15 +140,18 @@ export class FlowService {
   }
 
   getWikiDocUrl(): Observable<HttpResponse<any>> {
-    return this.http.get(`${SERVER_API_URL}/api/wiki-url`, { observe: 'response', responseType: 'text' });
+	const url = this.applicationConfigService + '/api/wiki-url';
+    return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getCamelDocUrl(): Observable<HttpResponse<any>> {
-    return this.http.get(`${SERVER_API_URL}/api/camel-url`, { observe: 'response', responseType: 'text' });
+    const url = this.applicationConfigService + '/api/camel-url';
+    return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getGatewayName(): Observable<HttpResponse<any>> {
-    return this.http.get(`${SERVER_API_URL}/api/gateway-name`, { observe: 'response', responseType: 'text' });
+	const url = this.applicationConfigService + '/api/gateway-name';
+    return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
@@ -275,84 +265,6 @@ export class FlowService {
       );
   }
 
-  connect() {
-    if (this.connectedPromise === null) {
-      this.connection = this.createConnection();
-    }
-
-    // building absolute path so that websocket doesn't fail when deploying with a context path
-    const loc = this.$window.nativeWindow.location;
-
-    let url;
-
-    if (loc.host === 'localhost:9000') {
-      // allow websockets on dev
-      url = '//localhost:8080' + loc.pathname + 'websocket/alert';
-    } else {
-      url = '//' + loc.host + loc.pathname + 'websocket/alert';
-    }
-
-    const socket = new SockJS(url);
-    this.stompClient = Stomp.over(socket);
-
-    const headers = {};
-
-    this.stompClient.connect(headers, () => {
-      this.connectedPromise('success');
-      this.connectedPromise = null;
-    });
-  }
-
-  disconnect() {
-    if (this.stompClient !== null) {
-      this.stompClient.disconnect();
-      this.stompClient = null;
-    }
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-      this.subscription = null;
-    }
-    this.alreadyConnectedOnce = false;
-  }
-
-  receive() {
-    return this.listener;
-  }
-
-  connectionStomp() {
-    return this.connection;
-  }
-
-  client() {
-    return this.stompClient;
-  }
-
-  subscribe(id) {
-    const topic = '/topic/' + id + '/alert';
-
-    this.connection.then(() => {
-      this.subscriber = this.stompClient.subscribe(topic, data => {
-        this.listenerObserver.next(JSON.parse(data.body));
-      });
-    });
-  }
-
-  unsubscribe() {
-    if (this.subscriber !== null) {
-      this.subscriber.unsubscribe();
-    }
-    this.listener = this.createListener();
-  }
-
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
-    });
-  }
-
-  private createConnection(): Promise<any> {
-    return new Promise((resolve, reject) => (this.connectedPromise = resolve));
-  }
 
   /**
    * Convert a returned JSON object to Flow.

@@ -23,7 +23,7 @@
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
             },
-            "outputPath": "build/resources/main/static/",
+            "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",
             "polyfills": "src/main/webapp/polyfills.ts",
@@ -96,6 +96,12 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "configPath": "jest.conf.js"
+          }
         }
       }
     }
@@ -104,7 +110,7 @@
   "cli": {
     "cache": {
       "enabled": true,
-      "path": "./build/",
+      "path": "./target/",
       "environment": "all"
     },
     "packageManager": "npm"

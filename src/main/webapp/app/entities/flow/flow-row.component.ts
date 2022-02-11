@@ -9,9 +9,13 @@ import { SecurityService } from 'app/entities/security/security.service';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { NavigationEnd, Router } from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+
+import { TrackerService } from 'app/core/tracker/tracker.service';
+import { TrackerActivity } from 'app/core/tracker/tracker-activity.model';
 
 enum Status {
   active = 'active',
@@ -92,7 +96,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private securityService: SecurityService,
     private modalService: NgbModal,
     private router: Router,
-    private eventManager: JhiEventManager
+    private eventManager: JhiEventManager,
+	private trackerService: TrackerService
   ) {
     this.listener = this.createListener();
 
@@ -118,11 +123,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.connection = this.flowService.connectionStomp();
-    this.stompClient = this.flowService.client();
-    this.subscribe('alert');
-    this.subscribe('event');
-    this.receive().subscribe(data => {
+  
+    this.trackerService.subscribeFlow(this.flow.id,'alert');
+	this.trackerService.subscribeFlow(this.flow.id,'event');
+	
+    this.subscription = this.trackerService.receiveFlow().subscribe(data => {
       const data2 = data.split(':');
 
       if (Array.isArray(data2) || data2.length) {
@@ -136,13 +141,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
       }
     });
+  
   }
 
   ngOnDestroy() {
-    this.flowService.unsubscribe();
-    if (this.mySubscription) {
-      this.mySubscription.unsubscribe();
-    }
+    //this.trackerService.unsubscribe();
   }
 
   getStatus(id: number) {
@@ -786,26 +789,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   receive() {
     return this.listener;
-  }
-
-  subscribe(type) {
-    const topic = '/topic/' + this.flow.id + '/' + type;
-
-    this.connection.then(() => {
-      this.subscriber = this.stompClient.subscribe(topic, data => {
-        if (!this.listenerObserver) {
-          this.listener = this.createListener();
-        }
-        this.listenerObserver.next(data.body);
-      });
-    });
-  }
-
-  unsubscribe() {
-    if (this.subscriber !== null) {
-      this.subscriber.unsubscribe();
-    }
-    this.listener = this.createListener();
   }
 
   private createListener(): Observable<any> {

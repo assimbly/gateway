@@ -31,7 +31,7 @@ import { ServiceDialogComponent } from 'app/entities/service/service-dialog.comp
 import { HeaderPopupService } from 'app/entities/header/header-popup.service';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import 'brace';
 import 'brace/mode/text';

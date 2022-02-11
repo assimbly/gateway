@@ -75,7 +75,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.registerDeletedQueues();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-      this.queueService.connect();
+      //this.queueService.connect();
     });
   }
 

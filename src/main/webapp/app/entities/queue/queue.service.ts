@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
@@ -10,9 +11,6 @@ import { WindowRef } from 'app/shared';
 
 import { IQueue } from 'app/shared/model/queue.model';
 import { IRootQueueAddress } from 'app/shared/model/address.model';
-
-import * as SockJS from 'sockjs-client';
-import * as Stomp from 'webstomp-client';
 
 import { BrokerService } from 'app/entities/broker/broker.service';
 import { IBroker } from 'app/shared/model/broker.model';
@@ -22,21 +20,12 @@ type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
-  public queuesResourceUrl = SERVER_API_URL + 'api/queues';
-  public brokersResourceUrl = SERVER_API_URL + 'api/brokers';
-
-  stompClient = null;
-  connection: Promise<any>;
-  connectedPromise: any;
-  listener: Observable<any>;
-  listenerObserver: Observer<any>;
+  public queuesResourceUrl = this.applicationConfigService +'api/queues';
+  public brokersResourceUrl = this.applicationConfigService +'api/brokers';
 
   brokerType: string;
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {
-    this.connection = this.createConnection();
-    this.listener = this.createListener();
-    // this.brokerType = 'classic';
+  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService, protected brokerService: BrokerService) {   
   }
 
   create(queue: IQueue): Observable<EntityResponseType> {
@@ -99,41 +88,4 @@ export class QueueService {
     });
   }
 
-  connect() {
-    if (this.connectedPromise === null) {
-      this.connection = this.createConnection();
-    }
-
-    // building absolute path so that websocket doesn't fail when deploying with a context path
-    const loc = this.$window.nativeWindow.location;
-
-    let url;
-
-    if (loc.host === 'localhost:9000') {
-      // allow websockets on dev
-      url = '//localhost:8080' + loc.pathname + 'websocket/alert';
-    } else {
-      url = '//' + loc.host + loc.pathname + 'websocket/alert';
-    }
-
-    const socket = new SockJS(url);
-    this.stompClient = Stomp.over(socket);
-
-    const headers = {};
-
-    this.stompClient.connect(headers, () => {
-      this.connectedPromise('success');
-      this.connectedPromise = null;
-    });
-  }
-
-  private createConnection(): Promise<any> {
-    return new Promise((resolve, reject) => (this.connectedPromise = resolve));
-  }
-
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
-    });
-  }
 }

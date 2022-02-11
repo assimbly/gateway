@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer, Subscription } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
@@ -10,9 +10,6 @@ import { WindowRef } from 'app/shared';
 
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress, IRootTopicAddresses, ITopicAddresses } from 'app/shared/model/address.model';
-
-import * as SockJS from 'sockjs-client';
-import * as Stomp from 'webstomp-client';
 
 import { BrokerService } from 'app/entities/broker/broker.service';
 import { IBroker } from 'app/shared/model/broker.model';
@@ -25,26 +22,15 @@ type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
 export class TopicService {
-  public topicsResourceUrl = SERVER_API_URL + 'api/topics';
-  public brokersResourceUrl = SERVER_API_URL + 'api/brokers';
-
-  stompClient = null;
-  subscriber = null;
-  connection: Promise<any>;
-  connectedPromise: any;
-  listener: Observable<any>;
-  listenerObserver: Observer<any>;
-  alreadyConnectedOnce = false;
-  private subscription: Subscription;
+  public topicsResourceUrl = this.applicationConfigService + 'api/topics';
+  public brokersResourceUrl = this.applicationConfigService + 'api/brokers';
 
   private gatewayid = 1;
   private brokerid = 1;
 
   brokerType: string;
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {
-    this.connection = this.createConnection();
-    this.listener = this.createListener();
+  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService, protected brokerService: BrokerService) {
   }
 
   create(topic: ITopic): Observable<EntityResponseType> {
@@ -103,41 +89,4 @@ export class TopicService {
     });
   }
 
-  connect() {
-    if (this.connectedPromise === null) {
-      this.connection = this.createConnection();
-    }
-
-    // building absolute path so that websocket doesn't fail when deploying with a context path
-    const loc = this.$window.nativeWindow.location;
-
-    let url;
-
-    if (loc.host === 'localhost:9000') {
-      // allow websockets on dev
-      url = '//localhost:8080' + loc.pathname + 'websocket/alert';
-    } else {
-      url = '//' + loc.host + loc.pathname + 'websocket/alert';
-    }
-
-    const socket = new SockJS(url);
-    this.stompClient = Stomp.over(socket);
-
-    const headers = {};
-
-    this.stompClient.connect(headers, () => {
-      this.connectedPromise('success');
-      this.connectedPromise = null;
-    });
-  }
-
-  private createConnection(): Promise<any> {
-    return new Promise((resolve, reject) => (this.connectedPromise = resolve));
-  }
-
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
-    });
-  }
 }

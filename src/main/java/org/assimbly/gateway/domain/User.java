@@ -1,6 +1,7 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.assimbly.gateway.config.Constants;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
-import org.assimbly.gateway.config.Constants;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;

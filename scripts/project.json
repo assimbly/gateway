@@ -2,7 +2,7 @@
   "applicationName": "gateway",
   "applicationType": "monolithic",
   "version": "3.6.0",
-  "jhipsterVersion": "7.1.0",
+  "jhipsterVersion": "7.5.0",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
   "repositoryName": "gateway",
@@ -83,11 +83,6 @@
     },
 	{
       "type": "dir",
-      "path": "src/main/jib",
-      "action": "replace"
-    },
-	{
-      "type": "dir",
       "path": "src/main/resources",
       "action": "ignore"
     },
@@ -109,7 +104,7 @@
 	{
       "type": "file",
       "path": "webpack/environment.js",
-      "action": "skip"
+      "action": "replace"
     },
 	{
       "type": "file",
@@ -160,11 +155,6 @@
       "type": "file",
       "path": ".gitignore",
       "action": "ignore"
-    },
-	{
-      "type": "file",
-      "path": ".huskyrc",
-      "action": "replace"
     },	
 	{
       "type": "file",
@@ -248,16 +238,6 @@
     },
 	{
       "type": "file",
-      "path": "postcss.config.js",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": "proxy.conf.json",
-      "action": "replace"
-    },
-	{
-      "type": "file",
       "path": "README",
       "action": "ignore"
     },
@@ -274,11 +254,6 @@
 	{
       "type": "file",
       "path": "tsconfig.app.json",
-      "action": "replace"
-    },
-	{
-      "type": "file",
-      "path": "tsconfig.e2e.json",
       "action": "replace"
     },
 	{
@@ -307,11 +282,6 @@
 		  "action": "ignore"
 		},
 		{
-		  "type": "dir",
-		  "path": "config/audit",
-		  "action": "replace"
-		},
-		{
 		  "type": "file",
 		  "path": "config/ApplicationProperties.java",
 		  "action": "ignore"
@@ -325,11 +295,6 @@
 		  "type": "file",
 		  "path": "config/CacheConfiguration.java",
 		  "action": "skip"
-		},
-		{
-		  "type": "file",
-		  "path": "config/CloudDatabaseConfiguration.java",
-		  "action": "replace"
 		},
 		{
 		  "type": "file",
@@ -403,6 +368,11 @@
 		},
 		{
 		  "type": "dir",
+		  "path": "management",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
 		  "path": "repository",
 		  "action": "ignore"
 		},
@@ -471,11 +441,6 @@
   "testBackendResources": {
   	"basePath": "/src/test/java/org/assimbly/gateway",
 	"resources": [
-		{
-		  "type": "dir",
-		  "path": "config",
-		  "action": "replace"
-		},
 		{
 		  "type": "dir",
 		  "path": "domain",
@@ -583,6 +548,11 @@
 		},
 		{
 		  "type": "dir",
+		  "path": "app/login",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
 		  "path": "app/shared/alert",
 		  "action": "replace"
 		},
@@ -599,11 +569,6 @@
 		{
 		  "type": "dir",
 		  "path": "app/shared/language",
-		  "action": "replace"
-		},
-		{
-		  "type": "dir",
-		  "path": "app/shared/login",
 		  "action": "replace"
 		},
 		{
@@ -674,6 +639,16 @@
 		{
 		  "type": "file",
 		  "path": "404.html",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "bootstrap.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "declarations.d.ts",
 		  "action": "replace"
 		},
 		{

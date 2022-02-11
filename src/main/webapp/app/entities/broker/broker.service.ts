@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
 import { createRequestOption } from 'app/shared';
 import { IBroker } from 'app/shared/model/broker.model';
 
@@ -11,11 +12,11 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
-    public resourceUrl = SERVER_API_URL + 'api/brokers';
+    public resourceUrl = this.applicationConfigService +'api/brokers';
 
     private gatewayid = 1;
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(broker: IBroker): Observable<EntityResponseType> {
         return this.http.post<IBroker>(this.resourceUrl, broker, { observe: 'response' });
