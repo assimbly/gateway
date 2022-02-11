@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { GatewayServiceKeysModule } from '../../entities/service-keys/service-keys.module';
+import { ServiceKeysModule } from '../../entities/service-keys/service-keys.module';
 
 import { Services } from 'app/shared/camel/service-connections';
 
@@ -29,7 +29,7 @@ import { ServicePopupComponent } from 'app/entities/service/service-dialog.compo
 const ENTITY_STATES = [...serviceRoute, ...servicePopupRoute];
 
 @NgModule({
-  imports: [SharedModule, GatewayServiceKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, ServiceKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     ServiceComponent,
     ServiceAllComponent,
@@ -54,4 +54,4 @@ const ENTITY_STATES = [...serviceRoute, ...servicePopupRoute];
   providers: [ServiceService, ServicePopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayServiceModule {}
+export class ServiceModule {}

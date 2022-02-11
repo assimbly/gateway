@@ -3,12 +3,12 @@ import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { SharedModule } from 'app/shared/shared.module';
-import { GatewayEndpointModule } from '../../entities/endpoint/endpoint.module';
-import { GatewayServiceModule } from '../../entities/service/service.module';
-import { GatewayHeaderModule } from '../../entities/header/header.module';
-import { GatewayRouteModule } from '../../entities/route/route.module';
-import { GatewayMaintenanceModule } from '../../entities/maintenance/maintenance.module';
-import { GatewaySecurityModule } from '../../entities/security/security.module';
+import { EndpointModule } from '../../entities/endpoint/endpoint.module';
+import { ServiceModule } from '../../entities/service/service.module';
+import { HeaderModule } from '../../entities/header/header.module';
+import { RouteModule } from '../../entities/route/route.module';
+import { MaintenanceModule } from '../../entities/maintenance/maintenance.module';
+import { SecurityModule } from '../../entities/security/security.module';
 import { AceModule } from 'ngx-ace-wrapper';
 import { ACE_CONFIG } from 'ngx-ace-wrapper';
 import { AceConfigInterface } from 'ngx-ace-wrapper';
@@ -41,12 +41,12 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 @NgModule({
   imports: [
     SharedModule,
-    GatewayEndpointModule,
-    GatewayServiceModule,
-    GatewaySecurityModule,
-    GatewayHeaderModule,
-    GatewayRouteModule,
-    GatewayMaintenanceModule,
+    EndpointModule,
+    ServiceModule,
+    SecurityModule,
+    HeaderModule,
+    RouteModule,
+    MaintenanceModule,
     // AceEditorModule,
     AceModule,
     RouterModule.forChild(ENTITY_STATES),
@@ -80,4 +80,4 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayFlowModule {}
+export class FlowModule {}

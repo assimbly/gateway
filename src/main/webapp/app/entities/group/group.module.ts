@@ -20,4 +20,4 @@ const ENTITY_STATES = [...groupRoute, ...groupPopupRoute];
   providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayGroupModule {}
+export class GroupModule {}

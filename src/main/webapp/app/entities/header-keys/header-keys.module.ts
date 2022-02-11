@@ -30,4 +30,4 @@ const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
   providers: [HeaderKeysDeletePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayHeaderKeysModule {}
+export class HeaderKeysModule {}

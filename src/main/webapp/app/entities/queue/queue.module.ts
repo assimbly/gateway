@@ -28,4 +28,4 @@ import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog
   ],
   entryComponents: [QueueDeleteDialogComponent, QueueClearDialogComponent],
 })
-export class GatewayQueueModule {}
+export class QueueModule {}

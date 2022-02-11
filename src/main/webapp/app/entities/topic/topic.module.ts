@@ -29,4 +29,4 @@ import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog
   ],
   entryComponents: [TopicDeleteDialogComponent, TopicClearDialogComponent],
 })
-export class GatewayTopicModule {}
+export class TopicModule {}

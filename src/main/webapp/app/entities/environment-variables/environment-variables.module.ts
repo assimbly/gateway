@@ -33,4 +33,4 @@ const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopu
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayEnvironmentVariablesModule {}
+export class EnvironmentVariablesModule {}

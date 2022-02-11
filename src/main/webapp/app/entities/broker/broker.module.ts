@@ -61,4 +61,4 @@ const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
   entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayBrokerModule {}
+export class BrokerModule {}
