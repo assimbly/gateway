@@ -529,7 +529,7 @@
 		{
 		  "type": "dir",
 		  "path": "app/layouts/footer",
-		  "action": "replace"
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",

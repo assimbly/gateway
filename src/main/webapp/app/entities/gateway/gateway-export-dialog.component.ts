@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
 import { GatewayService } from './gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
@@ -20,7 +19,6 @@ export class GatewayExportDialogComponent implements AfterContentInit {
     importError = false;
 
     constructor(
-        private eventManager: JhiEventManager,
         private gatewayService: GatewayService,
         public activeModal: NgbActiveModal,
         protected deploymentService: DeploymentService

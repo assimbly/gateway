@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
@@ -19,11 +18,9 @@ export class FlowDeleteDialogComponent {
     constructor(
         protected flowService: FlowService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
         protected router: Router
     ) {}
-
+	
     clear() {
         this.activeModal.dismiss('cancel');
     }

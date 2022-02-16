@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { EndpointService } from './endpoint.service';
@@ -18,8 +18,8 @@ export class EndpointComponent implements OnInit, OnDestroy {
 
     constructor(
         protected endpointService: EndpointService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -53,6 +53,9 @@ export class EndpointComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

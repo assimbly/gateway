@@ -28,7 +28,7 @@
       >
         <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
           <span>
-            <i class="fa fa-exchange" aria-hidden="true"></i>
+              <fa-icon icon="exchange-alt"></fa-icon>
             <span>Connector</span>
           </span>
         </a>
@@ -41,7 +41,6 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <!--<i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>-->
               <span>Manage</span>
             </a>
           </li>
@@ -53,7 +52,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Endpoints</span>
             </a>
           </li>
@@ -65,7 +64,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Headers</span>
             </a>
           </li>
@@ -77,7 +76,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Routes</span>
             </a>
           </li>
@@ -89,7 +88,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Services</span>
             </a>
           </li>
@@ -105,7 +104,7 @@
       >
         <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
           <span>
-            <i class="fa fa-envelope" aria-hidden="true"></i>
+            <fa-icon icon="envelope"></fa-icon>
             <span>Broker</span>
           </span>
         </a>
@@ -118,7 +117,6 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <!--<fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>-->
               <span>Manage</span>
             </a>
           </li>
@@ -130,7 +128,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Queues</span>
             </a>
           </li>
@@ -142,7 +140,7 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk"></fa-icon>
               <span>Topics</span>
             </a>
           </li>
@@ -184,19 +182,19 @@
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
               <span>Environment Variables</span>
             </a>
           </li>
           <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <a
               class="dropdown-item"
-              routerLink="security"
+              routerLink="certificate"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+              <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
               <span>Certificates</span>
             </a>
           </li>
@@ -250,14 +248,8 @@
             </a>
           </li>
           <li>
-            <a
-              class="dropdown-item"
-              routerLink="maintenance"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              (click)="collapseNavbar()"
-            >
-              <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+            <a class="dropdown-item" routerLink="maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+  			  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
               <span>Maintenance</span>
             </a>
           </li>
@@ -270,7 +262,7 @@
           </li>
           <li>
             <a class="dropdown-item" routerLink="admin/log-viewer" routerLinkActive="active" (click)="collapseNavbar()">
-              <i class="fa fa-fw fa-tasks" aria-hidden="true"></i>
+			  <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
               <span>Log viewer</span>
             </a>
           </li>

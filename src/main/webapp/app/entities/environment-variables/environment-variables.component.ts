@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -24,8 +25,8 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {
         this.page = 0;
@@ -81,7 +82,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     sort() {

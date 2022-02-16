@@ -13,9 +13,8 @@ import { SortByDirective } from './sort/sort-by.directive';
 import { SortDirective } from './sort/sort.directive';
 import { ItemCountComponent } from './pagination/item-count.component';
 
-import { WindowRef } from '../../app/shared/window/window.service';
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
-import { NgbDateMomentAdapter } from './util/datepicker-adapter';
+import { WindowRef } from './window/window.service';
 
 @NgModule({
   imports: [SharedLibsModule],
@@ -32,7 +31,7 @@ import { NgbDateMomentAdapter } from './util/datepicker-adapter';
     SortDirective,
     ItemCountComponent,
   ],
-  providers: [WindowRef, { provide: NgbDateAdapter, useClass: NgbDateMomentAdapter }],
+  providers: [WindowRef],
   exports: [
     SharedLibsModule,
     FindLanguageFromKeyPipe,

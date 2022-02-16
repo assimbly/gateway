@@ -44,14 +44,16 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             .orElse(new String[0]);
 
         registry
-            .addEndpoint("/websocket/alert")
+            .addEndpoint("/websocket/tracker")
             .setHandshakeHandler(defaultHandshakeHandler())
+			//.setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
 
         registry
             .addEndpoint("/topic/alert")
             .setHandshakeHandler(defaultHandshakeHandler())
+			//.setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
     }
@@ -68,7 +70,6 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             ) throws Exception {
                 if (request instanceof ServletServerHttpRequest) {
                     ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-                    System.out.println("request servlet" + servletRequest.getRemoteAddress());
                     attributes.put(IP_ADDRESS, servletRequest.getRemoteAddress());
                 }
                 return true;
@@ -100,38 +101,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
     }
 
     @Override
-    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void configureClientOutboundChannel(ChannelRegistration registration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        // TODO Auto-generated method stub
         return false;
     }
 }

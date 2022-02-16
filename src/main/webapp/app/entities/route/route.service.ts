@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IRoute[]>;
 
 @Injectable({ providedIn: 'root' })
 export class RouteService {
-    public resourceUrl = this.applicationConfigService +'api/routes';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/routes');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

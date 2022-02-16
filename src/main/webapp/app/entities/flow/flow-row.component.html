@@ -46,7 +46,7 @@
           [disabled]="disableActionBtns"
           *ngIf="!isFlowStarted"
         >
-          <span class="fa fa-play"></span>
+		 <fa-icon icon="play"></fa-icon>
         </button>
         <button
           [ngClass]="{
@@ -61,7 +61,7 @@
           [disabled]="disableActionBtns"
           *ngIf="!isFlowRestarted"
         >
-          <span class="fa fa-refresh"></span>
+          <fa-icon icon="sync"></fa-icon>
         </button>
         <button
           [ngClass]="{
@@ -76,7 +76,7 @@
           [disabled]="(!isFlowPaused && isFlowStopped) || disableActionBtns"
           *ngIf="!isFlowPaused"
         >
-          <span class="fa fa-pause"></span>
+          <fa-icon icon="pause"></fa-icon>
         </button>
         <button
           [ngClass]="{
@@ -91,7 +91,7 @@
           [disabled]="disableActionBtns"
           *ngIf="!isFlowResumed"
         >
-          <span class="fa fa-step-forward"></span>
+          <fa-icon icon="step-forward"></fa-icon>
         </button>
         <button
           [ngClass]="{
@@ -105,7 +105,7 @@
           class="btn btn-sm"
           [disabled]="isFlowStopped || disableActionBtns"
         >
-          <span class="fa fa-stop"></span>
+          <fa-icon icon="stop"></fa-icon>
         </button>
         <button
           [ngClass]="{
@@ -172,7 +172,6 @@
     </div>
     <div class="col">
       <i
-        class="fa fa-info"
         aria-hidden="true"
         data-container="body"
         (mouseenter)="getFlowDetails()"
@@ -180,7 +179,7 @@
         placement="right"
         popoverTitle="Details"
         [popover]="detailsTemplate"
-      ></i>
+      ><fa-icon icon="info"></fa-icon></i>
       <i
         style="padding-left: 1em"
         (mouseenter)="getFlowStats(flow)"
@@ -192,27 +191,32 @@
         popoverTitle="Stats"
         popover-class="increase-popover-width"
         [popover]="statsTemplate"
-        class="fa fa-bar-chart stats"
-      ></i>
+        class="stats"
+      >
+	  <fa-icon icon="chart-bar"></fa-icon>
+	  </i>
       <i
         [hidden]="isFlowStatusOK"
         style="padding-left: 1em"
         placement="right"
         triggers="mouseenter:mouseleave"
         popoverTitle="Stats"
-        [popover]="statsTemplate"
-        class="fa fa-bar-chart"
-      ></i>
+        [popover]="statsTemplate">
+		<fa-icon icon="chart-bar"></fa-icon>
+	  </i>
       <a
         style="padding-left: 1em"
         (click)="navigateToFlow('edit')"
-        class="fa fa-edit"
         aria-hidden="true"
         placement="right"
         title="Edit flow"
-      ></a>
-      <a style="padding-left: 1em" (click)="navigateToFlow('clone')" placement="right" title="Clone flow" class="fa fa-clone"></a>
-      <a style="padding-left: 1em" (click)="navigateToFlow('delete')" placement="right" title="Delete flow" class="fa fa-trash"></a>
+      ><fa-icon icon="edit"></fa-icon></a>
+      <a style="padding-left: 1em" (click)="navigateToFlow('clone')" placement="right" title="Clone flow">
+		<fa-icon icon="clone"></fa-icon>
+	  </a>
+      <a style="padding-left: 1em" (click)="navigateToFlow('delete')" placement="right" title="Delete flow">
+	  		<fa-icon icon="trash"></fa-icon>
+	  </a>
     </div>
   </div>
 </td>

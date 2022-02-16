@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { IQueue } from 'app/shared/model/queue.model';
@@ -24,8 +24,7 @@ export class QueueDeleteDialogComponent {
     constructor(
         protected queueService: QueueService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -46,13 +45,8 @@ export class QueueDeleteDialogComponent {
             this.disableDelete = true;
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
-                // this.router.navigate(['/queue']);
-                // .then(() => {
-                //     window.location.reload();
-                // });
-                // this.activeModal.close()
-                this.activeModal.dismiss(true);
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));			
+                 this.activeModal.dismiss(true);
             });
         }
     }

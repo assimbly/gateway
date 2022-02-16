@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 
 type EntityResponseType = HttpResponse<IServiceKeys>;
@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IServiceKeys[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ServiceKeysService {
-    public resourceUrl = this.applicationConfigService + 'api/service-keys';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/service-keys');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

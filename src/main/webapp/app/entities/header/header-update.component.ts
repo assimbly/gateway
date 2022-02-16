@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { IHeader, Header } from 'app/shared/model/header.model';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { filter } from 'rxjs/operators';
 
@@ -27,8 +27,7 @@ export class HeaderUpdateComponent implements OnInit {
   constructor(
     protected headerService: HeaderService,
     protected headerKeysService: HeaderKeysService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
+    protected eventManager: EventManager,
     protected activatedRoute: ActivatedRoute,
     protected router: Router
   ) {}
@@ -66,9 +65,9 @@ export class HeaderUpdateComponent implements OnInit {
   }
 
   protected onSaveSuccess(result: IHeader) {
-    this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
-    this.eventManager.broadcast({ name: 'headerModified', content: result.id });
-    this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
+    this.eventManager.broadcast(new EventWithContent('headerListModification', 'OK'));  
+    this.eventManager.broadcast(new EventWithContent('headerModified', result.id));
+    this.eventManager.broadcast(new EventWithContent('headerKeysUpdated', result));	
     this.isSaving = false;
 
     this.headerKeys.forEach(headerKey => {

@@ -152,7 +152,7 @@
 																			<ng-select *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
 																			<ng-select *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
 																			<div ngbDropdown class="col-2" placement="bottom-right" >
-																				<a class="btn btn-primary left-border-radius-0" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-16px'}" id="dropdownBasic1" ngbDropdownToggle><i class="fa fa-bars"></i> Docs</a>
+																				<a class="btn btn-primary left-border-radius-0" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-16px'}" id="dropdownBasic1" ngbDropdownToggle><fa-icon icon="bars"></fa-icon> Docs</a>
 																				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
 																					<a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
 																						<span>Camel Documentation</span>
@@ -179,8 +179,8 @@
 	                                                                <div class="container">
 																		<div class="row">
 																			<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
-																			<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">
-																				<span class="fa fa-pencil padding-button"></span>&nbsp;
+																			<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">																				
+																				<fa-icon icon="edit"></fa-icon>
 																			</button>																	
 																		</div>	
 																	</div>		
@@ -205,22 +205,22 @@
                                                                     </ng-select>
                                                                     <a> </a>
                                                                     <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
-                                                                    <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><span class="fa fa-plus"></span></button>
-                                                                    <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><span class="fa fa-remove"></span></button>
+                                                                    <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><fa-icon icon="plus"></fa-icon></button>
+                                                                    <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><fa-icon icon="times"></fa-icon></button>
                                                                 </div>
                                                             </div>
 															
                                                             <div class="border-bottom my-3"><h5>Header</h5></div>
                                                             <div class="form-group">
                                                                 <div class="input-group">
-                                                                    <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>
+																	<ng-select class="default" [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>                                                                    
                                                                     <button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-pencil  padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                     <button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                                                     </button>
                                                                     <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-plus padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -230,12 +230,12 @@
                                                                 <div class="input-group">
                                                                     <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route" id="field_route" dropdownPosition="top"></ng-select>
                                                                     <button type="button" *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value" title="Edit route" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-pencil  padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                     <button type="button" *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New route" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                                                     </button>
                                                                     <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create route" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-plus padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -245,12 +245,12 @@
                                                                 <div class="input-group">
                                                                     <ng-select [items]="filterService[index]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
                                                                     <button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-pencil padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                     <button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
                                                                     </button>
                                                                     <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                                                        <span class="fa fa-plus padding-button"></span>&nbsp;
+                                                                        <span class="padding-button"><fa-icon icon="bars"></fa-icon></span>&nbsp;
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -260,25 +260,25 @@
                                                             </div>
                                                             <div class="text-right form-group" role="group">
                                                                 <button type="button" class="btn btn-primary" style="visibility: hidden;">
-                                                                    <span class="fa fa-pencil"></span>&nbsp;
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     <span>Empty</span>
                                                                 </button>
                                                                 <button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))">
-                                                                    <span class="fa fa-remove"></span>&nbsp;
+                                                                    <span><fa-icon icon="times"></fa-icon></span>&nbsp;
                                                                     <span>Remove</span>
                                                                 </button>
                                                                 <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)" [ngbTooltip]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2) ? 'Only 3 FROM type endpoints allowed' : ''" placement="right">
-                                                                    <span class="fa fa-pencil"></span>&nbsp;
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     <span>Add</span>
                                                                 </button>
                                                             </div>
                                                             <div class="text-right form-group" role="group">
                                                                 <button type="button" class="btn btn-primary" *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)" [disabled]="numberOfResponseEndpoints>0" (click)="addResponseEndpoint(endpoint)">
-                                                                    <span class="fa fa-pencil"></span>
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     <span [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'" placement="right">Add Response Endpoint</span>
                                                                 </button>
                                                                 <button type="button" class="btn btn-danger" *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))" (click)="removeResponseEndpoint(endpoint)">
-                                                                    <span class="fa fa-remove"></span>
+                                                                    <span><fa-icon icon="times"></fa-icon></span>&nbsp;
                                                                     <span>Remove Response Endpoint</span>
                                                                 </button>
                                                             </div>

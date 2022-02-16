@@ -6,7 +6,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
-import { WindowRef } from 'app/shared';
+import { WindowRef } from 'app/shared/window/window.service';
 
 import { ITopic } from 'app/shared/model/topic.model';
 import { IAddress, IRootTopicAddresses, ITopicAddresses } from 'app/shared/model/address.model';
@@ -22,8 +22,8 @@ type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
 export class TopicService {
-  public topicsResourceUrl = this.applicationConfigService + 'api/topics';
-  public brokersResourceUrl = this.applicationConfigService + 'api/brokers';
+  public topicsResourceUrl = this.applicationConfigService.getEndpointFor('api/topics');
+  public brokersResourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
 
   private gatewayid = 1;
   private brokerid = 1;

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AccountService } from 'app/core/auth/account.service';
@@ -36,8 +37,8 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   constructor(
     protected queueService: QueueService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
     protected modalService: NgbModal,
     protected accountService: AccountService
   ) {
@@ -209,6 +210,9 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+	this.alertService.addAlert({
+	  type: 'danger',
+	  message: errorMessage,
+	});
   }
 }

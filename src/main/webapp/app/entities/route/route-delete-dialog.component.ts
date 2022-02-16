@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,7 +12,7 @@ import { RouteService } from './route.service';
 export class RouteDeleteDialogComponent {
     route?: IRoute;
 
-    constructor(protected routeService: RouteService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected routeService: RouteService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
     cancel(): void {
         this.activeModal.dismiss();
@@ -20,7 +20,7 @@ export class RouteDeleteDialogComponent {
 
     confirmDelete(id: number): void {
         this.routeService.delete(id).subscribe(() => {
-            this.eventManager.broadcast('routeListModification');
+			this.eventManager.broadcast(new EventWithContent('routeListModification', 'Deleted'));			
             this.activeModal.close();
         });
     }

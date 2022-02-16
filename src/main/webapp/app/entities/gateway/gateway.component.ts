@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -23,8 +24,8 @@ export class GatewayComponent implements OnInit, OnDestroy {
     constructor(
         protected flowService: FlowService,
         protected gatewayService: GatewayService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService,
         private router: Router,
         private modalService: NgbModal
@@ -100,7 +101,10 @@ export class GatewayComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});  
     }
 
     reset() {

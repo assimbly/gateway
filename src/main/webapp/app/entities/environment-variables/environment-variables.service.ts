@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 type EntityResponseType = HttpResponse<IEnvironmentVariables>;
@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IEnvironmentVariables[]>;
 
 @Injectable({ providedIn: 'root' })
 export class EnvironmentVariablesService {
-    public resourceUrl = this.applicationConfigService +'api/environment-variables';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/environment-variables');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

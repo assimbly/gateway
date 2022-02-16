@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
 import { map } from 'rxjs/operators';
 
@@ -13,9 +13,9 @@ type EntityArrayResponseType = HttpResponse<IEndpoint[]>;
 
 @Injectable({ providedIn: 'root' })
 export class EndpointService {
-    private resourceUrlEndpoint = this.applicationConfigService +'api/endpoint';
-    private resourceUrlEndpoints = this.applicationConfigService +'api/endpoints';
-    public resourceUrl = this.applicationConfigService +'api/endpoints';
+    private resourceUrlEndpoint = this.applicationConfigService.getEndpointFor('api/endpoint');
+    private resourceUrlEndpoints = this.applicationConfigService.getEndpointFor('api/endpoints');
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/endpoints');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

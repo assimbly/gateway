@@ -14,10 +14,6 @@ import { RouterModule } from '@angular/router';
                 }
             },
             {
-                path: 'audits',
-                loadChildren: () => import('./audits/audits.module').then(m => m.AuditsModule)
-            },
-            {
                 path: 'configuration',
                 loadChildren: () => import('./configuration/configuration.module').then(m => m.ConfigurationModule)
             },

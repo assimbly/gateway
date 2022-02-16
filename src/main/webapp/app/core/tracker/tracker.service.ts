@@ -12,6 +12,7 @@ import { TrackerActivity } from './tracker-activity.model';
 @Injectable({ providedIn: 'root' })
 export class TrackerService {
   private stompClient: Client | null = null;
+  private subscriber = null;
   private routerSubscription: Subscription | null = null;
   private connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
   private connectionSubscription: Subscription | null = null;
@@ -20,17 +21,29 @@ export class TrackerService {
   private listenerFlow: Observable<any>;
   private listenerObserver: Observer<any>;
 
+  connection: Promise<any>;
+  connectedPromise: any = null;
+  
   constructor(private router: Router, private authServerProvider: AuthServerProvider, private location: Location) {
 	this.listenerFlow = this.createListener();  
   }
 
   connect(): void {
+  
+	console.log('connect1');
     if (this.stompClient?.connected) {
       return;
     }
+	
+	if (this.connectedPromise === null) {
+		console.log('connect1b');
+		this.connection = this.createConnection();
+	}
+
+	console.log('connect2');
 
     // building absolute path so that websocket doesn't fail when deploying with a context path
-    let url = '/websocket/tracker';
+    let url = '/topic/alert';
     url = this.location.prepareExternalUrl(url);
     const authToken = this.authServerProvider.getToken();
     if (authToken) {
@@ -39,26 +52,24 @@ export class TrackerService {
     const socket: WebSocket = new SockJS(url);
     this.stompClient = Stomp.over(socket, { protocols: ['v12.stomp'] });
     const headers: ConnectionHeaders = {};
-    this.stompClient.connect(headers, () => {
-      this.connectionSubject.next();
 
-      this.sendActivity();
+	console.log('connect3');
+	
+	this.stompClient.connect(headers, () => {
+			console.log('connect3a');
+            this.connectedPromise('success');
+            this.connectedPromise = null;
+        });
+	
+	
 
-      this.routerSubscription = this.router.events
-        .pipe(filter((event: Event) => event instanceof NavigationEnd))
-        .subscribe(() => this.sendActivity());
-    });
+	console.log('connect4');	
   }
 
   disconnect(): void {
     this.unsubscribe();
 
     this.connectionSubject = new ReplaySubject(1);
-
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-      this.routerSubscription = null;
-    }
 
     if (this.stompClient) {
       if (this.stompClient.connected) {
@@ -76,74 +87,45 @@ export class TrackerService {
     return this.listenerFlow;
   }
   
-  subscribe(): void {
-    if (this.connectionSubscription) {
-      return;
-    }
-
-    this.connectionSubscription = this.connectionSubject.subscribe(() => {
-      if (this.stompClient) {
-        this.stompSubscription = this.stompClient.subscribe('/topic/tracker', (data: Message) => {
-          this.listenerSubject.next(JSON.parse(data.body));
-        });
-      }
-    });
-	
-  }
-  
+ 
   subscribeFlow(id, type): void {
-    if (this.connectionSubscription) {
-      return;
-    }
-
-	const topic = '/topic/' + id + '/' + type;
-	
-    this.connectionSubscription = this.connectionSubject.subscribe(() => {
-      if (this.stompClient) {
-        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
-          this.listenerSubject.next(JSON.parse(data.body));
-        });
-      }
-    });
-  }
   
-  subscribeAlert(id): void {
-    if (this.connectionSubscription) {
-      return;
-    }
+	const topic = '/topic/' + id + '/' + type;
 
-    this.connectionSubscription = this.connectionSubject.subscribe(() => {
-      if (this.stompClient) {
-        this.stompSubscription = this.stompClient.subscribe('/topic/' + id + 'alert', (data: Message) => {
-          this.listenerSubject.next(JSON.parse(data.body));
-        });
-      }
-    });
+  	console.log('subscribeFlow2 topic=' + topic);
+	  
+	//this.connection.then(() => {
+		console.log('subscribeFlow3 topic=' + topic);
+		
+		this.subscriber = this.stompClient.subscribe(topic, data => {
+			
+			console.log('subscribeFlow4 tracker data=' +data);
+			if (!this.listenerObserver) {
+				this.listenerFlow = this.createListener();
+			}
+			
+			this.listenerObserver.next(data.body);
+		});
+		
+	//});
+			
 	
-  }
+
+  }  
   
   unsubscribe(): void {
-    if (this.stompSubscription) {
-      this.stompSubscription.unsubscribe();
-      this.stompSubscription = null;
-    }
-
-    if (this.connectionSubscription) {
-      this.connectionSubscription.unsubscribe();
-      this.connectionSubscription = null;
-    }
+        if (this.subscriber !== null) {
+            this.subscriber.unsubscribe();
+        }
+        this.listenerFlow = this.createListener();
   }
 
-  private sendActivity(): void {
-    if (this.stompClient?.connected) {
-      this.stompClient.send(
-        '/topic/activity', // destination
-        JSON.stringify({ page: this.router.routerState.snapshot.url }), // body
-        {} // header
-      );
-    }
-  }
 
+
+	private createConnection(): Promise<any> {
+		return new Promise((resolve, reject) => (this.connectedPromise = resolve));
+	}
+  
   private createListener(): Observable<any> {
     return new Observable(observer => {
       this.listenerObserver = observer;

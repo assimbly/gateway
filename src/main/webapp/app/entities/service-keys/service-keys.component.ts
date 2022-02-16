@@ -3,7 +3,8 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { Service } from 'app/shared/model/service.model';
 import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -31,8 +32,8 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     constructor(
         protected serviceKeysService: ServiceKeysService,
         protected services: Services,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -166,7 +167,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             // this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
         this.mapServiceKeysKeys();
-        this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });
+		this.eventManager.broadcast(new EventWithContent('serviceKeysListModification', 'OK'));
     }
 
     private onSaveError() {
@@ -186,7 +187,10 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }
 

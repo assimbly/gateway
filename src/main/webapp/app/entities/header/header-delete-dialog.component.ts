@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
@@ -16,7 +16,7 @@ export class HeaderDeleteDialogComponent {
     errorMessage = false;
     deleteMode = true;
 
-    constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -25,11 +25,7 @@ export class HeaderDeleteDialogComponent {
     confirmDelete(id: number) {
         this.headerService.delete(id).subscribe(
             response => {
-                this.eventManager.broadcast({
-                    name: 'headerListModification',
-                    content: 'Deleted an header'
-                });
-                this.activeModal.dismiss(true);
+				this.eventManager.broadcast(new EventWithContent('headerListModification', 'Deleted an header'));
                 this.activeModal.dismiss(true);
             },
             r => this.onDeleteError(r)

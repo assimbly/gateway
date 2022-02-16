@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ITopic } from 'app/shared/model/topic.model';
@@ -24,8 +24,7 @@ export class TopicDeleteDialogComponent {
     constructor(
         protected topicService: TopicService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -46,7 +45,7 @@ export class TopicDeleteDialogComponent {
             this.disableDelete = true;
         } else {
             this.topicService.deleteTopic(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('topicListModification');
+				this.eventManager.broadcast(new EventWithContent('topicListModification', 'Deleted'));
                 this.router.navigate(['/topic']);
                 this.activeModal.dismiss(true);
             });

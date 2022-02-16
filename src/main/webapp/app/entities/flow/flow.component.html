@@ -34,7 +34,7 @@
         class="btn btn-primary"
         type="submit"
         *jhiHasAnyAuthority="'ROLE_ADMIN'"
-        [routerLink]="['../flow', 'edit-all']"
+        [routerLink]="['../flow', 'editor']"
         style="margin-right: -2em"
       >
         <span class="fa fa-plus"></span> <span>Create flow</span>
@@ -49,7 +49,7 @@
       <blockquote class="card-blockquote">
         <br />
         <p class="tab" style="margin-left: 0.3em">
-          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'edit-all']">'Create flow'</a>. For more info
+          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor']">'Create flow'</a>. For more info
           check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Wiki</a>
         </p>
       </blockquote>

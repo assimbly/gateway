@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IBroker } from 'app/shared/model/broker.model';
 
 type EntityResponseType = HttpResponse<IBroker>;
@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
-    public resourceUrl = this.applicationConfigService +'api/brokers';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
 
     private gatewayid = 1;
 

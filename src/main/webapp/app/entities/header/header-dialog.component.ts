@@ -8,7 +8,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IHeader, Header } from 'app/shared/model/header.model';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+
 import { HeaderKeysService } from '../header-keys/header-keys.service';
 import { filter } from 'rxjs/operators';
 import { HeaderPopupService } from 'app/entities/header/header-popup.service';
@@ -30,8 +32,8 @@ export class HeaderDialogComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private headerService: HeaderService,
     private headerKeysService: HeaderKeysService,
-    private jhiAlertService: JhiAlertService,
-    private eventManager: JhiEventManager,
+    private alertService: AlertService,
+    private eventManager: EventManager,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -128,9 +130,9 @@ export class HeaderDialogComponent implements OnInit {
   }
 
   private onSaveSuccess(result: IHeader, closePopup: boolean) {
-    this.eventManager.broadcast({ name: 'headerListModification', content: 'OK' });
-    this.eventManager.broadcast({ name: 'headerModified', content: result.id });
-    this.eventManager.broadcast({ name: 'headerKeysUpdated', content: result });
+	this.eventManager.broadcast(new EventWithContent('headerListModification', 'OK'));
+	this.eventManager.broadcast(new EventWithContent('headerListModification', result.id ));
+	this.eventManager.broadcast(new EventWithContent('headerListModification', result));  
     this.isSaving = false;
     this.activeModal.dismiss(result);
 
@@ -152,7 +154,10 @@ export class HeaderDialogComponent implements OnInit {
     this.isSaving = false;
   }
   private onError(error: any) {
-    this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});
   }
 }
 

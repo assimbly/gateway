@@ -26,8 +26,6 @@ import { FooterComponent } from './layouts/footer/footer.component';
 import { PageRibbonComponent } from './layouts/profiles/page-ribbon.component';
 import { ErrorComponent } from './layouts/error/error.component';
 
-import { NgJhipsterModule } from 'ng-jhipster';
-import moment from 'moment';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 
@@ -38,11 +36,6 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
     HomeModule,
     NgSelectModule,
     NgxWebstorageModule.forRoot({ prefix: 'jhi', separator: '-' }),
-    NgJhipsterModule.forRoot({
-      // set below to true to make alerts look like toast
-      alertAsToast: false,
-      alertTimeout: 5000,
-    }),
     PopoverModule.forRoot(),
     // jhipster-needle-angular-add-module JHipster will add new module here
 	EntityRoutingModule,

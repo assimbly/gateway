@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { IService } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 
@@ -19,8 +18,7 @@ export class ServiceDeleteDialogComponent {
     constructor(
         protected serviceService: ServiceService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService
+        protected eventManager: EventManager,
     ) {}
 
     clear() {
@@ -30,10 +28,7 @@ export class ServiceDeleteDialogComponent {
     confirmDelete(id: number) {
         this.serviceService.delete(id).subscribe(
             response => {
-                this.eventManager.broadcast({
-                    name: 'serviceListModification',
-                    content: 'Deleted an service'
-                });
+			    this.eventManager.broadcast(new EventWithContent('serviceListModification', 'Deleted an service'));
                 this.activeModal.dismiss(true);
             },
             r => this.onDeleteError(r)

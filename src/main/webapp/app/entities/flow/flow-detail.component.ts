@@ -11,7 +11,7 @@ import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { forkJoin } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -40,7 +40,7 @@ export class FlowDetailComponent implements OnInit {
   constructor(
     protected gatewayService: GatewayService,
     protected endpointService: EndpointService,
-    protected eventManager: JhiEventManager,
+    protected eventManager: EventManager,
     protected flowService: FlowService,
     protected activatedRoute: ActivatedRoute,
     public components: Components

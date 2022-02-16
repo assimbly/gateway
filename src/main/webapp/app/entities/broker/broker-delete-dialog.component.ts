@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
@@ -14,7 +14,7 @@ import { BrokerService } from './broker.service';
 export class BrokerDeleteDialogComponent {
     broker: IBroker;
 
-    constructor(protected brokerService: BrokerService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected brokerService: BrokerService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -22,10 +22,7 @@ export class BrokerDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.brokerService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'brokerListModification',
-                content: 'Deleted an broker'
-            });
+			this.eventManager.broadcast(new EventWithContent('brokerListModification', 'Deleted an broker'));
             this.activeModal.dismiss(true);
         });
     }

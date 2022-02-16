@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { EndpointService } from './endpoint.service';
@@ -17,7 +17,7 @@ export class EndpointDeleteDialogComponent {
     constructor(
         protected endpointService: EndpointService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager
+        protected eventManager: EventManager
     ) {}
 
     clear() {
@@ -26,10 +26,7 @@ export class EndpointDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.endpointService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'endpointListModification',
-                content: 'Deleted an endpoint'
-            });
+			this.eventManager.broadcast(new EventWithContent('endpointListModification', 'Deleted an endpoint'));
             this.activeModal.dismiss(true);
         });
     }

@@ -2,8 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { TopicService } from './topic.service';
-import { SecurityService } from 'app/entities/security/security.service';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, Observer, Subscription } from 'rxjs';
@@ -31,10 +30,9 @@ export class TopicRowComponent implements OnInit, OnDestroy {
 
   constructor(
     private topicService: TopicService,
-    private securityService: SecurityService,
     private modalService: NgbModal,
     private router: Router,
-    private eventManager: JhiEventManager
+    private eventManager: EventManager
   ) {
     this.listener = this.createListener();
 
@@ -63,11 +61,11 @@ export class TopicRowComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.address = address;
     modalRef.result.then(
       result => {
-        this.eventManager.broadcast({ name: 'topicDeleted', content: this.address });
+		this.eventManager.broadcast(new EventWithContent('topicDeleted', this.address));
         modalRef = null;
       },
       reason => {
-        this.eventManager.broadcast({ name: 'topicDeleted', content: this.address });
+		this.eventManager.broadcast(new EventWithContent('topicDeleted', this.address));
         modalRef = null;
       }
     );

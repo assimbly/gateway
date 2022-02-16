@@ -2,8 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
-import { SecurityService } from 'app/entities/security/security.service';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, Observer, Subscription } from 'rxjs';
@@ -31,10 +30,9 @@ export class QueueRowComponent implements OnInit, OnDestroy {
 
   constructor(
     private queueService: QueueService,
-    private securityService: SecurityService,
     private modalService: NgbModal,
     private router: Router,
-    private eventManager: JhiEventManager
+    private eventManager: EventManager
   ) {
     this.listener = this.createListener();
 
@@ -63,11 +61,11 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.address = address;
     modalRef.result.then(
       result => {
-        this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
         modalRef = null;
       },
       reason => {
-        this.eventManager.broadcast({ name: 'queueDeleted', content: this.address });
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
         modalRef = null;
       }
     );

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
 type EntityResponseType = HttpResponse<IHeaderKeys>;
@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IHeaderKeys[]>;
 
 @Injectable({ providedIn: 'root' })
 export class HeaderKeysService {
-    public resourceUrl = this.applicationConfigService +'api/header-keys';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/header-keys');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

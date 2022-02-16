@@ -35,7 +35,7 @@ export const flowRoute: Routes = [
     component: FlowComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -44,34 +44,34 @@ export const flowRoute: Routes = [
     component: FlowMessageSenderComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'flow/edit-all',
+    path: 'flow/editor',
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'flow/edit-all/:id',
+    path: 'flow/editor/:id',
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'flow/edit-all/:id/:clone',
+    path: 'flow/editor/:id/:clone',
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -83,7 +83,7 @@ export const flowRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -95,7 +95,7 @@ export const flowRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -110,7 +110,7 @@ export const flowPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Flows',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

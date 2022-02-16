@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import { JhiAlertService } from 'ng-jhipster';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { MaintenanceService } from './maintenance.service';
@@ -25,7 +25,7 @@ export class MaintenanceUpdateComponent implements OnInit {
   duration: string;
 
   constructor(
-    protected jhiAlertService: JhiAlertService,
+    protected alertService: AlertService,
     protected maintenanceService: MaintenanceService,
     protected flowService: FlowService,
     protected activatedRoute: ActivatedRoute
@@ -62,9 +62,9 @@ export class MaintenanceUpdateComponent implements OnInit {
 
   save() {
     this.isSaving = true;
-    this.maintenance.startTime = this.startTime != null ? moment(this.startTime, DATE_TIME_FORMAT) : null;
-    this.maintenance.endTime = this.endTime != null ? moment(this.endTime, DATE_TIME_FORMAT) : null;
-    this.maintenance.duration = this.duration != null ? moment(this.duration, DATE_TIME_FORMAT) : null;
+    this.maintenance.startTime = this.startTime != null ? dayjs(this.startTime, DATE_TIME_FORMAT) : null;
+    this.maintenance.endTime = this.endTime != null ? dayjs(this.endTime, DATE_TIME_FORMAT) : null;
+    this.maintenance.duration = this.duration != null ? dayjs(this.duration, DATE_TIME_FORMAT) : null;
     if (this.maintenance.id !== undefined) {
       this.subscribeToSaveResponse(this.maintenanceService.update(this.maintenance));
     } else {
@@ -89,7 +89,10 @@ export class MaintenanceUpdateComponent implements OnInit {
   }
 
   protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+    this.alertService.addAlert({
+              type: 'danger',
+              message: errorMessage,
+            });
   }
 
   trackFlowById(index: number, item: IFlow) {

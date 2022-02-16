@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { EndpointService } from './endpoint.service';
 import { IFlow } from 'app/shared/model/flow.model';
@@ -28,7 +27,7 @@ export class EndpointUpdateComponent implements OnInit {
     headers: IHeader[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+        protected alertService: AlertService,
         protected endpointService: EndpointService,
         protected flowService: FlowService,
         protected serviceService: ServiceService,
@@ -109,7 +108,10 @@ export class EndpointUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackFlowById(index: number, item: IFlow) {

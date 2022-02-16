@@ -33,11 +33,12 @@ export class AccountService {
     if (!identity) {
       this.accountCache$ = null;
     }
+	/*
     if (identity) {
       this.trackerService.connect();
     } else {
       this.trackerService.disconnect();
-    }
+    }*/
   }
 
   hasAnyAuthority(authorities: string[] | string): boolean {

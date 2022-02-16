@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IGateway } from 'app/shared/model/gateway.model';
 
 type EntityResponseType = HttpResponse<IGateway>;
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IGateway[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GatewayService {
-    public resourceUrl = this.applicationConfigService +'api/gateways';
-    public environmentUrl = this.applicationConfigService +'api/environment';
-    public integrationUrl = this.applicationConfigService +'api/integration';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/gateways');
+    public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
+    public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
@@ -39,7 +39,7 @@ export class GatewayService {
     }
 
     query(req?: any): Observable<EntityArrayResponseType> {
-        const options = createRequestOption(req);
+		const options = createRequestOption(req);
         return this.http.get<IGateway[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 

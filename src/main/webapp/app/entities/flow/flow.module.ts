@@ -8,11 +8,6 @@ import { ServiceModule } from '../../entities/service/service.module';
 import { HeaderModule } from '../../entities/header/header.module';
 import { RouteModule } from '../../entities/route/route.module';
 import { MaintenanceModule } from '../../entities/maintenance/maintenance.module';
-import { SecurityModule } from '../../entities/security/security.module';
-import { AceModule } from 'ngx-ace-wrapper';
-import { ACE_CONFIG } from 'ngx-ace-wrapper';
-import { AceConfigInterface } from 'ngx-ace-wrapper';
-// import { AceEditorModule } from 'ng2-ace-editor';
 import { CommonModule } from '@angular/common';
 
 import { FlowComponent } from './flow.component';
@@ -36,19 +31,15 @@ import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
 
 const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
-const DEFAULT_ACE_CONFIG: AceConfigInterface = {};
 
 @NgModule({
   imports: [
     SharedModule,
     EndpointModule,
     ServiceModule,
-    SecurityModule,
     HeaderModule,
     RouteModule,
     MaintenanceModule,
-    // AceEditorModule,
-    AceModule,
     RouterModule.forChild(ENTITY_STATES),
     NgbModule,
     NgSelectModule,

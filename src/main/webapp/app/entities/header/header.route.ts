@@ -36,7 +36,7 @@ export const headerRoute: Routes = [
     component: HeaderAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -45,7 +45,7 @@ export const headerRoute: Routes = [
     component: HeaderAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -57,7 +57,7 @@ export const headerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -69,7 +69,7 @@ export const headerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -81,7 +81,7 @@ export const headerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -93,7 +93,7 @@ export const headerPopupRoute: Routes = [
     component: HeaderPopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -103,7 +103,7 @@ export const headerPopupRoute: Routes = [
     component: HeaderPopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -116,7 +116,7 @@ export const headerPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

@@ -3,7 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { IService } from 'app/shared/model/service.model';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceService } from './service.service';
@@ -36,8 +37,8 @@ export class ServiceUpdateComponent implements OnInit {
     protected serviceService: ServiceService,
     protected serviceKeysService: ServiceKeysService,
     public services: Services,
-    protected eventManager: JhiEventManager,
-    protected jhiAlertService: JhiAlertService,
+    protected eventManager: EventManager,
+    protected alertService: AlertService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router
   ) {}
@@ -136,9 +137,8 @@ export class ServiceUpdateComponent implements OnInit {
   }
 
   protected onSaveSuccess(result: IService) {
-    this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK' });
-    // this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
-    // this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
+    this.eventManager.broadcast(new EventWithContent('serviceListModification', 'OK'));
+    
     this.isSaving = false;
 
     this.serviceKeysRemoveList.forEach(skrl => {
@@ -163,7 +163,10 @@ export class ServiceUpdateComponent implements OnInit {
   }
 
   private onError(error: any) {
-    this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});
   }
 
   protected onSaveError() {

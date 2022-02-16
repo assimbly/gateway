@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { JhiDataUtils } from 'ng-jhipster';
+import { DataUtils } from 'app/core/util/data-util.service';
 
 import { IRoute } from 'app/shared/model/route.model';
 
@@ -11,7 +11,7 @@ import { IRoute } from 'app/shared/model/route.model';
 export class RouteDetailComponent implements OnInit {
     route: IRoute | null = null;
 
-    constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
+    constructor(protected dataUtils: DataUtils, protected activatedRoute: ActivatedRoute) {}
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ route }) => (this.route = route));

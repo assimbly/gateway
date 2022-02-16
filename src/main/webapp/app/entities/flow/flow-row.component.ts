@@ -5,14 +5,13 @@ import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.
 
 import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
 import { EndpointService } from '../endpoint/endpoint.service';
-import { SecurityService } from 'app/entities/security/security.service';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { NavigationEnd, Router } from '@angular/router';
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
+
 import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
 
 import { TrackerService } from 'app/core/tracker/tracker.service';
 import { TrackerActivity } from 'app/core/tracker/tracker-activity.model';
@@ -93,10 +92,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   constructor(
     private flowService: FlowService,
     private endpointService: EndpointService,
-    private securityService: SecurityService,
     private modalService: NgbModal,
     private router: Router,
-    private eventManager: JhiEventManager,
+    private eventManager: EventManager,
 	private trackerService: TrackerService
   ) {
     this.listener = this.createListener();
@@ -128,6 +126,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 	this.trackerService.subscribeFlow(this.flow.id,'event');
 	
     this.subscription = this.trackerService.receiveFlow().subscribe(data => {
+	
+		console.log('websocket data=' + data)
       const data2 = data.split(':');
 
       if (Array.isArray(data2) || data2.length) {
@@ -303,10 +303,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   navigateToFlow(action: string) {
     switch (action) {
       case 'edit':
-        this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'edit' }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: 'edit' }]);
         break;
       case 'clone':
-        this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'clone' }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: 'clone' }]);
         break;
       case 'delete':
         let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
@@ -330,7 +330,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToEndpoint(endpoint: Endpoint) {
-    this.router.navigate(['../../flow/edit-all', this.flow.id], { queryParams: { mode: 'edit', endpointid: endpoint.id } });
+    this.router.navigate(['../../flow/editor', this.flow.id], { queryParams: { mode: 'edit', endpointid: endpoint.id } });
   }
 
   getFlowLastError(id: number, action: string, errMessage: string) {
@@ -385,8 +385,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   getFlowDetails() {
-    const createdFormatted = moment(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
-    const lastModifiedFormatted = moment(this.flow.lastModified).format('YYYY-MM-DD HH:mm:ss');
+    const createdFormatted = dayjs(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
+    const lastModifiedFormatted = dayjs(this.flow.lastModified).format('YYYY-MM-DD HH:mm:ss');
 
     this.flowDetails = `
 
@@ -432,9 +432,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     if (res === 0) {
       this.flowStatistic = `Currently there are no statistics for this flow.`;
     } else {
-      const now = moment(new Date());
-      const start = moment(res.stats.startTimestamp);
-      const flowRuningTime = moment.duration(now.diff(start));
+      const now = dayjs();
+      const start = dayjs(res.stats.startTimestamp);
+      const flowRuningTime = dayjs.duration(now.diff(start));
       const hours = Math.floor(flowRuningTime.asHours());
       const minutes = flowRuningTime.minutes();
       const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
@@ -524,7 +524,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   checkDate(r) {
     if (r) {
-      return moment(r).format('YYYY-MM-DD HH:mm:ss');
+      return dayjs(r).format('YYYY-MM-DD HH:mm:ss');
     } else {
       return '-';
     }
@@ -613,12 +613,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   curentDateTime(): string {
-    return moment().format('YYYY-MM-DD HH:mm:ss');
+    return dayjs().format('YYYY-MM-DD HH:mm:ss');
   }
 
   registerTriggeredAction() {
     this.eventManager.subscribe('trigerAction', response => {
-      switch (response.content) {
+      switch (response) {
         case 'start':
           if (this.statusFlow === Status.inactive) {
             this.start();

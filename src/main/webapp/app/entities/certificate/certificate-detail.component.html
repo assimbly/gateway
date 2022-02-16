@@ -1,0 +1,45 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="certificate">
+            <h2><span>Certificate</span> {{certificate.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Url</span></dt>
+                <dd>
+                    <span>{{certificate.url}}</span>
+                </dd>
+                <dt><span>Certificate Store</span></dt>
+                <dd>
+                    <span>{{certificate.certificateStore}}</span>
+                </dd>
+                <dt><span>Certificate Name</span></dt>
+                <dd>
+                    <span>{{certificate.certificateName}}</span>
+                </dd>
+                <dt><span>Certificate Expiry</span></dt>
+                <dd>
+                    <span>{{certificate.certificateExpiry}}</span>
+                </dd>
+                <dt><span>Details</span></dt>
+                <dd>
+                    <span>{{certificatieType}}</span>
+                </dd>
+                <dd>
+                    <span>{{SigningAlgorithm}}</span>
+                </dd>
+                <dd>
+                    <span>{{IssuerDNPrincipal}}</span>
+                </dd>
+                <dd>
+                    <span>{{SubjectDNPrincipal}}</span>
+                </dd>
+            </dl>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
+        </div>
+    </div>
+</div>

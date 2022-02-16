@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
@@ -31,11 +32,7 @@ import { ServiceDialogComponent } from 'app/entities/service/service-dialog.comp
 import { HeaderPopupService } from 'app/entities/header/header-popup.service';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
 
-import moment from 'moment';
-
-import 'brace';
-import 'brace/mode/text';
-import 'brace/theme/eclipse';
+import dayjs from 'dayjs/esm';
 
 @Component({
     selector: 'jhi-flow-message-sender',
@@ -146,13 +143,13 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     modalRef: NgbModalRef | null;
 
     constructor(
-        private eventManager: JhiEventManager,
+        private eventManager: EventManager,
         private gatewayService: GatewayService,
         private flowService: FlowService,
         private endpointService: EndpointService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         private route: ActivatedRoute,
         private router: Router,
         public components: Components,
@@ -778,7 +775,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        this.jhiAlertService.success('Send successfully', null, null);
+		this.alertService.addAlert({
+		  type: 'success',
+		  message: 'Send successfully',
+		});  
         setTimeout(() => {
             this.isSending = false;
         }, 1000);
@@ -793,7 +793,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     handleSendError(body: any) {
         this.isSending = false;
-        this.jhiAlertService.error('Send failed', null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: 'Send failed',
+		});  
         this.responseBody = body;
         this.active = '1';
     }
@@ -837,7 +840,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setVersion() {
-        const now = moment();
+        const now = dayjs();
     }
 
     // Get currrent scroll position
@@ -922,7 +925,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     private onSaveSuccess(result: Flow) {
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
+	    this.eventManager.broadcast(new EventWithContent('flowListModification', 'OK'));
         this.isSaving = false;
     }
 
@@ -931,6 +934,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});  
     }
 }
