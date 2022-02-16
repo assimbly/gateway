@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription, from } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
@@ -32,7 +34,7 @@ import { HeaderDialogComponent } from 'app/entities/header/header-dialog.compone
 import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
 import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
 
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 
 @Component({
   selector: 'jhi-flow-editor',
@@ -156,14 +158,14 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
   modalRef: NgbModalRef | null;
 
   constructor(
-    private eventManager: JhiEventManager,
+    private eventManager: EventManager,
     private gatewayService: GatewayService,
     private flowService: FlowService,
     private endpointService: EndpointService,
     private headerService: HeaderService,
     private routeService: RouteService,
     private serviceService: ServiceService,
-    private jhiAlertService: JhiAlertService,
+    private alertService: AlertService,
     private route: ActivatedRoute,
     private router: Router,
     public servicesList: Services,
@@ -1320,7 +1322,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
   }
 
   setVersion() {
-    const now = moment();
+    const now = dayjs();
 
     if (this.flow.id) {
       this.flow.version = this.flow.version + 1;
@@ -1384,7 +1386,7 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
   }
 
   private onSaveSuccess(result: Flow) {
-    this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
+    this.eventManager.broadcast(new EventWithContent('flowListModification', 'OK'));
     this.isSaving = false;
   }
 
@@ -1393,7 +1395,10 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
   }
 
   private onError(error) {
-    this.jhiAlertService.error(error.message, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});  
   }
 
   private decycle(obj, stack = []) {

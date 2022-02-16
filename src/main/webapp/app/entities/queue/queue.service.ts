@@ -7,7 +7,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
-import { WindowRef } from 'app/shared';
+import { WindowRef } from 'app/shared/window/window.service';
 
 import { IQueue } from 'app/shared/model/queue.model';
 import { IRootQueueAddress } from 'app/shared/model/address.model';
@@ -20,8 +20,8 @@ type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
-  public queuesResourceUrl = this.applicationConfigService +'api/queues';
-  public brokersResourceUrl = this.applicationConfigService +'api/brokers';
+  public queuesResourceUrl = this.applicationConfigService.getEndpointFor('api/queues');
+  public brokersResourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
 
   brokerType: string;
 

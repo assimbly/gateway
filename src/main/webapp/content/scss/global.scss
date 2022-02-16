@@ -1,6 +1,8 @@
 @import 'bootstrap-variables';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
+@import '~@ng-select/ng-select/scss/default.theme';
+
 
 /* ==============================================================
 Bootstrap tweaks
@@ -201,6 +203,7 @@ ui bootstrap tweaks
 
 /* ========================================================================== custom assimbly css ========================================================================== */
 
+
 #fromTab.active,
 #toTab.active,
 #toTab0.active,
@@ -253,24 +256,9 @@ ui bootstrap tweaks
   border-bottom-left-radius: 0;
 }
 
-.input-group {
-  ng-select {
-    flex: 1 1 auto;
-  }
-
-  .ng-select-container {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-}
-
 .right-border-radius-0 {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-}
-
-.ng-select.ng-select-single .ng-select-container {
-  height: 38px;
 }
 
 .assimbly-link {
@@ -302,6 +290,26 @@ ui bootstrap tweaks
   width: 50px;
   height: 50px;
   vertical-align: text-bottom;
+}
+
+.input-group {
+  ng-select {
+    flex: 1 1 auto;
+  }
+
+  .ng-select-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 38px;
+}
+
+ng-dropdown-panel > div {
+  position: relative;
+  z-index: 100;
 }
 
 .popover {
@@ -544,11 +552,6 @@ ui bootstrap tweaks
 .increase-popover-width {
   width: 1200px;
   max-width: 1200px;
-}
-
-ng-select select-dropdown > div {
-  position: relative;
-  z-index: 100;
 }
 
 .dropdown-toggle::after {

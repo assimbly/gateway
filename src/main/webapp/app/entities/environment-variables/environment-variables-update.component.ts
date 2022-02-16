@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
@@ -24,10 +24,9 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     private allEnvironmentVariablesKeys: Array<string> = [];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+        protected alertService: AlertService,
         protected environmentVariablesService: EnvironmentVariablesService,
         protected gatewayService: GatewayService,
-        protected eventManager: JhiEventManager,
         protected activatedRoute: ActivatedRoute,
         protected router: Router
     ) {}
@@ -135,7 +134,11 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+   		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
+
     }
 
     trackGatewayById(index: number, item: IGateway) {

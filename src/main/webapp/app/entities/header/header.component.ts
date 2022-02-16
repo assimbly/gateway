@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
 import { IHeader } from 'app/shared/model/header.model';
@@ -27,8 +28,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     constructor(
         protected headerService: HeaderService,
         protected headerKeysService: HeaderKeysService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -51,9 +52,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         if (this.headerKey !== undefined) {
-            this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(res.content));
+            this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(parseInt(res.toString())));
         } else {
-            this.eventManager.subscribe('headerKeyDeleted', res => res.content);
+            this.eventManager.subscribe('headerKeyDeleted', res => res);
         }
         this.registerChangeInHeaders();
         this.selectOption();
@@ -96,6 +97,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

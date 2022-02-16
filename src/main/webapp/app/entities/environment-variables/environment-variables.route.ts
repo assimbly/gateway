@@ -34,7 +34,7 @@ export const environmentVariablesRoute: Routes = [
     component: EnvironmentVariablesComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'EnvironmentVariables',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -46,7 +46,7 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'EnvironmentVariables',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -58,7 +58,7 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'EnvironmentVariables',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -70,7 +70,7 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'EnvironmentVariables',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -85,7 +85,7 @@ export const environmentVariablesPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'EnvironmentVariables',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

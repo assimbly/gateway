@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
@@ -13,13 +13,7 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Components } from '../../shared/camel/component-type';
 
-import moment from 'moment';
-
-import * as ace from 'ace-builds';
-import 'brace';
-import 'brace/mode/text';
-import 'brace/mode/json';
-import 'brace/theme/eclipse';
+import dayjs from 'dayjs/esm';
 
 @Component({
     selector: 'jhi-broker-message-sender',
@@ -93,10 +87,9 @@ export class BrokerMessageSenderComponent implements OnInit {
     modalRef: NgbModalRef | null;
 
     constructor(
-        private eventManager: JhiEventManager,
         private gatewayService: GatewayService,
         private brokerService: BrokerService,
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         public components: Components,
@@ -113,10 +106,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     public ngAfterViewInit(): void {
-        this.editor.nativeElement.focus();
-        const aceEditor = ace.edit(this.editor.nativeElement);
-        aceEditor.focus();
-        aceEditor.moveCursorTo(1, 1);
+        //this.editor.nativeElement.focus();        
     }
 
     load() {
@@ -346,7 +336,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        const now = moment();
+        const now = dayjs();
         this.dateTime = new Date().toLocaleString();
 
         this.isSuccessful = true;
@@ -382,7 +372,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     }
 
     setVersion() {
-        const now = moment();
+        const now = dayjs();
     }
 
     setBrokerType() {
@@ -449,8 +439,11 @@ export class BrokerMessageSenderComponent implements OnInit {
         reader.readAsText(file);
     }
 
-    onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+    onError(errorMessage) {
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     openFile(event) {

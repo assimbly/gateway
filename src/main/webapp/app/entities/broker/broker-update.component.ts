@@ -8,11 +8,6 @@ import { BrokerService } from './broker.service';
 
 import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broker-configuration';
 
-// import 'brace';
-// import 'brace/mode/xml';
-// import 'brace/theme/eclipse';
-// import { AceConfigInterface } from 'ngx-ace-wrapper/dist';
-
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html'
@@ -30,13 +25,6 @@ export class BrokerUpdateComponent implements OnInit {
     typePopoverMessage: string;
     configurationTypePopoverMessage: string;
     brokerConfigurationPopoverMessage: string;
-
-    /*
-    public config: AceConfigInterface = {
-        mode: 'xml',
-        theme: 'eclipse'
-    };
-	*/
 
     constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {}
 

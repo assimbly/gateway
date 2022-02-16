@@ -66,7 +66,7 @@ public class CacheConfiguration {
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows");
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".maintenances");
-            createCache(cm, org.assimbly.gateway.domain.Security.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Certificate.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Group.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".gateways");
             createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".users");

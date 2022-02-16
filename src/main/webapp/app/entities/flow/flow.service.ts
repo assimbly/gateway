@@ -4,10 +4,10 @@ import { Observable, Observer, Subscription } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
-import { WindowRef } from 'app/shared';
+import { WindowRef } from 'app/shared/window/window.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
@@ -17,9 +17,9 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
 @Injectable({ providedIn: 'root' })
 export class FlowService {
-  public resourceUrl = this.applicationConfigService +'api/flows';
-  public integrationUrl = this.applicationConfigService +'api/integration';
-  public environmentUrl = this.applicationConfigService +'api/environment';
+  public resourceUrl = this.applicationConfigService.getEndpointFor('api/flows');
+  public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
+  public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
 
   private gatewayid = 1;
 
@@ -140,17 +140,17 @@ export class FlowService {
   }
 
   getWikiDocUrl(): Observable<HttpResponse<any>> {
-	const url = this.applicationConfigService + '/api/wiki-url';
+	const url = this.applicationConfigService.getEndpointFor('/api/wiki-url');
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getCamelDocUrl(): Observable<HttpResponse<any>> {
-    const url = this.applicationConfigService + '/api/camel-url';
+    const url = this.applicationConfigService.getEndpointFor('/api/camel-url');
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getGatewayName(): Observable<HttpResponse<any>> {
-	const url = this.applicationConfigService + '/api/gateway-name';
+	const url = this.applicationConfigService.getEndpointFor('/api/gateway-name');
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 

@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { WindowRef } from 'app/shared/window/window.service';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -38,8 +39,8 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   constructor(
     protected maintenanceService: MaintenanceService,
     protected flowService: FlowService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
     this.page = 0;
@@ -90,7 +91,10 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
   }
 
   protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+	this.alertService.addAlert({
+	  type: 'danger',
+	  message: errorMessage,
+	});
   }
 
   setMaintenance() {
@@ -123,7 +127,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
         if (this.timeLeft[i] < 0) {
           this.clearInterval(i);
         } else {
-          this.maintenanceTimers[i] = moment.utc(this.timeLeft[i]).format('HH[h] mm[min] ss[sec]');
+          this.maintenanceTimers[i] = dayjs(this.timeLeft[i]).format('HH[h] mm[min] ss[sec]');
         }
       }, 1000);
     });

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
@@ -21,9 +20,7 @@ export class DeploymentComponent implements OnInit {
   url: String;
   constructor(
     private router: Router,
-    protected eventManager: JhiEventManager,
     protected gatewayService: GatewayService,
-    protected jhiAlertService: JhiAlertService,
     protected flowService: FlowService
   ) {}
 

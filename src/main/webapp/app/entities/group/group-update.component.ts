@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IGroup } from 'app/shared/model/group.model';
 import { GroupService } from './group.service';
 import { IGateway } from 'app/shared/model/gateway.model';
@@ -24,7 +23,7 @@ export class GroupUpdateComponent implements OnInit {
   users: IUser[];
 
   constructor(
-    protected jhiAlertService: JhiAlertService,
+    protected alertService: AlertService,
     protected groupService: GroupService,
     protected gatewayService: GatewayService,
     protected userService: UserService,
@@ -80,7 +79,10 @@ export class GroupUpdateComponent implements OnInit {
   }
 
   protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+	this.alertService.addAlert({
+	  type: 'danger',
+	  message: errorMessage,
+	});
   }
 
   trackGatewayById(index: number, item: IGateway) {

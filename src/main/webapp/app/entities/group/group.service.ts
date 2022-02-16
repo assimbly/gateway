@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IGroup } from 'app/shared/model/group.model';
 
 type EntityResponseType = HttpResponse<IGroup>;
@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IGroup[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
-    public resourceUrl = this.applicationConfigService +'api/groups';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/groups');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 

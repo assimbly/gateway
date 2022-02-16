@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderKeysService } from './header-keys.service';
 import { IHeader } from 'app/shared/model/header.model';
@@ -20,7 +19,7 @@ export class HeaderKeysUpdateComponent implements OnInit {
     headers: IHeader[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+		protected alertService: AlertService,
         protected headerKeysService: HeaderKeysService,
         protected headerService: HeaderService,
         protected activatedRoute: ActivatedRoute
@@ -69,7 +68,10 @@ export class HeaderKeysUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackHeaderById(index: number, item: IHeader) {

@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { Observable } from 'rxjs';
 
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
@@ -27,8 +28,8 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     constructor(
         protected headerKeysService: HeaderKeysService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -43,7 +44,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(res.content));
+        this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(parseInt(res.toString())));
     }
 
     updateHeaderKeys(id: number) {
@@ -101,7 +102,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         } else {
             // this.headerKeys.find(k => k.id === result.id).isDisabled = true;
         }
-        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK' });
+	    this.eventManager.broadcast(new EventWithContent('headerKeysUpdated', 'OK'));
     }
 
     private onSaveError() {
@@ -142,6 +143,9 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

@@ -1,10 +1,10 @@
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 
 export interface IMaintenance {
     id?: number;
-    startTime?: moment.Moment;
-    endTime?: moment.Moment;
-    duration?: moment.Moment;
+    startTime?: dayjs.Dayjs;
+    endTime?: dayjs.Dayjs;
+    duration?: dayjs.Dayjs;
     frequency?: string;
     flowId?: number;
 }
@@ -12,9 +12,9 @@ export interface IMaintenance {
 export class Maintenance implements IMaintenance {
     constructor(
         public id?: number,
-        public startTime?: moment.Moment,
-        public endTime?: moment.Moment,
-        public duration?: moment.Moment,
+        public startTime?: dayjs.Dayjs,
+        public endTime?: dayjs.Dayjs,
+        public duration?: dayjs.Dayjs,
         public frequency?: string,
         public flowId?: number
     ) {}

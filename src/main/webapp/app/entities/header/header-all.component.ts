@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
@@ -21,8 +22,8 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
 
   constructor(
     protected headerService: HeaderService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
     this.page = 0;
@@ -75,6 +76,9 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
   }
 
   private onError(error) {
-    this.jhiAlertService.error(error.message, null, null);
+            this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});
   }
 }

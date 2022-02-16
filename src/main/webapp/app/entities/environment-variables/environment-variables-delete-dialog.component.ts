@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
@@ -17,7 +17,7 @@ export class EnvironmentVariablesDeleteDialogComponent {
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager
+        protected eventManager: EventManager
     ) {}
 
     clear() {
@@ -26,10 +26,7 @@ export class EnvironmentVariablesDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.environmentVariablesService.delete(id).subscribe(response => {
-            this.eventManager.broadcast({
-                name: 'environmentVariablesListModification',
-                content: 'Deleted an environmentVariables'
-            });
+		    this.eventManager.broadcast(new EventWithContent('environmentVariablesListModification', 'Deleted an environmentVariables'));
             this.activeModal.dismiss(true);
         });
     }

@@ -34,7 +34,7 @@ export const serviceKeysRoute: Routes = [
     component: ServiceKeysComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'ServiceKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -46,7 +46,7 @@ export const serviceKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'ServiceKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -58,7 +58,7 @@ export const serviceKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'ServiceKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -70,7 +70,7 @@ export const serviceKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'ServiceKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -85,7 +85,7 @@ export const serviceKeysPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'ServiceKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

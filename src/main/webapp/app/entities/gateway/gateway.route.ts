@@ -36,7 +36,7 @@ export const gatewayRoute: Routes = [
     component: GatewayComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -48,7 +48,7 @@ export const gatewayRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -60,7 +60,7 @@ export const gatewayRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -72,7 +72,7 @@ export const gatewayRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -87,7 +87,7 @@ export const gatewayPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -100,7 +100,7 @@ export const gatewayPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -113,7 +113,7 @@ export const gatewayPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Gateways',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Router } from '@angular/router';
 
 import { IQueue } from 'app/shared/model/queue.model';
@@ -24,8 +24,7 @@ export class QueueClearDialogComponent {
     constructor(
         protected queueService: QueueService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -43,7 +42,7 @@ export class QueueClearDialogComponent {
             // this.disableClear = true;
         } else {
             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'cleared'));			
                 this.address.numberOfMessages = 0;
                 this.router.navigate(['/queue']);
                 this.activeModal.dismiss(true);

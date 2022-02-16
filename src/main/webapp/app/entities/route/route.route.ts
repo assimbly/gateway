@@ -42,7 +42,7 @@ export const routeRoute: Routes = [
     component: RouteComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Routes',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -54,7 +54,7 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Routes',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -66,7 +66,7 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Routes',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -78,7 +78,7 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Routes',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },

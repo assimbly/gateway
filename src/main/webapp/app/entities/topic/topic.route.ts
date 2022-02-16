@@ -14,7 +14,7 @@ import { TopicDeletePopupComponent } from './topic-delete-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class TopicResolve implements Resolve<ITopic> {
-  constructor(private service: TopicService, private router: Router) {}
+  constructor(private service: TopicService, private router: Router) {}s
 
   resolve(route: ActivatedRouteSnapshot): Observable<ITopic> | Observable<never> {
     const id = route.params['id'];
@@ -40,7 +40,7 @@ export const topicRoute: Routes = [
     component: TopicComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Topics',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -52,7 +52,7 @@ export const topicRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Topics',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -64,7 +64,7 @@ export const topicRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Topics',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -76,7 +76,7 @@ export const topicRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Topics',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -91,7 +91,7 @@ export const topicPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Topics',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

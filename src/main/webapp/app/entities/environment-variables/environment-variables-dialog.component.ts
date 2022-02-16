@@ -4,7 +4,9 @@ import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+
 import { filter, map } from 'rxjs/operators';
 import { EnvironmentVariablesService } from './environment-variables.service';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
@@ -27,10 +29,10 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
 
     constructor(
         public activeModal: NgbActiveModal,
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         private environmentVariablesService: EnvironmentVariablesService,
         private gatewayService: GatewayService,
-        private eventManager: JhiEventManager,
+        private eventManager: EventManager,
         private route: ActivatedRoute
     ) {}
 
@@ -130,8 +132,11 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         this.isSaving = false;
     }
 
-    private onError(error: any) {
-        this.jhiAlertService.error(error.message, null, null);
+    private onError(errorMessage: any) {
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackGatewayById(index: number, item: IGateway) {

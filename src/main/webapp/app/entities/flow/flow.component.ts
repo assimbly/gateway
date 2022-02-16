@@ -1,7 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin } from 'rxjs';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+
+import { ParseLinks } from 'app/core/util/parse-links.service';
+import { AlertService } from 'app/core/util/alert.service';
+
 import { Router } from '@angular/router';
 
 import { IFlow } from 'app/shared/model/flow.model';
@@ -11,7 +15,10 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { SecurityService } from 'app/entities/security/security.service';
+
+import { TrackerService } from 'app/core/tracker/tracker.service';
+import { TrackerActivity } from 'app/core/tracker/tracker-activity.model';
+
 
 @Component({
   selector: 'jhi-flow',
@@ -49,13 +56,13 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   constructor(
     protected flowService: FlowService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
-    protected parseLinks: JhiParseLinks,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
+    protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected gatewayService: GatewayService,
-    protected securityService: SecurityService,
-    protected router: Router
+    protected router: Router,
+	private trackerService: TrackerService
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -114,6 +121,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.getGateways();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
+	  this.trackerService.connect();
     });
     this.finished = true;
     this.registerChangeInFlows();
@@ -123,7 +131,8 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   ngAfterViewInit() {
     this.finished = true;
-    // this.securityService.syncTrustore().subscribe(res => {});
+	// Uncomment when to sync local certifcates in keystore.jks with certificates in the database
+    // this.certificateService.syncTrustore().subscribe(res => {});
   }
 
   ngOnDestroy() {
@@ -220,7 +229,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlow() {
-    this.router.navigate(['../../flow/edit-all']);
+    this.router.navigate(['../../flow/editor']);
   }
 
   private onSuccess(data, headers) {
@@ -235,6 +244,9 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
   }
 }

@@ -34,7 +34,7 @@ export const headerKeysRoute: Routes = [
     component: HeaderKeysComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'HeaderKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -46,7 +46,7 @@ export const headerKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'HeaderKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -58,7 +58,7 @@ export const headerKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'HeaderKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -70,7 +70,7 @@ export const headerKeysRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'HeaderKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -85,7 +85,7 @@ export const headerKeysPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'HeaderKeys',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
-import { createRequestOption } from 'app/shared';
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 
 type EntityResponseType = HttpResponse<IMaintenance>;
@@ -15,7 +15,7 @@ type EntityArrayResponseType = HttpResponse<IMaintenance[]>;
 
 @Injectable({ providedIn: 'root' })
 export class MaintenanceService {
-  public resourceUrl = this.applicationConfigService +'api/maintenances';
+  public resourceUrl = this.applicationConfigService.getEndpointFor('api/maintenances');
 
   constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
@@ -61,9 +61,9 @@ export class MaintenanceService {
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.startTime = res.body.startTime != null ? moment(res.body.startTime) : null;
-      res.body.endTime = res.body.endTime != null ? moment(res.body.endTime) : null;
-      res.body.duration = res.body.duration != null ? moment(res.body.duration) : null;
+      res.body.startTime = res.body.startTime != null ? dayjs(res.body.startTime) : null;
+      res.body.endTime = res.body.endTime != null ? dayjs(res.body.endTime) : null;
+      res.body.duration = res.body.duration != null ? dayjs(res.body.duration) : null;
     }
     return res;
   }
@@ -71,9 +71,9 @@ export class MaintenanceService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((maintenance: IMaintenance) => {
-        maintenance.startTime = maintenance.startTime != null ? moment(maintenance.startTime) : null;
-        maintenance.endTime = maintenance.endTime != null ? moment(maintenance.endTime) : null;
-        maintenance.duration = maintenance.duration != null ? moment(maintenance.duration) : null;
+        maintenance.startTime = maintenance.startTime != null ? dayjs(maintenance.startTime) : null;
+        maintenance.endTime = maintenance.endTime != null ? dayjs(maintenance.endTime) : null;
+        maintenance.duration = maintenance.duration != null ? dayjs(maintenance.duration) : null;
       });
     }
     return res;

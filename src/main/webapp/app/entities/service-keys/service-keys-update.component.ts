@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
 import { IService } from 'app/shared/model/service.model';
@@ -20,7 +19,7 @@ export class ServiceKeysUpdateComponent implements OnInit {
     services: IService[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+		protected alertService: AlertService,
         protected serviceKeysService: ServiceKeysService,
         protected serviceService: ServiceService,
         protected activatedRoute: ActivatedRoute
@@ -69,7 +68,10 @@ export class ServiceKeysUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackServiceById(index: number, item: IService) {

@@ -36,7 +36,7 @@ export const brokerRoute: Routes = [
     component: BrokerComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -48,7 +48,7 @@ export const brokerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -60,7 +60,7 @@ export const brokerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -72,7 +72,7 @@ export const brokerRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -81,7 +81,7 @@ export const brokerRoute: Routes = [
     component: BrokerMessageBrowserComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -90,7 +90,7 @@ export const brokerRoute: Routes = [
     component: BrokerMessageSenderComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -105,7 +105,7 @@ export const brokerPopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Brokers',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

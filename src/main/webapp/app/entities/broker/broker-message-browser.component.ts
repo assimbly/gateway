@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -13,10 +14,6 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IBroker } from 'app/shared/model/broker.model';
 
-import 'brace';
-import 'brace/mode/text';
-import 'brace/mode/json';
-import 'brace/theme/eclipse';
 import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
 @Component({
@@ -66,9 +63,8 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   constructor(
     private brokerService: BrokerService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
-    protected parseLinks: JhiParseLinks,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
     private modalService: NgbModal,
     protected accountService: AccountService,
     private router: Router,
@@ -240,7 +236,10 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   private onError(errorMessage: string) {
     this.isLoading = false;
-    this.jhiAlertService.error(errorMessage, null, null);
+	this.alertService.addAlert({
+	  type: 'danger',
+	  message: errorMessage,
+	});
   }
 
   reset() {
@@ -270,7 +269,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   trigerAction(selectedAction: string) {
-    this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
+    this.eventManager.broadcast(new EventWithContent('trigerAction', selectedAction));
   }
 
   refreshMessages() {

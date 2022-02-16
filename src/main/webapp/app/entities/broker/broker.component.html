@@ -86,7 +86,7 @@
               <!-- <div [innerHtml]="brokerDetails"></div> -->
             </ng-template>
             <ng-template #statsTemplate let-message="message">
-              <div [innerHtml]="brokerInfo"></div>
+              <div style="z-index: 1000; position: absolute;" [innerHtml]="brokerInfo"></div>
             </ng-template>
 
             <div class="float-left">
@@ -105,7 +105,7 @@
                     [disabled]="disableActionBtns"
                     *ngIf="!isBrokerStarted"
                   >
-                    <span class="fa fa-play"></span>
+               		 <fa-icon icon="play"></fa-icon>
                   </button>
                   <button
                     [ngClass]="{
@@ -120,7 +120,7 @@
                     [disabled]="disableActionBtns"
                     *ngIf="!isBrokerRestarted"
                   >
-                    <span class="fa fa-refresh"></span>
+               		 <fa-icon icon="sync"></fa-icon>
                   </button>
                   <button
                     [ngClass]="{
@@ -134,8 +134,8 @@
                     class="btn btn-lg"
                     [disabled]="isBrokerStopped || disableActionBtns"
                   >
-                    <span class="fa fa-stop"></span>
-                  </button>
+               		 <fa-icon icon="stop"></fa-icon>
+				 </button>
                   <ng-template #brokerStatusButtonTemplate><div [innerHtml]="brokerStatusButton"></div></ng-template>
                   <button
                     [ngClass]="{
@@ -162,42 +162,45 @@
                 <ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
                 <i
                   (mouseenter)="getBrokerDetails()"
-                  class="fa fa-info"
                   aria-hidden="true"
                   data-container="body"
                   triggers="mouseenter:mouseleave"
                   placement="right"
                   [ngbPopover]="detailsTemplate"
                   popoverTitle="Details"
-                ></i>
+                >
+					<fa-icon icon="info"></fa-icon>				
+				</i>
                 <i
-                  style="padding-left: 1em"
+                  style="padding-left: 1em;"
                   (mouseenter)="getBrokerInfo(broker.id)"
                   data-container="body"
                   triggers="mouseenter:mouseleave"
                   placement="right"
                   popoverTitle="Stats & Info"
                   [ngbPopover]="statsTemplate"
-                  class="fa fa-bar-chart"
-                ></i>
+                >
+					<fa-icon icon="chart-bar"></fa-icon>
+				</i>
                 <a
                   style="padding-left: 1em"
                   type="submit"
-                  [routerLink]="['/broker', broker.id, 'edit']"
-                  class="fa fa-edit"
+                  [routerLink]="['/broker', broker.id, 'edit']"                  
                   aria-hidden="true"
                   placement="right"
                   title="Edit broker"
-                ></a>
+                >
+					<fa-icon icon="edit"></fa-icon>
+				</a>
                 <a
                   style="padding-left: 1em"
                   type="submit"
                   [routerLink]="['/', { outlets: { popup: 'broker/' + broker.id + '/delete' } }]"
                   queryParamsHandling="merge"
                   placement="right"
-                  title="Delete broker"
-                  class="fa fa-trash"
-                ></a>
+                  title="Delete broker">
+				  	<fa-icon icon="trash"></fa-icon>
+				  </a>
               </div>
             </div>
           </td>

@@ -7,6 +7,6 @@ export const HOME_ROUTE: Route = {
   component: HomeComponent,
   data: {
     authorities: [],
-    pageTitle: 'Assimbly Gateway'
+    pageTitle: 'global.title'
   }
 };

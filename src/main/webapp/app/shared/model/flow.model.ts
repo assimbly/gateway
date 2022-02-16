@@ -1,5 +1,5 @@
 import { IEndpoint } from 'app/shared/model/endpoint.model';
-import moment from 'moment';
+import dayjs from 'dayjs/esm';
 
 export interface IFlow {
     id?: number;
@@ -14,8 +14,8 @@ export interface IFlow {
     assimblyHeaders?: boolean;
     instances?: number;
     version?: number;
-    created?: moment.Moment;
-    lastModified?: moment.Moment;
+    created?: dayjs.Dayjs;
+    lastModified?: dayjs.Dayjs;
     logLevel?: LogLevelType;
     gatewayId?: number;
     endpoints?: IEndpoint[];
@@ -35,8 +35,8 @@ export class Flow implements IFlow {
         public assimblyHeaders?: boolean,
         public instances?: number,
         public version?: number,
-        public created?: moment.Moment,
-        public lastModified?: moment.Moment,
+        public created?: dayjs.Dayjs,
+        public lastModified?: dayjs.Dayjs,
         public logLevel?: LogLevelType,
         public gatewayId?: number,
         public endpoints?: IEndpoint[]

@@ -36,7 +36,7 @@ export const serviceRoute: Routes = [
     component: ServiceComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -45,7 +45,7 @@ export const serviceRoute: Routes = [
     component: ServiceAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -57,7 +57,7 @@ export const serviceRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -69,7 +69,7 @@ export const serviceRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -78,7 +78,7 @@ export const serviceRoute: Routes = [
     component: ServiceComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -90,7 +90,7 @@ export const serviceRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -102,7 +102,7 @@ export const servicePopupRoute: Routes = [
     component: ServicePopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -112,7 +112,7 @@ export const servicePopupRoute: Routes = [
     component: ServiceComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -122,7 +122,7 @@ export const servicePopupRoute: Routes = [
     component: ServicePopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
@@ -135,7 +135,7 @@ export const servicePopupRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Services',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',

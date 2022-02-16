@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
@@ -20,8 +21,8 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
 
   constructor(
     protected serviceService: ServiceService,
-    protected jhiAlertService: JhiAlertService,
-    protected eventManager: JhiEventManager,
+    protected alertService: AlertService,
+    protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
     this.page = 0;
@@ -60,7 +61,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
   }
 
   private onError(error) {
-    this.jhiAlertService.error(error.message, null, null);
+	this.alertService.addAlert({
+	  type: 'danger',
+	  message: error.message,
+	});
   }
 
   sort() {
