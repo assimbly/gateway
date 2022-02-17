@@ -16,9 +16,7 @@ import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
 
-import { TrackerService } from 'app/core/tracker/tracker.service';
-import { TrackerActivity } from 'app/core/tracker/tracker-activity.model';
-
+import { WebSocketsService } from 'app/core/websockets/websockets.service';
 
 @Component({
   selector: 'jhi-flow',
@@ -62,7 +60,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected accountService: AccountService,
     protected gatewayService: GatewayService,
     protected router: Router,
-	private trackerService: TrackerService
+	private webSocketsService: WebSocketsService
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -121,7 +119,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.getGateways();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-	  this.trackerService.connect();
+	  this.webSocketsService.connect();
     });
     this.finished = true;
     this.registerChangeInFlows();

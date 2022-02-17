@@ -46,14 +46,14 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
         registry
             .addEndpoint("/websocket/tracker")
             .setHandshakeHandler(defaultHandshakeHandler())
-			//.setAllowedOrigins(allowedOrigins)
+			.setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
 
         registry
             .addEndpoint("/topic/alert")
             .setHandshakeHandler(defaultHandshakeHandler())
-			//.setAllowedOrigins(allowedOrigins)
+			.setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
     }
