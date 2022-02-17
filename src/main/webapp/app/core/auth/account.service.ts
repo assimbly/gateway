@@ -7,7 +7,7 @@ import { shareReplay, tap, catchError } from 'rxjs/operators';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { ApplicationConfigService } from '../config/application-config.service';
 import { Account } from 'app/core/auth/account.model';
-import { TrackerService } from '../tracker/tracker.service';
+import { WebSocketsService } from '../websockets/websockets.service';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
@@ -17,7 +17,7 @@ export class AccountService {
 
   constructor(
     private http: HttpClient,
-    private trackerService: TrackerService,
+    private webSocketsService: WebSocketsService,
     private stateStorageService: StateStorageService,
     private router: Router,
     private applicationConfigService: ApplicationConfigService
@@ -35,9 +35,9 @@ export class AccountService {
     }
 	/*
     if (identity) {
-      this.trackerService.connect();
+      this.webSocketsService.connect();
     } else {
-      this.trackerService.disconnect();
+      this.webSocketsService.disconnect();
     }*/
   }
 

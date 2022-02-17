@@ -10,11 +10,11 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { NavigationEnd, Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
 
-import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
+import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } from 'rxjs';
+
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { TrackerService } from 'app/core/tracker/tracker.service';
-import { TrackerActivity } from 'app/core/tracker/tracker-activity.model';
+import { WebSocketsService } from 'app/core/websockets/websockets.service';
 
 enum Status {
   active = 'active',
@@ -81,6 +81,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   subscriber = null;
   connection: Promise<any>;
   connectedPromise: any;
+  private listenerSubject: Subject<string> = new Subject();
   listener: Observable<any>;
   listenerObserver: Observer<any>;
 
@@ -95,7 +96,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	private trackerService: TrackerService
+	private webSocketsService: WebSocketsService
   ) {
     this.listener = this.createListener();
 
@@ -121,16 +122,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-  
-    this.trackerService.subscribeFlow(this.flow.id,'alert');
-	this.trackerService.subscribeFlow(this.flow.id,'event');
-	
-    this.subscription = this.trackerService.receiveFlow().subscribe(data => {
-	
-		console.log('websocket data=' + data)
-      const data2 = data.split(':');
 
-      if (Array.isArray(data2) || data2.length) {
+    this.stompClient = this.webSocketsService.client();
+  
+    this.subscribe(this.flow.id,'alert');
+	this.subscribe(this.flow.id,'event');
+	
+    this.subscription = this.receive().subscribe(data => {
+ 		
+  	const data2  = data.split(':');
+
+    if (Array.isArray(data2)) {
         if (data2[0] === 'event') {
           this.setFlowStatus(data2[1]);
         } else if (data2[0] === 'alert') {
@@ -140,12 +142,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
           }
         }
       }
-    });
+    });		
   
   }
 
   ngOnDestroy() {
-    //this.trackerService.unsubscribe();
+    this.unsubscribe();
   }
 
   getStatus(id: number) {
@@ -787,13 +789,40 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     );
   }
 
-  receive() {
-    return this.listener;
+  receive(): Subject<string> {
+    return this.listenerSubject;
   }
+ 
+  subscribe(id, type): void {
+  
+	const topic = '/topic/' + id + '/' + type;
+	  
+	//this.connection.then(() => {
+		
+		this.subscriber = this.stompClient.subscribe(topic, data => {
+			
+			if (!this.listener) {
+				this.listener = this.createListener();
+			}
+			
+			this.listenerSubject.next(data.body);
+		});
+		
+	//});
 
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
-    });
+  }  
+  
+  unsubscribe(): void {
+        if (this.subscriber !== null) {
+            this.subscriber.unsubscribe();
+        }
+        this.listener = this.createListener();
   }
+  
+    private createListener(): Observable<any> {
+        return new Observable(observer => {
+            this.listenerObserver = observer;
+        });
+    }
+  
 }

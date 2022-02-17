@@ -1,9 +1,9 @@
 package org.assimbly.gateway.security;
 
-import org.assimbly.gateway.domain.User;
-import org.assimbly.gateway.repository.UserRepository;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.assimbly.gateway.domain.User;
+import org.assimbly.gateway.repository.UserRepository;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
