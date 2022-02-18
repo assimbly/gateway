@@ -22,7 +22,10 @@
           "options": {
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
-            },
+            },			
+			"allowedCommonJsDependencies": [
+				"sockjs-client"
+			],
             "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",

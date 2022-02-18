@@ -28,6 +28,7 @@ import { ErrorComponent } from './layouts/error/error.component';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 @NgModule({
   imports: [
@@ -60,6 +61,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
     Title,
     { provide: LOCALE_ID, useValue: 'en' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
+ 	{ provide: LocationStrategy, useClass: HashLocationStrategy },
     httpInterceptorProviders,
   ],
   declarations: [MainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],

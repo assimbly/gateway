@@ -32,7 +32,6 @@ export class WebSocketsService {
     }
 	
 	if (this.connectedPromise === null) {
-		console.log('connect1b');
 		this.connection = this.createConnection();
 	}
 
@@ -40,6 +39,14 @@ export class WebSocketsService {
     // building absolute path so that websocket doesn't fail when deploying with a context path
     let url = '/topic/alert';
     url = this.location.prepareExternalUrl(url);
+	
+	console.log('url=' +  url);
+	
+	url = url.replace('#','');
+	
+	console.log('url2=' +  url);
+	
+	
     const authToken = this.authServerProvider.getToken();
     if (authToken) {
       url += '?access_token=' + authToken;
@@ -56,9 +63,6 @@ export class WebSocketsService {
   }
 
   disconnect(): void {
-    //this.unsubscribe();
-
-    this.connectionSubject = new ReplaySubject(1);
 
     if (this.stompClient) {
       if (this.stompClient.connected) {

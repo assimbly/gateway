@@ -184,7 +184,7 @@
 	{
       "type": "file",
       "path": "angular.json",
-      "action": "replace"
+      "action": "skip"
     },
 	{
       "type": "file",
@@ -570,6 +570,11 @@
 		  "type": "dir",
 		  "path": "app/shared/language",
 		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/websockets",
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",

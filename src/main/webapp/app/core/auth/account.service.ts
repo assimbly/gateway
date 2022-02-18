@@ -7,7 +7,7 @@ import { shareReplay, tap, catchError } from 'rxjs/operators';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { ApplicationConfigService } from '../config/application-config.service';
 import { Account } from 'app/core/auth/account.model';
-import { WebSocketsService } from '../websockets/websockets.service';
+import { WebSocketsService } from 'app/shared/websockets/websockets.service';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {

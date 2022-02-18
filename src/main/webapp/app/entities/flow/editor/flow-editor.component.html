@@ -40,7 +40,7 @@
                         <label class="form-control-label" for="field_header">Host
                             name</label> <i triggers="mouseenter:mouseleave" popoverTitle="Info"
                                             [popover]="hostnamePopover" container="body" placement="right"
-                                            class="fa fa-info-circle"></i> <input type="text"
+                                            ><fa-icon icon="info-circle"></fa-icon></i> <input type="text"
                                                                                   class="form-control" formControlName="connectionHost"
                                                                                   id="connectionHost" required/>
                     </div>
@@ -48,7 +48,7 @@
                         <label class="form-control-label" for="example-number-input">Port</label>
                         <i triggers="mouseenter:mouseleave" popoverTitle="Info"
                            [popover]="portPopover" container="body" placement="right"
-                           class="fa fa-info-circle"></i> <input type="number"
+                           ><fa-icon icon="info-circle"></fa-icon></i> <input type="number"
                                                                  class="form-control" min="1" max="65535"
                                                                  formControlName="connectionPort" id="connectionPort" />
                     </div>
@@ -59,7 +59,7 @@
                         <label class="form-control-label" for="example-number-input">Timeout</label>
                         <i triggers="mouseenter:mouseleave" popoverTitle="Info"
                            [popover]="timeoutPopover" container="body" placement="right"
-                           class="fa fa-info-circle"></i> <input type="number"
+                           ><fa-icon icon="info-circle"></fa-icon></i> <input type="number"
                                                                  class="form-control" formControlName="connectionTimeout"
                                                                  id="connectionTimeout" />
                     </div>
@@ -144,7 +144,7 @@
                                                             <div class="form-group">
                                                                 <div class="input-group">
 																	<label class="form-control-label" for="field_component_type">Component</label>
-																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" class="fa fa-info-circle" style="margin-left: 6px;"></i>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
 	                                                                <div class="container">
 																		<div class="row">
 																			<ng-select *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block'}" [items]="consumerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
@@ -175,7 +175,7 @@
 															<div class="form-group">	
 																<div class="input-group">
 																	<label class="form-control-label" for="field_uri">Path</label>
-																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" class="fa fa-info-circle" style="margin-left: 6px;"></i>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
 	                                                                <div class="container">
 																		<div class="row">
 																			<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
@@ -191,7 +191,7 @@
                                                             </div>
                                                             <div class="form-group" formArrayName="options">
                                                                 <label class="form-control-label" for="field_options">Options</label>
-                                                                <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right" class="fa fa-info-circle"></i>
+                                                                <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right"><fa-icon icon="info-circle"></fa-icon></i>
                                                                 <div class="row mx-0 mb-1 flex-nowrap" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
                                                                     <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '300px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
                                                                         <ng-template ng-option-tmp let-item="item">
@@ -321,7 +321,7 @@
                                         <div class="form-group">
                                             <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
 											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-                                                [popover]="logLevelPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i> 
+                                                [popover]="logLevelPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i> 
 											<select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
 												<option *ngFor="let logLevel of logLevelListType"
 														[ngValue]="logLevelListType[logLevel]" [value]="logLevel">
@@ -332,7 +332,7 @@
 											<label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
 											<i triggers="mouseenter:mouseleave" placement="right"
 											   popoverTitle="Info" [popover]="autoStartPopover"
-											   class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i> 
+											   style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i> 
 											<select type="text" class="form-control" id="field_autostart" *ngIf="flow" formControlName="autoStart">
 												<option value="true">true</option>
 												<option value="false">false</option>
@@ -341,7 +341,7 @@
                                         <div class="form-group">
                                             <label class="form-control-label" for="field_parallelprocessing" style="float: left; text-align: left;">Parallel Processing</label>
                                             <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-                                               [popover]="parallelProcessingPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;">
+                                               [popover]="parallelProcessingPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon>
 											</i> 
 											<select type="text" class="form-control" id="field_parallelprocessing" *ngIf="flow" formControlName="parallelProcessing">
 												<option value="true">true</option>
@@ -351,7 +351,7 @@
                                         <div class="form-group">
                                                 <label class="form-control-label" for="field_assimbly_headers" style="float: left; text-align: left;">Assimbly Headers</label>
                                                 <i triggers="mouseenter:mouseleave" placement="right"
-                                                   popoverTitle="Info" [popover]="assimblyHeadersPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;">
+                                                   popoverTitle="Info" [popover]="assimblyHeadersPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon>
 												</i> 
 												<select type="text" class="form-control" id="field_assimbly_headers" *ngIf="flow" formControlName="assimblyHeaders">
 													<option value="true">true</option>
@@ -360,7 +360,7 @@
                                             </div>
                                      <div class="form-group">
                                             <label class="form-control-label" for="field_maximumRedeliveries" style="float: left; text-align: left;">Maximum Redeliveries</label> 
-											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="maximumRedeliveriesPopover" class="fa fa-info-circle" style="float: left; margin-left: 6px;"></i>
+											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="maximumRedeliveriesPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
 											<input min="0" max="1000" size="0" maxlength="4" type="number" name="maximumRedeliveries" class="form-control" id="maximumRedeliveries" *ngIf="flow" formControlName="maximumRedeliveries" required>
                                             </div>
                                             <div class="form-group" *ngIf="!singleGateway">
@@ -384,9 +384,6 @@
                                 <hr />
                                 <div  class="col-lg-12" style="padding-left: 20px; padding-right: 20px; padding-top: 20px;">
                                     <div class="form-group">
-                                        <!--<i triggers="mouseenter:mouseleave" placement="right"
-                                           popoverTitle="Info" [popover]="notesPopover"
-                                           class="fa fa-info-circle"></i>-->
                                         <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="24" cols="70"></textarea>
                                     </div>
                                 </div>
