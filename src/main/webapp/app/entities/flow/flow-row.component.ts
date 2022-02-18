@@ -14,7 +14,7 @@ import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } 
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { WebSocketsService } from 'app/core/websockets/websockets.service';
+import { WebSocketsService } from 'app/shared/websockets/websockets.service';
 
 enum Status {
   active = 'active',
@@ -130,18 +130,19 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 	
     this.subscription = this.receive().subscribe(data => {
  		
-  	const data2  = data.split(':');
+		const data2  = data.split(':');
 
-    if (Array.isArray(data2)) {
-        if (data2[0] === 'event') {
-          this.setFlowStatus(data2[1]);
-        } else if (data2[0] === 'alert') {
-          const alertId = Number(data2[1]);
-          if (this.flow.id === alertId) {
-            this.getFlowNumberOfAlerts(alertId);
-          }
-        }
-      }
+		if (Array.isArray(data2)) {
+			if (data2[0] === 'event') {
+			  this.setFlowStatus(data2[1]);
+			} else if (data2[0] === 'alert') {
+			  const alertId = Number(data2[1]);
+			  if (this.flow.id === alertId) {
+				this.getFlowNumberOfAlerts(alertId);
+			  }
+			}
+		  }
+		  
     });		
   
   }

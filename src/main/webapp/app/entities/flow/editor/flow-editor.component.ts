@@ -515,12 +515,11 @@ export class FlowEditorComponent implements OnInit, OnDestroy {
 
     this.selectedComponentType = endpoint.componentType.toString();
 
-    componentType = endpoint.componentType.toString();
+    componentType = endpoint.componentType.toString().toLowerCase();
     camelComponentType = this.components.getCamelComponentType(componentType);
-
-    type = this.components.types.find(x => x.name === endpoint.componentType.toString());
-
-    camelType = this.components.types.find(x => x.name === camelComponentType);
+	
+    type = this.components.types.find(component => component.name === componentType);
+    camelType = this.components.types.find(component => component.name === camelComponentType);
 
     this.filterServices(endpoint, endpointForm.controls.service as FormControl);
 

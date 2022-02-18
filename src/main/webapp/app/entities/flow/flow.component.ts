@@ -16,7 +16,7 @@ import { FlowService } from './flow.service';
 import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
 
-import { WebSocketsService } from 'app/core/websockets/websockets.service';
+import { WebSocketsService } from 'app/shared/websockets/websockets.service';
 
 @Component({
   selector: 'jhi-flow',
