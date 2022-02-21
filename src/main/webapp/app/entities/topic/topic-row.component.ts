@@ -22,10 +22,6 @@ export class TopicRowComponent implements OnInit, OnDestroy {
 
   topicRowID: string;
 
-  connection: Promise<any>;
-  listener: Observable<any>;
-  listenerObserver: Observer<any>;
-
   modalRef: NgbModalRef | null;
 
   constructor(
@@ -34,8 +30,6 @@ export class TopicRowComponent implements OnInit, OnDestroy {
     private router: Router,
     private eventManager: EventManager
   ) {
-    this.listener = this.createListener();
-
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
@@ -51,10 +45,6 @@ export class TopicRowComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy() {}
-
-  subscribe(type) {}
-
-  unsubscribe() {}
 
   delete(address: IAddress): void {
     let modalRef = this.modalService.open(TopicDeleteDialogComponent as any);
@@ -74,12 +64,6 @@ export class TopicRowComponent implements OnInit, OnDestroy {
   clear(address: IAddress): void {
     const modalRef = this.modalService.open(TopicClearDialogComponent as any);
     modalRef.componentInstance.address = address;
-  }
-
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
-    });
   }
 
   navigateToMessageSender(addressName: string) {

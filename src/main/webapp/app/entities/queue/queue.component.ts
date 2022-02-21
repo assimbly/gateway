@@ -40,7 +40,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     protected alertService: AlertService,
     protected eventManager: EventManager,
     protected modalService: NgbModal,
-    protected accountService: AccountService
+    protected accountService: AccountService,
   ) {
     this.queues = [];
     this.brokers = [];
@@ -55,38 +55,26 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   reset(): void {
     this.page = 0;
-    this.searchQueueText = localStorage.getItem('searchQueueText');
+	this.setSearchBox();
     this.updateAllQueues();
   }
 
   loadPage(page: number): void {
     this.page = page;
-
-    this.searchQueueText = localStorage.getItem('searchQueueText');
-
-    if (!this.searchQueueText) {
-      this.searchQueueText = '';
-    }
-
+	this.setSearchBox();
     this.getBrokerType();
   }
 
   ngOnInit(): void {
+	this.setSearchBox();
     this.registerChangeInQueues();
     this.registerDeletedQueues();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-      //this.queueService.connect();
     });
   }
 
-  ngAfterViewInit() {
-    this.searchQueueText = localStorage.getItem('searchQueueText');
-
-    if (!this.searchQueueText) {
-      this.searchQueueText = '';
-    }
-
+  ngAfterViewInit() {    
     this.getBrokerType();
     this.poll();
   }
@@ -97,6 +85,18 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
     this.timeInterval.unsubscribe();
   }
+  
+   setSearchBox(){  
+   
+    const searchText = localStorage.getItem('searchQueueText');
+	if(searchText){
+		this.searchQueueText = searchText;
+	}else{
+		this.searchQueueText = '';
+	}
+
+   }
+  
 
   trackId(index: number, item: IAddress): number {
     return item.id!;
