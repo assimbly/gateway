@@ -1,4 +1,4 @@
-<div style="margin: 2em">
+<div style="margin: 2em; min-height: 30em">
   <div class="row">
     <div class="col-9">
       <h2 id="page-heading">
@@ -68,7 +68,7 @@
   </div>
 
   <div class="table-responsive" *ngIf="brokers?.length > 0" style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 100%">
+    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute; z-index: 1000;">
       <thead>
         <tr>
           <th [style.display]="'none'"><span>ID</span></th>
@@ -82,11 +82,10 @@
           </td>
           <td>
             <ng-template #detailsTemplate>
-              <b>something</b>
-              <!-- <div [innerHtml]="brokerDetails"></div> -->
+              <div [innerHtml]="brokerDetails"></div>
             </ng-template>
             <ng-template #statsTemplate let-message="message">
-              <div style="z-index: 1000; position: absolute;" [innerHtml]="brokerInfo"></div>
+              <div [innerHtml]="brokerInfo"></div>
             </ng-template>
 
             <div class="float-left">
@@ -160,7 +159,7 @@
 
               <div class="col">
                 <ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
-                <i
+                <a
                   (mouseenter)="getBrokerDetails()"
                   aria-hidden="true"
                   data-container="body"
@@ -170,8 +169,8 @@
                   popoverTitle="Details"
                 >
 					<fa-icon icon="info"></fa-icon>				
-				</i>
-                <i
+				</a>
+                <a
                   style="padding-left: 1em;"
                   (mouseenter)="getBrokerInfo(broker.id)"
                   data-container="body"
@@ -181,7 +180,7 @@
                   [ngbPopover]="statsTemplate"
                 >
 					<fa-icon icon="chart-bar"></fa-icon>
-				</i>
+				</a>
                 <a
                   style="padding-left: 1em"
                   type="submit"

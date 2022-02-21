@@ -213,7 +213,7 @@
                                                             <div class="border-bottom my-3"><h5>Header</h5></div>
                                                             <div class="form-group">
                                                                 <div class="input-group">
-																	<ng-select class="default" [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>                                                                    
+																	<ng-select class="default" [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header"></ng-select>                                                                    
                                                                     <button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                                                         <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>
@@ -228,7 +228,7 @@
                                                             <div class="border-bottom my-3"><h5>Route</h5></div>
                                                             <div class="form-group">
                                                                 <div class="input-group">
-                                                                    <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route" id="field_route" dropdownPosition="top"></ng-select>
+                                                                    <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route" id="field_route"></ng-select>
                                                                     <button type="button" *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value" title="Edit route" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                                                         <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>
@@ -243,7 +243,7 @@
                                                             <div class="border-bottom my-3"><h5>Service</h5></div>
                                                             <div class="form-group">
                                                                 <div class="input-group">
-                                                                    <ng-select [items]="filterService[index]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
+                                                                    <ng-select [items]="filterService[index]" bindLabel="name" bindValue="id" formControlName="service" id="field_service"></ng-select>
                                                                     <button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                                                         <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
                                                                     </button>

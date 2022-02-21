@@ -33,7 +33,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   timeInterval: Subscription;
   isBroker: boolean;
 
-  searchTopicText: string;
+  searchTopicText: string = '';
   brokerType = '';
 
   constructor(
@@ -54,39 +54,21 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.ascending = false;
   }
 
-  reset(): void {
-    this.page = 0;
-    this.searchTopicText = localStorage.getItem('searchTopicText');
-    this.getBrokerType();
-  }
-
-  loadPage(page: number): void {
-    this.page = page;
-
-    this.searchTopicText = localStorage.getItem('searchTopicText');
-
-    if (!this.searchTopicText) {
-      this.searchTopicText = '';
-    }
-
-    this.getBrokerType();
-  }
-
   ngOnInit(): void {
+
+	this.setSearchBox();
+	
     this.registerChangeInTopics();
     this.registerDeletedTopics();
 
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-      //this.topicService.connect();
     });
+	
+
   }
 
   ngAfterViewInit() {
-    this.searchTopicText = localStorage.getItem('searchTopicText');
-    if (!this.searchTopicText) {
-      this.searchTopicText = '';
-    }
     this.getBrokerType();
     this.poll();
   }
@@ -98,6 +80,28 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.timeInterval.unsubscribe();
   }
 
+  
+  reset(): void {
+    this.page = 0;
+    this.setSearchBox();
+    this.getBrokerType();
+  }
+
+  loadPage(page: number): void {
+    this.page = page;
+	this.setSearchBox();
+    this.getBrokerType();
+  }
+
+   setSearchBox(){   
+    const searchText = localStorage.getItem('searchTopicText');
+	if(searchText){
+		this.searchTopicText = searchText;
+	}else{
+		this.searchTopicText = '';
+	}
+   }
+  
   trackId(index: number, item: IAddress): number {
     return item.id!;
   }
