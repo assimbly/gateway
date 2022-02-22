@@ -7,4 +7,12 @@ target/
 build/
 node/
 postcss.config.js
-src/**
+src/gateway/src/main/webapp/app/account/**
+src/gateway/src/main/webapp/app/admin/**
+src/gateway/src/main/webapp/app/config/**
+src/gateway/src/main/webapp/app/core/**
+src/gateway/src/main/webapp/app/entities/**
+src/gateway/src/main/webapp/app/layouts/**
+src/gateway/src/main/webapp/app/login/**
+src/gateway/src/main/webapp/app/shared/**
+src/gateway/src/test/**
