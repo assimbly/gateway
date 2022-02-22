@@ -1,0 +1,426 @@
+<div class="container">
+    <div class="row">
+
+        <ng-template #componentPopover let-message="message">
+            <div [innerHtml]="componentPopoverMessage"></div>
+        </ng-template>
+        <ng-template #optionsPopover let-message="message">
+            <div [innerHtml]="optionsPopoverMessage"></div>
+        </ng-template>
+        <ng-template #headerPopover let-message="message">
+            <div [innerHtml]="headerPopoverMessage"></div>
+        </ng-template>
+        <ng-template #servicePopover let-message="message">
+            <div [innerHtml]="servicePopoverMessage"></div>
+        </ng-template>
+        <ng-template #popover let-message="message">
+            <div [innerHtml]="popoverMessage"></div>
+        </ng-template>
+        <ng-template #hostnamePopover let-message="message">
+            <div [innerHtml]="hostnamePopoverMessage"></div>
+        </ng-template>
+        <ng-template #portPopover let-message="message">
+            <div [innerHtml]="portPopoverMessage"></div>
+        </ng-template>
+        <ng-template #timeoutPopover let-message="message">
+            <div [innerHtml]="timeoutPopoverMessage"></div>
+        </ng-template>
+		
+        <ng-template #testConnectionModal>
+            <div class="modal-header">
+                <h4 class="modal-title">Test Connection</h4>
+                <button type="button" class="close" aria-label="Close"
+                        (click)="cancelModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" [formGroup]="testConnectionForm">
+                <div class="form-group row">
+                    <div class="col-8">
+                        <label class="form-control-label" for="field_header">Host
+                            name</label> <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+                                            [popover]="hostnamePopover" container="body" placement="right"
+                                            ><fa-icon icon="info-circle"></fa-icon></i> <input type="text"
+                                                                                  class="form-control" formControlName="connectionHost"
+                                                                                  id="connectionHost" required/>
+                    </div>
+                    <div class="col-3">
+                        <label class="form-control-label" for="example-number-input">Port</label>
+                        <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+                           [popover]="portPopover" container="body" placement="right"
+                           ><fa-icon icon="info-circle"></fa-icon></i> <input type="number"
+                                                                 class="form-control" min="1" max="65535"
+                                                                 formControlName="connectionPort" id="connectionPort" />
+                    </div>
+                    <div class="col-1"></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-8">
+                        <label class="form-control-label" for="example-number-input">Timeout</label>
+                        <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+                           [popover]="timeoutPopover" container="body" placement="right"
+                           ><fa-icon icon="info-circle"></fa-icon></i> <input type="number"
+                                                                 class="form-control" formControlName="connectionTimeout"
+                                                                 id="connectionTimeout" />
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+                <div [innerHtml]="testConnectionMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        (click)="cancelModal()">Close</button>
+                <button type="button" class="btn btn-primary"
+                        (click)="testConnection()">Test</button>
+            </div>
+        </ng-template>
+
+
+        <!--<form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">-->
+        <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
+            <jhi-alert-error></jhi-alert-error>
+            <div class="form-group" [style.display]="'none'">
+                <label for="id">ID</label>
+                <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id" />
+            </div>
+            <ng-template #namePopover let-message="message">
+                <div [innerHtml]="namePopoverMessage"></div>
+            </ng-template>
+            <div class="form-group">
+                <div class="form-group row">
+                    <div class="col-12">
+                        <input style="border: none; font-weight:bold; font-size: 24px;" type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow" formControlName="name" />
+                        <div
+                            *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
+                            <div *ngIf="editFlowForm['controls'].name.errors.required"
+                                 class="invalid-field-message">Flowname is required.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card text-center" style="width: 52rem;">
+                <div class="card-header">
+                    <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active2" orientation="horizontal">
+                            <li ngbNavItem="ENDPOINTS" novalidate>
+                                <a ngbNavLink>ENDPOINTS</a>
+                                <ng-template ngbNavContent>
+                                    <br/>
+                                    <hr />
+                                    <div class="d-flex">
+                                        <ul ngbNav #nav="ngbNav" class="nav-pills"  [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
+                                            <ng-container *ngFor="let endpoint of endpoints; index as index">
+                                                <li ngbNavItem="{{index}}" [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px', 'text-align': 'left' }" novalidate>
+                                                    <a ngbNavLink>{{endpoint.endpointType}}</a>
+                                                    <ng-template ngbNavContent>
+
+                                                        <div  class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">															
+                                                            <div class="form-group" [style.display]="'none'">
+                                                                <label for="id">ID</label>
+                                                                <input type="text" class="form-control" id="id" formControlName="id" readonly />
+                                                            </div>
+                                                            <ng-template #uriPopover let-message="message">
+                                                                <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
+                                                            </ng-template>
+															 <ng-template #pathPopover let-message="message">
+                                                                <div style="min-width:300px;">{{uriPlaceholders[index]}}</div>
+                                                            </ng-template>
+                                                            <ng-template #uriEditor>
+                                                                <div class="modal-header">
+                                                                    <h4 class="modal-title">URI (context path)</h4>
+                                                                    <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <textarea class="form-control" id="field_uri" formControlName="uri" placeholder="{{uriPlaceholders[index]}}" rows="5" [(ngModel)]="endpoint.uri"></textarea>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-outline-dark"  (click)="cancelModal()">Close</button>
+                                                                </div>
+                                                            </ng-template>
+
+                                                            <div class="border-bottom my-3"><h5>URI</h5></div>
+                                                            <div class="form-group">
+                                                                <div class="input-group">
+																	<label class="form-control-label" for="field_component_type">Component</label>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
+	                                                                <div class="container">
+																		<div class="row">
+																			<ng-select *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block'}" [items]="consumerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<ng-select *ngIf="endpoint.endpointType==='RESPONSE'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+																			<div ngbDropdown class="col-2" placement="bottom-right" >
+																				<a class="btn btn-primary left-border-radius-0" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-16px'}" id="dropdownBasic1" ngbDropdownToggle><fa-icon icon="bars"></fa-icon> Docs</a>
+																				<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+																					<a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+																						<span>Camel Documentation</span>
+																					</a>
+																					<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+																						<span>Assimbly Documentation</span>
+																					</a>
+																					<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+																						<span>Test Connection</span>
+																					</a>
+																				</div>
+																			</div>
+																		</div>	
+																	</div>
+																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
+																		<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
+																	</div>
+                                                                </div>
+															</div>	
+															<div class="form-group">	
+																<div class="input-group">
+																	<label class="form-control-label" for="field_uri">Path</label>
+																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
+	                                                                <div class="container">
+																		<div class="row">
+																			<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+																			<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">																				
+																				<fa-icon icon="edit"></fa-icon>
+																			</button>																	
+																		</div>	
+																	</div>		
+                                                                </div>
+																<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
+																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>
+																</div>
+                                                            </div>
+                                                            <div class="form-group" formArrayName="options">
+                                                                <label class="form-control-label" for="field_options">Options</label>
+                                                                <i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right"><fa-icon icon="info-circle"></fa-icon></i>
+                                                                <div class="row mx-0 mb-1 flex-nowrap" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
+                                                                    <ng-select [items]="componentOptions[index]" bindLabel="displayName" bindValue="name" [addTag]="addOptionTag" formControlName="key" [ngStyle]="{'display':'block', 'width': '300px'}" id="field_options-key-{{idx}}" (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)" [(ngModel)]="selectedOptions[index][idx]">
+                                                                        <ng-template ng-option-tmp let-item="item">
+                                                                            <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip" [openDelay]="500" placement="bottom" data-container="body">{{item.displayName}}</div>
+                                                                            <ng-template #optionTooltip>
+                                                                                <div>
+                                                                                    <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+                                                                                </div>
+                                                                            </ng-template>
+                                                                        </ng-template>
+                                                                    </ng-select>
+                                                                    <a> </a>
+                                                                    <input type="text" class="col-4 rounded-0 d-inline-block form-control" id="field_options-value-{{idx}}" formControlName="value" [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value" data-toggle="tooltip" title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                                                                    <button title="Add option" type="button" class="col-1 rounded-0 btn btn-primary" (click)="addOption(endpointsOptions[index], index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'"><fa-icon icon="plus"></fa-icon></button>
+                                                                    <button title="Remove option" type="button" class="col-1 left-border-radius-0 btn btn-danger" (click)="removeOption(endpointsOptions[index], option, index)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1"><fa-icon icon="times"></fa-icon></button>
+                                                                </div>
+                                                            </div>
+															
+                                                            <div class="border-bottom my-3"><h5>Header</h5></div>
+                                                            <div class="form-group">
+                                                                <div class="input-group">
+																	<ng-select class="default" [items]="headers" bindLabel="name" bindValue="id" formControlName="header" id="field_header" dropdownPosition="top"></ng-select>                                                                    
+                                                                    <button type="button" *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" title="Edit header" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                    <button type="button" *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                    </button>
+                                                                    <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create header" (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="border-bottom my-3"><h5>Route</h5></div>
+                                                            <div class="form-group">
+                                                                <div class="input-group">
+                                                                    <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route" id="field_route" dropdownPosition="top"></ng-select>
+                                                                    <button type="button" *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value" title="Edit route" class="col-2 btn btn-primary left-border-radius-0" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                    <button type="button" *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New route" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                    </button>
+                                                                    <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create route" (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="border-bottom my-3"><h5>Service</h5></div>
+                                                            <div class="form-group">
+                                                                <div class="input-group">
+                                                                    <ng-select [items]="filterService[index]" bindLabel="name" bindValue="id" formControlName="service" id="field_service" dropdownPosition="top"></ng-select>
+                                                                    <button type="button" *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0" title="Edit service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                    <button type="button" *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value" class="col-2 btn btn-primary left-border-radius-0 flow-header-button" title="New service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
+                                                                    </button>
+                                                                    <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary left-border-radius-0" title="Create service" (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)" [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                                                        <span class="padding-button"><fa-icon icon="bars"></fa-icon></span>&nbsp;
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.touched)">
+                                                                <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors.required" class="invalid-field-message">Service is required for this component</div>
+                                                            </div>
+                                                            <div class="text-right form-group" role="group">
+                                                                <button type="button" class="btn btn-primary" style="visibility: hidden;">
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    <span>Empty</span>
+                                                                </button>
+                                                                <button type="button" class="btn btn-danger" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="removeEndpoint(endpoint, 'endpointData'+index)" [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))">
+                                                                    <span><fa-icon icon="times"></fa-icon></span>&nbsp;
+                                                                    <span>Remove</span>
+                                                                </button>
+                                                                <button type="button" class="btn btn-primary" *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')" (click)="addEndpoint(endpoint, index)" [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)" [ngbTooltip]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2) ? 'Only 3 FROM type endpoints allowed' : ''" placement="right">
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    <span>Add</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="text-right form-group" role="group">
+                                                                <button type="button" class="btn btn-primary" *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)" [disabled]="numberOfResponseEndpoints>0" (click)="addResponseEndpoint(endpoint)">
+                                                                    <span><fa-icon icon="pencil-alt"></fa-icon></span>&nbsp;
+                                                                    <span [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'" placement="right">Add Response Endpoint</span>
+                                                                </button>
+                                                                <button type="button" class="btn btn-danger" *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))" (click)="removeResponseEndpoint(endpoint)">
+                                                                    <span><fa-icon icon="times"></fa-icon></span>&nbsp;
+                                                                    <span>Remove Response Endpoint</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                    </ng-template>
+                                                </li>
+                                            </ng-container>
+                                        </ul>
+                                        <div [ngbNavOutlet]="nav" class="ml-4"></div>
+                                    </div>
+
+                                </ng-template>
+                            </li>
+                        <li ngbNavItem="SETTINGS" novalidate>
+                            <a ngbNavLink>SETTINGS</a>
+                            <ng-template ngbNavContent>
+                                    <ng-template #autoStartPopover let-message="message">
+                                        <div [innerHtml]="autoStartPopoverMessage"></div>
+                                    </ng-template>
+                                    <ng-template #assimblyHeadersPopover let-message="message">
+                                        <div [innerHtml]="assimblyHeadersPopoverMessage"></div>
+                                    </ng-template>
+                                     <ng-template #parallelProcessingPopover let-message="message">
+                                        <div [innerHtml]="parallelProcessingPopoverMessage"></div>
+                                    </ng-template>
+                                    <ng-template #maximumRedeliveriesPopover let-message="message">
+                                        <div [innerHtml]="maximumRedeliveriesPopoverMessage"></div>
+                                    </ng-template>
+                                    <ng-template #redeliveryDelayPopover let-message="message">
+                                        <div [innerHtml]="redeliveryDelayPopoverMessage"></div>
+                                    </ng-template>
+                                    <ng-template #logLevelPopover let-message="message">
+                                        <div [innerHtml]="logLevelPopoverMessage"></div>
+                                    </ng-template>
+                                <br/>
+                                <hr />
+                                <div class="container">
+                                    <div  class="col-12" style="padding-left: 20px; padding-right: 452px; padding-bottom: 220px">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                                                [popover]="logLevelPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i> 
+											<select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+												<option *ngFor="let logLevel of logLevelListType"
+														[ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+													{{logLevel}}</option>
+											</select>
+                                        </div>
+                                        <div class="form-group">
+											<label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
+											<i triggers="mouseenter:mouseleave" placement="right"
+											   popoverTitle="Info" [popover]="autoStartPopover"
+											   style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i> 
+											<select type="text" class="form-control" id="field_autostart" *ngIf="flow" formControlName="autoStart">
+												<option value="true">true</option>
+												<option value="false">false</option>
+											</select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="field_parallelprocessing" style="float: left; text-align: left;">Parallel Processing</label>
+                                            <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                                               [popover]="parallelProcessingPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon>
+											</i> 
+											<select type="text" class="form-control" id="field_parallelprocessing" *ngIf="flow" formControlName="parallelProcessing">
+												<option value="true">true</option>
+												<option value="false">false</option>
+											</select>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="form-control-label" for="field_assimbly_headers" style="float: left; text-align: left;">Assimbly Headers</label>
+                                                <i triggers="mouseenter:mouseleave" placement="right"
+                                                   popoverTitle="Info" [popover]="assimblyHeadersPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon>
+												</i> 
+												<select type="text" class="form-control" id="field_assimbly_headers" *ngIf="flow" formControlName="assimblyHeaders">
+													<option value="true">true</option>
+													<option value="false">false</option>
+												</select>
+                                            </div>
+                                     <div class="form-group">
+                                            <label class="form-control-label" for="field_maximumRedeliveries" style="float: left; text-align: left;">Maximum Redeliveries</label> 
+											<i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="maximumRedeliveriesPopover" style="float: left; margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
+											<input min="0" max="1000" size="0" maxlength="4" type="number" name="maximumRedeliveries" class="form-control" id="maximumRedeliveries" *ngIf="flow" formControlName="maximumRedeliveries" required>
+                                            </div>
+                                            <div class="form-group" *ngIf="!singleGateway">
+                                                <label class="form-control-label" for="field_gateway" style="float: left; text-align: left;">Gateway</label>
+                                                <select class="form-control" id="field_gateway" *ngIf="flow"
+                                                        formControlName="gateway">
+                                                    <option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                </div>
+                                </ng-template>
+                        </li>
+                        <li ngbNavItem="FLOW3" novalidate>
+                            <a ngbNavLink>NOTES</a>
+                            <ng-template ngbNavContent>
+                                <ng-template #notesPopover let-message="message">
+                                    <div [innerHtml]="notesPopoverMessage"></div>
+                                </ng-template>
+                                <br />
+                                <hr />
+                                <div  class="col-lg-12" style="padding-left: 20px; padding-right: 20px; padding-top: 20px;">
+                                    <div class="form-group">
+                                        <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="24" cols="70"></textarea>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </li>
+
+                    </ul>
+                    <div [ngbNavOutlet]="nav" class="ml-4"></div>
+                </div>
+            </div>
+
+            <br />
+            <div class="float-right" style="margin-right: 14px;">
+                <button type="button" class="btn btn-secondary"
+                        [routerLink]="['/']">
+                    <span class="fa fa-ban"></span>&nbsp; <span>Cancel</span>
+                </button>
+                <button type="button" (click)="save()"
+                        [disabled]="isSaving"
+                        class="btn btn-primary">
+                    <span class="fa fa-save"></span>&nbsp; <span>Save</span>
+                </button>
+            </div>
+            <br />
+            <div *ngIf="savingFlowSuccess">
+                <span class="text-success">*{{savingFlowSuccessMessage}}</span>
+            </div>
+            <div *ngIf="savingFlowFailed">
+                <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+            </div>
+            <div *ngIf="!!invalidUriMessage">
+                <span class="text-danger">*{{invalidUriMessage}}</span>
+            </div>
+            <div *ngIf="!!notUniqueUriMessage">
+                <span class="text-danger">*{{notUniqueUriMessage}}</span>
+            </div>
+            <br />
+        </form>
+    </div>
+</div>

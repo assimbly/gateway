@@ -21,6 +21,7 @@ import { FlowPopupService } from './flow-popup.service';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowEditorComponent } from './editor/flow-editor.component';
+import { FlowEditorConnectorComponent } from './editor/flow-editor-connector.component';
 import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
 
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -48,12 +49,13 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     CommonModule,
     PopoverModule.forRoot(),
   ],
-  exports: [FlowComponent],
+  exports: [FlowComponent, FlowEditorConnectorComponent],
   declarations: [
     FlowComponent,
     FlowRowComponent,
     FlowUpdateComponent,
     FlowEditorComponent,
+	FlowEditorConnectorComponent,
     FlowMessageSenderComponent,
     FlowDetailComponent,
     FlowDeleteDialogComponent,
@@ -68,6 +70,9 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     FlowDeleteDialogComponent,
     FlowDeleteDialogComponent,
     FlowDeletePopupComponent,
+  ],
+  providers: [
+    { provide: FlowEditorConnectorComponent },    
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
