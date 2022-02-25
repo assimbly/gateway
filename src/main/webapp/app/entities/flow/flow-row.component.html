@@ -27,7 +27,7 @@
           triggers="mouseenter:mouseleave"
           popoverTitle="From Endpoint"
           [popover]="fromEndpointTooltips[i]"
-          (click)="navigateToEndpoint(fromEndpoint)"
+          (click)="navigateToEndpointEditor('edit','connector',fromEndpoint)"
         >
           <span>{{ fromEndpoint.componentType.toUpperCase() }}</span>
         </button>
@@ -143,7 +143,7 @@
           triggers="mouseenter:mouseleave"
           popoverTitle="To Endpoint"
           [popover]="toEndpointsTooltips[i]"
-          (click)="navigateToEndpoint(toEndpoint)"
+          (click)="navigateToEndpointEditor('edit','connector',toEndpoint)"
         >
           <span>{{ toEndpoint.componentType.toUpperCase() }}</span>
         </button>
@@ -164,7 +164,7 @@
           triggers="mouseenter:mouseleave"
           popoverTitle="Response Endpoint"
           [popover]="responseEndpointTooltips[i]"
-          (click)="navigateToEndpoint(responseEndpoint)"
+          (click)="navigateToEndpointEditor('edit','connector',responseEndpoint)"
         >
           <span>{{ responseEndpoint.componentType.toUpperCase() }}</span>
         </button>
@@ -206,15 +206,15 @@
 	  </i>
       <a
         style="padding-left: 1em"
-        (click)="navigateToFlow('edit')"
+        (click)="navigateToFlowEditor('edit','connector')"
         aria-hidden="true"
         placement="right"
         title="Edit flow"
       ><fa-icon icon="edit"></fa-icon></a>
-      <a style="padding-left: 1em" (click)="navigateToFlow('clone')" placement="right" title="Clone flow">
+      <a style="padding-left: 1em" (click)="navigateToFlowEditor('clone','connector')" placement="right" title="Clone flow">
 		<fa-icon icon="clone"></fa-icon>
 	  </a>
-      <a style="padding-left: 1em" (click)="navigateToFlow('delete')" placement="right" title="Delete flow">
+      <a style="padding-left: 1em" (click)="navigateToFlowEditor('delete','')" placement="right" title="Delete flow">
 	  		<fa-icon icon="trash"></fa-icon>
 	  </a>
     </div>

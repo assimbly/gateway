@@ -303,13 +303,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToFlow(action: string) {
-    switch (action) {
+  navigateToFlowEditor(mode: string, editorType: string) {
+    switch (mode) {
       case 'edit':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: 'edit', editor: 'connector' }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType }]);
         break;
       case 'clone':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: 'clone', editor: 'connector' }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType }]);
         break;
       case 'delete':
         let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
@@ -332,8 +332,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToEndpoint(endpoint: Endpoint) {
-    this.router.navigate(['../../flow/editor', this.flow.id], { queryParams: { mode: 'edit', editor: 'connector', endpointid: endpoint.id } });
+  navigateToEndpointEditor(mode: string, editorType: string, endpoint: Endpoint) {
+    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, endpointid: endpoint.id }]);
   }
 
   getFlowLastError(id: number, action: string, errMessage: string) {

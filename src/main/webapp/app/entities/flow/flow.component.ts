@@ -226,10 +226,16 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
   }
 
-  navigateToFlow() {
-    this.router.navigate(['../../flow/editor']);
+  navigateToFlowEditor(mode: string, editorType: string): void {
+	if(editorType === 'connector'){
+		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }] );
+	}else if(editorType === 'esb'){
+		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
+	}else if(editorType === 'api'){
+		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
+	}        
   }
-
+  
   private onSuccess(data, headers) {
     if (this.gateways.length === 1) {
       this.links = this.parseLinks.parse(headers.get('link'));

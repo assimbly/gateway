@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class FlowEditorComponent implements OnInit {
 
-  editor: string = 'unknown';;
+  editor: string = 'unknown';
 
   constructor(
 	private route: ActivatedRoute,
@@ -25,7 +25,7 @@ export class FlowEditorComponent implements OnInit {
 			    this.editor = 'api';
 		    }	  
 		});
-			
+		
 	}
 
 }
