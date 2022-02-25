@@ -37,11 +37,11 @@ import { ServiceDialogComponent } from 'app/entities/service/service-dialog.comp
 import dayjs from 'dayjs/esm';
 
 @Component({
-  selector: 'jhi-flow-editor-connector',
-  templateUrl: './flow-editor-connector.component.html',
+  selector: 'jhi-flow-editor-api',
+  templateUrl: './flow-editor-api.component.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
+export class FlowEditorApiComponent implements OnInit, OnDestroy {
   flow: IFlow;
   headers: IHeader[];
   routes: Route[];
@@ -182,13 +182,11 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
 
     this.setPopoverMessages();
 
+    this.activeEndpoint = this.route.snapshot.queryParamMap.get('endpointid');
+
     this.setComponents();
 
     this.subscription = this.route.params.subscribe(params => {
-	
-	  this.activeEndpoint = params['endpointid'];
-	  console.log('this.activeEndpoint=' + this.activeEndpoint);
-	
       if (params['mode'] === 'clone') {
         this.load(params['id'], true);
       } else {
@@ -315,20 +313,19 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
 
                   index = index + 1;
                 }, this);
-				
               }, this);
 
-       		  if (this.activeEndpoint) {
-					const activeIndex = this.endpoints.findIndex(item => item.id.toString() === this.activeEndpoint);
-					if (activeIndex === -1) {
-					  this.active = '0';
-					} else {
-					  this.active = activeIndex.toString();
-					}
-				}else {
-					this.active = '0';
-			  }
-			  
+              if (this.activeEndpoint) {
+                const activeIndex = this.endpoints.findIndex(item => item.id === this.activeEndpoint);
+                if (activeIndex === -1) {
+                  this.active = '0';
+                } else {
+                  this.active = activeIndex.toString();
+                }
+              } else {
+                this.active = '0';
+              }
+
               if (isCloning) {
                 this.clone();
               }

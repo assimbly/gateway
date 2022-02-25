@@ -15,7 +15,7 @@
     </select>
   </div>
   <div class="row">
-    <div class="col-3">
+    <div class="col-5">
       <input
         type="text"
         align="left"
@@ -26,19 +26,16 @@
         placeholder="Filter By Flow Name"
       />
     </div>
-    <div class="col-8 text-right">
-      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['../flow', 'message-sender']">
-        <span class="fa fa-envelope"></span> <span>Send message</span>
-      </button>
-      <button
-        class="btn btn-primary"
-        type="submit"
-        *jhiHasAnyAuthority="'ROLE_ADMIN'"
-        [routerLink]="['../flow', 'editor']"
-        style="margin-right: -2em"
-      >
-        <span class="fa fa-plus"></span> <span>Create flow</span>
-      </button>
+    <div class="col-6 text-right">
+		<div ngbDropdown class="d-inline-block">
+			<button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
+	        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+				<button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
+				<button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button>
+				<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>
+				<button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
+			</div>
+		</div>
     </div>
     <div class="col-1"></div>
   </div>
