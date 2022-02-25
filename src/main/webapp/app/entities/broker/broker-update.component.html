@@ -77,14 +77,24 @@
                 </div>
        			<div class="form-group" *ngIf="broker.configurationType == 'file' ">
        				<label class="form-control-label" for="field_type">Configuration</label>
-       				<!-- <div *ngIf="brokerConfigurationFailed" class="alert alert-secondary" role="alert">{{brokerConfigurationFailed}}</div> -->
 					<i class="fa fa-info-circle" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"></i>
 					<span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
 					<i class="fa fa-exclamation-circle" popoverClass="increase-popover-width" triggers="mouseenter:mouseleave" placement="right"
 							popoverTitle="Error" [ngbPopover]="brokerErrorConfigurationPopover" #p="ngbPopover"></i>
 					</span>
-					<!--<ace-editor #editor [(text)]="brokerConfiguration" [mode]="'xml'" [theme]="'eclipse'" contenteditable="true" style="min-height: 350px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ace-editor>-->
+					<div >
+					<ngx-codemirror
+							name="codemirror"
+						  [(ngModel)]="brokerConfiguration"
+						  [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: 'xml'
+						  }"
+						style="min-height: 500px;"></ngx-codemirror>
+					</div>
+					<br/>
 				</div>
 
 			</div>
@@ -99,5 +109,7 @@
             </div>
             <br/>
         </form>
+						
+
     </div>
 </div>

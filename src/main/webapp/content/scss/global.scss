@@ -1,8 +1,6 @@
 @import 'bootstrap-variables';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
-@import '~@ng-select/ng-select/scss/default.theme';
-
 
 /* ==============================================================
 Bootstrap tweaks
@@ -203,6 +201,8 @@ ui bootstrap tweaks
 
 /* ========================================================================== custom assimbly css ========================================================================== */
 
+@import '~@ng-select/ng-select/scss/default.theme';
+@import '~codemirror/lib/codemirror';
 
 #fromTab.active,
 #toTab.active,
@@ -645,3 +645,9 @@ ng-dropdown-panel > div {
   flex: 0 0 95.8333333%;
   max-width: 95.8333333%;
 }
+
+.editor-container {
+  height: 300px;
+  margin: 20px;
+}
+
