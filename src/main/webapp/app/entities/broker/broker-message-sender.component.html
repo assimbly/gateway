@@ -53,9 +53,20 @@
           <li ngbNavItem="0">
             <a ngbNavLink>Body</a>
             <br />
-            <!-- <ng-template ngbNavContent>
-                                     <ace-editor #editor [formControl]="messageSenderForm.controls['requestbody']" [(text)]="requestBody" [mode]="requestEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 760px; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>
-                                </ng-template>-->
+            <ng-template ngbNavContent>
+				<ngx-codemirror
+					[formControl]="$any(messageSenderForm.controls['requestbody'])"
+					name="codemirror"
+					[(ngModel)]="requestBody"
+					[options]="{
+						lineNumbers: true,
+						theme: 'default',
+						mode: requestEditorMode
+					  }"
+					(drop)="drop($event)" 
+					(dragover)="allowDrop($event)"
+					style="min-height: 500px; width: 760px; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>					
+            </ng-template>
           </li>
           <li ngbNavItem="1">
             <a ngbNavLink>Headers</a>
@@ -102,7 +113,7 @@
                           class="right-border-radius-0 btn btn-primary"
                           (click)="addHeader('headers')"
                         >
-                          <span class="fa fa-plus"></span>
+                          <fa-icon icon="plus"></fa-icon>
                         </button>
                         <button
                           title="Remove option"
@@ -112,7 +123,7 @@
                           style="margin-left: -4px"
                           (click)="removeHeader('headers', i, false)"
                         >
-                          <span class="fa fa-remove"></span>
+                          <fa-icon icon="times"></fa-icon>
                         </button>
                       </div>
                     </div>

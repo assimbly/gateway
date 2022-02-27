@@ -22,20 +22,6 @@
       </div>
     </form>
 
-    <!--
-        <div class="form-group">
-            <div class="form-group row">
-                <label style="float: left; text-align: left;">Source:</label>
-
-                <input id="sourceEndpoint" [(ngModel)]="endpointName"  style="padding:5em;" disabled/>
-            </div>
-            <br/>
-            <div class="row">
-                <label style="float: left; text-align: left;">Target:</label>
-                <div style="width:5px; height:auto; display:inline-block;"></div>
-                <input id="targetEndpoint" type="text" aria-label="Default" aria-describedby="inputGroup-sizing-default"  style="margin:5em;"/>
-            </div>
-        </div>-->
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-primary" (click)="cancelModal()">Close</button>
@@ -142,7 +128,15 @@
           <a ngbNavLink>Body</a>
           <ng-template ngbNavContent>
             <br />
-            <!--<ace-editor #editor [(text)]="selectedMessage.body" [mode]="selectedMessage.fileType" [theme]="'eclipse'" contenteditable="false" style="min-height: 600px; width: 96%; overflow: auto; border: 1px solid #ced4da"></ace-editor>-->
+			<ngx-codemirror
+					name="codemirror"
+				  [(ngModel)]="selectedMessage.body"
+				  [options]="{
+					lineNumbers: true,
+					theme: 'default',
+					mode: 'xml'
+				  }"
+				style="min-height: 600px; width: 96%; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>
           </ng-template>
         </li>
         <li ngbNavItem="1">
