@@ -105,10 +105,6 @@ export class BrokerMessageSenderComponent implements OnInit {
         this.finished = true;
     }
 
-    public ngAfterViewInit(): void {
-        //this.editor.nativeElement.focus();        
-    }
-
     load() {
         this.isSending = false;
         this.createRoute = 0;
@@ -561,4 +557,5 @@ export class BrokerMessageSenderComponent implements OnInit {
             }
         }
     }
+	
 }

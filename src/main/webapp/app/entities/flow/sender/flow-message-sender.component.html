@@ -132,9 +132,9 @@
       </div>
 
       <div class="d-flex">
-        <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="vertical" formArrayName="endpointsData">
+        <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="vertical">
           <ng-container>
-            <li ngbNavItem="0">
+            <li ngbNavItem="0" formArrayName="endpointsData">
               <a ngbNavLink>Request</a>
               <ng-template ngbNavContent>
                 <div class="col-12" style="padding-left: 20px" [formGroupName]="0" id="{{ 'tab' + 0 }}">
@@ -200,7 +200,6 @@
                         formControlName="uri"
                         placeholder="{{ uriPlaceholders[0] }}"
                         rows="5"
-                        [(ngModel)]="requestEndpoint.uri"
                       ></textarea>
                     </div>
                     <div class="modal-footer">
@@ -240,7 +239,6 @@
                         id="field_uri"
                         formControlName="uri"
                         placeholder="{{ uriPlaceholders[0] }}"
-                        [(ngModel)]="requestEndpoint.uri"
                         dropdownPosition="bottom"
                       ></ng-select>
                       <button
@@ -302,7 +300,6 @@
                           [addTag]="true"
                           [ngStyle]="{ display: 'block', width: '198px', 'align-left': '-14px' }"
                           (change)="changeOptionSelection(selectedOption[idx], 0, idx)"
-                          [(ngModel)]="selectedOption[idx]"
                           id="field_options-key-{{ idx }}"
                           (focusout)="
                             validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])
@@ -553,14 +550,17 @@
 
                   <div class="form-group">
                     <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
-                    <!--<ace-editor #editor formControlName="requestbody" [(text)]="requestBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da" (drop)="drop($event)" (dragover)="allowDrop($event)"></ace-editor>-->
-
-                    <!-- <div class="row">
-                                            <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
-                                        </div>
-                                        <div class="row">
-                                            <ace-editor #editor formControlName="responsebody" [(text)]="responseBody" [mode]="'text'" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>
-                                        </div>-->
+					<ngx-codemirror
+							name="codemirror"
+							formControlName="requestbody"
+						  [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: 'text'
+						  }"
+						 (drop)="drop($event)"
+						 (dragover)="allowDrop($event)"						  
+						style="min-height: 250px; width: 100%; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>
                   </div>
                 </div>
               </ng-template>
@@ -569,16 +569,25 @@
             <li ngbNavItem="1">
               <a ngbNavLink>Response</a>
               <ng-template ngbNavContent>
+			    <div class="form-group">
                 <div class="container">
-                  <div class="form-group">
-                    <div class="row">
+                   <div class="row">
                       <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
                     </div>
                     <div class="row">
-                      <!--<ace-editor #editor [(text)]="responseBody" [mode]="responseEditorMode" [theme]="'eclipse'" contenteditable="true" style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ace-editor>-->
+						<ngx-codemirror
+							name="codemirror"
+							formControlName="responsebody"
+						  [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: responseEditorMode
+						  }"
+						style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>
                     </div>
-                  </div>
                 </div>
+                </div>
+
               </ng-template>
             </li>
           </ng-container>

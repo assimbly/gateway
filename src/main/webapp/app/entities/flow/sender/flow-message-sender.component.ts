@@ -343,7 +343,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             templatefilter: new FormControl('from'),
             exchangepattern: new FormControl('FireAndForget'),
             numberoftimes: new FormControl('1'),
-            endpointsData: new FormArray([])
+            endpointsData: new FormArray([]),
+			responsebody: new FormControl('')
         });
     }
 

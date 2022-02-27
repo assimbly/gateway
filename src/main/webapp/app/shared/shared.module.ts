@@ -29,7 +29,7 @@ import { WindowRef } from './window/window.service';
     FormatMediumDatePipe,
     SortByDirective,
     SortDirective,
-    ItemCountComponent,
+    ItemCountComponent,	
   ],
   providers: [WindowRef],
   exports: [

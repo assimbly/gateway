@@ -21,7 +21,7 @@ import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
 import { brokerRoute } from './broker.route';
 import { brokerPopupRoute } from './broker.route';
 
-import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+//import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { FlowComponent } from 'app/entities/flow/flow.component';
 import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
@@ -38,7 +38,6 @@ const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
     ReactiveFormsModule,
     PopoverModule.forRoot(),
     CommonModule,
-	CodemirrorModule,
   ],
   exports: [BrokerComponent],
   declarations: [
