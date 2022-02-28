@@ -67,10 +67,10 @@ export class QueueRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToMessageSender(addressName: string) {
-    this.router.navigate(['../broker/message-sender', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/sender/message-sender', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
   }
 
   navigateToMessageBrowser(addressName: string) {
-    this.router.navigate(['../broker/message-browser', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/browser/message-browser', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
   }
 }

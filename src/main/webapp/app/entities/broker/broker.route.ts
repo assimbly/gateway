@@ -10,9 +10,9 @@ import { BrokerComponent } from './broker.component';
 import { BrokerDetailComponent } from './broker-detail.component';
 import { BrokerUpdateComponent } from './broker-update.component';
 import { BrokerDeletePopupComponent } from './broker-delete-dialog.component';
-import { BrokerMessageSenderComponent } from 'app/entities/broker/broker-message-sender.component';
+import { BrokerMessageSenderComponent } from 'app/entities/broker/sender/broker-message-sender.component';
 import { IBroker } from 'app/shared/model/broker.model';
-import { BrokerMessageBrowserComponent } from 'app/entities/broker/broker-message-browser.component';
+import { BrokerMessageBrowserComponent } from 'app/entities/broker/browser/broker-message-browser.component';
 
 @Injectable({ providedIn: 'root' })
 export class BrokerResolve implements Resolve<IBroker> {
@@ -77,7 +77,7 @@ export const brokerRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'broker/message-browser',
+    path: 'broker/browser/message-browser',
     component: BrokerMessageBrowserComponent,
     data: {
       authorities: ['ROLE_USER'],
@@ -86,7 +86,7 @@ export const brokerRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'broker/message-sender',
+    path: 'broker/sender/message-sender',
     component: BrokerMessageSenderComponent,
     data: {
       authorities: ['ROLE_USER'],
