@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -6,14 +7,13 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Gateway } from 'app/shared/model/gateway.model';
 import { IMessage } from 'app/shared/model/messsage.model';
 import { IBroker } from 'app/shared/model/broker.model';
+import { Components } from 'app//shared/camel/component-type';
 
-import { GatewayService } from './../gateway/gateway.service';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { BrokerService } from 'app/entities/broker/broker.service';
 
-import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
-import { Components } from '../../shared/camel/component-type';
-
 import dayjs from 'dayjs/esm';
+
 
 @Component({
     selector: 'jhi-broker-message-sender',
