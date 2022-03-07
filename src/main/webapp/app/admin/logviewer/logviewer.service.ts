@@ -4,14 +4,14 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 
 import { Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LogViewerService {
     private gatewayid = 1;
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     getLogs(lines: number): Observable<HttpResponse<any>> {
-		const url = this.applicationConfigService + '/api/logs/'+ this.gatewayid + '/log/' + lines;
+		const url = this.applicationConfigService.getEndpointFor('/api/logs/'+ this.gatewayid + '/log/' + lines);
         return this.http.get(url, {
             observe: 'response',
             responseType: 'text'

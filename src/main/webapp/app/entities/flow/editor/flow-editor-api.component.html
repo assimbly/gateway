@@ -76,7 +76,6 @@
         </ng-template>
 
 
-        <!--<form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">-->
         <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
             <jhi-alert-error></jhi-alert-error>
             <div class="form-group" [style.display]="'none'">
@@ -145,8 +144,8 @@
                                                                 <div class="input-group">
 																	<label class="form-control-label" for="field_component_type">Component</label>
 																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
-	                                                                <div class="container">
-																		<div class="row">
+	                                                                <!--<div class="container">
+																		<div class="row">-->
 																			<ng-select *ngIf="endpoint.endpointType==='FROM'" [ngStyle]="{'display':'inline-block'}" [items]="consumerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
 																			<ng-select *ngIf="endpoint.endpointType==='TO'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
 																			<ng-select *ngIf="endpoint.endpointType==='ERROR'" [ngStyle]="{'display':'inline-block'}" [items]="producerComponentsNames" [clearable]="false" formControlName="componentType" id="field_component_type" (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
@@ -165,9 +164,9 @@
 																					</a>
 																				</div>
 																			</div>
-																		</div>	
-																	</div>
-																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
+																		<!--</div>	
+																	</div>-->
+																	    <div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
 																		<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required" class="invalid-field-message">ComponentType is required. Please select one.</div>
 																	</div>
                                                                 </div>
@@ -176,14 +175,10 @@
 																<div class="input-group">
 																	<label class="form-control-label" for="field_uri">Path</label>
 																	<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
-	                                                                <div class="container">
-																		<div class="row">
-																			<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
-																			<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">																				
-																				<fa-icon icon="edit"></fa-icon>
-																			</button>																	
-																		</div>	
-																	</div>		
+																	<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
+																	<button type="button" class="col-2 btn btn-primary left-border-radius-0" title="Enlarge" (click)="openModal(uriEditor)">																				
+																		<fa-icon style="color: white;" icon="edit"></fa-icon>
+																	</button>																	
                                                                 </div>
 																<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
 																	<div *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required" class="invalid-field-message">Context path is required.</div>

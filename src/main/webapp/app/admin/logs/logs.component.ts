@@ -11,7 +11,7 @@ export class LogsComponent implements OnInit {
   loggers?: Log[];
   filteredAndOrderedLoggers?: Log[];
   filter = '';
-  orderProp: any = 'name';
+  orderProp: keyof Log = 'name';
   ascending = true;
 
   constructor(private logsService: LogsService) {}

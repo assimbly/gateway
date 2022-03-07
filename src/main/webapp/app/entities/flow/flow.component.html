@@ -15,7 +15,7 @@
     </select>
   </div>
   <div class="row">
-    <div class="col-5">
+    <div class="col-10">
       <input
         type="text"
         align="left"
@@ -26,7 +26,7 @@
         placeholder="Filter By Flow Name"
       />
     </div>
-    <div class="col-6 text-right">
+    <div class="col-2 text-right">
 		<div ngbDropdown class="d-inline-block">
 			<button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
 	        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
@@ -37,7 +37,7 @@
 			</div>
 		</div>
     </div>
-    <div class="col-1"></div>
+    <!--<div class="col-1"></div>-->
   </div>
 
   <br />
@@ -52,6 +52,7 @@
       </blockquote>
     </div>
   </div>
+
   <div
     class="table-responsive"
     *ngIf="flows?.length > 0"
@@ -86,4 +87,5 @@
       </tbody>
     </table>
   </div>
+  
 </div>

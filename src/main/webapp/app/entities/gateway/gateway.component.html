@@ -2,7 +2,7 @@
   <ng-template #restartGatewayModal>
     <div class="modal-header">
       <h4 class="modal-title">Restart Gateway</h4>
-      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+      <button type="button" class="close" aria-label="Close" (click)="cancelModal()" style="color: white;">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -56,7 +56,7 @@
     <button
       type="button"
       (click)="openRestartGatewayModal(restartGatewayModal)"
-      style="margin-right: 5px"
+      style="margin-right: 5px; color: white;"
       class="btn btn-info btn-sm mb-3"
       *jhiHasAnyAuthority="'ROLE_ADMIN'"
     >

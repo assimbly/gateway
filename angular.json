@@ -24,7 +24,7 @@
               "path": "./webpack/webpack.custom.js"
             },			
 			"allowedCommonJsDependencies": [
-				"sockjs-client"
+				"sockjs-client", "codemirror"
 			],
             "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",
@@ -113,7 +113,7 @@
   "cli": {
     "cache": {
       "enabled": true,
-      "path": "./target/",
+      "path": "./target/angular/",
       "environment": "all"
     },
     "packageManager": "npm"
