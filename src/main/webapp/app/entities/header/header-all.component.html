@@ -41,8 +41,8 @@
       </thead>
       <tbody infinite-scroll>
         <tr *ngFor="let header of headers">
-          <td>{{ header.name }}</td>
-          <td class="text-right">
+          <td style="width:80%">{{ header.name }}</td>
+          <td style="width:20%" class="text-right">
             <div class="btn-group flex-btn-group-container">
               <button type="button" [routerLink]="['/header', header.id, 'view']" queryParamsHandling="merge" class="btn btn-info btn-sm">
                 <span class="fa fa-eye"></span> View details

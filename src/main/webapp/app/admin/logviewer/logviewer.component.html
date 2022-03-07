@@ -16,8 +16,8 @@
 </div>
 
 <form name="logsForm" #logsForm="ngForm">
-    <div class="form-row align-items-center float-right">
-        <div class="col-auto">
+    <div class="form-row row align-items-center float-right" style="margin-top: 1em;">
+        <div class="col-2">
    	            <div class="input-group mb-2">
                 <div class="input-group-prepend">
                     <div class="input-group-text">Filter:</div>
@@ -25,7 +25,7 @@
                 <input type="text" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"/>
             </div>
 		</div>
-        <div class="col-auto">
+        <div class="col-2">
             <label class="sr-only" for="lines">Lines</label>
             <div class="input-group mb-2" data-toggle="tooltip"
                 title="The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail).">
@@ -36,6 +36,7 @@
                     [(ngModel)]="lines" id="lines" min="1" max="10000" required>
             </div>
         </div>
+		<div class="col-8"></div>
         <div class="col-auto" style="margin-right: 8px">
             <button type="button" (click)="getLogs()" [disabled]="logsForm.form.invalid" class="btn btn-primary mb-2">Refresh</button>
         </div>

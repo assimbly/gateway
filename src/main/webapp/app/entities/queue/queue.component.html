@@ -5,20 +5,20 @@
   </div>
 
   <div class="row">
-    <div class="col-11-5 text-right" *ngIf="isBroker && addresses?.length === 0">
+    <div class="col-10"></div>
+    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length === 0">
       <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/queue/new']">
-        <span class="fa fa-plus"></span> <span>Create a new Queue</span>
+        <span class="fa fa-plus"></span> <span>Create Queue</span>
       </button>
     </div>
-    <div class="col-11-5 text-right" *ngIf="isBroker && addresses?.length > 0">
+    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length > 0">
       <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/queue/new']">
-        <span class="fa fa-plus"></span> <span>Create a new Queue</span>
+        <span class="fa fa-plus"></span> <span>Create Queue</span>
       </button>
       <button class="btn btn-primary" type="submit" (click)="updateAllQueues()">
         <span class="fa fa-refresh"></span> <span>Refresh</span>
       </button>
     </div>
-    <div class="col-0-5"></div>
   </div>
 
   <div>

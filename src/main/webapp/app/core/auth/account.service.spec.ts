@@ -1,16 +1,16 @@
 jest.mock('app/core/auth/state-storage.service');
-jest.mock('app/core/tracker/tracker.service');
 
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { NgxWebstorageModule } from 'ngx-webstorage';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { of } from 'rxjs';
+import { NgxWebstorageModule, SessionStorageService } from 'ngx-webstorage';
 
 import { Account } from 'app/core/auth/account.model';
 import { Authority } from 'app/config/authority.constants';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
-import { TrackerService } from 'app/core/tracker/tracker.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 import { AccountService } from './account.service';
@@ -34,12 +34,13 @@ describe('Account Service', () => {
   let httpMock: HttpTestingController;
   let mockStorageService: StateStorageService;
   let mockRouter: Router;
-  let mockTrackerService: TrackerService;
+  let mockTranslateService: TranslateService;
+  let sessionStorageService: SessionStorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([]), NgxWebstorageModule.forRoot()],
-      providers: [TrackerService, StateStorageService],
+      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot(), NgxWebstorageModule.forRoot()],
+      providers: [StateStorageService],
     });
 
     service = TestBed.inject(AccountService);
@@ -49,7 +50,9 @@ describe('Account Service', () => {
     mockRouter = TestBed.inject(Router);
     jest.spyOn(mockRouter, 'navigateByUrl').mockImplementation(() => Promise.resolve(true));
 
-    mockTrackerService = TestBed.inject(TrackerService);
+    mockTranslateService = TestBed.inject(TranslateService);
+    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of(''));
+    sessionStorageService = TestBed.inject(SessionStorageService);
   });
 
   afterEach(() => {
@@ -83,8 +86,6 @@ describe('Account Service', () => {
       // THEN
       expect(userIdentity).toBeNull();
       expect(service.isAuthenticated()).toBe(false);
-      expect(mockTrackerService.disconnect).toHaveBeenCalled();
-      expect(mockTrackerService.connect).not.toHaveBeenCalled();
     });
 
     it('authenticationState should emit the same account as was in input parameter', () => {
@@ -99,8 +100,6 @@ describe('Account Service', () => {
       // THEN
       expect(userIdentity).toEqual(expectedResult);
       expect(service.isAuthenticated()).toBe(true);
-      expect(mockTrackerService.connect).toHaveBeenCalled();
-      expect(mockTrackerService.disconnect).not.toHaveBeenCalled();
     });
   });
 
@@ -132,6 +131,32 @@ describe('Account Service', () => {
 
       // Then there is a new request
       httpMock.expectOne({ method: 'GET' });
+    });
+
+    describe('should change the language on authentication if necessary', () => {
+      it('should change language if user has not changed language manually', () => {
+        // GIVEN
+        sessionStorageService.retrieve = jest.fn(key => (key === 'locale' ? undefined : 'otherSessionStorageValue'));
+
+        // WHEN
+        service.identity().subscribe();
+        httpMock.expectOne({ method: 'GET' }).flush({ ...accountWithAuthorities([]), langKey: 'accountLang' });
+
+        // THEN
+        expect(mockTranslateService.use).toHaveBeenCalledWith('accountLang');
+      });
+
+      it('should not change language if user has changed language manually', () => {
+        // GIVEN
+        sessionStorageService.retrieve = jest.fn(key => (key === 'locale' ? 'sessionLang' : undefined));
+
+        // WHEN
+        service.identity().subscribe();
+        httpMock.expectOne({ method: 'GET' }).flush({ ...accountWithAuthorities([]), langKey: 'accountLang' });
+
+        // THEN
+        expect(mockTranslateService.use).not.toHaveBeenCalled();
+      });
     });
 
     describe('navigateToStoredUrl', () => {

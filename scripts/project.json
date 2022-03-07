@@ -2,7 +2,7 @@
   "applicationName": "gateway",
   "applicationType": "monolithic",
   "version": "3.6.0",
-  "jhipsterVersion": "7.5.0",
+  "jhipsterVersion": "7.7.0",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
   "repositoryName": "gateway",
@@ -254,6 +254,11 @@
 	{
       "type": "file",
       "path": "tsconfig.app.json",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "tsconfig.e2e.json",
       "action": "replace"
     },
 	{
@@ -542,6 +547,16 @@
 		  "action": "ignore"
 		},
 		{
+		  "type": "file",
+		  "path": "app/layouts/navbar/active-menu.directive.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/layouts/navbar/navbar.route.ts",
+		  "action": "replace"
+		},
+		{
 		  "type": "dir",
 		  "path": "app/layouts/profiles",
 		  "action": "replace"
@@ -550,6 +565,16 @@
 		  "type": "dir",
 		  "path": "app/login",
 		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/shared/shared-module.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/shared/shared-libs.ts",
+		  "action": "ignore"
 		},
 		{
 		  "type": "dir",
@@ -674,7 +699,7 @@
 		{
 		  "type": "file",
 		  "path": "main.ts",
-		  "action": "replace"
+		  "action": "ignore"
 		},
 		{
 		  "type": "file",

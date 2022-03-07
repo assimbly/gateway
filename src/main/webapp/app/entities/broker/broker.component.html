@@ -99,6 +99,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
+					style="color: white;"
                     (click)="start()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
@@ -114,6 +115,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
+					style="color: white;"
                     (click)="restart()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
@@ -129,6 +131,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
+					style="color: white;"
                     (click)="stop()"
                     class="btn btn-lg"
                     [disabled]="isBrokerStopped || disableActionBtns"
@@ -144,7 +147,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
-                    style="min-width: 20em"
+                    style="min-width: 20em; color: white;"
                     data-container="body"
                     class="btn btn-lg btn-block"
                     placement="right"
@@ -157,9 +160,11 @@
                 </div>
               </div>
 
+			  <div class="row">
               <div class="col">
                 <ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
-                <a
+                <a 
+				  style="padding-left: 1em;"
                   (mouseenter)="getBrokerDetails()"
                   aria-hidden="true"
                   data-container="body"
@@ -201,6 +206,7 @@
 				  	<fa-icon icon="trash"></fa-icon>
 				  </a>
               </div>
+			  </div>
             </div>
           </td>
         </tr>

@@ -2,9 +2,9 @@ import { Route } from '@angular/router';
 import { DeploymentComponent } from './deployment.component';
 
 export const deploymentRoute: Route = {
-    path: 'deployment',
+    path: '',
     component: DeploymentComponent,
     data: {
-        pageTitle: 'Deployment'
+		pageTitle: 'global.title'
     }
 };
