@@ -6,7 +6,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { CertificateService } from './certificate.service';
 import { ICertificate } from 'app/shared/model/certificate.model';
-import { CertificatePopupService } from 'app/entities/certificate/certificate-popup.service';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
@@ -96,25 +95,5 @@ export class CertificateSelfSignDialogComponent implements OnInit, AfterContentI
 
   previousState() {
     window.history.back();
-  }
-}
-
-@Component({
-  selector: 'jhi-certificate-self-sign-popup',
-  template: '',
-})
-export class CertificateSelfSignPopupComponent implements OnInit, OnDestroy {
-  routeSub: any;
-
-  constructor(protected route: ActivatedRoute, protected certificatePopupService: CertificatePopupService) {}
-
-  ngOnInit() {
-    this.routeSub = this.route.params.subscribe(() => {
-      this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
-    });
-  }
-
-  ngOnDestroy() {
-    this.routeSub.unsubscribe();
   }
 }

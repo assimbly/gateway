@@ -63,8 +63,8 @@
                 queryParamsHandling="merge"
                 class="btn btn-primary btn-sm"
               >
-                <span class="fa fa-pencil"></span>&nbsp;
-                <span> Edit</span>
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
               </button>
               <button
                 type="button"
@@ -73,16 +73,15 @@
                 fragment="clone"
                 class="btn btn-info btn-sm"
               >
-                <span class="fa fa-clone"></span>&nbsp;
-                <span> Clone</span>
+      				<fa-icon icon="clone"></fa-icon>
+					<span class="d-none d-md-inline">Clone</span>
               </button>
               <button
                 type="button"
-                [routerLink]="['/', { outlets: { popup: 'service/' + service.id + '/delete' } }]"
-                queryParamsHandling="merge"
+				(click)="delete(service)"
                 class="btn btn-danger btn-sm"
               >
-                <span class="fa fa-remove"></span>
+                <fa-icon icon="times"></fa-icon>
                 <span class="d-none d-md-inline">Delete</span>
               </button>
             </div>

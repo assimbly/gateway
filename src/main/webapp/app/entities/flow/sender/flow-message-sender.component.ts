@@ -330,7 +330,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         const tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
-            if (this.requestComponentType === endpoint.componentType) {
+            if (this.requestComponentType === endpoint.componentType.toLowerCase()) {
                 this.URIList.push(endpoint);
             }
         });

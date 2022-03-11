@@ -1,5 +1,5 @@
 <div>
-  <div class="row mt-3" style="margin-left: 0.3em">
+  <div class="row mt-3">
     <h2>Topics ({{ brokerType }})</h2>
     <br />
   </div>
@@ -8,15 +8,15 @@
     <div class="col-10"></div>
     <div class="col-2 text-right" *ngIf="isBroker && addresses?.length === 0">
       <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
-        <span class="fa fa-plus"></span> <span>Create a new Topic</span>
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
       </button>
     </div>
     <div class="col-2 text-right" *ngIf="isBroker && addresses?.length > 0">
       <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
-        <span class="fa fa-plus"></span> <span>Create a new Topic</span>
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
       </button>
       <button class="btn btn-primary" type="submit" (click)="updateAllTopics()" style="margin-right: -2em">
-        <span class="fa fa-refresh"></span> <span>Refresh</span>
+        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline">Refresh</span>
       </button>
     </div>
     

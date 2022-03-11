@@ -5,7 +5,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
-import { RouteDeleteDialogComponent, RouteDeletePopupComponent } from './route-delete-dialog.component';
+import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 import { routeRoute } from './route.route';
 import { RoutePopupService } from 'app/entities/route/route-popup.service';
 import { RouteService } from 'app/entities/route/route.service';
@@ -22,7 +22,6 @@ import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route/route-
     RouteDeleteDialogComponent,
     RouteDialogComponent,
     RoutePopupComponent,
-    RouteDeletePopupComponent,
     ForbiddenRouteNamesValidatorDirective,
   ],
   entryComponents: [
@@ -31,7 +30,6 @@ import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route/route-
     RouteUpdateComponent,
     RoutePopupComponent,
     RouteDeleteDialogComponent,
-    RouteDeletePopupComponent,
   ],
   providers: [RouteService, RoutePopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

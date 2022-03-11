@@ -11,12 +11,10 @@ import { MaintenanceDetailComponent } from './maintenance-detail.component';
 
 import { MaintenanceUpdateComponent } from './maintenance-update.component';
 import { MaintenanceDeleteDialogComponent } from './maintenance-delete-dialog.component';
-import { MaintenanceDeletePopupComponent } from './maintenance-delete-dialog.component';
 
 import { maintenanceRoute } from './maintenance.route';
-import { maintenancePopupRoute } from './maintenance.route';
 
-const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
+const ENTITY_STATES = [...maintenanceRoute];
 
 @NgModule({
   imports: [SharedModule, ReactiveFormsModule, CommonModule, RouterModule.forChild(ENTITY_STATES)],
@@ -25,9 +23,8 @@ const ENTITY_STATES = [...maintenanceRoute, ...maintenancePopupRoute];
     MaintenanceDetailComponent,
     MaintenanceUpdateComponent,
     MaintenanceDeleteDialogComponent,
-    MaintenanceDeletePopupComponent,
   ],
-  entryComponents: [MaintenanceComponent, MaintenanceUpdateComponent, MaintenanceDeleteDialogComponent, MaintenanceDeletePopupComponent],
+  entryComponents: [MaintenanceComponent, MaintenanceUpdateComponent, MaintenanceDeleteDialogComponent],
   providers: [MaintenanceService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

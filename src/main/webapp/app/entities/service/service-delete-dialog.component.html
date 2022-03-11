@@ -1,8 +1,7 @@
 <form name="deleteForm" (ngSubmit)="confirmDelete(service.id)">
     <div class="modal-header">
         <h4 class="modal-title">Confirm delete operation</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                (click)="clear()">&times;</button>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>		
     </div>
     <div class="modal-body">        
         <p id="jhi-delete-service-heading" *ngIf="!errorMessage">Are you sure you want to delete this service?</p>

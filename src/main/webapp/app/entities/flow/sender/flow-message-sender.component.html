@@ -232,7 +232,8 @@
 							bindValue="uri"
 							id="field_uri"
 							formControlName="uri"
-							placeholder="{{ uriPlaceholders[0] }}"
+							placeholder="{{uriPlaceholders[0]}}"
+							[(ngModel)]="requestEndpoint.uri"
 							dropdownPosition="bottom"
 						  ></ng-select>
 						</div>  

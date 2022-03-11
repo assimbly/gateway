@@ -5,7 +5,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { CertificateService } from './certificate.service';
 import { ICertificate } from 'app/shared/model/certificate.model';
-import { CertificatePopupService } from 'app/entities/certificate/certificate-popup.service';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
@@ -29,6 +28,7 @@ export class CertificateUploadDialogComponent implements AfterContentInit {
   constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   ngAfterContentInit() {
+    console.log('4 upload');
     this.certificateService.query().subscribe(res => {
       this.securities = res.body;
       this.certificateId = this.securities[0].id;
@@ -87,25 +87,5 @@ export class CertificateUploadDialogComponent implements AfterContentInit {
         console.log(err);
       }
     );
-  }
-}
-
-@Component({
-  selector: 'jhi-certificate-upload-popup',
-  template: '',
-})
-export class CertificateUploadPopupComponent implements OnInit, OnDestroy {
-  routeSub: any;
-
-  constructor(protected route: ActivatedRoute, protected certificatePopupService: CertificatePopupService) {}
-
-  ngOnInit() {
-    this.routeSub = this.route.params.subscribe(() => {
-      this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
-    });
-  }
-
-  ngOnDestroy() {
-    this.routeSub.unsubscribe();
   }
 }

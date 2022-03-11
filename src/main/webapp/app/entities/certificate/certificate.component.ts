@@ -1,15 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';import { AlertService } from 'app/core/util/alert.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
-import { Router } from '@angular/router';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { CertificateService } from './certificate.service';
+import { CertificatePopupService } from './certificate-popup.service';
+
+import { CertificateDeleteDialogComponent } from './certificate-delete-dialog.component';
+import { CertificateUploadDialogComponent } from './certificate-upload-dialog.component';
+import { CertificateUploadP12DialogComponent } from './certificate-uploadp12-dialog.component';
+import { CertificateSelfSignDialogComponent } from './certificate-self-sign-dialog.component';
 
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
@@ -33,11 +39,12 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   constructor(
     protected certificateService: CertificateService,
+	protected certificatePopupService: CertificatePopupService,
     protected alertService: AlertService,
+	protected modalService: NgbModal,
     protected eventManager: EventManager,
     protected parseLinks: ParseLinks,
-    protected accountService: AccountService,
-    protected router: Router
+    protected accountService: AccountService
   ) {
     this.securities = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
@@ -61,7 +68,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }
-
+  
   reset() {
     this.page = 0;
     this.securities = [];
@@ -85,6 +92,18 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.eventManager.destroy(this.eventSubscriber);
   }
 
+  	delete(certificate: ICertificate): void {
+		const modalRef = this.modalService.open(CertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.certificate = certificate;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+
+	
   trackId(index: number, item: ICertificate) {
     return item.id;
   }
@@ -103,17 +122,17 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   uploadCertificate() {
     console.log('Upload certificate');
-    this.router.navigate(['/', { outlets: { popup: ['upload'] } }]);
+	this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
   }
 
   uploadP12Certificate() {
     console.log('Upload P12 certificate');
-    this.router.navigate(['/', { outlets: { popup: ['uploadp12'] } }]);
+	this.certificatePopupService.open(CertificateUploadP12DialogComponent as Component);
   }
 
   generateCertificate() {
     console.log('Generate self-signed certificate');
-    this.router.navigate(['/', { outlets: { popup: ['self-sign'] } }]);
+	this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
   }
 
   exportCertificate(id) {

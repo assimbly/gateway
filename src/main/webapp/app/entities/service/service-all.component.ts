@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 
+import { ServiceDeleteDialogComponent } from './service-delete-dialog.component';
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceService } from './service.service';
 import { Subscription } from 'rxjs';
@@ -22,6 +24,7 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
   constructor(
     protected serviceService: ServiceService,
     protected alertService: AlertService,
+	protected modalService: NgbModal,
     protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
@@ -31,7 +34,7 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAllServices();
+    this.loadAll();
     this.registerChangeInServices();
   }
 
@@ -40,10 +43,10 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
   }
 
   private registerChangeInServices() {
-    this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.loadAllServices());
+    this.eventSubscriber = this.eventManager.subscribe('serviceListModification', response => this.loadAll());
   }
 
-  private loadAllServices() {
+  private loadAll() {
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
@@ -59,6 +62,17 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
         res => this.onError(res)
       );
   }
+  
+  delete(service: IService): void {
+		const modalRef = this.modalService.open(ServiceDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.service = service;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
 
   private onError(error) {
 	this.alertService.addAlert({
@@ -78,6 +92,6 @@ export class ServiceAllComponent implements OnInit, OnDestroy {
   reset() {
     this.page = 0;
     this.services = [];
-    this.loadAllServices();
+    this.loadAll();
   }
 }

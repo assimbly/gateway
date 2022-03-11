@@ -6,14 +6,12 @@ import { SharedModule } from 'app/shared/shared.module';
 import { HeaderKeysComponent } from './header-keys.component';
 import { HeaderKeysDetailComponent } from './header-keys-detail.component';
 import { HeaderKeysUpdateComponent } from '././header-keys-update.component';
-import { HeaderKeysDeletePopupComponent } from '././header-keys-delete-dialog.component';
 import { HeaderKeysDeleteDialogComponent } from '././header-keys-delete-dialog.component';
 import { headerKeysRoute } from './header-keys.route';
-import { headerKeysPopupRoute } from './header-keys.route';
 
 import { ForbiddenHeaderKeysValidatorDirective } from './header-keys-validation.directive';
 
-const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
+const ENTITY_STATES = [...headerKeysRoute];
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild(ENTITY_STATES)],
@@ -23,11 +21,9 @@ const ENTITY_STATES = [...headerKeysRoute, ...headerKeysPopupRoute];
     HeaderKeysDetailComponent,
     HeaderKeysUpdateComponent,
     HeaderKeysDeleteDialogComponent,
-    HeaderKeysDeletePopupComponent,
     ForbiddenHeaderKeysValidatorDirective,
   ],
-  entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent, HeaderKeysDeletePopupComponent],
-  providers: [HeaderKeysDeletePopupComponent],
+  entryComponents: [HeaderKeysComponent, HeaderKeysUpdateComponent, HeaderKeysDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class HeaderKeysModule {}

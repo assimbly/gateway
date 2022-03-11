@@ -199,8 +199,7 @@
                 <a
                   style="padding-left: 1em"
                   type="submit"
-                  [routerLink]="['/', { outlets: { popup: 'broker/' + broker.id + '/delete' } }]"
-                  queryParamsHandling="merge"
+                  (click)="delete(broker)"
                   placement="right"
                   title="Delete broker">
 				  	<fa-icon icon="trash"></fa-icon>

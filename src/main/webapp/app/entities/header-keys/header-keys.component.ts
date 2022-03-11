@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { Observable } from 'rxjs';
 
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
+import { HeaderKeysDeleteDialogComponent } from '././header-keys-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { HeaderKeysService } from './header-keys.service';
 
@@ -29,6 +32,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     constructor(
         protected headerKeysService: HeaderKeysService,
         protected alertService: AlertService,
+		protected modalService: NgbModal,
         protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
@@ -47,6 +51,17 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(parseInt(res.toString())));
     }
 
+	delete(headerKey: IHeaderKeys): void {
+		const modalRef = this.modalService.open(HeaderKeysDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.headerKey = headerKey;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     updateHeaderKeys(id: number) {
         this.headerKeys = this.headerKeys.filter(x => x.id !== id);
         this.mapHeaderKeysKeys();

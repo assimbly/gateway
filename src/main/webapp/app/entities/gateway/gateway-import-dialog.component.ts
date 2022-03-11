@@ -54,23 +54,3 @@ export class GatewayImportDialogComponent implements AfterContentInit {
         );
     }
 }
-
-@Component({
-    selector: 'jhi-gateway-import-popup',
-    template: ''
-})
-export class GatewayImportPopupComponent implements OnInit, OnDestroy {
-    routeSub: any;
-
-    constructor(protected route: ActivatedRoute, protected gatewayPopupService: GatewayPopupService) {}
-
-    ngOnInit() {
-        this.routeSub = this.route.params.subscribe(() => {
-            this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
-        });
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
-}

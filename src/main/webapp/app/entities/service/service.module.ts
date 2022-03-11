@@ -11,7 +11,6 @@ import { ServiceComponent } from './service.component';
 import { ServiceDetailComponent } from './service-detail.component';
 import { ServiceUpdateComponent } from './service-update.component';
 
-import { ServiceDeletePopupComponent } from './service-delete-dialog.component';
 import { ServiceDeleteDialogComponent } from './service-delete-dialog.component';
 import { ServiceDialogComponent } from './service-dialog.component';
 import { ServiceAllComponent } from './service-all.component';
@@ -37,7 +36,6 @@ const ENTITY_STATES = [...serviceRoute, ...servicePopupRoute];
     ServiceUpdateComponent,
     ServiceDialogComponent,
     ServiceDeleteDialogComponent,
-    ServiceDeletePopupComponent,
     ServicePopupComponent,
     ForbiddenServiceNamesValidatorDirective,
     ForbiddenServiceKeysValidatorDirective,
@@ -48,7 +46,6 @@ const ENTITY_STATES = [...serviceRoute, ...servicePopupRoute];
     ServiceUpdateComponent,
     ServiceDeleteDialogComponent,
     ServiceDialogComponent,
-    ServiceDeletePopupComponent,
     ServicePopupComponent,
   ],
   providers: [ServiceService, ServicePopupService],

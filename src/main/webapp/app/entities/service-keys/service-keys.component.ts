@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Service } from 'app/shared/model/service.model';
 import { Observable, Subscription } from 'rxjs';
@@ -6,6 +7,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 
+import { ServiceKeysDeleteDialogComponent } from './service-keys-delete-dialog.component';
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { ServiceKeysService } from './service-keys.service';
@@ -33,6 +35,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         protected serviceKeysService: ServiceKeysService,
         protected services: Services,
         protected alertService: AlertService,
+		protected modalService: NgbModal,
         protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
@@ -66,6 +69,17 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         }
     }
 
+	delete(serviceKey: IServiceKeys): void {
+		const modalRef = this.modalService.open(ServiceKeysDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.serviceKey = serviceKey;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     ngOnChanges(changes: SimpleChanges) {
         this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {

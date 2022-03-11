@@ -9,7 +9,6 @@ import { MaintenanceService } from './maintenance.service';
 import { MaintenanceComponent } from './maintenance.component';
 import { MaintenanceDetailComponent } from './maintenance-detail.component';
 import { MaintenanceUpdateComponent } from './maintenance-update.component';
-import { MaintenanceDeletePopupComponent } from './maintenance-delete-dialog.component';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 
 @Injectable({ providedIn: 'root' })
@@ -34,7 +33,7 @@ export const maintenanceRoute: Routes = [
     component: MaintenanceComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'Maintenance',
+      pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
@@ -73,21 +72,5 @@ export const maintenanceRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const maintenancePopupRoute: Routes = [
-  {
-    path: 'maintenance/:id/delete',
-    component: MaintenanceDeletePopupComponent,
-    resolve: {
-      maintenance: MaintenanceResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

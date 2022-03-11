@@ -3,9 +3,13 @@ import { IFlow, Flow } from 'app/shared/model/flow.model';
 import dayjs from 'dayjs/esm';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { WindowRef } from 'app/shared/window/window.service';
+
+import { MaintenanceDeleteDialogComponent } from './maintenance-delete-dialog.component';
 import { IMaintenance } from 'app/shared/model/maintenance.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { MaintenanceService } from './maintenance.service';
@@ -40,6 +44,7 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     protected maintenanceService: MaintenanceService,
     protected flowService: FlowService,
     protected alertService: AlertService,
+	protected modalService: NgbModal,
     protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
@@ -82,6 +87,18 @@ export class MaintenanceComponent implements OnInit, OnDestroy {
     this.eventManager.destroy(this.eventSubscriber);
   }
 
+	delete(maintenance: IMaintenance): void {
+		const modalRef = this.modalService.open(MaintenanceDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.maintenance = maintenance;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}  		
+		
+		
   trackId(index: number, item: IMaintenance) {
     return item.id;
   }

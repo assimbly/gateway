@@ -37,8 +37,8 @@
             <div class="modal-body" [formGroup]="testConnectionForm">
                 <div class="form-group row">
                     <div class="col-8">
-                        <label class="form-control-label" for="field_header">Host
-                            name</label> <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+                        <label class="form-control-label" for="field_header">Host name</label>
+						<i triggers="mouseenter:mouseleave" popoverTitle="Info"
                                             [popover]="hostnamePopover" container="body" placement="right"
                                             ><fa-icon icon="info-circle"></fa-icon></i> <input type="text"
                                                                                   class="form-control" formControlName="connectionHost"
@@ -87,14 +87,15 @@
             </ng-template>
             <div class="form-group">
                 <div class="form-group row">
-                    <div class="col-12">
-                        <input style="border: none; font-weight:bold; font-size: 24px;" type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow" formControlName="name" />
+                    <div class="col-8">
+                        <input style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 2em;" type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow" formControlName="name" />
                         <div
                             *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
                             <div *ngIf="editFlowForm['controls'].name.errors.required"
                                  class="invalid-field-message">Flowname is required.</div>
                         </div>
                     </div>
+					<div class="col-4"></div>
                 </div>
             </div>
 
@@ -185,7 +186,7 @@
 																	<div class="col-10">
 																		<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block', 'width':'100%'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
 																	</div>																		
-																	<button type="button" class="col-2 btn btn-primary" title="Enlarge" (click)="openModal(uriEditor)">																				
+																	<button type="button" class="col-2 btn btn-primary" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-12px'}" title="Enlarge" (click)="openModal(uriEditor)">																				
 																		<fa-icon style="color: white;" icon="edit"></fa-icon>
 																	</button>																	
                                                                 </div>

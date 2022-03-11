@@ -9,7 +9,6 @@ import { EnvironmentVariablesService } from './environment-variables.service';
 import { EnvironmentVariablesComponent } from './environment-variables.component';
 import { EnvironmentVariablesDetailComponent } from './environment-variables-detail.component';
 import { EnvironmentVariablesUpdateComponent } from './environment-variables-update.component';
-import { EnvironmentVariablesDeletePopupComponent } from './environment-variables-delete-dialog.component';
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 @Injectable({ providedIn: 'root' })
@@ -73,21 +72,5 @@ export const environmentVariablesRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const environmentVariablesPopupRoute: Routes = [
-  {
-    path: 'environment-variables/:id/delete',
-    component: EnvironmentVariablesDeletePopupComponent,
-    resolve: {
-      environmentVariables: EnvironmentVariablesResolve,
-    },
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

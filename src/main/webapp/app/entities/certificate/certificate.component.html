@@ -75,8 +75,7 @@
               </button>
               <button
                 type="submit"
-                [routerLink]="['/', { outlets: { popup: 'certificate/' + certificate.id + '/delete' } }]"
-                queryParamsHandling="merge"
+				(click)="delete(certificate)"
                 class="btn btn-danger btn-sm"
               >
                 <fa-icon [icon]="'times'"></fa-icon>

@@ -1,7 +1,7 @@
 <ng-template #moveMessageModal>
   <div class="modal-header">
     <h4 class="modal-title">Move message</h4>
-    <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -122,12 +122,13 @@
       </button>
       <br />
     </div>
-    <div class="col-6" style="position: fixed; left: 50%; width: 100%">
+    <div class="col-6" style="position: fixed; left: 50%; width 90%;">
       <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="horizontal">
         <li ngbNavItem="0">
           <a ngbNavLink>Body</a>
           <ng-template ngbNavContent>
             <br />
+			<div style="border:1px solid black;">
 			<ngx-codemirror
 					name="codemirror"
 				  [(ngModel)]="selectedMessage.body"
@@ -136,7 +137,8 @@
 					theme: 'default',
 					mode: 'xml'
 				  }"
-				style="min-height: 600px; width: 96%; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>
+				style="min-height: 600px;"></ngx-codemirror>
+				</div>
           </ng-template>
         </li>
         <li ngbNavItem="1">
@@ -146,7 +148,7 @@
             <div
               class="table-responsive"
               [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 96%"
+              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 90%"
             >
               <table class="table table-striped table-condensed">
                 <thead class="transparant">
@@ -176,7 +178,7 @@
             <div
               class="table-responsive"
               [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 96%"
+              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 90%"
             >
               <table class="table table-striped table-condensed">
                 <thead class="transparant">

@@ -10,7 +10,6 @@ import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditorComponent } from './editor/flow-editor.component';
-import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
 import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
 
 @Injectable({ providedIn: 'root' })
@@ -98,21 +97,5 @@ export const flowRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const flowPopupRoute: Routes = [
-  {
-    path: 'flow/:id/delete',
-    component: FlowDeletePopupComponent,
-    resolve: {
-      flow: FlowResolve,
-    },
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

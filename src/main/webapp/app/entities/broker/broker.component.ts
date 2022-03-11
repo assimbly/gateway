@@ -3,12 +3,13 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { BrokerService } from './broker.service';
+import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
 
 enum Status {
     active = 'active',
@@ -50,6 +51,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         protected alertService: AlertService,
         protected eventManager: EventManager,
         protected accountService: AccountService,
+		protected modalService: NgbModal,
         protected router: Router
     ) {
         this.router.routeReuseStrategy.shouldReuseRoute = function() {
@@ -199,6 +201,17 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <b>Total Messages:</b> ${totalMessages}<br/>`;
         }
     }
+	
+	delete(broker: IBroker): void {
+		const modalRef = this.modalService.open(BrokerDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.broker = broker;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
 
     start() {
         this.isBrokerStatusOK = true;

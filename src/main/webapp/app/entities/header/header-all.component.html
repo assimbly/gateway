@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-10">
       <h2>
-        <span>Header</span>
+        <span>Headers</span>
       </h2>
     </div>
     <div class="col-2">
@@ -26,7 +26,7 @@
     <div class="col-10"></div>
     <div class="col-2">
       <button class="btn btn-primary float-right jh-create-entity create-header" [routerLink]="['/header/new']">
-        <span class="fa fa-plus"></span> <span>Create Header</span>
+        <fa-icon icon="plus"></fa-icon> <span>Create Header</span>
       </button>
     </div>
   </div>
@@ -41,19 +41,17 @@
       </thead>
       <tbody infinite-scroll>
         <tr *ngFor="let header of headers">
-          <td style="width:80%">{{ header.name }}</td>
-          <td style="width:20%" class="text-right">
+          <td style="width:85%">{{ header.name }}</td>
+          <td style="width:15%" class="text-right">
             <div class="btn-group flex-btn-group-container">
-              <button type="button" [routerLink]="['/header', header.id, 'view']" queryParamsHandling="merge" class="btn btn-info btn-sm">
-                <span class="fa fa-eye"></span> View details
-              </button>
               <button
                 type="button"
                 [routerLink]="['/header', header.id, 'edit']"
                 queryParamsHandling="merge"
                 class="btn btn-primary btn-sm"
               >
-                <span class="fa fa-pencil"></span>&nbsp; <span> Edit</span>
+                <fa-icon icon="pencil-alt"></fa-icon>
+				<span class="d-none d-md-inline">Edit</span>
               </button>
               <button
                 type="button"
@@ -62,15 +60,16 @@
                 fragment="clone"
                 class="btn btn-info btn-sm"
               >
-                <span class="fa fa-clone"></span>&nbsp; <span> Clone</span>
+                <fa-icon icon="clone"></fa-icon>
+				<span class="d-none d-md-inline">Clone</span>
               </button>
               <button
                 type="button"
-                [routerLink]="['/', { outlets: { popup: 'header/' + header.id + '/delete' } }]"
-                queryParamsHandling="merge"
+                 (click)="delete(header)"
                 class="btn btn-danger btn-sm"
               >
-                <span class="fa fa-remove"></span> <span class="d-none d-md-inline">Delete</span>
+                <fa-icon icon="times"></fa-icon>
+				<span class="d-none d-md-inline">Delete</span>
               </button>
             </div>
           </td>

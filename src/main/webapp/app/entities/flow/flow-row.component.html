@@ -44,6 +44,7 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"
+		  style="color: white;"
           type="button"
           (click)="start()"
           class="btn btn-sm"
@@ -59,6 +60,7 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"
+ 		  style="color: white;"
           type="button"
           (click)="restart()"
           class="btn btn-sm"
@@ -74,6 +76,7 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"
+  		  style="color: white;"
           type="button"
           (click)="pause()"
           class="btn btn-sm"
@@ -89,6 +92,7 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"
+  		  style="color: white;"
           type="button"
           (click)="resume()"
           class="btn btn-sm"
@@ -104,6 +108,7 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"
+  		  style="color: white;"
           type="button"
           (click)="stop()"
           class="btn btn-sm"
@@ -118,15 +123,15 @@
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
           }"		  
+  		  style="min-width: 20em; color: white;"
           type="button"
-          data-container="body"		  
           class="btn btn-sm btn-block btn-arrow-right text-left"
+		  data-container="body"		  
           placement="right"
           triggers="mouseenter:mouseleave"
           popoverTitle="Status"
           [ngbPopover]="statusFlowButtonTemplate"
           [autoClose]="'outside'"
-		  style="min-width: 20em"
         >
           <span style="text-transform: uppercase">{{ flow.name }}</span>
         </button>
@@ -228,11 +233,12 @@
     </div>
 </td>
 
-
 <td id="flowRowID" [hidden]="!flowRowID">
   <a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{ flow.gatewayId }}</a>
 </td>
+
 <td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID"></td>
+
 <td class="text-right">
   <div class="float-right" style="margin-right: 30px">
     <ng-template #statusFlowButtonTemplate let-message="message">
@@ -245,7 +251,7 @@
     </h4>
     <h5 class="float-right" style="margin-left: 10px; vertical-align: top">
       <span
-        class="badge badge-warning fa fa-exclamation-triangle"
+        class="badge bg-warning text-dark"
         *ngIf="flowAlerts === 'true'"
         (mouseenter)="(p != p)"
         placement="left"
@@ -255,6 +261,7 @@
         [ngbPopover]="alertsFlowButtonTemplate"
         [autoClose]="'outside'"
       >
+			<fa-icon icon="exclamation-triangle"></fa-icon>
         <span *ngIf="numberOfAlerts > 1">{{ numberOfAlerts }} Alerts</span>
         <span *ngIf="numberOfAlerts == 1">1 Alert</span>
       </span>

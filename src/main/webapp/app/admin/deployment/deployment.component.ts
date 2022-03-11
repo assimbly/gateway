@@ -4,6 +4,10 @@ import { IGateway } from 'app/shared/model/gateway.model';
 import { Router } from '@angular/router';
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
 import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
+import { GatewayExportDialogComponent } from 'app/entities/gateway/gateway-export-dialog.component';
+import { GatewayImportDialogComponent } from 'app/entities/gateway/gateway-import-dialog.component';
+
 import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow/flow.service';
 
@@ -21,6 +25,7 @@ export class DeploymentComponent implements OnInit {
   constructor(
     private router: Router,
     protected gatewayService: GatewayService,
+	protected gatewayPopupService: GatewayPopupService,
     protected flowService: FlowService
   ) {}
 
@@ -52,10 +57,10 @@ export class DeploymentComponent implements OnInit {
   }
 
   downloadConfiguration() {
-    this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
+    this.gatewayPopupService.open(GatewayExportDialogComponent as Component);
   }
 
   uploadConfiguration() {
-    this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
+	this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
   }
 }
