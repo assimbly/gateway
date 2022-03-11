@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 
+import { HeaderDeleteDialogComponent } from './header-delete-dialog.component';
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
 import { HeaderService } from './header.service';
 import { Subscription } from 'rxjs';
@@ -23,6 +25,7 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
   constructor(
     protected headerService: HeaderService,
     protected alertService: AlertService,
+	protected modalService: NgbModal,
     protected eventManager: EventManager,
     protected accountService: AccountService
   ) {
@@ -32,7 +35,7 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAllHeaders();
+    this.loadAll();
     this.registerChangeInHeaders();
   }
 
@@ -47,14 +50,14 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
   reset() {
     this.page = 0;
     this.headers = [];
-    this.loadAllHeaders();
+    this.loadAll();
   }
 
   ngOnDestroy() {
     this.eventManager.destroy(this.eventSubscriber);
   }
 
-  private loadAllHeaders() {
+  private loadAll() {
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
@@ -70,9 +73,20 @@ export class HeaderAllComponent implements OnInit, OnDestroy {
         res => this.onError(res.body)
       );
   }
+  
+  	delete(header: IHeader): void {
+		const modalRef = this.modalService.open(HeaderDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.header = header;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
 
   private registerChangeInHeaders() {
-    this.eventSubscriber = this.eventManager.subscribe('headerListModification', () => this.loadAllHeaders());
+    this.eventSubscriber = this.eventManager.subscribe('headerListModification', () => this.loadAll());
   }
 
   private onError(error) {

@@ -132,10 +132,9 @@
                 type="submit"
                 title="Delete"
                 *ngIf="headerKey.id"
-                queryParamsHandling="merge"
                 class="btn btn-danger"
-                [routerLink]="['/', { outlets: { popup: 'header-keys/' + headerKey?.id + '/delete' } }]"
-              >
+				(click)="delete(headerKey)"
+				>
                 <span class="fa fa-trash"></span>
               </button>
             </div>

@@ -99,7 +99,7 @@
                     <div class="btn-group flex-btn-group-container">
                       <div class="btn-group flex-btn-group-container">
                         <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
-                          <span class="fa fa-plus"></span>
+                          <fa-icon icon="plus" style="color: white;"></fa-icon>
                         </button>
                         <button
                           type="button"
@@ -109,10 +109,10 @@
                           class="btn btn-danger"
                           (click)="deleteHeaderKeys(headerKey)"
                         >
-                          <span class="fa fa-trash"></span>
-                        </button>
+							<fa-icon icon="times" style="color: white;" ></fa-icon>
+						</button>
                         <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
-                          <span class="fa fa-remove"></span>
+                          <fa-icon icon="times" style="color: white;" ></fa-icon>
                         </button>
                       </div>
                     </div>

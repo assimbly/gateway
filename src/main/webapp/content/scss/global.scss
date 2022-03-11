@@ -108,6 +108,7 @@ Generic styles
 
 .footer {
   border-top: 1px solid rgba(0, 0, 0, 0.125);
+  display: table-row;
 }
 
 .hand,
@@ -720,4 +721,19 @@ ng-dropdown-panel > div {
 .CodeMirror {
     height: 600px;
 	width: 100%;
+}
+
+.flex-wrapper {
+    display: flex;
+    margin-top: 10px;
+    min-height: 95vh;
+    flex-direction: column;
+    justify-content: space-between;
+    display: table;
+}
+
+.jh-card {
+    background-color: white;
+    min-height: 700px;
+    height: 100%;
 }

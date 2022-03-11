@@ -9,7 +9,6 @@ import { HeaderService } from './header.service';
 import { HeaderComponent } from './header.component';
 import { HeaderDetailComponent } from './header-detail.component';
 import { HeaderUpdateComponent } from './header-update.component';
-import { HeaderDeletePopupComponent } from './header-delete-dialog.component';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderAllComponent } from './header-all.component';
 import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
@@ -107,18 +106,5 @@ export const headerPopupRoute: Routes = [
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
-  },
-  {
-    path: 'header/:id/delete',
-    component: HeaderDeletePopupComponent,
-    resolve: {
-      header: HeaderResolve,
-    },
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  },
+  }
 ];

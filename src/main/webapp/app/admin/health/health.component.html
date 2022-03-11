@@ -19,7 +19,7 @@
       <tbody *ngIf="health">
         <tr *ngFor="let componentHealth of health.components | keyvalue">
           <td>
-            {{ 'health.indicator.' + componentHealth.key | translate }}
+            {{ componentHealth.key }}
           </td>
           <td class="text-center">
             <span

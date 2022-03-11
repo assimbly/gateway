@@ -5,7 +5,7 @@ import { SharedModule } from 'app/shared/shared.module';
 import { TopicComponent } from './topic.component';
 import { TopicDetailComponent } from './topic-detail.component';
 import { TopicUpdateComponent } from './topic-update.component';
-import { TopicDeleteDialogComponent, TopicDeletePopupComponent } from './topic-delete-dialog.component';
+import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { TopicRowComponent } from './topic-row.component';
 import { TopicSearchByNamePipe } from './topic.searchbyname.pipe';
 import { topicRoute } from './topic.route';
@@ -21,7 +21,6 @@ import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog
     TopicDetailComponent,
     TopicUpdateComponent,
     TopicDeleteDialogComponent,
-    TopicDeletePopupComponent,
     TopicSearchByNamePipe,
     TopicClearDialogComponent,
     TopicRowComponent,

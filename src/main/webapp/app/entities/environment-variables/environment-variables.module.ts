@@ -7,12 +7,10 @@ import { EnvironmentVariablesComponent } from './environment-variables.component
 import { EnvironmentVariablesDetailComponent } from './environment-variables-detail.component';
 import { EnvironmentVariablesUpdateComponent } from './environment-variables-update.component';
 import { EnvironmentVariablesDialogComponent } from './environment-variables-dialog.component';
-import { EnvironmentVariablesDeletePopupComponent } from './environment-variables-delete-dialog.component';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
 import { environmentVariablesRoute } from './environment-variables.route';
-import { environmentVariablesPopupRoute } from './environment-variables.route';
 
-const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopupRoute];
+const ENTITY_STATES = [...environmentVariablesRoute];
 
 @NgModule({
   imports: [ReactiveFormsModule, SharedModule, RouterModule.forChild(ENTITY_STATES)],
@@ -22,14 +20,12 @@ const ENTITY_STATES = [...environmentVariablesRoute, ...environmentVariablesPopu
     EnvironmentVariablesUpdateComponent,
     EnvironmentVariablesDialogComponent,
     EnvironmentVariablesDeleteDialogComponent,
-    EnvironmentVariablesDeletePopupComponent,
   ],
   entryComponents: [
     EnvironmentVariablesComponent,
     EnvironmentVariablesUpdateComponent,
     EnvironmentVariablesDialogComponent,
     EnvironmentVariablesDeleteDialogComponent,
-    EnvironmentVariablesDeletePopupComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

@@ -143,25 +143,3 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         return item.id;
     }
 }
-
-/*
-@Component({
-    selector: 'jhi-environment-variables-popup',
-    template: ''
-})
-export class EnvironmentVariablesPopupComponent implements OnInit, OnDestroy {
-
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-    ) { }
-
-    ngOnInit() {
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
-}
-*/

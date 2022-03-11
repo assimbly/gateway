@@ -9,10 +9,7 @@ import { GatewayService } from './gateway.service';
 import { GatewayComponent } from './gateway.component';
 import { GatewayDetailComponent } from './gateway-detail.component';
 import { GatewayUpdateComponent } from './gateway-update.component';
-import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayImportPopupComponent } from 'app/entities/gateway/gateway-import-dialog.component';
-import { GatewayExportPopupComponent } from 'app/entities/gateway/gateway-export-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class GatewayResolve implements Resolve<IGateway> {
@@ -75,47 +72,5 @@ export const gatewayRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const gatewayPopupRoute: Routes = [
-  {
-    path: 'gateway/:id/delete',
-    component: GatewayDeletePopupComponent,
-    resolve: {
-      gateway: GatewayResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'import',
-    component: GatewayImportPopupComponent,
-    resolve: {
-      gateway: GatewayResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'export',
-    component: GatewayExportPopupComponent,
-    resolve: {
-      gateway: GatewayResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

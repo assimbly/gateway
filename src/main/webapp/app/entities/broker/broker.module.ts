@@ -16,17 +16,15 @@ import { BrokerUpdateComponent } from './broker-update.component';
 import { BrokerMessageSenderComponent } from './sender/broker-message-sender.component';
 import { BrokerMessageBrowserComponent } from './browser/broker-message-browser.component';
 import { BrokerMessageBrowserRowComponent } from './browser/broker-message-browser-row.component';
-import { BrokerDeletePopupComponent } from './broker-delete-dialog.component';
 import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
 import { brokerRoute } from './broker.route';
-import { brokerPopupRoute } from './broker.route';
 
 //import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { FlowComponent } from 'app/entities/flow/flow.component';
 import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
 
-const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
+const ENTITY_STATES = [...brokerRoute];
 
 @NgModule({
   imports: [
@@ -46,13 +44,12 @@ const ENTITY_STATES = [...brokerRoute, ...brokerPopupRoute];
     BrokerDetailComponent,
     BrokerUpdateComponent,
     BrokerDeleteDialogComponent,
-    BrokerDeletePopupComponent,
     BrokerMessageSenderComponent,
     BrokerMessageBrowserComponent,
     MessageSearchByMessageIdPipe,
     MessageSortByHeaderKeyPipePipe,
   ],
-  entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent, BrokerDeletePopupComponent],
+  entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], 
 })
 export class BrokerModule {}

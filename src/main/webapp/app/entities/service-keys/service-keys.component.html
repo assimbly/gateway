@@ -166,9 +166,8 @@
                   title="Delete"
                   *ngIf="serviceKey.id"
                   [disabled]="serviceKey.isRequired"
-                  queryParamsHandling="merge"
                   class="btn btn-danger"
-                  [routerLink]="['/', { outlets: { popup: 'service-keys/' + serviceKey?.id + '/delete' } }]"
+				  (click)="delete(serviceKey)"
                 >
                   <span class="fa fa-trash"></span>
                 </button>

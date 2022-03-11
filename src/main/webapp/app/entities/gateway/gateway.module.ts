@@ -8,17 +8,13 @@ import { GatewayComponent } from './gateway.component';
 import { GatewayService } from './gateway.service';
 import { GatewayDetailComponent } from './gateway-detail.component';
 import { GatewayUpdateComponent } from './gateway-update.component';
-import { GatewayDeletePopupComponent } from './gateway-delete-dialog.component';
 import { GatewayDeleteDialogComponent } from './gateway-delete-dialog.component';
-import { GatewayImportPopupComponent } from './gateway-import-dialog.component';
 import { GatewayImportDialogComponent } from './gateway-import-dialog.component';
-import { GatewayExportPopupComponent } from './gateway-export-dialog.component';
 import { GatewayExportDialogComponent } from './gateway-export-dialog.component';
 import { gatewayRoute } from './gateway.route';
-import { gatewayPopupRoute } from './gateway.route';
 import { GatewayPopupService } from './gateway-popup.service';
 
-const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
+const ENTITY_STATES = [...gatewayRoute];
 
 @NgModule({
   imports: [SharedModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
@@ -27,20 +23,14 @@ const ENTITY_STATES = [...gatewayRoute, ...gatewayPopupRoute];
     GatewayDetailComponent,
     GatewayUpdateComponent,
     GatewayDeleteDialogComponent,
-    GatewayDeletePopupComponent,
-    GatewayImportPopupComponent,
     GatewayImportDialogComponent,
-    GatewayExportPopupComponent,
     GatewayExportDialogComponent,
   ],
   entryComponents: [
     GatewayComponent,
     GatewayUpdateComponent,
     GatewayDeleteDialogComponent,
-    GatewayDeletePopupComponent,
-    GatewayImportPopupComponent,
     GatewayImportDialogComponent,
-    GatewayExportPopupComponent,
     GatewayExportDialogComponent,
   ],
   providers: [Components, GatewayService, GatewayPopupService],

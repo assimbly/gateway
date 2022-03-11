@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { EnvironmentVariablesService } from './environment-variables.service';
 
@@ -27,6 +29,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         protected environmentVariablesService: EnvironmentVariablesService,
         protected alertService: AlertService,
         protected eventManager: EventManager,
+		protected modalService: NgbModal,
         protected accountService: AccountService
     ) {
         this.page = 0;
@@ -88,6 +91,17 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 		});
     }
 
+	delete(environmentVariables: IEnvironmentVariables): void {
+		const modalRef = this.modalService.open(EnvironmentVariablesDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.environmentVariables = environmentVariables;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'key') {

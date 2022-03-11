@@ -182,11 +182,13 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
 
     this.setPopoverMessages();
 
-    this.activeEndpoint = this.route.snapshot.queryParamMap.get('endpointid');
-
     this.setComponents();
 
     this.subscription = this.route.params.subscribe(params => {
+	
+	  this.activeEndpoint = params['endpointid'];
+	  console.log('this.activeEndpoint=' + this.activeEndpoint);
+	
       if (params['mode'] === 'clone') {
         this.load(params['id'], true);
       } else {
@@ -313,19 +315,20 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
 
                   index = index + 1;
                 }, this);
+				
               }, this);
 
-              if (this.activeEndpoint) {
-                const activeIndex = this.endpoints.findIndex(item => item.id === this.activeEndpoint);
-                if (activeIndex === -1) {
-                  this.active = '0';
-                } else {
-                  this.active = activeIndex.toString();
-                }
-              } else {
-                this.active = '0';
-              }
-
+       		  if (this.activeEndpoint) {
+					const activeIndex = this.endpoints.findIndex(item => item.id.toString() === this.activeEndpoint);
+					if (activeIndex === -1) {
+					  this.active = '0';
+					} else {
+					  this.active = activeIndex.toString();
+					}
+				}else {
+					this.active = '0';
+			  }
+			  
               if (isCloning) {
                 this.clone();
               }
@@ -724,7 +727,14 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     const camelComponentType = this.components.getCamelComponentType(componentType);
 
     this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
-      const options = endpoint.options.split('&');
+	  
+	  let options: Array<string> = [];
+	  
+	  if(endpoint.options.includes('&')){
+		options = endpoint.options.match(/[^&]+(?:&&[^&]+)*/g);
+	  }else{
+		options = endpoint.options.split('&');
+	  }
 
       options.forEach((option, optionIndex) => {
         const o = new Option();

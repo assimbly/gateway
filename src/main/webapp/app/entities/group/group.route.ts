@@ -9,7 +9,6 @@ import { GroupService } from './group.service';
 import { GroupComponent } from './group.component';
 import { GroupDetailComponent } from './group-detail.component';
 import { GroupUpdateComponent } from './group-update.component';
-import { GroupDeletePopupComponent } from './group-delete-dialog.component';
 import { IGroup } from 'app/shared/model/group.model';
 
 @Injectable({ providedIn: 'root' })
@@ -73,21 +72,5 @@ export const groupRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const groupPopupRoute: Routes = [
-  {
-    path: 'group/:id/delete',
-    component: GroupDeletePopupComponent,
-    resolve: {
-      group: GroupResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

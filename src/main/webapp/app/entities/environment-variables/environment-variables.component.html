@@ -77,12 +77,12 @@
                 queryParamsHandling="merge"
                 class="btn btn-info btn-sm"
               >
-                <span class="fa fa-clone"></span> <span class="d-none d-md-inline">Clone</span>
+              <fa-icon [icon]="'clone'"></fa-icon>
+			  <span class="d-none d-md-inline">Clone</span>
               </button>
               <button
                 type="submit"
-                [routerLink]="['/', { outlets: { popup: 'environment-variables/' + environmentVariables.id + '/delete' } }]"
-                queryParamsHandling="merge"
+                (click)="delete(environmentVariables)"
                 class="btn btn-danger btn-sm"
               >
                 <fa-icon [icon]="'times'"></fa-icon>

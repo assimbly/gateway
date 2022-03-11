@@ -1,9 +1,7 @@
 <form *ngIf="address" name="deleteForm" (ngSubmit)="confirmClear(address.name!)">
     <div class="modal-header">
         <h4 class="modal-title">Confirm clear operation</h4>
-
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                (click)="cancel()">&times;</button>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()"></button>		
     </div>
 
     <div class="modal-body">

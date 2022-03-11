@@ -9,7 +9,6 @@ import { ServiceKeysService } from './service-keys.service';
 import { ServiceKeysComponent } from './service-keys.component';
 import { ServiceKeysDetailComponent } from './service-keys-detail.component';
 import { ServiceKeysUpdateComponent } from './service-keys-update.component';
-import { ServiceKeysDeletePopupComponent } from './service-keys-delete-dialog.component';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 
 @Injectable({ providedIn: 'root' })
@@ -73,21 +72,5 @@ export const serviceKeysRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const serviceKeysPopupRoute: Routes = [
-  {
-    path: 'service-keys/:id/delete',
-    component: ServiceKeysDeletePopupComponent,
-    resolve: {
-      serviceKeys: ServiceKeysResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

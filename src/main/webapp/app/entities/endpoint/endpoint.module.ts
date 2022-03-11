@@ -11,13 +11,11 @@ import { EndpointComponent } from './endpoint.component';
 import { EndpointDetailComponent } from './endpoint-detail.component';
 import { EndpointUpdateComponent } from './endpoint-update.component';
 
-import { EndpointDeletePopupComponent } from './endpoint-delete-dialog.component';
 import { EndpointDeleteDialogComponent } from './endpoint-delete-dialog.component';
 
 import { endpointRoute } from './endpoint.route';
-import { endpointPopupRoute } from './endpoint.route';
 
-const ENTITY_STATES = [...endpointRoute, ...endpointPopupRoute];
+const ENTITY_STATES = [...endpointRoute];
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild(ENTITY_STATES), NgSelectModule, FormsModule, ReactiveFormsModule],
@@ -27,10 +25,9 @@ const ENTITY_STATES = [...endpointRoute, ...endpointPopupRoute];
     EndpointDetailComponent,
     EndpointUpdateComponent,
     EndpointDeleteDialogComponent,
-    EndpointDeletePopupComponent,
   ],
-  entryComponents: [EndpointComponent, EndpointUpdateComponent, EndpointDeleteDialogComponent, EndpointDeletePopupComponent],
-  providers: [Components, EndpointDeletePopupComponent],
+  entryComponents: [EndpointComponent, EndpointUpdateComponent, EndpointDeleteDialogComponent],
+  providers: [Components],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class EndpointModule {}

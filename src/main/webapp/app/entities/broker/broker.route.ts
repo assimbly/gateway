@@ -9,7 +9,6 @@ import { BrokerService } from './broker.service';
 import { BrokerComponent } from './broker.component';
 import { BrokerDetailComponent } from './broker-detail.component';
 import { BrokerUpdateComponent } from './broker-update.component';
-import { BrokerDeletePopupComponent } from './broker-delete-dialog.component';
 import { BrokerMessageSenderComponent } from 'app/entities/broker/sender/broker-message-sender.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerMessageBrowserComponent } from 'app/entities/broker/browser/broker-message-browser.component';
@@ -93,21 +92,5 @@ export const brokerRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const brokerPopupRoute: Routes = [
-  {
-    path: 'broker/:id/delete',
-    component: BrokerDeletePopupComponent,
-    resolve: {
-      broker: BrokerResolve,
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

@@ -79,9 +79,14 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
   messages:
     basename: i18n/messages
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true	
   mvc:
     favicon:
       enabled: true
+    pathmatch:
+      matching-strategy: ant_path_matcher	  
   thymeleaf:
     mode: HTML
   autoconfigure:
@@ -133,6 +138,8 @@ jhipster:
     contact-email:
     license: unlicensed
     license-url:
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
 
 # ===================================================================
 # Application specific properties

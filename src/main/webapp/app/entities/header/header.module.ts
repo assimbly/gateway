@@ -11,7 +11,6 @@ import { HeaderDialogComponent } from './header-dialog.component';
 
 import { HeaderUpdateComponent } from './header-update.component';
 import { HeaderDeleteDialogComponent } from './header-delete-dialog.component';
-import { HeaderDeletePopupComponent } from './header-delete-dialog.component';
 
 import { HeaderAllComponent } from './header-all.component';
 import { headerRoute } from './header.route';
@@ -35,7 +34,6 @@ const ENTITY_STATES = [...headerRoute, ...headerPopupRoute];
     HeaderUpdateComponent,
     HeaderAllComponent,
     HeaderDeleteDialogComponent,
-    HeaderDeletePopupComponent,
     HeaderPopupComponent,
     ForbiddenHeaderNamesValidatorDirective,
     ForbiddenHeaderKeysValidatorDirective,
@@ -47,7 +45,6 @@ const ENTITY_STATES = [...headerRoute, ...headerPopupRoute];
     HeaderPopupComponent,
     HeaderAllComponent,
     HeaderDeleteDialogComponent,
-    HeaderDeletePopupComponent,
   ],
   providers: [HeaderService, HeaderPopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

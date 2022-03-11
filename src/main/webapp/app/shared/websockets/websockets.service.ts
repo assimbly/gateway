@@ -22,31 +22,19 @@ export class WebSocketsService {
   connectedPromise: any = null;
   
   constructor(private router: Router, private authServerProvider: AuthServerProvider, private location: Location) {
-	this.listener = this.createListener();  
-  }
+	}
 
-  connect(): void {
-  
+    connect(): void {
     if (this.stompClient?.connected) {
       return;
     }
-	
-	if (this.connectedPromise === null) {
-		this.connection = this.createConnection();
-	}
-
 
     // building absolute path so that websocket doesn't fail when deploying with a context path
-    let url = '/topic/alert';
+    let url = '/websocket/tracker';
     url = this.location.prepareExternalUrl(url);
-	
-	console.log('url=' +  url);
-	
+
 	url = url.replace('#','');
-	
-	console.log('url2=' +  url);
-	
-	
+
     const authToken = this.authServerProvider.getToken();
     if (authToken) {
       url += '?access_token=' + authToken;
@@ -54,36 +42,47 @@ export class WebSocketsService {
     const socket: WebSocket = new SockJS(url);
     this.stompClient = Stomp.over(socket, { protocols: ['v12.stomp'] });
     const headers: ConnectionHeaders = {};
-	
-	this.stompClient.connect(headers, () => {
-            this.connectedPromise('success');
-            this.connectedPromise = null;
-        });
-
-  }
-
-  disconnect(): void {
-
-    if (this.stompClient) {
-      if (this.stompClient.connected) {
-        this.stompClient.disconnect();
-      }
-      this.stompClient = null;
-    }
-  }
-
-	private createConnection(): Promise<any> {
-		return new Promise((resolve, reject) => (this.connectedPromise = resolve));
-	}
-  
-  private createListener(): Observable<any> {
-    return new Observable(observer => {
-      this.listenerObserver = observer;
+    this.stompClient.connect(headers, () => {
+      this.connectionSubject.next();
     });
   }
-     
-    client() {
+  
+    disconnect(): void {
+		this.unsubscribe();
+
+		this.connectionSubject = new ReplaySubject(1);
+
+		if (this.stompClient) {
+		  if (this.stompClient.connected) {
+			this.stompClient.disconnect();
+		  }
+		  this.stompClient = null;
+		}
+	  }
+  
+    receive(): Subject<string> {
+		return this.listenerSubject;
+	}
+
+    getClient() {
         return this.stompClient;
-    }  
+    }
+
+	getConnectionSubject() {
+        return this.connectionSubject;
+    }	
+
+  unsubscribe(): void {
+  
+    if (this.stompSubscription) {
+      this.stompSubscription.unsubscribe();
+      this.stompSubscription = null;
+    }
+	
+    if (this.connectionSubscription) {
+      this.connectionSubscription.unsubscribe();
+      this.connectionSubscription = null;
+    }
+  } 
   
 }

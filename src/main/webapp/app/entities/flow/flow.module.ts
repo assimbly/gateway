@@ -14,9 +14,7 @@ import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowDeleteDialogComponent } from './flow-delete-dialog.component';
-import { FlowDeletePopupComponent } from './flow-delete-dialog.component';
 import { flowRoute } from './flow.route';
-import { flowPopupRoute } from './flow.route';
 import { FlowPopupService } from './flow-popup.service';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
@@ -33,7 +31,7 @@ import { FlowService } from 'app/entities/flow/flow.service';
 import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
 
-const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
+const ENTITY_STATES = [...flowRoute];
 
 @NgModule({
   imports: [
@@ -63,7 +61,6 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     FlowMessageSenderComponent,
     FlowDetailComponent,
     FlowDeleteDialogComponent,
-    FlowDeletePopupComponent,
     FlowSearchByNamePipe,
   ],
   entryComponents: [
@@ -73,7 +70,6 @@ const ENTITY_STATES = [...flowRoute, ...flowPopupRoute];
     FlowMessageSenderComponent,
     FlowDeleteDialogComponent,
     FlowDeleteDialogComponent,
-    FlowDeletePopupComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

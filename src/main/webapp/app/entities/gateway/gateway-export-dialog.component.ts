@@ -41,23 +41,3 @@ export class GatewayExportDialogComponent implements AfterContentInit {
         this.activeModal.dismiss(true);
     }
 }
-
-@Component({
-    selector: 'jhi-gateway-export-popup',
-    template: ''
-})
-export class GatewayExportPopupComponent implements OnInit, OnDestroy {
-    routeSub: any;
-
-    constructor(protected route: ActivatedRoute, protected gatewayPopupService: GatewayPopupService) {}
-
-    ngOnInit() {
-        this.routeSub = this.route.params.subscribe(() => {
-            this.gatewayPopupService.open(GatewayExportDialogComponent as Component);
-        });
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
-}

@@ -6,13 +6,11 @@ import { SharedModule } from 'app/shared/shared.module';
 import { ServiceKeysComponent } from './service-keys.component';
 import { ServiceKeysDetailComponent } from './service-keys-detail.component';
 import { ServiceKeysUpdateComponent } from './service-keys-update.component';
-import { ServiceKeysDeletePopupComponent } from './service-keys-delete-dialog.component';
 import { ServiceKeysDeleteDialogComponent } from './service-keys-delete-dialog.component';
 import { ForbiddenServiceKeysValidatorDirective } from './service-keys-validation.directive';
 import { serviceKeysRoute } from './service-keys.route';
-import { serviceKeysPopupRoute } from './service-keys.route';
 
-const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
+const ENTITY_STATES = [...serviceKeysRoute];
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild(ENTITY_STATES)],
@@ -22,11 +20,9 @@ const ENTITY_STATES = [...serviceKeysRoute, ...serviceKeysPopupRoute];
     ServiceKeysDetailComponent,
     ServiceKeysUpdateComponent,
     ServiceKeysDeleteDialogComponent,
-    ServiceKeysDeletePopupComponent,
     ForbiddenServiceKeysValidatorDirective,
   ],
-  entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent, ServiceKeysDeletePopupComponent],
-  providers: [ServiceKeysDeletePopupComponent],
+  entryComponents: [ServiceKeysComponent, ServiceKeysUpdateComponent, ServiceKeysDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ServiceKeysModule {}

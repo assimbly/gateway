@@ -15,6 +15,7 @@ import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { WebSocketsService } from 'app/shared/websockets/websockets.service';
+import Stomp, { Client, Subscription as StompSubscription, ConnectionHeaders, Message } from 'webstomp-client';
 
 enum Status {
   active = 'active',
@@ -79,6 +80,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   stompClient = null;
   subscriber = null;
+ 
+  connectionSubject: ReplaySubject<void> = new ReplaySubject(1); 
+  connectionEventSubscription: Subscription | null = null;
+  connectionAlertSubscription: Subscription | null = null;
+  stompSubscription: StompSubscription | null = null;
+  
   connection: Promise<any>;
   connectedPromise: any;
   private listenerSubject: Subject<string> = new Subject();
@@ -98,7 +105,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private eventManager: EventManager,
 	private webSocketsService: WebSocketsService
   ) {
-    this.listener = this.createListener();
 
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
@@ -119,17 +125,20 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.getEndpoints();
 
     this.registerTriggeredAction();
+
+    this.stompClient = this.webSocketsService.getClient();
+	this.connectionSubject = this.webSocketsService.getConnectionSubject();
+	
+	this.subscribeToEvent(this.flow.id,'event');
+	
+    this.subscribeToAlert(this.flow.id,'alert');
+	
   }
 
   ngAfterViewInit() {
 
-    this.stompClient = this.webSocketsService.client();
-  
-    this.subscribe(this.flow.id,'alert');
-	this.subscribe(this.flow.id,'event');
-	
     this.subscription = this.receive().subscribe(data => {
- 		
+	
 		const data2  = data.split(':');
 
 		if (Array.isArray(data2)) {
@@ -143,7 +152,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			}
 		  }
 		  
-    });		
+    });
   
   }
 
@@ -256,7 +265,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       let alertStartItem;
       let alertEndItem;
 
-      const flowAlertsList = flowAlertsItems.split(',');
+	  const flowAlertsList = flowAlertsItems.split(',');
       if (flowAlertsList.length < 4) {
         this.showNumberOfItems = flowAlertsList.length;
         alertStartItem = flowAlertsList.length - 1;
@@ -281,13 +290,14 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   getFlowNumberOfAlerts(id: number) {
     this.clickButton = true;
+
     this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
       this.setFlowNumberOfAlerts(response.body);
     });
   }
 
   setFlowNumberOfAlerts(numberOfAlerts: string): void {
-    const numberOfAlerts2 = parseInt(numberOfAlerts, 10);
+    let numberOfAlerts2 = parseInt(numberOfAlerts, 10);
     if (numberOfAlerts2 === 0) {
       this.flowAlerts = `false`;
       this.numberOfAlerts = `0`;
@@ -794,36 +804,53 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     return this.listenerSubject;
   }
  
-  subscribe(id, type): void {
-  
-	const topic = '/topic/' + id + '/' + type;
-	  
-	//this.connection.then(() => {
-		
-		this.subscriber = this.stompClient.subscribe(topic, data => {
-			
-			if (!this.listener) {
-				this.listener = this.createListener();
-			}
-			
-			this.listenerSubject.next(data.body);
-		});
-		
-	//});
-
-  }  
-  
-  unsubscribe(): void {
-        if (this.subscriber !== null) {
-            this.subscriber.unsubscribe();
-        }
-        this.listener = this.createListener();
-  }
-  
-    private createListener(): Observable<any> {
-        return new Observable(observer => {
-            this.listenerObserver = observer;
-        });
+  subscribeToEvent(id, type): void {
+  	
+    if (this.connectionEventSubscription) {
+      return;
     }
+	
+	
+	const topic = '/topic/' + id + '/' + type;
+
+    this.connectionEventSubscription = this.connectionSubject.subscribe(() => {
+
+      if (this.stompClient) {
+
+        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
+          this.listenerSubject.next(data.body);
+        });
+      }
+    });
+  }
+
+   subscribeToAlert(id, type): void {
+  	
+    if (this.connectionAlertSubscription) {
+      return;
+    }
+	
+	
+	const topic = '/topic/' + id + '/' + type;
+
+    this.connectionAlertSubscription = this.connectionSubject.subscribe(() => {
+
+      if (this.stompClient) {
+
+        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
+          this.listenerSubject.next(data.body);
+        });
+      }
+    });
+  }
+
+  
+  unsubscribe(): void { 
+
+    if (this.connectionEventSubscription) {
+      this.connectionEventSubscription.unsubscribe();
+      this.connectionEventSubscription = null;
+    }
+  }
   
 }

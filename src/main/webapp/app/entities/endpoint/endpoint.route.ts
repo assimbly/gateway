@@ -9,7 +9,6 @@ import { EndpointService } from './endpoint.service';
 import { EndpointComponent } from './endpoint.component';
 import { EndpointDetailComponent } from './endpoint-detail.component';
 import { EndpointUpdateComponent } from './endpoint-update.component';
-import { EndpointDeletePopupComponent } from './endpoint-delete-dialog.component';
 import { IEndpoint } from 'app/shared/model/endpoint.model';
 
 @Injectable({ providedIn: 'root' })
@@ -73,21 +72,5 @@ export const endpointRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
-  },
-];
-
-export const endpointPopupRoute: Routes = [
-  {
-    path: 'endpoint/:id/delete',
-    component: EndpointDeletePopupComponent,
-    resolve: {
-      endpoint: EndpointResolve,
-    },
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
   },
 ];

@@ -6,6 +6,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { IGateway } from 'app/shared/model/gateway.model';
+import { GatewayDeleteDialogComponent } from './gateway-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { GatewayService } from './gateway.service';
 import { FlowService } from '../flow/flow.service';
@@ -60,6 +61,17 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
     }
 
+	delete(gateway: IGateway): void {
+		const modalRef = this.modalService.open(GatewayDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.gateway = gateway;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     openModal(templateRef: TemplateRef<any>) {
         this.modalRef = this.modalService.open(templateRef);
     }

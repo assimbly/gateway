@@ -6,10 +6,6 @@ import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.*;
-import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
-import org.springframework.messaging.handler.invocation.HandlerMethodReturnValueHandler;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,18 +38,10 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             .ofNullable(jHipsterProperties.getCors().getAllowedOrigins())
             .map(origins -> origins.toArray(new String[0]))
             .orElse(new String[0]);
-
         registry
             .addEndpoint("/websocket/tracker")
             .setHandshakeHandler(defaultHandshakeHandler())
-			.setAllowedOrigins(allowedOrigins)
-            .withSockJS()
-            .setInterceptors(httpSessionHandshakeInterceptor());
-
-        registry
-            .addEndpoint("/topic/alert")
-            .setHandshakeHandler(defaultHandshakeHandler())
-			.setAllowedOrigins(allowedOrigins)
+            .setAllowedOrigins(allowedOrigins)
             .withSockJS()
             .setInterceptors(httpSessionHandshakeInterceptor());
     }
@@ -98,10 +86,5 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 return principal;
             }
         };
-    }
-
-    @Override
-    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        return false;
     }
 }

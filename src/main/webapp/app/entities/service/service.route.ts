@@ -9,7 +9,6 @@ import { ServiceService } from './service.service';
 import { ServiceComponent } from './service.component';
 import { ServiceDetailComponent } from './service-detail.component';
 import { ServiceUpdateComponent } from './service-update.component';
-import { ServiceDeletePopupComponent } from './service-delete-dialog.component';
 import { IService } from 'app/shared/model/service.model';
 import { ServiceAllComponent } from './service-all.component';
 import { ServicePopupComponent } from 'app/entities/service/service-dialog.component';
@@ -126,18 +125,5 @@ export const servicePopupRoute: Routes = [
     },
     canActivate: [UserRouteAccessService],
     outlet: 'popup',
-  },
-  {
-    path: 'service/:id/delete',
-    component: ServiceDeletePopupComponent,
-    resolve: {
-      service: ServiceResolve,
-    },
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  },
+  }
 ];

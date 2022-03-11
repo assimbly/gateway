@@ -727,7 +727,14 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
     const camelComponentType = this.components.getCamelComponentType(componentType);
 
     this.setComponentOptions(endpoint, camelComponentType).subscribe(data => {
-      const options = endpoint.options.split('&');
+	  
+	  let options: Array<string> = [];
+	  
+	  if(endpoint.options.includes('&')){
+		options = endpoint.options.match(/[^&]+(?:&&[^&]+)*/g);
+	  }else{
+		options = endpoint.options.split('&');
+	  }
 
       options.forEach((option, optionIndex) => {
         const o = new Option();

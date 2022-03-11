@@ -35,7 +35,7 @@
 
 <br />
 
-<div class="container-fluid">
+<div class="container">
   <div class="row">
     <ng-template #destinationPopover let-message="message">
       <div [innerHtml]="destinationPopoverMessage"></div>
@@ -48,24 +48,27 @@
     </ng-template>
 
     <form [formGroup]="messageSenderForm" *ngIf="finished" novalidate class="needs-validation">
-      <div class="col-8" style="position: fixed; left: 10%; width: 100%">
+      <div class="col-8" style="left: 10%; width: 100%">
         <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="horizontal">
           <li ngbNavItem="0">
             <a ngbNavLink>Body</a>
             <br />
             <ng-template ngbNavContent>
-				<ngx-codemirror
-					[formControl]="$any(messageSenderForm.controls['requestbody'])"
-					name="codemirror"
-					[(ngModel)]="requestBody"
-					[options]="{
-						lineNumbers: true,
-						theme: 'default',
-						mode: requestEditorMode
-					  }"
-					(drop)="drop($event)" 
-					(dragover)="allowDrop($event)"
-					style="min-height: 500px; width: 760px; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>					
+				<div style="border:1px solid black;">
+					<ngx-codemirror
+						[formControl]="$any(messageSenderForm.controls['requestbody'])"
+						name="codemirror"
+						[(ngModel)]="requestBody"
+						[options]="{
+							lineNumbers: false,
+							theme: 'default',
+							mode: requestEditorMode
+						  }"
+						(drop)="drop($event)" 
+						(dragover)="allowDrop($event)"
+						style="min-height: 500px; width: 760px;">
+					</ngx-codemirror>					
+				</div>	
             </ng-template>
           </li>
           <li ngbNavItem="1">
@@ -73,13 +76,9 @@
             <br />
             <ng-template ngbNavContent>
               <div class="form-group" style="min-height: 484px; min-width: 760px">
-                <!--<div class="row">
-
-                                        <label class="col-10 form-control-label" for="headerValue"><b>Value</b></label>
-                                    </div>-->
                 <div formArrayName="headers" *ngFor="let header of messageSenderForm.get('headers')['controls']; let i = index">
                   <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
-                    <div class="col-3">
+                    <div class="col-4">
                       <label class="form-control-label" for="headerKey" *ngIf="i === 0"><b>Key</b></label>
                       <input
                         type="text"
@@ -90,7 +89,7 @@
                         title="Name of the header."
                       />
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                       <label class="form-control-label" for="headerValue" *ngIf="i === 0"><b>Value</b></label>
                       <input
                         type="text"
@@ -101,7 +100,7 @@
                         title="Value of the header."
                       />
                     </div>
-                    <div class="col-6">
+                    <div class="col-2">
                       <div class="row" *ngIf="i === 0">
                         <label class="form-control-label" for="addHeader">Add/Remove</label>
                       </div>
@@ -111,6 +110,7 @@
                           type="button"
                           id="addHeader"
                           class="right-border-radius-0 btn btn-primary"
+                          style="margin-left: 10px; width: 50px;"
                           (click)="addHeader('headers')"
                         >
                           <fa-icon icon="plus"></fa-icon>
@@ -120,14 +120,15 @@
                           type="button"
                           id="removeHeader"
                           class="left-border-radius-0 btn btn-danger"
-                          style="margin-left: -4px"
+                          style="margin-left: -4px; width: 50px;"
                           (click)="removeHeader('headers', i, false)"
                         >
                           <fa-icon icon="times"></fa-icon>
                         </button>
                       </div>
                     </div>
-                  </div>
+					<div class="col-2"></div>
+					</div>
                 </div>
               </div>
             </ng-template>
@@ -140,7 +141,7 @@
               <div class="form-group" style="min-height: 484px; min-width: 760px">
                 <div formArrayName="jmsHeaders" *ngFor="let header of messageSenderForm.get('jmsHeaders')['controls']; let i = index">
                   <div class="row" [formGroupName]="i" style="margin-bottom: 3px">
-                    <div class="col-3">
+                    <div class="col-4">
                       <label class="form-control-label" for="jmsHeaderKey" *ngIf="i === 0"><b>Key</b></label>
                       <select
                         type="text"
@@ -155,7 +156,7 @@
                         <option value="JMSType">JMSType</option>
                       </select>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                       <label class="form-control-label" for="jmsHeaderValue" *ngIf="i === 0"><b>Value</b></label>
                       <input
                         type="text"
@@ -166,7 +167,7 @@
                         title="Value of the header."
                       />
                     </div>
-                    <div class="col-6">
+                    <div class="col-2">
                       <div class="row" *ngIf="i === 0">
                         <label class="form-control-label" for="addJMSHeader">Add/Remove</label>
                       </div>
@@ -176,22 +177,24 @@
                           type="button"
                           id="addJMSHeader"
                           class="right-border-radius-0 btn btn-primary"
+                          style="margin-left: 10px; width: 50px;"
                           (click)="addHeader('jmsHeaders')"
                         >
-                          <span class="fa fa-plus"></span>
+                          <fa-icon icon="plus"></fa-icon>
                         </button>
                         <button
                           title="Remove option"
                           type="button"
                           id="removeJMSHeader"
                           class="left-border-radius-0 btn btn-danger"
-                          style="margin-left: -4px"
+                          style="margin-left: -4px; width: 50px;"
                           (click)="removeHeader('jmsHeaders', i, false)"
                         >
-                          <span class="fa fa-remove"></span>
+                          <fa-icon icon="times"></fa-icon>
                         </button>
                       </div>
                     </div>
+  				   <div class="col-3"></div>
                   </div>
                 </div>
               </div>
@@ -216,3 +219,4 @@
     <div class="col-6"></div>
   </div>
 </div>
+
