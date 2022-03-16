@@ -28,7 +28,6 @@ export class CertificateUploadDialogComponent implements AfterContentInit {
   constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   ngAfterContentInit() {
-    console.log('4 upload');
     this.certificateService.query().subscribe(res => {
       this.securities = res.body;
       this.certificateId = this.securities[0].id;
