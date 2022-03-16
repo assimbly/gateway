@@ -3,13 +3,13 @@
         <div *ngIf="certificate">
             <h2><span>Certificate</span> {{certificate.id}}</h2>
             <hr>
-            <jhi-alert-error></jhi-alert-error>
+            <jhi-alert-error></jhi-alert-error>		
             <dl class="row-md jh-entity-details">
                 <dt><span>Url</span></dt>
                 <dd>
                     <span>{{certificate.url}}</span>
                 </dd>
-                <dt><span>Certificate Store</span></dt>
+                <dt><span>Certificate Store</span></dt>				
                 <dd>
                     <span>{{certificate.certificateStore}}</span>
                 </dd>
@@ -25,12 +25,15 @@
                 <dd>
                     <span>{{certificatieType}}</span>
                 </dd>
+				<br/>
                 <dd>
                     <span>{{SigningAlgorithm}}</span>
                 </dd>
+				<br/>
                 <dd>
                     <span>{{IssuerDNPrincipal}}</span>
                 </dd>
+				<br/>
                 <dd>
                     <span>{{SubjectDNPrincipal}}</span>
                 </dd>
