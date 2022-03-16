@@ -7,10 +7,10 @@ export class MessageSortByHeaderKeyPipePipe implements PipeTransform {
     transform(headers: KeyValue<string, any>[], ascending: boolean, predicate: string) {
         let sortedHeaders: HeaderKeys[] = [];
 
-        for (let i: number = 0; i < headers.length; i++) {
+        for (let i = 0; i < headers.length; i++) {
             sortedHeaders.push(new HeaderKeys(i, headers[i].key, headers[i].value, null, null, null));
         }
-        let asc: number = ascending ? 1 : -1;
+        const asc: number = ascending ? 1 : -1;
 
         if (predicate == 'key') {
             sortedHeaders = sortedHeaders.sort((a, b) => (a.key.toLocaleLowerCase() < b.key.toLocaleLowerCase() ? asc : asc * -1));

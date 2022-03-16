@@ -1,16 +1,13 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.config.DefaultProfileUtil;
-
-import tech.jhipster.config.JHipsterProperties;
-
-import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.DefaultProfileUtil;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.*;
+import tech.jhipster.config.JHipsterProperties;
 
 /**
  * Resource to return information about the currently running Spring profiles.
@@ -54,6 +51,5 @@ public class ProfileInfoResource {
         public String[] getActiveProfiles() {
             return activeProfiles;
         }
-
     }
 }

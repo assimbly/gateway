@@ -1,12 +1,15 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Service } from 'app/shared/model/service.model';
 import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
+import { ServiceKeysDeleteDialogComponent } from './service-keys-delete-dialog.component';
 import { IServiceKeys, ServiceKeys } from 'app/shared/model/service-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { ServiceKeysService } from './service-keys.service';
 import { Services } from '../../shared/camel/service-connections';
 
@@ -31,8 +34,9 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     constructor(
         protected serviceKeysService: ServiceKeysService,
         protected services: Services,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+		protected modalService: NgbModal,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -47,7 +51,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.registerChangeInServiceKeys();
@@ -65,6 +69,17 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
         }
     }
 
+	delete(serviceKey: IServiceKeys): void {
+		const modalRef = this.modalService.open(ServiceKeysDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.serviceKey = serviceKey;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     ngOnChanges(changes: SimpleChanges) {
         this.mapServiceKeysKeys();
         if (changes['serviceKeys'] && this.serviceKeys !== undefined) {
@@ -79,7 +94,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             const requiredType = this.requiredServiceKey.find(x => x.name === this.service.type);
             const requiredServiceKeys = new Array<ServiceKeys>();
             requiredType.serviceKeys.forEach(sk => {
-                let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
+                const ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
                 let rsk = new ServiceKeys();
                 if (ersk instanceof ServiceKeys) {
                     rsk = ersk;
@@ -97,7 +112,7 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
 
     save(serviceKey: ServiceKeys, i: number) {
         this.isSaving = true;
-        if (!!serviceKey.id) {
+        if (serviceKey.id) {
             this.subscribeToSaveResponse(this.serviceKeysService.update(serviceKey), false, i);
         } else {
             serviceKey.serviceId = this.service.id;
@@ -163,10 +178,10 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
             result.isDisabled = true;
             this.serviceKeys.splice(i, 1, result);
         } else {
-            //this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
+            // this.serviceKeys.find((k) => k.id === result.id).isDisabled = true;
         }
         this.mapServiceKeysKeys();
-        this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: 'OK' });
+		this.eventManager.broadcast(new EventWithContent('serviceKeysListModification', 'OK'));
     }
 
     private onSaveError() {
@@ -186,7 +201,10 @@ export class ServiceKeysComponent implements OnInit, OnChanges {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }
 

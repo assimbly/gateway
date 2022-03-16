@@ -25,11 +25,19 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_content">Content</label>
-                    <textarea class="form-control" name="content" id="field_content"
-                              formControlName="content" rows="10"></textarea>
+					<ngx-codemirror
+						class="form-control" name="content" id="field_content"
+							formControlName="content"
+						  [options]="{
+						lineNumbers: true,
+						theme: 'default',
+						mode: 'xml'
+					  }"
+						>
+					</ngx-codemirror>
                 </div>
             </div>
-
+			<br/>
             <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
                     <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>

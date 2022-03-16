@@ -4,10 +4,12 @@ import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+
 import { filter, map } from 'rxjs/operators';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { GatewayService } from '../gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
@@ -27,10 +29,10 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
 
     constructor(
         public activeModal: NgbActiveModal,
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         private environmentVariablesService: EnvironmentVariablesService,
         private gatewayService: GatewayService,
-        private eventManager: JhiEventManager,
+        private eventManager: EventManager,
         private route: ActivatedRoute
     ) {}
 
@@ -72,7 +74,7 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
     }
 
     save() {
-        //validate keys and values
+        // validate keys and values
         this.environmentVariablesForm.controls.key.updateValueAndValidity();
         if (this.environmentVariables.id === null) {
             this.environmentVariablesForm.controls.key.markAsTouched();
@@ -86,7 +88,7 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         this.isSaving = true;
         this.environmentVariables = this.environmentVariablesForm.value;
 
-        //save environment variable
+        // save environment variable
         if (this.environmentVariables.id !== undefined) {
             this.subscribeToSaveResponse(this.environmentVariablesService.update(this.environmentVariables));
         } else {
@@ -130,33 +132,14 @@ export class EnvironmentVariablesDialogComponent implements OnInit {
         this.isSaving = false;
     }
 
-    private onError(error: any) {
-        this.jhiAlertService.error(error.message, null, null);
+    private onError(errorMessage: any) {
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackGatewayById(index: number, item: IGateway) {
         return item.id;
     }
 }
-
-/*
-@Component({
-    selector: 'jhi-environment-variables-popup',
-    template: ''
-})
-export class EnvironmentVariablesPopupComponent implements OnInit, OnDestroy {
-
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-    ) { }
-
-    ngOnInit() {
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
-}
-*/

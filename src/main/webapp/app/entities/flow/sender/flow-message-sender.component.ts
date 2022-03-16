@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
@@ -14,10 +15,10 @@ import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.mod
 import { Service } from 'app/shared/model/service.model';
 import { IHeader } from 'app/shared/model/header.model';
 
-import { EndpointService } from '../../endpoint/';
-import { ServiceService } from '../../service';
-import { HeaderService } from '../../header';
-import { GatewayService } from '../../gateway';
+import { EndpointService } from '../../endpoint/endpoint.service';
+import { ServiceService } from '../../service/service.service';
+import { HeaderService } from 'app/entities/header/header.service';
+import { GatewayService } from '../../gateway/gateway.service';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Components } from 'app/shared/camel/component-type';
@@ -25,13 +26,13 @@ import { Services } from 'app/shared/camel/service-connections';
 
 import { map } from 'rxjs/operators';
 
-import { HeaderDialogComponent, HeaderPopupService } from 'app/entities/header';
-import { ServiceDialogComponent, ServicePopupService } from 'app/entities/service';
-import * as moment from 'moment';
+import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
+import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
 
-import 'brace';
-import 'brace/mode/text';
-import 'brace/theme/eclipse';
+import { HeaderPopupService } from 'app/entities/header/header-popup.service';
+import { ServicePopupService } from 'app/entities/service/service-popup.service';
+
+import dayjs from 'dayjs/esm';
 
 @Component({
     selector: 'jhi-flow-message-sender',
@@ -64,7 +65,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     requestBody: string;
 
     responseBody: string;
-    responseEditorMode: string = 'text';
+    responseEditorMode = 'text';
 
     panelCollapsed: any = 'uno';
     public isCollapsed = true;
@@ -142,13 +143,13 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     modalRef: NgbModalRef | null;
 
     constructor(
-        private eventManager: JhiEventManager,
+        private eventManager: EventManager,
         private gatewayService: GatewayService,
         private flowService: FlowService,
         private endpointService: EndpointService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         private route: ActivatedRoute,
         private router: Router,
         public components: Components,
@@ -212,7 +213,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    //this filters services not of the correct type
+    // this filters services not of the correct type
     filterServices(endpoint: any, formService: FormControl) {
         this.serviceType[0] = this.servicesList.getServiceType(endpoint.componentType);
         this.filterService[0] = this.services.filter(f => f.type === this.serviceType[0]);
@@ -222,11 +223,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setComponents() {
-        let producerComponents = this.components.types.filter(function(component) {
+        const producerComponents = this.components.types.filter(function(component) {
             return component.consumerOnly === false;
         });
 
-        let consumerComponents = this.components.types.filter(function(component) {
+        const consumerComponents = this.components.types.filter(function(component) {
             return component.producerOnly === false;
         });
 
@@ -272,7 +273,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
         // set options keys
         this.getComponentOptions(camelComponentType).subscribe(data => {
-            let componentOptions = data.properties;
+            const componentOptions = data.properties;
 
             this.componentOptions[0] = Object.keys(componentOptions).map(key => ({ ...componentOptions[key], ...{ name: key } }));
             this.componentOptions[0].sort(function(a, b) {
@@ -303,7 +304,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     enableFields(endpointForm) {
-        let componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+        const componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
 
         if (endpointForm.controls.componentType.value === 'wastebin') {
             endpointForm.controls.uri.disable();
@@ -326,10 +327,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setURIlist() {
         this.URIList = [];
 
-        let tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
+        const tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
         tEndpointsUnique.forEach((endpoint, i) => {
-            if (this.requestComponentType === endpoint.componentType) {
+            if (this.requestComponentType === endpoint.componentType.toLowerCase()) {
                 this.URIList.push(endpoint);
             }
         });
@@ -342,7 +343,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             templatefilter: new FormControl('from'),
             exchangepattern: new FormControl('FireAndForget'),
             numberoftimes: new FormControl('1'),
-            endpointsData: new FormArray([])
+            endpointsData: new FormArray([]),
+			responsebody: new FormControl('')
         });
     }
 
@@ -376,7 +378,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     updateForm() {
         this.updateTemplateData();
-        let endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
+        const endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
         this.endpoints.forEach((endpoint, i) => {
             this.updateEndpointData(endpoint, endpointsData.controls[i] as FormControl);
         });
@@ -476,7 +478,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     removeOption(options: Array<Option>, option: Option, endpointIndex) {
         const index = options.indexOf(option);
-        let formOptions = this.selectOptions(endpointIndex);
+        const formOptions = this.selectOptions(endpointIndex);
         formOptions.removeAt(index);
         options.splice(index, 1);
     }
@@ -499,8 +501,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     changeOptionSelection(selectedOption, index, optionIndex) {
-        let componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
-        let defaultValue = componentOption[0].defaultValue;
+        const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+        const defaultValue = componentOption[0].defaultValue;
 
         const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
         const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
@@ -557,7 +559,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         endpoint.headerId = formHeader.value;
 
         if (endpoint.headerId === null || typeof endpoint.headerId === 'undefined' || !endpoint.headerId) {
-            let modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
+            const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
             modalRef.then(res => {
                 res.result.then(
                     result => {
@@ -774,7 +776,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-        this.jhiAlertService.success('Send successfully', null, null);
+		this.alertService.addAlert({
+		  type: 'success',
+		  message: 'Send successfully',
+		});  
         setTimeout(() => {
             this.isSending = false;
         }, 1000);
@@ -789,7 +794,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     handleSendError(body: any) {
         this.isSending = false;
-        this.jhiAlertService.error('Send failed', null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: 'Send failed',
+		});  
         this.responseBody = body;
         this.active = '1';
     }
@@ -833,18 +841,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setVersion() {
-        let now = moment();
+        const now = dayjs();
     }
 
-    //Get currrent scroll position
+    // Get currrent scroll position
     findPos(obj) {
-        var curtop = 0;
+        let curtop = 0;
+
         if (obj.offsetParent) {
             do {
                 curtop += obj.offsetTop;
             } while ((obj = obj.offsetParent));
-            return curtop;
         }
+
+        return curtop;
     }
 
     goBack() {
@@ -860,13 +870,12 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     formatUri(endpointOptions, endpoint, formEndpoint): string {
         if (formEndpoint.controls.componentType.value === null) {
-            return;
+            return '';
+        } else {
+            const formOptions = <FormArray>formEndpoint.controls.options;
+            this.setEndpointOptions(endpointOptions, endpoint, formOptions);
+            return `${formEndpoint.controls.componentType.value.toLowerCase()}`;
         }
-        let formOptions = <FormArray>formEndpoint.controls.options;
-        this.setEndpointOptions(endpointOptions, endpoint, formOptions);
-        return `${formEndpoint.controls.componentType.value.toLowerCase()}://${formEndpoint.controls.uri.value}${
-            !endpoint.options ? '' : endpoint.options
-        }`;
     }
 
     validateTypeAndUri(endpoint: FormGroup) {
@@ -901,9 +910,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     readFile(file: File) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = () => {
-            //console.log(reader.result);
+            // console.log(reader.result);
             this.requestBody = reader.result.toString();
         };
         reader.readAsText(file);
@@ -917,7 +926,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     private onSaveSuccess(result: Flow) {
-        this.eventManager.broadcast({ name: 'flowListModification', content: 'OK' });
+	    this.eventManager.broadcast(new EventWithContent('flowListModification', 'OK'));
         this.isSaving = false;
     }
 
@@ -926,6 +935,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});  
     }
 }

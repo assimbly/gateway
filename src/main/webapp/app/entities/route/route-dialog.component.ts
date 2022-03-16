@@ -8,8 +8,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-import { RoutePopupService } from 'app/entities/route';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+import { RoutePopupService } from 'app/entities/route/route-popup.service';
 
 @Component({
     selector: 'jhi-route-dialog',
@@ -37,15 +38,15 @@ export class RouteDialogComponent implements OnInit {
     constructor(
         public activeModal: NgbActiveModal,
         private routeService: RouteService,
-        private jhiAlertService: JhiAlertService,
-        private eventManager: JhiEventManager,
+        private alertService: AlertService,
+        private eventManager: EventManager,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private fb: FormBuilder
     ) {}
 
     ngOnInit() {
-        //route is injected in the component (see RoutePopupService);
+        // route is injected in the component (see RoutePopupService);
         if (!this.route.id) {
             this.route = this.createFromForm();
         }
@@ -109,9 +110,9 @@ export class RouteDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: IRoute, closePopup: boolean) {
-        this.eventManager.broadcast({ name: 'routeListModification', content: 'OK' });
-        this.eventManager.broadcast({ name: 'routeModified', content: result.id });
-        this.eventManager.broadcast({ name: 'routeKeysUpdated', content: result });
+		this.eventManager.broadcast(new EventWithContent('routeListModification', 'OK'));
+	    this.eventManager.broadcast(new EventWithContent('routeModified', result.id));
+		this.eventManager.broadcast(new EventWithContent('routeKeysUpdated', result));	
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }
@@ -130,7 +131,10 @@ export class RouteDialogComponent implements OnInit {
         this.isSaving = false;
     }
     private onError(error: any) {
-        this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});
     }
 }
 

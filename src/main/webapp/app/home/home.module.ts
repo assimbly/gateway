@@ -1,13 +1,14 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../app/shared';
-import { HOME_ROUTE, HomeComponent } from './';
-import { GatewayEntityModule } from '../../app/entities/entity.module';
+import { SharedModule } from 'app/shared/shared.module';
+import { HOME_ROUTE } from './home.route';
+import { HomeComponent } from './home.component';
+import { EntityRoutingModule } from 'app/entities/entity-routing.module';
 
 @NgModule({
-    imports: [GatewaySharedModule, GatewayEntityModule, RouterModule.forChild([HOME_ROUTE])],
-    declarations: [HomeComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, EntityRoutingModule, RouterModule.forChild([HOME_ROUTE])],
+  declarations: [HomeComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayHomeModule {}
+export class HomeModule {}

@@ -1,57 +1,38 @@
 <div>
-    <h2 id="page-heading">
-        <span>Endpoints</span>
-        <!-- <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-endpoint" [routerLink]="['/endpoint/new']">
-            <fa-icon [icon]="'plus'"></fa-icon>
-            <span>Create Endpoint</span>
-        </button> -->
-    </h2>
-    <jhi-alert></jhi-alert>
-    <br/>
-    <div class="table-responsive" *ngIf="endpoints">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-            <th><span>ID</span></th>
-            <th><span>EndpointType</span></th>
-            <th><span>ComponentType</span></th>
-            <th><span>Uri</span></th>
-            <th><span>Options</span></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let endpoint of endpoints ;trackBy: trackId">
-                <td><a [routerLink]="['/endpoint', endpoint.id, 'view' ]">{{endpoint.id}}</a></td>
-                <td>{{endpoint.endpointType}}</td>
-                <td>{{endpoint.componentType}}</td>
-                <td>{{endpoint.uri}}</td>
-                <td>{{endpoint.options}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['/endpoint', endpoint.id, 'view' ]"
-                                class="btn btn-info btn-sm">
-                            <fa-icon [icon]="'eye'"></fa-icon>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                       <!--  <button type="submit"
-                                [routerLink]="['/endpoint', endpoint.id, 'edit']"
-                                class="btn btn-primary btn-sm">
-                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                            <span class="d-none d-md-inline">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'endpoint/'+ endpoint.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <fa-icon [icon]="'times'"></fa-icon>
-                            <span class="d-none d-md-inline">Delete</span>
-                        </button>--> 
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+  <h2 id="page-heading">
+    <span>Endpoints</span>
+  </h2>	
+  <br />
+  <div class="table-responsive" *ngIf="endpoints">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><span>ID</span></th>
+          <th><span>EndpointType</span></th>
+          <th><span>ComponentType</span></th>
+          <th><span>Uri</span></th>
+          <th><span>Options</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let endpoint of endpoints; trackBy: trackId">
+          <td>
+            <a [routerLink]="['/endpoint', endpoint.id, 'view']">{{ endpoint.id }}</a>
+          </td>
+          <td>{{ endpoint.endpointType }}</td>
+          <td>{{ endpoint.componentType }}</td>
+          <td>{{ endpoint.uri }}</td>
+          <td>{{ endpoint.options }}</td>
+          <td class="text-right">
+            <div class="btn-group flex-btn-group-container">
+              <button type="submit" [routerLink]="['/endpoint', endpoint.id, 'view']" class="btn btn-info btn-sm">
+                <fa-icon [icon]="'eye'"></fa-icon>
+                <span class="d-none d-md-inline">View</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

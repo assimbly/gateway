@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ITopic } from 'app/shared/model/topic.model';
@@ -15,7 +15,7 @@ export class TopicDeleteDialogComponent {
     topic?: ITopic;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to delete this topic?';
@@ -24,8 +24,7 @@ export class TopicDeleteDialogComponent {
     constructor(
         protected topicService: TopicService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -46,7 +45,7 @@ export class TopicDeleteDialogComponent {
             this.disableDelete = true;
         } else {
             this.topicService.deleteTopic(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('topicListModification');
+				this.eventManager.broadcast(new EventWithContent('topicListModification', 'Deleted'));
                 this.router.navigate(['/topic']);
                 this.activeModal.dismiss(true);
             });
@@ -57,7 +56,7 @@ export class TopicDeleteDialogComponent {
         this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }
@@ -65,38 +64,5 @@ export class TopicDeleteDialogComponent {
             },
             error => console.log(error)
         );
-    }
-}
-
-@Component({
-    selector: 'jhi-topic-delete-popup',
-    template: ''
-})
-export class TopicDeletePopupComponent implements OnInit, OnDestroy {
-    protected ngbModalRef: NgbModalRef;
-
-    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
-
-    ngOnInit() {
-        this.activatedRoute.data.subscribe(({ topic }) => {
-            setTimeout(() => {
-                this.ngbModalRef = this.modalService.open(TopicDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
-                this.ngbModalRef.componentInstance.topic = topic;
-                this.ngbModalRef.result.then(
-                    result => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    },
-                    reason => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    }
-                );
-            }, 0);
-        });
-    }
-
-    ngOnDestroy() {
-        this.ngbModalRef = null;
     }
 }

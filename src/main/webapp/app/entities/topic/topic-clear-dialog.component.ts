@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Router } from '@angular/router';
 
 import { ITopic } from 'app/shared/model/topic.model';
@@ -15,7 +15,7 @@ export class TopicClearDialogComponent {
     topic?: ITopic;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to clear this topic?';
@@ -24,8 +24,7 @@ export class TopicClearDialogComponent {
     constructor(
         protected topicService: TopicService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -43,7 +42,7 @@ export class TopicClearDialogComponent {
             this.disableClear = true;
         } else {
             this.topicService.clearTopic(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('topicListModification');
+				this.eventManager.broadcast(new EventWithContent('topicListModification', 'Cleared'));
                 this.address.numberOfMessages = 0;
                 this.router.navigate(['/topic']);
                 this.activeModal.dismiss(true);
@@ -55,7 +54,7 @@ export class TopicClearDialogComponent {
         this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

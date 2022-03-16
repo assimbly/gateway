@@ -1,6 +1,11 @@
 package org.assimbly.gateway.web.rest.broker;
 
-import tech.jhipster.web.util.ResponseUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.PostConstruct;
+import org.assimbly.brokerrest.ManagedBroker;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -10,15 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-
-import org.assimbly.brokerrest.ManagedBroker;
-
-import javax.annotation.PostConstruct;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Broker.
@@ -54,7 +51,8 @@ public class BrokerResource {
             throw new BadRequestAlertException("A new broker cannot already have an ID", ENTITY_NAME, "idexists");
         }
         BrokerDTO result = brokerService.save(brokerDTO);
-        return ResponseEntity.created(new URI("/api/brokers/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/brokers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -75,11 +73,8 @@ public class BrokerResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         BrokerDTO result = brokerService.save(brokerDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, brokerDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, brokerDTO.getId().toString())).body(result);
     }
-
 
     /**
      * DELETE  /brokers/:id : delete the "id" broker.
@@ -135,13 +130,10 @@ public class BrokerResource {
 
     @PostConstruct
     private void init() throws Exception {
-
         List<BrokerDTO> brokers = brokerService.findAll();
 
-        for(BrokerDTO broker : brokers) {
-
-            if(broker.isAutoStart()) {
-
+        for (BrokerDTO broker : brokers) {
+            if (broker.isAutoStart()) {
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
@@ -151,5 +143,4 @@ public class BrokerResource {
             }
         }
     }
-
 }

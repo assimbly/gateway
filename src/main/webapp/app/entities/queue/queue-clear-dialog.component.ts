@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Router } from '@angular/router';
 
 import { IQueue } from 'app/shared/model/queue.model';
@@ -15,7 +15,7 @@ export class QueueClearDialogComponent {
     queue?: IQueue;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to clear this queue?';
@@ -24,8 +24,7 @@ export class QueueClearDialogComponent {
     constructor(
         protected queueService: QueueService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -40,10 +39,10 @@ export class QueueClearDialogComponent {
     confirmClear(name: string): void {
         if (this.address.numberOfConsumers > 0) {
             this.message = 'Are you sure this queue has active consumers?';
-            //this.disableClear = true;
+            // this.disableClear = true;
         } else {
             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'cleared'));			
                 this.address.numberOfMessages = 0;
                 this.router.navigate(['/queue']);
                 this.activeModal.dismiss(true);
@@ -66,7 +65,7 @@ export class QueueClearDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

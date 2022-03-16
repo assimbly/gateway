@@ -7,10 +7,10 @@
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
             <h2 id="jhi-queue-heading">Create a new Queue</h2>
 
-            <div>
+            <div class="row">
                 <jhi-alert-error></jhi-alert-error>
 
-                <div class="form-group">
+                <div class="form-group col">
                     <label class="form-control-label" for="field_name">Name</label>
                     <i triggers="mouseenter:mouseleave" popoverTitle="Info"
                        [popover]="namePopover" container="body" placement="right"
@@ -20,14 +20,17 @@
                 </div>
             </div>
 
-            <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-                    <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
-                </button>
+            <div class="row" style="margin-top: 1em;">
+	            <div class="col">
+					<button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+						<fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+					</button>
 
-                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
-                    <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
-                </button>
+					<button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+						<fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+					</button>
+	            </div>
+
             </div>
         </form>
     </div>

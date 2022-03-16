@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { ServiceService } from './service.service';
-import { ServiceKeysComponent, ServiceKeysService } from '../../entities/service-keys';
+import { ServiceKeysComponent } from '../../entities/service-keys/service-keys.component';
+import { ServiceKeysService } from '../../entities/service-keys/service-keys.service';
 import { Services } from '../../shared/camel/service-connections';
 import { Observable } from 'rxjs';
 
@@ -31,9 +33,9 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
 
     constructor(
         protected serviceService: ServiceService,
-        protected jhiAlertService: JhiAlertService,
+        protected alertService: AlertService,
         public servicesLists: Services,
-        protected eventManager: JhiEventManager,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -60,13 +62,13 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         if (this.serviceKey !== undefined) {
-            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(res.content));
+            this.eventManager.subscribe('serviceKeyDeleted', res => this.updateServiceKeys(parseInt(res.toString())));
         } else {
-            this.eventManager.subscribe('serviceKeyDeleted', res => res.content);
+            this.eventManager.subscribe('serviceKeyDeleted', res => res);
         }
         this.registerChangeInServices();
     }
@@ -134,6 +136,9 @@ export class ServiceComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

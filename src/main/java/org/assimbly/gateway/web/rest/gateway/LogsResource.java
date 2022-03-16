@@ -3,7 +3,7 @@ package org.assimbly.gateway.web.rest.gateway;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
-import org.assimbly.gateway.web.rest.vm.LoggerVM;
+import org.assimbly.gateway.web.rest.customvm.LoggerVM;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;

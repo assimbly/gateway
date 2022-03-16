@@ -28,10 +28,12 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
+	id 'de.undercouch.download' version '5.0.1'
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
+
 
 group = "org.assimbly.gateway"
 version = '3.6.0'
@@ -42,6 +44,8 @@ sourceCompatibility=11
 targetCompatibility=11
 assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
+apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
+apply from: "$rootDir/scripts/resources/resources.gradle"
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
@@ -287,10 +291,12 @@ repositories {
 dependencies {
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
+    //implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
+	
 	implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -340,7 +346,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-	implementation "org.zalando:problem-spring-web:0.27.0"
+    implementation "org.zalando:problem-spring-web:0.27.0"
     implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
     implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"
@@ -349,7 +355,11 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "io.jsonwebtoken:jjwt:0.9.1"
+    //implementation "io.jsonwebtoken:jjwt:0.9.1"
+	//implementation "io.jsonwebtoken:jjwt-api"
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'	
+	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"

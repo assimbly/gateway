@@ -1,9 +1,0 @@
-{
-    "*": {
-        "target": "...",
-        "secure": false,
-        "loglevel": "debug",
-        "changeOrigin": true,
-        "pathRewrite": { "^/api": "" }
-    }
-}

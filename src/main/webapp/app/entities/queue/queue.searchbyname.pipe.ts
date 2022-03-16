@@ -4,7 +4,7 @@ import { IAddress } from 'app/shared/model/address.model';
 @Pipe({ name: 'QueueSearchByName' })
 export class QueueSearchByNamePipe implements PipeTransform {
     transform(addresses: IAddress[], searchText: string, ascending: boolean, predicate: string) {
-        let asc: number = ascending ? 1 : -1;
+        const asc: number = ascending ? 1 : -1;
 
         if (predicate == 'name') {
             addresses = addresses.sort((a, b) => (a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? asc : asc * -1));
@@ -16,7 +16,7 @@ export class QueueSearchByNamePipe implements PipeTransform {
 
         if (searchText) {
             localStorage.setItem('searchQueueText', searchText);
-            return addresses.filter(address => address.name.toLocaleLowerCase().indexOf(searchText.toLocaleLowerCase()) !== -1);
+            return addresses.filter(address => address.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
         } else {
             localStorage.setItem('searchQueueText', '');
             return addresses;

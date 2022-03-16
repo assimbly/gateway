@@ -1,0 +1,255 @@
+import groovy.transform.Field
+import groovy.io.FileType
+
+def json = file('scripts/project.json')
+def projectFile = new groovy.json.JsonSlurper().parseText(json.text)
+
+def applicationName = projectFile.applicationName
+def version = projectFile.version
+def jhipsterVersion = projectFile.jhipsterVersion
+
+def jhipsterDownloadPath = projectFile.jhipsterDownloadPath	
+def url = jhipsterDownloadPath + 'v' + jhipsterVersion
+	
+def tempDir = rootDir.toString() + projectFile.tempDir
+def tempZipFile = rootDir.toString() + projectFile.tempDir + '/sample.zip'
+
+@Field skippedResources = []
+
+tasks.register('upgrade') {
+
+    doFirst {
+	
+		println ''
+		println "Start upgrade application ${applicationName} to JHipster ${jhipsterVersion}"
+		println ''	
+		println "Download sample project from url: $url"
+				
+	}	
+
+	dependsOn('unzipFile')
+	
+	doLast {      
+
+		renameSampleprojectFile(tempDir, jhipsterVersion)
+		searchAndReplace(tempDir)
+		upgradeProjectResources(tempDir, projectFile)
+		upgradeBackendResources(tempDir, projectFile)
+		upgradeFrontendResources(tempDir, projectFile)
+		upgradeSpecialResources(tempDir, projectFile)
+		skippedResourcesReport()	
+		
+		printMessage('Upgrade finished')
+		
+    }
+}
+
+task deleteTempDir() {
+  ant.delete(dir: tempDir)
+}
+
+task downloadZipFile(dependsOn: deleteTempDir, type: Download) {
+	src url
+	dest new File(tempZipFile)
+}
+
+task unzipFile(dependsOn: downloadZipFile, type: Copy) {
+	from zipTree(tempZipFile)
+	into tempDir
+}
+
+def renameSampleprojectFile(tempDir, jhipsterVersion){
+	
+	def baseDir = "${tempDir}/gateway"
+
+	file("${tempDir}/jhipster-sample-app-${jhipsterVersion}").renameTo(file(baseDir))
+
+	def dir = new File("${baseDir}/src/main/java/io/github/jhipster/sample/")
+	dir.eachFile() {		
+		ant.move file: it, todir: "${baseDir}/src/main/java/org/assimbly/gateway"
+	}
+
+}
+
+def searchAndReplace(tempDir){
+
+	def baseDir = new File("${tempDir}/gateway")
+	
+	println "updating temp files..."
+		
+	baseDir.eachFileRecurse FileType.FILES,  { it ->
+		def f = it.toString()
+	
+		ant.replace(file: it, token: "JhipsterSampleApplication", value: "Gateway")
+		ant.replace(file: it, token: "jhipsterSampleApplication", value: "gateway")
+		ant.replace(file: it, token: "jhipstersampleapplication", value: "gateway")
+		ant.replace(file: it, token: "jhipster-sample-application", value: "gateway")
+		ant.replace(file: it, token: "io.github.jhipster.sample", value: "org.assimbly.gateway")
+		ant.replace(file: it, token: "io.github.jhipster.sample", value: "org.assimbly.gateway")
+		ant.replace(file: it, token: "io/github/jhipster/sample", value: "org/assimbly.gateway")
+		
+	}
+}
+
+def upgradeProjectResources(tempDir, projectFile){
+
+	def path = rootDir.toString() + projectFile.projectResources.basePath
+	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.projectResources.basePath
+	def resources = projectFile.projectResources.resources
+
+	printMessage('upgrade base resources:')
+	
+	resources.each {
+		applyAction(tempPath, path, it)	
+	}
+	
+}
+
+def upgradeSpecialResources(tempDir, projectFile){
+
+	def path = rootDir.toString() + projectFile.specialResources.basePath
+	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.specialResources.basePath
+	def resources = projectFile.specialResources.resources
+
+	printMessage('upgrade special resources:')
+	
+	resources.each {
+		applySpecialAction(tempPath, path, it)	
+	}
+	
+}
+
+
+def upgradeBackendResources(tempDir, projectFile){
+	def path = rootDir.toString() + projectFile.backendResources.basePath + "/"
+	def testPath = rootDir.toString() + projectFile.testBackendResources.basePath  + "/"
+	
+	def tempPath = tempDir + "/" + projectFile.applicationName + projectFile.backendResources.basePath + "/"
+	def tempTestPath = tempDir + "/" + projectFile.applicationName + projectFile.testBackendResources.basePath  + "/"
+	
+	def resources = projectFile.backendResources.resources
+	def testResources = projectFile.testBackendResources.resources
+	
+	printMessage('Upgrade backend resources:')
+		
+	resources.each {
+		applyAction(tempPath, path, it)	
+	}
+
+	testResources.each {
+		applyAction(tempTestPath, testPath, it)	
+	}
+	
+}
+
+def upgradeFrontendResources(tempDir, projectFile){
+	def path = rootDir.toString() + projectFile.frontendResources.basePath + "/"
+	def testPath = rootDir.toString() + projectFile.testFrontendResources.basePath + "/"
+
+	def tempPath = tempDir  + "/" + projectFile.applicationName + projectFile.frontendResources.basePath + "/"
+	def tempTestPath = tempDir  + "/" + projectFile.applicationName + projectFile.testFrontendResources.basePath + "/"
+
+	def resources = projectFile.frontendResources.resources
+	def testResources = projectFile.testFrontendResources.resources	
+	
+	printMessage('Upgrade frontend resources:')
+	
+	resources.each {
+		applyAction(tempPath, path, it)	
+	}
+
+	testResources.each {
+		applyAction(tempTestPath, testPath, it)	
+	}
+}
+
+def applyAction(tempPath, path, resource){
+
+	def sourcePath = tempPath + resource.path
+	def targetPath = path + resource.path
+	
+	if(resource.action.equals('delete')){
+		deleteResource(targetPath, resource.type)
+	} else if(resource.action.equals('replace')){
+		replaceResource(sourcePath,targetPath, resource.type)
+	} else if(resource.action.equals('skip')){
+		skipResource(targetPath)
+	}
+	
+}
+
+def applySpecialAction(tempPath, path, resource){
+
+	def sourcePath = tempPath + resource.sourcePath
+	def targetPath = path + resource.targetPath
+	
+	if(resource.action.equals('delete')){
+		deleteResource(targetPath, resource.type)
+	} else if(resource.action.equals('replace')){
+		replaceResource(sourcePath,targetPath, resource.type)
+	} else if(resource.action.equals('skip')){
+		skipResource(targetPath)
+	}
+	
+}
+
+def deleteResource(targetPath, type){
+	
+	printMessage('delete --> ' + targetPath)
+
+	if (!project.hasProperty("dryrun")){
+		if(type.equals('dir')){
+			ant.delete(dir: targetPath)
+		}else{
+			ant.delete(file: targetPath)
+		}
+	}	
+}
+
+def replaceResource(sourcePath, targetPath, type){	
+	
+	println ''
+	println 'replace --> '
+	println 'sourcepath: ' + sourcePath
+	println 'targetPath: ' + targetPath
+	println ''
+		
+	File sourcePathExist = new File(sourcePath)
+	
+	if (!project.hasProperty("dryrun")){
+		if(sourcePathExist.exists()){
+			if(type.equals('dir')){
+				ant.delete(dir: targetPath)
+				targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
+				ant.move file: "${sourcePath}", todir: "${targetPath}"
+			}else{
+				ant.delete(file: targetPath)
+				targetPath = targetPath.substring(0, targetPath.lastIndexOf("/"))
+				ant.move file: "${sourcePath}", todir: "${targetPath}"
+			}	
+		}else{
+			printMessage("warning file doesn't exist: ${sourcePath}")
+		}
+	}	
+	
+}
+
+def skipResource(targetPath){
+	skippedResources.push(targetPath)
+}
+
+def skippedResourcesReport(){
+
+	printMessage('The follow resources were skipped (and maybe checked manually):')
+
+	skippedResources.each {
+		println it
+	}
+}
+
+def printMessage(message){
+	println ''
+	println message
+	println ''
+}
+

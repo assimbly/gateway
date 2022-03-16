@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IGateway, EnvironmentType, GatewayType } from 'app/shared/model/gateway.model';
 import { GatewayService } from './gateway.service';
 import { Components } from '../../shared/camel/component-type';
@@ -29,7 +28,7 @@ export class GatewayUpdateComponent implements OnInit {
     defaultPopoverMessage: string;
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+		protected alertService: AlertService,
         protected gatewayService: GatewayService,
         protected activatedRoute: ActivatedRoute,
         protected router: Router,
@@ -89,7 +88,10 @@ export class GatewayUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     setTypeGateway() {
@@ -109,11 +111,11 @@ export class GatewayUpdateComponent implements OnInit {
     }
 
     setComponents() {
-        let producerComponents = this.components.types.filter(function(component) {
+        const producerComponents = this.components.types.filter(function(component) {
             return component.consumerOnly === false;
         });
 
-        let consumerComponents = this.components.types.filter(function(component) {
+        const consumerComponents = this.components.types.filter(function(component) {
             return component.producerOnly === false;
         });
 

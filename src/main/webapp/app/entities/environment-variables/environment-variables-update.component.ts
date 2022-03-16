@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { GatewayService } from 'app/entities/gateway';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
@@ -24,10 +24,9 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     private allEnvironmentVariablesKeys: Array<string> = [];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+        protected alertService: AlertService,
         protected environmentVariablesService: EnvironmentVariablesService,
         protected gatewayService: GatewayService,
-        protected eventManager: JhiEventManager,
         protected activatedRoute: ActivatedRoute,
         protected router: Router
     ) {}
@@ -40,9 +39,9 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             this.environmentVariables = environmentVariables;
         });
 
-        if(!this.environmentVariables.encrypted){
-			this.environmentVariables.encrypted = false;
-		}		
+        if (!this.environmentVariables.encrypted) {
+            this.environmentVariables.encrypted = false;
+        }
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.environmentVariables.id = null;
@@ -135,32 +134,14 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+   		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
+
     }
 
     trackGatewayById(index: number, item: IGateway) {
         return item.id;
     }
 }
-
-/*
-@Component({
-    selector: 'jhi-environment-variables-popup',
-    template: ''
-})
-export class EnvironmentVariablesPopupComponent implements OnInit, OnDestroy {
-
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-    ) { }
-
-    ngOnInit() {
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
-}
-*/

@@ -1,11 +1,15 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { Observable } from 'rxjs';
 
 import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
-import { AccountService } from 'app/core';
+import { HeaderKeysDeleteDialogComponent } from '././header-keys-delete-dialog.component';
+import { AccountService } from 'app/core/auth/account.service';
 import { HeaderKeysService } from './header-keys.service';
 
 @Component({
@@ -27,8 +31,9 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     constructor(
         protected headerKeysService: HeaderKeysService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+		protected modalService: NgbModal,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -43,9 +48,20 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(res.content));
+        this.eventManager.subscribe('headerKeyDeleted', res => this.updateHeaderKeys(parseInt(res.toString())));
     }
 
+	delete(headerKey: IHeaderKeys): void {
+		const modalRef = this.modalService.open(HeaderKeysDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.headerKey = headerKey;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     updateHeaderKeys(id: number) {
         this.headerKeys = this.headerKeys.filter(x => x.id !== id);
         this.mapHeaderKeysKeys();
@@ -69,7 +85,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
     save(headerKey: IHeaderKeys, i: number) {
         this.isSaving = true;
-        if (!!headerKey.id) {
+        if (headerKey.id) {
             this.subscribeToSaveResponse(this.headerKeysService.update(headerKey), false, i);
         } else {
             headerKey.headerId = this.headerId;
@@ -99,9 +115,9 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             result.isDisabled = true;
             this.headerKeys.splice(i, 1, result);
         } else {
-            //this.headerKeys.find(k => k.id === result.id).isDisabled = true;
+            // this.headerKeys.find(k => k.id === result.id).isDisabled = true;
         }
-        this.eventManager.broadcast({ name: 'headerKeysUpdated', content: 'OK' });
+	    this.eventManager.broadcast(new EventWithContent('headerKeysUpdated', 'OK'));
     }
 
     private onSaveError() {
@@ -142,6 +158,9 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

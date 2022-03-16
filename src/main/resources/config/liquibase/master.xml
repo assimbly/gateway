@@ -23,7 +23,7 @@
     <include file="config/liquibase/changelog/20200212092600_added_entity_Header.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092700_added_entity_HeaderKeys.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212092800_added_entity_Maintenance.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20200212092900_added_entity_Security.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200212092900_added_entity_Certificate.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200212093000_added_entity_Broker.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210421065019_added_entity_Route.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210421134428_added_entity_Queue.xml" relativeToChangelogFile="false"/>

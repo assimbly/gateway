@@ -13,7 +13,7 @@
         </button>
 
         <button type="submit" class="btn btn-primary btn-sm" (click)="navigateToMessageSender(address.name)">
-            <span class="fa fa-envelope"></span>
+            <fa-icon icon="envelope"></fa-icon>
             <span class="d-none d-md-inline">Send</span>
         </button>
 
@@ -21,7 +21,7 @@
                 class="btn btn-danger btn-sm"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 (click)="delete(address)">
-            <span class="fa fa-times"></span>
+            <fa-icon icon="times"></fa-icon>
             <span class="d-none d-md-inline">Delete</span>
         </button>
 
@@ -29,7 +29,7 @@
                 class="btn btn-warning btn-sm"
                 *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 (click)="clear(address)">
-            <span class="fa fa-trash"></span>
+            <fa-icon icon="trash"></fa-icon>
             <span class="d-none d-md-inline" *ngIf="brokerType==='classic'">Reset</span>
             <span class="d-none d-md-inline" *ngIf="brokerType==='artemis'">Clear</span>
         </button>

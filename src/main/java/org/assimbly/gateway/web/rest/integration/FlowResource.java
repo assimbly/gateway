@@ -1,17 +1,22 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import org.assimbly.integration.Integration;
-import org.assimbly.integrationrest.IntegrationResource;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import javax.annotation.PostConstruct;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowService;
+import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.FlowDTO;
-import tech.jhipster.web.util.ResponseUtil;
+import org.assimbly.integration.Integration;
+import org.assimbly.integrationrest.IntegrationResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +28,7 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.PostConstruct;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing flow.
@@ -68,7 +67,6 @@ public class FlowResource {
         this.flowService = flowService;
         this.applicationProperties = applicationProperties;
         this.integrationResource = integrationResource;
-
     }
 
     /**
@@ -85,7 +83,8 @@ public class FlowResource {
             throw new BadRequestAlertException("A new flow cannot already have an ID", ENTITY_NAME, "idexists");
         }
         FlowDTO result = flowService.save(flowDTO);
-        return ResponseEntity.created(new URI("/api/flows/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/flows/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -106,9 +105,7 @@ public class FlowResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         FlowDTO result = flowService.save(flowDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, flowDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, flowDTO.getId().toString())).body(result);
     }
 
     /**
@@ -132,7 +129,10 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
     @GetMapping("/flows/bygatewayid/{gatewayid}")
-    public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(@SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable, @PathVariable Long gatewayid) {
+    public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
+        @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
+        @PathVariable Long gatewayid
+    ) {
         log.debug("REST request to get a page of flows by gatewayid");
         Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
@@ -183,7 +183,6 @@ public class FlowResource {
 
     @PostConstruct
     private void initIntegration() throws Exception {
-
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         boolean isDebuggging = gateway.getDebugging();
         boolean isTracing = gateway.getTracing();
@@ -192,7 +191,7 @@ public class FlowResource {
 
         integrationResource.initIntegration();
 
-        integration =integrationResource.getIntegration();
+        integration = integrationResource.getIntegration();
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");
 
@@ -200,13 +199,13 @@ public class FlowResource {
         List<Flow> flows = flowRepository.findAll();
 
         try {
-            for(Flow flow : flows) {
-                if(flow.isAutoStart()) {
+            for (Flow flow : flows) {
+                if (flow.isAutoStart()) {
                     String configuration;
                     log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
-                    configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(),"xml/application",true);
+                    configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(), "xml/application", true);
 
-                    integration.setFlowConfiguration(flow.getId().toString(),"application/xml", configuration);
+                    integration.setFlowConfiguration(flow.getId().toString(), "application/xml", configuration);
                     integration.startFlow(flow.getId().toString());
                 }
             }
@@ -214,7 +213,5 @@ public class FlowResource {
             log.error("Autostart of flow failed (check configuration)");
             e.printStackTrace();
         }
-
     }
-
 }
