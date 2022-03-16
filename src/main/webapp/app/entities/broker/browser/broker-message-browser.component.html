@@ -128,7 +128,7 @@
           <a ngbNavLink>Body</a>
           <ng-template ngbNavContent>
             <br />
-			<div style="border:1px solid black;">
+			<div style="overflow-y: auto; height: 475px; border: 1px solid #ced4da; width: 98%">
 			<ngx-codemirror
 					name="codemirror"
 				  [(ngModel)]="selectedMessage.body"
@@ -137,7 +137,7 @@
 					theme: 'default',
 					mode: 'xml'
 				  }"
-				style="min-height: 600px;"></ngx-codemirror>
+				  ></ngx-codemirror>
 				</div>
           </ng-template>
         </li>
@@ -148,7 +148,7 @@
             <div
               class="table-responsive"
               [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 90%"
+              style="overflow-y: auto; min-height: 475px; border: 1px solid #ced4da; width: 98%"
             >
               <table class="table table-striped table-condensed">
                 <thead class="transparant">
@@ -178,7 +178,7 @@
             <div
               class="table-responsive"
               [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; height: 65vh; border: 1px solid #ced4da; width: 90%"
+              style="overflow-y: auto; min-height: 475px; border: 1px solid #ced4da; width: 98%"
             >
               <table class="table table-striped table-condensed">
                 <thead class="transparant">

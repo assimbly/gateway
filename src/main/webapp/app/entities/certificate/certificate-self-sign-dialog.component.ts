@@ -13,10 +13,10 @@ import dayjs from 'dayjs/esm';
   selector: 'jhi-certificate-self-sign-dialog',
   templateUrl: './certificate-self-sign-dialog.component.html',
 })
-export class CertificateSelfSignDialogComponent implements OnInit, AfterContentInit {
+export class CertificateSelfSignDialogComponent implements OnInit {
   certificate: ICertificate;
   certificateId: number;
-  securities: Array<ICertificate> = [];
+  certificates: Array<ICertificate> = [];
 
   importForm: FormGroup;
 
@@ -36,13 +36,6 @@ export class CertificateSelfSignDialogComponent implements OnInit, AfterContentI
     this.importForm.patchValue({
       cn: '',
       certificateStore: 'keystore',
-    });
-  }
-
-  ngAfterContentInit() {
-    this.certificateService.query().subscribe(res => {
-      this.securities = res.body;
-      this.certificateId = this.securities[0].id;
     });
   }
 
