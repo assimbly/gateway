@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiDataUtils } from 'ng-jhipster';
+import { DataUtils } from 'app/core/util/data-util.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IRoute } from 'app/shared/model/route.model';
@@ -18,8 +19,8 @@ export class RouteComponent implements OnInit, OnDestroy {
 
     constructor(
         protected routeService: RouteService,
-        protected dataUtils: JhiDataUtils,
-        protected eventManager: JhiEventManager,
+        protected dataUtils: DataUtils,
+        protected eventManager: EventManager,
         protected modalService: NgbModal
     ) {}
 

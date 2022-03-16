@@ -4,14 +4,15 @@ import { HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IService, Service } from 'app/shared/model/service.model';
 import { ServiceKeys } from 'app/shared/model/service-keys.model';
 
 import { ServiceService } from './service.service';
 import { ServiceKeysService } from '../service-keys/service-keys.service';
-import { RequiredServiceKey } from '../service-keys';
+import { RequiredServiceKey } from '../service-keys/service-keys.component';
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
 import { Services } from '../../shared/camel/service-connections';
 
@@ -39,8 +40,8 @@ export class ServiceDialogComponent implements OnInit {
         protected serviceService: ServiceService,
         protected serviceKeysService: ServiceKeysService,
         public services: Services,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
+        protected alertService: AlertService,
         protected activatedRoute: ActivatedRoute,
         protected router: Router
     ) {}
@@ -83,7 +84,7 @@ export class ServiceDialogComponent implements OnInit {
 
         const requiredServiceKeys = new Array<ServiceKeys>();
         this.requiredType.serviceKeys.forEach(sk => {
-            let ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
+            const ersk = this.serviceKeys.find(s => s.key === sk.serviceKeyName);
             let rsk = new ServiceKeys();
             if (typeof ersk !== 'undefined') {
                 if (ersk.value !== '') {
@@ -184,9 +185,9 @@ export class ServiceDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: Service, closePopup: boolean) {
-        this.eventManager.broadcast({ name: 'serviceListModification', content: 'OK' });
-        this.eventManager.broadcast({ name: 'serviceKeysUpdated', content: result });
-        this.eventManager.broadcast({ name: 'serviceModified', content: result.id });
+	    this.eventManager.broadcast(new EventWithContent('serviceListModification', 'OK'));
+	    this.eventManager.broadcast(new EventWithContent('serviceKeysUpdated', result));
+	    this.eventManager.broadcast(new EventWithContent('serviceModified', result.id));
         this.isSaving = false;
         this.activeModal.dismiss(result);
 
@@ -210,7 +211,10 @@ export class ServiceDialogComponent implements OnInit {
     }
 
     private onError(error: any) {
-        this.jhiAlertService.error(error.message, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: error.message,
+		});
     }
 
     private onSaveError() {

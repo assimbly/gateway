@@ -1,94 +1,135 @@
 <form name="editForm" role="form" novalidate #editForm="ngForm">
-    <div class="modal-header">
-        <h4 class="modal-title" id="myHeaderLabel">Create or edit a Header</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
+  <div class="modal-header">
+    <h4 class="modal-title" id="myHeaderLabel">Create or edit a Header</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>		
+  </div>
+  <div class="modal-body">
+    <jhi-alert-error></jhi-alert-error>
+    <div class="form-group" [hidden]="!header.id">
+      <label for="id">ID</label>
+      <input type="text" class="form-control" id="id" name="id" [(ngModel)]="header.id" readonly />
     </div>
-    <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" [hidden]="!header.id">
-            <label for="id">ID</label>
-            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="header.id" readonly />
-        </div>
-        <div class="form-group">
-            <label class="form-control-label" for="field_name">Name</label>
-            <input type="text" class="form-control" name="name" id="field_name" 
-                required maxlength="255" [jhiExistingHeaderNames]='headerNames'    
-                [(ngModel)]="header.name" #name="ngModel"/>
-            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
-                <span *ngIf="name.errors.required" >Name is required.</span>
-                <span *ngIf="name.errors.existingHeaderName">Name already exists.</span>
-            </div>
-        </div>
+    <div class="form-group">
+      <label class="form-control-label" for="field_name">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        name="name"
+        id="field_name"
+        required
+        maxlength="255"
+        [jhiExistingHeaderNames]="headerNames"
+        [(ngModel)]="header.name"
+        #name="ngModel"
+      />
+      <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
+        <span *ngIf="name.errors.required">Name is required.</span>
+        <span *ngIf="name.errors.existingHeaderName">Name already exists.</span>
+      </div>
+    </div>
 
-        <div>
-            <div class="table-responsive" *ngIf="headerKeys">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th colspan="4" class="border-top-0">Header Keys</th>
-                        </tr>
-                        <tr>
-                            <td><span>Key</span></td>
-                            <td><span>Value</span></td>
-                            <td><span>Type</span></td>
-                            <td></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let headerKey of headerKeys; let idx = index">
-                            <td>
-                                <input type="text" class="form-control" [(ngModel)]="headerKey.key" value="headerKey.key" name="headerKeys-key-{{idx}}" id="headerKeys-key-{{idx}}"
-                                    required maxlength="255" [jhiExistingHeaderKeys]="headerKeysKeys" #key="ngModel" />
-                                <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                                    <span *ngIf="key.errors.required">Key is required.</span>
-                                    <span *ngIf="key.errors.existingHeaderKeys">Key already exists.</span>
-                                </div>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" [(ngModel)]="headerKey.value" name="headerKeys-value-{{idx}}" id="headerKeys-value-{{idx}}"
-                                    required maxlength="1000" value="headerKey.value" #value="ngModel" />
-                                <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
-                                    <span *ngIf="value.errors.required">Value is required.</span>
-                                </div>
-                            </td>
-                            <td>
-                                <select class="form-control" required id="field_header" name="headerKeys-type-{{idx}}" id="headerKeys-type-{{idx}}" [(ngModel)]="headerKey.type" #type="ngModel">
-                                    <option [ngValue]="t" *ngFor="let t of typeHeader">{{t}}</option>
-                                </select>
-                                <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
-                                    <span *ngIf="type.errors.required">Value is required.</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="btn-group flex-btn-group-container">
-                                    <div class="btn-group flex-btn-group-container">
-                                        <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
-                                            <span class="fa fa-plus"></span>
-                                        </button>
-                                        <button type="button" title="Delete" *ngIf="headerKey.id" [disabled]="headerKey.isRequired" queryParamsHandling="merge" class="btn btn-danger" (click)="deleteHeaderKeys(headerKey)">
-                                            <span class="fa fa-trash"></span>
-                                        </button>
-                                        <button type="button" title="Remove" *ngIf="!headerKey.id" [disabled]="headerKey.isRequired" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
-                                            <span class="fa fa-remove"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+    <div>
+      <div class="table-responsive" *ngIf="headerKeys">
+        <table class="table">
+          <thead>
+            <tr>
+              <th colspan="4" class="border-top-0">Header Keys</th>
+            </tr>
+            <tr>
+              <td><span>Key</span></td>
+              <td><span>Value</span></td>
+              <td><span>Type</span></td>
+              <td></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let headerKey of headerKeys; let idx = index">
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="headerKey.key"
+                  value="headerKey.key"
+                  name="headerKeys-key-{{ idx }}"
+                  id="headerKeys-key-{{ idx }}"
+                  required
+                  maxlength="255"
+                  [jhiExistingHeaderKeys]="headerKeysKeys"
+                  #key="ngModel"
+                />
+                <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
+                  <span *ngIf="key.errors.required">Key is required.</span>
+                  <span *ngIf="key.errors.existingHeaderKeys">Key already exists.</span>
+                </div>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="headerKey.value"
+                  name="headerKeys-value-{{ idx }}"
+                  id="headerKeys-value-{{ idx }}"
+                  required
+                  maxlength="1000"
+                  value="headerKey.value"
+                  #value="ngModel"
+                />
+                <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
+                  <span *ngIf="value.errors.required">Value is required.</span>
+                </div>
+              </td>
+              <td>
+                <select
+                  class="form-control"
+                  required
+                  id="field_header"
+                  name="headerKeys-type-{{ idx }}"
+                  id="headerKeys-type-{{ idx }}"
+                  [(ngModel)]="headerKey.type"
+                  #type="ngModel"
+                >
+                  <option [ngValue]="t" *ngFor="let t of typeHeader">{{ t }}</option>
+                </select>
+                <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
+                  <span *ngIf="type.errors.required">Value is required.</span>
+                </div>
+              </td>
+              <td>
+                <div class="btn-group flex-btn-group-container">
+                  <div class="btn-group flex-btn-group-container">
+                    <button type="button" class="btn btn-success" title="Add" (click)="addHeaderKeys()">
+                      <span class="fa fa-plus"></span>
+                    </button>
+                    <button
+                      type="button"
+                      title="Delete"
+                      *ngIf="headerKey.id"
+                      queryParamsHandling="merge"
+                      class="btn btn-danger"
+                      (click)="deleteHeaderKeys(headerKey)"
+                    >
+                      <span class="fa fa-trash"></span>
+                    </button>
+                    <button type="button" title="Remove" *ngIf="!headerKey.id" class="btn btn-danger" (click)="removeHeaderKeys(idx)">
+                      <span class="fa fa-remove"></span>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;
-            <span>Cancel</span>
-        </button>
-        <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-            <span class="fa fa-save"></span>&nbsp;
-            <span>Save</span>
-        </button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+      <span class="fa fa-ban"></span>&nbsp;
+      <span>Cancel</span>
+    </button>
+    <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+      <span class="fa fa-save"></span>&nbsp;
+      <span>Save</span>
+    </button>
+  </div>
 </form>

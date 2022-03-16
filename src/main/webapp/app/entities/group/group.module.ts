@@ -1,29 +1,21 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { GatewaySharedModule } from '../../shared';
-// import { GatewayAdminModule } from '../../admin/admin.module';
-import {
-    GroupComponent,
-    GroupDetailComponent,
-    GroupUpdateComponent,
-    GroupDeletePopupComponent,
-    GroupDeleteDialogComponent,
-    groupRoute,
-    groupPopupRoute
-} from './';
+import { SharedModule } from 'app/shared/shared.module';
 
-const ENTITY_STATES = [...groupRoute, ...groupPopupRoute];
+import { GroupComponent } from './group.component';
+import { GroupDetailComponent } from './group-detail.component';
+import { GroupUpdateComponent } from './group-update.component';
+import { GroupDeleteDialogComponent } from './group-delete-dialog.component';
+import { groupRoute } from './group.route';
+
+const ENTITY_STATES = [...groupRoute];
 
 @NgModule({
-    imports: [
-        GatewaySharedModule,
-        // GatewayAdminModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
-    declarations: [GroupComponent, GroupUpdateComponent, GroupDetailComponent, GroupDeleteDialogComponent, GroupDeletePopupComponent],
-    entryComponents: [GroupComponent, GroupUpdateComponent, GroupDetailComponent, GroupDeleteDialogComponent, GroupDeletePopupComponent],
-    providers: [],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedModule, RouterModule.forChild(ENTITY_STATES)],
+  declarations: [GroupComponent, GroupDetailComponent, GroupUpdateComponent, GroupDeleteDialogComponent],
+  entryComponents: [GroupComponent, GroupDetailComponent, GroupDeleteDialogComponent],
+  providers: [],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GatewayGroupModule {}
+export class GroupModule {}

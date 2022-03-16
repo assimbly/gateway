@@ -1,7 +1,6 @@
 package org.assimbly.gateway.config;
 
 import org.assimbly.gateway.aop.logging.LoggingAspect;
-
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
@@ -15,5 +14,4 @@ public class LoggingAspectConfiguration {
     public LoggingAspect loggingAspect(Environment env) {
         return new LoggingAspect(env);
     }
-    
 }

@@ -2,10 +2,12 @@ import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { AccountService } from 'app/core';
+import { GatewayDeleteDialogComponent } from './gateway-delete-dialog.component';
+import { AccountService } from 'app/core/auth/account.service';
 import { GatewayService } from './gateway.service';
 import { FlowService } from '../flow/flow.service';
 
@@ -23,8 +25,8 @@ export class GatewayComponent implements OnInit, OnDestroy {
     constructor(
         protected flowService: FlowService,
         protected gatewayService: GatewayService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService,
         private router: Router,
         private modalService: NgbModal
@@ -41,7 +43,7 @@ export class GatewayComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.registerChangeInGateways();
@@ -59,6 +61,17 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
     }
 
+	delete(gateway: IGateway): void {
+		const modalRef = this.modalService.open(GatewayDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.gateway = gateway;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     openModal(templateRef: TemplateRef<any>) {
         this.modalRef = this.modalService.open(templateRef);
     }
@@ -100,7 +113,10 @@ export class GatewayComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});  
     }
 
     reset() {

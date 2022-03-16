@@ -21,7 +21,7 @@ export class QueueUpdateComponent implements OnInit {
 
     editForm: FormGroup;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     constructor(
@@ -130,7 +130,7 @@ export class QueueUpdateComponent implements OnInit {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }

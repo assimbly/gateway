@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { JhiEventManager } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,7 +12,7 @@ import { RouteService } from './route.service';
 export class RouteDeleteDialogComponent {
     route?: IRoute;
 
-    constructor(protected routeService: RouteService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+    constructor(protected routeService: RouteService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
     cancel(): void {
         this.activeModal.dismiss();
@@ -20,41 +20,8 @@ export class RouteDeleteDialogComponent {
 
     confirmDelete(id: number): void {
         this.routeService.delete(id).subscribe(() => {
-            this.eventManager.broadcast('routeListModification');
+			this.eventManager.broadcast(new EventWithContent('routeListModification', 'Deleted'));			
             this.activeModal.close();
         });
-    }
-}
-
-@Component({
-    selector: 'jhi-route-delete-popup',
-    template: ''
-})
-export class RouteDeletePopupComponent implements OnInit, OnDestroy {
-    protected ngbModalRef: NgbModalRef;
-
-    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
-
-    ngOnInit() {
-        this.activatedRoute.data.subscribe(({ route }) => {
-            setTimeout(() => {
-                this.ngbModalRef = this.modalService.open(RouteDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
-                this.ngbModalRef.componentInstance.route = route;
-                this.ngbModalRef.result.then(
-                    result => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    },
-                    reason => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    }
-                );
-            }, 0);
-        });
-    }
-
-    ngOnDestroy() {
-        this.ngbModalRef = null;
     }
 }

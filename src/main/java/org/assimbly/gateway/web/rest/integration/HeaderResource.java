@@ -1,15 +1,16 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.service.HeaderService;
+import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.HeaderDTO;
-
-import tech.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Header.
@@ -58,7 +56,8 @@ public class HeaderResource {
             throw new BadRequestAlertException("A new header cannot already have an ID", ENTITY_NAME, "idexists");
         }
         HeaderDTO result = headerService.save(headerDTO);
-        return ResponseEntity.created(new URI("/api/headers/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/headers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -79,9 +78,7 @@ public class HeaderResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         HeaderDTO result = headerService.save(headerDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, headerDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, headerDTO.getId().toString())).body(result);
     }
 
     /**
@@ -102,7 +99,6 @@ public class HeaderResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of headers in body
      */
-
 
     @GetMapping("/headers/getallheaders")
     @Transactional(readOnly = true)
@@ -138,7 +134,6 @@ public class HeaderResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-
     /**
      * GET  /headers/:id/keys : get the "id" header.
      *
@@ -153,20 +148,18 @@ public class HeaderResource {
         return headerMap;
     }
 
-
-    private TreeMap<String, Object> getKeys(String headerId){
-
+    private TreeMap<String, Object> getKeys(String headerId) {
         TreeMap<String, Object> headerMap = new TreeMap<>();
 
-        Long headerIdLong =  Long.valueOf(headerId);
+        Long headerIdLong = Long.valueOf(headerId);
         Optional<Header> header = headerRepository.findById(headerIdLong);
 
-        if(header.isPresent()){
+        if (header.isPresent()) {
             Set<HeaderKeys> headerKeys = header.get().getHeaderKeys();
 
             for (HeaderKeys headerKey : headerKeys) {
                 String key = headerKey.getKey();
-                String value= headerKey.getType() + "(" + headerKey.getValue() + ")";
+                String value = headerKey.getType() + "(" + headerKey.getValue() + ")";
 
                 headerMap.put(key, value);
             }
@@ -174,6 +167,4 @@ public class HeaderResource {
 
         return headerMap;
     }
-
-
 }

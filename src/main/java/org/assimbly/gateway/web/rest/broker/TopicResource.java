@@ -1,25 +1,23 @@
 package org.assimbly.gateway.web.rest.broker;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.assimbly.gateway.service.TopicService;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.service.dto.TopicDTO;
-
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Topic}.
@@ -54,7 +52,8 @@ public class TopicResource {
             throw new BadRequestAlertException("A new topic cannot already have an ID", ENTITY_NAME, "idexists");
         }
         TopicDTO result = topicService.save(topicDTO);
-        return ResponseEntity.created(new URI("/api/topics/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/topics/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -75,7 +74,8 @@ public class TopicResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         TopicDTO result = topicService.save(topicDTO);
-        return ResponseEntity.ok()
+        return ResponseEntity
+            .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, topicDTO.getId().toString()))
             .body(result);
     }
@@ -117,6 +117,9 @@ public class TopicResource {
     public ResponseEntity<Void> deleteTopic(@PathVariable Long id) {
         log.debug("REST request to delete Topic : {}", id);
         topicService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
+        return ResponseEntity
+            .noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

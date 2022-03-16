@@ -1,23 +1,50 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { NgModule } from '@angular/core';
+import { SharedLibsModule } from './shared-libs.module';
+import { FindLanguageFromKeyPipe } from './language/find-language-from-key.pipe';
+import { TranslateDirective } from './language/translate.directive';
+import { AlertComponent } from './alert/alert.component';
+import { AlertErrorComponent } from './alert/alert-error.component';
+import { HasAnyAuthorityDirective } from './auth/has-any-authority.directive';
 
-import { NgbDateMomentAdapter } from './util/datepicker-adapter';
-import { GatewaySharedLibsModule, GatewaySharedCommonModule, JhiLoginModalComponent, HasAnyAuthorityDirective } from './';
-import { WindowRef } from '../../app/shared/auth/window.service';
-import { CSRFService } from '../../app/core';
+import { DurationPipe } from './date/duration.pipe';
+import { FormatMediumDatetimePipe } from './date/format-medium-datetime.pipe';
+import { FormatMediumDatePipe } from './date/format-medium-date.pipe';
+import { SortByDirective } from './sort/sort-by.directive';
+import { SortDirective } from './sort/sort.directive';
+import { ItemCountComponent } from './pagination/item-count.component';
+
+import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from './window/window.service';
 
 @NgModule({
-    imports: [GatewaySharedLibsModule, GatewaySharedCommonModule],
-    declarations: [JhiLoginModalComponent, HasAnyAuthorityDirective],
-    providers: [WindowRef, CSRFService, { provide: NgbDateAdapter, useClass: NgbDateMomentAdapter }],
-    entryComponents: [JhiLoginModalComponent],
-    exports: [GatewaySharedCommonModule, JhiLoginModalComponent, HasAnyAuthorityDirective],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [SharedLibsModule],
+  declarations: [
+    FindLanguageFromKeyPipe,
+    TranslateDirective,
+    AlertComponent,
+    AlertErrorComponent,
+    HasAnyAuthorityDirective,
+    DurationPipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatePipe,
+    SortByDirective,
+    SortDirective,
+    ItemCountComponent,	
+  ],
+  providers: [WindowRef],
+  exports: [
+    SharedLibsModule,
+    FindLanguageFromKeyPipe,
+    TranslateDirective,
+    AlertComponent,
+    AlertErrorComponent,
+    HasAnyAuthorityDirective,
+    DurationPipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatePipe,
+    SortByDirective,
+    SortDirective,
+    ItemCountComponent,
+  ],
 })
-export class GatewaySharedModule {
-    static forRoot() {
-        return {
-            ngModule: GatewaySharedModule
-        };
-    }
-}
+export class SharedModule {}

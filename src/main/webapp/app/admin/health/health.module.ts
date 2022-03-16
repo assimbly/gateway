@@ -1,15 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { GatewaySharedModule } from '../../../app/shared/shared.module';
+import { SharedModule } from 'app/shared/shared.module';
 
-// import { HealthComponent } from './health.component';
-import { HealthModalComponent } from './health-modal.component';
-
+import { HealthComponent } from './health.component';
+import { HealthModalComponent } from './modal/health-modal.component';
 import { healthRoute } from './health.route';
 
 @NgModule({
-    imports: [GatewaySharedModule, RouterModule.forChild([healthRoute])],
-    declarations: [],
-    entryComponents: [HealthModalComponent]
+  imports: [SharedModule, RouterModule.forChild([healthRoute])],
+  declarations: [HealthComponent, HealthModalComponent],
+  entryComponents: [HealthModalComponent],
 })
 export class HealthModule {}
