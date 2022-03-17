@@ -399,7 +399,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest-library"
-    testImplementation "com.h2database:h2"
+    runtimeOnly "com.h2database:h2"
     liquibaseRuntime "com.h2database:h2"
 }
 
