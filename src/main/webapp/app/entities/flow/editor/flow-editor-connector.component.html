@@ -186,7 +186,7 @@
 																	<div class="col-10">
 																		<ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true" [ngStyle]="{'display':'inline-block', 'width':'100%'}" id="field_uri" formControlName="uri" [(ngModel)]="endpoint.uri" dropdownPosition="bottom"></ng-select>
 																	</div>																		
-																	<button type="button" class="col-2 btn btn-primary" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-12px'}" title="Enlarge" (click)="openModal(uriEditor)">																				
+																	<button type="button" class="col-2 btn btn-primary" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white'}" title="Enlarge" (click)="openModal(uriEditor)">																				
 																		<fa-icon style="color: white;" icon="edit"></fa-icon>
 																	</button>																	
                                                                 </div>
@@ -299,22 +299,24 @@
 																	</div>
 																</div>
 																<br />
-																
-                                                            </div>
-																		
-															<br/>
-                                                            <div class="form-group container-fluid" role="group">
-																<div class="float-right">
-																	<button type="button" class="btn btn-primary float-right" *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)" [disabled]="numberOfResponseEndpoints>0" (click)="addResponseEndpoint(endpoint)">
-																		<span><fa-icon icon="pencil-alt"  style="color: white;"></fa-icon></span>&nbsp;
-																		<span [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'" placement="right" style="color: white;">Add Response Endpoint</span>
-																	</button>
-																	<button type="button" class="btn btn-danger float-right" *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))" (click)="removeResponseEndpoint(endpoint)">
-																		<span><fa-icon icon="times"  style="color: white;"></fa-icon></span>&nbsp;
-																		<span  style="color: white;">Remove Response Endpoint</span>
-																	</button>
+																<br />
+																<div class="row">
+																	<div class="col-6 offset-6" >
+																		<div style="position:absolute; right: 100px;">
+																			<button type="button" class="btn btn-primary ml-auto" *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)" [disabled]="numberOfResponseEndpoints>0" (click)="addResponseEndpoint(endpoint)">
+																				<span><fa-icon icon="pencil-alt"  style="color: white;"></fa-icon></span>&nbsp;
+																				<span [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'" placement="right" style="color: white;">Add Response Endpoint</span>
+																			</button>
+																			<button type="button" class="btn btn-danger ml-auto" *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))" (click)="removeResponseEndpoint(endpoint)">
+																				<span><fa-icon icon="times"  style="color: white;"></fa-icon></span>&nbsp;
+																				<span  style="color: white;">Remove Response Endpoint</span>
+																			</button>
+																		</div>
+																	</div>	
 																</div>	
-                                                            </div>
+																<br />																
+                                                            </div>																		
+															<br/>
                                                         </div>
 
                                                     </ng-template>
@@ -431,14 +433,11 @@
             <br />
 			<div class="container">
 				<div class="row">
-					<div class="col-5 offset-6">
-						<button type="button" class="btn btn-secondary float-right"
-								[routerLink]="['/']">
+					<div class="col-5 offset-6" style="padding-left: 30px;">
+						<button type="button" class="btn btn-secondary float-right" [routerLink]="['/']">
 							<span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp; <span style="color: white;">Cancel</span>
 						</button>
-						<button type="button" (click)="save()"
-								[disabled]="isSaving"
-								class="btn btn-primary float-right">
+						<button type="button" (click)="save()" class="btn btn-primary float-right" [disabled]="isSaving">
 							<span><fa-icon icon="save"></fa-icon></span>&nbsp; <span style="color: white;">Save</span>
 						</button>
 					</div>
