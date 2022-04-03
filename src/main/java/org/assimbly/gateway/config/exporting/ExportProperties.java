@@ -1,4 +1,4 @@
-package org.assimbly.gateway.config.environment;
+package org.assimbly.gateway.config.exporting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class DBExportProperties {
+public class ExportProperties {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 

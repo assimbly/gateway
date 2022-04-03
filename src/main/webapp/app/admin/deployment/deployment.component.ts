@@ -61,6 +61,6 @@ export class DeploymentComponent implements OnInit {
   }
 
   uploadConfiguration() {
-	this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
+	  this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
   }
 }

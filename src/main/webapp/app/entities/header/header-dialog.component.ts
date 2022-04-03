@@ -132,7 +132,7 @@ export class HeaderDialogComponent implements OnInit {
   private onSaveSuccess(result: IHeader, closePopup: boolean) {
 	this.eventManager.broadcast(new EventWithContent('headerListModification', 'OK'));
 	this.eventManager.broadcast(new EventWithContent('headerListModification', result.id ));
-	this.eventManager.broadcast(new EventWithContent('headerListModification', result));  
+	this.eventManager.broadcast(new EventWithContent('headerListModification', result));
     this.isSaving = false;
     this.activeModal.dismiss(result);
 
@@ -181,6 +181,6 @@ export class HeaderPopupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.routeSub.unsubscribe();
+    //this.routeSub.unsubscribe();
   }
 }

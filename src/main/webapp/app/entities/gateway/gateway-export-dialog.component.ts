@@ -16,7 +16,7 @@ export class GatewayExportDialogComponent implements AfterContentInit {
     gateways: Array<IGateway> = [];
     xmlConfiguration: any;
     fileName = 'Choose file';
-    importError = false;
+    exportError = false;
 
     constructor(
         private gatewayService: GatewayService,
@@ -36,7 +36,6 @@ export class GatewayExportDialogComponent implements AfterContentInit {
     }
 
     exportConfiguration(gateways: IGateway[], gatewayId: number) {
-        gatewayId = gatewayId--;
         this.deploymentService.exportGatewayConfiguration(gateways.find(i => i.id === gatewayId));
         this.activeModal.dismiss(true);
     }

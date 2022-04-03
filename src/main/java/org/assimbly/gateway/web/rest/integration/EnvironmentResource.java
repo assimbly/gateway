@@ -2,7 +2,8 @@ package org.assimbly.gateway.web.rest.integration;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
-import org.assimbly.gateway.config.environment.DBConfiguration;
+import org.assimbly.gateway.config.exporting.Export;
+import org.assimbly.gateway.config.importing.Import;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -24,7 +25,10 @@ public class EnvironmentResource {
     private final Logger log = LoggerFactory.getLogger(EnvironmentResource.class);
 
 	@Autowired
-    private DBConfiguration DBConfiguration;
+    private Export confExport;
+
+	@Autowired
+    private Import confImport;
 
 	private String configuration;
 
@@ -41,7 +45,7 @@ public class EnvironmentResource {
 
        	try {
        		log.info("Importing configuration into database");
-        	DBConfiguration.convertConfigurationToDB(gatewayid, contentType, configuration);
+        	confImport.convertConfigurationToDB(gatewayid, contentType, configuration);
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Gateway configuration set");
    		} catch (Exception e) {
        		log.error("Import of configuration failed: " + e.getMessage());
@@ -61,7 +65,7 @@ public class EnvironmentResource {
     public ResponseEntity<String> getGatewayConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid ) throws Exception {
 
        	try {
-			configuration = DBConfiguration.convertDBToConfiguration(gatewayid, mediaType,isPlaceholderReplacement);
+			configuration = confExport.convertDBToConfiguration(gatewayid, mediaType,isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				log.error("Failed to get configuration: " + configuration);
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getGatewayConfiguration", configuration);
@@ -86,7 +90,7 @@ public class EnvironmentResource {
     public ResponseEntity<String> getConfigurationByFlowids(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid, @RequestBody String flowids) throws Exception {
 
        	try {
-			configuration = DBConfiguration.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids, isPlaceholderReplacement);
+			configuration = confExport.convertDBToConfigurationByFlowIds(gatewayid, mediaType, flowids, isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfigurationByFlowids", configuration);
 			}
@@ -109,7 +113,7 @@ public class EnvironmentResource {
     @PostMapping(path = "/environment/{gatewayid}/flow/{flowid}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> setFlowConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
         try {
-       		DBConfiguration.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
+       		confImport.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set");
    		} catch (Exception e) {
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setFlowConfiguration", e.getMessage());
@@ -126,7 +130,7 @@ public class EnvironmentResource {
     @GetMapping(path = "/environment/{gatewayid}/flow/{flowid}", produces = {"text/plain","application/xml","application/json"})
     public ResponseEntity<String> getFlowConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long gatewayid, @PathVariable Long flowid) throws Exception {
        	try {
-            configuration = DBConfiguration.convertDBToFlowConfiguration(flowid, mediaType, isPlaceholderReplacement);
+            configuration = confExport.convertDBToFlowConfiguration(flowid, mediaType, isPlaceholderReplacement);
 
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
 				return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", configuration);

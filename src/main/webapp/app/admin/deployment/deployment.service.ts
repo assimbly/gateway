@@ -12,6 +12,6 @@ export class DeploymentService {
     constructor(protected http: HttpClient, protected flowService: FlowService, protected gatewayService: GatewayService, private applicationConfigService: ApplicationConfigService) {}
 
     exportGatewayConfiguration(gateway: IGateway) {
-        this.flowService.exportGatewayConfiguration(gateway);
+        return this.flowService.exportGatewayConfiguration(gateway);
     }
 }

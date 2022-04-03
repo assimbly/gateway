@@ -7,7 +7,7 @@
 	</div>
 </ng-template>
 
-  
+
 <td id="flowRowID" [hidden]="!flowRowID">
   <a [routerLink]="['../flow', flow.id]">{{ flow.id }}</a>
 </td>
@@ -122,11 +122,11 @@
             'btn-success': statusFlow === 'active',
             'btn-secondary': statusFlow === 'paused',
             'btn-danger': statusFlow === 'inactiveError'
-          }"		  
+          }"
   		  style="min-width: 20em; color: white;"
           type="button"
           class="btn btn-sm btn-block btn-arrow-right text-left"
-		  data-container="body"		  
+		  data-container="body"
           placement="right"
           triggers="mouseenter:mouseleave"
           popoverTitle="Status"
@@ -217,15 +217,15 @@
 	  </i>
       <a
         style="padding-left: 1em"
-        (click)="navigateToFlowEditor('edit','connector')"
+        (click)="navigateToFlowEditor('edit')"
         aria-hidden="true"
         placement="right"
         title="Edit flow"
       ><fa-icon icon="edit"></fa-icon></a>
-      <a style="padding-left: 1em" (click)="navigateToFlowEditor('clone','connector')" placement="right" title="Clone flow">
+      <a style="padding-left: 1em" (click)="navigateToFlowEditor('clone')" placement="right" title="Clone flow">
 		<fa-icon icon="clone"></fa-icon>
 	  </a>
-      <a style="padding-left: 1em" (click)="navigateToFlowEditor('delete','')" placement="right" title="Delete flow">
+      <a style="padding-left: 1em" (click)="navigateToFlowEditor('delete')" placement="right" title="Delete flow">
 	  		<fa-icon icon="trash"></fa-icon>
 	  </a>
     </div>
@@ -249,7 +249,7 @@
         <div [innerHtml]="flowAlertsButton"></div>
       </ng-template>
     </h4>
-    <h5 class="float-right" style="margin-left: 10px; vertical-align: top">
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; vertical-align: top">
       <span
         class="badge bg-warning text-dark"
         *ngIf="flowAlerts === 'true'"
