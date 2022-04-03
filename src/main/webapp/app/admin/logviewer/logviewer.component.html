@@ -16,29 +16,28 @@
 </div>
 
 <form name="logsForm" #logsForm="ngForm">
-    <div class="form-row row align-items-center float-right" style="margin-top: 1em;">
-        <div class="col-2">
-   	            <div class="input-group mb-2">
+    <div class="form-row row" style="margin-top: 1em;">
+            <div class="col-3 input-group mb-2 float-start">
                 <div class="input-group-prepend">
                     <div class="input-group-text">Filter:</div>
                 </div>
-                <input type="text" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"/>
+                <input type="text" style="height: 36px; max-width: 220px;" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"/>
             </div>
-		</div>
-        <div class="col-2">
-            <label class="sr-only" for="lines">Lines</label>
-            <div class="input-group mb-2" data-toggle="tooltip"
-                title="The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail).">
+            <div class="col-9"></div>
+     </div>
+      <div class="form-row row">
+            <div class="col-3 display: inline-block;">
+              <div class="input-group mb-2 float-start" data-toggle="tooltip"
+                   title="The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail).">
                 <div class="input-group-prepend">
-                    <div class="input-group-text">Lines:</div>
+                  <div class="input-group-text">Lines:</div>
                 </div>
-                <input type="number" name="lines" class="form-control" [jhiLogViewerLineValidation]="lines"
-                    [(ngModel)]="lines" id="lines" min="1" max="10000" required>
+                <input type="number" name="lines" class="form-control" style="height: 36px; max-width: 220px;" [jhiLogViewerLineValidation]="lines"  [(ngModel)]="lines" id="lines" min="1" max="10000" required>
+              </div>
             </div>
-        </div>
-		<div class="col-8"></div>
-        <div class="col-auto" style="margin-right: 8px">
-            <button type="button" (click)="getLogs()" [disabled]="logsForm.form.invalid" class="btn btn-primary mb-2">Refresh</button>
-        </div>
-    </div>
+            <div class="col-9"></div>
+      </div>
+      <div class="float-start" style="margin-right: 8px">
+        <button type="button" (click)="getLogs()" [disabled]="logsForm.form.invalid" class="btn btn-primary mb-2">Refresh</button>
+      </div>
 </form>

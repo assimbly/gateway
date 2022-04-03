@@ -1,4 +1,4 @@
-package org.assimbly.gateway.config.environment;
+package org.assimbly.gateway.config.exporting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.assimbly.util.TransformUtil;
 import org.apache.commons.text.StringSubstitutor;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 @Service
-public class DBConfiguration {
+public class Export {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
@@ -29,13 +30,10 @@ public class DBConfiguration {
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	@Autowired
-	private DBExportProperties dbExportProperties;
+	private ExportProperties exportProperties;
 
 	@Autowired
-	private DBExportXMLConfiguration dbExportXML;
-
-	@Autowired
-	private DBImportXMLConfiguration dbImportXML;
+	private ExportXML exportXML;
 
 	private String output;
 
@@ -43,7 +41,7 @@ public class DBConfiguration {
 	public List<TreeMap<String, String>> convertDBToConfiguration(Long gatewayId) throws Exception {
 
 		propertiesList = new ArrayList<>();
-		propertiesList = dbExportProperties.getProperties(gatewayId);
+		propertiesList = exportProperties.getProperties(gatewayId);
 
 		return propertiesList;
 	}
@@ -53,7 +51,7 @@ public class DBConfiguration {
 
 		properties = new TreeMap<String, String>();
 
-		properties = dbExportProperties.getFlowProperties(id);
+		properties = exportProperties.getFlowProperties(id);
 
 		return properties;
 
@@ -62,7 +60,7 @@ public class DBConfiguration {
 	// exports gateway to XML, JSON or YAML format
 	public String convertDBToConfiguration(Long gatewayId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
-		xmlConfiguration = dbExportXML.getXMLConfiguration(gatewayId);
+		xmlConfiguration = exportXML.getXMLConfiguration(gatewayId);
 
 		if (mediaType.contains("json")) {
 			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
@@ -83,7 +81,7 @@ public class DBConfiguration {
 	// exports gateway by flowids to XML, JSON or YAML format
 	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids, boolean isPlaceHolderReplacement) throws Exception {
 
-		xmlConfiguration = dbExportXML.getXMLConfigurationByIds(gatewayId, flowids);
+		xmlConfiguration = exportXML.getXMLConfigurationByIds(gatewayId, flowids);
 
 		if (mediaType.contains("json")) {
 			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
@@ -104,7 +102,7 @@ public class DBConfiguration {
 	// exports flow to XML, JSON or YAML
 	public String convertDBToFlowConfiguration(Long id, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
-		xmlConfiguration = dbExportXML.getXMLFlowConfiguration(id);
+		xmlConfiguration = exportXML.getXMLFlowConfiguration(id);
 
 		if (mediaType.contains("json")) {
 			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
@@ -123,52 +121,6 @@ public class DBConfiguration {
 
 	}
 
-	// imports gateway configuration (complete configuration file)
-	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
-
-		// get the configuration as XML Document
-		Document doc = getDocument(mediaType, configuration);
-
-		// create gateway
-		dbImportXML.setGatewayFromXML(doc, gatewayId);
-
-		return "ok";
-
-	}
-
-	// imports flow configuration
-	public String convertFlowConfigurationToDB(Long gatewayId, Long id, String mediaType, String flowConfiguration)
-			throws Exception {
-
-		// get the configuration as XML Document
-		Document doc = getDocument(mediaType, configuration);
-
-		// create services and headers
-		dbImportXML.setServicesAndHeadersFromXML(doc);
-
-		// create flow
-		dbImportXML.setFlowFromXML(doc, gatewayId, id);
-
-		return "ok";
-
-	}
-
-	// private methods
-	private Document getDocument(String mediaType, String configuration) throws Exception {
-
-		if (mediaType.contains("json")) {
-			xmlConfiguration = DocConverter.convertJsonToXml(configuration);
-		} else if (mediaType.contains("yaml") || mediaType.contains("text")) {
-			xmlConfiguration = DocConverter.convertYamlToXml(configuration);
-		} else {
-			xmlConfiguration = configuration;
-		}
-
-		Document document = DocConverter.convertStringToDoc(xmlConfiguration);
-
-		return document;
-	}
-
 	private String PlaceholdersReplacement(String input) {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
@@ -185,5 +137,4 @@ public class DBConfiguration {
 		return output;
 
 	}
-
 }

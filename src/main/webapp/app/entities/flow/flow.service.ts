@@ -23,7 +23,7 @@ export class FlowService {
 
   private gatewayid = 1;
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService) {        
+  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService) {
   }
 
   create(flow: IFlow): Observable<EntityResponseType> {
@@ -223,7 +223,7 @@ export class FlowService {
     const url = `${this.environmentUrl}/${gateway.id}`;
     const exportDate = this.getDate();
 
-    this.http
+    return this.http
       .get(url, {
         headers: new HttpHeaders({
           Accept: 'application/xml',

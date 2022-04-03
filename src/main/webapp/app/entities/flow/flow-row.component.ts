@@ -313,13 +313,18 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToFlowEditor(mode: string, editorType: string) {
+  navigateToFlowEditor(mode: string) {
+	console.log('type=' + this.flow.type);
+	if(!this.flow.type){
+		this.flow.type = 'connector';
+	}  	  
+	  
     switch (mode) {
       case 'edit':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
         break;
       case 'clone':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType }]);
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
         break;
       case 'delete':
         let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);

@@ -44,7 +44,7 @@ public class FlowResource {
     private final FlowService flowService;
 
     @Autowired
-    private org.assimbly.gateway.config.environment.DBConfiguration DBConfiguration;
+    private org.assimbly.gateway.config.exporting.Export confExport;
 
     @Autowired
     FlowRepository flowRepository;
@@ -203,7 +203,7 @@ public class FlowResource {
                 if (flow.isAutoStart()) {
                     String configuration;
                     log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
-                    configuration = DBConfiguration.convertDBToFlowConfiguration(flow.getId(), "xml/application", true);
+                    configuration = confExport.convertDBToFlowConfiguration(flow.getId(), "xml/application", true);
 
                     integration.setFlowConfiguration(flow.getId().toString(), "application/xml", configuration);
                     integration.startFlow(flow.getId().toString());

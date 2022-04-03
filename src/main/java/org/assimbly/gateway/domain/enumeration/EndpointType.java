@@ -4,7 +4,17 @@ package org.assimbly.gateway.domain.enumeration;
  * The EndpointType enumeration.
  */
 public enum EndpointType {
-    FROM("from"), TO("to"), ERROR("error"), RESPONSE("response"), SERVICE("SERVICE");
+    FROM("from"),
+	TO("to"),
+	ERROR("error"),
+	RESPONSE("response"),
+	GET("get"),
+	POST("put"),
+	PATCH("patch"),
+	PUT("put"),
+	DELETE("delete"),
+	ROUTE("route"),
+	SERVICE("SERVICE");
     
     private String endpoint;
     

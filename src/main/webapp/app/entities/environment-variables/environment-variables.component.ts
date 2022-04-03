@@ -29,7 +29,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         protected environmentVariablesService: EnvironmentVariablesService,
         protected alertService: AlertService,
         protected eventManager: EventManager,
-		protected modalService: NgbModal,
+    		protected modalService: NgbModal,
         protected accountService: AccountService
     ) {
         this.page = 0;
@@ -95,13 +95,21 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 		const modalRef = this.modalService.open(EnvironmentVariablesDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
 		modalRef.componentInstance.environmentVariables = environmentVariables;
 		// unsubscribe not needed because closed completes on modal close
-		modalRef.closed.subscribe(reason => {
-		  if (reason === 'deleted') {
-			this.loadAll();
-		  }
-		});
+
+		modalRef.result.then(
+        result => {
+           if (result) {
+                this.environmentVariables = [];
+           }
+        },
+        reason => {
+           if (reason) {
+                this.environmentVariables = [];
+           }
+        }
+      );
 	}
-	
+
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'key') {

@@ -38,16 +38,6 @@ export class RoutePopupService {
         const modalRef = this.modalService.open(component, { windowClass: 'fullscreen-modal'});
         if (typeof component as Component) {
             modalRef.componentInstance.route = route;
-            modalRef.result.then(
-                result => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                },
-                reason => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                }
-            );
         }
         return modalRef;
     }

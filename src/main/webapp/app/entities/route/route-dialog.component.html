@@ -37,9 +37,10 @@
 		</form>
     </div>
 	<div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="clear()" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" (click)="clear()" data-bs-dismiss="modal">
+          <fa-icon icon="ban" style="color: white;"></fa-icon> <span>Cancel</span></button>
         <button type="button" (click)="save(true)"  id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
             <fa-icon icon="save" style="color: white;"></fa-icon>&nbsp;<span>Save</span>
-        </button>		
+        </button>
     </div>
 </div>

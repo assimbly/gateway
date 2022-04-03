@@ -1,6 +1,6 @@
 package org.assimbly.gateway.config.scheduling;
 
-import org.assimbly.gateway.config.environment.DBConfiguration;
+import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.web.rest.gateway.GatewayResource;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 @Component
@@ -19,10 +20,15 @@ public class ExportConfigJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
-            Files.write(Paths.get(context.getScheduler().getContext().get("url") + "" + LocalDateTime.now() + ".xml"), ((DBConfiguration) context.getScheduler().getContext().get("database")).convertDBToConfiguration((long) (int) context.getScheduler().getContext().get("gatewayid"), "xml",false).getBytes());
+			Object url = context.getScheduler().getContext().get("url");
+			Long gatewayId = (long) (int) context.getScheduler().getContext().get("gatewayid");
+
+			Path path = Paths.get(url + "" + LocalDateTime.now() + ".xml");
+			String configuration = ((Export) context.getScheduler().getContext().get("database")).convertDBToConfiguration(gatewayId, "xml",false);
+
+            Files.write(path, configuration.getBytes());
         } catch (Exception e) {
             log.info("Exception in ExportConfigJob: " + e);
         }
     }
 }
-

@@ -695,7 +695,7 @@ ng-dropdown-panel > div {
   padding: 0 !important; // override inline padding-right added from js
 }
 
-.fullscreen-modal .modal-dialog { 
+.fullscreen-modal .modal-dialog {
   width: 100%;
   max-width: none;
   height: 100%;
@@ -734,6 +734,12 @@ ng-dropdown-panel > div {
 
 .jh-card {
     background-color: white;
-    min-height: 700px;
+    min-height: calc(100vh - 118px);
     height: 100%;
+}
+
+.editor-nav {
+    background-color: #E0E0E0;
+    min-height: 70rem;
+    width: 54rem;
 }

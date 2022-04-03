@@ -5,5 +5,4 @@ package org.assimbly.gateway.domain.enumeration;
  */
 public enum EnvironmentType {
     DEVELOPMENT, TEST, ACCEPTANCE, PRODUCTION;
-
 }

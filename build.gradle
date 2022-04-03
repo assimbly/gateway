@@ -40,8 +40,8 @@ version = '3.6.0'
 
 description = ""
 
-sourceCompatibility=11
-targetCompatibility=11
+//sourceCompatibility=11
+//targetCompatibility=11
 assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
@@ -454,6 +454,11 @@ wrapper {
     gradleVersion = "7.3.3"
 }
 
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}
 
 if (project.hasProperty("nodeInstall")) {
     node {

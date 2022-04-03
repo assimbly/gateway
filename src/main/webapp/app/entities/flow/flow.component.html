@@ -28,10 +28,10 @@
     </div>
     <div class="col-2 text-right">
 		<div ngbDropdown class="d-inline-block">
-			<button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
+			<button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
 	        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
 				<button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
-				<!-- uncomment to link to esb or api editor --> 
+				<!-- uncomment to link to esb or api editor -->
 				<!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button> -->
 				<!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>-->
 				<button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
@@ -88,5 +88,5 @@
       </tbody>
     </table>
   </div>
-  
+
 </div>

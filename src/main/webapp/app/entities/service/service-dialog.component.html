@@ -2,7 +2,7 @@
 
     <div class="modal-header">
         <h4 class="modal-title" id="myServiceLabel">Create or edit a Service</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>		
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
@@ -90,14 +90,14 @@
                                 <div class="btn-group flex-btn-group-container">
                                     <div class="btn-group flex-btn-group-container">
                                         <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
-                                            <span class="fa fa-plus"></span>
+                                            <span><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                                         </button>
                                         <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired"
                                             class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
-                                            <span class="fa fa-trash"></span>
+                                            <span><fa-icon icon="trash" style="color: white;"></fa-icon></span>
                                         </button>
                                         <button type="button" title="Remove" *ngIf="!serviceKey.id" [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="removeServiceKeys(idx)">
-                                            <span class="fa fa-remove"></span>
+                                            <span><fa-icon icon="times" style="color: white;"></fa-icon></span>
                                         </button>
                                     </div>
                                 </div>
@@ -110,11 +110,11 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;
+            <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp;
             <span>Cancel</span>
         </button>
         <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-            <span class="fa fa-save"></span>&nbsp;
+            <span><fa-icon icon="save" style="color: white;"></fa-icon></span>&nbsp;
             <span>Save</span>
         </button>
     </div>

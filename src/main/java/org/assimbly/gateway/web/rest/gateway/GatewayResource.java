@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.config.environment.DBConfiguration;
+import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
@@ -36,7 +36,7 @@ import tech.jhipster.web.util.ResponseUtil;
 public class GatewayResource {
 
     @Autowired
-    private org.assimbly.gateway.config.environment.DBConfiguration DBConfiguration;
+    private org.assimbly.gateway.config.exporting.Export confExport;
 
     private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
 
@@ -124,7 +124,7 @@ public class GatewayResource {
     private void scheduleJob(Trigger trigger, int gatewayid, String url) throws SchedulerException {
         if (isCreated("" + gatewayid)) scheduler.deleteJob(getJobKey("" + gatewayid));
         scheduler.getContext().put("gatewayid", gatewayid);
-        scheduler.getContext().put("database", DBConfiguration);
+        scheduler.getContext().put("database", confExport);
         scheduler.getContext().put("url", url);
         scheduler.scheduleJob(JobBuilder.newJob(ExportConfigJob.class).withIdentity("" + gatewayid, "" + gatewayid).build(), trigger);
     }
