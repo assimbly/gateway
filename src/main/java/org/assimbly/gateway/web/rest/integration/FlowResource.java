@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import javax.annotation.PostConstruct;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
@@ -61,9 +60,7 @@ public class FlowResource {
 
     private IntegrationResource integrationResource;
 
-    private boolean integrationIsStarting = false;
-
-    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
+     public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
         this.flowService = flowService;
         this.applicationProperties = applicationProperties;
         this.integrationResource = integrationResource;
@@ -184,8 +181,10 @@ public class FlowResource {
     @PostConstruct
     private void initIntegration() throws Exception {
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
+        ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
         boolean isDebuggging = gateway.getDebugging();
-        boolean isTracing = gateway.getTracing();
+        boolean deployOnStart = deployDirectory.getDeployOnStart();
+        boolean deployOnChange = deployDirectory.getDeployOnChange();
 
         integrationResource.setIntegration(encryptionProperties.getProperties());
 
@@ -194,6 +193,7 @@ public class FlowResource {
         integration = integrationResource.getIntegration();
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");
+        integration.setDeployDirectory(deployOnStart,deployOnChange);
 
         //start flows with autostart
         List<Flow> flows = flowRepository.findAll();

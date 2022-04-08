@@ -1,19 +1,14 @@
 package org.assimbly.gateway.config.importing;
 
 import org.assimbly.util.TransformUtil;
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.w3c.dom.Document;
 
 @Service
 public class Import {
 
 	private String configuration;
-
-	@Autowired
-	private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	@Autowired
 	private ImportXMLGateways importXMLGateways;

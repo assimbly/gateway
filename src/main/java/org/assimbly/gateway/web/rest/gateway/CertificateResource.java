@@ -175,8 +175,6 @@ public class CertificateResource {
         Optional<Certificate> certificate = certificateService.findByCertificateName(certificateName);
         String certificateFile = certificate.get().getCertificateFile();
 
-        CertificatesUtil util = new CertificatesUtil();
-
         X509Certificate real = convertPemToX509Certificate(certificateFile);
 
         String certificateString = "Type=" + real.getType() + ";Signing Algorithm=" + real.getSigAlgName() + ";IssuerDN Principal=" + real.getIssuerX500Principal() + ";SubjectDN Principal=" + real.getSubjectX500Principal();

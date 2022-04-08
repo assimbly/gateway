@@ -8,7 +8,7 @@ import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
-
+import org.assimbly.gateway.web.rest.integration.HeaderResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

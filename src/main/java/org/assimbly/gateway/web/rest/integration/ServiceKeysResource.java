@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Properties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.ServiceKeysService;
-import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.service.dto.ServiceKeysDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;

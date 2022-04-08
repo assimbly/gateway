@@ -36,9 +36,6 @@ public class ImportXMLFlows {
     private HeaderRepository headerRepository;
 
     @Autowired
-    private RouteRepository routeRepository;
-
-    @Autowired
     private ServiceRepository serviceRepository;
 
     public String xmlConfiguration;
@@ -214,7 +211,6 @@ public class ImportXMLFlows {
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 id = xPath.evaluate("//flows/flow[name='" + flow.getName() + "']/id", doc);
 
-                Long endpointId = endpoint.getId();
 				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index.toString());
 				endpoints.add(endpoint);
 				index++;
@@ -298,7 +294,7 @@ public class ImportXMLFlows {
 
 			Long headerIdLong = Long.parseLong(headerId, 10);
 			String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerIdLong + "]/name",doc);
-			Optional<Header> headerOptional = headerOptional = headerRepository.findByName(headerName);
+			Optional<Header> headerOptional = headerRepository.findByName(headerName);
 			if(headerOptional.isPresent()) {
 				header = headerOptional.get();
 			}else {

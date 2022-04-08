@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -73,8 +72,7 @@ public class ManageCertificateResource {
 
             Certificate cert;
             if(fileType.equalsIgnoreCase("pem")) {
-                CertificatesUtil util = new CertificatesUtil();
-                cert = util.convertPemToX509Certificate(certificate);
+                cert = CertificatesUtil.convertPemToX509Certificate(certificate);
             }else if(fileType.equalsIgnoreCase("p12")){
                 return ResponseUtil.createFailureResponse(1L, mediaType,"/certificates/upload","use the p12 uploader");
             }else{
@@ -131,10 +129,7 @@ public class ManageCertificateResource {
             keyPairGenerator.initialize(4096, new SecureRandom());
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-            CertificatesUtil util = new CertificatesUtil();
-            //X509Certificate cert = util.selfsignCertificate(keyPair, "SHA256withRSA", cn, 730);
-
-            Certificate cert = util.selfsignCertificate2(keyPair, cn);
+            Certificate cert = CertificatesUtil.selfsignCertificate2(keyPair, cn);
 
             importCertificateInKeystore(keystoreName, keystorePassword, cn, cert);
 
@@ -208,8 +203,7 @@ public class ManageCertificateResource {
                 log.info("Certificate '" + certificateName + "' for url " + url + " is valid (Expiry Date: " + certificateExpiry + ")");
             }
 
-            CertificatesUtil util = new CertificatesUtil();
-            X509Certificate real = util.convertPemToX509Certificate(certificateFile);
+            X509Certificate real = CertificatesUtil.convertPemToX509Certificate(certificateFile);
             importCertificateInKeystore(keystoreName, keystorePassword, certificateName,real);
         }
 
@@ -232,8 +226,7 @@ public class ManageCertificateResource {
             String certificateName = key;
             Instant certificateExpiry = real.getNotAfter().toInstant();
 
-            CertificatesUtil util = new CertificatesUtil();
-            String certificateFile = util.convertX509CertificateToPem(real);
+            String certificateFile = CertificatesUtil.convertX509CertificateToPem(real);
 
             JSONObject certificateDetails = new JSONObject();
 
@@ -259,7 +252,6 @@ public class ManageCertificateResource {
             Certificate[] certificates = util.downloadCertificates(url);
             return certificates;
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         return null;
@@ -279,7 +271,6 @@ public class ManageCertificateResource {
             String keystorePath = baseDir + "/security/" + keystoreName;
             util.importCertificates(keystorePath, keystorePassword, certificates);
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }

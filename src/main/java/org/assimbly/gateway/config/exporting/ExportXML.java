@@ -1,6 +1,5 @@
 package org.assimbly.gateway.config.exporting;
 
-import com.jayway.jsonpath.Criteria;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;

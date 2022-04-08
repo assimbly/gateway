@@ -31,7 +31,6 @@ public class ImportXMLServices {
     public String configuration;
 
 	private Set<ServiceKeys> serviceKeys;
-	private long serviceIdLong;
 
 	public String setServicesFromXML(Document doc) throws Exception {
 
@@ -79,7 +78,6 @@ public class ImportXMLServices {
 		log.info("Importing service: " + serviceName);
 
 		try {
-			serviceIdLong = Long.parseLong(serviceId, 10);
 			Optional<org.assimbly.gateway.domain.Service> serviceOptional = serviceRepository.findByName(serviceName);
 
 			if(!serviceOptional.isPresent()) {

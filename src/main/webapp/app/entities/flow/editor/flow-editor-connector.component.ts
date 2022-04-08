@@ -1,40 +1,32 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable, Subscription, from } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { AlertService } from 'app/core/util/alert.service';
-
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
-import { Gateway } from 'app/shared/model/gateway.model';
-import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
-import { FlowService } from '../flow.service';
-import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
-import { IHeader } from 'app/shared/model/header.model';
-import { Service } from 'app/shared/model/service.model';
-import { Route } from 'app/shared/model/route.model';
-
-import { EndpointService } from '../../endpoint/endpoint.service';
-import { ServiceService } from '../../service/service.service';
-import { HeaderService } from '../../header/header.service';
-import { RouteService } from '../../route/route.service';
-import { GatewayService } from '../../gateway/gateway.service';
-
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AlertService } from 'app/core/util/alert.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
+import { HeaderPopupService } from 'app/entities/header/header-popup.service';
+import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
+import { RoutePopupService } from 'app/entities/route/route-popup.service';
+import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
+import { ServicePopupService } from 'app/entities/service/service-popup.service';
 import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
-
-import { map } from 'rxjs/operators';
-
-import { HeaderPopupService } from 'app/entities/header/header-popup.service';
-import { RoutePopupService } from 'app/entities/route/route-popup.service';
-import { ServicePopupService } from 'app/entities/service/service-popup.service';
-
-import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
-import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
-import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
-
+import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
+import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
+import { Gateway } from 'app/shared/model/gateway.model';
+import { IHeader } from 'app/shared/model/header.model';
+import { Route } from 'app/shared/model/route.model';
+import { Service } from 'app/shared/model/service.model';
 import dayjs from 'dayjs/esm';
+import { forkJoin, from, Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { EndpointService } from '../../endpoint/endpoint.service';
+import { GatewayService } from '../../gateway/gateway.service';
+import { HeaderService } from '../../header/header.service';
+import { RouteService } from '../../route/route.service';
+import { ServiceService } from '../../service/service.service';
+import { FlowService } from '../flow.service';
 
 @Component({
   selector: 'jhi-flow-editor-connector',
@@ -147,8 +139,6 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   numberOfFromEndpoints = 0;
   numberOfToEndpoints = 0;
   numberOfResponseEndpoints = 0;
-
-  loading = false;
 
   modalRef: NgbModalRef | null;
 
@@ -506,7 +496,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
         value: null,
       });
       endpointForm.controls.header.patchValue(endpoint.headerId);
-      endpointForm.controls.service.patchValue(endpoint.routeId);
+      endpointForm.controls.route.patchValue(endpoint.routeId);
       endpointForm.controls.service.patchValue(endpoint.serviceId);
     } else if (!endpoint.componentType) {
       endpoint.componentType = 'file';
@@ -549,13 +539,13 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
 
   setPopoverMessages(): void {
     this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
-    this.notesPopoverMessage = `Notes to documentatie your flow`;
+    this.notesPopoverMessage = `Notes to document the flow.`;
     this.autoStartPopoverMessage = `If true then the flow starts automatically when the gateway starts.`;
     this.assimblyHeadersPopoverMessage = `If true then message headers like timestamp, uri, flowid and correlationid are set. These headers start with Assimbly and can be used for logging purposes. `;
     this.parallelProcessingPopoverMessage = `If true then to endpoints are processed in parallel.`;
     this.maximumRedeliveriesPopoverMessage = `The maximum times a messages is redelivered in case of failure.<br/><br/>`;
     this.redeliveryDelayPopoverMessage = `The delay in miliseconds between redeliveries (this delays all messages!)`;
-    this.logLevelPopoverMessage = `Sets the log level (default=OFF). This logs incoming and outgoing messages in the flow`;
+    this.logLevelPopoverMessage = `Sets the log level (default=OFF). This logs incoming and outgoing messages in the flow.`;
     this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
     this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
@@ -566,7 +556,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
                                      Use the button on the right to create or edit services.`;
     this.popoverMessage = `Destination`;
     this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
-    this.portPopoverMessage = `Number of the port. Range between 1 and 65536`;
+    this.portPopoverMessage = `Number of the port. Range between 1 and 65536.`;
     this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
   }
 

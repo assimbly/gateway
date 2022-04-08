@@ -38,8 +38,6 @@ public class ImportXMLHeaders {
 
     private Set<HeaderKeys> headerKeys;
 
-	private long headerIdLong;
-
 	public String setHeadersFromXML(Document doc) throws Exception {
 
         log.info("Importing headers");
@@ -86,7 +84,7 @@ public class ImportXMLHeaders {
 		String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerId + "]/name", doc);
 
 		try {
-			headerIdLong = Long.parseLong(headerId, 10);
+			Long.parseLong(headerId, 10);
 			Optional<Header> headerOptional = headerRepository.findByName(headerName);
 
 			if (!headerOptional.isPresent()) {

@@ -184,7 +184,7 @@ public class EndpointResource {
             arrayOfIds.add(endpoint.getId().toString());
         }
 
-        endpointRepository.deleteInBatch(endpoints);
+        endpointRepository.deleteAllInBatch(endpoints);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, arrayOfIds.toString())).build();
     }
 }

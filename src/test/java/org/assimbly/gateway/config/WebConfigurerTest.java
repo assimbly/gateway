@@ -65,7 +65,6 @@ public class WebConfigurerTest {
 
         webConfigurer = new WebConfigurer(env, props);
         metricRegistry = new MetricRegistry();
-        webConfigurer.setMetricRegistry(metricRegistry);
     }
 
     @Test

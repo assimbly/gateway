@@ -81,12 +81,12 @@ spring:
     basename: i18n/messages
   main:
     allow-bean-definition-overriding: true
-    allow-circular-references: true	
+    allow-circular-references: true
   mvc:
     favicon:
       enabled: true
     pathmatch:
-      matching-strategy: ant_path_matcher	  
+      matching-strategy: ant_path_matcher
   thymeleaf:
     mode: HTML
   autoconfigure:
@@ -158,9 +158,12 @@ application:
     camel-url: https://camel.apache.org/components/latest
   gateway:
     name: default
-    base-directory: default
     tracing: false
     debugging: false
+    base-directory: default
+  deploy-directory:
+    deploy-on-start: true
+    deploy-on-change: true
 hawtio:
   authenticationEnabled: false
   offline: true
