@@ -2,7 +2,6 @@ package org.assimbly.gateway.service.impl;
 
 import org.assimbly.gateway.service.ServiceService;
 import org.assimbly.gateway.repository.ServiceRepository;
-import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.dto.ServiceDTO;
 import org.assimbly.gateway.service.mapper.ServiceMapper;
 import org.slf4j.Logger;

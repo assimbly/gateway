@@ -6,15 +6,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.assimbly.util.TransformUtil;
 import org.apache.commons.text.StringSubstitutor;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import org.w3c.dom.Document;
 
 @Service
 public class Export {

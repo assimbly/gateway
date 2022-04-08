@@ -5,7 +5,6 @@ import java.util.*;
 import org.assimbly.gateway.domain.Gateway;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
-import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +44,6 @@ public class ImportXMLGateways {
 
     @Autowired
     private ImportXMLEnvironmentVariables importXMLEnvironmentVariables;
-
-    @Autowired
-    private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	public String xmlConfiguration;
 	public String configuration;

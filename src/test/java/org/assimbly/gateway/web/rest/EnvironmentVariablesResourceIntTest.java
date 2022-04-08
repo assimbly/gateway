@@ -8,7 +8,7 @@ import org.assimbly.gateway.service.EnvironmentVariablesService;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
 import org.assimbly.gateway.service.mapper.EnvironmentVariablesMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
-
+import org.assimbly.gateway.web.rest.gateway.EnvironmentVariablesResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

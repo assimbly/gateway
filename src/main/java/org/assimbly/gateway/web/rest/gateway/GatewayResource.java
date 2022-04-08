@@ -9,9 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
-import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
 import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
@@ -49,8 +47,6 @@ public class GatewayResource {
     private final ApplicationProperties applicationProperties;
 
     private Scheduler scheduler;
-
-    private String gatewayType;
 
     private boolean ran = false;
 
@@ -97,7 +93,6 @@ public class GatewayResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        gatewayType = gatewayDTO.getType().name();
         GatewayDTO result = gatewayService.save(gatewayDTO);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString())).body(result);

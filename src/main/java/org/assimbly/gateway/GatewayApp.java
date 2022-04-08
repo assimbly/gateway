@@ -16,7 +16,6 @@ import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -126,7 +125,7 @@ public class GatewayApp {
             applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
         }
 
-        log.info(
+       log.info(
             "\n----------------------------------------------------------\n\t" +
             "Application '{}' is running! \n\n\t" +
             "Application Version: \t{}\n\t" +

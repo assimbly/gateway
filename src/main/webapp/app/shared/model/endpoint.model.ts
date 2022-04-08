@@ -3,7 +3,8 @@ export const enum EndpointType {
     TO = 'TO',
     ERROR = 'ERROR',
     RESPONSE = 'RESPONSE',
-    SERVICE = 'SERVICE'
+    ROUTE = 'ROUTE',
+    API = 'API'
 }
 
 export interface IEndpoint {

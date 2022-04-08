@@ -1,8 +1,5 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.springframework.core.env.Environment;
@@ -18,7 +15,7 @@ public class ProfileInfoResource {
 
     private final Environment env;
 
-    private final JHipsterProperties jHipsterProperties;
+    private JHipsterProperties jHipsterProperties;
 
     private final ApplicationProperties.Documentation documentation;
 

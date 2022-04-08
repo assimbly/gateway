@@ -1,40 +1,32 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable, Subscription, from } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { AlertService } from 'app/core/util/alert.service';
-
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
-import { Gateway } from 'app/shared/model/gateway.model';
-import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
-import { FlowService } from '../flow.service';
-import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
-import { IHeader } from 'app/shared/model/header.model';
-import { Service } from 'app/shared/model/service.model';
-import { Route } from 'app/shared/model/route.model';
-
-import { EndpointService } from '../../endpoint/endpoint.service';
-import { ServiceService } from '../../service/service.service';
-import { HeaderService } from '../../header/header.service';
-import { RouteService } from '../../route/route.service';
-import { GatewayService } from '../../gateway/gateway.service';
-
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AlertService } from 'app/core/util/alert.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
+import { HeaderPopupService } from 'app/entities/header/header-popup.service';
+import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
+import { RoutePopupService } from 'app/entities/route/route-popup.service';
+import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
+import { ServicePopupService } from 'app/entities/service/service-popup.service';
 import { Components } from 'app/shared/camel/component-type';
 import { Services } from 'app/shared/camel/service-connections';
-
-import { map } from 'rxjs/operators';
-
-import { HeaderPopupService } from 'app/entities/header/header-popup.service';
-import { RoutePopupService } from 'app/entities/route/route-popup.service';
-import { ServicePopupService } from 'app/entities/service/service-popup.service';
-
-import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
-import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
-import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
-
+import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
+import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
+import { Gateway } from 'app/shared/model/gateway.model';
+import { IHeader } from 'app/shared/model/header.model';
+import { Route } from 'app/shared/model/route.model';
+import { Service } from 'app/shared/model/service.model';
 import dayjs from 'dayjs/esm';
+import { forkJoin, from, Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { EndpointService } from '../../endpoint/endpoint.service';
+import { GatewayService } from '../../gateway/gateway.service';
+import { HeaderService } from '../../header/header.service';
+import { RouteService } from '../../route/route.service';
+import { ServiceService } from '../../service/service.service';
+import { FlowService } from '../flow.service';
 
 
 @Component({

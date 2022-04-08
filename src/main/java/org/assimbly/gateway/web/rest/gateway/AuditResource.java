@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import java.time.Instant;
 import java.time.LocalDate;
