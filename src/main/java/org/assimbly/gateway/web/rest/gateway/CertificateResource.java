@@ -237,11 +237,7 @@ public class CertificateResource {
 
         List<Certificate> listExpired = certificateService.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
 
-        if(listExpired.size()>0) {
-        	isExpired = true;
-        }else {
-        	isExpired = false;
-        }
+        isExpired = listExpired.size() > 0;
 
         return ResponseEntity.ok().body(isExpired);
 

@@ -126,10 +126,10 @@ export class CertificateService {
     });
   }
 
-  importCertificate(url, keystoreName): Observable<HttpResponse<any>> {
+  importCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: 'supersecret',
+      keystorePassword,
     });
 
     return this.http.post(`${this.resourceUrl}/import`, url, {

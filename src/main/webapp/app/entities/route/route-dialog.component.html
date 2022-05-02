@@ -22,16 +22,17 @@
             </select>
         </div>
 		<br/>
-		<div class="form-group" >
-			<ngx-codemirror
+		<div class="form-group">
+      <label class="form-control-label" for="field_route">Route</label>
+			<ngx-codemirror #codeEditor
 				class="form-control" name="content" id="field_content"
                     formControlName="content"
    				  [options]="{
 				lineNumbers: true,
 				theme: 'default',
-				mode: 'xml'
-			  }"
-				>
+				mode: 'xml',
+        autoCloseTags: true
+			  }">
 			</ngx-codemirror>
         </div>
 		</form>

@@ -51,6 +51,11 @@ public class ManageCertificateResource {
         try {
 
             Certificate[] certificates = getCertificates(url);
+
+            if(certificates == null || certificates.length == 0){
+                throw new Exception("Certificates couldn't be downloaded.");
+            }
+
             Map<String,Certificate> certificateMap = importCertificatesInKeystore(keystoreName, keystorePassword, certificates);
 
             String result = certificatesAsJSon(certificateMap, url, keystoreName);

@@ -50,12 +50,9 @@ public class ImportXMLEnvironmentVariables {
 			String value = environmentVariableChildNode.item(3).getTextContent();
             String encrypted = environmentVariableChildNode.item(5).getTextContent();
 
-            boolean encryptedBoolean = false;
-            if(encrypted.equalsIgnoreCase("true")){
-                encryptedBoolean = true;
-            }
+            boolean encryptedBoolean = encrypted.equalsIgnoreCase("true");
 
-			if (!map.containsKey(key)) {
+            if (!map.containsKey(key)) {
 				EnvironmentVariables environmentVariable = new EnvironmentVariables();
 				environmentVariable.setKey(key);
 				environmentVariable.setValue(value);

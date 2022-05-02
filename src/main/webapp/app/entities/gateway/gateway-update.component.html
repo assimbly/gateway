@@ -46,6 +46,7 @@
 			                <option *ngFor="let gatewayType of gatewayListType" [ngValue]="gatewayType">{{gatewayType}}</option>
 			            </select>-->
 			        </div>
+              <br/>
 			        <h4>Environment
 					<i placement="right" triggers="mouseenter:mouseleave"
 						popoverTitle="Info"
@@ -90,7 +91,7 @@
 
 			    </div>
 				<br/>
-                <div>				
+                <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
                     <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
                 </button>

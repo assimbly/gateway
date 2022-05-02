@@ -32,7 +32,7 @@ public class PersistentToken implements Serializable {
     @NotNull
     @Column(name = "token_value", nullable = false)
     private String tokenValue;
-    
+
     @Column(name = "token_date")
     private LocalDate tokenDate;
 
@@ -111,11 +111,7 @@ public class PersistentToken implements Serializable {
 
         PersistentToken that = (PersistentToken) o;
 
-        if (!series.equals(that.series)) {
-            return false;
-        }
-
-        return true;
+        return series.equals(that.series);
     }
 
     @Override

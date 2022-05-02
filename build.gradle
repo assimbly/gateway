@@ -19,7 +19,7 @@ plugins {
     id "java"
     id "maven-publish"
     id "idea"
-	id "eclipse"	
+	id "eclipse"
     id "jacoco"
     id "org.springframework.boot"
     id "com.google.cloud.tools.jib"
@@ -61,7 +61,7 @@ apply plugin: 'eclipse'
 
 configurations.all {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'    
+    exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
   	exclude group: "org.slf4j", module: "slf4j-nop"
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
@@ -269,13 +269,13 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.20.0")
+                    details.useVersion("2.21.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.16.3")
+                    details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.73.Final")
+                    details.useVersion("4.1.76.Final")
                 }
             }
         }
@@ -290,13 +290,13 @@ repositories {
 
 dependencies {
 
-    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.5.1'
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
     //implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
-	
+
 	implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -310,7 +310,7 @@ dependencies {
     implementation "net.logstash.logback:logstash-logback-encoder"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"	
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -326,13 +326,13 @@ dependencies {
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate:hibernate-envers"
     implementation "org.hibernate.validator:hibernate-validator"
-        
+
     implementation "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
-    liquibaseRuntime sourceSets.main.compileClasspath    
+    liquibaseRuntime sourceSets.main.compileClasspath
 
-    implementation "org.springframework.boot:spring-boot-starter-cache"   
+    implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-loader-tools"
     implementation "org.springframework.boot:spring-boot-starter-mail"
     implementation "org.springframework.boot:spring-boot-starter-logging"
@@ -358,7 +358,7 @@ dependencies {
     //implementation "io.jsonwebtoken:jjwt:0.9.1"
 	//implementation "io.jsonwebtoken:jjwt-api"
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'	
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
 	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
@@ -380,7 +380,7 @@ dependencies {
         implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
     }else{
         implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true        
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"

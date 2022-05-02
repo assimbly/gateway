@@ -5,12 +5,14 @@ import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.*;
+import org.assimbly.util.IntegrationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,25 +43,32 @@ public class ExportXML {
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
-	private Set<Endpoint> endpoints;
+	private String xmlConfiguration;
+    private String configuration;
 
-	public String xmlConfiguration;
-	private Element integrations;
 	private Document doc;
-	private Element flows;
+
+    private Set<Endpoint> endpoints;
+
+    private Node environmentVariablesList;
+
+    private Element integrations;
+    private Element flows;
 	private Element services;
 	private Element headers;
     private Element routes;
+    private Element routeConfigurations;
 	private Element flow;
-	public String integrationId;
 
-	private List<String> servicesList;
+	private String integrationId;
+    private String logLevelAsString = "OFF";
+    private String flowTypeAsString;
+	private String flowNameAsString;
+
+    private List<String> servicesList;
 	private List<String> headersList;
     private List<String> routesList;
 
-	public String configuration;
-
-	private Node environmentVariablesList;
 
     public ExportXML(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -174,6 +183,7 @@ public class ExportXML {
 		services = setElement("services", null, integration);
 		headers = setElement("headers", null, integration);
         routes = setElement("routes", null, integration);
+        routeConfigurations = setElement("routeConfigurations", null, integration);
 		environmentVariablesList = setElement("environmentVariables", null, integration);
 
 		servicesList = new ArrayList<String>();
@@ -203,6 +213,11 @@ public class ExportXML {
 		Element maximumRedeliveries =  setElement("maximumRedeliveries", Integer.toString(flowDB.getMaximumRedeliveries()), flow);
 		Element redeliveryDelay =  setElement("redeliveryDelay", Integer.toString(flowDB.getRedeliveryDelay()), flow);
 		Element logLevel =  setElement("logLevel", flowDB.getLogLevel().toString(), flow);
+
+
+        flowNameAsString = flowDB.getName();
+        flowTypeAsString = flowDB.getType();
+        logLevelAsString = flowDB.getLogLevel().toString();
 
 		//notes
         String flowNotes = flowDB.getNotes();
@@ -320,9 +335,9 @@ public class ExportXML {
 
 			Element id =  setElement("id", serviceDB.getId().toString(), service);
 
-			Element name =  setElement("name", serviceDB.getName().toString(), service);
+			Element name =  setElement("name", serviceDB.getName(), service);
 
-			Element serviceType =  setElement("type", serviceDB.getType().toString(), service);
+			Element serviceType =  setElement("type", serviceDB.getType(), service);
 
 			Element keys =  setElement("keys", null, service);
 
@@ -350,7 +365,7 @@ public class ExportXML {
 
 			Element id =  setElement("id", headerDB.getId().toString(), header);
 
-			Element name =  setElement("name", headerDB.getName().toString(), header);
+			Element name =  setElement("name", headerDB.getName(), header);
 
 			Element keys =  setElement("keys", null, header);
 
@@ -372,6 +387,8 @@ public class ExportXML {
 
     public void setXMLRouteFromDB(Integer routeid, String flowId, String endpointId) throws Exception {
 
+        System.out.println("1. setRoute routeid" + routeid);
+
         Long routIdAsLong = routeid.longValue();
         String routIdAsString = routeid.toString();
 
@@ -387,19 +404,45 @@ public class ExportXML {
 
                 String routeContent = route.getContent();
 
-                routeContent = routeContent.replaceAll("<route(.*)>","<route id=\"" + routIdAsString + "\">");
+                routeContent = routeContent.replaceAll("&","&amp;");
 
-                DocumentBuilderFactory dbFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = dbFactory.newDocumentBuilder();
-                Document doc2 = builder.parse(new ByteArrayInputStream(routeContent.getBytes()));
+                routeContent = createLogLines(routeContent);
+                System.out.println("3a. setRoute routecontent" + routeContent);
 
-                Node node = doc.importNode(doc2.getDocumentElement(), true);
-                routes.appendChild(node);
-
+                if(IntegrationUtil.isXML(routeContent)){
+                    Document routeDocument = getRouteDocument(routeContent, routIdAsString);
+                    Node node = doc.importNode(routeDocument.getDocumentElement(), true);
+                    if(routeContent.startsWith("<routeConfiguration")){
+                        routeConfigurations.appendChild(node);
+                    }else{
+                        routes.appendChild(node);
+                    }
+                }
             }
+        }
+    }
 
+    private Document getRouteDocument(String route, String routeId) throws Exception {
+
+        DocumentBuilderFactory dbFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = dbFactory.newDocumentBuilder();
+        Document routeDocument = builder.parse(new ByteArrayInputStream(route.getBytes()));
+
+        //update the route ID
+        NodeList nodes = routeDocument.getElementsByTagName("route");
+        for (int idx = 0; idx < nodes.getLength(); idx++) {
+            Node node = nodes.item(idx);
+            ((Element)node).setAttribute("id",routeId);
         }
 
+        //update the routeConfiguration ID
+        nodes = routeDocument.getElementsByTagName("routeConfiguration");
+        for (int idx = 0; idx < nodes.getLength(); idx++) {
+            Node node = nodes.item(idx);
+            ((Element)node).setAttribute("id",routeId);
+        }
+
+        return routeDocument;
 
     }
 
@@ -446,6 +489,25 @@ public class ExportXML {
 
 		return confUri;
 	}
+
+    private String createLogLines(String route){
+
+        System.out.println("logLevelAsString=" + logLevelAsString);
+
+        if(!logLevelAsString.equalsIgnoreCase("OFF") && flowTypeAsString.equalsIgnoreCase("ESB")){
+            String logLine = "<to uri=\"log:" + flowNameAsString + "?showAll=true&amp;multiline=true&amp;level=" + logLevelAsString + "\"/>";
+
+            System.out.println("1. route=" + route);
+            route = route.replaceAll("<from(.*)/>", "<from$1/>\n" + logLine);
+            System.out.println("2. route=" + route);
+            route = route.replaceAll("</route>", logLine + "\n</route>");
+            System.out.println("3. route=" + route);
+        }
+
+        return route;
+
+    }
+
 
 	private String setDefaultComponentType(String componentType) {
 

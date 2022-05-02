@@ -1,7 +1,7 @@
 <form name="importForm" [formGroup]="importForm">
     <div class="modal-header">
-        <h4 class="modal-title" id="myGatewayLabel">Generate Self-Signed Cetificate</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="clear()">&times;</button>
+        <h4 class="modal-title" id="selfSignLabel">Generate Self-Signed Cetificate</h4>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
     </div>
     <div class="modal-body">
     	<div class="alert alert-danger" *ngIf="error">
@@ -15,6 +15,7 @@
                 <option value="truststore">truststore</option>
             </select>
         </div>
+        <br/>
         <div class="form-group" style="padding-left: 5px; padding-right: 5px;">
             <label for="cn" class="form-control-label font-weight-bold">Common Name (CN)</label>
             <input type="text" id="cn" formControlName="cn" class="form-control" [(ngModel)]="cn" placeholder="Example: localhost">

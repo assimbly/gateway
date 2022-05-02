@@ -39,8 +39,8 @@ public class ProfileInfoResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        String mockProfile[] = { "test" };
-        String activeProfiles[] = {"test"};
+        String[] mockProfile = { "test" };
+        String[] activeProfiles = {"test"};
         when(environment.getDefaultProfiles()).thenReturn(activeProfiles);
         when(environment.getActiveProfiles()).thenReturn(activeProfiles);
 
@@ -52,7 +52,7 @@ public class ProfileInfoResourceIntTest {
 
     @Test
     public void getProfileInfoWithoutActiveProfiles() throws Exception {
-        String emptyProfile[] = {};
+        String[] emptyProfile = {};
         when(environment.getDefaultProfiles()).thenReturn(emptyProfile);
         when(environment.getActiveProfiles()).thenReturn(emptyProfile);
 

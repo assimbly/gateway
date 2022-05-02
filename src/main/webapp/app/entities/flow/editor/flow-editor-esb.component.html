@@ -8,6 +8,32 @@
   <div [innerHtml]="errorHandlerPopoverMessage"></div>
 </ng-template>
 
+<div class="row">
+  <div class="col-9"></div>
+  <div class="col-2-5">
+    <a
+      role="button"
+      class="btn btn-sm right-border-radius-0 camel-link camel-img"
+      href="https://camel.apache.org/docs/"
+      title="Camel Documentation"
+      target="_blank"
+    ></a>
+    <a
+      role="button"
+      class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
+      href="https://github.com/assimbly/gateway/wiki"
+      title="Assimbly Documentation"
+      target="_blank"
+    >
+      <picture>
+        <source srcset="../../../content/images/assimbly_transparant.webp" />
+        <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+      </picture>
+    </a>
+  </div>
+  <div class="col-0-5"></div>
+</div>
+
 <div class="container">
   <div class="row">
 
@@ -41,8 +67,9 @@
         <div class="card-header">
           <br/>
           <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active2" orientation="horizontal">
-            <li ngbNavItem="SERVICES" formArrayName="endpointsData" novalidate>
-              <a ngbNavLink>SERVICES</a>
+            <li ngbNavItem="ROUTES" formArrayName="endpointsData" novalidate
+                [ngStyle]="{'text-align': 'left' }">
+              <a ngbNavLink>ROUTES</a>
               <ng-template ngbNavContent>
                 <br/>
                 <hr/>
@@ -55,26 +82,41 @@
                           <label for="id">ID</label>
                           <input type="text" class="form-control" id="endpointid" formControlName="id" readonly/>
                         </div>
-                        <div class="col-10">
+                        <div class="col-9">
                           <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                                     id="field_route" dropdownPosition="top"></ng-select>
+                                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
                         </div>
-                        <button type="button"
+                        <button title="Edit route"  type="button"
+                                class="col-1 btn btn-primary"
+                                style="height: 37px;"
                                 *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
-                                title="Edit route" class="col-2 btn btn-primary"
                                 (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
                     <span class="padding-button"><fa-icon icon="edit"
                                                           style="color: white;"></fa-icon></span>&nbsp;
                         </button>
-                        <button type="button"
+                        <button title="New route" type="button"
+                                class="col-1 btn btn-primary flow-header-button"
+                                style="height: 37px;"
                                 *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
-                                class="col-2 btn btn-primary flow-header-button" title="New route"
                                 (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
                         </button>
-                        <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary"
-                                title="Create route"
+                        <button title="Create route" type="button" *ngIf="!routeCreated"
+                                class="col-1 btn btn-primary"
+                                style="height: 37px;"
                                 (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
                           <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
+                        </button>
+                        <button title="Add route" type="button"
+                                class="col-1 btn btn-success"
+                                style="height: 37px;"
+                                (click)="addEndpoint(endpoint, index)">
+                          <fa-icon icon="plus" style="color: white;"></fa-icon>
+                        </button>
+                        <button title="Remove route" type="button"
+                                class="col-1 btn btn-danger"
+                                style="height: 37px;"
+                                (click)="removeEndpoint(endpoint, index)">
+                          <fa-icon icon="times" style="color: white;"></fa-icon>
                         </button>
                       </div>
                       <br/>
@@ -83,29 +125,13 @@
                 </div>
               </ng-template>
             </li>
-            <li ngbNavItem="SETTINGS" novalidate>
-              <a ngbNavLink>SETTINGS</a>
+            <li ngbNavItem="ERROR_ROUTE" novalidate
+                [ngStyle]="{'text-align': 'left' }">
+              <a ngbNavLink>ERROR ROUTE</a>
               <ng-template ngbNavContent>
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
-                  <div class="row">
-                    <div class="form-group col-10" style="margin-left: 24px;">
-                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
-                      <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-                         [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
-                        <fa-icon icon="info-circle"></fa-icon>
-                      </i>
-                      <select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
-                        <option *ngFor="let logLevel of logLevelListType"
-                                [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
-                          {{logLevel}}
-                        </option>
-                      </select>
-                    </div>
-                    <div class="col-2"></div>
-                  </div>
-                  <br/>
                   <ng-container formArrayName="endpointsData" *ngFor="let endpoint of endpoints; index as index">
                     <div class="form-group container" [formGroupName]="index">
                       <div class="row" *ngIf="endpoint.endpointType=='ERROR'">
@@ -122,7 +148,7 @@
                         </div>
                         <div class="col-10">
                           <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                                     id="field_route" dropdownPosition="top"></ng-select>
+                                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
                         </div>
                         <button type="button"
                                 *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
@@ -145,13 +171,37 @@
                       <br/>
                     </div>
                   </ng-container>
-
-
+                </div>
+              </ng-template>
+            </li>
+            <li ngbNavItem="SETTINGS" novalidate [ngStyle]="{'text-align': 'left' }">
+            <a ngbNavLink>SETTINGS</a>
+              <ng-template ngbNavContent>
+                <br/>
+                <hr/>
+                <div style="min-height: 44rem;">
+                  <div class="row">
+                    <div class="form-group col-10" style="margin-left: 24px;">
+                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+                      <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                         [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
+                        <fa-icon icon="info-circle"></fa-icon>
+                      </i>
+                      <select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+                        <option *ngFor="let logLevel of logLevelListType"
+                                [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+                          {{logLevel}}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col-2"></div>
+                  </div>
+                  <br/>
                 </div>
               </ng-template>
             </li>
 
-            <li ngbNavItem="NOTES" novalidate>
+            <li ngbNavItem="NOTES" novalidate [ngStyle]="{'text-align': 'left' }">
               <a ngbNavLink>NOTES</a>
               <ng-template ngbNavContent>
                 <ng-template #notesPopover let-message="message">
@@ -175,18 +225,24 @@
       </div>
 
       <br/>
+      <br/>
       <div class="container">
-        <div class="row">
-          <div class="col-5 offset-6" style="padding-left: 30px;">
-            <button type="button" class="btn btn-secondary float-right" [routerLink]="['/']">
-              <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp; <span
-              style="color: white;">Cancel</span>
-            </button>
-            <button type="button" (click)="save()" class="btn btn-primary float-right" [disabled]="isSaving">
-              <span><fa-icon icon="save"></fa-icon></span>&nbsp; <span style="color: white;">Save</span>
-            </button>
+        <div class="row justify-content-center">
+          <div class="col-8 offset-4">
+            <div class="position-relative">
+              <div class="position-absolute bottom-50 end-50">
+                <button type="button" class="btn btn-secondary" [routerLink]="['/']">
+                  <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>
+                  &nbsp; <span style="color: white;">Cancel</span>
+                </button>
+                <button class="float-end" type="button" (click)="save()" class="btn btn-primary" [disabled]="isSaving">
+                  <span><fa-icon icon="save"></fa-icon></span>&nbsp;
+                  &nbsp; <span style="color: white;">Save</span>
+                </button>
+
+              </div>
+            </div>
           </div>
-          <div class="col-1"></div>
         </div>
       </div>
       <br/>

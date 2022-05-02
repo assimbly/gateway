@@ -33,7 +33,7 @@ public class ImportXMLRoutes {
     private RouteRepository routeRepository;
 
 	private Route route;
-	private Map<String, String> routesIdMap = new HashMap<String, String>();
+	private final Map<String, String> routesIdMap = new HashMap<String, String>();
 
 	public String xmlConfiguration;
 	public String configuration;
@@ -97,7 +97,7 @@ public class ImportXMLRoutes {
 				route = new Route();
 				route.setId(null);
 				route.setName(routeId);
-				route.setType("xml");
+				route.setType("route");
 				route.setContent(routeContent);
 
 			} else {
@@ -106,7 +106,7 @@ public class ImportXMLRoutes {
 		} catch (NumberFormatException nfe) {
 			route = new Route();
 			route.setName(routeId);
-			route.setType("xml");
+			route.setType("route");
 			route.setContent(routeContent);
 		}
 

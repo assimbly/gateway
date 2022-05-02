@@ -1051,7 +1051,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
     endpoint.routeId = formRoute.value;
 
     if (typeof endpoint.routeId === 'undefined' || endpoint.routeId === null || !endpoint.routeId) {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component);
+      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, null, this.flow.type);
       modalRef.then(res => {
         res.result.then(
           result => {
@@ -1063,7 +1063,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
         );
       });
     } else {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId);
+      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId,this.flow.type);
       modalRef.then(res => {
         // Success
         res.result.then(

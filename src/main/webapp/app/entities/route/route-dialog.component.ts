@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -12,6 +12,8 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { RoutePopupService } from 'app/entities/route/route-popup.service';
 
+import 'codemirror/addon/edit/closetag';
+
 @Component({
     selector: 'jhi-route-dialog',
     templateUrl: './route-dialog.component.html'
@@ -22,6 +24,7 @@ export class RouteDialogComponent implements OnInit {
     routeNames: Array<string> = [];
     isSaving = false;
     show = true;
+    type: string;
 
     editForm = this.fb.group({
         id: [null],
@@ -29,9 +32,7 @@ export class RouteDialogComponent implements OnInit {
         type: ['xml'],
         content: [
             '<route>\n' +
-                '        <!-- Please do not remove the from statement. -->\n' +
-                '        <from uri="direct:generated"/>\n' +
-                '</route>'
+            '</route>'
         ]
     });
 
@@ -46,9 +47,17 @@ export class RouteDialogComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+
         // route is injected in the component (see RoutePopupService);
         if (!this.route.id) {
             this.route = this.createFromForm();
+
+            if(this.type === 'connector'){
+              this.route.content = '<route>\n' +
+                      '        <!-- Please do not remove the from statement. -->\n' +
+                      '        <from uri="direct:generated"/>\n' +
+                      '</route>'
+            }
         }
 
         this.updateForm(this.route);
@@ -60,6 +69,8 @@ export class RouteDialogComponent implements OnInit {
             },
             res => this.onError(res.body)
         );
+
+
     }
 
     updateForm(route: IRoute): void {
@@ -110,11 +121,11 @@ export class RouteDialogComponent implements OnInit {
     }
 
     private onSaveSuccess(result: IRoute, closePopup: boolean) {
-		this.eventManager.broadcast(new EventWithContent('routeListModification', 'OK'));
+		  this.eventManager.broadcast(new EventWithContent('routeListModification', 'OK'));
 	    this.eventManager.broadcast(new EventWithContent('routeModified', result.id));
-		this.eventManager.broadcast(new EventWithContent('routeKeysUpdated', result));	
-        this.isSaving = false;
-        this.activeModal.dismiss(result);
+		  this.eventManager.broadcast(new EventWithContent('routeKeysUpdated', result));
+      this.isSaving = false;
+      this.activeModal.dismiss(result);
     }
 
     private createFromForm(): IRoute {
@@ -136,6 +147,7 @@ export class RouteDialogComponent implements OnInit {
 		  message: error.message,
 		});
     }
+
 }
 
 @Component({
@@ -143,6 +155,7 @@ export class RouteDialogComponent implements OnInit {
     template: ''
 })
 export class RoutePopupComponent implements OnInit, OnDestroy {
+
     routeSub: any;
 
     constructor(private route: ActivatedRoute, private routePopupService: RoutePopupService) {}
@@ -159,7 +172,8 @@ export class RoutePopupComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy() {
+   ngOnDestroy() {
         this.routeSub.unsubscribe();
     }
+
 }

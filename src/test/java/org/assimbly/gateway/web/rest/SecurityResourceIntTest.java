@@ -171,12 +171,12 @@ public class SecurityResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(security.getId().intValue())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
-            .andExpect(jsonPath("$.[*].certificateName").value(hasItem(DEFAULT_CERTIFICATE_NAME.toString())))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
+            .andExpect(jsonPath("$.[*].certificateName").value(hasItem(DEFAULT_CERTIFICATE_NAME)))
             .andExpect(jsonPath("$.[*].certificateExpiry").value(hasItem(DEFAULT_CERTIFICATE_EXPIRY.toString())))
-            .andExpect(jsonPath("$.[*].certificateFile").value(hasItem(DEFAULT_CERTIFICATE_FILE.toString())));
+            .andExpect(jsonPath("$.[*].certificateFile").value(hasItem(DEFAULT_CERTIFICATE_FILE)));
     }
-    
+
     @Test
     @Transactional
     public void getSecurity() throws Exception {
@@ -188,10 +188,10 @@ public class SecurityResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(security.getId().intValue()))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL.toString()))
-            .andExpect(jsonPath("$.certificateName").value(DEFAULT_CERTIFICATE_NAME.toString()))
+            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
+            .andExpect(jsonPath("$.certificateName").value(DEFAULT_CERTIFICATE_NAME))
             .andExpect(jsonPath("$.certificateExpiry").value(DEFAULT_CERTIFICATE_EXPIRY.toString()))
-            .andExpect(jsonPath("$.certificateFile").value(DEFAULT_CERTIFICATE_FILE.toString()));
+            .andExpect(jsonPath("$.certificateFile").value(DEFAULT_CERTIFICATE_FILE));
     }
 
     @Test
