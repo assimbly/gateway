@@ -262,8 +262,7 @@ public class ImportXMLFlows {
 
 			if (options != null && !options.isEmpty()) {
 				options = options + "&" + key + "=" + value;
-				;
-			} else {
+            } else {
 				options = key + "=" + value;
 			}
 

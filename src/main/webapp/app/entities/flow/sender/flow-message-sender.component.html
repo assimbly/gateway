@@ -214,17 +214,17 @@
 								<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
 									<span>Test Connection</span>
 								</a>
-							</div>																		
+							</div>
 						</div>
-					</div> 
+					</div>
 					<div class="row" style="margin-top: 1em">
 						<div class="col-12">
 							<label class="form-control-label" for="field_uri">Path</label>
 							<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
 						</div>
-					</div>					
+					</div>
                     <div class="row">
-						<div class="col-10">			  
+						<div class="col-10">
 						  <ng-select
 							[items]="URIList"
 							[addTag]="true"
@@ -236,7 +236,7 @@
 							[(ngModel)]="requestEndpoint.uri"
 							dropdownPosition="bottom"
 						  ></ng-select>
-						</div>  
+						</div>
 						  <button
 							type="button"
 							class="btn btn-primary col-2"
@@ -275,24 +275,26 @@
                       Context path is required.
                     </div>
                   </div>
-
                   <div class="form-group" formArrayName="options">
-					<div class="row" style="margin-top: 1em">
-						<div class="col-12">
-							<label class="form-control-label" for="field_options">Options</label>
-							<i triggers="mouseenter:mouseleave"	popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right"><fa-icon icon="info-circle"></fa-icon></i>
-						</div>
-					</div>
+                    <div class="row" style="margin-top: 1em">
+                      <div class="col-12">
+                        <label class="form-control-label" for="field_options">Options</label>
+                        <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"
+                           container="body" placement="right">
+                          <fa-icon icon="info-circle"></fa-icon>
+                        </i>
+                      </div>
+                    </div>
 
-					<div class="row g-0" *ngFor="let option of endpointsOptions[0]; index as idx" [formGroupName]="idx">
-						<div class="col-5">
+                    <div class="row" *ngFor="let option of endpointsOptions[0]; index as idx" [formGroupName]="idx">
+                      <div class="col-5">
                         <ng-select
                           [items]="componentOptions[0]"
                           bindLabel="displayName"
                           bindValue="name"
                           formControlName="key"
                           [addTag]="true"
-						  [ngStyle]="{'display':'block', 'width': '250px'}"
+                          [ngStyle]="{'display':'block', 'width': '250px'}"
                           (change)="changeOptionSelection(selectedOption[idx], 0, idx)"
                           id="field_options-key-{{ idx }}"
                           (focusout)="
@@ -310,19 +312,19 @@
                             </div>
                             <ng-template #optionTooltip>
                               <div>
-                                <b>Description: </b>{{ item.description }}<br /><br /><b>Group: </b>{{ item.group }}<br /><b>DataType: </b
-                                >{{ item.type }}<br /><span *ngIf="item.hasOwnProperty('defaultValue')"
-                                  ><b>DefaultValue:</b> {{ item.defaultValue }}</span
-                                >
+                                <b>Description: </b>{{ item.description }}<br/><br/><b>Group: </b>{{ item.group}}
+                                <br/><b>DataType: </b>{{ item.type }}<br/><span *ngIf="item.hasOwnProperty('defaultValue')">
+                                <b>DefaultValue:</b> {{ item.defaultValue }}</span>
                               </div>
                             </ng-template>
                           </ng-template>
                         </ng-select>
-						</div>
-						<div class="col-5">
+                      </div>
+                      <div class="col-5" style="margin-right: -12px;">
                         <input
                           type="text"
                           class="col-4 rounded-0 d-inline-block form-control"
+                          style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 20px;"
                           id="field_options-value-{{ idx }}"
                           formControlName="value"
                           [placeholder]="
@@ -333,82 +335,29 @@
                             validateOptions(messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx])
                           "
                           data-toggle="tooltip"
-                          title="Value of the option. Click the Camel component button for documentation on valid options."
-                        />
+                          title="Value of the option. Click the Camel component button for documentation on valid options."/>
                       </div>
-                        <button
-                          title="Add option"
-                          type="button"
-                          class="col-1 rounded-0 btn btn-primary"
-                          (click)="addOption(endpointsOptions[0], 0)"
-                          [disabled]="
+                      <button title="Add option" type="button"
+                        class="col-1 rounded-0 btn btn-primary"
+                        (click)="addOption(endpointsOptions[0], 0)"
+                        [disabled]="
                             messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
                           "
-                        >
-                          <fa-icon icon="plus" style="color: white;"></fa-icon>
-                        </button>
-                        <button
-                          title="Remove option"
-                          type="button"
-                          class="col-1 left-border-radius-0 btn btn-danger"
-                          (click)="removeOption(endpointsOptions[0], option, 0)"
-                          [disabled]="
+                      >
+                        <fa-icon icon="plus" style="color: white;"></fa-icon>
+                      </button>
+                      <button title="Remove option" type="button"
+                        class="col-1 left-border-radius-0 btn btn-danger"
+                        (click)="removeOption(endpointsOptions[0], option, 0)"
+                        [disabled]="
                             messageSenderForm['controls'].endpointsData['controls'][0]['controls'].componentType.value === 'WASTEBIN' ||
                             endpointsOptions[0].length === 1
                           "
-                        >
-                          <fa-icon icon="times"></fa-icon>
-                        </button>
-                      <div class="row">
-                        <div class="col-5 d-inline-block px-0">
-                          <div
-                            *ngIf="
-                              messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                .key.errors &&
-                              (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                .key.dirty ||
-                                messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                  .key.touched)
-                            "
-                          >
-                            <div
-                              *ngIf="
-                                messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                  .key.errors.required
-                              "
-                              class="invalid-field-message"
-                            >
-                              Option key is required.
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-5 d-inline-block px-0">
-                          <div
-                            *ngIf="
-                              messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                .value.errors &&
-                              (messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                .value.dirty ||
-                                messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                  .value.touched)
-                            "
-                          >
-                            <div
-                              *ngIf="
-                                messageSenderForm['controls'].endpointsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                                  .value.errors.required
-                              "
-                              class="invalid-field-message"
-                            >
-                              Option value is required.
-                            </div>
-                          </div>
-                        </div>
+                      >
+                        <fa-icon icon="times" style="color: white;"></fa-icon>
+                      </button>
                       </div>
                     </div>
-                  </div>
-
-                  <br />
 
                   <div class="border-bottom my-3"><h5>Header</h5></div>
                   <div class="form-group">
@@ -542,24 +491,30 @@
                     </div>
                   </div>
 
-				  <br/>
+                  <br />
+
                   <div class="form-group">
                     <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
-					<div style="border: 1px solid #ced4da">
-					<ngx-codemirror
-							name="codemirror"
-							formControlName="requestbody"
-						  [options]="{
+                    <div style="border: 1px solid #ced4da">
+                      <ngx-codemirror
+                        name="codemirror"
+                        formControlName="requestbody"
+                        [options]="{
 							lineNumbers: true,
 							theme: 'default',
 							mode: 'text'
 						  }"
-						 (drop)="drop($event)"
-						 (dragover)="allowDrop($event)"						  
-						style="min-height: 200px; width: 100%; overflow: auto;"></ngx-codemirror>
-					</div>	
+                        (drop)="drop($event)"
+                        (dragover)="allowDrop($event)"
+                        style="min-height: 200px; width: 100%; overflow: auto;"></ngx-codemirror>
+                    </div>
                   </div>
-                </div>
+
+                  </div>
+
+                <br />
+
+
               </ng-template>
             </li>
 

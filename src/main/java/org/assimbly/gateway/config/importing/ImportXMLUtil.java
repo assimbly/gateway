@@ -81,11 +81,7 @@ public class ImportXMLUtil {
     }
 
     public static boolean setBooleanValue(String value){
-        if (value != null && value.equals("true")) {
-            return true;
-        } else {
-            return false;
-        }
+        return value != null && value.equals("true");
     }
 
     public static int setIntegerValue(String value, int defaultValue){

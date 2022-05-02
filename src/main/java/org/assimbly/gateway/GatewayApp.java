@@ -27,7 +27,7 @@ import tech.jhipster.config.JHipsterConstants;
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
-    private static final Logger log = LoggerFactory.getLogger(GatewayApp.class);
+    protected static Logger log = LoggerFactory.getLogger(GatewayApp.class);
 
     private static final String userHomeDir = System.getProperty("user.home");
 

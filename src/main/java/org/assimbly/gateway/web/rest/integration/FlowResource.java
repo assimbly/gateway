@@ -58,7 +58,7 @@ public class FlowResource {
 
     private Integration integration;
 
-    private IntegrationResource integrationResource;
+    private final IntegrationResource integrationResource;
 
      public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
         this.flowService = flowService;

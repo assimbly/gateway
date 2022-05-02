@@ -12,7 +12,7 @@ export class RoutePopupService {
         this.ngbModalRef = null;
     }
 
-    open(component: Component, id?: number | any): Promise<NgbModalRef> {
+    open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
@@ -21,23 +21,24 @@ export class RoutePopupService {
 
             if (id) {
                 this.routeService.find(id).subscribe(route => {
-                    this.ngbModalRef = this.routeModalRef(component, route.body);
+                    this.ngbModalRef = this.routeModalRef(component, route.body, type);
                     resolve(this.ngbModalRef);
                 });
             } else {
                 // setTimeout used as a workaround for getting ExpressionChangedAfterItHasBeenCheckedError
                 setTimeout(() => {
-                    this.ngbModalRef = this.routeModalRef(component, new Route());
+                    this.ngbModalRef = this.routeModalRef(component, new Route(), type);
                     resolve(this.ngbModalRef);
                 }, 0);
             }
         });
     }
 
-    routeModalRef(component: any, route: Route): NgbModalRef {
+    routeModalRef(component: any, route: Route, type?: string): NgbModalRef {
         const modalRef = this.modalService.open(component, { windowClass: 'fullscreen-modal'});
         if (typeof component as Component) {
             modalRef.componentInstance.route = route;
+            modalRef.componentInstance.type = type;
         }
         return modalRef;
     }

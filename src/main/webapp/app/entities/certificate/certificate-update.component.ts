@@ -6,6 +6,8 @@ import { forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 
+import { Router } from '@angular/router';
+
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
 
@@ -20,7 +22,7 @@ export class CertificateUpdateComponent implements OnInit {
   isSaving: boolean;
   certificateExpiry: string;
 
-  constructor(protected certificateService: CertificateService, protected activatedRoute: ActivatedRoute) {}
+  constructor(protected certificateService: CertificateService, protected activatedRoute: ActivatedRoute, protected router: Router,) {}
 
   ngOnInit() {
     this.isSaving = false;
@@ -39,7 +41,7 @@ export class CertificateUpdateComponent implements OnInit {
 
     this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
 
-    this.certificateService.importCertificate(this.certificate.url, 'keystore.jks').subscribe(
+    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks','supersecret').subscribe(
       res => {
         const json = JSON.parse(res.body);
 
@@ -126,10 +128,15 @@ export class CertificateUpdateComponent implements OnInit {
 
   protected onSaveSuccess() {
     this.isSaving = false;
-    this.previousState();
+    this.router.navigate(['/certificate']);
   }
 
   protected onSaveError() {
     this.isSaving = false;
   }
+
+  protected goBack() {
+      window.history.back();
+  }
+
 }

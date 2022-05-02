@@ -1276,6 +1276,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
   }
 
   setDataFromForm(): void {
+
     const flowControls = this.editFlowForm.controls;
 
     flowControls.name.markAsTouched();

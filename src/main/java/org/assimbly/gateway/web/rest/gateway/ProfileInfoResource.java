@@ -15,7 +15,7 @@ public class ProfileInfoResource {
 
     private final Environment env;
 
-    private JHipsterProperties jHipsterProperties;
+    private final JHipsterProperties jHipsterProperties;
 
     private final ApplicationProperties.Documentation documentation;
 
@@ -39,7 +39,7 @@ public class ProfileInfoResource {
 
     class ProfileInfoVM {
 
-        private String[] activeProfiles;
+        private final String[] activeProfiles;
 
         ProfileInfoVM(String[] activeProfiles) {
             this.activeProfiles = activeProfiles;

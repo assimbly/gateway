@@ -22,7 +22,7 @@
           "options": {
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
-            },			
+            },
 			"allowedCommonJsDependencies": [
 				"sockjs-client", "codemirror"
 			],

@@ -25,7 +25,7 @@ public class ImportXMLServices {
 	private ServiceRepository serviceRepository;
 
 	private org.assimbly.gateway.domain.Service service;
-    private Map<String, String> servicesIdMap = new HashMap<String, String>();
+    private final Map<String, String> servicesIdMap = new HashMap<String, String>();
 
 	public String xmlConfiguration;
     public String configuration;

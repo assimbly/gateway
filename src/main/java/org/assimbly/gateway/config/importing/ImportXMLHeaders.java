@@ -34,7 +34,7 @@ public class ImportXMLHeaders {
 	public String configuration;
 
     private Header header;
-    private Map<String, String> headersIdMap = new HashMap<String, String>();
+    private final Map<String, String> headersIdMap = new HashMap<String, String>();
 
     private Set<HeaderKeys> headerKeys;
 

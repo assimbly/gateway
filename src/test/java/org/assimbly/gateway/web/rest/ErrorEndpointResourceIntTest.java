@@ -165,10 +165,10 @@ public class ErrorEndpointResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(errorEndpoint.getId().intValue())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
-            .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
+            .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI)))
+            .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS)));
     }
-    
+
     @Test
     @Transactional
     public void getErrorEndpoint() throws Exception {
@@ -181,8 +181,8 @@ public class ErrorEndpointResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(errorEndpoint.getId().intValue()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.uri").value(DEFAULT_URI.toString()))
-            .andExpect(jsonPath("$.options").value(DEFAULT_OPTIONS.toString()));
+            .andExpect(jsonPath("$.uri").value(DEFAULT_URI))
+            .andExpect(jsonPath("$.options").value(DEFAULT_OPTIONS));
     }
 
     @Test

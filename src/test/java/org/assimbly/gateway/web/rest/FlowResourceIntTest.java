@@ -186,15 +186,15 @@ public class FlowResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(flow.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())))
             .andExpect(jsonPath("$.[*].maximumRedeliveries").value(hasItem(DEFAULT_MAXIMUM_REDELIVERIES)))
             .andExpect(jsonPath("$.[*].redeliveryDelay").value(hasItem(DEFAULT_REDELIVERY_DELAY)))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
             .andExpect(jsonPath("$.[*].loadBalancing").value(hasItem(DEFAULT_LOAD_BALANCING.booleanValue())))
             .andExpect(jsonPath("$.[*].instances").value(hasItem(DEFAULT_INSTANCES)));
     }
-    
+
     @Test
     @Transactional
     public void getFlow() throws Exception {
@@ -206,11 +206,11 @@ public class FlowResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(flow.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()))
             .andExpect(jsonPath("$.maximumRedeliveries").value(DEFAULT_MAXIMUM_REDELIVERIES))
             .andExpect(jsonPath("$.redeliveryDelay").value(DEFAULT_REDELIVERY_DELAY))
-            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
             .andExpect(jsonPath("$.loadBalancing").value(DEFAULT_LOAD_BALANCING.booleanValue()))
             .andExpect(jsonPath("$.instances").value(DEFAULT_INSTANCES));
     }

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 // How to renew the list
 // 1) Run Assimbly and go to (Administration --> API)
 // 2) Run the 'getComponents' API under flow
-// 3) Replace the JSON and add custom components at the end.
+// 3) Replace the JSON in this file and add custom components at the end (currently starting after last entry of the json).
 
 // add the component types for a specific endpoint
 @Injectable({

@@ -80,12 +80,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   stompClient = null;
   subscriber = null;
- 
-  connectionSubject: ReplaySubject<void> = new ReplaySubject(1); 
+
+  connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
   connectionEventSubscription: Subscription | null = null;
   connectionAlertSubscription: Subscription | null = null;
   stompSubscription: StompSubscription | null = null;
-  
+
   connection: Promise<any>;
   connectedPromise: any;
   private listenerSubject: Subject<string> = new Subject();
@@ -128,17 +128,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.stompClient = this.webSocketsService.getClient();
 	this.connectionSubject = this.webSocketsService.getConnectionSubject();
-	
+
 	this.subscribeToEvent(this.flow.id,'event');
-	
+
     this.subscribeToAlert(this.flow.id,'alert');
-	
+
   }
 
   ngAfterViewInit() {
 
     this.subscription = this.receive().subscribe(data => {
-	
+
 		const data2  = data.split(':');
 
 		if (Array.isArray(data2)) {
@@ -151,9 +151,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			  }
 			}
 		  }
-		  
+
     });
-  
+
   }
 
   ngOnDestroy() {
@@ -317,8 +317,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 	console.log('type=' + this.flow.type);
 	if(!this.flow.type){
 		this.flow.type = 'connector';
-	}  	  
-	  
+	}
+
     switch (mode) {
       case 'edit':
         this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
@@ -390,7 +390,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.statsTableRows = [];
 
     for (const endpoint of flow.endpoints) {
-      if (endpoint.endpointType === EndpointType.FROM) {
+      if (endpoint.endpointType === EndpointType.FROM || endpoint.endpointType === EndpointType.ROUTE) {
         this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
           this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
         });
@@ -808,14 +808,14 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   receive(): Subject<string> {
     return this.listenerSubject;
   }
- 
+
   subscribeToEvent(id, type): void {
-  	
+
     if (this.connectionEventSubscription) {
       return;
     }
-	
-	
+
+
 	const topic = '/topic/' + id + '/' + type;
 
     this.connectionEventSubscription = this.connectionSubject.subscribe(() => {
@@ -830,12 +830,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
    subscribeToAlert(id, type): void {
-  	
+
     if (this.connectionAlertSubscription) {
       return;
     }
-	
-	
+
+
 	const topic = '/topic/' + id + '/' + type;
 
     this.connectionAlertSubscription = this.connectionSubject.subscribe(() => {
@@ -849,13 +849,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     });
   }
 
-  
-  unsubscribe(): void { 
+
+  unsubscribe(): void {
 
     if (this.connectionEventSubscription) {
       this.connectionEventSubscription.unsubscribe();
       this.connectionEventSubscription = null;
     }
   }
-  
+
 }

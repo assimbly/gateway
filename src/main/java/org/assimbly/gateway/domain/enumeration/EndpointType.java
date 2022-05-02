@@ -15,13 +15,13 @@ public enum EndpointType {
 	DELETE("delete"),
 	ROUTE("route"),
 	SERVICE("SERVICE");
-    
-    private String endpoint;
-    
+
+    private final String endpoint;
+
     EndpointType(String endpoint) {
         this.endpoint = endpoint;
     }
- 
+
     public String getEndpoint() {
         return endpoint;
     }

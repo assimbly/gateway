@@ -8,6 +8,8 @@ import { BrokerService } from './broker.service';
 
 import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broker-configuration';
 
+import 'codemirror/addon/edit/closetag';
+
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html'
@@ -20,7 +22,7 @@ export class BrokerUpdateComponent implements OnInit {
     activemqConfiguration: string;
     brokerConfigurationFailed: string;
     isSaving: boolean;
-	
+
     namePopoverMessage: string;
     autostartPopoverMessage: string;
     typePopoverMessage: string;
@@ -55,7 +57,7 @@ export class BrokerUpdateComponent implements OnInit {
             }
         });
     }
-	   
+
     setDefaultConfiguration() {
         this.artemisConfiguration = artemisBrokerConfiguration;
         this.activemqConfiguration = activemqBrokerConfiguration;

@@ -163,11 +163,11 @@ public class HeaderKeysResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(headerKeys.getId().intValue())))
-            .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY.toString())))
-            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
+            .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
+            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE)))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)));
     }
-    
+
     @Test
     @Transactional
     public void getHeaderKeys() throws Exception {
@@ -179,9 +179,9 @@ public class HeaderKeysResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(headerKeys.getId().intValue()))
-            .andExpect(jsonPath("$.key").value(DEFAULT_KEY.toString()))
-            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.toString()))
-            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()));
+            .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
+            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE));
     }
 
     @Test

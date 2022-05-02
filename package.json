@@ -101,7 +101,7 @@
     "ngx-bootstrap": "8.0.0",
     "ngx-cookie-service": "13.1.2",
     "@ctrl/ngx-codemirror": "5.1.1",
-    "codemirror": "5.65.2"
+    "codemirror": "5.65.3"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "13.1.0",

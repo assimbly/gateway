@@ -266,8 +266,7 @@
                                     </i>
                                   </div>
                                 </div>
-                                <div class="row" *ngFor="let option of endpointsOptions[index]; index as idx"
-                                     [formGroupName]="idx">
+                                <div class="row" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
                                   <div class="col-5">
                                     <ng-select [items]="componentOptions[index]" bindLabel="displayName"
                                                bindValue="name" [addTag]="addOptionTag" formControlName="key"
@@ -377,7 +376,7 @@
 
                             <div class="form-group container">
                               <div class="row">
-                                <div class="border-bottom my-3"><h5>Service</h5></div>
+                                <div class="border-bottom my-3"><h5>Connection</h5></div>
                               </div>
                               <div class="row">
                                 <div class="col-10">
