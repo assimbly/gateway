@@ -2,13 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IGateway, EnvironmentType, GatewayType } from 'app/shared/model/gateway.model';
 import { GatewayService } from './gateway.service';
-import { IWireTapEndpoint } from 'app/shared/model/wire-tap-endpoint.model';
-import { WireTapEndpointService } from 'app/entities/wire-tap-endpoint';
-import { ComponentType, Components } from '../../shared/camel/component-type';
+import { Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
 
 @Component({
@@ -22,16 +19,17 @@ export class GatewayUpdateComponent implements OnInit {
     public gatewayListType = [GatewayType.FULL, GatewayType.BROKER, GatewayType.CONNECTOR];
     public gatewayListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
 
+    consumerComponentsNames: Array<any> = [];
+    producerComponentsNames: Array<any> = [];
+
     generalPopoverMessage: string;
     typePopoverMessage: string;
     environmentPopoverMessage: string;
     defaultPopoverMessage: string;
-    wiretapEndpoints: IWireTapEndpoint[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+		protected alertService: AlertService,
         protected gatewayService: GatewayService,
-        protected wireTapEndpointService: WireTapEndpointService,
         protected activatedRoute: ActivatedRoute,
         protected router: Router,
         public components: Components
@@ -42,30 +40,19 @@ export class GatewayUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ gateway }) => {
             this.gateway = gateway;
         });
+
+        this.setComponents();
+
         this.setPopoverMessages();
+
         if (typeof this.gateway.id === 'undefined') {
             this.gateway.type = GatewayType.FULL;
             this.gateway.stage = EnvironmentType.DEVELOPMENT;
-            this.gateway.defaultFromComponentType = ComponentType.FILE;
-            this.gateway.defaultToComponentType = ComponentType.FILE;
-            this.gateway.defaultErrorComponentType = ComponentType.FILE;
+            this.gateway.defaultFromComponentType = 'file';
+            this.gateway.defaultToComponentType = 'file';
+            this.gateway.defaultErrorComponentType = 'file';
         }
 
-        this.wireTapEndpointService.query({ filter: 'gateway-is-null' }).subscribe(
-            (res: HttpResponse<IWireTapEndpoint[]>) => {
-                if (!this.gateway.wiretapEndpointId) {
-                    this.wiretapEndpoints = res.body;
-                } else {
-                    this.wireTapEndpointService.find(this.gateway.wiretapEndpointId).subscribe(
-                        (subRes: HttpResponse<IWireTapEndpoint>) => {
-                            this.wiretapEndpoints = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.gateway.id = null;
         }
@@ -101,27 +88,42 @@ export class GatewayUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
-    }
-
-    trackWireTapEndpointById(index: number, item: IWireTapEndpoint) {
-        return item.id;
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     setTypeGateway() {
         if (this.gateway.type.toString() === 'BROKER') {
-            this.gateway.defaultFromComponentType = ComponentType.ACTIVEMQ;
-            this.gateway.defaultToComponentType = ComponentType.ACTIVEMQ;
-            this.gateway.defaultErrorComponentType = ComponentType.ACTIVEMQ;
+            this.gateway.defaultFromComponentType = 'activemq';
+            this.gateway.defaultToComponentType = 'activemq';
+            this.gateway.defaultErrorComponentType = 'activemq';
         } else if (this.gateway.type.toString() === 'ARTEMIS') {
-            this.gateway.defaultFromComponentType = ComponentType.SJMS;
-            this.gateway.defaultToComponentType = ComponentType.SJMS;
-            this.gateway.defaultErrorComponentType = ComponentType.SJMS;
+            this.gateway.defaultFromComponentType = 'amqp';
+            this.gateway.defaultToComponentType = 'amqp';
+            this.gateway.defaultErrorComponentType = 'amqp';
         } else {
-            this.gateway.defaultFromComponentType = ComponentType.FILE;
-            this.gateway.defaultToComponentType = ComponentType.FILE;
-            this.gateway.defaultErrorComponentType = ComponentType.FILE;
+            this.gateway.defaultFromComponentType = 'file';
+            this.gateway.defaultToComponentType = 'file';
+            this.gateway.defaultErrorComponentType = 'file';
         }
+    }
+
+    setComponents() {
+        const producerComponents = this.components.types.filter(function(component) {
+            return component.consumerOnly === false;
+        });
+
+        const consumerComponents = this.components.types.filter(function(component) {
+            return component.producerOnly === false;
+        });
+
+        this.producerComponentsNames = producerComponents.map(component => component.name);
+        this.producerComponentsNames.sort();
+
+        this.consumerComponentsNames = consumerComponents.map(component => component.name);
+        this.consumerComponentsNames.sort();
     }
 
     setPopoverMessages() {

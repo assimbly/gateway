@@ -191,16 +191,16 @@ public class GatewayResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(gateway.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].environmentName").value(hasItem(DEFAULT_ENVIRONMENT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].environmentName").value(hasItem(DEFAULT_ENVIRONMENT_NAME)))
             .andExpect(jsonPath("$.[*].stage").value(hasItem(DEFAULT_STAGE.toString())))
             .andExpect(jsonPath("$.[*].connectorType").value(hasItem(DEFAULT_CONNECTOR_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultFromComponentType").value(hasItem(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultToComponentType").value(hasItem(DEFAULT_DEFAULT_TO_COMPONENT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].defaultErrorComponentType").value(hasItem(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE.toString())));
+            .andExpect(jsonPath("$.[*].defaultFromComponentType").value(hasItem(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE)))
+            .andExpect(jsonPath("$.[*].defaultToComponentType").value(hasItem(DEFAULT_DEFAULT_TO_COMPONENT_TYPE)))
+            .andExpect(jsonPath("$.[*].defaultErrorComponentType").value(hasItem(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE)));
     }
-    
+
     @Test
     @Transactional
     public void getGateway() throws Exception {
@@ -212,14 +212,14 @@ public class GatewayResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(gateway.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.environmentName").value(DEFAULT_ENVIRONMENT_NAME.toString()))
+            .andExpect(jsonPath("$.environmentName").value(DEFAULT_ENVIRONMENT_NAME))
             .andExpect(jsonPath("$.stage").value(DEFAULT_STAGE.toString()))
             .andExpect(jsonPath("$.connectorType").value(DEFAULT_CONNECTOR_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultFromComponentType").value(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultToComponentType").value(DEFAULT_DEFAULT_TO_COMPONENT_TYPE.toString()))
-            .andExpect(jsonPath("$.defaultErrorComponentType").value(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE.toString()));
+            .andExpect(jsonPath("$.defaultFromComponentType").value(DEFAULT_DEFAULT_FROM_COMPONENT_TYPE))
+            .andExpect(jsonPath("$.defaultToComponentType").value(DEFAULT_DEFAULT_TO_COMPONENT_TYPE))
+            .andExpect(jsonPath("$.defaultErrorComponentType").value(DEFAULT_DEFAULT_ERROR_COMPONENT_TYPE));
     }
 
     @Test

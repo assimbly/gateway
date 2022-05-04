@@ -168,12 +168,12 @@ public class BrokerResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(broker.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].configurationType").value(hasItem(DEFAULT_CONFIGURATION_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
+            .andExpect(jsonPath("$.[*].configurationType").value(hasItem(DEFAULT_CONFIGURATION_TYPE)))
             .andExpect(jsonPath("$.[*].autoStart").value(hasItem(DEFAULT_AUTO_START.booleanValue())));
     }
-    
+
     @Test
     @Transactional
     public void getBroker() throws Exception {
@@ -185,9 +185,9 @@ public class BrokerResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(broker.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.configurationType").value(DEFAULT_CONFIGURATION_TYPE.toString()))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
+            .andExpect(jsonPath("$.configurationType").value(DEFAULT_CONFIGURATION_TYPE))
             .andExpect(jsonPath("$.autoStart").value(DEFAULT_AUTO_START.booleanValue()));
     }
 

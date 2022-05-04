@@ -1,73 +1,79 @@
 <div>
-    <div class="row mt-3" style="margin-left: 0.3em">
-        <h2>Topics ({{brokerType}})</h2><br/>
+  <div class="row mt-3">
+    <h2>Topics ({{ brokerType }})</h2>
+    <br />
+  </div>
+
+  <div class="row">
+    <div class="col-10"></div>
+    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length === 0">
+      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
+      </button>
     </div>
-
-    <div class="row">
-        <div class="col-11-5 text-right" *ngIf="isBroker && addresses?.length === 0">
-            <button class="btn btn-primary" type="submit"
-                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
-                    [routerLink]="['/topic/new']">
-                <span class="fa fa-plus"></span> <span>Create a new Topic</span>
-            </button>
-        </div>
-        <div class="col-11-5 text-right"  *ngIf="isBroker && addresses?.length > 0">
-            <button class="btn btn-primary" type="submit"
-                    *jhiHasAnyAuthority="'ROLE_ADMIN'"
-                    [routerLink]="['/topic/new']">
-                <span class="fa fa-plus"></span> <span>Create a new Topic</span>
-            </button>
-            <button class="btn btn-primary" type="submit"
-                    (click)="updateAllTopics()"
-                    style="margin-right:-2em">
-                <span class="fa fa-refresh"></span> <span>Refresh</span>
-            </button>
-        </div>
-        <div class="col-0-5">
-        </div>
+    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length > 0">
+      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
+      </button>
+      <button class="btn btn-primary" type="submit" (click)="updateAllTopics()" style="margin-right: -2em">
+        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline">Refresh</span>
+      </button>
     </div>
+    
+  </div>
 
-
-    <div>
-        <div class="col-4" style="margin-bottom: 15px">
-            <input type="text" align="left" style="margin-left: 0.3em"
-                   [(ngModel)]="searchTopicText"
-                   id="searchTextId" name="searchText"
-                   placeholder="Filter By Topic Name"/>
-        </div>
-        <div class="col-1">
-        </div>
+  <div>
+    <div class="col-4" style="margin-bottom: 15px">
+      <input
+        type="text"
+        align="left"
+        style="margin-left: 0.3em"
+        [(ngModel)]="searchTopicText"
+        id="searchTextId"
+        name="searchText"
+        placeholder="Filter By Topic Name"
+      />
     </div>
+    <div class="col-1"></div>
+  </div>
 
-    <div class="alert alert-warning" id="no-result" *ngIf="!isBroker">
-        <span>No running broker found</span>
-    </div>
+  <div class="alert alert-warning" id="no-result" *ngIf="!isBroker">
+    <span>No running broker found</span>
+  </div>
 
-    <div class="alert alert-warning" id="no-result" *ngIf="isBroker && addresses?.length === 0">
-        <span>No topics found</span>
-    </div>
+  <div class="alert alert-warning" id="no-result" *ngIf="isBroker && addresses?.length === 0">
+    <span>No topics found</span>
+  </div>
 
-    <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
-        <table class="table table-striped" aria-describedby="page-heading">
-            <thead>
-            <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
-                <th scope="col"  jhiSortBy="name"><span>Address</span> <fa-icon icon="sort"></fa-icon></th>
-                <th scope="col"  jhiSortBy="numberOfConsumers"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
-                <th scope="col"  jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
-                <th scope="col"  jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
-                <th scope="col" class="text-right" ><span>Actions</span></th>
-            </tr>
-            </thead>
+  <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
+          <th scope="col" jhiSortBy="name"><span>Address</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="numberOfConsumers"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" class="text-right"><span>Actions</span></th>
+        </tr>
+      </thead>
 
-            <tbody *ngIf="addresses" infinite-scroll
-                   (scrolled)="loadPage(page + 1)" (scrolledUp)="loadPage(page - 1)"
-                   [infiniteScrollDisabled]="page >= links['last']"
-                   [infiniteScrollDistance]="0" [infiniteScrollUpDistance]="0">
-            <tr jhi-topic-row
-                *ngFor="let address of  (addresses | TopicSearchByName: searchTopicText : ascending : predicate) ;trackBy: trackId"
-                [address]="address" [isAdmin]="isAdmin" [brokerType]="brokerType"
-                ng-init="$last && finished()"></tr>
-            </tbody>
-        </table>
-    </div>
+      <tbody
+        *ngIf="addresses"
+        infinite-scroll
+        (scrolled)="loadPage(page + 1)"
+        (scrolledUp)="loadPage(page - 1)"
+        [infiniteScrollDisabled]="page >= links['last']"
+        [infiniteScrollDistance]="0"
+        [infiniteScrollUpDistance]="0"
+      >
+        <tr
+          jhi-topic-row
+          *ngFor="let address of addresses | TopicSearchByName: searchTopicText:ascending:predicate; trackBy: trackId"
+          [address]="address"
+          [brokerType]="brokerType"
+          ng-init="$last && finished()"
+        ></tr>
+      </tbody>
+    </table>
+  </div>
 </div>

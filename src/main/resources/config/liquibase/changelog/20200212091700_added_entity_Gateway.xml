@@ -40,9 +40,6 @@
             <column name="default_error_component_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="wiretap_endpoint_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_gateway_wiretap_endpoint_id" />
-            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
     </changeSet>

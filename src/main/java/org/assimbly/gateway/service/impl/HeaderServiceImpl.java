@@ -3,7 +3,6 @@ package org.assimbly.gateway.service.impl;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.repository.HeaderRepository;
-import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;

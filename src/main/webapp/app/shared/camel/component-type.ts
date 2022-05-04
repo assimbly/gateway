@@ -1,5803 +1,8023 @@
 import { Injectable } from '@angular/core';
 
-// add a new component here
-// 1) Add to the ComponentType list
-// 2) Add to typelinks for live documentation
-// 3) Add to different Component type (from/to/error)
-
-export enum ComponentType {
-    ACTIVEMQ = 'ACTIVEMQ',
-    AHC = 'AHC',
-    AHCWS = 'AHC-WS',
-    AHCWSS = 'AHC-WSS',
-    AMAZONMQ = 'AMAZONMQ',
-    AMQP = 'AMQP',
-    AMQPS = 'AMQPS',
-    APNS = 'APNS',
-    ARANGODB = 'ARANGODB',
-    AS2 = 'AS2',
-    ASTERISK = 'ASTERISK',
-    ATMOS = 'ATMOS',
-    ATMOSPHEREWEBSOCKET = 'ATMOSPHERE-WEBSOCKET',
-    ATOM = 'ATOM',
-    ATOMIXMAP = 'ATOMIX-MAP',
-    ATOMIXMESSAGING = 'ATOMIX-MESSAGING',
-    ATOMIXMULTIMAP = 'ATOMIX-MULTIMAP',
-    ATOMIXQUEUE = 'ATOMIX-QUEUE',
-    ATOMIXSET = 'ATOMIX-SET',
-    ATOMIXVALUE = 'ATOMIX-VALUE',
-    ATLASMAP = 'ATLASMAP',
-    AVRO = 'AVRO',
-    AWS2ATHENA = 'AWS2-ATHENA',
-    AWS2CW = 'AWS2-CW',
-    AWS2DDB = 'AWS2-DDB',
-    AWS2DDBSTREAM = 'AWS2-DDBSTREAM',
-    AWS2EC2 = 'AWS2-EC2',
-    AWS2ECS = 'AWS2-ECS',
-    AWS2EKS = 'AWS2-EKS',
-    AWS2EVENTBRIDGE = 'AWS2-EVENTBRIDGE',
-    AWS2IAM = 'AWS2-IAM',
-    AWS2KMS = 'AWS2-KMS',
-    AWS2KINESIS = 'AWS2-KINESIS',
-    AWS2KINESISFIREHOSE = 'AWS2-KINESIS-FIREHOSE',
-    AWS2LAMBDA = 'AWS2-LAMBDA',
-    AWS2MSK = 'AWS2-MSK',
-    AWS2MQ = 'AWS2-MQ',
-    AWS2S3 = 'AWS2-S3',
-    AWS2SECRETSMANAGER = 'AWS2-SECRETS-MANAGER',
-    AWS2STS = 'AWS2-STS',
-    AWS2SNS = 'AWS2-SNS',
-    AWS2SQS = 'AWS2-SQS',
-    AWS2TRANSLATE = 'AWS2-TRANSLATE',
-    AZURECOSMOSDB = 'AZURE-COSMOSDB',
-    AZUREEVENTHUBS = 'AZURE-EVENTHUBS',
-    AZURESTORAGEBLOB = 'AZURE-STORAGE-BLOB',
-    AZURESTORAGEDATALAKE = 'AZURE-STORAGE-DATALAKE',
-    AZURESTORAGEQUEUE = 'AZURE-STORAGE-QUEUE',
-    BEANVALIDATOR = 'BEAN-VALIDATOR',
-    BEAN = 'BEAN',
-    CLASS = 'CLASS',
-    BEANSTALK = 'BEANSTALK',
-    BONITA = 'BONITA',
-    BOX = 'BOX',
-    BRAINTREE = 'BRAINTREE',
-    BROWSE = 'BROWSE',
-    CAFFEINECACHE = 'CAFFEINE-CACHE',
-    CAFFEINELOADCACHE = 'CAFFEINE-LOADCACHE',
-    CQL = 'CQL',
-    CHATSCRIPT = 'CHATSCRIPT',
-    CHUNK = 'CHUNK',
-    CMSMS = 'CM-SMS',
-    CMIS = 'CMIS',
-    COAP = 'COAP',
-    COMETD = 'COMETD',
-    CONSUL = 'CONSUL',
-    CONTROLBUS = 'CONTROLBUS',
-    CORDA = 'CORDA',
-    COUCHBASE = 'COUCHBASE',
-    COUCHDB = 'COUCHDB',
-    CRON = 'CRON',
-    CRYPTO = 'CRYPTO',
-    CRYPTOCMS = 'CRYPTO-CMS',
-    CXF = 'CXF',
-    CXFRS = 'CXFRS',
-    DATAFORMAT = 'DATAFORMAT',
-    DATASET = 'DATASET',
-    DATASETTEST = 'DATASET-TEST',
-    DEBEZIUMMONGODB = 'DEBEZIUM-MONGODB',
-    DEBEZIUMMYSQL = 'DEBEZIUM-MYSQL',
-    DEBEZIUMPOSTGRESQL = 'DEBEZIUM-POSTGRESQL',
-    DEBEZIUMSQLSERVER = 'DEBEZIUM-SQLSERVER',
-    DIGITALOCEAN = 'DIGITALOCEAN',
-    DIRECT = 'DIRECT',
-    DIRECTVM = 'DIRECT-VM',
-    DISRUPTOR = 'DISRUPTOR',
-    DISRUPTORVM = 'DISRUPTOR-VM',
-    DJL = 'DJL',
-    DNS = 'DNS',
-    DOCKER = 'DOCKER',
-    DOZER = 'DOZER',
-    DRILL = 'DRILL',
-    DROPBOX = 'DROPBOX',
-    EHCACHE = 'EHCACHE',
-    ELASTICSEARCHREST = 'ELASTICSEARCH-REST',
-    ELSQL = 'ELSQL',
-    ELYTRON = 'ELYTRON',
-    ETCDKEYS = 'ETCD-KEYS',
-    ETCDSTATS = 'ETCD-STATS',
-    ETCDWATCH = 'ETCD-WATCH',
-    EVENTADMIN = 'EVENTADMIN',
-    EXEC = 'EXEC',
-    FACEBOOK = 'FACEBOOK',
-    FHIR = 'FHIR',
-    FILE = 'FILE',
-    FILEWATCH = 'FILE-WATCH',
-    FLATPACK = 'FLATPACK',
-    FLINK = 'FLINK',
-    FOP = 'FOP',
-    FREEMARKER = 'FREEMARKER',
-    FTP = 'FTP',
-    FTPS = 'FTPS',
-    GANGLIA = 'GANGLIA',
-    GEOCODER = 'GEOCODER',
-    GIT = 'GIT',
-    GITHUB = 'GITHUB',
-    GOOGLEBIGQUERY = 'GOOGLE-BIGQUERY',
-    GOOGLEBIGQUERYSQL = 'GOOGLE-BIGQUERY-SQL',
-    GOOGLECALENDAR = 'GOOGLE-CALENDAR',
-    GOOGLECALENDARSTREAM = 'GOOGLE-CALENDAR-STREAM',
-    GOOGLEDRIVE = 'GOOGLE-DRIVE',
-    GOOGLEFUNCTIONS = 'GOOGLE-FUNCTIONS',
-    GOOGLEMAIL = 'GOOGLE-MAIL',
-    GOOGLEMAILSTREAM = 'GOOGLE-MAIL-STREAM',
-    GOOGLEPUBSUB = 'GOOGLE-PUBSUB',
-    GOOGLESHEETS = 'GOOGLE-SHEETS',
-    GOOGLESHEETSSTREAM = 'GOOGLE-SHEETS-STREAM',
-    GOOGLESTORAGE = 'GOOGLE-STORAGE',
-    GORA = 'GORA',
-    GRAPE = 'GRAPE',
-    GRAPHQL = 'GRAPHQL',
-    GRPC = 'GRPC',
-    GUAVAEVENTBUS = 'GUAVA-EVENTBUS',
-    HAZELCASTATOMICVALUE = 'HAZELCAST-ATOMICVALUE',
-    HAZELCASTINSTANCE = 'HAZELCAST-INSTANCE',
-    HAZELCASTLIST = 'HAZELCAST-LIST',
-    HAZELCASTMAP = 'HAZELCAST-MAP',
-    HAZELCASTMULTIMAP = 'HAZELCAST-MULTIMAP',
-    HAZELCASTQUEUE = 'HAZELCAST-QUEUE',
-    HAZELCASTREPLICATEDMAP = 'HAZELCAST-REPLICATEDMAP',
-    HAZELCASTRINGBUFFER = 'HAZELCAST-RINGBUFFER',
-    HAZELCASTSEDA = 'HAZELCAST-SEDA',
-    HAZELCASTSET = 'HAZELCAST-SET',
-    HAZELCASTTOPIC = 'HAZELCAST-TOPIC',
-    HBASE = 'HBASE',
-    HDFS = 'HDFS',
-    HTTP = 'HTTP',
-    HTTPS = 'HTTPS',
-    HWCLOUDFUNCTIONGRAPH = 'HWCLOUD-FUNCTIONGRAPH',
-    HWCLOUDIAM = 'HWCLOUD-IAM',
-    HWCLOUDSMN = 'HWCLOUD-SMN',
-    IBMMQ = 'IBMMQ',
-    IEC60870CLIENT = 'IEC60870-CLIENT',
-    IEC60870SERVER = 'IEC60870-SERVER',
-    IGNITECACHE = 'IGNITE-CACHE',
-    IGNITECOMPUTE = 'IGNITE-COMPUTE',
-    IGNITEEVENTS = 'IGNITE-EVENTS',
-    IGNITEIDGEN = 'IGNITE-IDGEN',
-    IGNITEMESSAGING = 'IGNITE-MESSAGING',
-    IGNITEQUEUE = 'IGNITE-QUEUE',
-    IGNITESET = 'IGNITE-SET',
-    IMAP = 'IMAP',
-    IMAPS = 'IMAPS',
-    INFINISPAN = 'INFINISPAN',
-    INFLUXDB = 'INFLUXDB',
-    IOTA = 'IOTA',
-    IPFS = 'IPFS',
-    IRC = 'IRC',
-    IRONMQ = 'IRONMQ',
-    JBPM = 'JBPM',
-    JCACHE = 'JCACHE',
-    JCLOUDS = 'JCLOUDS',
-    JCR = 'JCR',
-    JDBC = 'JDBC',
-    JETTY = 'JETTY',
-    JGROUPS = 'JGROUPS',
-    JGROUPSRAFT = 'JGROUPS-RAFT',
-    JING = 'JING',
-    JIRA = 'JIRA',
-    JMS = 'JMS',
-    JMX = 'JMX',
-    JOLT = 'JOLT',
-    JOOQ = 'JOOQ',
-    JPA = 'JPA',
-    JSLT = 'JSLT',
-    JSONATA = 'JSONATA',
-    JSONVALIDATOR = 'JSON-VALIDATOR',
-    JT400 = 'JT400',
-    KAFKA = 'KAFKA',
-    KAMELET = 'KAMELET',
-    KUBERNETESCONFIGMAPS = 'KUBERNETES-CONFIG-MAPS',
-    KUBERNETESDEPLOYMENTS = 'KUBERNETES-DEPLOYMENTS',
-    KUBERNETESHPA = 'KUBERNETES-HPA',
-    KUBERNETESJOB = 'KUBERNETES-JOB',
-    KUBERNETESNAMESPACES = 'KUBERNETES-NAMESPACES',
-    KUBERNETESNODES = 'KUBERNETES-NODES',
-    KUBERNETESPERSISTENTVOLUMES = 'KUBERNETES-PERSISTENT-VOLUMES',
-    KUBERNETESPERSISTENTVOLUMESCLAIM = 'KUBERNETES-PERSISTENT-VOLUMES-CLAIM',
-    KUBERNETESPODS = 'KUBERNETES-PODS',
-    KUBERNETESREPLICATIONCONTROLLERS = 'KUBERNETES-REPLICATION-CONTROLLERS',
-    KUBERNETESRESOURCESQUOTA = 'KUBERNETES-RESOURCES-QUOTA',
-    KUBERNETESSECRETS = 'KUBERNETES-SECRETS',
-    KUBERNETESSERVICEACCOUNTS = 'KUBERNETES-SERVICE-ACCOUNTS',
-    KUBERNETESSERVICES = 'KUBERNETES-SERVICES',
-    OPENSHIFTBUILDS = 'OPENSHIFT-BUILDS',
-    OPENSHIFTBUILDCONFIGS = 'OPENSHIFT-BUILD-CONFIGS',
-    KUDU = 'KUDU',
-    LANGUAGE = 'LANGUAGE',
-    LDAP = 'LDAP',
-    LDIF = 'LDIF',
-    LEVELDB = 'LEVELDB',
-    LOG = 'LOG',
-    LUCENE = 'LUCENE',
-    LUMBERJACK = 'LUMBERJACK',
-    MASTER = 'MASTER',
-    MECTRICS = 'MECTRICS',
-    MICROMETER = 'MICROMETER',
-    MICROPROFILEMETRICS = 'MICROPROFILE-METRICS',
-    MILOCLIENT = 'MILO-CLIENT',
-    MILOSERVER = 'MILO-SERVER',
-    MINA = 'MINA',
-    MINIO = 'MINIO',
-    MLLP = 'MLLP',
-    MOCK = 'MOCK',
-    MONGODB = 'MONGODB',
-    MONGODBGRIDFS = 'MONGODB-GRIDFS',
-    MSV = 'MSV',
-    MUSTACHE = 'MUSTACHE',
-    MVEL = 'MVEL',
-    MYBATIS = 'MYBATIS',
-    MYBATISBEAN = 'MYBATIS-BEAN',
-    NAGIOS = 'NAGIOS',
-    NATS = 'NATS',
-    NETTY4 = 'NETTY4',
-    NETTYHTTP = 'NETTY-HTTP',
-    NITRITE = 'NITRITE',
-    NSQ = 'NSQ',
-    OAIPMH = 'OAI-PMH',
-    OLINGO2 = 'OLINGO2',
-    OLINGO4 = 'OLINGO4',
-    OPENSTACKCINDER = 'OPENSTACK-CINDER',
-    OPENSTACKGLANCE = 'OPENSTACK-GLANCE',
-    OPENSTACKKEYSTONE = 'OPENSTACK-KEYSTONE',
-    OPENSTACKNEUTRON = 'OPENSTACK-NEUTRON',
-    OPENSTACK = 'OPENSTACK-',
-    OPENSTACKNOVA = 'OPENSTACK-NOVA',
-    OPENSTACKSWIFT = 'OPENSTACK-SWIFT',
-    OPTAPLANNER = 'OPTAPLANER',
-    PAHO = 'PAHO',
-    PAHOMQTT5 = 'PAHO-MQTT5',
-    PAXLOGGING = 'PAXLOGGING',
-    PDF = 'PDF',
-    PGREPLICATIONSLOT = 'PG-REPLICATION-SLOT',
-    PGEVENT = 'PGEVENT',
-    PLATFORMHTTP = 'PLATFORM-HTTP',
-    LPR = 'LPR',
-    PUBNUB = 'PUBNUB',
-    PULSAR = 'PULSAR',
-    QUARTZ2 = 'QUARTZ2',
-    QUICKFIX = 'QUICKFIX',
-    RABBITMQ = 'RABBITMQ',
-    REACTIVESTREAMS = 'REACTIVE-STREAMS',
-    REF = 'REF',
-    REST = 'REST',
-    RESTLET = 'RESTLET',
-    RESTAPI = 'REST-API',
-    RESTEASY = 'RESTEASY',
-    RESTOPENAPI = 'REST-OPENAPI',
-    RESTSWAGGER = 'REST-SWAGGER',
-    RSS = 'RSS',
-    SAGA = 'SAGA',
-    SALESFORCE = 'SALESFORCE',
-    SAPNETWEAVER = 'SAP-NETWEAVER',
-    SCHEDULER = 'SCHEDULER',
-    SCHEMATRON = 'SCHEMATRON',
-    SCP = 'SCP',
-    SEDA = 'SEDA',
-    SERVICE = 'SERVICE',
-    SERVICENOW = 'SERVICENOW',
-    SERVLET = 'SERVLET',
-    SFTP = 'SFTP',
-    SIP = 'SIP',
-    SIPS = 'SIPS',
-    SJMS = 'SJMS',
-    SJMS2 = 'SJMS2',
-    SLACK = 'SLACK',
-    SMMP = 'SMMP',
-    SMMPS = 'SMMPS',
-    SNMP = 'SNMP',
-    SMTP = 'SMTP',
-    SMTPS = 'SMTPS',
-    SOLR = 'SOLR',
-    SOLRS = 'SOLRS',
-    SPARK = 'SPARK',
-    SPARKREST = 'SPARK-REST',
-    SPLUNK = 'SPLUNK',
-    SPLUNKHEC = 'SPLUNK-HEC',
-    SPRINGBATCH = 'SPRING-BATCH',
-    SPRINGJDBC = 'SPRING-JDBC',
-    SPRINGINTEGRATION = 'SPRING-INTEGRATION',
-    SPRINGLDAP = 'SPRING-LDAP',
-    SPRINGREDIS = 'SPRING-REDIS',
-    SPRINGRABBITMQ = 'SPRING-RABBITMQ',
-    SPRINGWS = 'SPRING-WS',
-    SPRINGEVENT = 'SPRING-EVENT',
-    SQL = 'SQL',
-    SQLSTORED = 'SQL-STORED',
-    SSH = 'SSH',
-    SONICMQ = 'SONICMQ',
-    STAX = 'STAX',
-    STICH = 'STICH',
-    STOMP = 'STOMP',
-    STREAM = 'STREAM',
-    STUB = 'STUB',
-    TELEGRAM = 'TELEGRAM',
-    THRIFT = 'THRIFT',
-    TIKA = 'TIKA',
-    TIMER = 'TIMER',
-    TWILIO = 'TWILIO',
-    TWITTERDIRECTMESSAGE = 'TWITTER-DIRECTMESSAGE',
-    TWITTERSEARCH = 'TWITTER-SEARCH',
-    TWITTERTIMELINE = 'TWITTER-TIMELINE',
-    UNDERTOW = 'UNDERTOW',
-    VALIDATOR = 'VALIDATOR',
-    VELOCITY = 'VELOCITY',
-    VERTX = 'VERTX',
-    VERTXHTTP = 'VERTX-HTTP',
-    VERTXKAFKA = 'VERTX-KAFKA',
-    VERTXWEBSOCKET = 'VERTX-WEBSOCKET',
-    VM = 'VM',
-    WASTEBIN = 'WASTEBIN',
-    WEATHER = 'WEATHER',
-    WEB3J = 'WEB3J',
-    WEBHOOK = 'WEBHOOK',
-    WEBSOCKET = 'WEBSOCKET',
-    WEBSOCKETJSR = 'WEBSOCKET-JSR',
-    WORDPRESS = 'WORDPRESS',
-    XCHANGE = 'XCHANGE',
-    XJ = 'XJ',
-    XMPP = 'XMPP',
-    XQUERY = 'XQUERY',
-    XSLT = 'XSLT',
-    XSLTSAXON = 'XSLT-SAXON',
-    YAMMER = 'YAMMER',
-    ZENDESK = 'ZENDESK',
-    ZOOKEEPER = 'ZOOKEEPER',
-    ZOOKEEPERMASTER = 'ZOOKEEPER-MASTER'
-}
-
-// add here the component documentation / links (basepaths are configured in the application.yml)
-
-export const typesLinks = [
-    {
-        name: 'ACTIVEMQ',
-        assimblyTypeLink: `/component-activemq`,
-        camelTypeLink: `/activemq-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
-    `
-    },
-    {
-        name: 'AHC',
-        assimblyTypeLink: `/component-ahc`,
-        camelTypeLink: `/ahc-component.html`,
-        uriPlaceholder: 'http://hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname <br/>
-        <b>Description</b>: The hostname <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Name</b>: port <br/>
-        <b>Description</b>: The port to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: http://hostname:port/path <br/>
-    `
-    },
-    {
-        name: 'AHC-WS',
-        assimblyTypeLink: `/component-ahc-ws`,
-        camelTypeLink: `/ahc-ws-component.html`,
-        uriPlaceholder: ' http://hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname <br/>
-        <b>Description</b>: The hostname <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Name</b>: port <br/>
-        <b>Description</b>: The port to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: http://hostname:port/path <br/>
-        `
-    },
-    {
-        name: 'AMAZONMQ',
-        assimblyTypeLink: `/component-activemq`,
-        camelTypeLink: `/activemq-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
-    `
-    },
-    {
-        name: 'AMQP',
-        assimblyTypeLink: `/component-amqp`,
-        camelTypeLink: `/amqp-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType <br/>
-        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: destinationName <br/>
-        <b>Description</b>: Name of the queue or topic to use as destination. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: queue:foo <br/>
-    `
-    },
-    {
-        name: 'AMQPS',
-        assimblyTypeLink: `/component-amqps`,
-        camelTypeLink: `/amqp-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType <br/>
-        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: destinationName <br/>
-        <b>Description</b>: Name of the queue or topic to use as destination. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: queue:foo <br/>
-    `
-    },
-    {
-        name: 'APNS',
-        assimblyTypeLink: `/component-amqp`,
-        camelTypeLink: `/amqp-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name <br/>
-        <b>Description</b>: Name of the endpoint. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: foo <br/>
-    `
-    },
-    {
-        name: 'AS2',
-        assimblyTypeLink: `/component-as2`,
-        camelTypeLink: `/as2-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: as2<br/>
-        <b>Description</b>:  The name of the endpoint<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>:  The name of the api [client, server]<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>:  The name of the api-call<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'AWS2-ATHENA',
-        assimblyTypeLink: `/component-aws2-athena`,
-        camelTypeLink: `/aws2-athena-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: MyLabel<br/>
-    `
-    },
-    {
-        name: 'AWS2-CW',
-        assimblyTypeLink: `/component-aws2-cw`,
-        camelTypeLink: `/aws2-cw-component.html`,
-        uriPlaceholder: 'Namespace',
-        uriPopoverMessage: `
-        <b>Name</b>: Namespace<br/>
-        <b>Description</b>: The metric namespace.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: Namespace<br/>
-    `
-    },
-    {
-        name: 'AWS2-DDB',
-        assimblyTypeLink: `/component-aws2-ddb`,
-        camelTypeLink: `/aws2-ddb-component.html`,
-        uriPlaceholder: 'tableName',
-        uriPopoverMessage: `
-        <b>Name</b>: tableName<br/>
-        <b>Description</b>: The name of the table currently worked with..<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: domainName<br/>
-    `
-    },
-    {
-        name: 'AWS2-DDBSTREAMS',
-        assimblyTypeLink: `/component-aws2-ddbstream`,
-        camelTypeLink: `/aws2-ddbstream-component.html`,
-        uriPlaceholder: 'table-name[',
-        uriPopoverMessage: `
-        <b>Name</b>: table-name[<br/>
-        <b>Description</b>: Name of the dynamodb table.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-EC2',
-        assimblyTypeLink: `/component-aws2-ec2`,
-        camelTypeLink: `/aws2-ec2-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-ECS',
-        assimblyTypeLink: `/component-aws2-ecs`,
-        camelTypeLink: `/aws2-ecs-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-EKS',
-        assimblyTypeLink: `/component-aws2-eks`,
-        camelTypeLink: `/aws2-eks-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-EVENTBRIDGE',
-        assimblyTypeLink: `/component-aws2-eventbridge`,
-        camelTypeLink: `/aws2-eventbridge-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-IAM',
-        assimblyTypeLink: `/component-aws2-iam`,
-        camelTypeLink: `/aws2-iam-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-KMS',
-        assimblyTypeLink: `/component-aws2-kms`,
-        camelTypeLink: `/aws2-kms-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-KINESIS',
-        assimblyTypeLink: `/component-aws2-kinesis`,
-        camelTypeLink: `/aws2-kinesis-component.html`,
-        uriPlaceholder: 'stream-name',
-        uriPopoverMessage: `
-        <b>Name</b>: stream-name<br/>
-        <b>Description</b>: Name of the stream.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: streamName<br/>
-    `
-    },
-    {
-        name: 'AWS2-KINESIS-FIREHOSE',
-        assimblyTypeLink: `/component-aws2-kinesis-firehose`,
-        camelTypeLink: `/aws2-kinesis-firehose-component.html`,
-        uriPlaceholder: 'delivery-stream-name',
-        uriPopoverMessage: `
-        <b>Name</b>: delivery-stream-name<br/>
-        <b>Description</b>: Name of the stream.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: streamName<br/>
-    `
-    },
-    {
-        name: 'AWS2-LAMBDA',
-        assimblyTypeLink: `/component-aws2-lambda`,
-        camelTypeLink: `/aws2-lambda-component.html`,
-        uriPlaceholder: 'functionName',
-        uriPopoverMessage: `
-        <b>Name</b>: functionName<br/>
-        <b>Description</b>: Name of the Lambda function.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: functionX<br/>
-    `
-    },
-    {
-        name: 'AWS2-MSK',
-        assimblyTypeLink: `/component-aws2-msk`,
-        camelTypeLink: `/aws2-msk-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-		`
-    },
-    {
-        name: 'AWS2-MQ',
-        assimblyTypeLink: `/component-aws2-mq`,
-        camelTypeLink: `/aws2-mq-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-		`
-    },
-    {
-        name: 'AWS2-S3',
-        assimblyTypeLink: `/component-amazons3`,
-        camelTypeLink: `/aws-s3-component.html`,
-        uriPlaceholder: 'bucketNameOrArn',
-        uriPopoverMessage: `
-        <b>Name</b>: bucketNameOrArn<br/>
-        <b>Description</b>: Bucket name or ARN.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: MyBucket<br/>
-    `
-    },
-    {
-        name: 'AWS-SECRETS-MANAGER',
-        assimblyTypeLink: `/component-aws-secrets-manager`,
-        camelTypeLink: `/aws-secrets-manager-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-		`
-    },
-    {
-        name: 'AWS2-STS',
-        assimblyTypeLink: `/component-aws2-sts`,
-        camelTypeLink: `/aws2-sts-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-    `
-    },
-    {
-        name: 'AWS2-SNS',
-        assimblyTypeLink: `/component-aws2-sns`,
-        camelTypeLink: `/aws2-sns-component.html`,
-        uriPlaceholder: 'topicNameOrArn',
-        uriPopoverMessage: `
-        <b>Name</b>: topicNameOrArn<br/>
-        <b>Description</b>: Topic name or ARN.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: MyTopic<br/>
-    `
-    },
-    {
-        name: 'AWS2-SQS',
-        assimblyTypeLink: `/component-aws2-sqs`,
-        camelTypeLink: `/aws2-sqs-component.html`,
-        uriPlaceholder: 'Topic name or ARN',
-        uriPopoverMessage: `
-        <b>Name</b>: Topic name or ARN<br/>
-        <b>Description</b>: Queue name or ARN.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: MyQueue<br/>
-    `
-    },
-    {
-        name: 'AWS2-TRANSLATE',
-        assimblyTypeLink: `/component-aws2-translate`,
-        camelTypeLink: `/aws2-translate-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Logical name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: label<br/>
-	`
-    },
-    {
-        name: 'ASTERISK',
-        assimblyTypeLink: `/component-asterisk`,
-        camelTypeLink: `/asterisk-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name <br/>
-        <b>Description</b>: Name of component <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: foo <br/>
-    `
-    },
-    {
-        name: 'ATMOS',
-        assimblyTypeLink: `/component-atmos`,
-        camelTypeLink: `/atmos-component.html`,
-        uriPlaceholder: 'name/operation',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Atmos name. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: URI<br/>
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation to perform. The value can be one of: put, del, search, get, move. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: AtmosOperation<br/>
-    `
-    },
-    {
-        name: 'ARANGODB',
-        assimblyTypeLink: `/component-arangodb`,
-        camelTypeLink: `/arangodb-component.html`,
-        uriPlaceholder: 'database',
-        uriPopoverMessage: `
-        <b>Name</b>: database<br/>
-        <b>Description</b>: Database name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATMOSPHERE-WEBSOCKET',
-        assimblyTypeLink: `/component-atmosphere-websocket`,
-        camelTypeLink: `/atmosphere-websocket-component.html`,
-        uriPlaceholder: 'feedUri',
-        uriPopoverMessage: `
-        <b>Name</b>: feedUri<br/>
-        <b>Description</b>: The URI to the feed to poll. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOM',
-        assimblyTypeLink: `/component-atom`,
-        camelTypeLink: `/atom-component.html`,
-        uriPlaceholder: 'feedUri',
-        uriPopoverMessage: `
-        <b>Name</b>: servicePath<br/>
-        <b>Description</b>: The URI to the feed to poll. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-MAP',
-        assimblyTypeLink: `/component-atomix-map`,
-        camelTypeLink: `/atomix-map-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-MESSAGING',
-        assimblyTypeLink: `/component-atomix-messaging`,
-        camelTypeLink: `/atomix-messaging-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-MULTIMAP',
-        assimblyTypeLink: `/component-atomix-multimap`,
-        camelTypeLink: `/atomix-multimap-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-QUEUE',
-        assimblyTypeLink: `/component-atomix-queue`,
-        camelTypeLink: `/atomix-queue-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-SET',
-        assimblyTypeLink: `/component-atomix-set`,
-        camelTypeLink: `/atomix-set-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATOMIX-VALUE',
-        assimblyTypeLink: `/component-atomix-value`,
-        camelTypeLink: `/atomix-value-component.html`,
-        uriPlaceholder: 'resourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceName<br/>
-        <b>Description</b>: The distributed resource name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'ATLASMAP',
-        assimblyTypeLink: `/component-atlasmap`,
-        camelTypeLink: `/atlasmap-component.html`,
-        uriPlaceholder: 'mappingName',
-        uriPopoverMessage: `
-        <b>Name</b>: mappingName<br/>
-        <b>Description</b>: The classpath-local URI of the AtlasMap mapping definition, either ADM archive file or mapping definition JSON file to process. Path to the resource. You can prefix with: classpath, file, http, ref, or bean. classpath, file and http loads the resource using these protocols (classpath is default). ref will lookup the resource in the registry. bean will call a method on a bean to be used as the resource. For bean you can specify the method name after dot, eg bean:myBean.myMethod. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AVRO',
-        assimblyTypeLink: `/component-avro`,
-        camelTypeLink: `/atomix-avro.html`,
-        uriPlaceholder: 'transport:host:port/messageName',
-        uriPopoverMessage: `
-        <b>Name</b>: transport<br/>
-        <b>Description</b>: Transport to use, can be either http or netty. The value can be one of: http, netty. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: AvroTransport<br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port <br/>
-        <b>Description</b>: Port number to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: messageName<br/>
-        <b>Description</b>: The name of the message to send.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AZURE-COSMOSDB',
-        assimblyTypeLink: `/azure-cosmosdb`,
-        camelTypeLink: `/azure-cosmosdb-component.html`,
-        uriPlaceholder: '[databaseName][/containerName]',
-        uriPopoverMessage: `
-        <b>Name</b>: databaseName<br/>
-        <b>Description</b>: The name of the database<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-         <b>Name</b>: container<br/>
-        <b>Description</b>: The name of the container.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AZURE-EVENTHUBS',
-        assimblyTypeLink: `/azure-eventhub`,
-        camelTypeLink: `/azure-eventhubs-component.html`,
-        uriPlaceholder: '[namespace/eventHubName]',
-        uriPopoverMessage: `
-        <b>Name</b>: namespace<br/>
-        <b>Description</b>: EventHubs namespace created in Azure Portal<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-         <b>Name</b>: eventHubName<br/>
-        <b>Description</b>: EventHubs name under a specific namcespace.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AZURE-STORAGE-BLOB',
-        assimblyTypeLink: `/azure-storage-blob`,
-        camelTypeLink: `/azure-storage-blob-component.html`,
-        uriPlaceholder: 'accountName[/containerName]',
-        uriPopoverMessage: `
-        <b>Name</b>: accountName<br/>
-        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-         <b>Name</b>: containerName<br/>
-        <b>Description</b>: The blob container name <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AZURE-STORAGE-DATALAKE',
-        assimblyTypeLink: `/azure-storage-datalake`,
-        camelTypeLink: `/azure-storage-datalake-component.html`,
-        uriPlaceholder: 'accountName[/fileSystemName]',
-        uriPopoverMessage: `
-        <b>Name</b>: accountName<br/>
-        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-         <b>Name</b>: fileSystemName<br/>
-        <b>Description</b>: Name of the filesystem to be used. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'AZURE-STORAGE-QUEUE',
-        assimblyTypeLink: `/azure-storage-queue`,
-        camelTypeLink: `/azure-storage-queue-component.html`,
-        uriPlaceholder: 'accountName[/queueName]',
-        uriPopoverMessage: `
-        <b>Name</b>: storageAccount<br/>
-        <b>Description</b>: Windows Azure Storage account. Azure account name to be used for authentication with azure blob services<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-         <b>Name</b>: queueName<br/>
-        <b>Description</b>: The queue resource name<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BEAN',
-        assimblyTypeLink: `/component-bean`,
-        camelTypeLink: `/bean-component.html`,
-        uriPlaceholder: 'beanName',
-        uriPopoverMessage: `
-        <b>Name</b>: beanName<br/>
-        <b>Description</b>: Sets the name of the bean to invoke. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BEAN-VALIDATOR',
-        assimblyTypeLink: `/component-bean-validator`,
-        camelTypeLink: `/bean-validator-component.html`,
-        uriPlaceholder: 'label',
-        uriPopoverMessage: `
-        <b>Name</b>: label<br/>
-        <b>Description</b>: Where label is an arbitrary text value describing the endpoint. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BEANSTALK',
-        assimblyTypeLink: `/component-beanstalk`,
-        camelTypeLink: `/beanstalk-component.html`,
-        uriPlaceholder: 'connectionSettings',
-        uriPopoverMessage: `
-        <b>Name</b>: connectionSettings<br/>
-        <b>Description</b>: Connection settings host:port/tube. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BONITA',
-        assimblyTypeLink: `/component-bonita`,
-        camelTypeLink: `/bonita-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation to use. The value can be one of: startCase. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: BonitaOperation<br/>
-    `
-    },
-    {
-        name: 'BOX',
-        assimblyTypeLink: `/component-box`,
-        camelTypeLink: `/box-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: BoxApiName<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What sub operation to use for the selected operation. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BRAINTREE',
-        assimblyTypeLink: `/component-braintree`,
-        camelTypeLink: `/braintree-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: BraintreeApiName<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What sub operation to use for the selected operation. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'BROWSE',
-        assimblyTypeLink: `/component-browse`,
-        camelTypeLink: `/browse-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: A name which can be any string to uniquely identify the endpoint. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CAFFEINE-CACHE',
-        assimblyTypeLink: `/component-caffeine-cache`,
-        camelTypeLink: `/caffeine-cache-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The cache name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CAFFEINE-LOADCACHE',
-        assimblyTypeLink: `/component-caffeine-loadcache`,
-        camelTypeLink: `/caffeine-loadcache-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The cache name. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CQL',
-        assimblyTypeLink: `/component-cql`,
-        camelTypeLink: `/cql-component.html`,
-        uriPlaceholder: 'beanRef:hosts:port/keyspace',
-        uriPopoverMessage: `
-        <b>Name</b>: beanRef<br/>
-        <b>Description</b>: beanRef is defined using bean:id. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: hosts<br/>
-        <b>Description</b>: Hostname(s) cassansdra server(s). Multiple hosts can be separated by comma. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number of cassansdra server(s). <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: keyspace<br/>
-        <b>Description</b>: Keyspace to use. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CHATSCRIPT',
-        assimblyTypeLink: `/component-chatscript`,
-        camelTypeLink: `/chatscript-component.html`,
-        uriPlaceholder: 'host:port/botName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname or IP of the server on which CS server is running. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port on which ChatScript is listening to. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: botName<br/>
-        <b>Description</b>:  Name of the Bot in CS to converse with. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CHUNK',
-        assimblyTypeLink: `/component-chunk`,
-        camelTypeLink: `/chunk-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CLASS',
-        assimblyTypeLink: `/component-class`,
-        camelTypeLink: `/class-component.html`,
-        uriPlaceholder: 'beanName',
-        uriPopoverMessage: `
-        <b>Name</b>: beanName<br/>
-        <b>Description</b>: Sets the name of the bean to invoke. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CM-SMS',
-        assimblyTypeLink: `/component-cm-sms`,
-        camelTypeLink: `/cm-sms-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: SMS Provider HOST with scheme <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CMIS',
-        assimblyTypeLink: `/component-cmis`,
-        camelTypeLink: `/cmis-component.html`,
-        uriPlaceholder: 'cmsUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: URL to the cmis repository. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'COAP',
-        assimblyTypeLink: `/component-coap`,
-        camelTypeLink: `/coap-component.html`,
-        uriPlaceholder: 'uri',
-        uriPopoverMessage: `
-        <b>Name</b>: uri<br/>
-        <b>Description</b>: The URI for the CoAP endpoint <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI<br/>
-    `
-    },
-    {
-        name: 'COMETD',
-        assimblyTypeLink: `/component-cometd`,
-        camelTypeLink: `/cometd-component.html`,
-        uriPlaceholder: 'host:port/channelName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: hostname <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port <br/>
-        <b>Description</b>: Host port number <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: channelname <br/>
-        <b>Description</b>: The channelName represents a topic that can be subscribed to by the Camel endpoints. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CONSUL',
-        assimblyTypeLink: `/component-consul`,
-        camelTypeLink: `/consul-component.html`,
-        uriPlaceholder: 'apiEndpoint',
-        uriPopoverMessage: `
-        <b>Name</b>: apiEndpoint<br/>
-        <b>Description</b>: The API endpoint <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CORDA',
-        assimblyTypeLink: `/component-corda`,
-        camelTypeLink: `/corda-component.html`,
-        uriPlaceholder: 'node',
-        uriPopoverMessage: `
-        <b>Name</b>: node<br/>
-        <b>Description</b>: The url for the corda node <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'COUCHBASE',
-        assimblyTypeLink: `/component-couchbase`,
-        camelTypeLink: `/couchbase-component.html`,
-        uriPlaceholder: 'protocol:hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: The protocol to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: The hostname to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The port number to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-    `
-    },
-    {
-        name: 'COUCHDB',
-        assimblyTypeLink: `/component-couchdb`,
-        camelTypeLink: `/couchdb-component.html`,
-        uriPlaceholder: 'protocol:hostname:port/database',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: The protocol to use for communicating with the database. The value can be one of: http, https. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Hostname of the running couchdb instance <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number for the running couchdb instance <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: database<br/>
-        <b>Description</b>: Name of the database to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: http://localhost:5984/database <br/>
-    `
-    },
-    {
-        name: 'CRON',
-        assimblyTypeLink: `/component-cron`,
-        camelTypeLink: `/cron-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The name of the cron trigger. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Example</b>: foo <br/>
-    `
-    },
-    {
-        name: 'CRYPTO',
-        assimblyTypeLink: `/component-crypto`,
-        camelTypeLink: `/crypto-component.html`,
-        uriPlaceholder: 'cryptoOperation:name',
-        uriPopoverMessage: `
-        <b>Name</b>: cryptoOperation<br/>
-        <b>Description</b>:  Set the Crypto operation from that supplied after the crypto scheme in the endpoint uri e.g. crypto:sign sets sign as the operation. The value can be one of: sign, verify. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: CryptoOperation<br/>
-        <b>Name</b>: name<br/>
-        <b>Description</b>:  The logical name of this operation. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CRYPTO-CMS',
-        assimblyTypeLink: `/component-crypto-cms`,
-        camelTypeLink: `/crypto-cms-component.html`,
-        uriPlaceholder: 'cryptoOperation:name',
-        uriPopoverMessage: `
-        <b>Name</b>: cryptoOperation<br/>
-        <b>Description</b>:  Set the Crypto operation from that supplied after the crypto scheme in the endpoint uri e.g. crypto:sign sets sign as the operation. The value can be one of: sign, verify. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: CryptoOperation<br/>
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The name part in the URI can be chosen by the user to distinguish between different signer/verifier/encryptor/decryptor endpoints within the camel context. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CXF',
-        assimblyTypeLink: `/component-cxf`,
-        camelTypeLink: `/cxf-component.html`,
-        uriPlaceholder: 'beanId:address',
-        uriPopoverMessage: `
-        <b>Name</b>: beanId<br/>
-        <b>Description</b>: To lookup an existing configured CxfEndpoint. Must used bean: as prefix. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: address<br/>
-        <b>Description</b>: The service publish address. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'CXFRS',
-        assimblyTypeLink: `/component-cxfrs`,
-        camelTypeLink: `/cxfrs-component.html`,
-        uriPlaceholder: 'beanId:address',
-        uriPopoverMessage: `
-        <b>Name</b>: beanId<br/>
-        <b>Description</b>: To lookup an existing configured CxfEndpoint. Must used bean: as prefix. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: address<br/>
-        <b>Description</b>: The service publish address. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-    `
-    },
-    {
-        name: 'DATAFORMAT',
-        assimblyTypeLink: `/component-dataformat`,
-        camelTypeLink: `/dataformat-component.html`,
-        uriPlaceholder: 'name:operation',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>:  Name of data format.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: operation<br/>
-        <b>Description</b>:  Operation to use either marshal or unmarshal. The value can be one of: marshal, unmarshal.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DATASET',
-        assimblyTypeLink: `/component-dataset`,
-        camelTypeLink: `/dataset-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name of DataSet to lookup in the registry<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: DataSet <br/><br/>
-    `
-    },
-    {
-        name: 'DATASET-TEST',
-        assimblyTypeLink: `/component-dataset-test`,
-        camelTypeLink: `/dataset-test-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name of DataSet to lookup in the registry<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: DataSet <br/><br/>
-    `
-    },
-    {
-        name: 'DEBEZIUM-MONGODB',
-        assimblyTypeLink: `/component-debezium-mongodb`,
-        camelTypeLink: `/debezium-mongodb-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DEBEZIUM-MYSQL',
-        assimblyTypeLink: `/component-debezium-mysql`,
-        camelTypeLink: `/debezium-mysql-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DEBEZIUM-POSTGRESQL',
-        assimblyTypeLink: `/component-debezium-postgres`,
-        camelTypeLink: `/debezium-postgres-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DEBEZIUM-SQLSERVER',
-        assimblyTypeLink: `/component-debezium-sqlserver`,
-        camelTypeLink: `/debezium-sqlserver-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Unique name for the connector. Attempting to register again with the same name will fail.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DIGITALOCEAN',
-        assimblyTypeLink: `/component-digitalocean`,
-        camelTypeLink: `/digitalocean-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: The operation to perform to the given resource.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: DigitalOceanOperations <br/><br/>
-    `
-    },
-    {
-        name: 'DIRECT',
-        assimblyTypeLink: `/component-direct`,
-        camelTypeLink: `/direct-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>:  The name of the endpoint<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: test<br/>
-    `
-    },
-    {
-        name: 'DIRECT-VM',
-        assimblyTypeLink: `/component-direct-vm`,
-        camelTypeLink: `/direct-vm-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>:  The name of the endpoint<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: test<br/>
-    `
-    },
-    {
-        name: 'DISRUPTOR',
-        assimblyTypeLink: `/component-disruptor`,
-        camelTypeLink: `/disruptor-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name of queue.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DJL',
-        assimblyTypeLink: `/component-djl`,
-        camelTypeLink: `/djl-component.html`,
-        uriPlaceholder: 'application',
-        uriPopoverMessage: `
-        <b>Name</b>: application<br/>
-        <b>Description</b>: Application name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DNS',
-        assimblyTypeLink: `/component-dns`,
-        camelTypeLink: `/dns-component.html`,
-        uriPlaceholder: 'dnsType',
-        uriPopoverMessage: `
-        <b>Name</b>: dnsType<br/>
-        <b>Description</b>: The type of the lookup. The value can be one of: dig, ip, lookup, wikipedia.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: DnsType <br/><br/>
-    `
-    },
-    {
-        name: 'DOCKER',
-        assimblyTypeLink: `/component-docker`,
-        camelTypeLink: `/docker-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Which operation to use (see docs).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: DockerOperation <br/><br/>
-    `
-    },
-    {
-        name: 'DOZER',
-        assimblyTypeLink: `/component-dozer`,
-        camelTypeLink: `/dozer-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>:A human readable name of the mapping.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DRILL',
-        assimblyTypeLink: `/component-drill`,
-        camelTypeLink: `/drill-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Host name or IP address.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'DROPBOX',
-        assimblyTypeLink: `/component-dropbox`,
-        camelTypeLink: `/dropbox-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation <br/>
-        <b>Description</b>: The specific action (typically a CRUD action) to perform on Dropbox remote folder.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: move <br/>
-    `
-    },
-    {
-        name: 'EHCACHE',
-        assimblyTypeLink: `/component-ehcache`,
-        camelTypeLink: `/ehcache-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName <br/>
-        <b>Description</b>: The cache name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'ELASTICSEARCH',
-        assimblyTypeLink: `/component-elasticsearch`,
-        camelTypeLink: `/elasticsearch-rest-component.html`,
-        uriPlaceholder: 'clusterName',
-        uriPopoverMessage: `
-        <b>Name</b>: Elasticsearch-rest<br/>
-        <b>Description</b>:  The name of the endpoint<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: clusterName<br/>
-        <b>Description</b>:  The name of the cluster<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'ELSQL',
-        assimblyTypeLink: `/component-elsql`,
-        camelTypeLink: `/elsql-component.html`,
-        uriPlaceholder: 'elsqlName:resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: elsqlName <br/>
-        <b>Description</b>: The name of the elsql to use (is NAMED in the elsql file).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'ETCD-KEYS',
-        assimblyTypeLink: `/component-etcd-keys`,
-        camelTypeLink: `/etcd-keys-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path <br/>
-        <b>Description</b>: The path the endpoint refers to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'ETCD-STATS',
-        assimblyTypeLink: `/component-etcd-stats`,
-        camelTypeLink: `/etcd-stats-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path <br/>
-        <b>Description</b>: The path the endpoint refers to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'ETCD-WATCH',
-        assimblyTypeLink: `/component-etcd-watch`,
-        camelTypeLink: `/etcd-watch-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path <br/>
-        <b>Description</b>: The path the endpoint refers to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'EXEC',
-        assimblyTypeLink: `/component-exec`,
-        camelTypeLink: `/exec-component.html`,
-        uriPlaceholder: 'executable',
-        uriPopoverMessage: `
-        <b>Name</b>: executable <br/>
-        <b>Description</b>: Sets the executable to be executed. The executable must not be empty or null.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FACEBOOK',
-        assimblyTypeLink: `/component-facebook`,
-        camelTypeLink: `/facebook-component.html`,
-        uriPlaceholder: 'methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What operation to perform.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FHIR',
-        assimblyTypeLink: `/component-fhir`,
-        camelTypeLink: `/fhir-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName <br/>
-        <b>Description</b>: What kind of operation to perform. The value can be one of: capabilities, create, delete, history, load-page, meta, patch, read, search, transaction, update, validate.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: FhirApiName <br/><br/>
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What sub operation to use for the selected operation.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FILE',
-        assimblyTypeLink: `/component-file`,
-        camelTypeLink: `/file-component.html`,
-        uriPlaceholder: 'directoryName',
-        uriPopoverMessage: `
-        <b>Name</b>: directoryName<br/>
-        <b>Description</b>:  The starting directory.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: File <br/><br/>
-        <b>Example</b>: /home/user/order or C:\\order<br/>
-    `
-    },
-    {
-        name: 'FILE-WATCH',
-        assimblyTypeLink: `/component-filewatch`,
-        camelTypeLink: `/filewatch-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path<br/>
-        <b>Description</b>: Path of directory to consume events from.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FLATPACK',
-        assimblyTypeLink: `/component-flatpack`,
-        camelTypeLink: `/flatpack-component.html`,
-        uriPlaceholder: 'type:resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: type<br/>
-        <b>Description</b>: Whether to use fixed or delimiter. The value can be one of: fixed, delim.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: FlatpackType <br/><br/>
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: URL for loading the flatpack mapping file from classpath or file system.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FLINK',
-        assimblyTypeLink: `/component-flink`,
-        camelTypeLink: `/flink-component.html`,
-        uriPlaceholder: 'endpointType',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointType<br/>
-        <b>Description</b>: Type of the endpoint (dataset, datastream). The value can be one of: dataset, datastream.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: EndpointType <br/><br/>
-    `
-    },
-    {
-        name: 'FOP',
-        assimblyTypeLink: `/component-fop`,
-        camelTypeLink: `/fop-component.html`,
-        uriPlaceholder: 'outputType',
-        uriPopoverMessage: `
-        <b>Name</b>: outputType<br/>
-        <b>Description</b>: The primary output format is PDF but other output formats are also supported. The value can be one of: pdf, ps, pcl, png, jpeg, svg, xml, mif, rtf, txt.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: FopOutputType <br/><br/>
-    `
-    },
-    {
-        name: 'FREEMARKER',
-        assimblyTypeLink: `/component-freemarker`,
-        camelTypeLink: `/freemarker-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'FTP',
-        assimblyTypeLink: `/component-ftp`,
-        camelTypeLink: `/ftp-component.html`,
-        uriPlaceholder: 'host:port/directoryName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname of the FTP server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port of the FTP server.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 21<br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-        <b>Name</b>: directoryName<br/>
-        <b>Description</b>: The starting directory.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: servername:21/dir1/subdir<br/>
-    `
-    },
-    {
-        name: 'FTPS',
-        assimblyTypeLink: `/component-ftps`,
-        camelTypeLink: `/ftps-component.html`,
-        uriPlaceholder: 'host:port/directoryName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname of the FTPS server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port of the FTP server.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: No default, but commonly runs on port 990 and sometimes on port 21<br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-        <b>Name</b>: directoryName<br/>
-        <b>Description</b>: The starting directory.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: servername:990/dir1/subdir<br/>
-    `
-    },
-    {
-        name: 'GANGLIA',
-        assimblyTypeLink: `/component-ganglia`,
-        camelTypeLink: `/ganglia-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Host name for Ganglia server.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 239.2.11.71<br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>:  Port for Ganglia server.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 8649<br/>
-        <b>Data Type</b>: int <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GIT',
-        assimblyTypeLink: `/component-git`,
-        camelTypeLink: `/git-component.html`,
-        uriPlaceholder: 'localPath',
-        uriPopoverMessage: `
-        <b>Name</b>: localPath<br/>
-        <b>Description</b>: Local repository path.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GITHUB',
-        assimblyTypeLink: `/component-github`,
-        camelTypeLink: `/github-component.html`,
-        uriPlaceholder: 'type/branchName',
-        uriPopoverMessage: `
-        <b>Name</b>: type<br/>
-        <b>Description</b>: What git operation to execute. The value can be one of: CLOSEPULLREQUEST, PULLREQUESTCOMMENT, COMMIT, PULLREQUEST, TAG, PULLREQUESTSTATE, PULLREQUESTFILES, GETCOMMITFILE, CREATEISSUE.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GitHubType <br/>
-        <b>Name</b>: branchName<br/>
-        <b>Description</b>: Name of branch.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GEOCODER',
-        assimblyTypeLink: `/component-geocoder`,
-        camelTypeLink: `/geocoder-component.html`,
-        uriPlaceholder: 'address:latlng',
-        uriPopoverMessage: `
-        <b>Name</b>: address-id<br/>
-        <b>Description</b>: The geo address which should be prefixed with address.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: latlng <br/>
-        <b>Description</b>: The geo latitude and longitude which should be prefixed with latlng.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-BIG-QUERY',
-        assimblyTypeLink: `/component-google-bigquery`,
-        camelTypeLink: `/google-bigquery-component.html`,
-        uriPlaceholder: 'project-id:datasetId',
-        uriPopoverMessage: `
-        <b>Name</b>: project-id<br/>
-        <b>Description</b>: Google Cloud Project Id.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: datasetId <br/>
-        <b>Description</b>: BigQuery Dataset Id.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-        <b>Example</b>: sample-project193402:example-project-193402_dataset<br/>
-    `
-    },
-    {
-        name: 'GOOGLE-BIG-QUERY-SQL',
-        assimblyTypeLink: `/component-google-bigquery-sql`,
-        camelTypeLink: `/google-bigquery-sql-component.html`,
-        uriPlaceholder: 'project-id:query',
-        uriPopoverMessage: `
-        <b>Name</b>: project-id<br/>
-        <b>Description</b>: Google Cloud Project Id.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: query <br/>
-        <b>Description</b>: BigQuery standard SQL query.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-CALENDAR',
-        assimblyTypeLink: `/component-google-calendar`,
-        camelTypeLink: `/google-calendar-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform (see docs).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GoogleCalendarApiName <br/>
-        <br/>
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What sub operation to use for the selected operation.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: LIST/GET <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-CALENDAR-STREAM',
-        assimblyTypeLink: `/component-google-calendar-stream`,
-        camelTypeLink: `/google-calendar-stream-component.html`,
-        uriPlaceholder: 'index',
-        uriPopoverMessage: `
-        <b>Name</b>: index<br/>
-        <b>Description</b>: Specifies an index for the endpoint.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-DRIVE',
-        assimblyTypeLink: `/component-google-drive`,
-        camelTypeLink: `/google-drive-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GoogleDriveApiName <br/>
-        <br/>
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What sub operation to use for the selected operation.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: drive-about/get<br/>
-    `
-    },
-    {
-        name: 'GOOGLE-FUNCTIONS',
-        assimblyTypeLink: `/component-google-functions`,
-        camelTypeLink: `/google-functions-component.html`,
-        uriPlaceholder: 'functionName',
-        uriPopoverMessage: `
-        <b>Name</b>: functionName<br/>
-        <b>Description</b>: The user-defined name of the function.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: string <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-MAIL',
-        assimblyTypeLink: `/component-google-mail`,
-        camelTypeLink: `/google-mail-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GoogleDriveApiName <br/>
-        <br/>
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What sub operation to use for the selected operation.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: messages/get<br/>
-    `
-    },
-    {
-        name: 'GOOGLE-MAIL-STREAM',
-        assimblyTypeLink: `/component-google-mail-stream`,
-        camelTypeLink: `/google-mail-stream-component.html`,
-        uriPlaceholder: 'index',
-        uriPopoverMessage: `
-        <b>Name</b>: index<br/>
-        <b>Description</b>: Specifies an index for the endpoint.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-PUBSUB',
-        assimblyTypeLink: `/component-google-pubsub`,
-        camelTypeLink: `/google-pubsub-component.html`,
-        uriPlaceholder: 'index',
-        uriPopoverMessage: `
-        <b>Name</b>: projectId<br/>
-        <b>Description</b>:  Project Id.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: DestinationName <br/>
-        <b>Description</b>: Destination Name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-SHEETS',
-        assimblyTypeLink: `/component-google-sheets`,
-        camelTypeLink: `/google-sheets-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform (see docs).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GoogleSheetsApiName <br/>
-        <br/>
-        <b>Name</b>: methodName <br/>
-        <b>Description</b>: What sub operation to use for the selected operation.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: DATA/GET <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-SHEETS-STREAM',
-        assimblyTypeLink: `/component-google-sheets-stream`,
-        camelTypeLink: `/google-sheets-stream-component.html`,
-        uriPlaceholder: 'apiName',
-        uriPopoverMessage: `
-        <b>Name</b>: index<br/>
-        <b>Description</b>: Sets the apiName.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GOOGLE-STORAGE',
-        assimblyTypeLink: `/component-google-storage`,
-        camelTypeLink: `/google-storage-component.html`,
-        uriPlaceholder: 'bucketNameOrArn',
-        uriPopoverMessage: `
-        <b>Name</b>: bucketNameOrArn<br/>
-        <b>Description</b>: What kind of operation to perform (see docs).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: GoogleSheetsApiName <br/>
-        <br/>
-        <b>Example</b>: myCamelBucket <br/>
-    `
-    },
-    {
-        name: 'GORA',
-        assimblyTypeLink: `/component-gora`,
-        camelTypeLink: `/gora-component.html`,
-        uriPlaceholder: 'apiName',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Instance name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GRAPE',
-        assimblyTypeLink: `/component-grape`,
-        camelTypeLink: `/grape-component.html`,
-        uriPlaceholder: 'defaultCoordinates',
-        uriPopoverMessage: `
-        <b>Name</b>: defaultCoordinates<br/>
-        <b>Description</b>: Maven coordinates to use as default to grab if the message body is empty.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GRAPHQL',
-        assimblyTypeLink: `/component-graphql`,
-        camelTypeLink: `/graphql-component.html`,
-        uriPlaceholder: 'httpUri',
-        uriPopoverMessage: `
-        <b>Name</b>: httpUri<br/>
-        <b>Description</b>: The GraphQL server URI.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI <br/>
-        <br/>
-        <b>Example</b>: http://myapi/graphql<br/>
-    `
-    },
-    {
-        name: 'GRPC',
-        assimblyTypeLink: `/component-grpc`,
-        camelTypeLink: `/grpc-component.html`,
-        uriPlaceholder: 'host:port/service',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The gRPC server host name. This is localhost or 0.0.0.0 when being a consumer or remote server host name when using producer.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The gRPC local or remote server port.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int <br/>
-        <b>Name</b>: service<br/>
-        <b>Description</b>: Fully qualified service name from the protocol buffer descriptor file (package dot service definition name).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'GUAVA-EVENTBUS',
-        assimblyTypeLink: `/component-guava-eventbus`,
-        camelTypeLink: `/guava-eventbus-component.html`,
-        uriPlaceholder: 'eventBusRef',
-        uriPopoverMessage: `
-        <b>Name</b>: eventBusRef<br/>
-        <b>Description</b>: To lookup the Guava EventBus from the registry with the given name.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-ATOMICVALUE',
-        assimblyTypeLink: `/component-hazelcast-atomicvalue`,
-        camelTypeLink: `/hazelcast-atomicvalue-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-INSTANCE',
-        assimblyTypeLink: `/component-hazelcast-instance`,
-        camelTypeLink: `/hazelcast-instance-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-LIST',
-        assimblyTypeLink: `/component-hazelcast-list`,
-        camelTypeLink: `/hazelcast-list-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-MAP',
-        assimblyTypeLink: `/component-hazelcast-map`,
-        camelTypeLink: `/hazelcast-map-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-MULTIMAP',
-        assimblyTypeLink: `/component-hazelcast-multimap`,
-        camelTypeLink: `/hazelcast-multimap-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-QUEUE',
-        assimblyTypeLink: `/component-hazelcast-queue`,
-        camelTypeLink: `/hazelcast-queue-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-REPLICATEDMAP',
-        assimblyTypeLink: `/component-hazelcast-replicatedmap`,
-        camelTypeLink: `/hazelcast-replicatedmap-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-RINGBUFFER',
-        assimblyTypeLink: `/component-hazelcast-ringbuffer`,
-        camelTypeLink: `/hazelcast-ringbuffer-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-SEDA',
-        assimblyTypeLink: `/component-hazelcast-seda`,
-        camelTypeLink: `/hazelcast-seda-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-SET',
-        assimblyTypeLink: `/component-hazelcast-set`,
-        camelTypeLink: `/hazelcast-set-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HAZELCAST-TOPIC',
-        assimblyTypeLink: `/component-hazelcast-topic`,
-        camelTypeLink: `/hazelcast-topic-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HBASE',
-        assimblyTypeLink: `/component-hbase`,
-        camelTypeLink: `/hbase-component.html`,
-        uriPlaceholder: 'table',
-        uriPopoverMessage: `
-        <b>Name</b>: table<br/>
-        <b>Description</b>: The table name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: users<br/>
-    `
-    },
-    {
-        name: 'HDFS',
-        assimblyTypeLink: `/component-hdfs`,
-        camelTypeLink: `/hdfs-component.html`,
-        uriPlaceholder: 'hostname:port/path',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: HDFS host to use<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: HDFS port to use<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int <br/><br/>
-        <b>Name</b>: path<br/>
-        <b>Description</b>: HDFS host to use<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: localhost:8020/user <br/>
-    `
-    },
-    {
-        name: 'HTTP',
-        assimblyTypeLink: `/component-http`,
-        camelTypeLink: `/http-component.html`,
-        uriPlaceholder: 'httpUri',
-        uriPopoverMessage: `
-        <b>Name</b>: httpUri<br/>
-        <b>Description</b>: The url of the HTTP endpoint to call.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: servername:8080/orders (without http://)<br/>
-    `
-    },
-    {
-        name: 'HTTPS',
-        assimblyTypeLink: `/component-http`,
-        camelTypeLink: `/http-component.html`,
-        uriPlaceholder: 'httpUri',
-        uriPopoverMessage: `
-        <b>Name</b>: httpUri<br/>
-        <b>Description</b>: The url of the HTTPS endpoint to call.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: servername:443/orders  (without https://)<br/>
-    `
-    },
-    {
-        name: 'HWCLOUD-FUNCTIONGRAPH',
-        assimblyTypeLink: `/component-hwcloud-funcitonsgraph`,
-        camelTypeLink: `/hwcloud-functionsgraph-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation to be performed.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HWCLOUD-IAM',
-        assimblyTypeLink: `/component-hwcloud-iam`,
-        camelTypeLink: `/hwcloud-iam-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation to be performed.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'HWCLOUD-SMN',
-        assimblyTypeLink: `/component-smn-client`,
-        camelTypeLink: `/hwcloud-smn-component.html`,
-        uriPlaceholder: 'service',
-        uriPopoverMessage: `
-        <b>Name</b>: service<br/>
-        <b>Description</b>: Name of SMN service to invoke.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IBMMQ',
-        assimblyTypeLink: `/component-ibmmq`,
-        camelTypeLink: `/jms-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
-    `
-    },
-    {
-        name: 'IEC60870-CLIENT',
-        assimblyTypeLink: `/component-iec60870-client`,
-        camelTypeLink: `/iec60870-client-component.html`,
-        uriPlaceholder: 'uriPath',
-        uriPopoverMessage: `
-        <b>Name</b>: uriPath<br/>
-        <b>Description</b>: The object information address.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: ObjectAddress <br/><br/>
-    `
-    },
-    {
-        name: 'IEC60870-SERVER',
-        assimblyTypeLink: `/component-iec60870-server`,
-        camelTypeLink: `/iec60870-server-component.html`,
-        uriPlaceholder: 'uriPath',
-        uriPopoverMessage: `
-        <b>Name</b>: uriPath<br/>
-        <b>Description</b>: The object information address.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: ObjectAddress <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-CACHE',
-        assimblyTypeLink: `/component-ignite-cache`,
-        camelTypeLink: `/ignite-cache-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The cache name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-COMPUTE',
-        assimblyTypeLink: `/component-ignite-compute`,
-        camelTypeLink: `/ignite-compute-component.html`,
-        uriPlaceholder: 'endpointId',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointId<br/>
-        <b>Description</b>: The endpoint ID (not used).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-EVENTS',
-        assimblyTypeLink: `/component-ignite-events`,
-        camelTypeLink: `/ignite-events-component.html`,
-        uriPlaceholder: 'endpointId',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointId<br/>
-        <b>Description</b>: The endpoint ID (not used).<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-IDGEN',
-        assimblyTypeLink: `/component-ignite-idgen`,
-        camelTypeLink: `/ignite-idgen-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The sequence name.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-MESSAGING',
-        assimblyTypeLink: `/component-ignite-messaging`,
-        camelTypeLink: `/ignite-messaging-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The topic name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-QUEUE',
-        assimblyTypeLink: `/component-ignite-queue`,
-        camelTypeLink: `/ignite-queue-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The queue name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IGNITE-SETS',
-        assimblyTypeLink: `/component-ignite-sets`,
-        camelTypeLink: `/ignite-sets-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The set name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IMAP',
-        assimblyTypeLink: `/component-imap`,
-        camelTypeLink: `/mail-component.html`,
-        uriPlaceholder: 'host[:port]',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>:  Mail server<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-		<b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Default</b>: 143<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: localhost:143<br/>
-    `
-    },
-    {
-        name: 'IMAPS',
-        assimblyTypeLink: `/component-imap`,
-        camelTypeLink: `/mail-component.html`,
-        uriPlaceholder: 'host[:port]',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>:  Mail server over SSL<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-		<b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Default</b>: 993<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: localhost:993<br/>
-    `
-    },
-    {
-        name: 'INFINISPAN',
-        assimblyTypeLink: `/component-infinispan`,
-        camelTypeLink: `/infinispan-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>:  The name of the cache to use. Use current to use the existing cache name from the currently configured cached manager. Or use default for the default cache manager name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'INFLUXDB',
-        assimblyTypeLink: `/component-influxdb`,
-        camelTypeLink: `/influxdb-component.html`,
-        uriPlaceholder: 'connectionBean',
-        uriPopoverMessage: `
-        <b>Name</b>: connectionBean<br/>
-        <b>Description</b>: Connection to the influx database, of class InfluxDB.class.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IOTA',
-        assimblyTypeLink: `/component-iota`,
-        camelTypeLink: `/iota-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Component name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IPFS',
-        assimblyTypeLink: `/component-ipfs`,
-        camelTypeLink: `/ipfs-component.html`,
-        uriPlaceholder: 'ipfsCmd',
-        uriPopoverMessage: `
-        <b>Name</b>: ipfsCmd<br/>
-        <b>Description</b>: The ipfs command. The value can be one of: add, cat, get, version.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'IRC',
-        assimblyTypeLink: `/component-irc`,
-        camelTypeLink: `/irc-component.html`,
-        uriPlaceholder: 'hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Hostname for the IRC chat server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number for the IRC chat server. If no port is configured then a default port of either 6667, 6668 or 6669 is used.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int <br/><br/>
-    `
-    },
-    {
-        name: 'IRONMQ',
-        assimblyTypeLink: `/component-ironmq`,
-        camelTypeLink: `/ironmq-component.html`,
-        uriPlaceholder: 'queueName',
-        uriPopoverMessage: `
-        <b>Name</b>: queueName<br/>
-        <b>Description</b>:  The name of the IronMQ queue.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: foo<br/>
-    `
-    },
-    {
-        name: 'JBPM',
-        assimblyTypeLink: `/component-jbpm`,
-        camelTypeLink: `/jbpm-component.html`,
-        uriPlaceholder: 'connectionURL',
-        uriPopoverMessage: `
-        <b>Name</b>: connectionURL<br/>
-        <b>Description</b>: The URL to the jBPM server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URL <br/><br/>
-        <b>Name</b>: eventListenerType<br/>
-        <b>Description</b>: Sets the event listener type to attach to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JCACHE',
-        assimblyTypeLink: `/component-jcache`,
-        camelTypeLink: `/jcache-component.html`,
-        uriPlaceholder: 'cacheName',
-        uriPopoverMessage: `
-        <b>Name</b>: cacheName<br/>
-        <b>Description</b>: The name of the cache.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JCLOUDS',
-        assimblyTypeLink: `/component-jclouds`,
-        camelTypeLink: `/jclouds-component.html`,
-        uriPlaceholder: 'command:providerId',
-        uriPopoverMessage: `
-        <b>Name</b>: command<br/>
-        <b>Description</b>: What command to execute such as blobstore or compute. The value can be one of: blobstore, compute.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: JcloudsCommand <br/><br/>
-        <b>Name</b>: providerId<br/>
-        <b>Description</b>: The name of the cloud provider that provides the target service (e.g. aws-s3 or aws_ec2).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JCR',
-        assimblyTypeLink: `/component-jcr`,
-        camelTypeLink: `/jcr-component.html`,
-        uriPlaceholder: 'host/base',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Name of the javax.jcr.Repository to lookup from the Camel registry to be used.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: base<br/>
-        <b>Description</b>: Get the base node when accessing the repository.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JDBC',
-        assimblyTypeLink: `/component-jdbc`,
-        camelTypeLink: `/jdbc-component.html`,
-        uriPlaceholder: 'dataSourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: dataSourceName<br/>
-        <b>Description</b>: Name of DataSource to lookup in the Registry. If the name is dataSource or default, then Camel will attempt to lookup a default DataSource from the registry, meaning if there is a only one instance of DataSource found, then this DataSource will be used.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JETTY',
-        assimblyTypeLink: `/component-jetty`,
-        camelTypeLink: `/jetty-component.html`,
-        uriPlaceholder: 'httpUri',
-        uriPopoverMessage: `
-        <b>Name</b>: httpUri<br/>
-        <b>Description</b>: The url of the HTTP(S) endpoint to call.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI <br/><br/>
-        <b>Example</b>: http://servername:8080/orders<br/>
-    `
-    },
-    {
-        name: 'JGROUPS',
-        assimblyTypeLink: `/component-jgroups`,
-        camelTypeLink: `/jgroups-component.html`,
-        uriPlaceholder: 'clusterName',
-        uriPopoverMessage: `
-        <b>Name</b>: clusterName<br/>
-        <b>Description</b>: The name of the JGroups cluster the component should connect to.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JGROUPSRAFT',
-        assimblyTypeLink: `/component-jgroups-raft`,
-        camelTypeLink: `/jgroups-raft-component.html`,
-        uriPlaceholder: 'clusterName',
-        uriPopoverMessage: `
-        <b>Name</b>: clusterName<br/>
-        <b>Description</b>: The name of the JGroupsraft cluster the component should connect to.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JING',
-        assimblyTypeLink: `/component-jing`,
-        camelTypeLink: `/jing-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: URL to a local resource on the classpath or a full URL to a remote resource or resource on the file system which contains the schema to validate against.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JIRA',
-        assimblyTypeLink: `/component-jira`,
-        camelTypeLink: `/jira-component.html`,
-        uriPlaceholder: 'type',
-        uriPopoverMessage: `
-        <b>Name</b>: type<br/>
-        <b>Description</b>: Operation to perform.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: JiraType <br/><br/>
-    `
-    },
-    {
-        name: 'JMS',
-        assimblyTypeLink: `/component-jms`,
-        camelTypeLink: `/jms-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic, temp-queue, temp-topic.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: Name of the queue or topic to use as destination.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JMX',
-        assimblyTypeLink: `/component-jmx`,
-        camelTypeLink: `/jmx-component.html`,
-        uriPlaceholder: 'serverURL',
-        uriPopoverMessage: `
-        <b>Name</b>: serverURL<br/>
-        <b>Description</b>: Server url comes from the remaining endpoint. Use platform to connect to local JVM.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JOLT',
-        assimblyTypeLink: `/component-jolt`,
-        camelTypeLink: `/jolt-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: bean:myBean.myMethod <br/>
-    `
-    },
-    {
-        name: 'JOOQ',
-        assimblyTypeLink: `/component-jooq`,
-        camelTypeLink: `/jooq-component.html`,
-        uriPlaceholder: 'entityType',
-        uriPopoverMessage: `
-        <b>Name</b>: entityType<br/>
-        <b>Description</b>: JOOQ entity class.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Class <br/><br/>
-    `
-    },
-    {
-        name: 'JPA',
-        assimblyTypeLink: `/component-jpa`,
-        camelTypeLink: `/jpa-component.html`,
-        uriPlaceholder: 'entityType',
-        uriPopoverMessage: `
-        <b>Name</b>: entityType<br/>
-        <b>Description</b>: Entity class name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JSLT',
-        assimblyTypeLink: `/component-jslt`,
-        camelTypeLink: `/jslt-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JSONATA',
-        assimblyTypeLink: `/component-jsonata`,
-        camelTypeLink: `/jsonata-component.html`,
-        uriPlaceholder: 'specName',
-        uriPopoverMessage: `
-        <b>Name</b>: specName<br/>
-        <b>Description</b>: The classpath-local URI of the specification to invoke; or the complete URL of the remote specification.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JSON-VALIDATOR',
-        assimblyTypeLink: `/component-json-validator`,
-        camelTypeLink: `/json-validator-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'JT400',
-        assimblyTypeLink: `/component-jt400`,
-        camelTypeLink: `/jt400-component.html`,
-        uriPlaceholder: 'userID:password/systemName/objectPath.type',
-        uriPopoverMessage: `
-        <b>Name</b>: userID<br/>
-        <b>Description</b>: Returns the ID of the AS/400 user.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: password<br/>
-        <b>Description</b>: Returns the password of the AS/400 user.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: systemName<br/>
-        <b>Description</b>: Returns the name of the AS/400 system.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: objectPath<br/>
-        <b>Description</b>: Returns the fully qualified integrated file system path name of the target object of this endpoint.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: type<br/>
-        <b>Description</b>: Whether to work with data queues or remote program call. The value can be one of: DTAQ, PGM, SRVPGM.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Jt400Type <br/><br/>
-    `
-    },
-    {
-        name: 'KAFKA',
-        assimblyTypeLink: `/component-kafka`,
-        camelTypeLink: `/kafka-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>:  Name of the topic to use. On the from tab (a Kafka consumer) you can use comma to separate multiple topics.
-            On the to and error tab (a Kafka producer) you can only send a message to a single topic.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: test or test1,test2,test3<br/>
-    `
-    },
-    {
-        name: 'KAMELET',
-        assimblyTypeLink: `/component-kamelet`,
-        camelTypeLink: `/kamelet-component.html`,
-        uriPlaceholder: 'templateId/routeId',
-        uriPopoverMessage: `
-        <b>Name</b>: templeteId<br/>
-        <b>Description</b>:  The Route Template ID.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: routeID<br/>
-        <b>Description</b>:  The Route ID. Default value notice: The ID will be auto-generated if not provided.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: setMyBody<br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-CONFIG-MAPS',
-        assimblyTypeLink: `/component-kubernetes-config-maps`,
-        camelTypeLink: `/kubernetes-config-maps-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-DEPLOYMENTS',
-        assimblyTypeLink: `/component-kubernetes-deployments`,
-        camelTypeLink: `/kubernetes-deployments-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-HPA',
-        assimblyTypeLink: `/component-kubernetes-hpa`,
-        camelTypeLink: `/kubernetes-hpa-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-JOB',
-        assimblyTypeLink: `/component-kubernetes-job`,
-        camelTypeLink: `/kubernetes-job-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-NAMESPACES',
-        assimblyTypeLink: `/component-kubernetes-namespaces`,
-        camelTypeLink: `/kubernetes-namespaces-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-NODES',
-        assimblyTypeLink: `/component-kubernetes-nodes`,
-        camelTypeLink: `/kubernetes-nodes-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-PERSISTENT-VOLUMES',
-        assimblyTypeLink: `/component-kubernetes-persistent-volumes`,
-        camelTypeLink: `/kubernetes-persistent-volumes-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-PERSISTENT-VOLUMES-CLAIM',
-        assimblyTypeLink: `/component-kubernetes-persistent-volumes-claim`,
-        camelTypeLink: `/kubernetes-persistent-volumes-claim-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-PODS',
-        assimblyTypeLink: `/component-kubernetes-pods`,
-        camelTypeLink: `/kubernetes-pods-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-REPLICATION-CONTROLLERS',
-        assimblyTypeLink: `/component-kubernetes-replication-controllers`,
-        camelTypeLink: `/kubernetes-replication-controllers-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-RESOURCES-QUOTA',
-        assimblyTypeLink: `/component-kubernetes-resources-quota`,
-        camelTypeLink: `/kubernetes-resources-quota-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-SECRETS',
-        assimblyTypeLink: `/component-kubernetes-secrets`,
-        camelTypeLink: `/kubernetes-secrets-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-SERVICE-ACCOUNTS',
-        assimblyTypeLink: `/component-kubernetes-service-accounts`,
-        camelTypeLink: `/kubernetes-service-accounts-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUBERNETES-SERVICES',
-        assimblyTypeLink: `/component-kubernetes-services`,
-        camelTypeLink: `/kubernetes-services-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'KUDU',
-        assimblyTypeLink: `/component-kudu`,
-        camelTypeLink: `/kudu-component.html`,
-        uriPlaceholder: 'host:port/tableName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Host of the server to connect to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port of the server to connect to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: tableName<br/>
-        <b>Description</b>: Table to connect to.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'LANGUAGE',
-        assimblyTypeLink: `/component-language`,
-        camelTypeLink: `/language-component.html`,
-        uriPlaceholder: 'languageName:resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: languageName <br/>
-        <b>Description</b>: Sets the name of the language to use <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <b>Name</b>: resourceUri <br/>
-        <b>Description</b>: Path to the resource, or a reference to lookup a bean in the Registry to use as the resource <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'LDAP',
-        assimblyTypeLink: `/component-ldap`,
-        camelTypeLink: `/ldap-component.html`,
-        uriPlaceholder: 'ldap.example.com:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host <br/>
-        <b>Description</b>: The LDAP uri <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: example.com:389 <br/>
-    `
-    },
-    {
-        name: 'LDIF',
-        assimblyTypeLink: `/component-ldif`,
-        camelTypeLink: `/ldif-component.html`,
-        uriPlaceholder: 'ldapConnectionName',
-        uriPopoverMessage: `
-        <b>Name</b>: ldapConnectionName <br/>
-        <b>Description</b>:The name of the LdapConnection bean to pull from the registry. Note that this must be of scope prototype to avoid it being shared among threads or using a connection that has timed out. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'LOG',
-        assimblyTypeLink: `/component-log`,
-        camelTypeLink: `/log-component.html`,
-        uriPlaceholder: 'loggerName',
-        uriPopoverMessage: `
-        <b>Name</b>: loggerName <br/>
-        <b>Description</b>: Name of the logging category to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'LUCENE',
-        assimblyTypeLink: `/component-lucene`,
-        camelTypeLink: `/lucene-component.html`,
-        uriPlaceholder: 'host:operation',
-        uriPopoverMessage: `
-        <b>Name</b>: host <br/>
-        <b>Description</b>: The URL to the lucene server <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: operation <br/>
-        <b>Description</b>: Operation to do such as insert or query. The value can be one of: insert, query <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: LuceneOperation <br/><br/>
-    `
-    },
-    {
-        name: 'LUMBERJACK',
-        assimblyTypeLink: `/component-lumberjack`,
-        camelTypeLink: `/lumberjack-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host <br/>
-        <b>Description</b>: Network interface on which to listen for Lumberjack. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port <br/>
-        <b>Description</b>: Network port on which to listen for Lumberjack. <br/>
-        <b>Default</b>: 5044 <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int <br/><br/>
-    `
-    },
-    {
-        name: 'MASTER',
-        assimblyTypeLink: `/component-master`,
-        camelTypeLink: `/master-component.html`,
-        uriPlaceholder: 'namespace:delegateUri',
-        uriPopoverMessage: `
-        <b>Name</b>: namespace <br/>
-        <b>Description</b>: The name of the cluster namespace to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: delegateUri <br/>
-        <b>Description</b>: The endpoint uri to use in master/slave mode. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'METRICS',
-        assimblyTypeLink: `/component-metrics`,
-        camelTypeLink: `/metrics-component.html`,
-        uriPlaceholder: 'metricsType:metricsName',
-        uriPopoverMessage: `
-        <b>Name</b>: metricsType <br/>
-        <b>Description</b>: Type of metrics. The value can be one of: gauge, counter, histogram, meter, timer <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: MetricsType <br/><br/>
-        <b>Name</b>: metricsName <br/>
-        <b>Description</b>: Name of metrics. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'MICROMETER',
-        assimblyTypeLink: `/component-micrometer`,
-        camelTypeLink: `/micrometer-component.html`,
-        uriPlaceholder: 'micrometer:metricsType:metricsName',
-        uriPopoverMessage: `
-        <b>Name</b>: metricsType<br/>
-        <b>Description</b>: Type of metrics. The value can be one of: COUNTER, GAUGE, LONG_TASK_TIMER, TIMER, DISTRIBUTION_SUMMARY, OTHER. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Type<br/>
-        <b>Name</b>: metricsName<br/>
-        <b>Description</b>: Name of metrics. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: tags<br/>
-        <b>Description</b>: Tags of metrics. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Iterable<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MICROPROFILE-METRICS',
-        assimblyTypeLink: `/component-microprofile-metrics`,
-        camelTypeLink: `/microprofile-metrics-component.html`,
-        uriPlaceholder: 'metricsType:metricsName',
-        uriPopoverMessage: `
-        <b>Name</b>: metricsType <br/>
-        <b>Description</b>: Type of metrics. The value can be one of: gauge, counter, histogram, meter, timer <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: MetricsType <br/><br/>
-        <b>Name</b>: metricsName <br/>
-        <b>Description</b>: Name of metrics. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'MINA',
-        assimblyTypeLink: `/component-mina`,
-        camelTypeLink: `/mina-component.html`,
-        uriPlaceholder: 'protocol:host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: Protocol to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname to use. Use localhost or 0.0.0.0 for local server as consumer. For producer use the hostname or ip address of the remote server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MINIO',
-        assimblyTypeLink: `/component-mino`,
-        camelTypeLink: `/minio-component.html`,
-        uriPlaceholder: 'bucketName',
-        uriPopoverMessage: `
-        <b>Name</b>: bucketName<br/>
-        <b>Description</b>: Bucket name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MLLP',
-        assimblyTypeLink: `/component-mllp`,
-        camelTypeLink: `/mllp-component.html`,
-        uriPlaceholder: 'hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Hostname or IP for connection for the TCP connection. The default value is null, which means any local IP address.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number for the TCP connection.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MOCK',
-        assimblyTypeLink: `/component-mock`,
-        camelTypeLink: `/mock-component.html`,
-        uriPlaceholder: 'someName',
-        uriPopoverMessage: `
-        <b>Name</b>: mockName<br/>
-        <b>Description</b>: Any name for the mock<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: foo<br/>
-    `
-    },
-    {
-        name: 'MONGODB',
-        assimblyTypeLink: `/component-mongodb`,
-        camelTypeLink: `/mongodb-component.html`,
-        uriPlaceholder: 'connectionBean',
-        uriPopoverMessage: `
-        <b>Name</b>: connectionBean<br/>
-        <b>Description</b>: Sets the connection bean reference used to lookup a client for connecting to a database. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MONGODB-GRIDFS',
-        assimblyTypeLink: `/component-mongodb-gridfs`,
-        camelTypeLink: `/mongodb-gridfs-component.html`,
-        uriPlaceholder: 'connectionBean',
-        uriPopoverMessage: `
-        <b>Name</b>: connectionBean<br/>
-        <b>Description</b>: Name of com.mongodb.client.MongoClient to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MSV',
-        assimblyTypeLink: `/component-msv`,
-        camelTypeLink: `/msv-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: URL to a local resource on the classpath, or a reference to lookup a bean in the Registry, or a full URL to a remote resource or resource on the file system which contains the XSD to validate against. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MUSTACHE',
-        assimblyTypeLink: `/component-mustache`,
-        camelTypeLink: `/mustache-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: bean:myBean.myMethod<br/>
-    `
-    },
-    {
-        name: 'MYBATIS',
-        assimblyTypeLink: `/component-mybatis`,
-        camelTypeLink: `/mybatis-component.html`,
-        uriPlaceholder: 'statement',
-        uriPopoverMessage: `
-        <b>Name</b>: statement<br/>
-        <b>Description</b>: The statement name in the MyBatis XML mapping file which maps to the query, insert, update or delete operation you wish to evaluate.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MYBATIS-BEAN',
-        assimblyTypeLink: `/component-mybatis-bean`,
-        camelTypeLink: `/mybatis-bean-component.html`,
-        uriPlaceholder: 'beanName:methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: beanName<br/>
-        <b>Description</b>: Name of the bean with the MyBatis annotations. This can either by a type alias or a FQN class name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: Name of the method on the bean that has the SQL query to be executed.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NAGIOS',
-        assimblyTypeLink: `/component-nagios`,
-        camelTypeLink: `/nagios-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: This is the address of the Nagios host where checks should be send. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The port number of the host. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NATS',
-        assimblyTypeLink: `/component-nagios`,
-        camelTypeLink: `/nagios-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The name of topic we want to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NATS',
-        assimblyTypeLink: `/component-nagios`,
-        camelTypeLink: `/nagios-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The name of topic we want to use. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NETTY4',
-        assimblyTypeLink: `/component-netty4`,
-        camelTypeLink: `/netty-component.html`,
-        uriPlaceholder: 'transport://hostname:port',
-        uriPopoverMessage: `
-        <b>Name</b>: transport<br/>
-        <b>Description</b>: The network protocol to use (tcp or udp)<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Enumeration. Valid values: tcp, udp<br/>
-        <br/>
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Name of the server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: tcp://localhost:9999<br/>
-    `
-    },
-    {
-        name: 'NETTY-HTTP',
-        assimblyTypeLink: `/component-nagios`,
-        camelTypeLink: `/nagios-component.html`,
-        uriPlaceholder: 'protocol:host:port/path',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: The protocol to use which is either http, https or proxy - a consumer only option. The value can be one of: http, https. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The local hostname such as localhost, or 0.0.0.0 when being a consumer. The remote HTTP server hostname when using producer. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The host port number. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: path <br/>
-        <b>Description</b>: Resource path. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NITRITE',
-        assimblyTypeLink: `/component-nsq`,
-        camelTypeLink: `/nsq-component.html`,
-        uriPlaceholder: 'database',
-        uriPopoverMessage: `
-        <b>Name</b>: database<br/>
-        <b>Description</b>: Path to database file. Will be created if not exists. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'NSQ',
-        assimblyTypeLink: `/component-nsq`,
-        camelTypeLink: `/nsq-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The NSQ topic. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OAIPMH',
-        assimblyTypeLink: `/component-oai-pmh`,
-        camelTypeLink: `/oaipmh-component.html`,
-        uriPlaceholder: 'url',
-        uriPopoverMessage: `
-        <b>Name</b>: url<br/>
-        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Olingo2ApiName<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OLINGO2',
-        assimblyTypeLink: `/component-olingo2`,
-        camelTypeLink: `/olingo2-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Olingo2ApiName<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What sub operation to use for the selected operation<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OLINGO4',
-        assimblyTypeLink: `/component-olingo4`,
-        camelTypeLink: `/olingo4-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>:  What kind of operation to perform. The value can be one of: DEFAULT. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Olingo4ApiName<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What sub operation to use for the selected operation<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MILO-CLIENT',
-        assimblyTypeLink: `/component-milo-client`,
-        camelTypeLink: `/milo-client-component.html`,
-        uriPlaceholder: 'endpointUri',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointUri<br/>
-        <b>Description</b>:  The OPC UA server endpoint. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'MILO-SERVER',
-        assimblyTypeLink: `/component-milo-server`,
-        camelTypeLink: `/milo-server-component.html`,
-        uriPlaceholder: 'itemId',
-        uriPopoverMessage: `
-        <b>Name</b>: itemId<br/>
-        <b>Description</b>: ID of the item. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSHIFT-BUILD-CONFIGS',
-        assimblyTypeLink: `/component-openshift-build-configs`,
-        camelTypeLink: `/openshift-build-configs-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSHIFT-BUILDS',
-        assimblyTypeLink: `/component-openshift-builds`,
-        camelTypeLink: `/openshift-builds-component.html`,
-        uriPlaceholder: 'masterUrl',
-        uriPopoverMessage: `
-        <b>Name</b>: masterUrl<br/>
-        <b>Description</b>: Kubernetes Master url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-CINDER',
-        assimblyTypeLink: `/component-openstack-cinder`,
-        camelTypeLink: `/openstack-cinder-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-GLANCE',
-        assimblyTypeLink: `/component-openstack-glance`,
-        camelTypeLink: `/openstack-glance-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-KEYSTONE',
-        assimblyTypeLink: `/component-openstack-keystone`,
-        camelTypeLink: `/openstack-keystone-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-NEUTRON',
-        assimblyTypeLink: `/component-openstack-neutron`,
-        camelTypeLink: `/openstack-neutron-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-NOVA',
-        assimblyTypeLink: `/component-openstack-nova`,
-        camelTypeLink: `/openstack-nova-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPENSTACK-SWIFT',
-        assimblyTypeLink: `/component-openstack-swift`,
-        camelTypeLink: `/openstack-swift-component.html`,
-        uriPlaceholder: 'host',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: OpenStack host url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'OPTAPLANNER',
-        assimblyTypeLink: `/component-optaplanner`,
-        camelTypeLink: `/optaplanner-component.html`,
-        uriPlaceholder: 'configFile',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Specifies the location to the solver file. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PAHO',
-        assimblyTypeLink: `/component-paho`,
-        camelTypeLink: `/paho-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: Name of the topic.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PAHO-MQTT5',
-        assimblyTypeLink: `/component-paho-mqtt5`,
-        camelTypeLink: `/paho-mqtt5-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: Name of the topic.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PDF',
-        assimblyTypeLink: `/component-pdf`,
-        camelTypeLink: `/pdf-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation type. The value can be one of: create, append, extractText.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: PdfOperation<br/>
-        <br/>
-        <b>Example</b>: create<br/>
-    `
-    },
-    {
-        name: 'PLATFORM-HTTP',
-        assimblyTypeLink: `/component-platform-http`,
-        camelTypeLink: `/platform-http-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path<br/>
-        <b>Description</b>: The path under which this endpoint serves the HTTP requests.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PGEVENT',
-        assimblyTypeLink: `/component-pgevent`,
-        camelTypeLink: `/pgevent-component.html`,
-        uriPlaceholder: 'host:port/database/channel',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: To connect using hostname and port to the database.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: localhost<br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: To connect using hostname and port to the database.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 5432<br/>
-        <b>Data Type</b>: Integer<br/>
-        <b>Name</b>: database<br/>
-        <b>Description</b>: The database name.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: channel<br/>
-        <b>Description</b>: The channel name.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: create<br/>
-    `
-    },
-    {
-        name: 'PG-REPLICATION-SLOT',
-        assimblyTypeLink: `/component-replication-slot`,
-        camelTypeLink: `/pg-replication-slot-component.html`,
-        uriPlaceholder: 'host:port/database/slot:outputPlugin',
-        uriPopoverMessage: `
-        <b>Name</b>: slot<br/>
-        <b>Description</b>: Replication Slot name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Postgres host.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: localhost<br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Postgres port.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 5432<br/>
-        <b>Data Type</b>: Integer<br/>
-        <b>Name</b>: database<br/>
-        <b>Description</b>: Postgres database name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: outputPlugin<br/>
-        <b>Description</b>: Output plugin name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PUBNUB',
-        assimblyTypeLink: `/component-pubnub`,
-        camelTypeLink: `/pubnub-component.html`,
-        uriPlaceholder: 'channel',
-        uriPopoverMessage: `
-        <b>Name</b>: channel<br/>
-        <b>Description</b>: The channel used for subscribing/publishing events.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'PULSAR',
-        assimblyTypeLink: `/component-pulsar`,
-        camelTypeLink: `/pulsar-component.html`,
-        uriPlaceholder: 'persistence://tenant/namespace/topic',
-        uriPopoverMessage: `
-        <b>Name</b>: persistence<br/>
-        <b>Description</b>: Whether the topic is persistent or non-persistent. The value can be one of: persistent, non-persistent.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: tenant<br/>
-        <b>Description</b>: The tenant.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: namespace<br/>
-        <b>Description</b>: The namespace.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: The topic.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'QUARTZ2',
-        assimblyTypeLink: `/component-quartz`,
-        camelTypeLink: `/quartz-component.html`,
-        uriPlaceholder: 'groupName/triggerName',
-        uriPopoverMessage: `
-        <b>Name</b>: groupName<br/>
-        <b>Description</b>: The quartz group name to use. The combination of group name and timer name should be unique.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: Camel <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: triggerName<br/>
-        <b>Description</b>: The quartz timer name to use. The combination of group name and timer name should be unique.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'QUICKFIX',
-        assimblyTypeLink: `/component-quickfix`,
-        camelTypeLink: `/quickfix-component.html`,
-        uriPlaceholder: 'configurationName',
-        uriPopoverMessage: `
-        <b>Name</b>: configurationName<br/>
-        <b>Description</b>: The configFile is the name of the QuickFIX/J configuration to use for the FIX engine (located as a resource found in your classpath).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'RABBITMQ',
-        assimblyTypeLink: `/component-rabbitmq`,
-        camelTypeLink: `/rabbitmq-component.html`,
-        uriPlaceholder: 'hostname[:port]/exchangeName',
-        uriPopoverMessage: `
-        <b>Name</b>: rabbitmq<br/>
-        <b>Description</b>:  The name of the endpoint<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>:  The hostname of the running rabbitmq instance or cluster.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>:  Port is optional and if not specified then defaults to the RabbitMQ client default (5672)<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Name</b>: exchangeName<br/>
-        <b>Description</b>:  The exchange name determines which exchange produced messages will sent to.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'REACTIVE-STREAMS',
-        assimblyTypeLink: `/component-reactive-streams`,
-        camelTypeLink: `/reactive-streams-component.html`,
-        uriPlaceholder: 'stream',
-        uriPopoverMessage: `
-        <b>Name</b>: stream<br/>
-        <b>Description</b>: Name of the stream channel used by the endpoint to exchange messages.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'REF',
-        assimblyTypeLink: `/component-ref`,
-        camelTypeLink: `/ref-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name of endpoint to lookup in the registry.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'REST',
-        assimblyTypeLink: `/component-rest`,
-        camelTypeLink: `/rest-component.html`,
-        uriPlaceholder: 'method:path:{uriTemplate}',
-        uriPopoverMessage: `
-        <b>Name</b>: method<br/>
-        <b>Description</b>:  http method like get or post<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Enumeration. Valid values: get, post, put, patch, delete, head, trace, connect, options<br/><br/>
-        <b>Name</b>: path<br/>
-        <b>Description</b>:  basepath or the REST url<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: uriTemplate<br/>
-        <b>Description</b>:  uri template with support for REST Syntax<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String (REST URI)<br/><br/>
-        <b>Example</b>: get:test or post:test<br/>
-        `
-    },
-    {
-        name: 'REST-API',
-        assimblyTypeLink: `/component-rest-api`,
-        camelTypeLink: `/rest-api-component.html`,
-        uriPlaceholder: 'path/contextIdPattern',
-        uriPopoverMessage: `
-        <b>Name</b>: path<br/>
-        <b>Description</b>: The base path.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: contextIdPattern<br/>
-        <b>Description</b>: Optional CamelContext id pattern to only allow Rest APIs from rest services within CamelContext’s which name matches the pattern.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'RESTEASY',
-        assimblyTypeLink: `/component-resteasy`,
-        camelTypeLink: `/resteasy-component.html`,
-        uriPlaceholder: 'httpUri',
-        uriPopoverMessage: `
-        <b>Name</b>: httpUri<br/>
-        <b>Description</b>: The url of the HTTP endpoint to call.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'RESTLET',
-        assimblyTypeLink: `/component-restlet`,
-        camelTypeLink: `/restlet-component.html`,
-        uriPlaceholder: 'protocol://hostname[:port][/resourcePattern]',
-        uriPopoverMessage: `
-        <b>Name</b>: protocol<br/>
-        <b>Description</b>: The protocol to use which is http or https.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The hostname of the restlet service.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The port number of the restlet service.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: uriPattern<br/>
-        <b>Description</b>: The resource pattern such as /customer/id.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'REST-OPENAPI',
-        assimblyTypeLink: `/component-rest-openapi`,
-        camelTypeLink: `/rest-openapi-component.html`,
-        uriPlaceholder: 'specificationUri#operationId',
-        uriPopoverMessage: `
-        <b>Name</b>: specificationUri<br/>
-        <b>Description</b>: Path to the OpenApi specification file.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Default</b>: openapi.json <br/>
-        <b>Data Type</b>: URI<br/><br/>
-        <b>Name</b>: operationId<br/>
-        <b>Description</b>: ID of the operation from the OpenApi specification.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'REST-SWAGGER',
-        assimblyTypeLink: `/component-rest-swagger`,
-        camelTypeLink: `/rest-swagger-component.html`,
-        uriPlaceholder: 'specificationUri#operationId',
-        uriPopoverMessage: `
-        <b>Name</b>: specificationUri<br/>
-        <b>Description</b>: Path to the Swagger specification file. The scheme, host base path are taken from this specification, but these can be overridden with properties on the component or endpoint level.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI<br/><br/>
-        <b>Name</b>: operationId<br/>
-        <b>Description</b>: ID of the operation from the Swagger specification.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'RSS',
-        assimblyTypeLink: `/component-rss`,
-        camelTypeLink: `/rss-component.html`,
-        uriPlaceholder: 'feedUri',
-        uriPopoverMessage: `
-        <b>Name</b>: feedUri<br/>
-        <b>Description</b>: The URI to the feed to poll.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'SAGA',
-        assimblyTypeLink: `/component-saga`,
-        camelTypeLink: `/saga-component.html`,
-        uriPlaceholder: 'action',
-        uriPopoverMessage: `
-        <b>Name</b>: action<br/>
-        <b>Description</b>: Action to execute (complete or compensate). The value can be one of: COMPLETE, COMPENSATE.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: SagaEndpointAction<br/><br/>
-        `
-    },
-    {
-        name: 'SALESFORCE',
-        assimblyTypeLink: `/component-salesforce`,
-        camelTypeLink: `/salesforce-component.html`,
-        uriPlaceholder: 'operationName:topicName',
-        uriPopoverMessage: `
-        <b>Name</b>: operationName<br/>
-        <b>Description</b>: The operation to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: OperationName<br/><br/>
-        <b>Name</b>: topicName<br/>
-        <b>Description</b>: The name of the topic/channel to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'SAP-NETWEAVER',
-        assimblyTypeLink: `/component-sap-netweaver`,
-        camelTypeLink: `/sap-netweaver-component.html`,
-        uriPlaceholder: 'url',
-        uriPopoverMessage: `
-        <b>Name</b>: url<br/>
-        <b>Description</b>: Url to the SAP net-weaver gateway server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        `
-    },
-    {
-        name: 'SCHEDULER',
-        assimblyTypeLink: `/component-scheduler`,
-        camelTypeLink: `/scheduler-component.html`,
-        uriPlaceholder: 'schedulerName',
-        uriPopoverMessage: `
-        <b>Name</b>: schedulerName<br/>
-        <b>Description</b>: The name for the scheduler<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: foo<br/>
-    `
-    },
-    {
-        name: 'SCHEMATRON',
-        assimblyTypeLink: `/component-schematron`,
-        camelTypeLink: `/schematron-component.html`,
-        uriPlaceholder: 'path',
-        uriPopoverMessage: `
-        <b>Name</b>: path<br/>
-        <b>Description</b>: The path to the schematron rules file. Can either be in class path or location in the file system.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'SCP',
-        assimblyTypeLink: `/component-scp`,
-        camelTypeLink: `/scp-component.html`,
-        uriPlaceholder: 'host:port/directoryName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname of the FTP server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port of the FTP server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: int<br/>
-        <b>Name</b>: directoryName<br/>
-        <b>Description</b>: The starting directory.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'SERVICE',
-        assimblyTypeLink: `/component-service`,
-        camelTypeLink: `/service-component.html`,
-        uriPlaceholder: 'delegateUri',
-        uriPopoverMessage: `
-        <b>Name</b>: delegateUri<br/>
-        <b>Description</b>: The endpoint uri to expose as service<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SERVICENOW',
-        assimblyTypeLink: `/component-servicenow`,
-        camelTypeLink: `/servicenow-component.html`,
-        uriPlaceholder: 'instanceName',
-        uriPopoverMessage: `
-        <b>Name</b>: instanceName<br/>
-        <b>Description</b>:  The ServiceNow instance name<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SERVLET',
-        assimblyTypeLink: `/component-servlet`,
-        camelTypeLink: `/servlet-component.html`,
-        uriPlaceholder: 'contextPath',
-        uriPopoverMessage: `
-        <b>Name</b>: contextPath<br/>
-        <b>Description</b>:  The context-path to use<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SEDA',
-        assimblyTypeLink: `/component-seda`,
-        camelTypeLink: `/seda-component.html`,
-        uriPlaceholder: 'queueName',
-        uriPopoverMessage: `
-        <b>Name</b>: queueName<br/>
-        <b>Description</b>: Internal (asynchhonous) queue between two flows<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Example</b>: test<br/>
-    `
-    },
-    {
-        name: 'SFTP',
-        assimblyTypeLink: `/component-sftp`,
-        camelTypeLink: `/sftp-component.html`,
-        uriPlaceholder: 'host:port/directoryName',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname of the FTP server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/>
-        <br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port of the FTP server.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: 22<br/>
-        <b>Data Type</b>: int<br/>
-        <br/>
-        <b>Name</b>: directoryName<br/>
-        <b>Description</b>: The starting directory.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: servername:22/dir1/subdir<br/>
-    `
-    },
-    {
-        name: 'SJMS',
-        assimblyTypeLink: `/component-sjms`,
-        camelTypeLink: `/sjms-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
-    `
-    },
-    {
-        name: 'SJMS2',
-        assimblyTypeLink: `/component-sjms2`,
-        camelTypeLink: `/sjms2-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use. The value can be one of: queue, topic.<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: DestinationName is a JMS queue or topic name. By default, the destinationName is interpreted as a queue name..<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'SIP',
-        assimblyTypeLink: `/component-sip`,
-        camelTypeLink: `/sip-component.html`,
-        uriPlaceholder: 'uri',
-        uriPopoverMessage: `
-        <b>Name</b>: uri<br/>
-        <b>Description</b>: URI of the SIP server to connect to (the username and password can be included such as: john:secretmyserver:9999)<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI <br/><br/>
-    `
-    },
-    {
-        name: 'SLACK',
-        assimblyTypeLink: `/component-slack`,
-        camelTypeLink: `/slack-component.html`,
-        uriPlaceholder: '#channel',
-        uriPopoverMessage: `
-        <b>Name</b>: Slack<br/>
-        <b>Description</b>:  The name of the instance of Slack<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: channel<br/>
-        <b>Description</b>: Channel is like a room for discussions (ex. topic, discussion, team)<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: ?<br/>
-    `
-    },
-    {
-        name: 'SMTP',
-        assimblyTypeLink: `/component-smtp`,
-        camelTypeLink: `/mail-component.html`,
-        uriPlaceholder: 'host[:port]',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>:  Mail server<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-		<b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Default</b>: 25<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: localhost:143<br/>
-    `
-    },
-    {
-        name: 'SMTPS',
-        assimblyTypeLink: `/component-smtp`,
-        camelTypeLink: `/mail-component.html`,
-        uriPlaceholder: 'host[:port]',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>:  Mail server over SSL<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-		<b>Name</b>: port<br/>
-        <b>Description</b>: Network port<br/>
-        <b>Default</b>: 465<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Example</b>: localhost:993<br/>
-    `
-    },
-    {
-        name: 'SMPP',
-        assimblyTypeLink: `/component-smpp`,
-        camelTypeLink: `/smpp-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname for the SMSC server to use.<br/>
-        <b>Required</b>: no <br/>
-        <b>Default</b>: localhost <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number for the SMSC server to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Default</b>: 2775 <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-    `
-    },
-    {
-        name: 'SNMP',
-        assimblyTypeLink: `/component-snmp`,
-        camelTypeLink: `/snmp-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname of the SNMP enabled device.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number of the SNMP enabled device.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-    `
-    },
-    {
-        name: 'SOLR',
-        assimblyTypeLink: `/component-solr`,
-        camelTypeLink: `/solr-component.html`,
-        uriPlaceholder: 'url',
-        uriPopoverMessage: `
-        <b>Name</b>: url<br/>
-        <b>Description</b>: Hostname and port for the solr server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'SONICMQ',
-        assimblyTypeLink: `/component-sonicmq`,
-        camelTypeLink: `/sjms-component.html`,
-        uriPlaceholder: 'destinationType:destinationName',
-        uriPopoverMessage: `
-        <b>Name</b>: destinationType<br/>
-        <b>Description</b>: The kind of destination to use (queue or topic).<br/>
-        <b>Default</b>: queue<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/>
-        <br/>
-        <b>Name</b>: destinationName<br/>
-        <b>Description</b>: The name of destination, a JMS queue or topic name.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: queue:order or just order (without destinationType) / topic:order<br/>
-    `
-    },
-    {
-        name: 'SOROUSH',
-        assimblyTypeLink: `/component-soroush`,
-        camelTypeLink: `/soroush-component.html`,
-        uriPlaceholder: 'action',
-        uriPopoverMessage: `
-        <b>Name</b>: action<br/>
-        <b>Description</b>: The action to do. The value can be one of: sendMessage, getMessage, uploadFile, downloadFile<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: SoroushAction <br/><br/>
-    `
-    },
-    {
-        name: 'SPARK',
-        assimblyTypeLink: `/component-spark`,
-        camelTypeLink: `/spark-component.html`,
-        uriPlaceholder: 'endpointType',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointType<br/>
-        <b>Description</b>: Type of the endpoint (rdd, dataframe, hive). The value can be one of: rdd, dataframe, hive.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Enumeration. Valid values: queue, topic<br/><br/>
-        <b>Example</b>: dataframe<br/>
-    `
-    },
-    {
-        name: 'SPLUNK',
-        assimblyTypeLink: `/component-splunk`,
-        camelTypeLink: `/splunk-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name has no purpose<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPLUNK-HEC',
-        assimblyTypeLink: `/component-splunk-hec`,
-        camelTypeLink: `/splunk-hec-component.html`,
-        uriPlaceholder: '[endpoint]/[token]',
-        uriPopoverMessage: `
-        <b>Name</b>: endpoint<br/>
-        <b>Description</b>: Splunk Host URL<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: token<br/>
-        <b>Description</b>: Splunk authorization token<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-BATCH',
-        assimblyTypeLink: `/component-spring-batch`,
-        camelTypeLink: `/spring-batch-component.html`,
-        uriPlaceholder: 'jobName',
-        uriPopoverMessage: `
-        <b>Name</b>: jobName<br/>
-        <b>Description</b>: The name of the Spring Batch job located in the registry.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-JDBC',
-        assimblyTypeLink: `/component-spring-jdbc`,
-        camelTypeLink: `/spring-jdbc-component.html`,
-        uriPlaceholder: 'dataSourceName',
-        uriPopoverMessage: `
-        <b>Name</b>: dataSourceName<br/>
-        <b>Description</b>: Name of DataSource to lookup in the Registry. If the name is dataSource or default, then Camel will attempt to lookup a default DataSource from the registry, meaning if there is a only one instance of DataSource found, then this DataSource will be used.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-EVENT',
-        assimblyTypeLink: `/component-spring-event`,
-        camelTypeLink: `/spring-event-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: Name of endpoint.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-INTEGRATION',
-        assimblyTypeLink: `/component-spring-integration`,
-        camelTypeLink: `/spring-integration-component.html`,
-        uriPlaceholder: 'defaultChannel',
-        uriPopoverMessage: `
-        <b>Name</b>: defaultChannel<br/>
-        <b>Description</b>: The default channel name which is used by the Spring Integration Spring context. It will equal to the inputChannel name for the Spring Integration consumer and the outputChannel name for the Spring Integration provider.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-LDAP',
-        assimblyTypeLink: `/component-spring-ldap`,
-        camelTypeLink: `/spring-ldap-component.html`,
-        uriPlaceholder: 'templateName',
-        uriPopoverMessage: `
-        <b>Name</b>: templateName<br/>
-        <b>Description</b>: Name of the Spring LDAP Template bean.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-RABBITMQ',
-        assimblyTypeLink: `/component-spring-rabbitmq`,
-        camelTypeLink: `/spring-rabbitmq-component.html`,
-        uriPlaceholder: 'exchangeName',
-        uriPopoverMessage: `
-        <b>Name</b>: exchangeName<br/>
-        <b>Description</b>: he exchange name determines the exchange to which the produced messages will be sent to. In the case of consumers, the exchange name determines the exchange the queue will be bound to. Note: to use default exchange then do not use empty name, but use default instead.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-REDIS',
-        assimblyTypeLink: `/component-spring-redis`,
-        camelTypeLink: `/spring-redis-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The host where Redis server is running.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Redis server port number.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer<br/><br/>
-    `
-    },
-    {
-        name: 'SPRING-WS',
-        assimblyTypeLink: `/component-spring-ws`,
-        camelTypeLink: `/spring-ws-component.html`,
-        uriPlaceholder: 'type:lookupKey:webServiceEndpointUri',
-        uriPopoverMessage: `
-        <b>Name</b>: type<br/>
-        <b>Description</b>: Endpoint mapping type if endpoint mapping is used.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: EndpointMappingType<br/><br/>
-        <b>Name</b>: lookupKey<br/>
-        <b>Description</b>: Endpoint mapping key if endpoint mapping is used.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: webServiceEndpointUri<br/>
-        <b>Description</b>: The default Web Service endpoint uri to use for the producer.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: expression<br/>
-        <b>Description</b>: The XPath expression to use when option type=xpathresult. Then this option is required to be configured.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'SQL',
-        assimblyTypeLink: `/component-sql`,
-        camelTypeLink: `/sql-component.html`,
-        uriPlaceholder: 'query',
-        uriPopoverMessage: `
-        <b>Name</b>: query<br/>
-        <b>Description</b>: Sets the SQL query to perform. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: select id from order<br/>
-    `
-    },
-    {
-        name: 'SQL-STORED',
-        assimblyTypeLink: `/component-sql-stored`,
-        camelTypeLink: `/sql-stored-component.html`,
-        uriPlaceholder: 'template',
-        uriPopoverMessage: `
-        <b>Name</b>: template<br/>
-        <b>Description</b>: Sets the StoredProcedure template to perform. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'SSH',
-        assimblyTypeLink: `/component-ssh`,
-        camelTypeLink: `/ssh-component.html`,
-        uriPlaceholder: 'host:port',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Sets the hostname of the remote SSH server. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Sets the port number for the remote SSH server. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: int<br/><br/>
-        <b>Example</b>: localhost:22 <br/>
-    `
-    },
-    {
-        name: 'STAX',
-        assimblyTypeLink: `/component-stax`,
-        camelTypeLink: `/stax-component.html`,
-        uriPlaceholder: 'contentHandlerClass',
-        uriPopoverMessage: `
-        <b>Name</b>: contentHandlerClass<br/>
-        <b>Description</b>: The FQN class name for the ContentHandler implementation to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'STICH',
-        assimblyTypeLink: `/component-stich`,
-        camelTypeLink: `/stich-component.html`,
-        uriPlaceholder: '[tableName]',
-        uriPopoverMessage: `
-        <b>Name</b>: [tableName]<br/>
-        <b>Description</b>:The name of the destination table the data is being pushed to. Table names must be unique in each destination schema, or loading issues will occur. Note: The number of characters in the table name should be within the destination’s allowed limits or data will rejected.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'STOMP',
-        assimblyTypeLink: `/component-stomp`,
-        camelTypeLink: `/stomp-component.html`,
-        uriPlaceholder: 'destination',
-        uriPopoverMessage: `
-        <b>Name</b>: destination<br/>
-        <b>Description</b>: Name of the queue.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'SQL-STORED',
-        assimblyTypeLink: `/component-sql-stored`,
-        camelTypeLink: `/sql-stored-component.html`,
-        uriPlaceholder: 'template',
-        uriPopoverMessage: `
-        <b>Name</b>: template<br/>
-        <b>Description</b>: Template is the stored procedure template, where you declare the name of the stored procedure and the IN, INOUT, and OUT arguments. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: STOREDSAMPLE(INTEGER 1,OUT INTEGER result2)<br/>
-    `
-    },
-    {
-        name: 'STREAM',
-        assimblyTypeLink: `/component-stream`,
-        camelTypeLink: `/stream-component.html`,
-        uriPlaceholder: 'kind',
-        uriPopoverMessage: `
-        <b>Name</b>: kind<br/>
-        <b>Description</b>: Kind of stream to use such as System.in or System.out.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Example</b>: <i>out</i> or <i>in</i> or <i>err</i><br/>
-    `
-    },
-    {
-        name: 'STUB',
-        assimblyTypeLink: `/component-stub`,
-        camelTypeLink: `/stub-component.html`,
-        uriPlaceholder: 'someUri',
-        uriPopoverMessage: `
-        <b>Name</b>: uri<br/>
-        <b>Description</b>: Any endpoint URI to stub out the endpoint. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Example</b>: smtp://somehost.foo.com?user=whatnot&something=else<br/>
-    `
-    },
-    {
-        name: 'TELEGRAM',
-        assimblyTypeLink: `/component-telegram`,
-        camelTypeLink: `/telegram-component.html`,
-        uriPlaceholder: 'type/authorizationToken',
-        uriPopoverMessage: `
-        <b>Name</b>: type<br/>
-        <b>Description</b>: Type of endpoint (currently only bots is supported)<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String <br/><br/>
-        <b>Name</b>: authorizationToken<br/>
-        <b>Description</b>: The authorization token for using the bot<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Token <br/><br/>
-        <b>Example</b>: bots/123456789:AAE_dLq5C19xwGjw3yiC2NvEUrZcejK21-Q987654321:AAE_dLq5C19xwOmg5yiC2NvSrkT3wj5Q1-L<br/>
-    `
-    },
-    {
-        name: 'THRIFT',
-        assimblyTypeLink: `/component-thrift`,
-        camelTypeLink: `/thrift-component.html`,
-        uriPlaceholder: 'host:port/service',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: The Thrift server host name. This is localhost or 0.0.0.0 (if not defined) when being a consumer or remote server host name when using producer.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The Thrift server port.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer<br/>
-        <b>Name</b>: service<br/>
-        <b>Description</b>: Fully qualified service name from the thrift descriptor file (package dot service definition name).<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'TIKA',
-        assimblyTypeLink: `/component-tika`,
-        camelTypeLink: `/tika-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: Operation type. The value can be one of: parse, detect<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: TikaOperation<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'TIMER',
-        assimblyTypeLink: `/component-timer`,
-        camelTypeLink: `/timer-component.html`,
-        uriPlaceholder: 'timerName',
-        uriPopoverMessage: `
-        <b>Name</b>: timerName<br/>
-        <b>Description</b>: The name for the timer<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: foo<br/>
-    `
-    },
-    {
-        name: 'TWILIO',
-        assimblyTypeLink: `/component-twilio`,
-        camelTypeLink: `/twilio-component.html`,
-        uriPlaceholder: 'apiName/methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: apiName<br/>
-        <b>Description</b>: What kind of operation to perform.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: TwilioApiName<br/>
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What sub operation to use for the selected operation. The value can be one of: create, delete, fetch, read, update.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-        <b>Example</b>: ACCOUNT/create<br/>
-    `
-    },
-    {
-        name: 'TWITTER-DIRECTMESSAGE',
-        assimblyTypeLink: `/component-twitter-directmessage`,
-        camelTypeLink: `/twitter-directmessage-component.html`,
-        uriPlaceholder: 'user',
-        uriPopoverMessage: `
-        <b>Name</b>: user<br/>
-        <b>Description</b>: The user name to send a direct message. This will be ignored for consumer.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'TWITTER-SEARCH',
-        assimblyTypeLink: `/component-twitter-search`,
-        camelTypeLink: `/twitter-search-component.html`,
-        uriPlaceholder: 'keywords',
-        uriPopoverMessage: `
-        <b>Name</b>: keywords<br/>
-        <b>Description</b>: The search query, use the keywords AND, OR, - and () to narrow the search results.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'TWITTER-TIMELINE',
-        assimblyTypeLink: `/component-twitter-timeline`,
-        camelTypeLink: `/twitter-timeline-component.html`,
-        uriPlaceholder: 'timelineType',
-        uriPopoverMessage: `
-        <b>Name</b>: timelineType<br/>
-        <b>Description</b>: The timeline type to produce/consume. The value can be one of: PUBLIC, HOME, USER, MENTIONS, RETWEETSOFME, UNKNOWN.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: TimelineType<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'UNDERTOW',
-        assimblyTypeLink: `/component-undertow`,
-        camelTypeLink: `/undertow-component.html`,
-        uriPlaceholder: 'httpURI',
-        uriPopoverMessage: `
-        <b>Name</b>: httpURI<br/>
-        <b>Description</b>: The url of the HTTP endpoint to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: URI<br/>
-        <br/>
-    `
-    },
-    {
-        name: 'VALIDATOR',
-        assimblyTypeLink: `/component-validator`,
-        camelTypeLink: `/validator-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: URL to a local resource on the classpath, or a reference to lookup a bean in the Registry, or a full URL to a remote resource or resource on the file system which contains the XSD to validate against.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Example</b>: http://acme.com/cheese.xsd | file:../foo/bar.xsd <br/>
-    `
-    },
-    {
-        name: 'VELOCITY',
-        assimblyTypeLink: `/component-velocity`,
-        camelTypeLink: `/velocity-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the resource. You can prefix with: classpath, file, http, ref, or bean. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'VERTX',
-        assimblyTypeLink: `/component-vertx`,
-        camelTypeLink: `/vertx-component.html`,
-        uriPlaceholder: 'address',
-        uriPopoverMessage: `
-        <b>Name</b>: address<br/>
-        <b>Description</b>: Sets the event bus address used to communicate. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'VERTX-HTTP',
-        assimblyTypeLink: `/component-vertx-http`,
-        camelTypeLink: `/vertx-http-component.html`,
-        uriPlaceholder: 'hostname[:port][/resourceUri]',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Sets the hostname of the url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The http port<br/>
-        <b>Required</b>: not <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: The url extension<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'VERTX-KAFKA',
-        assimblyTypeLink: `/component-vertx-kafka`,
-        camelTypeLink: `/vertx-kafka-component.html`,
-        uriPlaceholder: 'topic',
-        uriPopoverMessage: `
-        <b>Name</b>: topic<br/>
-        <b>Description</b>: Name of the topic to use. On the consumer you can use comma to separate multiple topics. A producer can only send a message to a single topic.. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'VERTX-WEBSOCKET',
-        assimblyTypeLink: `/component-vertx-websocket`,
-        camelTypeLink: `/vertx-websocket-component.html`,
-        uriPlaceholder: 'hostname[:port][/resourceUri]',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: Sets the hostname of the url. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The http port<br/>
-        <b>Required</b>: not <br/>
-        <b>Data Type</b>: Integer <br/><br/>
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: The url extension<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String <br/><br/>
-    `
-    },
-    {
-        name: 'VM',
-        assimblyTypeLink: `/component-vm`,
-        camelTypeLink: `/vm-component.html`,
-        uriPlaceholder: 'queueName',
-        uriPopoverMessage: `
-        <b>Name</b>: queueName<br/>
-        <b>Description</b>: Internal queue between two flows<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Example</b>: test<br/>
-    `
-    },
-    {
-        name: 'WASTEBIN',
-        assimblyTypeLink: `/component-wastebin`,
-        camelTypeLink: `/mock-component.html`,
-        uriPlaceholder: '',
-        uriPopoverMessage: `
-        <b>Description</b>: This set automatically the endpoint mock:wastebin<br/>
-    `
-    },
-    {
-        name: 'WEBSOCKET',
-        assimblyTypeLink: `/component-websocket`,
-        camelTypeLink: `/websocket-component.html`,
-        uriPlaceholder: 'host:port/resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: hostname<br/>
-        <b>Description</b>: The hostname. The default value is 0.0.0.0. Setting this option on the component will use the component configured value as default.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: The port number. The default value is 9292. Setting this option on the component will use the component configured value as default.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: Integer<br/><br/>
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Required Name of the websocket channel to use<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: options<br/>
-        <b>Description</b>: The Jetty Websocket component supports 14 options<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Example</b>: //hostname[:port][/resourceUri][?options]<br/>
-    `
-    },
-    {
-        name: 'WEATHER',
-        assimblyTypeLink: `/component-weather`,
-        camelTypeLink: `/weather-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The name value is not used.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'WEB3J',
-        assimblyTypeLink: `/component-web3j`,
-        camelTypeLink: `/web3j-component.html`,
-        uriPlaceholder: 'nodeAddress',
-        uriPopoverMessage: `
-        <b>Name</b>: nodeAddress<br/>
-        <b>Description</b>: Sets the node address used to communicate.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'WEBHOOK',
-        assimblyTypeLink: `/component-webhook`,
-        camelTypeLink: `/webhook-component.html`,
-        uriPlaceholder: 'endpointUri',
-        uriPopoverMessage: `
-        <b>Name</b>: endpointUri<br/>
-        <b>Description</b>: The delegate uri. Must belong to a component that supports webhooks.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'WEKA',
-        assimblyTypeLink: `/component-weka`,
-        camelTypeLink: `/weka-component.html`,
-        uriPlaceholder: 'command',
-        uriPopoverMessage: `
-        <b>Name</b>: command<br/>
-        <b>Description</b>: The command to use. The value can be one of: filter, model, read, write, push, pop, version.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Command<br/><br/>
-    `
-    },
-    {
-        name: 'WORDPRESS',
-        assimblyTypeLink: `/component-wordpress`,
-        camelTypeLink: `/wordpress-component.html`,
-        uriPlaceholder: 'operation',
-        uriPopoverMessage: `
-        <b>Name</b>: operation<br/>
-        <b>Description</b>: The endpoint operation. The value can be one of: post, user.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: operationDetail<br/>
-        <b>Description</b>: The second part of an endpoint operation. Needed only when endpoint semantic is not enough, like wordpress:post:delete. <br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'WORKDAY',
-        assimblyTypeLink: `/component-workday`,
-        camelTypeLink: `/workday-component.html`,
-        uriPlaceholder: 'entity:path',
-        uriPopoverMessage: `
-        <b>Name</b>: entity<br/>
-        <b>Description</b>: The entity to be requested or subscribed via API. The value can be one of: report<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Entity<br/><br/>
-        <b>Name</b>: path<br/>
-        <b>Description</b>: The API path to access an entity structure.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XCHANGE',
-        assimblyTypeLink: `/component-xchange`,
-        camelTypeLink: `/xchange-component.html`,
-        uriPlaceholder: 'name',
-        uriPopoverMessage: `
-        <b>Name</b>: name<br/>
-        <b>Description</b>: The exchange to connect to.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XJ',
-        assimblyTypeLink: `/component-xj`,
-        camelTypeLink: `/xj-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the template.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XMPP',
-        assimblyTypeLink: `/component-xmpp`,
-        camelTypeLink: `/xmpp-component.html`,
-        uriPlaceholder: 'host:port/participant',
-        uriPopoverMessage: `
-        <b>Name</b>: host<br/>
-        <b>Description</b>: Hostname for the chat server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: port<br/>
-        <b>Description</b>: Port number for the chat server.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: Integer<br/><br/>
-        <b>Name</b>: participant<br/>
-        <b>Description</b>: JID (Jabber ID) of person to receive messages. room parameter has precedence over participant.<br/>
-        <b>Required</b>: no <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XQUERY',
-        assimblyTypeLink: `/component-xquery`,
-        camelTypeLink: `/xquery-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: The name of the template to load from classpath or file system.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XSLT',
-        assimblyTypeLink: `/component-xslt`,
-        camelTypeLink: `/xslt-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the template.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'XSLT-SAXON',
-        assimblyTypeLink: `/component-xslt-saxon`,
-        camelTypeLink: `/xslt-saxon-component.html`,
-        uriPlaceholder: 'resourceUri',
-        uriPopoverMessage: `
-        <b>Name</b>: resourceUri<br/>
-        <b>Description</b>: Path to the template.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'YAMMER',
-        assimblyTypeLink: `/component-yammer`,
-        camelTypeLink: `/yammer-component.html`,
-        uriPlaceholder: 'function',
-        uriPopoverMessage: `
-        <b>Name</b>: function<br/>
-        <b>Description</b>: The function to use. The value can be one of: MESSAGES, MY_FEED, ALGO, FOLLOWING, SENT, PRIVATE, RECEIVED, USERS, CURRENT.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: YammerFunctionType<br/><br/>
-    `
-    },
-    {
-        name: 'ZENDESK',
-        assimblyTypeLink: `/component-zendesk`,
-        camelTypeLink: `/zendesk-component.html`,
-        uriPlaceholder: 'methodName',
-        uriPopoverMessage: `
-        <b>Name</b>: methodName<br/>
-        <b>Description</b>: What operation to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'ZOOKEEPER',
-        assimblyTypeLink: `/component-zookeeper`,
-        camelTypeLink: `/zookeeper-component.html`,
-        uriPlaceholder: 'serverUrls/path',
-        uriPopoverMessage: `
-        <b>Name</b>: serverUrls<br/>
-        <b>Description</b>: The zookeeper server hosts (multiple servers can be separated by comma).<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: path<br/>
-        <b>Description</b>: The node in the ZooKeeper server (aka znode). <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    },
-    {
-        name: 'ZOOKEEPER-MASTER',
-        assimblyTypeLink: `/component-zookeeper-master`,
-        camelTypeLink: `/zookeeper-master-component.html`,
-        uriPlaceholder: 'groupName:consumerEndpointUri',
-        uriPopoverMessage: `
-        <b>Name</b>: groupName<br/>
-        <b>Description</b>: The name of the cluster group to use.<br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-        <b>Name</b>: consumerEndpointUri<br/>
-        <b>Description</b>: The consumer endpoint to use in master/slave mode. <br/>
-        <b>Required</b>: yes <br/>
-        <b>Data Type</b>: String<br/><br/>
-    `
-    }
-];
+// How to renew the list
+// 1) Run Assimbly and go to (Administration --> API)
+// 2) Run the 'getComponents' API under flow
+// 3) Replace the JSON in this file and add custom components at the end (currently starting after last entry of the json).
 
 // add the component types for a specific endpoint
 @Injectable({
     providedIn: 'root'
 })
 export class Components {
-    fromTypes = [
-        'ACTIVEMQ',
-        'AHC-WS',
-        'AMAZONMQ',
-        'AMQP',
-        'AMQPS',
-        'APNS',
-        'AS2',
-        'AWS2DDBSTREAM',
-        'AWS2KINESIS',
-        'AWS2S3',
-        'AWS2SQS',
-        'ASTERISK',
-        'ATMOS',
-        'ATMOSPHERE-WEBSOCKET',
-        'ATOM',
-        'ATOMIX-MAP',
-        'ATOMIX-MESSAGING',
-        'ATOMIX-QUEUE',
-        'ATOMIX-SET',
-        'ATOMIX-VALUE',
-        'AVRO',
-        'AZURE-COSMOSDB',
-        'AZURE-EVENTHUBS',
-        'AZURE-STORAGE-BLOB',
-        'AZURE-STORAGE-DATALAKE',
-        'AZURE-STORAGE-QUEUE',
-        'BEANSTALK',
-        'BOX',
-        'BRAINTREE',
-        'BROWSE',
-        'CQL',
-        'CMIS',
-        'COAP',
-        'COMETD',
-        'CONSUL',
-        'CORDA',
-        'COUCHBASE',
-        'COUCHDB',
-        'CXF',
-        'CXFRS',
-        'DATASET',
-        'DEBEZIUM-MONGODB',
-        'DEBEZIUM-MYSQL',
-        'DEBEZIUM-POSTGRESQL',
-        'DEBEZIUM-SQLSERVER',
-        'DIRECT',
-        'DIRECT-VM',
-        'DISRUPTOR',
-        'DROPBOX',
-        'DOCKER',
-        'EHCACHE',
-        'ELSQL',
-        'ETCDSTATS',
-        'FACEBOOK',
-        'FHIR',
-        'FILE',
-        'FILE-WATCH',
-        'FLATPACK',
-        'FTP',
-        'FTPS',
-        'GIT',
-        'GITHUB',
-        'GOOGLE-CALENDAR',
-        'GOOGLE-DRIVE',
-        'GOOGLE-MAIL',
-        'GOOGLE-PUBSUB',
-        'GOOGLE-SHEETS',
-        'GOOGLE-STORGAGE',
-        'GORA',
-        'GRPC',
-        'GUAVA-EVENTBUS',
-        'HAZELCAST-INSTANCE',
-        'HAZELCAST-LIST',
-        'HAZELCAST-MAP',
-        'HAZELCAST-MULTIMAP',
-        'HAZELCAST-QUEUE',
-        'HAZELCAST-REPLICATEDMAP',
-        'HAZELCAST-SEDA',
-        'HAZELCAST-SET',
-        'HAZELCAST-TOPIC',
-        'HBASE',
-        'HDFS',
-        'IBMMQ',
-        'IEC60870-CLIENT',
-        'IEC60870-SERVER',
-        'IGNITE-CACHE',
-        'IGNITE-EVENTS',
-        'IGNITE-MESSAGING',
-        'IMAP',
-        'IMAPS',
-        'INFINISPAN',
-        'IRC',
-        'JBPM',
-        'JCACHE',
-        'JCLOUDS',
-        'JCR',
-        'JETTY',
-        'JGROUPS',
-        'JGROUPSRAFT',
-        'JIRA',
-        'JMS',
-        'JMX',
-        'JOOQ',
-        'JPA',
-        'JT400',
-        'KAFKA',
-        'KAMELET',
-        'KUBERNETES-DEPLOYMENTS',
-        'KUBERNETES-HPA',
-        'KUBERNETES-JOB',
-        'KUBERNETES-NAMESPACES',
-        'KUBERNETES-NODES',
-        'KUBERNETES-PODS',
-        'KUBERNETES-REPLICATION-CONTROLLERS',
-        'KUBERNETES-SERVICES',
-        'LUMBERJACK',
-        'MASTER',
-        'MILO-CLIENT',
-        'MILO-SERVER',
-        'MINA',
-        'MINIO',
-        'MLLP',
-        'MONGODB',
-        'MONGODB-GRIDFS',
-        'MYBATIS',
-        'NATS',
-        'NITRITE',
-        'NETTY4',
-        'NETTY-HTTP',
-        'NSQ',
-        'OAI-PMH',
-        'OLINGO2',
-        'OLINGO4',
-        'OPTAPLANNER',
-        'PAHO',
-        'PAHO-MQTT5',
-        'PLATFORM-HTTP',
-        'PGEVENT',
-        'PG-REPLICATION-SLOT',
-        'PUBNUB',
-        'PULSAR',
-        'QUARTZ2',
-        'QUICKFIX',
-        'RABBITMQ',
-        'REACTIVE-STREAMS',
-        'REF',
-        'REST',
-        'RESTLET',
-        'REST-API',
-        'RESTEASY',
-        'RSS',
-        'SCHEDULER',
-        'SEDA',
-        'SERVICE',
-        'SERVLET',
-        'SALESFORCE',
-        'SFTP',
-        'SSH',
-        'SJMS',
-        'SJMS2',
-        'SIP',
-        'SLACK',
-        'SMPP',
-        'SNMP',
-        'SMTPS',
-        'SMTP',
-        'SONICMQ',
-        'SOROUSH',
-        'SPLUNK',
-        'SPRING-EVENT',
-        'SPRING-INTEGRATION',
-        'SPRING-RABBITMQ',
-        'SPRING-REDIS',
-        'SPRING-WS',
-        'SQL',
-        'STOMP',
-        'STUB',
-        'STREAM',
-        'TELEGRAM',
-        'THRIFT',
-        'TIMER',
-        'TWILIO',
-        'TWITTER-DIRECTMESSAGE',
-        'TWITTER-SEARCH',
-        'TWITTER-TIMELINE',
-        'VERTX',
-        'VERTX-KAFKA',
-        'VERTX-WEBSOCKET',
-        'VM',
-        'WEATHER',
-        'WEB3J',
-        'WORDPRESS',
-        'WEBSOCKET',
-        'XMPP',
-        'XQUERY',
-        'XSLT',
-        'YAMMER',
-        'ZENDESK',
-        'ZOOKEEPER',
-        'ZOOKEEPER-MASTER'
-    ];
-
-    toTypes = [
-        'ACTIVEMQ',
-        'AHC',
-        'AHC-WS',
-        'AMAZONMQ',
-        'AMQP',
-        'AMQPS',
-        'APNS',
-        'ARANGODB',
-        'AS2',
-        'AWS2ATHENA',
-        'AWS2CW',
-        'AWS2DDB',
-        'AWS2EC2',
-        'AWS2ECS',
-        'AWS2EKS',
-        'AWS2EVENTBRIDGE',
-        'AWS2IAM',
-        'AWS2KMS',
-        'AWS2KINESIS',
-        'AWS2KINESISFIREHOSE',
-        'AWS2LAMBDA',
-        'AWS2MSK',
-        'AWS2MQ',
-        'AWS2S3',
-        'AWS2STS',
-        'AWS2SNS',
-        'AWS2SQS',
-        'AWS2TRANSLATE',
-        'ASTERISK',
-        'ATMOS',
-        'ATMOSPHERE-WEBSOCKET',
-        'ATOMIX-MAP',
-        'ATOMIX-MESSAGING',
-        'ATOMIX-MULTIMAP',
-        'ATOMIX-QUEUE',
-        'ATOMIX-SET',
-        'ATOMIX-VALUE',
-        'ATLASMAP',
-        'AVRO',
-        'AZURE-COSMOSDB',
-        'AZURE-EVENTHUBS',
-        'AZURE-STORAGE-BLOB',
-        'AZURE-STORAGE-DATALAKE',
-        'AZURE-STORAGE-QUEUE',
-        'BEAN',
-        'BEAN-VALIDATOR',
-        'BEANSTALK',
-        'BONITA',
-        'BOX',
-        'BRAINTREE',
-        'BROWSE',
-        'CAFFEINE-CACHE',
-        'CAFFEINE-LOADCACHE',
-        'CQL',
-        'CHATSCRIPT',
-        'CHUNK',
-        'CLASS',
-        'CM-SMS',
-        'CMIS',
-        'COAP',
-        'COMETD',
-        'CONSUL',
-        'CORDA',
-        'COUCHBASE',
-        'COUCHDB',
-        'CRYPTO',
-        'CRYPTO-CMS',
-        'CXF',
-        'CXFRS',
-        'DATAFORMAT',
-        'DATASET',
-        'DATASET-TEST',
-        'DIGITALOCEAN',
-        'DISRUPTOR',
-        'DJL',
-        'DNS',
-        'DOZER',
-        'DIRECT',
-        'DIRECT-VM',
-        'DROPBOX',
-        'DOCKER',
-        'EHCACHE',
-        'ELASTICSEARCH-REST',
-        'ELSQL',
-        'ETCDKEYS',
-        'ETCDSTATS',
-        'ETCDWATCH',
-        'EXEC',
-        'FACEBOOK',
-        'FHIR',
-        'FILE',
-        'FLATPACK',
-        'FLINK',
-        'FOP',
-        'FREEMARKER',
-        'FTP',
-        'FTPS',
-        'GANGLIA',
-        'GEOCODER',
-        'GIT',
-        'GITHUB',
-        'GOOGLE-BIG-QUERY',
-        'GOOGLE-CALENDAR',
-        'GOOGLE-CALENDAR-STREAM',
-        'GOOGLE-DRIVE',
-        'GOOGLE-FUNCTIONS',
-        'GOOGLE-MAIL',
-        'GOOGLE-MAIL-STREAM',
-        'GOOGLE-PUBSUB',
-        'GOOGLE-SHEETS',
-        'GOOGLE-SHEETS-STREAM',
-        'GOOGLE-STORGAGE',
-        'GORA',
-        'GRAPE',
-        'GRAPHQL',
-        'GRPC',
-        'GUAVA-EVENTBUS',
-        'HAZELCAST-ATOMICVALUE',
-        'HAZELCAST-LIST',
-        'HAZELCAST-MAP',
-        'HAZELCAST-MULTIMAP',
-        'HAZELCAST-QUEUE',
-        'HAZELCAST-REPLICATEDMAP',
-        'HAZELCAST-RINGBUFFER',
-        'HAZELCAST-SEDA',
-        'HAZELCAST-SET',
-        'HAZELCAST-TOPIC',
-        'HBASE',
-        'HDFS',
-        'HTTP',
-        'HTTPS',
-        'HWCLOUD-FUNCTIONGRAPH',
-        'HWCLOUD-IAM',
-        'HWCLOUD-SMN',
-        'IBMMQ',
-        'IEC60870-CLIENT',
-        'IEC60870-SERVER',
-        'IGNITE-CACHE',
-        'IGNITE-COMPUTE',
-        'IGNITE-IDGEN',
-        'IGNITE-MESSAGING',
-        'IGNITE-QUEUE',
-        'IGNITE-SETS',
-        'IMAP',
-        'IMAPS',
-        'INFINISPAN',
-        'INFLUXDB',
-        'IOTA',
-        'IPFS',
-        'IRC',
-        'IRONMQ',
-        'JBPM',
-        'JCACHE',
-        'JCLOUDS',
-        'JCR',
-        'JDBC',
-        'JETTY',
-        'JGROUPS',
-        'JGROUPSRAFT',
-        'JING',
-        'JIRA',
-        'JMS',
-        'JOLT',
-        'JOOQ',
-        'JPA',
-        'JSLT',
-        'JSONATA',
-        'JSON-VALIDATOR',
-        'JT400',
-        'KAFKA',
-        'KAMELET',
-        'KUBERNETES-CONFIG-MAPS',
-        'KUBERNETES-DEPLOYMENTS',
-        'KUBERNETES-HPA',
-        'KUBERNETES-JOB',
-        'KUBERNETES-NAMESPACES',
-        'KUBERNETES-NODES',
-        'KUBERNETES-PERSISTENT-VOLUMES',
-        'KUBERNETES-PERSISTENT-VOLUMES-CLAIM',
-        'KUBERNETES-PODS',
-        'KUBERNETES-REPLICATION-CONTROLLERS',
-        'KUBERNETES-RESOURCES-QUOTA',
-        'KUBERNETES-SECRETS',
-        'KUBERNETES-SERVICE-ACCOUNTS',
-        'KUBERNETES-SERVICES',
-        'KUDU',
-        'LANGUAGE',
-        'LDAP',
-        'LDIF',
-        'LOG',
-        'LUCENE',
-        'METRICS',
-        'MICROMETER',
-        'MICROPROFILE-METRICS',
-        'MILO-CLIENT',
-        'MILO-SERVER',
-        'MINA',
-        'MINIO',
-        'MLLP',
-        'MOCK',
-        'MONGODB',
-        'MONGODB-GRIDFS',
-        'MSV',
-        'MUSTACHE',
-        'MVEL',
-        'MYBATIS',
-        'MYBATIS-BEAN',
-        'NAGIOS',
-        'NATS',
-        'NETTY4',
-        'NETTY-HTTP',
-        'NITRITE',
-        'OAI-PMH',
-        'OLINGO2',
-        'OLINGO4',
-        'OPENSHIFT-BUILD-CONFIGS',
-        'OPENSHIFT-BUILDS',
-        'OPENSTACK-CINDER',
-        'OPENSTACK-GLANCE',
-        'OPENSTACK-KEYSTONE',
-        'OPENSTACK-NEUTRON',
-        'OPENSTACK-NOVA',
-        'OPENSTACK-SWIFT',
-        'OPTAPLANNER',
-        'PAHO',
-        'PAHO-MQTT5',
-        'PDF',
-        'PGEVENT',
-        'PUBNUB',
-        'PULSAR',
-        'QUICKFIX',
-        'NSQ',
-        'RABBITMQ',
-        'REACTIVE-STREAMS',
-        'REF',
-        'REST',
-        'RESTLET',
-        'REST-OPENAPI',
-        'RESTEASY',
-        'REST-SWAGGER',
-        'SAGA',
-        'SCHEDULER',
-        'SCHEMATRON',
-        'SCP',
-        'SEDA',
-        'SERVICENOW',
-        'SALESFORCE',
-        'SAP-NETWEAVER',
-        'SFTP',
-        'SSH',
-        'SJMS',
-        'SJMS2',
-        'SIP',
-        'SLACK',
-        'SMPP',
-        'SMTPS',
-        'SMTP',
-        'SNMP',
-        'SOLR',
-        'SONICMQ',
-        'SOROUSH',
-        'SPARK',
-        'SPLUNK',
-        'SPLUNK-HEC',
-        'SPRING-BATCH',
-        'SPRING-JDBC',
-        'SPRING-EVENT',
-        'SPRING-INTEGRATION',
-        'SPRING-LDAP',
-        'SPRING-RABBITMQ',
-        'SPRING-REDIS',
-        'SPRING-WS',
-        'SQL',
-        'SQL-STORED',
-        'STAX',
-        'STICH',
-        'STOMP',
-        'STUB',
-        'STREAM',
-        'TELEGRAM',
-        'THRIFT',
-        'TIKA',
-        'TWILIO',
-        'TWITTER-DIRECTMESSAGE',
-        'TWITTER-SEARCH',
-        'TWITTER-TIMELINE',
-        'UNDERTOW',
-        'TIMER',
-        'VALIDATOR',
-        'VELOCITY',
-        'VERTX',
-        'VERTX-HTTP',
-        'VERTX-KAFKA',
-        'VERTX-WEBSOCKET',
-        'VM',
-        'WASTEBIN',
-        'WEATHER',
-        'WEB3J',
-        'WEBHOOK',
-        'WEKA',
-        'WORDPRESS',
-        'WORKDAY',
-        'WEBSOCKET',
-        'XCHANGE',
-        'XJ',
-        'XMPP',
-        'XQUERY',
-        'XSLT',
-        'XSLT-SAXON',
-        'YAMMER',
-        'ZENDESK',
-        'ZOOKEEPER',
-        'ZOOKEEPER-MASTER'
-    ];
-
-    errorTypes = [
-        'ACTIVEMQ',
-        'AMAZONMQ',
-        'AMQP',
-        'AMQPS',
-        'AS2',
-        'AWS-S3',
-        'CRON',
-        'ELASTICSEARCH-REST',
-        'DIRECT',
-        'DIRECT-VM',
-        'SEDA',
-        'FILE',
-        'FTP',
-        'FTPS',
-        'HTTP',
-        'HTTPS',
-        'IBMMQ',
-        'IMAP',
-        'IMAPS',
-        'IRONMQ',
-        'JETTY',
-        'NETTY4',
-        'LOG',
-        'KAFKA',
-        'RABBITMQ',
-        'REST',
-        'SFTP',
-        'SJMS',
-        'SLACK',
-        'SMTP',
-        'SMTPS',
-        'SONICMQ',
-        'SQL',
-        'SQL-STORED',
-        'TELEGRAM',
-        'STREAM',
-        'VM',
-        'WEBSOCKET'
-    ];
-
-    wireTapTypes = [
-        'ACTIVEMQ',
-        'AMAZONMQ',
-        'AWS-S3',
-        'ELASTICSEARCH-REST',
-        'FILE',
-        'FTPS',
-        'FTP',
-        'HTTP',
-        'HTTPS',
-        'IBMMQ',
-        'IMAP',
-        'IMAPS',
-        'NETTY4',
-        'LOG',
-        'KAFKA',
-        'RABBITMQ',
-        'REST',
-        'SFTP',
-        'SJMS',
-        'SONICMQ',
-        'SQL',
-        'STREAM',
-        'WEBSOCKET'
+    types = [
+        {
+            kind: 'component',
+            name: 'activemq',
+            title: 'ActiveMQ',
+            description: 'Send messages to (or consume from) Apache ActiveMQ. This component extends the Camel JMS component.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.activemq.ActiveMQComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-activemq',
+            version: '3.14.0',
+            scheme: 'activemq',
+            extendsScheme: 'jms',
+            syntax: 'activemq:destinationType:destinationName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ahc',
+            title: 'Async HTTP Client (AHC)',
+            description: 'Call external HTTP services using Async Http Client.',
+            deprecated: false,
+            firstVersion: '2.8.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.ahc.AhcComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ahc',
+            version: '3.14.0',
+            scheme: 'ahc',
+            extendsScheme: '',
+            syntax: 'ahc:httpUri',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'ahc-ws',
+            title: 'Async HTTP Client (AHC) Websocket',
+            description: 'Exchange data with external Websocket servers using Async Http Client.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.ahc.ws.WsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ahc-ws',
+            version: '3.14.0',
+            scheme: 'ahc-ws',
+            extendsScheme: 'ahc',
+            alternativeSchemes: 'ahc-ws,ahc-wss',
+            syntax: 'ahc-ws:httpUri',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ahc-wss',
+            title: 'Async HTTP Client (AHC) Secure Websocket (Secure)',
+            description: 'Exchange data with external Websocket servers using Async Http Client.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.ahc.ws.WsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ahc-ws',
+            version: '3.14.0',
+            scheme: 'ahc-wss',
+            extendsScheme: 'ahc',
+            alternativeSchemes: 'ahc-ws,ahc-wss',
+            syntax: 'ahc-wss:httpUri',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'amqp',
+            title: 'AMQP',
+            description: 'Messaging with AMQP protocol using Apache QPid Client.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.amqp.AMQPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-amqp',
+            version: '3.14.0',
+            scheme: 'amqp',
+            extendsScheme: 'jms',
+            syntax: 'amqp:destinationType:destinationName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'arangodb',
+            title: 'ArangoDb',
+            description: 'Perform operations on ArangoDb when used as a Document Database, or as a Graph Database',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.arangodb.ArangoDbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-arangodb',
+            version: '3.14.0',
+            scheme: 'arangodb',
+            extendsScheme: '',
+            syntax: 'arangodb:database',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'as2',
+            title: 'AS2',
+            description: 'Transfer data securely and reliably using the AS2 protocol (RFC4130).',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.22.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.as2.AS2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-as2',
+            version: '3.14.0',
+            scheme: 'as2',
+            extendsScheme: '',
+            syntax: 'as2:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'asterisk',
+            title: 'Asterisk',
+            description: 'Interact with Asterisk PBX Server.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'voip',
+            javaType: 'org.apache.camel.component.asterisk.AsteriskComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-asterisk',
+            version: '3.14.0',
+            scheme: 'asterisk',
+            extendsScheme: '',
+            syntax: 'asterisk:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atlasmap',
+            title: 'AtlasMap',
+            description: 'Transforms the message using an AtlasMap transformation.',
+            deprecated: false,
+            firstVersion: '3.7.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.atlasmap.AtlasMapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atlasmap',
+            version: '3.14.0',
+            scheme: 'atlasmap',
+            extendsScheme: '',
+            syntax: 'atlasmap:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atmos',
+            title: 'Atmos',
+            description: "Integrate with EMC's ViPR object data services using the Atmos Client.",
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'cloud,file',
+            javaType: 'org.apache.camel.component.atmos.AtmosComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atmos',
+            version: '3.14.0',
+            scheme: 'atmos',
+            extendsScheme: '',
+            syntax: 'atmos:name/operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atmosphere-websocket',
+            title: 'Atmosphere Websocket',
+            description: 'Expose WebSocket endpoints using the Atmosphere framework.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.14.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.atmosphere.websocket.WebsocketComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atmosphere-websocket',
+            version: '3.14.0',
+            scheme: 'atmosphere-websocket',
+            extendsScheme: 'servlet',
+            syntax: 'atmosphere-websocket:servicePath',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atom',
+            title: 'Atom',
+            description: 'Poll Atom RSS feeds.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'rss',
+            javaType: 'org.apache.camel.component.atom.AtomComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atom',
+            version: '3.14.0',
+            scheme: 'atom',
+            extendsScheme: '',
+            syntax: 'atom:feedUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'atomix-map',
+            title: 'Atomix Map',
+            description: "Access Atomix's distributed map.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.map.AtomixMapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-map',
+            extendsScheme: '',
+            syntax: 'atomix-map:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atomix-messaging',
+            title: 'Atomix Messaging',
+            description: "Access Atomix's group messaging.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.messaging.AtomixMessagingComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-messaging',
+            extendsScheme: '',
+            syntax: 'atomix-messaging:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atomix-multimap',
+            title: 'Atomix MultiMap',
+            description: "Access Atomix's distributed multi map.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.multimap.AtomixMultiMapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-multimap',
+            extendsScheme: '',
+            syntax: 'atomix-multimap:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atomix-queue',
+            title: 'Atomix Queue',
+            description: "Access Atomix's distributed queue.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.queue.AtomixQueueComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-queue',
+            extendsScheme: '',
+            syntax: 'atomix-queue:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atomix-set',
+            title: 'Atomix Set',
+            description: "Access Atomix's distributed set.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.set.AtomixSetComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-set',
+            extendsScheme: '',
+            syntax: 'atomix-set:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'atomix-value',
+            title: 'Atomix Value',
+            description: "Access Atomix's distributed value.",
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.atomix.client.value.AtomixValueComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-atomix',
+            version: '3.14.0',
+            scheme: 'atomix-value',
+            extendsScheme: '',
+            syntax: 'atomix-value:resourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'avro',
+            title: 'Avro RPC',
+            description: 'Produce or consume Apache Avro RPC services.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'rpc',
+            javaType: 'org.apache.camel.component.avro.AvroComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-avro-rpc',
+            version: '3.14.0',
+            scheme: 'avro',
+            extendsScheme: '',
+            syntax: 'avro:transport:host:port/messageName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws-secrets-manager',
+            title: 'AWS Secrets Manager',
+            description: 'Manage AWS Secrets Manager services using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.9.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws.secretsmanager.SecretsManagerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws-secrets-manager',
+            version: '3.14.0',
+            scheme: 'aws-secrets-manager',
+            extendsScheme: '',
+            syntax: 'aws-secrets-manager:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-athena',
+            title: 'AWS Athena',
+            description: 'Access AWS Athena service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.4.0',
+            label: 'cloud,database',
+            javaType: 'org.apache.camel.component.aws2.athena.Athena2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-athena',
+            version: '3.14.0',
+            scheme: 'aws2-athena',
+            extendsScheme: '',
+            syntax: 'aws2-athena:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-cw',
+            title: 'AWS CloudWatch',
+            description: 'Sending metrics to AWS CloudWatch using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,monitoring',
+            javaType: 'org.apache.camel.component.aws2.cw.Cw2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-cw',
+            version: '3.14.0',
+            scheme: 'aws2-cw',
+            extendsScheme: '',
+            syntax: 'aws2-cw:namespace',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-ddb',
+            title: 'AWS DynamoDB',
+            description: 'Store and retrieve data from AWS DynamoDB service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,database,nosql',
+            javaType: 'org.apache.camel.component.aws2.ddb.Ddb2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-ddb',
+            version: '3.14.0',
+            scheme: 'aws2-ddb',
+            extendsScheme: '',
+            syntax: 'aws2-ddb:tableName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-ddbstream',
+            title: 'AWS DynamoDB Streams',
+            description: 'Receive messages from AWS DynamoDB Stream service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,messaging,streams',
+            javaType: 'org.apache.camel.component.aws2.ddbstream.Ddb2StreamComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-ddb',
+            version: '3.14.0',
+            scheme: 'aws2-ddbstream',
+            extendsScheme: '',
+            syntax: 'aws2-ddbstream:tableName',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-ec2',
+            title: 'AWS Elastic Compute Cloud (EC2)',
+            description: 'Manage AWS EC2 instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.ec2.AWS2EC2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-ec2',
+            version: '3.14.0',
+            scheme: 'aws2-ec2',
+            extendsScheme: '',
+            syntax: 'aws2-ec2:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-ecs',
+            title: 'AWS Elastic Container Service (ECS)',
+            description: 'Manage AWS ECS cluster instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.ecs.ECS2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-ecs',
+            version: '3.14.0',
+            scheme: 'aws2-ecs',
+            extendsScheme: '',
+            syntax: 'aws2-ecs:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-eks',
+            title: 'AWS Elastic Kubernetes Service (EKS)',
+            description: 'Manage AWS EKS cluster instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.eks.EKS2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-eks',
+            version: '3.14.0',
+            scheme: 'aws2-eks',
+            extendsScheme: '',
+            syntax: 'aws2-eks:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-eventbridge',
+            title: 'AWS Eventbridge',
+            description: 'Manage AWS Eventbridge cluster instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.6.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.eventbridge.EventbridgeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-eventbridge',
+            version: '3.14.0',
+            scheme: 'aws2-eventbridge',
+            extendsScheme: '',
+            syntax: 'aws2-eventbridge://eventbusNameOrArn',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-iam',
+            title: 'AWS Identity and Access Management (IAM)',
+            description: 'Manage AWS IAM instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.iam.IAM2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-iam',
+            version: '3.14.0',
+            scheme: 'aws2-iam',
+            extendsScheme: '',
+            syntax: 'aws2-iam:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-kinesis',
+            title: 'AWS Kinesis',
+            description: 'Consume and produce records from and to AWS Kinesis Streams using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.2.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.aws2.kinesis.Kinesis2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-kinesis',
+            version: '3.14.0',
+            scheme: 'aws2-kinesis',
+            extendsScheme: '',
+            syntax: 'aws2-kinesis:streamName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-kinesis-firehose',
+            title: 'AWS Kinesis Firehose',
+            description: 'Produce data to AWS Kinesis Firehose streams using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.2.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.aws2.firehose.KinesisFirehose2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-kinesis',
+            version: '3.14.0',
+            scheme: 'aws2-kinesis-firehose',
+            extendsScheme: '',
+            syntax: 'aws2-kinesis-firehose:streamName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-kms',
+            title: 'AWS Key Management Service (KMS)',
+            description: 'Manage keys stored in AWS KMS instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.kms.KMS2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-kms',
+            version: '3.14.0',
+            scheme: 'aws2-kms',
+            extendsScheme: '',
+            syntax: 'aws2-kms:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-lambda',
+            title: 'AWS Lambda',
+            description: 'Manage and invoke AWS Lambda functions using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.2.0',
+            label: 'cloud,computing,serverless',
+            javaType: 'org.apache.camel.component.aws2.lambda.Lambda2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-lambda',
+            version: '3.14.0',
+            scheme: 'aws2-lambda',
+            extendsScheme: '',
+            syntax: 'aws2-lambda:function',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-mq',
+            title: 'AWS MQ',
+            description: 'Manage AWS MQ instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.aws2.mq.MQ2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-mq',
+            version: '3.14.0',
+            scheme: 'aws2-mq',
+            extendsScheme: '',
+            syntax: 'aws2-mq:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-msk',
+            title: 'AWS Managed Streaming for Apache Kafka (MSK)',
+            description: 'Manage AWS MSK instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.msk.MSK2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-msk',
+            version: '3.14.0',
+            scheme: 'aws2-msk',
+            extendsScheme: '',
+            syntax: 'aws2-msk:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-s3',
+            title: 'AWS S3 Storage Service',
+            description: 'Store and retrieve objects from AWS S3 Storage Service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.2.0',
+            label: 'cloud,file',
+            javaType: 'org.apache.camel.component.aws2.s3.AWS2S3Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-s3',
+            version: '3.14.0',
+            scheme: 'aws2-s3',
+            extendsScheme: '',
+            syntax: 'aws2-s3://bucketNameOrArn',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-ses',
+            title: 'AWS Simple Email Service (SES)',
+            description: 'Send e-mails through AWS SES service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,mail',
+            javaType: 'org.apache.camel.component.aws2.ses.Ses2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-ses',
+            version: '3.14.0',
+            scheme: 'aws2-ses',
+            extendsScheme: '',
+            syntax: 'aws2-ses:from',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-sns',
+            title: 'AWS Simple Notification System (SNS)',
+            description: 'Send messages to an AWS Simple Notification Topic using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,messaging,mobile',
+            javaType: 'org.apache.camel.component.aws2.sns.Sns2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-sns',
+            version: '3.14.0',
+            scheme: 'aws2-sns',
+            extendsScheme: '',
+            syntax: 'aws2-sns:topicNameOrArn',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-sqs',
+            title: 'AWS Simple Queue Service (SQS)',
+            description: 'Send and receive messages to/from AWS SQS service using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.aws2.sqs.Sqs2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-sqs',
+            version: '3.14.0',
+            scheme: 'aws2-sqs',
+            extendsScheme: '',
+            syntax: 'aws2-sqs:queueNameOrArn',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-sts',
+            title: 'AWS Security Token Service (STS)',
+            description: 'Manage AWS STS cluster instances using AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.sts.STS2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-sts',
+            version: '3.14.0',
+            scheme: 'aws2-sts',
+            extendsScheme: '',
+            syntax: 'aws2-sts:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'aws2-translate',
+            title: 'AWS Translate',
+            description: 'Translate texts using AWS Translate and AWS SDK version 2.x.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.aws2.translate.Translate2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-aws2-translate',
+            version: '3.14.0',
+            scheme: 'aws2-translate',
+            extendsScheme: '',
+            syntax: 'aws2-translate:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'azure-cosmosdb',
+            title: 'Azure CosmosDB',
+            description: 'To read and write records to the CosmosDB database on Azure cloud platform.',
+            deprecated: false,
+            firstVersion: '3.10.0',
+            label: 'cloud,database',
+            javaType: 'org.apache.camel.component.azure.cosmosdb.CosmosDbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-azure-cosmosdb',
+            version: '3.14.0',
+            scheme: 'azure-cosmosdb',
+            extendsScheme: '',
+            syntax: 'azure-cosmosdb:databaseName/containerName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'azure-eventhubs',
+            title: 'Azure Event Hubs',
+            description:
+                'The azure-eventhubs component that integrates Azure Event Hubs using AMQP protocol. Azure EventHubs is a highly scalable publish-subscribe service that can ingest millions of events per second and stream them to multiple consumers.',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.azure.eventhubs.EventHubsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-azure-eventhubs',
+            version: '3.14.0',
+            scheme: 'azure-eventhubs',
+            extendsScheme: '',
+            syntax: 'azure-eventhubs:namespace/eventHubName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'azure-storage-blob',
+            title: 'Azure Storage Blob Service',
+            description: 'Store and retrieve blobs from Azure Storage Blob Service using SDK v12.',
+            deprecated: false,
+            firstVersion: '3.3.0',
+            label: 'cloud,file',
+            javaType: 'org.apache.camel.component.azure.storage.blob.BlobComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-azure-storage-blob',
+            version: '3.14.0',
+            scheme: 'azure-storage-blob',
+            extendsScheme: '',
+            syntax: 'azure-storage-blob:accountName/containerName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'azure-storage-datalake',
+            title: 'Azure Storage Datalake Service',
+            description: 'Camel Azure Datalake Gen2 Component',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'cloud,file',
+            javaType: 'org.apache.camel.component.azure.storage.datalake.DataLakeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-azure-storage-datalake',
+            version: '3.14.0',
+            scheme: 'azure-storage-datalake',
+            extendsScheme: '',
+            syntax: 'azure-storage-datalake:accountName/fileSystemName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'azure-storage-queue',
+            title: 'Azure Storage Queue Service',
+            description:
+                'The azure-storage-queue component is used for storing and retrieving the messages to/from Azure Storage Queue using Azure SDK v12.',
+            deprecated: false,
+            firstVersion: '3.3.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.azure.storage.queue.QueueComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-azure-storage-queue',
+            version: '3.14.0',
+            scheme: 'azure-storage-queue',
+            extendsScheme: '',
+            syntax: 'azure-storage-queue:accountName/queueName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'bean',
+            title: 'Bean',
+            description: 'Invoke methods of Java beans stored in Camel registry.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'core,java',
+            javaType: 'org.apache.camel.component.bean.BeanComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-bean',
+            version: '3.14.0',
+            scheme: 'bean',
+            extendsScheme: '',
+            syntax: 'bean:beanName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'bean-validator',
+            title: 'Bean Validator',
+            description: 'Validate the message body using the Java Bean Validation API.',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'validation',
+            javaType: 'org.apache.camel.component.bean.validator.BeanValidatorComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-bean-validator',
+            version: '3.14.0',
+            scheme: 'bean-validator',
+            extendsScheme: '',
+            syntax: 'bean-validator:label',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'beanstalk',
+            title: 'Beanstalk',
+            description: 'Retrieve and post-process Beanstalk jobs.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.beanstalk.BeanstalkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-beanstalk',
+            version: '3.14.0',
+            scheme: 'beanstalk',
+            extendsScheme: '',
+            syntax: 'beanstalk:connectionSettings',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'bonita',
+            title: 'Bonita',
+            description: 'Communicate with a remote Bonita BPM process engine.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'process',
+            javaType: 'org.apache.camel.component.bonita.BonitaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-bonita',
+            version: '3.14.0',
+            scheme: 'bonita',
+            extendsScheme: '',
+            syntax: 'bonita:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'box',
+            title: 'Box',
+            description: 'Upload, download and manage files, folders, groups, collaborations, etc. on box.com.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.14.0',
+            label: 'cloud,file,api',
+            javaType: 'org.apache.camel.component.box.BoxComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-box',
+            version: '3.14.0',
+            scheme: 'box',
+            extendsScheme: '',
+            syntax: 'box:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'braintree',
+            title: 'Braintree',
+            description: 'Process payments using Braintree Payments.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'cloud,payment',
+            javaType: 'org.apache.camel.component.braintree.BraintreeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-braintree',
+            version: '3.14.0',
+            scheme: 'braintree',
+            extendsScheme: '',
+            syntax: 'braintree:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'browse',
+            title: 'Browse',
+            description: 'Inspect the messages received on endpoints supporting BrowsableEndpoint.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'core,monitoring',
+            javaType: 'org.apache.camel.component.browse.BrowseComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-browse',
+            version: '3.14.0',
+            scheme: 'browse',
+            extendsScheme: '',
+            syntax: 'browse:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'caffeine-cache',
+            title: 'Caffeine Cache',
+            description: 'Perform caching operations using Caffeine Cache.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.caffeine.cache.CaffeineCacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-caffeine',
+            version: '3.14.0',
+            scheme: 'caffeine-cache',
+            extendsScheme: '',
+            syntax: 'caffeine-cache:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'caffeine-loadcache',
+            title: 'Caffeine LoadCache',
+            description: 'Perform caching operations using Caffeine Cache with an attached CacheLoader.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.caffeine.load.CaffeineLoadCacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-caffeine',
+            version: '3.14.0',
+            scheme: 'caffeine-loadcache',
+            extendsScheme: '',
+            syntax: 'caffeine-loadcache:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'chatscript',
+            title: 'ChatScript',
+            description: 'Chat with a ChatScript Server.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'ai,chat',
+            javaType: 'org.apache.camel.component.chatscript.ChatScriptComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-chatscript',
+            version: '3.14.0',
+            scheme: 'chatscript',
+            extendsScheme: '',
+            syntax: 'chatscript:host:port/botName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'chunk',
+            title: 'Chunk',
+            description: 'Transform messages using Chunk templating engine.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.chunk.ChunkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-chunk',
+            version: '3.14.0',
+            scheme: 'chunk',
+            extendsScheme: '',
+            syntax: 'chunk:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'class',
+            title: 'Class',
+            description: 'Invoke methods of Java beans specified by class name.',
+            deprecated: false,
+            firstVersion: '2.4.0',
+            label: 'core,java',
+            javaType: 'org.apache.camel.component.beanclass.ClassComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-bean',
+            version: '3.14.0',
+            scheme: 'class',
+            extendsScheme: '',
+            syntax: 'class:beanName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cm-sms',
+            title: 'CM SMS Gateway',
+            description: 'Send SMS messages via CM SMS Gateway.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'mobile',
+            javaType: 'org.apache.camel.component.cm.CMComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cm-sms',
+            version: '3.14.0',
+            scheme: 'cm-sms',
+            extendsScheme: '',
+            syntax: 'cm-sms:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cmis',
+            title: 'CMIS',
+            description: 'Read and write data from to/from a CMIS compliant content repositories.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'cms,database',
+            javaType: 'org.apache.camel.component.cmis.CMISComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cmis',
+            version: '3.14.0',
+            scheme: 'cmis',
+            extendsScheme: '',
+            syntax: 'cmis:cmsUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'coap',
+            title: 'CoAP',
+            description: 'Send and receive messages to/from COAP capable devices.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.coap.CoAPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-coap',
+            version: '3.14.0',
+            scheme: 'coap',
+            extendsScheme: '',
+            alternativeSchemes: 'coap,coaps,coap+tcp,coaps+tcp',
+            syntax: 'coap:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'coap+tcp',
+            title: 'CoAP',
+            description: 'Send and receive messages to/from COAP capable devices.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.coap.CoAPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-coap',
+            version: '3.14.0',
+            scheme: 'coap+tcp',
+            extendsScheme: '',
+            alternativeSchemes: 'coap,coaps,coap+tcp,coaps+tcp',
+            syntax: 'coap+tcp:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'coaps',
+            title: 'CoAP (Secure)',
+            description: 'Send and receive messages to/from COAP capable devices.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.coap.CoAPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-coap',
+            version: '3.14.0',
+            scheme: 'coaps',
+            extendsScheme: '',
+            alternativeSchemes: 'coap,coaps,coap+tcp,coaps+tcp',
+            syntax: 'coaps:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'coaps+tcp',
+            title: 'CoAP',
+            description: 'Send and receive messages to/from COAP capable devices.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.coap.CoAPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-coap',
+            version: '3.14.0',
+            scheme: 'coaps+tcp',
+            extendsScheme: '',
+            alternativeSchemes: 'coap,coaps,coap+tcp,coaps+tcp',
+            syntax: 'coaps+tcp:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cometd',
+            title: 'CometD',
+            description: 'Offers publish/subscribe, peer-to-peer (via a server), and RPC style messaging using the CometD/Bayeux protocol.',
+            deprecated: false,
+            firstVersion: '2.0.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.cometd.CometdComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cometd',
+            version: '3.14.0',
+            scheme: 'cometd',
+            extendsScheme: '',
+            alternativeSchemes: 'cometd,cometds',
+            syntax: 'cometd:host:port/channelName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cometds',
+            title: 'CometD (Secure)',
+            description: 'Offers publish/subscribe, peer-to-peer (via a server), and RPC style messaging using the CometD/Bayeux protocol.',
+            deprecated: false,
+            firstVersion: '2.0.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.cometd.CometdComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cometd',
+            version: '3.14.0',
+            scheme: 'cometds',
+            extendsScheme: '',
+            alternativeSchemes: 'cometd,cometds',
+            syntax: 'cometds:host:port/channelName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'consul',
+            title: 'Consul',
+            description: 'Integrate with Consul service discovery and configuration store.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'cloud,api',
+            javaType: 'org.apache.camel.component.consul.ConsulComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-consul',
+            version: '3.14.0',
+            scheme: 'consul',
+            extendsScheme: '',
+            syntax: 'consul:apiEndpoint',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'controlbus',
+            title: 'Control Bus',
+            description: 'Manage and monitor Camel routes.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'core,monitoring',
+            javaType: 'org.apache.camel.component.controlbus.ControlBusComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-controlbus',
+            version: '3.14.0',
+            scheme: 'controlbus',
+            extendsScheme: '',
+            syntax: 'controlbus:command:language',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'corda',
+            title: 'Corda',
+            description: 'Perform operations against Corda blockchain platform using corda-rpc library.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'blockchain,rpc',
+            javaType: 'org.apache.camel.component.corda.CordaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-corda',
+            version: '3.14.0',
+            scheme: 'corda',
+            extendsScheme: '',
+            syntax: 'corda:node',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'couchbase',
+            title: 'Couchbase',
+            description: 'Query Couchbase Views with a poll strategy and/or perform various operations against Couchbase databases.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.couchbase.CouchbaseComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-couchbase',
+            version: '3.14.0',
+            scheme: 'couchbase',
+            extendsScheme: '',
+            syntax: 'couchbase:protocol://hostname:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'couchdb',
+            title: 'CouchDB',
+            description:
+                'Consume changesets for inserts, updates and deletes in a CouchDB database, as well as get, save, update and delete documents from a CouchDB database.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.couchdb.CouchDbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-couchdb',
+            version: '3.14.0',
+            scheme: 'couchdb',
+            extendsScheme: '',
+            syntax: 'couchdb:protocol:hostname:port/database',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cql',
+            title: 'Cassandra CQL',
+            description:
+                'Integrate with Cassandra 2.0 using the CQL3 API (not the Thrift API). Based on Cassandra Java Driver provided by DataStax.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.cassandra.CassandraComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cassandraql',
+            version: '3.14.0',
+            scheme: 'cql',
+            extendsScheme: '',
+            syntax: 'cql:beanRef:hosts:port/keyspace',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cron',
+            title: 'Cron',
+            description: 'A generic interface for triggering events at times specified through the Unix cron syntax.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'scheduling',
+            javaType: 'org.apache.camel.component.cron.CronComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cron',
+            version: '3.14.0',
+            scheme: 'cron',
+            extendsScheme: '',
+            syntax: 'cron:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'crypto',
+            title: 'Crypto (JCE)',
+            description: 'Sign and verify exchanges using the Signature Service of the Java Cryptographic Extension (JCE).',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'security,transformation',
+            javaType: 'org.apache.camel.component.crypto.DigitalSignatureComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-crypto',
+            version: '3.14.0',
+            scheme: 'crypto',
+            extendsScheme: '',
+            syntax: 'crypto:cryptoOperation:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cxf',
+            title: 'CXF',
+            description: 'Expose SOAP WebServices using Apache CXF or connect to external WebServices using CXF WS client.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'soap,webservice',
+            javaType: 'org.apache.camel.component.cxf.CxfComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cxf',
+            version: '3.14.0',
+            scheme: 'cxf',
+            extendsScheme: '',
+            syntax: 'cxf:beanId:address',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'cxfrs',
+            title: 'CXF-RS',
+            description: 'Expose JAX-RS REST services using Apache CXF or connect to external REST services using CXF REST client.',
+            deprecated: false,
+            firstVersion: '2.0.0',
+            label: 'rest',
+            javaType: 'org.apache.camel.component.cxf.jaxrs.CxfRsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-cxf',
+            version: '3.14.0',
+            scheme: 'cxfrs',
+            extendsScheme: '',
+            syntax: 'cxfrs:beanId:address',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'dataformat',
+            title: 'Data Format',
+            description: 'Use a Camel Data Format as a regular Camel Component.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'core,transformation',
+            javaType: 'org.apache.camel.component.dataformat.DataFormatComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dataformat',
+            version: '3.14.0',
+            scheme: 'dataformat',
+            extendsScheme: '',
+            syntax: 'dataformat:name:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'dataset',
+            title: 'Dataset',
+            description: 'Provide data for load and soak testing of your Camel application.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'core,testing',
+            javaType: 'org.apache.camel.component.dataset.DataSetComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dataset',
+            version: '3.14.0',
+            scheme: 'dataset',
+            extendsScheme: '',
+            syntax: 'dataset:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'dataset-test',
+            title: 'DataSet Test',
+            description:
+                'Extends the mock component by pulling messages from another endpoint on startup to set the expected message bodies.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'core,testing',
+            javaType: 'org.apache.camel.component.dataset.DataSetTestComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dataset',
+            version: '3.14.0',
+            scheme: 'dataset-test',
+            extendsScheme: '',
+            syntax: 'dataset-test:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'debezium-mongodb',
+            title: 'Debezium MongoDB Connector',
+            description: 'Capture changes from a MongoDB database.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.debezium.DebeziumMongodbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-debezium-mongodb',
+            version: '3.14.0',
+            scheme: 'debezium-mongodb',
+            extendsScheme: '',
+            syntax: 'debezium-mongodb:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'debezium-mysql',
+            title: 'Debezium MySQL Connector',
+            description: 'Capture changes from a MySQL database.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.debezium.DebeziumMySqlComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-debezium-mysql',
+            version: '3.14.0',
+            scheme: 'debezium-mysql',
+            extendsScheme: '',
+            syntax: 'debezium-mysql:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'debezium-postgres',
+            title: 'Debezium PostgresSQL Connector',
+            description: 'Capture changes from a PostgresSQL database.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.debezium.DebeziumPostgresComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-debezium-postgres',
+            version: '3.14.0',
+            scheme: 'debezium-postgres',
+            extendsScheme: '',
+            syntax: 'debezium-postgres:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'debezium-sqlserver',
+            title: 'Debezium SQL Server Connector',
+            description: 'Capture changes from an SQL Server database.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.debezium.DebeziumSqlserverComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-debezium-sqlserver',
+            version: '3.14.0',
+            scheme: 'debezium-sqlserver',
+            extendsScheme: '',
+            syntax: 'debezium-sqlserver:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'digitalocean',
+            title: 'DigitalOcean',
+            description: 'Manage Droplets and resources within the DigitalOcean cloud.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,management',
+            javaType: 'org.apache.camel.component.digitalocean.DigitalOceanComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-digitalocean',
+            version: '3.14.0',
+            scheme: 'digitalocean',
+            extendsScheme: '',
+            syntax: 'digitalocean:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'direct',
+            title: 'Direct',
+            description: 'Call another endpoint from the same Camel Context synchronously.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.direct.DirectComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-direct',
+            version: '3.14.0',
+            scheme: 'direct',
+            extendsScheme: '',
+            syntax: 'direct:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'direct-vm',
+            title: 'Direct VM',
+            description: 'Call another endpoint from any Camel Context in the same JVM synchronously.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.directvm.DirectVmComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-directvm',
+            version: '3.14.0',
+            scheme: 'direct-vm',
+            extendsScheme: '',
+            syntax: 'direct-vm:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'disruptor',
+            title: 'Disruptor',
+            description: 'Provides asynchronous SEDA behavior using LMAX Disruptor.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'endpoint',
+            javaType: 'org.apache.camel.component.disruptor.DisruptorComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-disruptor',
+            version: '3.14.0',
+            scheme: 'disruptor',
+            extendsScheme: '',
+            alternativeSchemes: 'disruptor,disruptor-vm',
+            syntax: 'disruptor:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'disruptor-vm',
+            title: 'Disruptor VM',
+            description: 'Provides asynchronous SEDA behavior using LMAX Disruptor.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'endpoint',
+            javaType: 'org.apache.camel.component.disruptor.vm.DisruptorVmComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-disruptor',
+            version: '3.14.0',
+            scheme: 'disruptor-vm',
+            extendsScheme: '',
+            alternativeSchemes: 'disruptor,disruptor-vm',
+            syntax: 'disruptor-vm:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'djl',
+            title: 'Deep Java Library',
+            description: 'Infer Deep Learning models from message exchanges data using Deep Java Library (DJL).',
+            deprecated: false,
+            firstVersion: '3.3.0',
+            label: 'ai,deeplearning',
+            javaType: 'org.apache.camel.component.djl.DJLComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-djl',
+            version: '3.14.0',
+            scheme: 'djl',
+            extendsScheme: '',
+            syntax: 'djl:application',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'dns',
+            title: 'DNS',
+            description: 'Perform DNS queries using DNSJava.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'networking',
+            javaType: 'org.apache.camel.component.dns.DnsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dns',
+            version: '3.14.0',
+            scheme: 'dns',
+            extendsScheme: '',
+            syntax: 'dns:dnsType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'docker',
+            title: 'Docker',
+            description: 'Manage Docker containers.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'cloud,container,paas',
+            javaType: 'org.apache.camel.component.docker.DockerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-docker',
+            version: '3.14.0',
+            scheme: 'docker',
+            extendsScheme: '',
+            syntax: 'docker:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'dozer',
+            title: 'Dozer',
+            description: 'Map between Java beans using the Dozer mapping library.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.dozer.DozerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dozer',
+            version: '3.14.0',
+            scheme: 'dozer',
+            extendsScheme: '',
+            syntax: 'dozer:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'drill',
+            title: 'Drill',
+            description: 'Perform queries against an Apache Drill cluster.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.drill.DrillComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-drill',
+            version: '3.14.0',
+            scheme: 'drill',
+            extendsScheme: '',
+            syntax: 'drill:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'dropbox',
+            title: 'Dropbox',
+            description: 'Upload, download and manage files, folders, groups, collaborations, etc on Dropbox.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'cloud,file,api',
+            javaType: 'org.apache.camel.component.dropbox.DropboxComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-dropbox',
+            version: '3.14.0',
+            scheme: 'dropbox',
+            extendsScheme: '',
+            syntax: 'dropbox:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ehcache',
+            title: 'Ehcache',
+            description: 'Perform caching operations using Ehcache.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.ehcache.EhcacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ehcache',
+            version: '3.14.0',
+            scheme: 'ehcache',
+            extendsScheme: '',
+            syntax: 'ehcache:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'elasticsearch-rest',
+            title: 'Elasticsearch Rest',
+            description: 'Send requests to ElasticSearch via REST API',
+            deprecated: false,
+            firstVersion: '2.21.0',
+            label: 'search,monitoring',
+            javaType: 'org.apache.camel.component.elasticsearch.ElasticsearchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-elasticsearch-rest',
+            version: '3.14.0',
+            scheme: 'elasticsearch-rest',
+            extendsScheme: '',
+            syntax: 'elasticsearch-rest:clusterName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'elsql',
+            title: 'ElSQL',
+            description: 'Use ElSql to define SQL queries. Extends the SQL Component.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.elsql.ElsqlComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-elsql',
+            version: '3.14.0',
+            scheme: 'elsql',
+            extendsScheme: '',
+            syntax: 'elsql:elsqlName:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'etcd-keys',
+            title: 'Etcd Keys',
+            description: 'Get, set or delete keys in etcd key-value store.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'clustering,database',
+            javaType: 'org.apache.camel.component.etcd.EtcdKeysComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-etcd',
+            version: '3.14.0',
+            scheme: 'etcd-keys',
+            extendsScheme: '',
+            syntax: 'etcd-keys:path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'etcd-stats',
+            title: 'Etcd Stats',
+            description: 'Access etcd cluster statistcs.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'clustering,database',
+            javaType: 'org.apache.camel.component.etcd.EtcdStatsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-etcd',
+            version: '3.14.0',
+            scheme: 'etcd-stats',
+            extendsScheme: '',
+            syntax: 'etcd-stats:path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'etcd-watch',
+            title: 'Etcd Watch',
+            description: 'Watch specific etcd keys or directories for changes.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'clustering,database',
+            javaType: 'org.apache.camel.component.etcd.EtcdWatchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-etcd',
+            version: '3.14.0',
+            scheme: 'etcd-watch',
+            extendsScheme: '',
+            syntax: 'etcd-watch:path',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'exec',
+            title: 'Exec',
+            description: 'Execute commands on the underlying operating system.',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'system',
+            javaType: 'org.apache.camel.component.exec.ExecComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-exec',
+            version: '3.14.0',
+            scheme: 'exec',
+            extendsScheme: '',
+            syntax: 'exec:executable',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'facebook',
+            title: 'Facebook',
+            description: 'Send requests to Facebook APIs supported by Facebook4J.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'social',
+            javaType: 'org.apache.camel.component.facebook.FacebookComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-facebook',
+            version: '3.14.0',
+            scheme: 'facebook',
+            extendsScheme: '',
+            syntax: 'facebook:methodName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'fhir',
+            title: 'FHIR',
+            description:
+                'Exchange information in the healthcare domain using the FHIR (Fast Healthcare Interoperability Resources) standard.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'api',
+            javaType: 'org.apache.camel.component.fhir.FhirComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-fhir',
+            version: '3.14.0',
+            scheme: 'fhir',
+            extendsScheme: '',
+            syntax: 'fhir:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'file',
+            title: 'File',
+            description: 'Read and write files.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'file,core',
+            javaType: 'org.apache.camel.component.file.FileComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-file',
+            version: '3.14.0',
+            scheme: 'file',
+            extendsScheme: '',
+            syntax: 'file:directoryName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'file-watch',
+            title: 'File Watch',
+            description: 'Get notified about file events in a directory using java.nio.file.WatchService.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.file.watch.FileWatchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-file-watch',
+            version: '3.14.0',
+            scheme: 'file-watch',
+            extendsScheme: '',
+            syntax: 'file-watch:path',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'flatpack',
+            title: 'Flatpack',
+            description: 'Parse fixed width and delimited files using the FlatPack library.',
+            deprecated: false,
+            firstVersion: '1.4.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.flatpack.FlatpackComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-flatpack',
+            version: '3.14.0',
+            scheme: 'flatpack',
+            extendsScheme: '',
+            syntax: 'flatpack:type:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'flink',
+            title: 'Flink',
+            description: 'Send DataSet jobs to an Apache Flink cluster.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'transformation,bigdata,streams',
+            javaType: 'org.apache.camel.component.flink.FlinkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-flink',
+            version: '3.14.0',
+            scheme: 'flink',
+            extendsScheme: '',
+            syntax: 'flink:endpointType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'fop',
+            title: 'FOP',
+            description: 'Render messages into PDF and other output formats supported by Apache FOP.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'file,transformation',
+            javaType: 'org.apache.camel.component.fop.FopComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-fop',
+            version: '3.14.0',
+            scheme: 'fop',
+            extendsScheme: '',
+            syntax: 'fop:outputType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'freemarker',
+            title: 'Freemarker',
+            description: 'Transform messages using FreeMarker templates.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.freemarker.FreemarkerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-freemarker',
+            version: '3.14.0',
+            scheme: 'freemarker',
+            extendsScheme: '',
+            syntax: 'freemarker:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ftp',
+            title: 'FTP',
+            description: 'Upload and download files to/from FTP servers.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '1.1.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.file.remote.FtpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ftp',
+            version: '3.14.0',
+            scheme: 'ftp',
+            extendsScheme: 'file',
+            syntax: 'ftp:host:port/directoryName',
+            alternativeSyntax: 'ftp:username:password@host:port/directoryName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ftps',
+            title: 'FTPS',
+            description: 'Upload and download files to/from FTP servers supporting the FTPS protocol.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.2.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.file.remote.FtpsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ftp',
+            version: '3.14.0',
+            scheme: 'ftps',
+            extendsScheme: 'file',
+            syntax: 'ftps:host:port/directoryName',
+            alternativeSyntax: 'ftps:username:password@host:port/directoryName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ganglia',
+            title: 'Ganglia',
+            description: 'Send metrics to Ganglia monitoring system.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.ganglia.GangliaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ganglia',
+            version: '3.14.0',
+            scheme: 'ganglia',
+            extendsScheme: '',
+            syntax: 'ganglia:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'geocoder',
+            title: 'Geocoder',
+            description: 'Find geocodes (latitude and longitude) for a given address or the other way round.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'api,location',
+            javaType: 'org.apache.camel.component.geocoder.GeoCoderComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-geocoder',
+            version: '3.14.0',
+            scheme: 'geocoder',
+            extendsScheme: '',
+            syntax: 'geocoder:address:latlng',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'git',
+            title: 'Git',
+            description: 'Perform operations on git repositories.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.git.GitComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-git',
+            version: '3.14.0',
+            scheme: 'git',
+            extendsScheme: '',
+            syntax: 'git:localPath',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'github',
+            title: 'GitHub',
+            description: 'Interact with the GitHub API.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'file,cloud,api',
+            javaType: 'org.apache.camel.component.github.GitHubComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-github',
+            version: '3.14.0',
+            scheme: 'github',
+            extendsScheme: '',
+            syntax: 'github:type/branchName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-bigquery',
+            title: 'Google BigQuery',
+            description: 'Google BigQuery data warehouse for analytics.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'cloud,bigdata',
+            javaType: 'org.apache.camel.component.google.bigquery.GoogleBigQueryComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-bigquery',
+            version: '3.14.0',
+            scheme: 'google-bigquery',
+            extendsScheme: '',
+            syntax: 'google-bigquery:projectId:datasetId:tableId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-bigquery-sql',
+            title: 'Google BigQuery Standard SQL',
+            description: 'Access Google Cloud BigQuery service using SQL queries.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.google.bigquery.sql.GoogleBigQuerySQLComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-bigquery',
+            version: '3.14.0',
+            scheme: 'google-bigquery-sql',
+            extendsScheme: '',
+            syntax: 'google-bigquery-sql:projectId:queryString',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-calendar',
+            title: 'Google Calendar',
+            description: 'Perform various operations on a Google Calendar.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'api,cloud',
+            javaType: 'org.apache.camel.component.google.calendar.GoogleCalendarComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-calendar',
+            version: '3.14.0',
+            scheme: 'google-calendar',
+            extendsScheme: '',
+            syntax: 'google-calendar:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-calendar-stream',
+            title: 'Google Calendar Stream',
+            description: 'Poll for changes in a Google Calendar.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.google.calendar.stream.GoogleCalendarStreamComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-calendar',
+            version: '3.14.0',
+            scheme: 'google-calendar-stream',
+            extendsScheme: '',
+            syntax: 'google-calendar-stream:index',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-drive',
+            title: 'Google Drive',
+            description: 'Manage files in Google Drive.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'file,cloud,api',
+            javaType: 'org.apache.camel.component.google.drive.GoogleDriveComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-drive',
+            version: '3.14.0',
+            scheme: 'google-drive',
+            extendsScheme: '',
+            syntax: 'google-drive:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-functions',
+            title: 'Google Cloud Functions',
+            description: 'Manage and invoke Google Cloud Functions',
+            deprecated: false,
+            firstVersion: '3.9.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.google.functions.GoogleCloudFunctionsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-functions',
+            version: '3.14.0',
+            scheme: 'google-functions',
+            extendsScheme: '',
+            syntax: 'google-functions:functionName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-mail',
+            title: 'Google Mail',
+            description: 'Manage messages in Google Mail.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'cloud,api,mail',
+            javaType: 'org.apache.camel.component.google.mail.GoogleMailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-mail',
+            version: '3.14.0',
+            scheme: 'google-mail',
+            extendsScheme: '',
+            syntax: 'google-mail:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-mail-stream',
+            title: 'Google Mail Stream',
+            description: 'Poll for incoming messages in Google Mail.',
+            deprecated: false,
+            firstVersion: '2.22.0',
+            label: 'cloud,mail',
+            javaType: 'org.apache.camel.component.google.mail.stream.GoogleMailStreamComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-mail',
+            version: '3.14.0',
+            scheme: 'google-mail-stream',
+            extendsScheme: '',
+            syntax: 'google-mail-stream:index',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-pubsub',
+            title: 'Google Pubsub',
+            description: 'Send and receive messages to/from Google Cloud Platform PubSub Service.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.google.pubsub.GooglePubsubComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-pubsub',
+            version: '3.14.0',
+            scheme: 'google-pubsub',
+            extendsScheme: '',
+            syntax: 'google-pubsub:projectId:destinationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'google-sheets',
+            title: 'Google Sheets',
+            description: 'Manage spreadsheets in Google Sheets.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'api,cloud,sheets',
+            javaType: 'org.apache.camel.component.google.sheets.GoogleSheetsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-sheets',
+            version: '3.14.0',
+            scheme: 'google-sheets',
+            extendsScheme: '',
+            syntax: 'google-sheets:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'google-sheets-stream',
+            title: 'Google Sheets Stream',
+            description: 'Poll for changes in Google Sheets.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'cloud,sheets',
+            javaType: 'org.apache.camel.component.google.sheets.stream.GoogleSheetsStreamComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-sheets',
+            version: '3.14.0',
+            scheme: 'google-sheets-stream',
+            extendsScheme: '',
+            syntax: 'google-sheets-stream:spreadsheetId',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'google-storage',
+            title: 'Google Storage',
+            description: 'Store and retrieve objects from Google Cloud Storage Service using the google-cloud-storage library.',
+            deprecated: false,
+            firstVersion: '3.9.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.google.storage.GoogleCloudStorageComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-google-storage',
+            version: '3.14.0',
+            scheme: 'google-storage',
+            extendsScheme: '',
+            syntax: 'google-storage:bucketName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'gora',
+            title: 'Gora',
+            description: 'Access NoSQL databases using the Apache Gora framework.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'database,nosql,bigdata',
+            javaType: 'org.apache.camel.component.gora.GoraComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-gora',
+            version: '3.14.0',
+            scheme: 'gora',
+            extendsScheme: '',
+            syntax: 'gora:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'grape',
+            title: 'Grape',
+            description: 'Fetch, load and manage additional jars dynamically after Camel Context was started.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'management,deployment',
+            javaType: 'org.apache.camel.component.grape.GrapeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-grape',
+            version: '3.14.0',
+            scheme: 'grape',
+            extendsScheme: '',
+            syntax: 'grape:defaultCoordinates',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'graphql',
+            title: 'GraphQL',
+            description: 'Send GraphQL queries and mutations to external systems.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'api',
+            javaType: 'org.apache.camel.component.graphql.GraphqlComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-graphql',
+            version: '3.14.0',
+            scheme: 'graphql',
+            extendsScheme: '',
+            syntax: 'graphql:httpUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'grpc',
+            title: 'gRPC',
+            description: 'Expose gRPC endpoints and access external gRPC endpoints.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'rpc',
+            javaType: 'org.apache.camel.component.grpc.GrpcComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-grpc',
+            version: '3.14.0',
+            scheme: 'grpc',
+            extendsScheme: '',
+            syntax: 'grpc:host:port/service',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'guava-eventbus',
+            title: 'Guava EventBus',
+            description: 'Send and receive messages to/from Guava EventBus.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'eventbus',
+            javaType: 'org.apache.camel.component.guava.eventbus.GuavaEventBusComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-guava-eventbus',
+            version: '3.14.0',
+            scheme: 'guava-eventbus',
+            extendsScheme: '',
+            syntax: 'guava-eventbus:eventBusRef',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-atomicvalue',
+            title: 'Hazelcast Atomic Number',
+            description: 'Increment, decrement, set, etc. Hazelcast atomic number (a grid wide number).',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.atomicnumber.HazelcastAtomicnumberComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-atomicvalue',
+            extendsScheme: '',
+            syntax: 'hazelcast-atomicvalue:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-instance',
+            title: 'Hazelcast Instance',
+            description: 'Consume join/leave events of a cache instance in a Hazelcast cluster.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.instance.HazelcastInstanceComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-instance',
+            extendsScheme: '',
+            syntax: 'hazelcast-instance:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-list',
+            title: 'Hazelcast List',
+            description: 'Perform operations on Hazelcast distributed list.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.list.HazelcastListComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-list',
+            extendsScheme: '',
+            syntax: 'hazelcast-list:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-map',
+            title: 'Hazelcast Map',
+            description: 'Perform operations on Hazelcast distributed map.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.map.HazelcastMapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-map',
+            extendsScheme: '',
+            syntax: 'hazelcast-map:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-multimap',
+            title: 'Hazelcast Multimap',
+            description: 'Perform operations on Hazelcast distributed multimap.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.multimap.HazelcastMultimapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-multimap',
+            extendsScheme: '',
+            syntax: 'hazelcast-multimap:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-queue',
+            title: 'Hazelcast Queue',
+            description: 'Perform operations on Hazelcast distributed queue.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid,messaging',
+            javaType: 'org.apache.camel.component.hazelcast.queue.HazelcastQueueComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-queue',
+            extendsScheme: '',
+            syntax: 'hazelcast-queue:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-replicatedmap',
+            title: 'Hazelcast Replicated Map',
+            description: 'Perform operations on Hazelcast replicated map.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.replicatedmap.HazelcastReplicatedmapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-replicatedmap',
+            extendsScheme: '',
+            syntax: 'hazelcast-replicatedmap:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-ringbuffer',
+            title: 'Hazelcast Ringbuffer',
+            description: 'Perform operations on Hazelcast distributed ringbuffer.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.ringbuffer.HazelcastRingbufferComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-ringbuffer',
+            extendsScheme: '',
+            syntax: 'hazelcast-ringbuffer:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-seda',
+            title: 'Hazelcast SEDA',
+            description:
+                'Asynchronously send/receive Exchanges between Camel routes running on potentially distinct JVMs/hosts backed by Hazelcast BlockingQueue.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.seda.HazelcastSedaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-seda',
+            extendsScheme: '',
+            syntax: 'hazelcast-seda:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-set',
+            title: 'Hazelcast Set',
+            description: 'Perform operations on Hazelcast distributed set.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.set.HazelcastSetComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-set',
+            extendsScheme: '',
+            syntax: 'hazelcast-set:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hazelcast-topic',
+            title: 'Hazelcast Topic',
+            description: 'Send and receive messages to/from Hazelcast distributed topic.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.hazelcast.topic.HazelcastTopicComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hazelcast',
+            version: '3.14.0',
+            scheme: 'hazelcast-topic',
+            extendsScheme: '',
+            syntax: 'hazelcast-topic:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hbase',
+            title: 'HBase',
+            description: 'Reading and write from/to an HBase store (Hadoop database).',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'bigdata,database,hadoop',
+            javaType: 'org.apache.camel.component.hbase.HBaseComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hbase',
+            version: '3.14.0',
+            scheme: 'hbase',
+            extendsScheme: '',
+            syntax: 'hbase:tableName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hdfs',
+            title: 'HDFS',
+            description: 'Read and write from/to an HDFS filesystem using Hadoop 2.x.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'bigdata,hadoop,file',
+            javaType: 'org.apache.camel.component.hdfs.HdfsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-hdfs',
+            version: '3.14.0',
+            scheme: 'hdfs',
+            extendsScheme: '',
+            syntax: 'hdfs:hostName:port/path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'http',
+            title: 'HTTP',
+            description: 'Send requests to external HTTP servers using Apache HTTP Client 4.x.',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.http.HttpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-http',
+            version: '3.14.0',
+            scheme: 'http',
+            extendsScheme: '',
+            alternativeSchemes: 'http,https',
+            syntax: 'http://httpUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'https',
+            title: 'HTTPS (Secure)',
+            description: 'Send requests to external HTTP servers using Apache HTTP Client 4.x.',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.http.HttpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-http',
+            version: '3.14.0',
+            scheme: 'https',
+            extendsScheme: '',
+            alternativeSchemes: 'http,https',
+            syntax: 'https://httpUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-dms',
+            title: 'Huawei Distributed Message Service (DMS)',
+            description: 'To integrate with a fully managed, high-performance message queuing service on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.12.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.huaweicloud.dms.DMSComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-dms',
+            version: '3.14.0',
+            scheme: 'hwcloud-dms',
+            extendsScheme: '',
+            syntax: 'hwcloud-dms:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-functiongraph',
+            title: 'Huawei FunctionGraph',
+            description: 'To call serverless functions on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.11.0',
+            label: 'cloud,serverless',
+            javaType: 'org.apache.camel.FunctionGraphComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-functiongraph',
+            version: '3.14.0',
+            scheme: 'hwcloud-functiongraph',
+            extendsScheme: '',
+            syntax: 'hwcloud-functiongraph:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-iam',
+            title: 'Huawei Identity and Access Management (IAM)',
+            description: 'To securely manage users on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.11.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.huaweicloud.iam.IAMComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-iam',
+            version: '3.14.0',
+            scheme: 'hwcloud-iam',
+            extendsScheme: '',
+            syntax: 'hwcloud-iam:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-imagerecognition',
+            title: 'Huawei Cloud Image Recognition',
+            description: 'To identify objects, scenes, and concepts in images on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.12.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.huaweicloud.image.ImageRecognitionComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-imagerecognition',
+            version: '3.14.0',
+            scheme: 'hwcloud-imagerecognition',
+            extendsScheme: '',
+            syntax: 'hwcloud-imagerecognition:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-obs',
+            title: 'Huawei Object Storage Service (OBS)',
+            description: 'To provide stable, secure, efficient, and easy-to-use cloud storage service on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.12.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.huaweicloud.obs.OBSComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-obs',
+            version: '3.14.0',
+            scheme: 'hwcloud-obs',
+            extendsScheme: '',
+            syntax: 'hwcloud-obs:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'hwcloud-smn',
+            title: 'Huawei Simple Message Notification (SMN)',
+            description: 'To broadcast messages and connect cloud services through notifications on Huawei Cloud',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.huaweicloud.smn.SimpleNotificationComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-huaweicloud-smn',
+            version: '3.14.0',
+            scheme: 'hwcloud-smn',
+            extendsScheme: '',
+            syntax: 'hwcloud-smn:smnService',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'iec60870-client',
+            title: 'IEC 60870 Client',
+            description: 'IEC 60870 supervisory control and data acquisition (SCADA) client using NeoSCADA implementation.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.component.iec60870.client.ClientComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-iec60870',
+            version: '3.14.0',
+            scheme: 'iec60870-client',
+            extendsScheme: '',
+            syntax: 'iec60870-client:uriPath',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'iec60870-server',
+            title: 'IEC 60870 Server',
+            description: 'IEC 60870 supervisory control and data acquisition (SCADA) server using NeoSCADA implementation.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.component.iec60870.server.ServerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-iec60870',
+            version: '3.14.0',
+            scheme: 'iec60870-server',
+            extendsScheme: '',
+            syntax: 'iec60870-server:uriPath',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-cache',
+            title: 'Ignite Cache',
+            description: 'Perform cache operations on an Ignite cache or consume changes from a continuous query.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'cache,datagrid',
+            javaType: 'org.apache.camel.component.ignite.cache.IgniteCacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-cache',
+            extendsScheme: '',
+            syntax: 'ignite-cache:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-compute',
+            title: 'Ignite Compute',
+            description: 'Run compute operations on an Ignite cluster.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'compute',
+            javaType: 'org.apache.camel.component.ignite.compute.IgniteComputeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-compute',
+            extendsScheme: '',
+            syntax: 'ignite-compute:endpointId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-events',
+            title: 'Ignite Events',
+            description: 'Receive events from an Ignite cluster by creating a local event listener.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'messaging,eventbus',
+            javaType: 'org.apache.camel.component.ignite.events.IgniteEventsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-events',
+            extendsScheme: '',
+            syntax: 'ignite-events:endpointId',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-idgen',
+            title: 'Ignite ID Generator',
+            description: 'Interact with Ignite Atomic Sequences and ID Generators .',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'compute',
+            javaType: 'org.apache.camel.component.ignite.idgen.IgniteIdGenComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-idgen',
+            extendsScheme: '',
+            syntax: 'ignite-idgen:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-messaging',
+            title: 'Ignite Messaging',
+            description: 'Send and receive messages from an Ignite topic.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.ignite.messaging.IgniteMessagingComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-messaging',
+            extendsScheme: '',
+            syntax: 'ignite-messaging:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-queue',
+            title: 'Ignite Queues',
+            description: 'Interact with Ignite Queue data structures.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'messaging,queue',
+            javaType: 'org.apache.camel.component.ignite.queue.IgniteQueueComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-queue',
+            extendsScheme: '',
+            syntax: 'ignite-queue:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ignite-set',
+            title: 'Ignite Sets',
+            description: 'Interact with Ignite Set data structures.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'cache,compute',
+            javaType: 'org.apache.camel.component.ignite.set.IgniteSetComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ignite',
+            version: '3.14.0',
+            scheme: 'ignite-set',
+            extendsScheme: '',
+            syntax: 'ignite-set:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'imap',
+            title: 'IMAP',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'imap',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'imap:host:port',
+            alternativeSyntax: 'imap:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'imaps',
+            title: 'IMAPS (Secure)',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'imaps',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'imaps:host:port',
+            alternativeSyntax: 'imaps:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'infinispan',
+            title: 'Infinispan',
+            description: 'Read and write from/to Infinispan distributed key/value store and data grid.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.infinispan.remote.InfinispanRemoteComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-infinispan',
+            version: '3.14.0',
+            scheme: 'infinispan',
+            extendsScheme: '',
+            syntax: 'infinispan:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'infinispan-embedded',
+            title: 'Infinispan Embedded',
+            description: 'Read and write from/to Infinispan distributed key/value store and data grid.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.infinispan.embedded.InfinispanEmbeddedComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-infinispan-embedded',
+            version: '3.14.0',
+            scheme: 'infinispan-embedded',
+            extendsScheme: '',
+            syntax: 'infinispan-embedded:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'influxdb',
+            title: 'InfluxDB',
+            description: 'Interact with InfluxDB, a time series database.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'database',
+            javaType: 'org.apache.camel.component.influxdb.InfluxDbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-influxdb',
+            version: '3.14.0',
+            scheme: 'influxdb',
+            extendsScheme: '',
+            syntax: 'influxdb:connectionBean',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'iota',
+            title: 'IOTA',
+            description: 'Manage financial transactions using IOTA distributed ledger.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'ledger,api',
+            javaType: 'org.apache.camel.component.iota.IOTAComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-iota',
+            version: '3.14.0',
+            scheme: 'iota',
+            extendsScheme: '',
+            syntax: 'iota:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ipfs',
+            title: 'IPFS',
+            description: 'Access the Interplanetary File System (IPFS).',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'file,ipfs',
+            javaType: 'org.apache.camel.component.ipfs.IPFSComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ipfs',
+            version: '3.14.0',
+            scheme: 'ipfs',
+            extendsScheme: '',
+            syntax: 'ipfs:ipfsCmd',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'irc',
+            title: 'IRC',
+            description: 'Send and receive messages to/from and IRC chat.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'chat',
+            javaType: 'org.apache.camel.component.irc.IrcComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-irc',
+            version: '3.14.0',
+            scheme: 'irc',
+            extendsScheme: '',
+            syntax: 'irc:hostname:port',
+            alternativeSyntax: 'irc:username:password@hostname:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ironmq',
+            title: 'IronMQ',
+            description: 'Send and receive messages to/from IronMQ an elastic and durable hosted message queue as a service.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'cloud,messaging',
+            javaType: 'org.apache.camel.component.ironmq.IronMQComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ironmq',
+            version: '3.14.0',
+            scheme: 'ironmq',
+            extendsScheme: '',
+            syntax: 'ironmq:queueName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jbpm',
+            title: 'JBPM',
+            description: 'Interact with jBPM workflow engine over REST.',
+            deprecated: false,
+            firstVersion: '2.6.0',
+            label: 'api,workflow',
+            javaType: 'org.apache.camel.component.jbpm.JBPMComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jbpm',
+            version: '3.14.0',
+            scheme: 'jbpm',
+            extendsScheme: '',
+            syntax: 'jbpm:connectionURL',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jcache',
+            title: 'JCache',
+            description: 'Perform caching operations against JSR107/JCache.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'cache,datagrid,clustering',
+            javaType: 'org.apache.camel.component.jcache.JCacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jcache',
+            version: '3.14.0',
+            scheme: 'jcache',
+            extendsScheme: '',
+            syntax: 'jcache:cacheName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jclouds',
+            title: 'JClouds',
+            description: 'Interact with jclouds compute and blobstore service.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'api,cloud,compute',
+            javaType: 'org.apache.camel.component.jclouds.JcloudsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jclouds',
+            version: '3.14.0',
+            scheme: 'jclouds',
+            extendsScheme: '',
+            syntax: 'jclouds:command:providerId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jcr',
+            title: 'JCR',
+            description: 'Read and write nodes to/from a JCR compliant content repository.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'database,cms',
+            javaType: 'org.apache.camel.component.jcr.JcrComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jcr',
+            version: '3.14.0',
+            scheme: 'jcr',
+            extendsScheme: '',
+            syntax: 'jcr:host/base',
+            alternativeSyntax: 'jcr:username:password@host/base',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jdbc',
+            title: 'JDBC',
+            description: 'Access databases through SQL and JDBC.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.jdbc.JdbcComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jdbc',
+            version: '3.14.0',
+            scheme: 'jdbc',
+            extendsScheme: '',
+            syntax: 'jdbc:dataSourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jetty',
+            title: 'Jetty',
+            description: 'Expose HTTP endpoints using Jetty 9.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '1.2.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.jetty9.JettyHttpComponent9',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jetty',
+            version: '3.14.0',
+            scheme: 'jetty',
+            extendsScheme: 'http',
+            syntax: 'jetty:httpUri',
+            async: true,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'jgroups',
+            title: 'JGroups',
+            description: 'Exchange messages with JGroups clusters.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'clustering,messaging',
+            javaType: 'org.apache.camel.component.jgroups.JGroupsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jgroups',
+            version: '3.14.0',
+            scheme: 'jgroups',
+            extendsScheme: '',
+            syntax: 'jgroups:clusterName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jgroups-raft',
+            title: 'JGroups raft',
+            description: 'Exchange messages with JGroups-raft clusters.',
+            deprecated: false,
+            firstVersion: '2.24.0',
+            label: 'clustering,messaging',
+            javaType: 'org.apache.camel.component.jgroups.raft.JGroupsRaftComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jgroups-raft',
+            version: '3.14.0',
+            scheme: 'jgroups-raft',
+            extendsScheme: '',
+            syntax: 'jgroups-raft:clusterName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jing',
+            title: 'Jing',
+            description: 'Validate XML against a RelaxNG schema (XML Syntax or Compact Syntax) using Jing library.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'validation',
+            javaType: 'org.apache.camel.component.validator.jing.JingComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jing',
+            version: '3.14.0',
+            scheme: 'jing',
+            extendsScheme: '',
+            syntax: 'jing:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jira',
+            title: 'Jira',
+            description: 'Interact with JIRA issue tracker.',
+            deprecated: false,
+            firstVersion: '3.0',
+            label: 'api,reporting',
+            javaType: 'org.apache.camel.component.jira.JiraComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jira',
+            version: '3.14.0',
+            scheme: 'jira',
+            extendsScheme: '',
+            syntax: 'jira:type',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jms',
+            title: 'JMS',
+            description: 'Sent and receive messages to/from a JMS Queue or Topic.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '1.0.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.jms.JmsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jms',
+            version: '3.14.0',
+            scheme: 'jms',
+            extendsScheme: '',
+            syntax: 'jms:destinationType:destinationName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jmx',
+            title: 'JMX',
+            description: 'Receive JMX notifications.',
+            deprecated: false,
+            firstVersion: '2.6.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.jmx.JMXComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jmx',
+            version: '3.14.0',
+            scheme: 'jmx',
+            extendsScheme: '',
+            syntax: 'jmx:serverURL',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jolt',
+            title: 'JOLT',
+            description: 'JSON to JSON transformation using JOLT.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.jolt.JoltComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jolt',
+            version: '3.14.0',
+            scheme: 'jolt',
+            extendsScheme: '',
+            syntax: 'jolt:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jooq',
+            title: 'JOOQ',
+            description: 'Store and retrieve Java objects from an SQL database using JOOQ.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.jooq.JooqComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jooq',
+            version: '3.14.0',
+            scheme: 'jooq',
+            extendsScheme: '',
+            syntax: 'jooq:entityType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jpa',
+            title: 'JPA',
+            description: 'Store and retrieve Java objects from databases using Java Persistence API (JPA).',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.jpa.JpaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jpa',
+            version: '3.14.0',
+            scheme: 'jpa',
+            extendsScheme: '',
+            syntax: 'jpa:entityType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jslt',
+            title: 'JSLT',
+            description: 'Query or transform JSON payloads using an JSLT.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.jslt.JsltComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jslt',
+            version: '3.14.0',
+            scheme: 'jslt',
+            extendsScheme: '',
+            syntax: 'jslt:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'json-patch',
+            title: 'JsonPatch',
+            description: 'JsonPatch component which transform JSON using JSON patch (RFC 6902).',
+            deprecated: false,
+            firstVersion: '3.12.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.jsonpatch.JsonPatchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-json-patch',
+            version: '3.14.0',
+            scheme: 'json-patch',
+            extendsScheme: '',
+            syntax: 'json-patch:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'json-validator',
+            title: 'JSON Schema Validator',
+            description: 'Validate JSON payloads using NetworkNT JSON Schema.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'validation',
+            javaType: 'org.apache.camel.component.jsonvalidator.JsonValidatorComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-json-validator',
+            version: '3.14.0',
+            scheme: 'json-validator',
+            extendsScheme: '',
+            syntax: 'json-validator:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jsonata',
+            title: 'JSONata',
+            description: 'Transforms JSON payload using JSONata transformation.',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.jsonata.JsonataComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jsonata',
+            version: '3.14.0',
+            scheme: 'jsonata',
+            extendsScheme: '',
+            syntax: 'jsonata:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'jt400',
+            title: 'JT400',
+            description:
+                'Exchanges messages with an IBM i system using data queues, message queues, or program call. IBM i is the replacement for AS/400 and iSeries servers.',
+            deprecated: false,
+            firstVersion: '1.5.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.jt400.Jt400Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jt400',
+            version: '3.14.0',
+            scheme: 'jt400',
+            extendsScheme: '',
+            syntax: 'jt400:userID:password/systemName/objectPath.type',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kafka',
+            title: 'Kafka',
+            description: 'Sent and receive messages to/from an Apache Kafka broker.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.kafka.KafkaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kafka',
+            version: '3.14.0',
+            scheme: 'kafka',
+            extendsScheme: '',
+            syntax: 'kafka:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kamelet',
+            title: 'Kamelet',
+            description: 'To call Kamelets',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'core',
+            javaType: 'org.apache.camel.component.kamelet.KameletComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kamelet',
+            version: '3.14.0',
+            scheme: 'kamelet',
+            extendsScheme: '',
+            syntax: 'kamelet:templateId/routeId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'kamelet-reify',
+            title: 'Kamelet Reify',
+            description: 'To call Kamelets (indirectly)',
+            deprecated: true,
+            firstVersion: '3.6.0',
+            label: 'core',
+            javaType: 'org.apache.camel.component.kameletreify.KameletReifyComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kamelet-reify',
+            version: '3.14.0',
+            scheme: 'kamelet-reify',
+            extendsScheme: '',
+            syntax: 'kamelet-reify:delegateUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-config-maps',
+            title: 'Kubernetes ConfigMap',
+            description: 'Perform operations on Kubernetes ConfigMaps and get notified on ConfigMaps changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.config_maps.KubernetesConfigMapsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-config-maps',
+            extendsScheme: '',
+            syntax: 'kubernetes-config-maps:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-custom-resources',
+            title: 'Kubernetes Custom Resources',
+            description: 'Perform operations on Kubernetes Custom Resources and get notified on Deployment changes.',
+            deprecated: false,
+            firstVersion: '3.7.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.customresources.KubernetesCustomResourcesComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-custom-resources',
+            extendsScheme: '',
+            syntax: 'kubernetes-custom-resources:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-deployments',
+            title: 'Kubernetes Deployments',
+            description: 'Perform operations on Kubernetes Deployments and get notified on Deployment changes.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.deployments.KubernetesDeploymentsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-deployments',
+            extendsScheme: '',
+            syntax: 'kubernetes-deployments:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-hpa',
+            title: 'Kubernetes HPA',
+            description: 'Perform operations on Kubernetes Horizontal Pod Autoscalers (HPA) and get notified on HPA changes.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.hpa.KubernetesHPAComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-hpa',
+            extendsScheme: '',
+            syntax: 'kubernetes-hpa:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-job',
+            title: 'Kubernetes Job',
+            description: 'Perform operations on Kubernetes Jobs.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.job.KubernetesJobComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-job',
+            extendsScheme: '',
+            syntax: 'kubernetes-job:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-namespaces',
+            title: 'Kubernetes Namespaces',
+            description: 'Perform operations on Kubernetes Namespaces and get notified on Namespace changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.namespaces.KubernetesNamespacesComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-namespaces',
+            extendsScheme: '',
+            syntax: 'kubernetes-namespaces:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-nodes',
+            title: 'Kubernetes Nodes',
+            description: 'Perform operations on Kubernetes Nodes and get notified on Node changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.nodes.KubernetesNodesComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-nodes',
+            extendsScheme: '',
+            syntax: 'kubernetes-nodes:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-persistent-volumes',
+            title: 'Kubernetes Persistent Volume',
+            description: 'Perform operations on Kubernetes Persistent Volumes and get notified on Persistent Volume changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.persistent_volumes.KubernetesPersistentVolumesComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-persistent-volumes',
+            extendsScheme: '',
+            syntax: 'kubernetes-persistent-volumes:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-persistent-volumes-claims',
+            title: 'Kubernetes Persistent Volume Claim',
+            description: 'Perform operations on Kubernetes Persistent Volumes Claims and get notified on Persistent Volumes Claim changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.persistent_volumes_claims.KubernetesPersistentVolumesClaimsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-persistent-volumes-claims',
+            extendsScheme: '',
+            syntax: 'kubernetes-persistent-volumes-claims:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-pods',
+            title: 'Kubernetes Pods',
+            description: 'Perform operations on Kubernetes Pods and get notified on Pod changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.pods.KubernetesPodsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-pods',
+            extendsScheme: '',
+            syntax: 'kubernetes-pods:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-replication-controllers',
+            title: 'Kubernetes Replication Controller',
+            description: 'Perform operations on Kubernetes Replication Controllers and get notified on Replication Controllers changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.replication_controllers.KubernetesReplicationControllersComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-replication-controllers',
+            extendsScheme: '',
+            syntax: 'kubernetes-replication-controllers:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-resources-quota',
+            title: 'Kubernetes Resources Quota',
+            description: 'Perform operations on Kubernetes Resources Quotas.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.resources_quota.KubernetesResourcesQuotaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-resources-quota',
+            extendsScheme: '',
+            syntax: 'kubernetes-resources-quota:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-secrets',
+            title: 'Kubernetes Secrets',
+            description: 'Perform operations on Kubernetes Secrets.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.secrets.KubernetesSecretsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-secrets',
+            extendsScheme: '',
+            syntax: 'kubernetes-secrets:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-service-accounts',
+            title: 'Kubernetes Service Account',
+            description: 'Perform operations on Kubernetes Service Accounts.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.service_accounts.KubernetesServiceAccountsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-service-accounts',
+            extendsScheme: '',
+            syntax: 'kubernetes-service-accounts:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kubernetes-services',
+            title: 'Kubernetes Services',
+            description: 'Perform operations on Kubernetes Services and get notified on Service changes.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.kubernetes.services.KubernetesServicesComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'kubernetes-services',
+            extendsScheme: '',
+            syntax: 'kubernetes-services:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'kudu',
+            title: 'Kudu',
+            description: 'Interact with Apache Kudu, a free and open source column-oriented data store of the Apache Hadoop ecosystem.',
+            deprecated: false,
+            firstVersion: '3.0',
+            label: 'database,iot,cloud',
+            javaType: 'org.apache.camel.component.kudu.KuduComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kudu',
+            version: '3.14.0',
+            scheme: 'kudu',
+            extendsScheme: '',
+            syntax: 'kudu:host:port/tableName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'language',
+            title: 'Language',
+            description: 'Execute scripts in any of the languages supported by Camel.',
+            deprecated: false,
+            firstVersion: '2.5.0',
+            label: 'core,script',
+            javaType: 'org.apache.camel.component.language.LanguageComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-language',
+            version: '3.14.0',
+            scheme: 'language',
+            extendsScheme: '',
+            syntax: 'language:languageName:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ldap',
+            title: 'LDAP',
+            description: 'Perform searches on LDAP servers.',
+            deprecated: false,
+            firstVersion: '1.5.0',
+            label: 'search,ldap',
+            javaType: 'org.apache.camel.component.ldap.LdapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ldap',
+            version: '3.14.0',
+            scheme: 'ldap',
+            extendsScheme: '',
+            syntax: 'ldap:dirContextName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ldif',
+            title: 'LDIF',
+            description: 'Perform updates on an LDAP server from an LDIF body content.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'ldap',
+            javaType: 'org.apache.camel.component.ldif.LdifComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ldif',
+            version: '3.14.0',
+            scheme: 'ldif',
+            extendsScheme: '',
+            syntax: 'ldif:ldapConnectionName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'log',
+            title: 'Log',
+            description: 'Log messages to the underlying logging mechanism.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'core,monitoring',
+            javaType: 'org.apache.camel.component.log.LogComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-log',
+            version: '3.14.0',
+            scheme: 'log',
+            extendsScheme: '',
+            syntax: 'log:loggerName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'lpr',
+            title: 'Printer',
+            description: 'Send print jobs to printers.',
+            deprecated: false,
+            firstVersion: '2.1.0',
+            label: 'printing',
+            javaType: 'org.apache.camel.component.printer.PrinterComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-printer',
+            version: '3.14.0',
+            scheme: 'lpr',
+            extendsScheme: '',
+            syntax: 'lpr:hostname:port/printername',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'lucene',
+            title: 'Lucene',
+            description: 'Perform inserts or queries against Apache Lucene databases.',
+            deprecated: false,
+            firstVersion: '2.2.0',
+            label: 'database,search',
+            javaType: 'org.apache.camel.component.lucene.LuceneComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-lucene',
+            version: '3.14.0',
+            scheme: 'lucene',
+            extendsScheme: '',
+            syntax: 'lucene:host:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'lumberjack',
+            title: 'Lumberjack',
+            description: 'Receive logs messages using the Lumberjack protocol.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'log',
+            javaType: 'org.apache.camel.component.lumberjack.LumberjackComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-lumberjack',
+            version: '3.14.0',
+            scheme: 'lumberjack',
+            extendsScheme: '',
+            syntax: 'lumberjack:host:port',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'master',
+            title: 'Master',
+            description:
+                'Have only a single consumer in a cluster consuming from a given endpoint; with automatic failover if the JVM dies.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'clustering',
+            javaType: 'org.apache.camel.component.master.MasterComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-master',
+            version: '3.14.0',
+            scheme: 'master',
+            extendsScheme: '',
+            syntax: 'master:namespace:delegateUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'metrics',
+            title: 'Metrics',
+            description: 'Collect various metrics directly from Camel routes using the DropWizard metrics library.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.metrics.MetricsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-metrics',
+            version: '3.14.0',
+            scheme: 'metrics',
+            extendsScheme: '',
+            syntax: 'metrics:metricsType:metricsName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'micrometer',
+            title: 'Micrometer',
+            description: 'Collect various metrics directly from Camel routes using the Micrometer library.',
+            deprecated: false,
+            firstVersion: '2.22.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.micrometer.MicrometerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-micrometer',
+            version: '3.14.0',
+            scheme: 'micrometer',
+            extendsScheme: '',
+            syntax: 'micrometer:metricsType:metricsName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'microprofile-metrics',
+            title: 'MicroProfile Metrics',
+            description: 'Expose metrics from Camel routes.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.microprofile.metrics.MicroProfileMetricsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-microprofile-metrics',
+            version: '3.14.0',
+            scheme: 'microprofile-metrics',
+            extendsScheme: '',
+            syntax: 'microprofile-metrics:metricType:metricName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'milo-client',
+            title: 'OPC UA Client',
+            description: 'Connect to OPC UA servers using the binary protocol for acquiring telemetry data.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.component.milo.client.MiloClientComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-milo',
+            version: '3.14.0',
+            scheme: 'milo-client',
+            extendsScheme: '',
+            syntax: 'milo-client:endpointUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'milo-server',
+            title: 'OPC UA Server',
+            description: 'Make telemetry data available as an OPC UA server.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'iot',
+            javaType: 'org.apache.camel.component.milo.server.MiloServerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-milo',
+            version: '3.14.0',
+            scheme: 'milo-server',
+            extendsScheme: '',
+            syntax: 'milo-server:itemId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mina',
+            title: 'Mina',
+            description: 'Socket level networking using TCP or UDP with Apache Mina 2.x.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'networking,tcp,udp',
+            javaType: 'org.apache.camel.component.mina.MinaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mina',
+            version: '3.14.0',
+            scheme: 'mina',
+            extendsScheme: '',
+            syntax: 'mina:protocol:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'minio',
+            title: 'Minio',
+            description: 'Store and retrieve objects from Minio Storage Service using Minio SDK.',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'cloud,file',
+            javaType: 'org.apache.camel.component.minio.MinioComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-minio',
+            version: '3.14.0',
+            scheme: 'minio',
+            extendsScheme: '',
+            syntax: 'minio:bucketName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mllp',
+            title: 'MLLP',
+            description: 'Communicate with external systems using the MLLP protocol.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'networking,rpc,mllp',
+            javaType: 'org.apache.camel.component.mllp.MllpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mllp',
+            version: '3.14.0',
+            scheme: 'mllp',
+            extendsScheme: '',
+            syntax: 'mllp:hostname:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mock',
+            title: 'Mock',
+            description: 'Test routes and mediation rules using mocks.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'core,testing',
+            javaType: 'org.apache.camel.component.mock.MockComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mock',
+            version: '3.14.0',
+            scheme: 'mock',
+            extendsScheme: '',
+            syntax: 'mock:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'mongodb',
+            title: 'MongoDB',
+            description: 'Perform operations on MongoDB documents and collections.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.mongodb.MongoDbComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mongodb',
+            version: '3.14.0',
+            scheme: 'mongodb',
+            extendsScheme: '',
+            syntax: 'mongodb:connectionBean',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mongodb-gridfs',
+            title: 'MongoDB GridFS',
+            description: 'Interact with MongoDB GridFS.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.mongodb.gridfs.GridFsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mongodb-gridfs',
+            version: '3.14.0',
+            scheme: 'mongodb-gridfs',
+            extendsScheme: '',
+            syntax: 'mongodb-gridfs:connectionBean',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'msv',
+            title: 'MSV',
+            description: 'Validate XML payloads using Multi-Schema Validator (MSV).',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'validation',
+            javaType: 'org.apache.camel.component.validator.msv.MsvComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-msv',
+            version: '3.14.0',
+            scheme: 'msv',
+            extendsScheme: '',
+            syntax: 'msv:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mustache',
+            title: 'Mustache',
+            description: 'Transform messages using a Mustache template.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.mustache.MustacheComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mustache',
+            version: '3.14.0',
+            scheme: 'mustache',
+            extendsScheme: '',
+            syntax: 'mustache:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mvel',
+            title: 'MVEL',
+            description: 'Transform messages using an MVEL template.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'transformation,script',
+            javaType: 'org.apache.camel.component.mvel.MvelComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mvel',
+            version: '3.14.0',
+            scheme: 'mvel',
+            extendsScheme: '',
+            syntax: 'mvel:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mybatis',
+            title: 'MyBatis',
+            description: 'Performs a query, poll, insert, update or delete in a relational database using MyBatis.',
+            deprecated: false,
+            firstVersion: '2.7.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.mybatis.MyBatisComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mybatis',
+            version: '3.14.0',
+            scheme: 'mybatis',
+            extendsScheme: '',
+            syntax: 'mybatis:statement',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'mybatis-bean',
+            title: 'MyBatis Bean',
+            description: 'Perform queries, inserts, updates or deletes in a relational database using MyBatis.',
+            deprecated: false,
+            firstVersion: '2.22.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.mybatis.MyBatisBeanComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mybatis',
+            version: '3.14.0',
+            scheme: 'mybatis-bean',
+            extendsScheme: '',
+            syntax: 'mybatis-bean:beanName:methodName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'nagios',
+            title: 'Nagios',
+            description: 'Send passive checks to Nagios using JSendNSCA.',
+            deprecated: false,
+            firstVersion: '2.3.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.nagios.NagiosComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-nagios',
+            version: '3.14.0',
+            scheme: 'nagios',
+            extendsScheme: '',
+            syntax: 'nagios:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'nats',
+            title: 'Nats',
+            description: 'Send and receive messages from NATS messaging system.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.nats.NatsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-nats',
+            version: '3.14.0',
+            scheme: 'nats',
+            extendsScheme: '',
+            syntax: 'nats:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'netty',
+            title: 'Netty',
+            description: 'Socket level networking using TCP or UDP with Netty 4.x.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'networking,tcp,udp',
+            javaType: 'org.apache.camel.component.netty.NettyComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-netty',
+            version: '3.14.0',
+            scheme: 'netty',
+            extendsScheme: '',
+            syntax: 'netty:protocol://host:port',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'netty-http',
+            title: 'Netty HTTP',
+            description: 'Netty HTTP server and client using the Netty 4.x.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.14.0',
+            label: 'networking,http',
+            javaType: 'org.apache.camel.component.netty.http.NettyHttpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-netty-http',
+            version: '3.14.0',
+            scheme: 'netty-http',
+            extendsScheme: 'netty',
+            syntax: 'netty-http:protocol://host:port/path',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'nitrite',
+            title: 'Nitrite',
+            description: 'Access Nitrite databases.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,nosql',
+            javaType: 'org.apache.camel.component.nitrite.NitriteComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-nitrite',
+            version: '3.14.0',
+            scheme: 'nitrite',
+            extendsScheme: '',
+            syntax: 'nitrite:database',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'nsq',
+            title: 'NSQ',
+            description: 'Send and receive messages from NSQ realtime distributed messaging platform.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.nsq.NsqComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-nsq',
+            version: '3.14.0',
+            scheme: 'nsq',
+            extendsScheme: '',
+            syntax: 'nsq:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'oaipmh',
+            title: 'OAI-PMH',
+            description: 'Harvest metadata using OAI-PMH protocol',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'endpoint,webservice,batch',
+            javaType: 'org.apache.camel.oaipmh.component.OAIPMHComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-oaipmh',
+            version: '3.14.0',
+            scheme: 'oaipmh',
+            extendsScheme: '',
+            syntax: 'oaipmh:baseUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'olingo2',
+            title: 'Olingo2',
+            description: 'Communicate with OData 2.0 services using Apache Olingo.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.olingo2.Olingo2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-olingo2',
+            version: '3.14.0',
+            scheme: 'olingo2',
+            extendsScheme: '',
+            syntax: 'olingo2:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'olingo4',
+            title: 'Olingo4',
+            description: 'Communicate with OData 4.0 services using Apache Olingo OData API.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.olingo4.Olingo4Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-olingo4',
+            version: '3.14.0',
+            scheme: 'olingo4',
+            extendsScheme: '',
+            syntax: 'olingo4:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openshift-build-configs',
+            title: 'Openshift Build Config',
+            description: 'Perform operations on OpenShift Build Configs.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.openshift.build_configs.OpenshiftBuildConfigsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'openshift-build-configs',
+            extendsScheme: '',
+            syntax: 'openshift-build-configs:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openshift-builds',
+            title: 'Openshift Builds',
+            description: 'Perform operations on OpenShift Builds.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'container,cloud,paas',
+            javaType: 'org.apache.camel.component.openshift.builds.OpenshiftBuildsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-kubernetes',
+            version: '3.14.0',
+            scheme: 'openshift-builds',
+            extendsScheme: '',
+            syntax: 'openshift-builds:masterUrl',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-cinder',
+            title: 'OpenStack Cinder',
+            description: 'Access data in OpenStack Cinder block storage.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.cinder.CinderComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-cinder',
+            extendsScheme: '',
+            syntax: 'openstack-cinder:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-glance',
+            title: 'OpenStack Glance',
+            description: 'Manage VM images and metadata definitions in OpenStack Glance.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.glance.GlanceComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-glance',
+            extendsScheme: '',
+            syntax: 'openstack-glance:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-keystone',
+            title: 'OpenStack Keystone',
+            description:
+                'Access OpenStack Keystone for API client authentication, service discovery and distributed multi-tenant authorization.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.keystone.KeystoneComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-keystone',
+            extendsScheme: '',
+            syntax: 'openstack-keystone:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-neutron',
+            title: 'OpenStack Neutron',
+            description: 'Access OpenStack Neutron for network services.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.neutron.NeutronComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-neutron',
+            extendsScheme: '',
+            syntax: 'openstack-neutron:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-nova',
+            title: 'OpenStack Nova',
+            description: 'Access OpenStack to manage compute resources.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.nova.NovaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-nova',
+            extendsScheme: '',
+            syntax: 'openstack-nova:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'openstack-swift',
+            title: 'OpenStack Swift',
+            description: 'Access OpenStack Swift object/blob store.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,paas',
+            javaType: 'org.apache.camel.component.openstack.swift.SwiftComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-openstack',
+            version: '3.14.0',
+            scheme: 'openstack-swift',
+            extendsScheme: '',
+            syntax: 'openstack-swift:host',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'optaplanner',
+            title: 'OptaPlanner',
+            description: 'Solve planning problems with OptaPlanner.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'engine,planning',
+            javaType: 'org.apache.camel.component.optaplanner.OptaPlannerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-optaplanner',
+            version: '3.14.0',
+            scheme: 'optaplanner',
+            extendsScheme: '',
+            syntax: 'optaplanner:configFile',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'paho',
+            title: 'Paho',
+            description: 'Communicate with MQTT message brokers using Eclipse Paho MQTT Client.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'messaging,iot',
+            javaType: 'org.apache.camel.component.paho.PahoComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-paho',
+            version: '3.14.0',
+            scheme: 'paho',
+            extendsScheme: '',
+            syntax: 'paho:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'paho-mqtt5',
+            title: 'Paho MQTT 5',
+            description: 'Communicate with MQTT message brokers using Eclipse Paho MQTT v5 Client.',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'messaging,iot',
+            javaType: 'org.apache.camel.component.paho.mqtt5.PahoMqtt5Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-paho-mqtt5',
+            version: '3.14.0',
+            scheme: 'paho-mqtt5',
+            extendsScheme: '',
+            syntax: 'paho-mqtt5:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pdf',
+            title: 'PDF',
+            description: 'Create, modify or extract content from PDF documents.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'document,transformation,printing',
+            javaType: 'org.apache.camel.component.pdf.PdfComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-pdf',
+            version: '3.14.0',
+            scheme: 'pdf',
+            extendsScheme: '',
+            syntax: 'pdf:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pg-replication-slot',
+            title: 'PostgresSQL Replication Slot',
+            description: 'Poll for PostgreSQL Write-Ahead Log (WAL) records using Streaming Replication Slots.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.pg.replication.slot.PgReplicationSlotComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-pg-replication-slot',
+            version: '3.14.0',
+            scheme: 'pg-replication-slot',
+            extendsScheme: '',
+            syntax: 'pg-replication-slot:host:port/database/slot:outputPlugin',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pgevent',
+            title: 'PostgresSQL Event',
+            description: 'Send and receive PostgreSQL events via LISTEN and NOTIFY commands.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.pgevent.PgEventComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-pgevent',
+            version: '3.14.0',
+            scheme: 'pgevent',
+            extendsScheme: '',
+            syntax: 'pgevent:host:port/database/channel',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'platform-http',
+            title: 'Platform HTTP',
+            description: 'Expose HTTP endpoints using the HTTP server available in the current platform.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.platform.http.PlatformHttpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-platform-http',
+            version: '3.14.0',
+            scheme: 'platform-http',
+            extendsScheme: '',
+            syntax: 'platform-http:path',
+            async: true,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pop3',
+            title: 'POP3',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'pop3',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'pop3:host:port',
+            alternativeSyntax: 'pop3:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pop3s',
+            title: 'POP3S',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'pop3s',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'pop3s:host:port',
+            alternativeSyntax: 'pop3s:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pubnub',
+            title: 'PubNub',
+            description: 'Send and receive messages to/from PubNub data stream network for connected devices.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,iot,messaging',
+            javaType: 'org.apache.camel.component.pubnub.PubNubComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-pubnub',
+            version: '3.14.0',
+            scheme: 'pubnub',
+            extendsScheme: '',
+            syntax: 'pubnub:channel',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'pulsar',
+            title: 'Pulsar',
+            description: 'Send and receive messages from/to Apache Pulsar messaging system.',
+            deprecated: false,
+            firstVersion: '2.24.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.pulsar.PulsarComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-pulsar',
+            version: '3.14.0',
+            scheme: 'pulsar',
+            extendsScheme: '',
+            syntax: 'pulsar:persistence://tenant/namespace/topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'quartz',
+            title: 'Quartz',
+            description: 'Schedule sending of messages using the Quartz 2.x scheduler.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'scheduling',
+            javaType: 'org.apache.camel.component.quartz.QuartzComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-quartz',
+            version: '3.14.0',
+            scheme: 'quartz',
+            extendsScheme: '',
+            syntax: 'quartz:groupName/triggerName',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'quickfix',
+            title: 'QuickFix',
+            description: 'Open a Financial Interchange (FIX) session using an embedded QuickFix/J engine.',
+            deprecated: false,
+            firstVersion: '2.1.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.quickfixj.QuickfixjComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-quickfix',
+            version: '3.14.0',
+            scheme: 'quickfix',
+            extendsScheme: '',
+            syntax: 'quickfix:configurationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'rabbitmq',
+            title: 'RabbitMQ',
+            description: 'Send and receive messages from RabbitMQ instances.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.rabbitmq.RabbitMQComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rabbitmq',
+            version: '3.14.0',
+            scheme: 'rabbitmq',
+            extendsScheme: '',
+            syntax: 'rabbitmq:exchangeName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'reactive-streams',
+            title: 'Reactive Streams',
+            description: 'Exchange messages with reactive stream processing libraries compatible with the reactive streams standard.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'reactive,streams',
+            javaType: 'org.apache.camel.component.reactive.streams.ReactiveStreamsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-reactive-streams',
+            version: '3.14.0',
+            scheme: 'reactive-streams',
+            extendsScheme: '',
+            syntax: 'reactive-streams:stream',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ref',
+            title: 'Ref',
+            description: 'Route messages to an endpoint looked up dynamically by name in the Camel Registry.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.ref.RefComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ref',
+            version: '3.14.0',
+            scheme: 'ref',
+            extendsScheme: '',
+            syntax: 'ref:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'rest',
+            title: 'REST',
+            description: 'Expose REST services or call external REST services.',
+            deprecated: false,
+            firstVersion: '2.14.0',
+            label: 'core,rest',
+            javaType: 'org.apache.camel.component.rest.RestComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rest',
+            version: '3.14.0',
+            scheme: 'rest',
+            extendsScheme: '',
+            syntax: 'rest:method:path:uriTemplate',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'rest-api',
+            title: 'REST API',
+            description: 'Expose OpenAPI Specification of the REST services defined using Camel REST DSL.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'core,rest',
+            javaType: 'org.apache.camel.component.rest.RestApiComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rest',
+            version: '3.14.0',
+            scheme: 'rest-api',
+            extendsScheme: '',
+            syntax: 'rest-api:path',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'rest-openapi',
+            title: 'REST OpenApi',
+            description:
+                'Configure REST producers based on an OpenAPI specification document delegating to a component implementing the RestProducerFactory interface.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'openapi,rest,api',
+            javaType: 'org.apache.camel.component.rest.openapi.RestOpenApiComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rest-openapi',
+            version: '3.14.0',
+            scheme: 'rest-openapi',
+            extendsScheme: '',
+            syntax: 'rest-openapi:specificationUri#operationId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'rest-swagger',
+            title: 'REST Swagger',
+            description:
+                'Configure REST producers based on a Swagger (OpenAPI) specification document delegating to a component implementing the RestProducerFactory interface.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'rest,swagger,http',
+            javaType: 'org.apache.camel.component.rest.swagger.RestSwaggerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rest-swagger',
+            version: '3.14.0',
+            scheme: 'rest-swagger',
+            extendsScheme: '',
+            syntax: 'rest-swagger:specificationUri#operationId',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'resteasy',
+            title: 'Resteasy',
+            description: 'Expose REST endpoints and access external REST servers.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '3.4.0',
+            label: 'rest',
+            javaType: 'org.apache.camel.component.resteasy.ResteasyComponent',
+            supportLevel: 'Preview',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-resteasy',
+            version: '3.14.0',
+            scheme: 'resteasy',
+            extendsScheme: 'http',
+            syntax: 'resteasy:httpUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'robotframework',
+            title: 'Robot Framework',
+            description: 'Pass camel exchanges to acceptence test written in Robot DSL.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'testing',
+            javaType: 'org.apache.camel.component.robotframework.RobotFrameworkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-robotframework',
+            version: '3.14.0',
+            scheme: 'robotframework',
+            extendsScheme: '',
+            syntax: 'robotframework:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'rss',
+            title: 'RSS',
+            description: 'Poll RSS feeds.',
+            deprecated: false,
+            firstVersion: '2.0.0',
+            label: 'rss',
+            javaType: 'org.apache.camel.component.rss.RssComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-rss',
+            version: '3.14.0',
+            scheme: 'rss',
+            extendsScheme: 'atom',
+            syntax: 'rss:feedUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'saga',
+            title: 'Saga',
+            description: 'Execute custom actions within a route using the Saga EIP.',
+            deprecated: false,
+            firstVersion: '2.21.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.saga.SagaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-saga',
+            version: '3.14.0',
+            scheme: 'saga',
+            extendsScheme: '',
+            syntax: 'saga:action',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'salesforce',
+            title: 'Salesforce',
+            description: 'Communicate with Salesforce using Java DTOs.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'cloud,api,crm',
+            javaType: 'org.apache.camel.component.salesforce.SalesforceComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-salesforce',
+            version: '3.14.0',
+            scheme: 'salesforce',
+            extendsScheme: '',
+            syntax: 'salesforce:operationName:topicName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'sap-netweaver',
+            title: 'SAP NetWeaver',
+            description: 'Send requests to SAP NetWeaver Gateway using HTTP.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'sap,cloud,api',
+            javaType: 'org.apache.camel.component.sap.netweaver.NetWeaverComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sap-netweaver',
+            version: '3.14.0',
+            scheme: 'sap-netweaver',
+            extendsScheme: '',
+            syntax: 'sap-netweaver:url',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'scheduler',
+            title: 'Scheduler',
+            description: 'Generate messages in specified intervals using java.util.concurrent.ScheduledExecutorService.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'core,scheduling',
+            javaType: 'org.apache.camel.component.scheduler.SchedulerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-scheduler',
+            version: '3.14.0',
+            scheme: 'scheduler',
+            extendsScheme: '',
+            syntax: 'scheduler:name',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'schematron',
+            title: 'Schematron',
+            description: 'Validate XML payload using the Schematron Library.',
+            deprecated: false,
+            firstVersion: '2.15.0',
+            label: 'validation',
+            javaType: 'org.apache.camel.component.schematron.SchematronComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-schematron',
+            version: '3.14.0',
+            scheme: 'schematron',
+            extendsScheme: '',
+            syntax: 'schematron:path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'scp',
+            title: 'SCP',
+            description: 'Copy files to/from remote hosts using the secure copy protocol (SCP).',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.10.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.scp.ScpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jsch',
+            version: '3.14.0',
+            scheme: 'scp',
+            extendsScheme: 'ftp',
+            syntax: 'scp:host:port/directoryName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'seda',
+            title: 'SEDA',
+            description: 'Asynchronously call another endpoint from any Camel Context in the same JVM.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.seda.SedaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-seda',
+            version: '3.14.0',
+            scheme: 'seda',
+            extendsScheme: '',
+            syntax: 'seda:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'service',
+            title: 'Service',
+            description: 'Register a Camel endpoint to a Service Registry (such as Consul, Etcd) and delegate to it.',
+            deprecated: false,
+            firstVersion: '2.22.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.service.ServiceComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-service',
+            version: '3.14.0',
+            scheme: 'service',
+            extendsScheme: '',
+            syntax: 'service:delegateUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'servicenow',
+            title: 'ServiceNow',
+            description: 'Interact with ServiceNow via its REST API.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'api,cloud,management',
+            javaType: 'org.apache.camel.component.servicenow.ServiceNowComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-servicenow',
+            version: '3.14.0',
+            scheme: 'servicenow',
+            extendsScheme: '',
+            syntax: 'servicenow:instanceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'servlet',
+            title: 'Servlet',
+            description: 'Serve HTTP requests by a Servlet.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '2.0.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.servlet.ServletComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-servlet',
+            version: '3.14.0',
+            scheme: 'servlet',
+            extendsScheme: 'http',
+            syntax: 'servlet:contextPath',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sftp',
+            title: 'SFTP',
+            description: 'Upload and download files to/from SFTP servers.',
+            deprecated: false,
+            deprecationNote: '',
+            firstVersion: '1.1.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.file.remote.SftpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ftp',
+            version: '3.14.0',
+            scheme: 'sftp',
+            extendsScheme: 'file',
+            syntax: 'sftp:host:port/directoryName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sip',
+            title: 'SIP',
+            description: 'Send and receive messages using the SIP protocol (used in telecommunications).',
+            deprecated: false,
+            firstVersion: '2.5.0',
+            label: 'mobile',
+            javaType: 'org.apache.camel.component.sip.SipComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sip',
+            version: '3.14.0',
+            scheme: 'sip',
+            extendsScheme: '',
+            alternativeSchemes: 'sip,sips',
+            syntax: 'sip:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sips',
+            title: 'SIP (Secure)',
+            description: 'Send and receive messages using the SIP protocol (used in telecommunications).',
+            deprecated: false,
+            firstVersion: '2.5.0',
+            label: 'mobile',
+            javaType: 'org.apache.camel.component.sip.SipComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sip',
+            version: '3.14.0',
+            scheme: 'sips',
+            extendsScheme: '',
+            alternativeSchemes: 'sip,sips',
+            syntax: 'sips:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sjms',
+            title: 'Simple JMS',
+            description: 'Send and receive messages to/from a JMS Queue or Topic using plain JMS 1.x API.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.sjms.SjmsComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sjms',
+            version: '3.14.0',
+            scheme: 'sjms',
+            extendsScheme: '',
+            syntax: 'ibmmq',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sjms2',
+            title: 'Simple JMS2',
+            description: 'Send and receive messages to/from a JMS Queue or Topic using plain JMS 2.x API.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.sjms2.Sjms2Component',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sjms2',
+            version: '3.14.0',
+            scheme: 'sjms2',
+            extendsScheme: 'sjms',
+            syntax: 'sjms2:destinationType:destinationName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'slack',
+            title: 'Slack',
+            description: 'Send and receive messages to/from Slack.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'social',
+            javaType: 'org.apache.camel.component.slack.SlackComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-slack',
+            version: '3.14.0',
+            scheme: 'slack',
+            extendsScheme: '',
+            syntax: 'slack:channel',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'smpp',
+            title: 'SMPP',
+            description: 'Send and receive SMS messages using a SMSC (Short Message Service Center).',
+            deprecated: false,
+            firstVersion: '2.2.0',
+            label: 'mobile',
+            javaType: 'org.apache.camel.component.smpp.SmppComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-smpp',
+            version: '3.14.0',
+            scheme: 'smpp',
+            extendsScheme: '',
+            alternativeSchemes: 'smpp,smpps',
+            syntax: 'smpp:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'smpps',
+            title: 'SMPP (Secure)',
+            description: 'Send and receive SMS messages using a SMSC (Short Message Service Center).',
+            deprecated: false,
+            firstVersion: '2.2.0',
+            label: 'mobile',
+            javaType: 'org.apache.camel.component.smpp.SmppComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-smpp',
+            version: '3.14.0',
+            scheme: 'smpps',
+            extendsScheme: '',
+            alternativeSchemes: 'smpp,smpps',
+            syntax: 'smpps:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'smtp',
+            title: 'SMTP',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'smtp',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'smtp:host:port',
+            alternativeSyntax: 'smtp:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'smtps',
+            title: 'SMTPS',
+            description: 'Send and receive emails using imap, pop3 and smtp protocols.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'mail',
+            javaType: 'org.apache.camel.component.mail.MailComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-mail',
+            version: '3.14.0',
+            scheme: 'smtps',
+            extendsScheme: '',
+            alternativeSchemes: 'imap,imaps,pop3,pop3s,smtp,smtps',
+            syntax: 'smtps:host:port',
+            alternativeSyntax: 'smtps:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'snmp',
+            title: 'SNMP',
+            description: 'Receive traps and poll SNMP (Simple Network Management Protocol) capable devices.',
+            deprecated: false,
+            firstVersion: '2.1.0',
+            label: 'monitoring',
+            javaType: 'org.apache.camel.component.snmp.SnmpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-snmp',
+            version: '3.14.0',
+            scheme: 'snmp',
+            extendsScheme: '',
+            syntax: 'snmp:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'solr',
+            title: 'Solr',
+            description: 'Perform operations against Apache Lucene Solr.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'monitoring,search',
+            javaType: 'org.apache.camel.component.solr.SolrComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-solr',
+            version: '3.14.0',
+            scheme: 'solr',
+            extendsScheme: '',
+            alternativeSchemes: 'solr,solrs,solrCloud',
+            syntax: 'solr:url',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'solrCloud',
+            title: 'Solr',
+            description: 'Perform operations against Apache Lucene Solr.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'monitoring,search',
+            javaType: 'org.apache.camel.component.solr.SolrComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-solr',
+            version: '3.14.0',
+            scheme: 'solrCloud',
+            extendsScheme: '',
+            alternativeSchemes: 'solr,solrs,solrCloud',
+            syntax: 'solrCloud:url',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'solrs',
+            title: 'Solr (Secure)',
+            description: 'Perform operations against Apache Lucene Solr.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'monitoring,search',
+            javaType: 'org.apache.camel.component.solr.SolrComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-solr',
+            version: '3.14.0',
+            scheme: 'solrs',
+            extendsScheme: '',
+            alternativeSchemes: 'solr,solrs,solrCloud',
+            syntax: 'solrs:url',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'soroush',
+            title: 'Soroush',
+            description: 'Send and receive messages as a Soroush chat bot.',
+            deprecated: false,
+            firstVersion: '3.0',
+            label: 'chat',
+            javaType: 'org.apache.camel.component.soroushbot.component.SoroushBotComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-soroush',
+            version: '3.14.0',
+            scheme: 'soroush',
+            extendsScheme: '',
+            syntax: 'soroush:action',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spark',
+            title: 'Spark',
+            description: 'Send RDD or DataFrame jobs to Apache Spark clusters.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'bigdata,iot',
+            javaType: 'org.apache.camel.component.spark.SparkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spark',
+            version: '3.14.0',
+            scheme: 'spark',
+            extendsScheme: '',
+            syntax: 'spark:endpointType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'splunk',
+            title: 'Splunk',
+            description: 'Publish or search for events in Splunk.',
+            deprecated: false,
+            firstVersion: '2.13.0',
+            label: 'iot,monitoring',
+            javaType: 'org.apache.camel.component.splunk.SplunkComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-splunk',
+            version: '3.14.0',
+            scheme: 'splunk',
+            extendsScheme: '',
+            syntax: 'splunk:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'splunk-hec',
+            title: 'Splunk HEC',
+            description: 'The splunk component allows to publish events in Splunk using the HTTP Event Collector.',
+            deprecated: false,
+            firstVersion: '3.3.0',
+            label: 'log,monitoring',
+            javaType: 'org.apache.camel.component.splunkhec.SplunkHECComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-splunk-hec',
+            version: '3.14.0',
+            scheme: 'splunk-hec',
+            extendsScheme: '',
+            syntax: 'splunk-hec:splunkURL/token',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-batch',
+            title: 'Spring Batch',
+            description: 'Send messages to Spring Batch for further processing.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'spring,batch,scheduling',
+            javaType: 'org.apache.camel.component.spring.batch.SpringBatchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-batch',
+            version: '3.14.0',
+            scheme: 'spring-batch',
+            extendsScheme: '',
+            syntax: 'spring-batch:jobName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-event',
+            title: 'Spring Event',
+            description: 'Listen for Spring Application Events.',
+            deprecated: false,
+            firstVersion: '1.4.0',
+            label: 'spring,eventbus',
+            javaType: 'org.apache.camel.component.event.EventComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring',
+            version: '3.14.0',
+            scheme: 'spring-event',
+            extendsScheme: '',
+            syntax: 'spring-event:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-integration',
+            title: 'Spring Integration',
+            description: 'Bridge Camel with Spring Integration.',
+            deprecated: false,
+            firstVersion: '1.4.0',
+            label: 'spring,eventbus',
+            javaType: 'org.apache.camel.component.spring.integration.SpringIntegrationComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-integration',
+            version: '3.14.0',
+            scheme: 'spring-integration',
+            extendsScheme: '',
+            syntax: 'spring-integration:defaultChannel',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-jdbc',
+            title: 'Spring JDBC',
+            description: 'Access databases through SQL and JDBC with Spring Transaction support.',
+            deprecated: false,
+            firstVersion: '3.10.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.spring.jdbc.SpringJdbcComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-jdbc',
+            version: '3.14.0',
+            scheme: 'spring-jdbc',
+            extendsScheme: '',
+            syntax: 'spring-jdbc:dataSourceName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-ldap',
+            title: 'Spring LDAP',
+            description: 'Perform searches in LDAP servers using filters as the message payload.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'spring,ldap',
+            javaType: 'org.apache.camel.component.springldap.SpringLdapComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-ldap',
+            version: '3.14.0',
+            scheme: 'spring-ldap',
+            extendsScheme: '',
+            syntax: 'spring-ldap:templateName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-rabbitmq',
+            title: 'Spring RabbitMQ',
+            description: 'Send and receive messages from RabbitMQ using Spring RabbitMQ client.',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.springrabbit.SpringRabbitMQComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-rabbitmq',
+            version: '3.14.0',
+            scheme: 'spring-rabbitmq',
+            extendsScheme: '',
+            syntax: 'spring-rabbitmq:exchangeName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-redis',
+            title: 'Spring Redis',
+            description: 'Send and receive messages from Redis.',
+            deprecated: false,
+            firstVersion: '2.11.0',
+            label: 'spring,nosql',
+            javaType: 'org.apache.camel.component.redis.RedisComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-redis',
+            version: '3.14.0',
+            scheme: 'spring-redis',
+            extendsScheme: '',
+            syntax: 'spring-redis:host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'spring-ws',
+            title: 'Spring WebService',
+            description: 'Access external web services as a client or expose your own web services.',
+            deprecated: false,
+            firstVersion: '2.6.0',
+            label: 'spring,soap,webservice',
+            javaType: 'org.apache.camel.component.spring.ws.SpringWebserviceComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-spring-ws',
+            version: '3.14.0',
+            scheme: 'spring-ws',
+            extendsScheme: '',
+            syntax: 'spring-ws:type:lookupKey:webServiceEndpointUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sql',
+            title: 'SQL',
+            description: 'Perform SQL queries using Spring JDBC.',
+            deprecated: false,
+            firstVersion: '1.4.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.sql.SqlComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sql',
+            version: '3.14.0',
+            scheme: 'sql',
+            extendsScheme: '',
+            syntax: 'sql:query',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sql-stored',
+            title: 'SQL Stored Procedure',
+            description: 'Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.',
+            deprecated: false,
+            firstVersion: '2.17.0',
+            label: 'database,sql',
+            javaType: 'org.apache.camel.component.sql.stored.SqlStoredComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-sql',
+            version: '3.14.0',
+            scheme: 'sql-stored',
+            extendsScheme: '',
+            syntax: 'sql-stored:template',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'ssh',
+            title: 'SSH',
+            description: 'Execute commands on remote hosts using SSH.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'file',
+            javaType: 'org.apache.camel.component.ssh.SshComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-ssh',
+            version: '3.14.0',
+            scheme: 'ssh',
+            extendsScheme: '',
+            syntax: 'ssh:host:port',
+            alternativeSyntax: 'ssh:username:password@host:port',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'stax',
+            title: 'StAX',
+            description: 'Process XML payloads by a SAX ContentHandler.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.stax.StAXComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stax',
+            version: '3.14.0',
+            scheme: 'stax',
+            extendsScheme: '',
+            syntax: 'stax:contentHandlerClass',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'stitch',
+            title: 'Stitch',
+            description:
+                'Stitch is a cloud ETL service that integrates various data sources into a central data warehouse through various integrations.',
+            deprecated: false,
+            firstVersion: '3.8.0',
+            label: 'cloud,api,compute,bigdata',
+            javaType: 'org.apache.camel.component.stitch.StitchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stitch',
+            version: '3.14.0',
+            scheme: 'stitch',
+            extendsScheme: '',
+            syntax: 'stitch:tableName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'stomp',
+            title: 'Stomp',
+            description: 'Send and rececive messages to/from STOMP (Simple Text Oriented Messaging Protocol) compliant message brokers.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.stomp.StompComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stomp',
+            version: '3.14.0',
+            scheme: 'stomp',
+            extendsScheme: '',
+            syntax: 'stomp:destination',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'stream',
+            title: 'Stream',
+            description: 'Read from system-in and write to system-out and system-err streams.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'file,system',
+            javaType: 'org.apache.camel.component.stream.StreamComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stream',
+            version: '3.14.0',
+            scheme: 'stream',
+            extendsScheme: '',
+            syntax: 'stream:kind',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'string-template',
+            title: 'String Template',
+            description: 'Transform messages using StringTemplate engine.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'transformation,script',
+            javaType: 'org.apache.camel.component.stringtemplate.StringTemplateComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stringtemplate',
+            version: '3.14.0',
+            scheme: 'string-template',
+            extendsScheme: '',
+            syntax: 'string-template:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'stub',
+            title: 'Stub',
+            description: 'Stub out any physical endpoints while in development or testing.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'core,testing',
+            javaType: 'org.apache.camel.component.stub.StubComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-stub',
+            version: '3.14.0',
+            scheme: 'stub',
+            extendsScheme: '',
+            syntax: 'stub:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'telegram',
+            title: 'Telegram',
+            description: 'Send and receive messages acting as a Telegram Bot Telegram Bot API.',
+            deprecated: false,
+            firstVersion: '2.18.0',
+            label: 'cloud,api,chat',
+            javaType: 'org.apache.camel.component.telegram.TelegramComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-telegram',
+            version: '3.14.0',
+            scheme: 'telegram',
+            extendsScheme: '',
+            syntax: 'telegram:type',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'thrift',
+            title: 'Thrift',
+            description: 'Call and expose remote procedures (RPC) with Apache Thrift data format and serialization mechanism.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'rpc,transformation',
+            javaType: 'org.apache.camel.component.thrift.ThriftComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-thrift',
+            version: '3.14.0',
+            scheme: 'thrift',
+            extendsScheme: '',
+            syntax: 'thrift:host:port/service',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'tika',
+            title: 'Tika',
+            description: 'Parse documents and extract metadata and text using Apache Tika.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'document,transformation',
+            javaType: 'org.apache.camel.component.tika.TikaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-tika',
+            version: '3.14.0',
+            scheme: 'tika',
+            extendsScheme: '',
+            syntax: 'tika:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'timer',
+            title: 'Timer',
+            description: 'Generate messages in specified intervals using java.util.Timer.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'core,scheduling',
+            javaType: 'org.apache.camel.component.timer.TimerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-timer',
+            version: '3.14.0',
+            scheme: 'timer',
+            extendsScheme: '',
+            syntax: 'timer:timerName',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'twilio',
+            title: 'Twilio',
+            description: 'Interact with Twilio REST APIs using Twilio Java SDK.',
+            deprecated: false,
+            firstVersion: '2.20.0',
+            label: 'api,messaging,cloud',
+            javaType: 'org.apache.camel.component.twilio.TwilioComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-twilio',
+            version: '3.14.0',
+            scheme: 'twilio',
+            extendsScheme: '',
+            syntax: 'twilio:apiName/methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'apiName/methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'twitter-directmessage',
+            title: 'Twitter Direct Message',
+            description: 'Send and receive Twitter direct messages.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'cloud,api,social,chat',
+            javaType: 'org.apache.camel.component.twitter.directmessage.TwitterDirectMessageComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-twitter',
+            version: '3.14.0',
+            scheme: 'twitter-directmessage',
+            extendsScheme: '',
+            syntax: 'twitter-directmessage:user',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'twitter-search',
+            title: 'Twitter Search',
+            description: 'Access Twitter Search.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'cloud,api,search,social',
+            javaType: 'org.apache.camel.component.twitter.search.TwitterSearchComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-twitter',
+            version: '3.14.0',
+            scheme: 'twitter-search',
+            extendsScheme: '',
+            syntax: 'twitter-search:keywords',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'twitter-timeline',
+            title: 'Twitter Timeline',
+            description: "Send tweets and receive tweets from user's timeline.",
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'api,cloud,social',
+            javaType: 'org.apache.camel.component.twitter.timeline.TwitterTimelineComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-twitter',
+            version: '3.14.0',
+            scheme: 'twitter-timeline',
+            extendsScheme: '',
+            syntax: 'twitter-timeline:timelineType',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'undertow',
+            title: 'Undertow',
+            description: 'Expose HTTP and WebSocket endpoints and access external HTTP/WebSocket servers.',
+            deprecated: false,
+            firstVersion: '2.16.0',
+            label: 'http,websocket',
+            javaType: 'org.apache.camel.component.undertow.UndertowComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-undertow',
+            version: '3.14.0',
+            scheme: 'undertow',
+            extendsScheme: '',
+            syntax: 'undertow:httpURI',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true,
+            verifiers: 'parameters,connectivity'
+        },
+        {
+            kind: 'component',
+            name: 'validator',
+            title: 'Validator',
+            description: 'Validate the payload using XML Schema and JAXP Validation.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'core,validation',
+            javaType: 'org.apache.camel.component.validator.ValidatorComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-validator',
+            version: '3.14.0',
+            scheme: 'validator',
+            extendsScheme: '',
+            syntax: 'validator:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'velocity',
+            title: 'Velocity',
+            description: 'Transform messages using a Velocity template.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.velocity.VelocityComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-velocity',
+            version: '3.14.0',
+            scheme: 'velocity',
+            extendsScheme: '',
+            syntax: 'velocity:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'vertx',
+            title: 'Vert.x',
+            description: 'Send and receive messages to/from Vert.x Event Bus.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'eventbus,reactive',
+            javaType: 'org.apache.camel.component.vertx.VertxComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-vertx',
+            version: '3.14.0',
+            scheme: 'vertx',
+            extendsScheme: '',
+            syntax: 'vertx:address',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'vertx-http',
+            title: 'Vert.x HTTP Client',
+            description: 'Send requests to external HTTP servers using Vert.x',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'http',
+            javaType: 'org.apache.camel.component.vertx.http.VertxHttpComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-vertx-http',
+            version: '3.14.0',
+            scheme: 'vertx-http',
+            extendsScheme: '',
+            syntax: 'vertx-http:httpUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'vertx-kafka',
+            title: 'Vert.x Kafka',
+            description: 'Sent and receive messages to/from an Apache Kafka broker using vert.x Kafka client',
+            deprecated: true,
+            firstVersion: '3.7.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.vertx.kafka.VertxKafkaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-vertx-kafka',
+            version: '3.14.0',
+            scheme: 'vertx-kafka',
+            extendsScheme: '',
+            syntax: 'vertx-kafka:topic',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'vertx-websocket',
+            title: 'Vert.x WebSocket',
+            description: 'Expose WebSocket endpoints and connect to remote WebSocket servers using Vert.x',
+            deprecated: false,
+            firstVersion: '3.5.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.vertx.websocket.VertxWebsocketComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-vertx-websocket',
+            version: '3.14.0',
+            scheme: 'vertx-websocket',
+            extendsScheme: '',
+            syntax: 'vertx-websocket:host:port/path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'vm',
+            title: 'VM',
+            description: 'Call another endpoint in the same CamelContext asynchronously.',
+            deprecated: false,
+            firstVersion: '1.1.0',
+            label: 'core,endpoint',
+            javaType: 'org.apache.camel.component.vm.VmComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-vm',
+            version: '3.14.0',
+            scheme: 'vm',
+            extendsScheme: '',
+            syntax: 'vm:name',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'weather',
+            title: 'Weather',
+            description: 'Poll the weather information from Open Weather Map.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'api',
+            javaType: 'org.apache.camel.component.weather.WeatherComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-weather',
+            version: '3.14.0',
+            scheme: 'weather',
+            extendsScheme: '',
+            syntax: 'weather:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'web3j',
+            title: 'Web3j Ethereum Blockchain',
+            description: 'Interact with Ethereum nodes using web3j client API.',
+            deprecated: false,
+            firstVersion: '2.22.0',
+            label: 'bitcoin,blockchain,api',
+            javaType: 'org.apache.camel.component.web3j.Web3jComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-web3j',
+            version: '3.14.0',
+            scheme: 'web3j',
+            extendsScheme: '',
+            syntax: 'web3j:nodeAddress',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'webhook',
+            title: 'Webhook',
+            description: 'Expose webhook endpoints to receive push notifications for other Camel components.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'cloud',
+            javaType: 'org.apache.camel.component.webhook.WebhookComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-webhook',
+            version: '3.14.0',
+            scheme: 'webhook',
+            extendsScheme: '',
+            syntax: 'webhook:endpointUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'websocket',
+            title: 'Jetty Websocket',
+            description: 'Expose websocket endpoints using Jetty.',
+            deprecated: false,
+            firstVersion: '2.10.0',
+            label: 'websocket',
+            javaType: 'org.apache.camel.component.websocket.WebsocketComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-websocket',
+            version: '3.14.0',
+            scheme: 'websocket',
+            extendsScheme: '',
+            syntax: 'websocket:host:port/resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'websocket-jsr356',
+            title: 'Javax Websocket',
+            description: 'Expose websocket endpoints using JSR356.',
+            deprecated: false,
+            firstVersion: '2.23.0',
+            label: 'http',
+            javaType: 'org.apache.camel.websocket.jsr356.JSR356WebSocketComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-websocket-jsr356',
+            version: '3.14.0',
+            scheme: 'websocket-jsr356',
+            extendsScheme: '',
+            syntax: 'websocket-jsr356:uri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'weka',
+            title: 'Weka',
+            description: 'Perform machine learning tasks using Weka.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'datamining',
+            javaType: 'org.apache.camel.component.weka.WekaComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-weka',
+            version: '3.14.0',
+            scheme: 'weka',
+            extendsScheme: '',
+            syntax: 'weka:command',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'wordpress',
+            title: 'Wordpress',
+            description: 'Manage posts and users using Wordpress API.',
+            deprecated: false,
+            firstVersion: '2.21.0',
+            label: 'cloud,api,cms',
+            javaType: 'org.apache.camel.component.wordpress.WordpressComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-wordpress',
+            version: '3.14.0',
+            scheme: 'wordpress',
+            extendsScheme: '',
+            syntax: 'wordpress:operation',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'workday',
+            title: 'Workday',
+            description: 'Detect and parse documents using Workday.',
+            deprecated: false,
+            firstVersion: '3.1.0',
+            label: 'cloud,api,hcm',
+            javaType: 'org.apache.camel.component.workday.WorkdayComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-workday',
+            version: '3.14.0',
+            scheme: 'workday',
+            extendsScheme: '',
+            syntax: 'workday:entity:path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xchange',
+            title: 'XChange',
+            description: 'Access market data and trade on Bitcoin and Altcoin exchanges.',
+            deprecated: false,
+            firstVersion: '2.21.0',
+            label: 'bitcoin,blockchain',
+            javaType: 'org.apache.camel.component.xchange.XChangeComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xchange',
+            version: '3.14.0',
+            scheme: 'xchange',
+            extendsScheme: '',
+            syntax: 'xchange:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xj',
+            title: 'XJ',
+            description: 'Transform JSON and XML message using a XSLT.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.xj.XJComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xj',
+            version: '3.14.0',
+            scheme: 'xj',
+            extendsScheme: '',
+            syntax: 'xj:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xmlsecurity-sign',
+            title: 'XML Security Sign',
+            description: 'Sign XML payloads using the XML signature specification.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'security,transformation',
+            javaType: 'org.apache.camel.component.xmlsecurity.XmlSignerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xmlsecurity',
+            version: '3.14.0',
+            scheme: 'xmlsecurity-sign',
+            extendsScheme: '',
+            syntax: 'xmlsecurity-sign:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xmlsecurity-verify',
+            title: 'XML Security Verify',
+            description: 'Verify XML payloads using the XML signature specification.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'security,transformation',
+            javaType: 'org.apache.camel.component.xmlsecurity.XmlVerifierComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xmlsecurity',
+            version: '3.14.0',
+            scheme: 'xmlsecurity-verify',
+            extendsScheme: '',
+            syntax: 'xmlsecurity-verify:name',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xmpp',
+            title: 'XMPP',
+            description: 'Send and receive messages to/from an XMPP chat server.',
+            deprecated: false,
+            firstVersion: '1.0',
+            label: 'chat,messaging',
+            javaType: 'org.apache.camel.component.xmpp.XmppComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xmpp',
+            version: '3.14.0',
+            scheme: 'xmpp',
+            extendsScheme: '',
+            syntax: 'xmpp:host:port/participant',
+            alternativeSyntax: 'xmpp:user:password@host:port/participant',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xquery',
+            title: 'XQuery',
+            description: 'Query and/or transform XML payloads using XQuery and Saxon.',
+            deprecated: false,
+            firstVersion: '1.0.0',
+            label: 'transformation',
+            javaType: 'org.apache.camel.component.xquery.XQueryComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-saxon',
+            version: '3.14.0',
+            scheme: 'xquery',
+            extendsScheme: '',
+            syntax: 'xquery:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xslt',
+            title: 'XSLT',
+            description: 'Transforms XML payload using an XSLT template.',
+            deprecated: false,
+            firstVersion: '1.3.0',
+            label: 'core,transformation',
+            javaType: 'org.apache.camel.component.xslt.XsltComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xslt',
+            version: '3.14.0',
+            scheme: 'xslt',
+            extendsScheme: '',
+            syntax: 'xslt:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'xslt-saxon',
+            title: 'XSLT Saxon',
+            description: 'Transform XML payloads using an XSLT template using Saxon.',
+            deprecated: false,
+            firstVersion: '3.0.0',
+            label: 'core,transformation',
+            javaType: 'org.apache.camel.component.xslt.saxon.XsltSaxonComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-xslt-saxon',
+            version: '3.14.0',
+            scheme: 'xslt-saxon',
+            extendsScheme: '',
+            syntax: 'xslt-saxon:resourceUri',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'yammer',
+            title: 'Yammer',
+            description: 'Interact with the Yammer enterprise social network.',
+            deprecated: false,
+            firstVersion: '2.12.0',
+            label: 'social,cloud,api',
+            javaType: 'org.apache.camel.component.yammer.YammerComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-yammer',
+            version: '3.14.0',
+            scheme: 'yammer',
+            extendsScheme: '',
+            syntax: 'yammer:function',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'zendesk',
+            title: 'Zendesk',
+            description: 'Manage Zendesk tickets, users, organizations, etc.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'cloud,api,support',
+            javaType: 'org.apache.camel.component.zendesk.ZendeskComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-zendesk',
+            version: '3.14.0',
+            scheme: 'zendesk',
+            extendsScheme: '',
+            syntax: 'zendesk:methodName',
+            async: false,
+            api: true,
+            apiSyntax: 'methodName',
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'zookeeper',
+            title: 'ZooKeeper',
+            description: 'Manage ZooKeeper clusters.',
+            deprecated: false,
+            firstVersion: '2.9.0',
+            label: 'clustering,management,bigdata',
+            javaType: 'org.apache.camel.component.zookeeper.ZooKeeperComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-zookeeper',
+            version: '3.14.0',
+            scheme: 'zookeeper',
+            extendsScheme: '',
+            syntax: 'zookeeper:serverUrls/path',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'zookeeper-master',
+            title: 'ZooKeeper Master',
+            description:
+                'Have only a single consumer in a cluster consuming from a given endpoint; with automatic failover if the JVM dies.',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'clustering,management,bigdata',
+            javaType: 'org.apache.camel.component.zookeepermaster.MasterComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-zookeeper-master',
+            version: '3.14.0',
+            scheme: 'zookeeper-master',
+            extendsScheme: '',
+            syntax: 'zookeeper-master:groupName:consumerEndpointUri',
+            async: false,
+            api: false,
+            consumerOnly: true,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'amazonmq',
+            title: 'AmazonMQ',
+            description: 'Send and receive messages to/from AmazonMQ',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'mq,jms',
+            javaType: '',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jms',
+            version: '3.14.0',
+            scheme: '',
+            extendsScheme: '',
+            syntax: 'destinationType:destinationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'ibmmq',
+            title: 'IBM MQ',
+            description: 'Send and receive messages to/from IBMQ MQ',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'mq,jms',
+            javaType: '',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jms',
+            version: '3.14.0',
+            scheme: '',
+            extendsScheme: '',
+            syntax: 'destinationType:destinationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'amqps',
+            title: 'AMQPS',
+            description: 'Messaging with AMQP protocol using Apache QPid Client.',
+            deprecated: false,
+            firstVersion: '1.2.0',
+            label: 'messaging',
+            javaType: 'org.apache.camel.component.amqp.AMQPComponent',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-amqp',
+            version: '3.14.0',
+            scheme: 'amqp',
+            extendsScheme: 'jms',
+            syntax: 'amqp:destinationType:destinationName',
+            async: true,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: false
+        },
+        {
+            kind: 'component',
+            name: 'sonicmq',
+            title: 'SONICMQ',
+            description: 'Send and receive messages to/from SonicMQ',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'mq,jms',
+            javaType: '',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jms',
+            version: '3.14.0',
+            scheme: '',
+            extendsScheme: '',
+            syntax: 'destinationType:destinationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: false,
+            lenientProperties: true
+        },
+        {
+            kind: 'component',
+            name: 'wastebin',
+            title: 'WASTBIN',
+            description: 'Delete the messages',
+            deprecated: false,
+            firstVersion: '2.19.0',
+            label: 'mq,jms',
+            javaType: '',
+            supportLevel: 'Stable',
+            groupId: 'org.apache.camel',
+            artifactId: 'camel-jms',
+            version: '3.14.0',
+            scheme: '',
+            extendsScheme: '',
+            syntax: 'destinationType:destinationName',
+            async: false,
+            api: false,
+            consumerOnly: false,
+            producerOnly: true,
+            lenientProperties: true
+        }
     ];
 
     getCamelComponentType(componentType: any) {

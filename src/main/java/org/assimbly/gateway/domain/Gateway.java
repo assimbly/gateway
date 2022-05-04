@@ -1,6 +1,5 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -57,9 +56,6 @@ public class Gateway implements Serializable {
 
     @Column(name = "default_error_component_type")
     private String defaultErrorComponentType;
-
-    @OneToOne    @JoinColumn(unique = true)
-    private WireTapEndpoint wiretapEndpoint;
 
     @OneToMany(mappedBy = "gateway")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -183,19 +179,6 @@ public class Gateway implements Serializable {
 
     public void setDefaultErrorComponentType(String defaultErrorComponentType) {
         this.defaultErrorComponentType = defaultErrorComponentType;
-    }
-
-    public WireTapEndpoint getWiretapEndpoint() {
-        return wiretapEndpoint;
-    }
-
-    public Gateway wiretapEndpoint(WireTapEndpoint wireTapEndpoint) {
-        this.wiretapEndpoint = wireTapEndpoint;
-        return this;
-    }
-
-    public void setWiretapEndpoint(WireTapEndpoint wireTapEndpoint) {
-        this.wiretapEndpoint = wireTapEndpoint;
     }
 
     public Set<Flow> getFlows() {

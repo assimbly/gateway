@@ -81,10 +81,10 @@
 		                                <td>
 		                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
 		                                    	<ng-container *ngIf="serviceKey.key == 'driver'">
-		                                   	     <option[value]="l" *ngFor="let l of driversList">{{l}}</option>
+		                                   	     <option [value]="l" *ngFor="let l of driversList">{{l}}</option>
 		                                        </ng-container>
 		                                       	<ng-container *ngIf="serviceKey.key == 'jmsprovider'">
-		                                   	     <option[value]="l" *ngFor="let l of jmsProvidersList">{{l}}</option>
+		                                   	     <option [value]="l" *ngFor="let l of jmsProvidersList">{{l}}</option>
 		                                        </ng-container>
 		                                    </select>
 		                                    <div *ngIf="listValue.invalid && (listValue.dirty || listValue.touched)" class="invalid-field-message">
@@ -96,13 +96,13 @@
 		                                <div class="btn-group flex-btn-group-container">
 		                                    <div class="btn-group flex-btn-group-container">
 		                                        <button type="button" class="btn btn-success" title="Add" (click)="addServiceKeys()">
-		                                            <span class="fa fa-plus"></span>
+		                                            <fa-icon icon="plus" style="color: white;"></fa-icon>
 		                                        </button>
 		                                        <button type="button" title="Delete" *ngIf="serviceKey.id"  [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="deleteServiceKeys(serviceKey)">
-		                                            <span class="fa fa-trash"></span>
+													<fa-icon icon="times" style="color: white;" ></fa-icon>
 		                                        </button>
 		                                        <button type="button" title="Remove" *ngIf="!serviceKey.id" [disabled]="serviceKey.isRequired" class="btn btn-danger" (click)="removeServiceKeys(idx)">
-		                                            <span class="fa fa-remove"></span>
+		                                            <fa-icon icon="times" style="color: white;" ></fa-icon>
 		                                        </button>
 		                                    </div>
 		                                </div>

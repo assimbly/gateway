@@ -1,410 +1,412 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
-
 import { FlowService } from './flow.service';
-import { EndpointService } from '../endpoint';
-import { SecurityService } from '../security';
-import { JhiEventManager } from 'ng-jhipster';
-import { LoginModalService } from 'app/core';
+import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
+
+import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
+import { EndpointService } from '../endpoint/endpoint.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { NavigationEnd, Router } from '@angular/router';
-import * as moment from 'moment';
-import { forkJoin, Observable, Observer, Subscription } from 'rxjs';
+import dayjs from 'dayjs/esm';
+
+import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } from 'rxjs';
+
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FlowDeleteDialogComponent } from 'app/entities/flow';
+
+import { WebSocketsService } from 'app/shared/websockets/websockets.service';
+import Stomp, { Client, Subscription as StompSubscription, ConnectionHeaders, Message } from 'webstomp-client';
 
 enum Status {
-    active = 'active',
-    paused = 'paused',
-    inactive = 'inactive',
-    inactiveError = 'inactiveError'
+  active = 'active',
+  paused = 'paused',
+  inactive = 'inactive',
+  inactiveError = 'inactiveError',
 }
 @Component({
-    selector: '[jhi-flow-row]',
-    templateUrl: './flow-row.component.html'
+  selector: '[jhi-flow-row]',
+  templateUrl: './flow-row.component.html',
 })
 export class FlowRowComponent implements OnInit, OnDestroy {
-    sslUrl: any;
-    mySubscription: Subscription;
+  sslUrl: any;
+  mySubscription: Subscription;
 
-    @Input() flow: Flow;
-    //@Input() fromEndpoints: Endpoint[];
-    @Input() isAdmin: boolean;
+  @Input() flow: Flow;
 
-    endpoints: Array<Endpoint> = [new Endpoint()];
-    fromEndpoint: Array<Endpoint> = [];
-    toEndpoints: Array<Endpoint> = [];
-    errorEndpoint: Endpoint = new Endpoint();
-    responseEndpoints: Array<Endpoint> = [];
+  endpoints: Array<Endpoint> = [new Endpoint()];
+  fromEndpoint: Array<Endpoint> = [];
+  toEndpoints: Array<Endpoint> = [];
+  errorEndpoint: Endpoint = new Endpoint();
+  responseEndpoints: Array<Endpoint> = [];
 
-    public isFlowStarted: boolean;
-    public isFlowRestarted: boolean;
+  public isFlowStarted: boolean;
+  public isFlowRestarted: boolean;
 
-    public isFlowPaused: boolean;
-    public isFlowResumed: boolean;
+  public isFlowPaused: boolean;
+  public isFlowResumed: boolean;
 
-    public isFlowStopped: boolean;
-    public disableActionBtns: boolean;
+  public isFlowStopped: boolean;
+  public disableActionBtns: boolean;
 
-    public flowDetails: string;
-    public flowStatus: string;
-    public flowStatusError: string;
-    public isFlowStatusOK: boolean;
-    public flowStatistic: string;
-    public flowStatusButton: string;
-    public flowStartTime: any;
-    public clickButton = false;
+  public flowDetails: string;
+  public flowStatus: string;
+  public flowStatusError: string;
+  public isFlowStatusOK: boolean;
+  public flowStatistic: string;
+  public flowStatusButton: string;
+  public flowStartTime: any;
+  public clickButton = false;
 
-    public flowAlerts: string;
-    public flowAlertsButton: string;
-    public numberOfAlerts: any;
-    public showNumberOfItems: number;
+  public flowAlerts: string;
+  public flowAlertsButton: string;
+  public numberOfAlerts: any;
+  public showNumberOfItems: number;
 
-    fromEndpointTooltips: Array<string> = [];
-    toEndpointsTooltips: Array<string> = [];
-    errorEndpointTooltip: string;
-    responseEndpointTooltips: Array<string> = [];
-    public statusFlow: Status;
-    public previousState: string;
-    public p = false;
-    lastError: string;
+  fromEndpointTooltips: Array<string> = [];
+  toEndpointsTooltips: Array<string> = [];
+  errorEndpointTooltip: string;
+  responseEndpointTooltips: Array<string> = [];
+  public statusFlow: Status;
+  public previousState: string;
+  public p = false;
+  lastError: string;
 
-    flowRowID: string;
-    flowRowErrorEndpointID: string;
+  flowRowID: string;
+  flowRowErrorEndpointID: string;
 
-    statsTableRows: Array<string> = [];
+  statsTableRows: Array<string> = [];
 
-    intervalTime: any;
+  intervalTime: any;
 
-    stompClient = null;
-    subscriber = null;
-    connection: Promise<any>;
-    connectedPromise: any;
-    listener: Observable<any>;
-    listenerObserver: Observer<any>;
+  stompClient = null;
+  subscriber = null;
 
-    alreadyConnectedOnce = false;
-    private subscription: Subscription;
+  connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
+  connectionEventSubscription: Subscription | null = null;
+  connectionAlertSubscription: Subscription | null = null;
+  stompSubscription: StompSubscription | null = null;
 
-    modalRef: NgbModalRef | null;
+  connection: Promise<any>;
+  connectedPromise: any;
+  private listenerSubject: Subject<string> = new Subject();
+  listener: Observable<any>;
+  listenerObserver: Observer<any>;
 
-    constructor(
-        private flowService: FlowService,
-        private endpointService: EndpointService,
-        private securityService: SecurityService,
-        private loginModalService: LoginModalService,
-        private modalService: NgbModal,
-        private router: Router,
-        private eventManager: JhiEventManager
-    ) {
-        this.listener = this.createListener();
+  alreadyConnectedOnce = false;
+  private subscription: Subscription;
 
-        this.router.routeReuseStrategy.shouldReuseRoute = function() {
-            return false;
-        };
+  modalRef: NgbModalRef | null;
 
-        this.mySubscription = this.router.events.subscribe(event => {
-            if (event instanceof NavigationEnd) {
-                // Trick the Router into believing it's last link wasn't previously loaded
-                this.router.navigated = false;
-            }
-        });
-    }
+  constructor(
+    private flowService: FlowService,
+    private endpointService: EndpointService,
+    private modalService: NgbModal,
+    private router: Router,
+    private eventManager: EventManager,
+	private webSocketsService: WebSocketsService
+  ) {
 
-    ngOnInit() {
-        this.setFlowStatusDefaults();
-        this.getStatus(this.flow.id);
-        this.endpoints = this.flow.endpoints;
-        this.getEndpoints();
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
 
-        this.registerTriggeredAction();
-    }
+    this.mySubscription = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        // Trick the Router into believing it's last link wasn't previously loaded
+        this.router.navigated = false;
+      }
+    });
+  }
 
-    ngAfterViewInit() {
-        this.connection = this.flowService.connectionStomp();
-        this.stompClient = this.flowService.client();
-        this.subscribe('alert');
-        this.subscribe('event');
-        this.receive().subscribe(data => {
-            const data2 = data.split(':');
+  ngOnInit() {
+    this.setFlowStatusDefaults();
+    this.getStatus(this.flow.id);
+    this.endpoints = this.flow.endpoints;
+    this.getEndpoints();
 
-            if (Array.isArray(data2) || data2.length) {
-                if (data2[0] === 'event') {
-                    this.setFlowStatus(data2[1]);
-                } else if (data2[0] === 'alert') {
-                    const alertId = Number(data2[1]);
-                    if (this.flow.id === alertId) {
-                        this.getFlowNumberOfAlerts(alertId);
-                    }
-                }
-            }
-        });
-    }
+    this.registerTriggeredAction();
 
-    ngOnDestroy() {
-        this.flowService.unsubscribe();
-        if (this.mySubscription) {
-            this.mySubscription.unsubscribe();
-        }
-    }
+    this.stompClient = this.webSocketsService.getClient();
+	this.connectionSubject = this.webSocketsService.getConnectionSubject();
 
-    getStatus(id: number) {
-        this.clickButton = true;
+	this.subscribeToEvent(this.flow.id,'event');
 
-        forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowNumberOfAlerts(id)).subscribe(
-            ([flowStatus, flowAlertsNumber]) => {
-                if (flowStatus.body != 'unconfigured') {
-                    this.setFlowStatus(flowStatus.body);
-                }
-                this.setFlowNumberOfAlerts(flowAlertsNumber.body);
-            }
-        );
-    }
+    this.subscribeToAlert(this.flow.id,'alert');
 
-    setFlowStatusDefaults() {
-        this.isFlowStatusOK = true;
-        this.flowStatus = 'unconfigured';
-        this.lastError = '';
-        this.setFlowStatus(this.flowStatus);
-    }
+  }
 
-    getFlowStatus(id: number) {
-        this.clickButton = true;
-        this.flowService.getFlowStatus(id).subscribe(response => {
-            this.setFlowStatus(response.body);
-        });
-    }
+  ngAfterViewInit() {
 
-    setFlowStatus(status: string): void {
-        switch (status) {
-            case 'unconfigured':
-                this.statusFlow = Status.inactive;
-                this.isFlowStarted = this.isFlowPaused = false;
-                this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.flowStatusButton = `
+    this.subscription = this.receive().subscribe(data => {
+
+		const data2  = data.split(':');
+
+		if (Array.isArray(data2)) {
+			if (data2[0] === 'event') {
+			  this.setFlowStatus(data2[1]);
+			} else if (data2[0] === 'alert') {
+			  const alertId = Number(data2[1]);
+			  if (this.flow.id === alertId) {
+				this.getFlowNumberOfAlerts(alertId);
+			  }
+			}
+		  }
+
+    });
+
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe();
+  }
+
+  getStatus(id: number) {
+    this.clickButton = true;
+
+    forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowNumberOfAlerts(id)).subscribe(([flowStatus, flowAlertsNumber]) => {
+      if (flowStatus.body != 'unconfigured') {
+        this.setFlowStatus(flowStatus.body);
+      }
+      this.setFlowNumberOfAlerts(flowAlertsNumber.body);
+    });
+  }
+
+  setFlowStatusDefaults() {
+    this.isFlowStatusOK = true;
+    this.flowStatus = 'unconfigured';
+    this.lastError = '';
+    this.setFlowStatus(this.flowStatus);
+  }
+
+  getFlowStatus(id: number) {
+    this.clickButton = true;
+    this.flowService.getFlowStatus(id).subscribe(response => {
+      this.setFlowStatus(response.body);
+    });
+  }
+
+  setFlowStatus(status: string): void {
+    switch (status) {
+      case 'unconfigured':
+        this.statusFlow = Status.inactive;
+        this.isFlowStarted = this.isFlowPaused = false;
+        this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
+        this.flowStatusButton = `
                             Last action: - <br/>
                             Status: Flow is stopped<br/>
             `;
 
-                break;
-            case 'started':
-                this.statusFlow = Status.active;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
-                this.isFlowStarted = this.isFlowResumed = true;
-                this.flowStatusButton = `
+        break;
+      case 'started':
+        this.statusFlow = Status.active;
+        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowStarted = this.isFlowResumed = true;
+        this.flowStatusButton = `
                             Last action: Start <br/>
                             Status: Started succesfullly
                         `;
 
-                break;
-            case 'suspended':
-                this.statusFlow = Status.paused;
-                this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
-                this.isFlowPaused = this.isFlowStarted = true;
-                this.flowStatusButton = `
+        break;
+      case 'suspended':
+        this.statusFlow = Status.paused;
+        this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowPaused = this.isFlowStarted = true;
+        this.flowStatusButton = `
                             Last action: Pause <br/>
                             Status:  Paused succesfully
             `;
 
-                break;
-            case 'restarted':
-                this.statusFlow = Status.active;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
-                this.isFlowResumed = this.isFlowStarted = true;
-                this.flowStatusButton = `
+        break;
+      case 'restarted':
+        this.statusFlow = Status.active;
+        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowResumed = this.isFlowStarted = true;
+        this.flowStatusButton = `
                             Last action: Restart <br/>
                             Status:  Restarted succesfully
             `;
-                break;
-            case 'resumed':
-                this.statusFlow = Status.active;
-                this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
-                this.isFlowResumed = this.isFlowStarted = true;
-                this.flowStatusButton = `
+        break;
+      case 'resumed':
+        this.statusFlow = Status.active;
+        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowResumed = this.isFlowStarted = true;
+        this.flowStatusButton = `
                             Last action: Resume <br/>
                             Status:  Resumed succesfully
             `;
-                break;
-            case 'stopped':
-                this.statusFlow = Status.inactive;
-                this.isFlowStarted = this.isFlowPaused = false;
-                this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-                this.flowStatusButton = `
+        break;
+      case 'stopped':
+        this.statusFlow = Status.inactive;
+        this.isFlowStarted = this.isFlowPaused = false;
+        this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
+        this.flowStatusButton = `
                             Last action: Stop <br/>
                             Status: Stopped succesfully
             `;
-                break;
-            default:
-                this.flowStatusButton = `
+        break;
+      default:
+        this.flowStatusButton = `
                             Last action: ${this.flowStatus} <br/>
                             Status: Stopped after error
               `;
-                break;
-        }
+        break;
     }
+  }
 
-    getFlowAlerts(id: number) {
-        this.clickButton = true;
-        this.flowService.getFlowAlerts(id).subscribe(response => {
-            this.setFlowAlerts(response.body);
-        });
+  getFlowAlerts(id: number) {
+    this.clickButton = true;
+    this.flowService.getFlowAlerts(id).subscribe(response => {
+      this.setFlowAlerts(response.body);
+    });
+  }
+
+  setFlowAlerts(flowAlertsItems: string): void {
+    if (flowAlertsItems !== null) {
+      let alertStartItem;
+      let alertEndItem;
+
+	  const flowAlertsList = flowAlertsItems.split(',');
+      if (flowAlertsList.length < 4) {
+        this.showNumberOfItems = flowAlertsList.length;
+        alertStartItem = flowAlertsList.length - 1;
+        alertEndItem = 0;
+      } else {
+        this.showNumberOfItems = 3;
+        alertStartItem = flowAlertsList.length - 1;
+        alertEndItem = flowAlertsList.length - 3;
+      }
+
+      let i;
+      let alertItems = '';
+      for (i = alertStartItem; i >= alertEndItem; i--) {
+        alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`;
+      }
+
+      this.flowAlertsButton = `<div class="list-group">` + alertItems + `</div>`;
+    } else {
+      this.flowAlertsButton = `Can't retrieve alert details`;
     }
+  }
 
-    setFlowAlerts(flowAlertsItems: string): void {
-        if (flowAlertsItems !== null) {
-            let alertStartItem;
-            let alertEndItem;
+  getFlowNumberOfAlerts(id: number) {
+    this.clickButton = true;
 
-            let flowAlertsList = flowAlertsItems.split(',');
-            if (flowAlertsList.length < 4) {
-                this.showNumberOfItems = flowAlertsList.length;
-                alertStartItem = flowAlertsList.length - 1;
-                alertEndItem = 0;
-            } else {
-                this.showNumberOfItems = 3;
-                alertStartItem = flowAlertsList.length - 1;
-                alertEndItem = flowAlertsList.length - 3;
+    this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
+      this.setFlowNumberOfAlerts(response.body);
+    });
+  }
+
+  setFlowNumberOfAlerts(numberOfAlerts: string): void {
+    let numberOfAlerts2 = parseInt(numberOfAlerts, 10);
+    if (numberOfAlerts2 === 0) {
+      this.flowAlerts = `false`;
+      this.numberOfAlerts = `0`;
+      this.showNumberOfItems = 3;
+    } else {
+      this.flowAlerts = `true`;
+      this.numberOfAlerts = numberOfAlerts;
+      if (numberOfAlerts2 < 4) {
+        this.showNumberOfItems = numberOfAlerts.length;
+      } else {
+        this.showNumberOfItems = 3;
+      }
+    }
+  }
+
+  navigateToFlowEditor(mode: string) {
+	console.log('type=' + this.flow.type);
+	if(!this.flow.type){
+		this.flow.type = 'connector';
+	}
+
+    switch (mode) {
+      case 'edit':
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+        break;
+      case 'clone':
+        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+        break;
+      case 'delete':
+        let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
+        if (typeof FlowDeleteDialogComponent as Component) {
+          modalRef.componentInstance.flow = this.flow;
+          modalRef.result.then(
+            result => {
+              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+              modalRef = null;
+            },
+            reason => {
+              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+              modalRef = null;
             }
-
-            let i;
-            let alertItems = '';
-            for (i = alertStartItem; i >= alertEndItem; i--) {
-                alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`;
-            }
-
-            this.flowAlertsButton = `<div class="list-group">` + alertItems + `</div>`;
-        } else {
-            this.flowAlertsButton = `Can't retrieve alert details`;
+          );
         }
+        break;
+      default:
+        break;
     }
+  }
 
-    getFlowNumberOfAlerts(id: number) {
-        this.clickButton = true;
-        this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
-            this.setFlowNumberOfAlerts(response.body);
-        });
-    }
+  navigateToEndpointEditor(mode: string, editorType: string, endpoint: Endpoint) {
+    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, endpointid: endpoint.id }]);
+  }
 
-    setFlowNumberOfAlerts(numberOfAlerts: string): void {
-        let numberOfAlerts2 = parseInt(numberOfAlerts, 10);
-        if (numberOfAlerts2 === 0) {
-            this.flowAlerts = `false`;
-            this.numberOfAlerts = `0`;
-            this.showNumberOfItems = 3;
-        } else {
-            this.flowAlerts = `true`;
-            this.numberOfAlerts = numberOfAlerts;
-            if (numberOfAlerts2 < 4) {
-                this.showNumberOfItems = numberOfAlerts.length;
-            } else {
-                this.showNumberOfItems = 3;
-            }
-        }
-    }
-
-    navigateToFlow(action: string) {
-        switch (action) {
-            case 'edit':
-                this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'edit' }])
-                    : this.router.navigate(['../flow', this.flow.id]);
-                break;
-            case 'clone':
-                this.isAdmin
-                    ? this.router.navigate(['../../flow/edit-all', this.flow.id, { mode: 'clone' }])
-                    : this.router.navigate(['../flow', this.flow.id]);
-                break;
-            case 'delete':
-                if (this.isAdmin) {
-                    let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-                    if (typeof FlowDeleteDialogComponent as Component) {
-                        modalRef.componentInstance.flow = this.flow;
-                        modalRef.result.then(
-                            result => {
-                                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                                modalRef = null;
-                            },
-                            reason => {
-                                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                                modalRef = null;
-                            }
-                        );
-                    }
-                } else {
-                    this.router.navigate(['../flow', this.flow.id]);
-                }
-
-                //this.router.navigate([{ outlets: { popup: 'flow/' + this.flow.id + '/delete' } }], { replaceUrl: true, queryParamsHandling: 'merge' }) :
-                //this.router.navigate(['../flow', this.flow.id]);
-                break;
-            default:
-                break;
-        }
-    }
-
-    navigateToEndpoint(endpoint: Endpoint) {
-        this.isAdmin
-            ? this.router.navigate(['../../flow/edit-all', this.flow.id], { queryParams: { mode: 'edit', endpointid: endpoint.id } })
-            : this.router.navigate(['../flow', this.flow.id]);
-    }
-
-    getFlowLastError(id: number, action: string, errMessage: string) {
-        if (errMessage) {
-            if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
-                this.loginModalService.open();
-            } else {
-                this.flowStatusButton = `
+  getFlowLastError(id: number, action: string, errMessage: string) {
+    if (errMessage) {
+      if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
+        this.router.navigate(['/login']);
+      } else {
+        this.flowStatusButton = `
                     Last action: ${action} <br/>
                     Status: Stopped after error <br/><br/>
                     ${errMessage}
                     `;
-                this.statusFlow = Status.inactiveError;
-            }
-        } else {
-            this.flowService.getFlowLastError(id).subscribe(response => {
-                this.lastError = response === '0' ? '' : response.body;
-                this.flowStatusButton = `
+        this.statusFlow = Status.inactiveError;
+      }
+    } else {
+      this.flowService.getFlowLastError(id).subscribe(response => {
+        this.lastError = response === '0' ? '' : response.body;
+        this.flowStatusButton = `
                 Last action: ${action} <br/>
                 Status: Stopped after error <br/><br/>
                 ${this.lastError}
                 `;
-                this.statusFlow = Status.inactiveError;
-            });
-        }
+        this.statusFlow = Status.inactiveError;
+      });
     }
+  }
 
-    getFlowStats(flow: IFlow) {
-        this.startGetFlowStats(flow);
+  getFlowStats(flow: IFlow) {
+    this.startGetFlowStats(flow);
 
-        //refresh every 5 seconds
-        this.intervalTime = setInterval(() => {
-            this.startGetFlowStats(flow);
-        }, 5000);
+    // refresh every 5 seconds
+    this.intervalTime = setInterval(() => {
+      this.startGetFlowStats(flow);
+    }, 5000);
+  }
+
+  startGetFlowStats(flow: IFlow) {
+    this.flowStatistic = ``;
+    this.statsTableRows = [];
+
+    for (const endpoint of flow.endpoints) {
+      if (endpoint.endpointType === EndpointType.FROM || endpoint.endpointType === EndpointType.ROUTE) {
+        this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
+          this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
+        });
+      }
     }
+  }
 
-    startGetFlowStats(flow: IFlow) {
-        this.flowStatistic = ``;
-        this.statsTableRows = [];
+  stopGetFlowStats() {
+    clearInterval(this.intervalTime);
+  }
 
-        for (let endpoint of flow.endpoints) {
-            if (endpoint.endpointType === EndpointType.FROM) {
-                this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
-                    this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
-                });
-            }
-        }
-    }
+  getFlowDetails() {
+    const createdFormatted = dayjs(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
+    const lastModifiedFormatted = dayjs(this.flow.lastModified).format('YYYY-MM-DD HH:mm:ss');
 
-    stopGetFlowStats() {
-        clearInterval(this.intervalTime);
-    }
-
-    getFlowDetails() {
-        const createdFormatted = moment(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
-        const lastModifiedFormatted = moment(this.flow.lastModified).format('YYYY-MM-DD HH:mm:ss');
-
-        this.flowDetails = `
+    this.flowDetails = `
 
                 <b>ID:</b> ${this.flow.id}<br/>
                 <b>Name:</b> ${this.flow.name}<br/>
@@ -412,16 +414,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
-                <b>Offloading:</b> ${this.flow.offLoading}<br/><br/>
                 <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
                 <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
                 <b>Log Level:</b> ${this.flow.logLevel}<br/>
 
         `;
-    }
+  }
 
-    setFlowStatistic(res, uri) {
-        /* Example Available stats
+  setFlowStatistic(res, uri) {
+    /* Example Available stats
           *
           * "maxProcessingTime": 1381,
             "lastProcessingTime": 1146,
@@ -446,45 +447,44 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             "startTimestamp": "2019-03-26T08:43:59.201+0100"
          */
 
-        if (res === 0) {
-            this.flowStatistic = `Currently there are no statistics for this flow.`;
-        } else {
-            const now = moment(new Date());
-            const start = moment(res.stats.startTimestamp);
-            const flowRuningTime = moment.duration(now.diff(start));
-            const hours = Math.floor(flowRuningTime.asHours());
-            const minutes = flowRuningTime.minutes();
-            const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
-            const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
-            let processingTime = ``;
+    if (res === 0) {
+      this.flowStatistic = `Currently there are no statistics for this flow.`;
+    } else {
+      const now = dayjs();
+      const start = dayjs(res.stats.startTimestamp);
+      const flowRuningTime = dayjs.duration(now.diff(start));
+      const hours = Math.floor(flowRuningTime.asHours());
+      const minutes = flowRuningTime.minutes();
+      const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
+      const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
+      let processingTime = ``;
 
-            if (this.statsTableRows.length === 0) {
-                this.statsTableRows[0] = `<td>${uri}</td>`;
-                this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
-                this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-                this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-                this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
-                this.statsTableRows[5] = `<td>${completed}</td>`;
-                this.statsTableRows[6] = `<td>${failures}</td>`;
-                this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
-                this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
-                this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
-            } else {
-                this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
-                this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
-                this.statsTableRows[2] =
-                    this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-                this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-                this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
-                this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
-                this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
-                this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
-                this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
-                this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
-            }
+      if (this.statsTableRows.length === 0) {
+        this.statsTableRows[0] = `<td>${uri}</td>`;
+        this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
+        this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[5] = `<td>${completed}</td>`;
+        this.statsTableRows[6] = `<td>${failures}</td>`;
+        this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
+      } else {
+        this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
+        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[2] = this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
+        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
+        this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
+        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
+      }
 
-            if (res.stats.lastProcessingTime > 0) {
-                processingTime = `<tr>
+      if (res.stats.lastProcessingTime > 0) {
+        processingTime = `<tr>
 			      <th scope="row">Min</th>
 			      ${this.statsTableRows[7]}
 			    </tr>
@@ -496,10 +496,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			      <th scope="row">Average</th>
 			      ${this.statsTableRows[9]}
 			    </tr>`;
-            }
+      }
 
-            this.flowStatistic =
-                `
+      this.flowStatistic =
+        `
             <div class="col-12">
 			<table class="table">
 			  <tbody>
@@ -523,8 +523,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			      <th scope="row">Last Message</th>
 			       ${this.statsTableRows[4]}
 			    </tr>` +
-                processingTime +
-                `
+        processingTime +
+        `
 			    <tr>
 			      <th scope="row">Completed</th>
                   ${this.statsTableRows[5]}
@@ -537,300 +537,325 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			</table>
 			<div>
         `;
-        }
     }
+  }
 
-    checkDate(r) {
-        if (!!r) {
-            return moment(r).format('YYYY-MM-DD HH:mm:ss');
+  checkDate(r) {
+    if (r) {
+      return dayjs(r).format('YYYY-MM-DD HH:mm:ss');
+    } else {
+      return '-';
+    }
+  }
+
+  flowConfigurationNotObtained(id) {
+    this.isFlowStatusOK = false;
+    this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
+  }
+
+  getEndpoints() {
+    this.endpoints.forEach(endpoint => {
+      if (endpoint.endpointType.valueOf() === 'FROM') {
+        this.fromEndpoint.push(endpoint);
+        this.fromEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+      } else if (endpoint.endpointType.valueOf() === 'TO') {
+        this.toEndpoints.push(endpoint);
+        this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+      } else if (endpoint.endpointType.valueOf() === 'ERROR') {
+        this.errorEndpoint = endpoint;
+        this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
+      } else if (endpoint.endpointType.valueOf() === 'RESPONSE') {
+        this.responseEndpoints.push(endpoint);
+        this.responseEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+      }
+    });
+  }
+
+  getSSLUrl(type: String, uri: String, options: String) {
+    let hostname;
+
+    switch (type) {
+      case 'FTPS':
+        if (uri.includes('@')) {
+          uri = uri.substring(uri.indexOf('@') + 1);
+        }
+        hostname = new URL('https://' + uri).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      case 'HTTPS':
+        hostname = new URL('https://' + uri).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      case 'IMAPS':
+        if (uri.includes('@')) {
+          uri = uri.substring(uri.indexOf('@') + 1);
+        }
+        hostname = new URL('https://' + uri).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      case 'KAFKA':
+        if (options.includes(',')) {
+          options = options.substring(options.lastIndexOf('brokers=') + 1, options.lastIndexOf(','));
         } else {
-            return '-';
+          options = options.substring(uri.indexOf(',') + 1);
         }
+        hostname = new URL('https://' + options).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      case 'NETTY4':
+        hostname = new URL('https://' + uri).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      case 'SMTPS':
+        if (uri.includes('@')) {
+          uri = uri.substring(uri.indexOf('@') + 1);
+        }
+        hostname = new URL('https://' + uri).hostname;
+        this.sslUrl = 'https://' + hostname;
+        break;
+      default:
+        this.sslUrl = `0`;
+        break;
     }
 
-    flowConfigurationNotObtained(id) {
+    return this.sslUrl;
+  }
+
+  endpointTooltip(type, uri, options): string {
+    if (type === null) {
+      return '';
+    } else {
+      const opt = options === '' ? '' : `?${options}`;
+      return `${type.toLowerCase()}://${uri}${opt}`;
+    }
+  }
+
+  curentDateTime(): string {
+    return dayjs().format('YYYY-MM-DD HH:mm:ss');
+  }
+
+  registerTriggeredAction() {
+    this.eventManager.subscribe('trigerAction', response => {
+      switch (response) {
+        case 'start':
+          if (this.statusFlow === Status.inactive) {
+            this.start();
+          }
+          break;
+        case 'stop':
+          if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
+            this.stop();
+          }
+          break;
+        case 'pause':
+          if (this.statusFlow === Status.active) {
+            this.pause();
+          }
+          break;
+        case 'restart':
+          if (this.statusFlow === Status.active) {
+            this.restart();
+          }
+          break;
+        case 'resume':
+          if (this.statusFlow === Status.paused) {
+            this.resume();
+          }
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  start() {
+    this.flowStatus = 'Starting';
+    this.isFlowStatusOK = true;
+    this.disableActionBtns = true;
+
+    this.flowService.getConfiguration(this.flow.id).subscribe(
+      data => {
+        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
+          this.flowService.start(this.flow.id).subscribe(
+            response => {
+              if (response.status === 200) {
+                // this.setFlowStatus('started');
+              }
+              this.disableActionBtns = false;
+            },
+            err => {
+              this.getFlowLastError(this.flow.id, 'Start', err.error);
+              this.isFlowStatusOK = false;
+              this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+              this.disableActionBtns = false;
+            }
+          );
+        });
+      },
+      err => {
+        this.getFlowLastError(this.flow.id, 'Start', err.error);
         this.isFlowStatusOK = false;
-        this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
-    }
+        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+        this.flowConfigurationNotObtained(this.flow.id);
+        this.disableActionBtns = false;
+      }
+    );
+  }
 
-    getEndpoints() {
-        this.endpoints.forEach(endpoint => {
-            if (endpoint.endpointType.valueOf() === 'FROM') {
-                this.fromEndpoint.push(endpoint);
-                this.fromEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-            } else if (endpoint.endpointType.valueOf() === 'TO') {
-                this.toEndpoints.push(endpoint);
-                this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-            } else if (endpoint.endpointType.valueOf() === 'ERROR') {
-                this.errorEndpoint = endpoint;
-                this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
-            } else if (endpoint.endpointType.valueOf() === 'RESPONSE') {
-                this.responseEndpoints.push(endpoint);
-                this.responseEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-            }
-        });
-    }
-
-    getSSLUrl(type: String, uri: String, options: String) {
-        var hostname;
-
-        switch (type) {
-            case 'FTPS':
-                if (uri.includes('@')) {
-                    uri = uri.substring(uri.indexOf('@') + 1);
-                }
-                hostname = new URL('https://' + uri).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            case 'HTTPS':
-                hostname = new URL('https://' + uri).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            case 'IMAPS':
-                if (uri.includes('@')) {
-                    uri = uri.substring(uri.indexOf('@') + 1);
-                }
-                hostname = new URL('https://' + uri).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            case 'KAFKA':
-                if (options.includes(',')) {
-                    options = options.substring(options.lastIndexOf('brokers=') + 1, options.lastIndexOf(','));
-                } else {
-                    options = options.substring(uri.indexOf(',') + 1);
-                }
-                hostname = new URL('https://' + options).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            case 'NETTY4':
-                hostname = new URL('https://' + uri).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            case 'SMTPS':
-                if (uri.includes('@')) {
-                    uri = uri.substring(uri.indexOf('@') + 1);
-                }
-                hostname = new URL('https://' + uri).hostname;
-                this.sslUrl = 'https://' + hostname;
-                break;
-            default:
-                this.sslUrl = `0`;
-                break;
+  pause() {
+    this.flowStatus = 'Pausing';
+    this.isFlowStatusOK = true;
+    this.disableActionBtns = true;
+    this.flowService.pause(this.flow.id).subscribe(
+      response => {
+        if (response.status === 200) {
+          // this.setFlowStatus('suspended');
         }
+        this.disableActionBtns = false;
+      },
+      err => {
+        this.getFlowLastError(this.flow.id, 'Pause', err.error);
+        this.isFlowStatusOK = false;
+        this.flowStatusError = `Flow with id=${this.flow.id} is not paused.`;
+        this.disableActionBtns = false;
+      }
+    );
+  }
 
-        return this.sslUrl;
-    }
+  resume() {
+    this.flowStatus = 'Resuming';
+    this.isFlowStatusOK = true;
+    this.disableActionBtns = true;
 
-    endpointTooltip(type, uri, options): string {
-        if (type === null) {
-            return;
-        }
-        const opt = options === '' ? '' : `?${options}`;
-        return `${type.toLowerCase()}://${uri}${opt}`;
-    }
-
-    curentDateTime(): string {
-        return moment().format('YYYY-MM-DD HH:mm:ss');
-    }
-
-    registerTriggeredAction() {
-        this.eventManager.subscribe('trigerAction', response => {
-            switch (response.content) {
-                case 'start':
-                    if (this.statusFlow === Status.inactive) {
-                        this.start();
-                    }
-                    break;
-                case 'stop':
-                    if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
-                        this.stop();
-                    }
-                    break;
-                case 'pause':
-                    if (this.statusFlow === Status.active) {
-                        this.pause();
-                    }
-                    break;
-                case 'restart':
-                    if (this.statusFlow === Status.active) {
-                        this.restart();
-                    }
-                    break;
-                case 'resume':
-                    if (this.statusFlow === Status.paused) {
-                        this.resume();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-
-    start() {
-        this.flowStatus = 'Starting';
-        this.isFlowStatusOK = true;
-        this.disableActionBtns = true;
-
-        this.flowService.getConfiguration(this.flow.id).subscribe(
-            data => {
-                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-                    this.flowService.start(this.flow.id).subscribe(
-                        response => {
-                            if (response.status === 200) {
-                                //this.setFlowStatus('started');
-                            }
-                            this.disableActionBtns = false;
-                        },
-                        err => {
-                            this.getFlowLastError(this.flow.id, 'Start', err.error);
-                            this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-                            this.disableActionBtns = false;
-                        }
-                    );
-                });
-            },
-            err => {
-                this.getFlowLastError(this.flow.id, 'Start', err.error);
-                this.isFlowStatusOK = false;
-                this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-                this.flowConfigurationNotObtained(this.flow.id);
-                this.disableActionBtns = false;
-            }
-        );
-    }
-
-    pause() {
-        this.flowStatus = 'Pausing';
-        this.isFlowStatusOK = true;
-        this.disableActionBtns = true;
-        this.flowService.pause(this.flow.id).subscribe(
+    this.flowService.getConfiguration(this.flow.id).subscribe(
+      data => {
+        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
+          this.flowService.resume(this.flow.id).subscribe(
             response => {
-                if (response.status === 200) {
-                    // this.setFlowStatus('suspended');
-                }
-                this.disableActionBtns = false;
+              if (response.status === 200) {
+                // this.setFlowStatus('resumed');
+              }
+              this.disableActionBtns = false;
             },
             err => {
-                this.getFlowLastError(this.flow.id, 'Pause', err.error);
-                this.isFlowStatusOK = false;
-                this.flowStatusError = `Flow with id=${this.flow.id} is not paused.`;
-                this.disableActionBtns = false;
+              this.getFlowLastError(this.flow.id, 'Resume', err.error);
+              this.isFlowStatusOK = false;
+              this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
+              this.disableActionBtns = false;
             }
-        );
-    }
+          );
+        });
+      },
+      err => {
+        this.flowConfigurationNotObtained(this.flow.id);
+        this.disableActionBtns = false;
+      }
+    );
+  }
 
-    resume() {
-        this.flowStatus = 'Resuming';
-        this.isFlowStatusOK = true;
-        this.disableActionBtns = true;
+  restart() {
+    this.flowStatus = 'Restarting';
+    this.isFlowStatusOK = true;
+    this.disableActionBtns = true;
 
-        this.flowService.getConfiguration(this.flow.id).subscribe(
-            data => {
-                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-                    this.flowService.resume(this.flow.id).subscribe(
-                        response => {
-                            if (response.status === 200) {
-                                // this.setFlowStatus('resumed');
-                            }
-                            this.disableActionBtns = false;
-                        },
-                        err => {
-                            this.getFlowLastError(this.flow.id, 'Resume', err.error);
-                            this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
-                            this.disableActionBtns = false;
-                        }
-                    );
-                });
-            },
-            err => {
-                this.flowConfigurationNotObtained(this.flow.id);
-                this.disableActionBtns = false;
-            }
-        );
-    }
-
-    restart() {
-        this.flowStatus = 'Restarting';
-        this.isFlowStatusOK = true;
-        this.disableActionBtns = true;
-
-        this.flowService.getConfiguration(this.flow.id).subscribe(
-            data => {
-                this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-                    this.flowService.restart(this.flow.id).subscribe(
-                        response => {
-                            if (response.status === 200) {
-                                // this.setFlowStatus('restarted');
-                            }
-                            this.disableActionBtns = false;
-                        },
-                        err => {
-                            this.getFlowLastError(this.flow.id, 'Restart', err.error);
-                            this.isFlowStatusOK = false;
-                            this.flowStatusError = `Flow with id=${this.flow.id} is not restarted.`;
-                            this.disableActionBtns = false;
-                        }
-                    );
-                });
-            },
-            err => {
-                this.flowConfigurationNotObtained(this.flow.id);
-                this.disableActionBtns = false;
-            }
-        );
-    }
-
-    stop() {
-        this.flowStatus = 'Stopping';
-        this.isFlowStatusOK = true;
-        this.disableActionBtns = true;
-
-        this.flowService.stop(this.flow.id).subscribe(
+    this.flowService.getConfiguration(this.flow.id).subscribe(
+      data => {
+        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
+          this.flowService.restart(this.flow.id).subscribe(
             response => {
-                if (response.status === 200) {
-                    // this.setFlowStatus('stopped');
-                }
-                this.disableActionBtns = false;
+              if (response.status === 200) {
+                // this.setFlowStatus('restarted');
+              }
+              this.disableActionBtns = false;
             },
             err => {
-                this.getFlowLastError(this.flow.id, 'Stop', err.error);
-                this.isFlowStatusOK = false;
-                this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
-                this.disableActionBtns = false;
+              this.getFlowLastError(this.flow.id, 'Restart', err.error);
+              this.isFlowStatusOK = false;
+              this.flowStatusError = `Flow with id=${this.flow.id} is not restarted.`;
+              this.disableActionBtns = false;
             }
-        );
-    }
-
-    receive() {
-        return this.listener;
-    }
-
-    subscribe(type) {
-        const topic = '/topic/' + this.flow.id + '/' + type;
-
-        this.connection.then(() => {
-            this.subscriber = this.stompClient.subscribe(topic, data => {
-                if (!this.listenerObserver) {
-                    this.listener = this.createListener();
-                }
-                this.listenerObserver.next(data.body);
-            });
+          );
         });
-    }
+      },
+      err => {
+        this.flowConfigurationNotObtained(this.flow.id);
+        this.disableActionBtns = false;
+      }
+    );
+  }
 
-    unsubscribe() {
-        if (this.subscriber !== null) {
-            this.subscriber.unsubscribe();
+  stop() {
+    this.flowStatus = 'Stopping';
+    this.isFlowStatusOK = true;
+    this.disableActionBtns = true;
+
+    this.flowService.stop(this.flow.id).subscribe(
+      response => {
+        if (response.status === 200) {
+          // this.setFlowStatus('stopped');
         }
-        this.listener = this.createListener();
+        this.disableActionBtns = false;
+      },
+      err => {
+        this.getFlowLastError(this.flow.id, 'Stop', err.error);
+        this.isFlowStatusOK = false;
+        this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
+        this.disableActionBtns = false;
+      }
+    );
+  }
+
+  receive(): Subject<string> {
+    return this.listenerSubject;
+  }
+
+  subscribeToEvent(id, type): void {
+
+    if (this.connectionEventSubscription) {
+      return;
     }
 
-    private createListener(): Observable<any> {
-        return new Observable(observer => {
-            this.listenerObserver = observer;
+
+	const topic = '/topic/' + id + '/' + type;
+
+    this.connectionEventSubscription = this.connectionSubject.subscribe(() => {
+
+      if (this.stompClient) {
+
+        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
+          this.listenerSubject.next(data.body);
         });
+      }
+    });
+  }
+
+   subscribeToAlert(id, type): void {
+
+    if (this.connectionAlertSubscription) {
+      return;
     }
+
+
+	const topic = '/topic/' + id + '/' + type;
+
+    this.connectionAlertSubscription = this.connectionSubject.subscribe(() => {
+
+      if (this.stompClient) {
+
+        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
+          this.listenerSubject.next(data.body);
+        });
+      }
+    });
+  }
+
+
+  unsubscribe(): void {
+
+    if (this.connectionEventSubscription) {
+      this.connectionEventSubscription.unsubscribe();
+      this.connectionEventSubscription = null;
+    }
+  }
+
 }

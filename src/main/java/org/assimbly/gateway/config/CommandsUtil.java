@@ -2,8 +2,6 @@ package org.assimbly.gateway.config;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.assimbly.gateway.GatewayApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +45,6 @@ public final class CommandsUtil {
         options.addOption(restore);
 
         CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
 
         String[] arguments = getArguments(args);

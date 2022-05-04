@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 
 import { IBroker } from 'app/shared/model/broker.model';
-import { AccountService } from 'app/core';
+import { AccountService } from 'app/core/auth/account.service';
 import { BrokerService } from './broker.service';
+import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
 
 enum Status {
     active = 'active',
@@ -46,9 +48,10 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     constructor(
         protected brokerService: BrokerService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
         protected accountService: AccountService,
+		protected modalService: NgbModal,
         protected router: Router
     ) {
         this.router.routeReuseStrategy.shouldReuseRoute = function() {
@@ -61,7 +64,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
         this.loadAll();
 
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
 
@@ -173,7 +176,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         if (info.startsWith('no info')) {
             this.brokerInfo = `Currently there are no statistics for this flow.`;
         } else {
-            var infoSplitted = info.split(',');
+            const infoSplitted = info.split(',');
 
             const uptime = infoSplitted[0].split('=').pop();
             const totalConnections = infoSplitted[1].split('=').pop();
@@ -198,6 +201,17 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <b>Total Messages:</b> ${totalMessages}<br/>`;
         }
     }
+	
+	delete(broker: IBroker): void {
+		const modalRef = this.modalService.open(BrokerDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.broker = broker;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
 
     start() {
         this.isBrokerStatusOK = true;
@@ -211,7 +225,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Start', err.error);
+                // this.getFlowLastError(this.broker.id, 'Start', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Broker with id=${this.broker.id} is not started.`;
                 this.disableActionBtns = false;
@@ -236,7 +250,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Restart', err.error);
+                // this.getFlowLastError(this.broker.id, 'Restart', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not restarted.`;
                 this.disableActionBtns = false;
@@ -257,7 +271,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.disableActionBtns = false;
             },
             err => {
-                //this.getFlowLastError(this.broker.id, 'Stop', err.error);
+                // this.getFlowLastError(this.broker.id, 'Stop', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not stopped.`;
                 this.disableActionBtns = false;
@@ -285,6 +299,9 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+   		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

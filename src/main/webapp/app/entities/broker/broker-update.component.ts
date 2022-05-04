@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,21 +8,19 @@ import { BrokerService } from './broker.service';
 
 import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broker-configuration';
 
-import 'brace';
-import 'brace/mode/xml';
-import 'brace/theme/eclipse';
-import { AceConfigInterface } from 'ngx-ace-wrapper/dist';
+import 'codemirror/addon/edit/closetag';
 
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html'
 })
 export class BrokerUpdateComponent implements OnInit {
+
     broker: IBroker;
-    brokerConfiguration: String;
-    artemisConfiguration: String;
-    activemqConfiguration: String;
-    brokerConfigurationFailed: String;
+    brokerConfiguration: string;
+    artemisConfiguration: string;
+    activemqConfiguration: string;
+    brokerConfigurationFailed: string;
     isSaving: boolean;
 
     namePopoverMessage: string;
@@ -31,12 +29,9 @@ export class BrokerUpdateComponent implements OnInit {
     configurationTypePopoverMessage: string;
     brokerConfigurationPopoverMessage: string;
 
-    public config: AceConfigInterface = {
-        mode: 'xml',
-        theme: 'eclipse'
-    };
 
-    constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {}
+    constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {
+	}
 
     ngOnInit() {
         this.isSaving = false;

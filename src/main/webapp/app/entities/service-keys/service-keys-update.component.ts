@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IServiceKeys } from 'app/shared/model/service-keys.model';
 import { ServiceKeysService } from './service-keys.service';
 import { IService } from 'app/shared/model/service.model';
-import { ServiceService } from 'app/entities/service';
+import { ServiceService } from 'app/entities/service/service.service';
 
 @Component({
     selector: 'jhi-service-keys-update',
@@ -20,7 +19,7 @@ export class ServiceKeysUpdateComponent implements OnInit {
     services: IService[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+		protected alertService: AlertService,
         protected serviceKeysService: ServiceKeysService,
         protected serviceService: ServiceService,
         protected activatedRoute: ActivatedRoute
@@ -53,7 +52,10 @@ export class ServiceKeysUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IServiceKeys>>) {
-        result.subscribe((res: HttpResponse<IServiceKeys>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IServiceKeys>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {
@@ -66,7 +68,10 @@ export class ServiceKeysUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackServiceById(index: number, item: IService) {

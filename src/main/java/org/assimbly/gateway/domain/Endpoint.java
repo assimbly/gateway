@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.assimbly.gateway.domain.enumeration.ComponentType;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 
 /**
@@ -30,9 +29,8 @@ public class Endpoint implements Serializable {
     @Column(name = "endpointType")
     private EndpointType endpointType;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "componentType")
-    private ComponentType componentType;
+    private String componentType;
 
     @Column(name = "uri")
     private String uri;
@@ -80,16 +78,16 @@ public class Endpoint implements Serializable {
         this.endpointType = endpointType;
     }
 
-    public ComponentType getComponentType() {
+    public String getComponentType() {
         return componentType;
     }
 
-    public Endpoint componentType(ComponentType componentType) {
+    public Endpoint componentType(String componentType) {
         this.componentType = componentType;
         return this;
     }
 
-    public void setComponentType(ComponentType componentType) {
+    public void setComponentType(String componentType) {
         this.componentType = componentType;
     }
 

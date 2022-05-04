@@ -1,17 +1,20 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.swagger.annotations.ApiParam;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.config.environment.DBConfiguration;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
-import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.GatewayRepository;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
-import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.GatewayService;
 import org.assimbly.gateway.service.dto.GatewayDTO;
-
-import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -21,15 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Gateway.
@@ -39,7 +34,7 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 public class GatewayResource {
 
     @Autowired
-    private org.assimbly.gateway.config.environment.DBConfiguration DBConfiguration;
+    private org.assimbly.gateway.config.exporting.Export confExport;
 
     private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
 
@@ -47,22 +42,20 @@ public class GatewayResource {
 
     private final GatewayRepository gatewayRepository;
 
-	private final GatewayService gatewayService;
+    private final GatewayService gatewayService;
 
     private final ApplicationProperties applicationProperties;
 
     private Scheduler scheduler;
 
-    private String gatewayType;
-
     private boolean ran = false;
 
-    public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository, ApplicationProperties applicationProperties) throws SchedulerException {
+    public GatewayResource(GatewayService gatewayService, GatewayRepository gatewayRepository, ApplicationProperties applicationProperties)
+        throws SchedulerException {
         this.gatewayService = gatewayService;
         this.gatewayRepository = gatewayRepository;
         this.applicationProperties = applicationProperties;
     }
-
 
     /**
      * POST  /gateways : Create a new gateway.
@@ -78,7 +71,8 @@ public class GatewayResource {
             throw new BadRequestAlertException("A new gateway cannot already have an ID", ENTITY_NAME, "idexists");
         }
         GatewayDTO result = gatewayService.save(gatewayDTO);
-        return ResponseEntity.created(new URI("/api/gateways/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/gateways/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -94,24 +88,19 @@ public class GatewayResource {
      */
     @PutMapping("/gateways")
     public ResponseEntity<GatewayDTO> updateGateway(@RequestBody GatewayDTO gatewayDTO) throws URISyntaxException {
-
-    	log.debug("REST request to update Gateway : {}", gatewayDTO);
+        log.debug("REST request to update Gateway : {}", gatewayDTO);
         if (gatewayDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        gatewayType = gatewayDTO.getType().name();
         GatewayDTO result = gatewayService.save(gatewayDTO);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, gatewayDTO.getId().toString())).body(result);
     }
 
     private boolean isCreated(String groupName) throws SchedulerException {
         for (String name : scheduler.getJobGroupNames()) {
-            if(name.equals(groupName))
-                return true;
+            if (name.equals(groupName)) return true;
         }
         return false;
     }
@@ -128,10 +117,9 @@ public class GatewayResource {
     }
 
     private void scheduleJob(Trigger trigger, int gatewayid, String url) throws SchedulerException {
-        if (isCreated("" + gatewayid))
-            scheduler.deleteJob(getJobKey("" + gatewayid));
+        if (isCreated("" + gatewayid)) scheduler.deleteJob(getJobKey("" + gatewayid));
         scheduler.getContext().put("gatewayid", gatewayid);
-        scheduler.getContext().put("database", DBConfiguration);
+        scheduler.getContext().put("database", confExport);
         scheduler.getContext().put("url", url);
         scheduler.scheduleJob(JobBuilder.newJob(ExportConfigJob.class).withIdentity("" + gatewayid, "" + gatewayid).build(), trigger);
     }
@@ -140,32 +128,57 @@ public class GatewayResource {
      * POST  /updatebackup : updates the backup frequency
      *
      * @param gatewayid
-     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping connector failed
+     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping gateway failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping(path = "/gateways/{gatewayid}/updatebackup/{frequency}", consumes = {"text/plain","application/xml", "application/json"}, produces = {"text/plain","application/xml","application/json"})
-    public ResponseEntity<String> updateBackup(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable String frequency, @RequestBody String url) throws Exception {
-        if(!ran) {
+    @PostMapping(
+        path = "/gateways/{gatewayid}/updatebackup/{frequency}",
+        consumes = { "text/plain", "application/xml", "application/json" },
+        produces = { "text/plain", "application/xml", "application/json" }
+    )
+    public ResponseEntity<String> updateBackup(
+        @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
+        @PathVariable Long gatewayid,
+        @PathVariable String frequency,
+        @RequestBody String url
+    ) throws Exception {
+        if (!ran) {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             ran = true;
         }
         switch (frequency) {
             case "Daily":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON-FRI *")).build(), Math.toIntExact(gatewayid), url);
+                scheduleJob(
+                    TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON-FRI *")).build(),
+                    Math.toIntExact(gatewayid),
+                    url
+                );
                 break;
             case "Weekly":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON *")).build(), Math.toIntExact(gatewayid), url);
+                scheduleJob(
+                    TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 ? * MON *")).build(),
+                    Math.toIntExact(gatewayid),
+                    url
+                );
                 break;
             case "Monthly":
-                scheduleJob(TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 1 1/1 ? *")).build(), Math.toIntExact(gatewayid), url);
+                scheduleJob(
+                    TriggerBuilder.newTrigger().withIdentity("" + gatewayid).withSchedule(cronSchedule("0 0 10 1 1/1 ? *")).build(),
+                    Math.toIntExact(gatewayid),
+                    url
+                );
                 break;
             default:
-                if (isCreated("" + gatewayid))
-                    scheduler.deleteJob(getJobKey("" + gatewayid));
+                if (isCreated("" + gatewayid)) scheduler.deleteJob(getJobKey("" + gatewayid));
                 break;
-            }
-        return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(gatewayid, mediaType, "/gateways/{gatewayid}/updatebackup/{frequency}", "Backup frequency updated");
+        }
+        return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(
+            gatewayid,
+            mediaType,
+            "/gateways/{gatewayid}/updatebackup/{frequency}",
+            "Backup frequency updated"
+        );
     }
 
     /**
@@ -215,9 +228,12 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = {"text/plain"})
-    public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
-
+    @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = { "text/plain" })
+    public ResponseEntity<String> getLog(
+        @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
+        @PathVariable Long gatewayid,
+        @PathVariable int lines
+    ) throws Exception {
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
             String log = LogUtil.tail(file, lines);
@@ -226,6 +242,4 @@ public class GatewayResource {
             return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
         }
     }
-
-
 }

@@ -1,0 +1,264 @@
+<ng-template #namePopover let-message="message">
+  <div [innerHtml]="namePopoverMessage"></div>
+</ng-template>
+<ng-template #logLevelPopover let-message="message">
+  <div [innerHtml]="logLevelPopoverMessage"></div>
+</ng-template>
+<ng-template #errorHandlerPopover let-message="message">
+  <div [innerHtml]="errorHandlerPopoverMessage"></div>
+</ng-template>
+
+<div class="row">
+  <div class="col-9"></div>
+  <div class="col-2-5">
+    <a
+      role="button"
+      class="btn btn-sm right-border-radius-0 camel-link camel-img"
+      href="https://camel.apache.org/docs/"
+      title="Camel Documentation"
+      target="_blank"
+    ></a>
+    <a
+      role="button"
+      class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
+      href="https://github.com/assimbly/gateway/wiki"
+      title="Assimbly Documentation"
+      target="_blank"
+    >
+      <picture>
+        <source srcset="../../../content/images/assimbly_transparant.webp" />
+        <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+      </picture>
+    </a>
+  </div>
+  <div class="col-0-5"></div>
+</div>
+
+<div class="container">
+  <div class="row">
+
+    <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
+      <jhi-alert-error></jhi-alert-error>
+      <div class="form-group" [style.display]="'none'">
+        <label for="id">ID</label>
+        <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id"/>
+      </div>
+
+      <div class="form-group">
+        <div class="form-group row">
+          <div class="col-8">
+            <input
+              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em; min-width: 866px;"
+              type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow"
+              formControlName="name"/>
+            <div
+              *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
+              <div *ngIf="editFlowForm['controls'].name.errors.required" class="invalid-field-message"
+                   style="color: red;">Flowname is required.
+              </div>
+              <br/>
+            </div>
+          </div>
+          <div class="col-4"></div>
+        </div>
+      </div>
+
+      <div class="card text-center" style="width: 54rem; background-color: #F8F8F8;">
+        <div class="card-header">
+          <br/>
+          <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active2" orientation="horizontal">
+            <li ngbNavItem="ROUTES" formArrayName="endpointsData" novalidate
+                [ngStyle]="{'text-align': 'left' }">
+              <a ngbNavLink>ROUTES</a>
+              <ng-template ngbNavContent>
+                <br/>
+                <hr/>
+                <div style="min-height: 44rem;">
+                  <ng-container *ngFor="let endpoint of endpoints; index as index">
+
+                    <div class="form-group container" [formGroupName]="index">
+                      <div class="row" *ngIf="endpoint.endpointType=='ROUTE'">
+                        <div [style.display]="'none'">
+                          <label for="id">ID</label>
+                          <input type="text" class="form-control" id="endpointid" formControlName="id" readonly/>
+                        </div>
+                        <div class="col-9">
+                          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
+                                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+                        </div>
+                        <button title="Edit route"  type="button"
+                                class="col-1 btn btn-primary"
+                                style="height: 37px;"
+                                *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                    <span class="padding-button"><fa-icon icon="edit"
+                                                          style="color: white;"></fa-icon></span>&nbsp;
+                        </button>
+                        <button title="New route" type="button"
+                                class="col-1 btn btn-primary flow-header-button"
+                                style="height: 37px;"
+                                *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                        </button>
+                        <button title="Create route" type="button" *ngIf="!routeCreated"
+                                class="col-1 btn btn-primary"
+                                style="height: 37px;"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                          <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
+                        </button>
+                        <button title="Add route" type="button"
+                                class="col-1 btn btn-success"
+                                style="height: 37px;"
+                                (click)="addEndpoint(endpoint, index)">
+                          <fa-icon icon="plus" style="color: white;"></fa-icon>
+                        </button>
+                        <button title="Remove route" type="button"
+                                class="col-1 btn btn-danger"
+                                style="height: 37px;"
+                                (click)="removeEndpoint(endpoint, index)">
+                          <fa-icon icon="times" style="color: white;"></fa-icon>
+                        </button>
+                      </div>
+                      <br/>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-template>
+            </li>
+            <li ngbNavItem="ERROR_ROUTE" novalidate
+                [ngStyle]="{'text-align': 'left' }">
+              <a ngbNavLink>ERROR ROUTE</a>
+              <ng-template ngbNavContent>
+                <br/>
+                <hr/>
+                <div style="min-height: 44rem;">
+                  <ng-container formArrayName="endpointsData" *ngFor="let endpoint of endpoints; index as index">
+                    <div class="form-group container" [formGroupName]="index">
+                      <div class="row" *ngIf="endpoint.endpointType=='ERROR'">
+                        <div [style.display]="'none'">
+                          <label for="id">ID</label>
+                          <input type="text" class="form-control" id="id" formControlName="id" readonly/>
+                        </div>
+                        <div class="col-12">
+                          <label class="form-control-label float-start" for="field_route" style="float: left; margin-left: 6px;">Error Handler</label>
+                          <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                             [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
+                            <fa-icon icon="info-circle"></fa-icon>
+                          </i>
+                        </div>
+                        <div class="col-10">
+                          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
+                                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+                        </div>
+                        <button type="button"
+                                *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                title="Edit route" class="col-2 btn btn-primary"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                  <span class="padding-button"><fa-icon icon="edit"
+                                                        style="color: white;"></fa-icon></span>&nbsp;
+                        </button>
+                        <button type="button"
+                                *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                class="col-2 btn btn-primary flow-header-button" title="New route"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                        </button>
+                        <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary"
+                                title="Create route"
+                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                          <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
+                        </button>
+                      </div>
+                      <br/>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-template>
+            </li>
+            <li ngbNavItem="SETTINGS" novalidate [ngStyle]="{'text-align': 'left' }">
+            <a ngbNavLink>SETTINGS</a>
+              <ng-template ngbNavContent>
+                <br/>
+                <hr/>
+                <div style="min-height: 44rem;">
+                  <div class="row">
+                    <div class="form-group col-10" style="margin-left: 24px;">
+                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+                      <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                         [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
+                        <fa-icon icon="info-circle"></fa-icon>
+                      </i>
+                      <select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+                        <option *ngFor="let logLevel of logLevelListType"
+                                [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
+                          {{logLevel}}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col-2"></div>
+                  </div>
+                  <br/>
+                </div>
+              </ng-template>
+            </li>
+
+            <li ngbNavItem="NOTES" novalidate [ngStyle]="{'text-align': 'left' }">
+              <a ngbNavLink>NOTES</a>
+              <ng-template ngbNavContent>
+                <ng-template #notesPopover let-message="message">
+                  <div [innerHtml]="notesPopoverMessage"></div>
+                </ng-template>
+                <br/>
+                <hr/>
+                <div class="container col-lg-12"
+                     style="min-height: 44rem; padding-left: 20px; padding-right: 20px; padding-top: 20px;">
+                  <div class="form-group">
+                    <textarea class="form-control" formControlName="notes" id="field_notes" *ngIf="flow" rows="24"
+                              cols="70"></textarea>
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+
+          </ul>
+          <div [ngbNavOutlet]="nav" class="ml-4"></div>
+        </div>
+      </div>
+
+      <br/>
+      <br/>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-8 offset-4">
+            <div class="position-relative">
+              <div class="position-absolute bottom-50 end-50">
+                <button type="button" class="btn btn-secondary" [routerLink]="['/']">
+                  <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>
+                  &nbsp; <span style="color: white;">Cancel</span>
+                </button>
+                <button class="float-end" type="button" (click)="save()" class="btn btn-primary" [disabled]="isSaving">
+                  <span><fa-icon icon="save"></fa-icon></span>&nbsp;
+                  &nbsp; <span style="color: white;">Save</span>
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div *ngIf="savingFlowSuccess">
+        <span class="text-success">*{{savingFlowSuccessMessage}}</span>
+      </div>
+      <div *ngIf="savingFlowFailed">
+        <span class="text-danger">*{{savingFlowFailedMessage}}</span>
+      </div>
+      <div *ngIf="!!invalidUriMessage">
+        <span class="text-danger">*{{invalidUriMessage}}</span>
+      </div>
+      <div *ngIf="!!notUniqueUriMessage">
+        <span class="text-danger">*{{notUniqueUriMessage}}</span>
+      </div>
+      <br/>
+    </form>
+  </div>
+</div>

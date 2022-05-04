@@ -38,16 +38,6 @@ export class HeaderPopupService {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         if (typeof component as Component) {
             modalRef.componentInstance.header = header;
-            modalRef.result.then(
-                result => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                },
-                reason => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                }
-            );
         }
         return modalRef;
     }

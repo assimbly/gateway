@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { GatewayService } from './gateway.service';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayPopupService } from 'app/entities/gateway';
+import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
 
 @Component({
     selector: 'jhi-gateway-import-dialog',
@@ -18,7 +18,7 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     fileName = 'Choose file';
     importError = false;
 
-    constructor(private eventManager: JhiEventManager, private gatewayService: GatewayService, public activeModal: NgbActiveModal) {}
+    constructor(private eventManager: EventManager, private gatewayService: GatewayService, public activeModal: NgbActiveModal) {}
 
     ngAfterContentInit() {
         this.gatewayService.query().subscribe(res => {
@@ -45,32 +45,12 @@ export class GatewayImportDialogComponent implements AfterContentInit {
             data => {
                 this.importError = false;
                 this.activeModal.dismiss(true);
-                this.eventManager.broadcast({ name: 'gatewayListModification', content: 'OK' });
+			    this.eventManager.broadcast(new EventWithContent('gatewayListModification', 'OK'));
             },
             err => {
                 this.importError = true;
                 console.log(err);
             }
         );
-    }
-}
-
-@Component({
-    selector: 'jhi-gateway-import-popup',
-    template: ''
-})
-export class GatewayImportPopupComponent implements OnInit, OnDestroy {
-    routeSub: any;
-
-    constructor(protected route: ActivatedRoute, protected gatewayPopupService: GatewayPopupService) {}
-
-    ngOnInit() {
-        this.routeSub = this.route.params.subscribe(() => {
-            this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
-        });
-    }
-
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
     }
 }

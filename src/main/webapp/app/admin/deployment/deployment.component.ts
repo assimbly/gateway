@@ -1,63 +1,66 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { IGateway } from 'app/shared/model/gateway.model';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { Router } from '@angular/router';
-import { DeploymentService } from 'app/admin';
-import { GatewayService } from 'app/entities/gateway';
+import { DeploymentService } from 'app/admin/deployment/deployment.service';
+import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
+import { GatewayExportDialogComponent } from 'app/entities/gateway/gateway-export-dialog.component';
+import { GatewayImportDialogComponent } from 'app/entities/gateway/gateway-import-dialog.component';
+
 import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from 'app/entities/flow';
+import { FlowService } from 'app/entities/flow/flow.service';
 
 @Component({
-    selector: 'deployment',
-    templateUrl: './deployment.component.html'
+  selector: 'deployment',
+  templateUrl: './deployment.component.html',
 })
 export class DeploymentComponent implements OnInit {
-    gateways: IGateway[] = [];
-    flows: IFlow[];
-    frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
-    selectedFrequency: String = 'Never';
-    gatewayId: number = null;
-    url: String;
-    constructor(
-        private router: Router,
-        protected eventManager: JhiEventManager,
-        protected gatewayService: GatewayService,
-        protected jhiAlertService: JhiAlertService,
-        protected flowService: FlowService
-    ) {}
+  gateways: IGateway[] = [];
+  flows: IFlow[];
+  frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
+  selectedFrequency: String = 'Never';
+  gatewayId: number = null;
+  url: String;
+  constructor(
+    private router: Router,
+    protected gatewayService: GatewayService,
+	protected gatewayPopupService: GatewayPopupService,
+    protected flowService: FlowService
+  ) {}
 
-    ngOnInit(): void {
-        this.loadAllGateways();
-    }
+  ngOnInit(): void {
+    this.loadAllGateways();
+  }
 
-    updateBackupFrequency(gatewayId, frequency, url) {
-        this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
-            console.log(res);
-        });
-    }
+  updateBackupFrequency(gatewayId, frequency, url) {
+    this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
+      console.log(res);
+    });
+  }
 
-    loadAllGateways() {
-        this.gatewayService.query().subscribe((res: HttpResponse<IGateway[]>) => {
-            this.gateways = res.body;
-        });
-    }
+  loadAllGateways() {
+    this.gatewayService.query().subscribe((res: HttpResponse<IGateway[]>) => {
+      this.gateways = res.body;
+    });
+  }
 
-    exportFlowConfiguration(flow) {
-        this.flowService.exportFlowConfiguration(flow);
-    }
+  exportFlowConfiguration(flow) {
+    this.flowService.exportFlowConfiguration(flow);
+  }
 
-    getFlowsForSelectedGateway(id) {
-        this.flowService.getFlowByGatewayId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
-            this.flows = res.body;
-        });
-    }
+  getFlowsForSelectedGateway(event) {
+    let id = (event.target as HTMLSelectElement).value as string;
+    this.flowService.getFlowByGatewayId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
+      this.flows = res.body;
+    });
+  }
 
-    downloadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['export'] } }]);
-    }
+  downloadConfiguration() {
+    this.gatewayPopupService.open(GatewayExportDialogComponent as Component);
+  }
 
-    uploadConfiguration() {
-        this.router.navigate(['/', { outlets: { popup: ['import'] } }]);
-    }
+  uploadConfiguration() {
+	  this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
+  }
 }

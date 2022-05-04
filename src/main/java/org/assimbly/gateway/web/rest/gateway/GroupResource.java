@@ -1,24 +1,21 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 import org.assimbly.gateway.domain.Group;
 import org.assimbly.gateway.repository.GroupRepository;
-import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
-import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
-
-import io.github.jhipster.web.util.ResponseUtil;
+import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
+import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Group.
@@ -35,14 +32,14 @@ public class GroupResource {
 
     private final GroupMapper groupMapper;
 
-	private JpaRepository<Group, Long> groupService;
+    private JpaRepository<Group, Long> groupService;
 
     public GroupResource(GroupRepository groupRepository, GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
     }
 
-	/**
+    /**
      * POST  /groups : Create a new group.
      *
      * @param groupDTO the groupDTO to create
@@ -58,7 +55,8 @@ public class GroupResource {
         Group group = groupMapper.toEntity(groupDTO);
         group = groupRepository.save(group);
         GroupDTO result = groupMapper.toDto(group);
-        return ResponseEntity.created(new URI("/api/groups/" + result.getId()))
+        return ResponseEntity
+            .created(new URI("/api/groups/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -83,9 +81,7 @@ public class GroupResource {
         group = groupRepository.save(group);
         GroupDTO result = groupMapper.toDto(group);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, groupDTO.getId().toString()))
-            .body(result);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, groupDTO.getId().toString())).body(result);
     }
 
     /**

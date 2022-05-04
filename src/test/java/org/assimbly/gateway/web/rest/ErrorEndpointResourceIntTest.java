@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.assimbly.gateway.domain.enumeration.ComponentType;
+import org.assimbly.gateway.domain.enumeration.ComponentTypeOLD;
 /**
  * Test class for the ErrorEndpointResource REST controller.
  *
@@ -44,8 +44,8 @@ import org.assimbly.gateway.domain.enumeration.ComponentType;
 @SpringBootTest(classes = GatewayApp.class)
 public class ErrorEndpointResourceIntTest {
 
-    private static final ComponentType DEFAULT_TYPE = ComponentType.ACTIVEMQ;
-    private static final ComponentType UPDATED_TYPE = ComponentType.FILE;
+    private static final ComponentTypeOLD DEFAULT_TYPE = ComponentTypeOLD.ACTIVEMQ;
+    private static final ComponentTypeOLD UPDATED_TYPE = ComponentTypeOLD.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -165,10 +165,10 @@ public class ErrorEndpointResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(errorEndpoint.getId().intValue())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI.toString())))
-            .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS.toString())));
+            .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI)))
+            .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS)));
     }
-    
+
     @Test
     @Transactional
     public void getErrorEndpoint() throws Exception {
@@ -181,8 +181,8 @@ public class ErrorEndpointResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(errorEndpoint.getId().intValue()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.uri").value(DEFAULT_URI.toString()))
-            .andExpect(jsonPath("$.options").value(DEFAULT_OPTIONS.toString()));
+            .andExpect(jsonPath("$.uri").value(DEFAULT_URI))
+            .andExpect(jsonPath("$.options").value(DEFAULT_OPTIONS));
     }
 
     @Test

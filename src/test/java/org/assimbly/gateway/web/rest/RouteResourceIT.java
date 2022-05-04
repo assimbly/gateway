@@ -173,9 +173,9 @@ public class RouteResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(route.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())));
+            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)));
     }
-    
+
     @Test
     @Transactional
     public void getRoute() throws Exception {
@@ -189,7 +189,7 @@ public class RouteResourceIT {
             .andExpect(jsonPath("$.id").value(route.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
-            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()));
+            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT));
     }
 
     @Test

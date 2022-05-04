@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
-import { AccountService } from 'app/core';
+import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
+import { AccountService } from 'app/core/auth/account.service';
 import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({
@@ -16,7 +19,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
 
-    //sorting
+    // sorting
     predicate: any;
     reverse: any;
     page: any;
@@ -24,8 +27,9 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+        protected eventManager: EventManager,
+    		protected modalService: NgbModal,
         protected accountService: AccountService
     ) {
         this.page = 0;
@@ -61,7 +65,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.loadAll();
@@ -81,8 +85,30 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
+
+	delete(environmentVariables: IEnvironmentVariables): void {
+		const modalRef = this.modalService.open(EnvironmentVariablesDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.environmentVariables = environmentVariables;
+		// unsubscribe not needed because closed completes on modal close
+
+		modalRef.result.then(
+        result => {
+           if (result) {
+                this.environmentVariables = [];
+           }
+        },
+        reason => {
+           if (reason) {
+                this.environmentVariables = [];
+           }
+        }
+      );
+	}
 
     sort() {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];

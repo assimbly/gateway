@@ -1,0 +1,5152 @@
+{
+    "projectResources": {
+        "basePath": "/",
+        "resources": [
+            {
+                "type": "file",
+                "path": ".editorconfig",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".eslintignore",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".eslintrc.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".huskyrc",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": ".jhipster",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".lintstagedrc.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".prettierignore",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".prettierrc",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".project",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": ".yo-rc.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "angular.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "checkstyle.xml",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "classpath",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "CONTRIBUTING.md",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "gradle",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "gradle.properties",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "gradlew",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "gradlew.bat",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "LICENSE",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "logback-spring.xml",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "package-lock.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "package.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "postcss.config.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "proxy.conf.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "README.md",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "scripts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "sonar-project.properties",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "tsconfig.app.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "tsconfig.base.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "tsconfig.e2e.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "tsconfig.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "tslint.json",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "webpack",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "logo-jhipster.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "utils.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "webpack.common.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "webpack.common.js.bak",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "webpack.dev.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "webpack.prod.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "webpack.test.js",
+                "action": "ignore"
+            }
+        ]
+    },
+    "backendResources": {
+        "basePath": "/src/main/java/org/assimbly/gateway",
+        "resources": [
+            {
+                "type": "dir",
+                "path": "aop",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "aop/logging",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "aop/logging/LoggingAspect.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "ApplicationWebXml.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "config",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/ApplicationProperties.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/AsyncConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "config/audit",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/audit/AuditEventConverter.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/audit/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/CacheConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/CloudDatabaseConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/CommandsUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/Constants.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/DatabaseConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/DateTimeFormatConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/DefaultProfileUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/EncryptionProperties.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "config/environment",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/environment/DBConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/environment/DBExportProperties.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/environment/DBExportXMLConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/environment/DBImportXMLConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/JacksonConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/LiquibaseConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/LocaleConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/LoggingAspectConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/LoggingConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "config/scheduling",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/scheduling/ExportConfigJob.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/SecurityConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/WebConfigurer.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/WebsocketConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/WebsocketSecurityConfiguration.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "domain",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/AbstractAuditingEntity.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Authority.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Broker.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Endpoint.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "domain/enumeration",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/enumeration/ConnectorType.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/enumeration/EndpointType.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/enumeration/EnvironmentType.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/enumeration/GatewayType.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/enumeration/LogLevelType.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/EnvironmentVariables.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Flow.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Gateway.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Group.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Header.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/HeaderKeys.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Maintenance.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/PersistentAuditEvent.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/PersistentToken.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Queue.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Route.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Security.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Service.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/ServiceKeys.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/Topic.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/User.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "GatewayApp.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "repository",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/AuthorityRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/BrokerRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/CustomAuditEventRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/EndpointRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/EnvironmentVariablesRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/FlowRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/GatewayRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/GroupRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/HeaderKeysRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/HeaderRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/MaintenanceRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/PersistenceAuditEventRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/PersistentTokenRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/QueueRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/RouteRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/SecurityRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/ServiceKeysRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/ServiceRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/TopicRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/UserRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "security",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/AuthoritiesConstants.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/DomainUserDetailsService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "security/jwt",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/jwt/JWTConfigurer.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/jwt/JWTFilter.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/jwt/TokenProvider.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/SecurityUtils.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/SpringSecurityAuditorAware.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/UserNotActivatedException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/AuditEventService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/BrokerService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/dto",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/AdminUserDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/BrokerDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/EndpointDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/EnvironmentVariablesDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/FlowDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/GatewayDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/GroupDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/HeaderDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/HeaderKeysDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/MaintenanceDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/PasswordChangeDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/QueueDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/RouteDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/SecurityDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/ServiceDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/ServiceKeysDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/TopicDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/UserDTO.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/EmailAlreadyUsedException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/EndpointService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/EnvironmentVariablesService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/FlowService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/GatewayService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/GroupService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/HeaderKeysService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/HeaderService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/impl",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/BrokerServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/EndpointServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/EnvironmentVariablesServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/FlowServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/GatewayServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/GroupServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/HeaderKeysServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/HeaderServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/MaintenanceServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/QueueServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/RouteServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/SecurityServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/ServiceKeysServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/ServiceServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/impl/TopicServiceImpl.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/InvalidPasswordException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/MailService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/MaintenanceService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/mapper",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/BrokerMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/EndpointMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/EntityMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/EnvironmentVariablesMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/FlowMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/GatewayMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/GroupMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/HeaderKeysMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/HeaderMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/MaintenanceMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/QueueMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/RouteMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/SecurityTLSMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/ServiceKeysMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/ServiceMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/TopicMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/UserMapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/QueueService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/RouteService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/SecurityService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/ServiceKeysService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/ServiceService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/TopicService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/UsernameAlreadyUsedException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/UserService.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/util",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/util/RandomUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/broker",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/broker/BrokerResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/broker/QueueResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/broker/TopicResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/customvm",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/customvm/LoggerVM.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/errors",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/BadRequestAlertException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/EmailAlreadyUsedException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/ErrorConstants.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/ExceptionTranslator.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/FieldErrorVM.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/InvalidPasswordException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/LoginAlreadyUsedException.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/gateway",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/AccountResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/ApplicationInfoResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/AuditResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/CertificateResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/EnvironmentVariablesResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/GatewayResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/GroupResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/LogsResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/ProfileInfoResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/SecurityResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/UserJWTController.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/gateway/UserResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/integration",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/EndpointResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/EnvironmentResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/FlowResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/HeaderKeysResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/HeaderResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/MaintenanceResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/RouteResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/ServiceKeysResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/integration/ServiceResource.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/package-info.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/util",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/BodyUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/HeaderUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/LogUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/PaginationUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/ResponseUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/vm",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/vm/KeyAndPasswordVM.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/vm/LoginVM.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/vm/ManagedUserVM.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/vm/package-info.java",
+                "action": "ignore"
+            }
+        ]
+    },
+    "testBackendResources": {
+        "basePath": "/src/test/java/org/assimbly/gateway",
+        "resources": [
+            {
+                "type": "dir",
+                "path": "config",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "config/timezone",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/timezone/HibernateTimeZoneTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/WebConfigurerTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "config/WebConfigurerTestController.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "domain",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/EndpointTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/FlowTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/QueueTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/RouteTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "domain/TopicTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "repository",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/CustomAuditEventRepositoryIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "repository/timezone",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/timezone/DateTimeWrapper.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "repository/timezone/DateTimeWrapperRepository.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "security",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/DomainUserDetailsServiceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "security/SecurityUtilsUnitTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/dto",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/EndpointDTOTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/FlowDTOTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/QueueDTOTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/RouteDTOTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/dto/TopicDTOTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/MailServiceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "service/mapper",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/EndpointMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/FlowMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/QueueMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/RouteMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/TopicMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/mapper/UserMapperTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "service/UserServiceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/AccountResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/AuditResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/BrokerResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/EndpointResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/EndpointResourceIT.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/EnvironmentVariablesResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/ErrorEndpointResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/errors",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/ExceptionTranslatorIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/errors/ExceptionTranslatorTestController.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/FlowResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/FlowResourceIT.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/FromEndpointResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/GatewayResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/GroupResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/HeaderKeysResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/HeaderResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/LogsResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/MaintenanceResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/ProfileInfoResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/QueueResourceIT.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/RouteResourceIT.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/SecurityResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/ServiceKeysResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/ServiceResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/TestUtil.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/TopicResourceIT.java",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/UserResourceIntTest.java",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "web/rest/util",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "web/rest/util/PaginationUtilUnitTest.java",
+                "action": "ignore"
+            }
+        ]
+    },
+    "frontendResources": {
+        "basePath": "/src/main/webapp",
+        "resources": [
+            {
+                "type": "file",
+                "path": "404.html",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/account.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/account.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/activate",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/activate/activate.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/activate/activate.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/activate/activate.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/activate/activate.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/password",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password-strength-bar.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password-strength-bar.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password/password.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/password-reset",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/password-reset/finish",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/finish/password-reset-finish.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/finish/password-reset-finish.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/finish/password-reset-finish.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/finish/password-reset-finish.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/password-reset/init",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/init/password-reset-init.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/init/password-reset-init.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/init/password-reset-init.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/password-reset/init/password-reset-init.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/register",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/register/register.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/register/register.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/register/register.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/register/register.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/account/settings",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/settings/settings.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/settings/settings.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/account/settings/settings.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/admin-routing.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/audits",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audit-data.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audit.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audits.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audits.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audits.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audits.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/audits/audits.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/configuration",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/configuration/configuration.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/configuration/configuration.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/configuration/configuration.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/configuration/configuration.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/configuration/configuration.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/deployment",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/deployment/deployment.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/deployment/deployment.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/deployment/deployment.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/deployment/deployment.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/deployment/deployment.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/docs",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/docs/docs.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/docs/docs.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/docs/docs.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/docs/docs.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/docs/docs.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/health",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health-modal.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health-modal.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/health/health.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/logs",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/log.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/logs.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/logs.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/logs.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/logs.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logs/logs.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/logviewer",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer-line-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.searchbyname.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/logviewer/logviewer.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/metrics",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/metrics/metrics.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/metrics/metrics.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/metrics/metrics.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/metrics/metrics.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/metrics/metrics.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/admin/user-management",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/admin/user-management/user-management.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/app-routing.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/app.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/app.main.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/app.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/blocks",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/blocks/config",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/config/prod.config.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/config/uib-pagination.config.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/blocks/interceptor",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/interceptor/auth-expired.interceptor.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/interceptor/auth.interceptor.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/interceptor/errorhandler.interceptor.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/blocks/interceptor/notification.interceptor.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core/auth",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/auth/account.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/auth/auth-jwt.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/auth/csrf.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/auth/state-storage.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/auth/user-route-access-service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/core.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core/icons",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/icons/font-awesome-icons.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core/language",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/language/language.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core/login",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/login/login-modal.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/login/login.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/login/login.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/core/user",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/user/account.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/user/user.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/core/user/user.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/broker",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-configuration.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-browser-row.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-browser-row.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-browser.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-browser.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-sender.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-message-sender.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/broker.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/message.searchbymessageid.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/broker/message.sortbyheaderkey.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/endpoint",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/endpoint/endpoint.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/entity.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/environment-variables",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/environment-variables/environment-variables.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/flow",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/apache-camel.png",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/flow/editor",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/editor/flow-editor.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/editor/flow-editor.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-row.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-row.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.searchbyname.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/flow.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/flow/sender",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/sender/flow-message-sender.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/flow/sender/flow-message-sender.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/gateway",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-export-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-export-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-import-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-import-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/gateway/gateway.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/group",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/group/group.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/header",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-all.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-all.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-keys-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header/header.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/header-keys",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/header-keys/header-keys.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/maintenance",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/maintenance/maintenance.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/queue",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-clear-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-clear-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-row.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-row.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.searchbyname.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/queue/queue.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/route",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/route/route.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/security",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-self-sign-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-self-sign-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-upload-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-upload-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-uploadp12-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security-uploadp12-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/security/security.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/service",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-all.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-all.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-keys-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-popup.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service/service.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/service-keys",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys-validation.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/service-keys/service-keys.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/entities/topic",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-clear-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-clear-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-delete-dialog.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-delete-dialog.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-detail.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-detail.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-row.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-row.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-update.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic-update.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.searchbyname.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/entities/topic/topic.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/home",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/home/home.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/home/home.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/home/home.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/home/home.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/home/home.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts/error",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/error/error.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/error/error.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/error/error.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts/footer",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/footer/footer.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/footer/footer.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts/main",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/main/main.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/main/main.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts/navbar",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/navbar/active-menu.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/navbar/navbar.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/navbar/navbar.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/navbar/navbar.route.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/navbar/navbar.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/layouts/profiles",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/profiles/page-ribbon.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/profiles/page-ribbon.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/profiles/profile-info.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/layouts/profiles/profile.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/polyfills.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/alert",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/alert/alert-error.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/alert/alert-error.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/alert/alert.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/auth",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/auth/has-any-authority.directive.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/camel",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/camel/component-type.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/camel/components.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/camel/service-connections.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/constants",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/constants/authority.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/constants/error.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/constants/input.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/constants/pagination.constants.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/index.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/language",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/language/find-language-from-key.pipe.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/login",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/login/login.component.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/login/login.component.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/model",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/address.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/broker.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/endpoint.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/model/enumerations",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/enumerations/endpoint-type.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/enumerations/log-level-type.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/environment-variables.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/flow.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/gateway.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/group.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/header-keys.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/header.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/maintenance.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/messsage.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/queue.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/route.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/security.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/service-keys.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/service.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/model/topic.model.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/shared-libs.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/shared.module.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/util",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/util/datepicker-adapter.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/util/request-util.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "app/shared/window",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/shared/window/window.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "app/vendor.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "assimbly.ico",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "content",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "content/css",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/css/loading.css",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "content/images",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/activemq.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/activemq.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/apache-camel.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/apache-camel.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly2.jpg",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_logo.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_logo.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_screenshot.jpg",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_small.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_transparant.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_transparant.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_transparant_small.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/assimbly_transparant_white.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/favicon.ico",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/favicon2.ico",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "content/images/landingspage",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/landingspage/1.jpg",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/landingspage/1.old.jpg",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/landingspage/1.old.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/landingspage/1.webp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/logo-jhipster.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/new_page.png",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/images/s.png",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "content/scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/scss/global.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/scss/vendor.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "content/scss/_bootstrap-variables.scss",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "favicon.ico",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "i18n",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "i18n/en",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/activate.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/audits.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/bankAccount.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/configuration.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/error.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/global.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/health.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/home.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/label.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/login.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/logs.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/metrics.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/operation.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/password.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/register.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/reset.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/sessions.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/settings.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "i18n/en/user-management.json",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "index.html",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "manifest.webapp",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "robots.txt",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "swagger-ui",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "swagger-ui/dist",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "swagger-ui/dist/images",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "swagger-ui/dist/images/throbber.gif",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "swagger-ui/index.html",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "WEB-INF",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "WEB-INF/web.xml",
+                "action": "ignore"
+            }
+        ]
+    },
+    "testFrontendResources": {
+        "basePath": "/src/test/javascript",
+        "resources": [
+            {
+                "type": "file",
+                "path": "jest-global-mocks.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "jest.conf.js",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "jest.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/activate",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/activate/activate.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/password",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/password/password-strength-bar.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/password/password.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/password-reset",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/password-reset/finish",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/password-reset/finish/password-reset-finish.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/password-reset/init",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/password-reset/init/password-reset-init.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/register",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/register/register.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/account/settings",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/account/settings/settings.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/audits",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/audits/audits.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/audits/audits.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/configuration",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/configuration/configuration.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/configuration/configuration.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/health",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/health/health.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/logs",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/logs/logs.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/logs/logs.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/metrics",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/metrics/metrics.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/metrics/metrics.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/admin/user-management",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/user-management/user-management-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/user-management/user-management-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/user-management/user-management-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/admin/user-management/user-management.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/core",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/core/login",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/core/login/login-modal.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/core/user",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/core/user/account.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/core/user/user.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/broker",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/broker/broker-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/broker/broker-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/broker/broker-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/broker/broker.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/broker/broker.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/endpoint",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/endpoint/endpoint-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/endpoint/endpoint-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/endpoint/endpoint-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/endpoint/endpoint.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/endpoint/endpoint.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/environment-variables",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/environment-variables/environment-variables-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/environment-variables/environment-variables-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/environment-variables/environment-variables-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/environment-variables/environment-variables.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/environment-variables/environment-variables.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/flow",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/flow/flow-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/flow/flow-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/flow/flow-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/flow/flow.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/flow/flow.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/gateway",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/gateway/gateway-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/gateway/gateway-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/gateway/gateway-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/gateway/gateway.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/gateway/gateway.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/group",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/group/group-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/group/group-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/group/group-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/group/group.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/group/group.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/header",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header/header-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header/header-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header/header-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header/header.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header/header.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/header-keys",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header-keys/header-keys-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header-keys/header-keys-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header-keys/header-keys-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header-keys/header-keys.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/header-keys/header-keys.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/maintenance",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/maintenance/maintenance-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/maintenance/maintenance-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/maintenance/maintenance-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/maintenance/maintenance.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/maintenance/maintenance.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/queue",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/queue/queue-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/queue/queue-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/queue/queue-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/queue/queue.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/queue/queue.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/route",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/route/route-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/route/route-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/route/route-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/route/route.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/route/route.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/security",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/security/security-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/security/security-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/security/security-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/security/security.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/security/security.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/service",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service/service-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service/service-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service/service-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service/service.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service/service.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/service-keys",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service-keys/service-keys-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service-keys/service-keys-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service-keys/service-keys-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service-keys/service-keys.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/service-keys/service-keys.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/entities/topic",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/topic/topic-delete-dialog.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/topic/topic-detail.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/topic/topic-update.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/topic/topic.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/entities/topic/topic.service.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/shared",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/shared/alert",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/shared/alert/alert-error.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/shared/alert/alert.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/app/shared/login",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/app/shared/login/login.component.spec.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "dir",
+                "path": "spec/helpers",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-account.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-active-modal.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-alert.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-event-manager.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-language.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-login-modal.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-login.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-route.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/mock-state-storage.service.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/helpers/spyobject.ts",
+                "action": "ignore"
+            },
+            {
+                "type": "file",
+                "path": "spec/test.module.ts",
+                "action": "ignore"
+            }
+        ]
+    }
+}

@@ -173,9 +173,9 @@ public class MaintenanceResourceIntTest {
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(DEFAULT_START_TIME.toString())))
             .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())))
             .andExpect(jsonPath("$.[*].duration").value(hasItem(DEFAULT_DURATION.toString())))
-            .andExpect(jsonPath("$.[*].frequency").value(hasItem(DEFAULT_FREQUENCY.toString())));
+            .andExpect(jsonPath("$.[*].frequency").value(hasItem(DEFAULT_FREQUENCY)));
     }
-    
+
     @Test
     @Transactional
     public void getMaintenance() throws Exception {
@@ -190,7 +190,7 @@ public class MaintenanceResourceIntTest {
             .andExpect(jsonPath("$.startTime").value(DEFAULT_START_TIME.toString()))
             .andExpect(jsonPath("$.endTime").value(DEFAULT_END_TIME.toString()))
             .andExpect(jsonPath("$.duration").value(DEFAULT_DURATION.toString()))
-            .andExpect(jsonPath("$.frequency").value(DEFAULT_FREQUENCY.toString()));
+            .andExpect(jsonPath("$.frequency").value(DEFAULT_FREQUENCY));
     }
 
     @Test

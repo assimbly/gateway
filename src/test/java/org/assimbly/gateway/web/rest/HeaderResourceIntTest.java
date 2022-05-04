@@ -8,7 +8,7 @@ import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
-
+import org.assimbly.gateway.web.rest.integration.HeaderResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -153,9 +153,9 @@ public class HeaderResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(header.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
     }
-    
+
     @Test
     @Transactional
     public void getHeader() throws Exception {
@@ -167,7 +167,7 @@ public class HeaderResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(header.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
     }
 
     @Test

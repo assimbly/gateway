@@ -24,17 +24,11 @@
                 <dt><span>Response ID</span></dt>
                 <dd>
                     <span>{{endpoint.responseId}}</span>
-                </dd>                
+                </dd>
                 <dt><span>Flow ID</span></dt>
                 <dd>
                     <div *ngIf="endpoint.flowId">
                         <a [routerLink]="['/flow', endpoint.flowId, 'view']">{{endpoint.flowId}}</a>
-                    </div>
-                </dd>
-                <dt><span>Service ID</span></dt>
-                <dd>
-                    <div *ngIf="endpoint.serviceId">
-                        <a [routerLink]="['/service', endpoint.serviceId, 'view']">{{endpoint.serviceId}}</a>
                     </div>
                 </dd>
                 <dt><span>Header ID</span></dt>
@@ -42,6 +36,18 @@
                     <div *ngIf="endpoint.headerId">
                         <a [routerLink]="['/header', endpoint.headerId, 'view']">{{endpoint.headerId}}</a>
                     </div>
+                </dd>
+                <dt><span>Route ID</span></dt>
+                <dd>
+                  <div *ngIf="endpoint.routeId">
+                    <a [routerLink]="['/route', endpoint.routeId, 'view']">{{endpoint.routeId}}</a>
+                  </div>
+                </dd>
+                <dt><span>Service ID</span></dt>
+                <dd>
+                  <div *ngIf="endpoint.serviceId">
+                    <a [routerLink]="['/service', endpoint.serviceId, 'view']">{{endpoint.serviceId}}</a>
+                  </div>
                 </dd>
             </dl>
 

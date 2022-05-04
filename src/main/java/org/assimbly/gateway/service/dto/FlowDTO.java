@@ -22,8 +22,6 @@ public class FlowDTO implements Serializable {
 
     private Boolean autoStart;
 
-    private Boolean offLoading;
-
     private Integer maximumRedeliveries;
 
     private Integer redeliveryDelay;
@@ -80,14 +78,6 @@ public class FlowDTO implements Serializable {
 
     public void setAutoStart(Boolean autoStart) {
         this.autoStart = autoStart;
-    }
-
-    public Boolean isOffLoading() {
-        return offLoading;
-    }
-
-    public void setOffLoading(Boolean offLoading) {
-        this.offLoading = offLoading;
     }
 
     public Integer getMaximumRedeliveries() {
@@ -221,8 +211,7 @@ public class FlowDTO implements Serializable {
         return "FlowDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", autoStart='" + isAutoStart() + "'" +
-            ", offLoading='" + isOffLoading() + "'" +
+            ", autoStart='" + isAutoStart() + "'" + 
             ", maximumRedeliveries=" + getMaximumRedeliveries() +
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
-import { createRequestOption } from 'app/shared';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IService } from 'app/shared/model/service.model';
 
 type EntityResponseType = HttpResponse<IService>;
@@ -11,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IService[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ServiceService {
-    public resourceUrl = SERVER_API_URL + 'api/services';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/services');
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(service: IService): Observable<EntityResponseType> {
         return this.http.post<IService>(this.resourceUrl, service, { observe: 'response' });

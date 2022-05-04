@@ -1,0 +1,179 @@
+import groovy.transform.Field
+import groovy.io.FileType
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import static groovy.io.FileType.*
+
+def json = file('scripts/project.json')
+def projectFile = new groovy.json.JsonSlurper().parseText(json.text)
+def resources
+def data
+
+tasks.register('resources') {
+
+	doLast {
+
+		printMessage('Create resources')
+		data = getProjectResources()
+
+		resources  = [
+				projectResources: data
+			]
+
+		data = getResources("/src/main/java/org/assimbly/gateway")
+
+		resources  = resources + [
+				backendResources: data
+			]
+
+		data = getResources("/src/test/java/org/assimbly/gateway")
+
+		resources  = resources + [
+				testBackendResources: data
+			]
+
+		data = getResources("/src/main/webapp")
+
+		resources  = resources + [
+				frontendResources: data
+			]
+
+		data = getResources("/src/test/javascript")
+
+		resources  = resources + [
+				testFrontendResources: data
+			]
+
+		def json_str = JsonOutput.toJson(resources)
+		def json_beauty = JsonOutput.prettyPrint(json_str)
+		println(json_beauty)
+
+		File file = new File(rootDir.toString() + "/scripts/resources.json")
+		file.write(json_beauty)
+
+		printMessage('Finished')
+		printMessage('See: ./scripts/resources/resources.json')
+
+    }
+}
+
+def getProjectResources(){
+
+	def resources = []
+	def list = getProjectList()
+
+	list.each {
+		if(it.isFile()){
+			resources = resources + [
+				type: "file",
+				path: it.name,
+				action: "ignore"
+			]
+		}else if(it.isDirectory()){
+			resources = resources + [
+				type: "dir",
+				path: it.name,
+				action: "ignore"
+			]
+		}
+	}
+
+	def data = [
+		basePath: "/",
+		resources: resources
+	]
+
+	return data
+
+}
+
+
+def getProjectList(){
+
+	def list = []
+
+	def files = []
+
+	def webpackDir = new File(rootDir.toString() + "/webpack")
+
+	rootDir.traverse(type: ANY, maxDepth: 0) { files.add(it) }
+	webpackDir.traverse(type: ANY, maxDepth: 0) { files.add(it) }
+
+	files.each {
+		if (it.toString().contains(".git")) { return }
+		if (it.toString().contains(".gradle")) { return }
+		if (it.toString().contains("node_modules")) { return }
+		if (it.toString().contains("build")) { return }
+		if (it.toString().contains("src")) { return }
+		if (it.toString().contains("target")) { return }
+		list << it
+	}
+
+
+
+	return list
+}
+
+
+def getResources(subDir){
+
+	def resources = []
+	def list = getResourcesList(subDir)
+
+	list.each {
+
+		def absolutePath = it.path.replace("\\", "/")
+		def relativePath = absolutePath.substring(absolutePath.lastIndexOf(subDir) + subDir.length() + 1)
+
+		if(it.isFile()){
+			resources = resources + [
+				type: "file",
+				path: relativePath,
+				action: "ignore"
+			]
+		}else if(it.isDirectory()){
+			resources = resources + [
+				type: "dir",
+				path: relativePath,
+				action: "ignore"
+			]
+		}
+
+	}
+
+
+	def data = [
+		basePath: subDir,
+		resources: resources
+	]
+
+	return data
+
+}
+
+
+def getResourcesList(subDir){
+
+	def list = []
+
+	def files = []
+
+	def resourcesDir = new File(rootDir.toString() + subDir)
+
+	resourcesDir.traverse(type: ANY) { files.add(it) }
+
+	files.each {
+		list << it
+	}
+
+	return list
+
+}
+
+
+def printMessage(message){
+	println ''
+	println message
+	println ''
+}
+

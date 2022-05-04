@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
-import { createRequestOption } from 'app/shared';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IBroker } from 'app/shared/model/broker.model';
 
 type EntityResponseType = HttpResponse<IBroker>;
@@ -11,12 +12,11 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
-    public resourceUrl = SERVER_API_URL + 'api/brokers';
-    public connectorUrl = SERVER_API_URL + 'api/connector';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
 
     private gatewayid = 1;
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(broker: IBroker): Observable<EntityResponseType> {
         return this.http.post<IBroker>(this.resourceUrl, broker, { observe: 'response' });
@@ -43,7 +43,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/start`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -51,7 +51,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/restart`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -59,7 +59,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/stop`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -74,7 +74,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/status`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -86,7 +86,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/info`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -94,7 +94,7 @@ export class BrokerService {
         return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType }
+            params: { brokerType }
         });
     }
 
@@ -108,7 +108,7 @@ export class BrokerService {
         return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType: brokerType, brokerConfigurationType: brokerConfigurationType }
+            params: { brokerType, brokerConfigurationType }
         });
     }
 
@@ -153,7 +153,7 @@ export class BrokerService {
         return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
             observe: 'response',
             responseType: 'text',
-            params: { messageHeaders: messageHeaders }
+            params: { messageHeaders }
         });
     }
 }

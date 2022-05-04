@@ -2,16 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JhiAlertService } from 'ng-jhipster';
-
+import { AlertService } from 'app/core/util/alert.service';
 import { IEndpoint } from 'app/shared/model/endpoint.model';
 import { EndpointService } from './endpoint.service';
 import { IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from 'app/entities/flow';
+import { FlowService } from 'app/entities/flow/flow.service';
 import { IService } from 'app/shared/model/service.model';
-import { ServiceService } from 'app/entities/service';
+import { ServiceService } from 'app/entities/service/service.service';
 import { IHeader } from 'app/shared/model/header.model';
-import { HeaderService } from 'app/entities/header';
+import { HeaderService } from 'app/entities/header/header.service';
 
 @Component({
     selector: 'jhi-endpoint-update',
@@ -28,7 +27,7 @@ export class EndpointUpdateComponent implements OnInit {
     headers: IHeader[];
 
     constructor(
-        protected jhiAlertService: JhiAlertService,
+        protected alertService: AlertService,
         protected endpointService: EndpointService,
         protected flowService: FlowService,
         protected serviceService: ServiceService,
@@ -93,7 +92,10 @@ export class EndpointUpdateComponent implements OnInit {
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IEndpoint>>) {
-        result.subscribe((res: HttpResponse<IEndpoint>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+        result.subscribe(
+            (res: HttpResponse<IEndpoint>) => this.onSaveSuccess(),
+            (res: HttpErrorResponse) => this.onSaveError()
+        );
     }
 
     protected onSaveSuccess() {
@@ -106,7 +108,10 @@ export class EndpointUpdateComponent implements OnInit {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+		this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 
     trackFlowById(index: number, item: IFlow) {
