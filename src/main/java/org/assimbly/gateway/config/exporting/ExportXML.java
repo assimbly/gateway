@@ -324,6 +324,39 @@ public class ExportXML {
 
 	}
 
+    public void setXMLRouteFromDB(Integer routeid, String flowId, String endpointId) throws Exception {
+
+        Long routeIdAsLong = routeid.longValue();
+        String routeIdAsString = routeid.toString();
+
+        Optional<Route> routeOptional = routeRepository.findById(routeIdAsLong);
+
+        if(routeOptional.isPresent()){
+
+            Route route = routeRepository.findById(routeIdAsLong).get();
+
+            if (!routesList.contains(routeIdAsString)) {
+
+                routesList.add(routeIdAsString);
+
+                String routeContent = route.getContent();
+
+                routeContent = routeContent.replaceAll("&","&amp;");
+
+                routeContent = createLogLines(routeContent);
+
+                if(IntegrationUtil.isXML(routeContent)){
+                    Document routeDocument = getRouteDocument(routeContent, routeIdAsString);
+                    Node node = doc.importNode(routeDocument.getDocumentElement(), true);
+                    if(routeContent.startsWith("<routeConfiguration")){
+                        routeConfigurations.appendChild(node);
+                    }else{
+                        routes.appendChild(node);
+                    }
+                }
+            }
+        }
+    }
 
 	public void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
 
@@ -384,43 +417,6 @@ public class ExportXML {
 			}
 		}
 	}
-
-    public void setXMLRouteFromDB(Integer routeid, String flowId, String endpointId) throws Exception {
-
-        System.out.println("1. setRoute routeid" + routeid);
-
-        Long routIdAsLong = routeid.longValue();
-        String routIdAsString = routeid.toString();
-
-        Optional<Route> routeOptional = routeRepository.findById(routIdAsLong);
-
-        if(routeOptional.isPresent()){
-
-            Route route = routeRepository.findById(routIdAsLong).get();
-
-            if (!routesList.contains(routIdAsString)) {
-
-                routesList.add(routIdAsString);
-
-                String routeContent = route.getContent();
-
-                routeContent = routeContent.replaceAll("&","&amp;");
-
-                routeContent = createLogLines(routeContent);
-                System.out.println("3a. setRoute routecontent" + routeContent);
-
-                if(IntegrationUtil.isXML(routeContent)){
-                    Document routeDocument = getRouteDocument(routeContent, routIdAsString);
-                    Node node = doc.importNode(routeDocument.getDocumentElement(), true);
-                    if(routeContent.startsWith("<routeConfiguration")){
-                        routeConfigurations.appendChild(node);
-                    }else{
-                        routes.appendChild(node);
-                    }
-                }
-            }
-        }
-    }
 
     private Document getRouteDocument(String route, String routeId) throws Exception {
 
@@ -492,16 +488,11 @@ public class ExportXML {
 
     private String createLogLines(String route){
 
-        System.out.println("logLevelAsString=" + logLevelAsString);
-
         if(!logLevelAsString.equalsIgnoreCase("OFF") && flowTypeAsString.equalsIgnoreCase("ESB")){
             String logLine = "<to uri=\"log:" + flowNameAsString + "?showAll=true&amp;multiline=true&amp;level=" + logLevelAsString + "\"/>";
 
-            System.out.println("1. route=" + route);
             route = route.replaceAll("<from(.*)/>", "<from$1/>\n" + logLine);
-            System.out.println("2. route=" + route);
             route = route.replaceAll("</route>", logLine + "\n</route>");
-            System.out.println("3. route=" + route);
         }
 
         return route;

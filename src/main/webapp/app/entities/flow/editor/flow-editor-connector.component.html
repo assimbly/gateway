@@ -94,7 +94,7 @@
         <div class="form-group row">
           <div class="col-8">
             <input
-              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em;"
+              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em; min-width: 866px;"
               type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow"
               formControlName="name"/>
             <div
@@ -597,18 +597,24 @@
       </div>
 
       <br/>
+      <br/>
       <div class="container">
-        <div class="row">
-          <div class="col-5 offset-6" style="padding-left: 30px;">
-            <button type="button" class="btn btn-secondary float-right" [routerLink]="['/']">
-              <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp; <span
-              style="color: white;">Cancel</span>
-            </button>
-            <button type="button" (click)="save()" class="btn btn-primary float-right" [disabled]="isSaving">
-              <span><fa-icon icon="save"></fa-icon></span>&nbsp; <span style="color: white;">Save</span>
-            </button>
+        <div class="row justify-content-center">
+          <div class="col-8 offset-4">
+            <div class="position-relative">
+              <div class="position-absolute bottom-50 end-50">
+                <button type="button" class="btn btn-secondary" [routerLink]="['/']">
+                  <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>
+                  &nbsp; <span style="color: white;">Cancel</span>
+                </button>
+                <button class="float-end" type="button" (click)="save()" class="btn btn-primary" [disabled]="isSaving">
+                  <span><fa-icon icon="save"></fa-icon></span>&nbsp;
+                  &nbsp; <span style="color: white;">Save</span>
+                </button>
+
+              </div>
+            </div>
           </div>
-          <div class="col-1"></div>
         </div>
       </div>
       <br/>

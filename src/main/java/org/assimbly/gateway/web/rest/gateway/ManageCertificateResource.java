@@ -286,8 +286,6 @@ public class ManageCertificateResource {
 
         String keystorePath = baseDir + "/security/" + keystoreName;
 
-        System.out.println("keystorePath=" + keystorePath);
-
         return  util.importCertificate(keystorePath, keystorePassword, certificateName, certificate);
 
     }

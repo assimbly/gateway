@@ -1,7 +1,7 @@
 <form name="importForm">
     <div class="modal-header">
         <h4 class="modal-title" id="myGatewayLabel">Import XML Configuration</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>		
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <div class="form-group">
@@ -10,6 +10,7 @@
                 <option *ngFor="let gateway of gateways" value="{{gateway.id}}">{{gateway.id}}</option>
             </select>
         </div>
+        <br/>
         <div class="form-group">
             <label class="form-control-label font-weight-bold">XML configuration</label>
             <div class="custom-file">

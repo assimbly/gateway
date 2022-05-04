@@ -4,15 +4,25 @@
 <div class="form-group">
   <div class="row">
     <div class="col-12">
-      <h2>Gateways</h2>
+      <h2>Import Gateway</h2>
+      <p>Imports an XML configuration from file</p>
       <button (click)="uploadConfiguration()" class="btn btn-primary btn-sm" type="button">
         <span class="fa fa-upload"></span>
-        <span class="d-none d-md-inline">Import Configuration (XML)</span>
+        <span class="d-none d-md-inline">Import</span>
       </button>
+
+      <br/>
+      <br/>
+      <h2>Export Gateway</h2>
+      <p>Export an XML configuration to file</p>
       <button (click)="downloadConfiguration()" type="button" class="btn btn-primary btn-sm">
         <span class="fa fa-download"></span>
-        <span (click)="downloadConfiguration()" class="d-none d-md-inline">Export Configuration (XML)</span>
+        <span (click)="downloadConfiguration()" class="d-none d-md-inline">Export</span>
       </button>
+
+      <br/>
+      <br/>
+      <!--
       <h3 class="mt-3">Schedule Exports</h3>
 
       <label class="col-12 col-form-label">Select a gateway to schedule the exports.</label>
@@ -30,9 +40,9 @@
       <input [(ngModel)]="url" class="form-control w-50" type="text" placeholder="C:/user/documents/Assimbly/backups/" />
       <input class="btn btn-primary mt-2" type="button" value="Save" (click)="updateBackupFrequency(gatewayId, selectedFrequency, url)" />
       <hr />
-
-      <h2>Export Flows</h2>
-      <label class="col-12 col-form-label">Select a gateway to see the flows.</label>
+      -->
+      <h2>Export Flow</h2>
+      <p>Export an XML configuration per flow to file. Select a gateway to see the flows.</p>
       <select class="form-control w-50" (change)="getFlowsForSelectedGateway($event)">
         <option disabled selected hidden>Choose a gateway</option>
         <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>

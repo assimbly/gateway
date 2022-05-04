@@ -25,7 +25,7 @@ public class ImportXMLServices {
 	private ServiceRepository serviceRepository;
 
 	private org.assimbly.gateway.domain.Service service;
-    private final Map<String, String> servicesIdMap = new HashMap<String, String>();
+    private Map<String, String> servicesIdMap;
 
 	public String xmlConfiguration;
     public String configuration;
@@ -37,8 +37,9 @@ public class ImportXMLServices {
         log.info("Importing services");
 
         List<String> serviceIds = ImportXMLUtil.getList(doc, "/integrations/integration/services/service/id/text()");
-
 		XPath xPath = XPathFactory.newInstance().newXPath();
+
+        servicesIdMap = new HashMap<String, String>();
 
 		for (String serviceId : serviceIds) {
 			setServiceFromXml(doc, serviceId);
@@ -75,18 +76,22 @@ public class ImportXMLServices {
 		String serviceName = xPath.evaluate("/integrations/integration/services/service[id='" + serviceId + "']/name",doc);
 		String serviceType = xPath.evaluate("/integrations/integration/services/service[id='" + serviceId + "']/type",doc);
 
-		log.info("Importing service: " + serviceName);
+		log.info("Start importing service: " + serviceName);
 
 		try {
 			Optional<org.assimbly.gateway.domain.Service> serviceOptional = serviceRepository.findByName(serviceName);
 
 			if(!serviceOptional.isPresent()) {
-				service = new org.assimbly.gateway.domain.Service();
+
+                log.debug("Create new service: " + serviceName);
+
+                service = new org.assimbly.gateway.domain.Service();
 				serviceKeys = new HashSet<ServiceKeys>();
 				service.setId(null);
 				service.setName(serviceName);
 				service.setType(serviceType);
 			} else {
+                log.debug("Update service: " + serviceName);
 				service = serviceOptional.get();
 				if (serviceName != null) {
 					service.setName(serviceName);
@@ -94,7 +99,8 @@ public class ImportXMLServices {
 					service.setName(serviceId);
 				}
 				service.setType(serviceType);
-				serviceKeys = service.getServiceKeys();
+
+                serviceKeys = service.getServiceKeys();
 
 			}
 		} catch (NumberFormatException nfe) {
@@ -109,13 +115,17 @@ public class ImportXMLServices {
 
 		}
 
-		Map<String, String> serviceMap = ImportXMLUtil.getMap(doc,"/integrations/integration/services/service[id='" + serviceId + "']/keys/*");
+        log.debug("Get Service Keys: " + serviceName);
+
+        Map<String, String> serviceMap = ImportXMLUtil.getMap(doc,"/integrations/integration/services/service[id='" + serviceId + "']/keys/*");
 		Map<String, ServiceKeys> map = new HashMap<>();
 		for (ServiceKeys s : serviceKeys) {
 			map.put(s.getKey(), s);
 		}
 
-		for (Map.Entry<String, String> entry : serviceMap.entrySet()) {
+        log.debug("Set Service Keys: " + serviceName);
+
+        for (Map.Entry<String, String> entry : serviceMap.entrySet()) {
 
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -140,9 +150,12 @@ public class ImportXMLServices {
 			}
 		}
 
-		if (service != null && serviceKeys != null) {
 
-			service = serviceRepository.save(service);
+        if (service != null && serviceKeys != null) {
+
+            log.debug("Import into database: " + serviceName);
+
+            service = serviceRepository.save(service);
 
 			//save servicekeys
 			service.setServiceKeys(serviceKeys);
@@ -155,7 +168,10 @@ public class ImportXMLServices {
 			service = null;
 			serviceKeys = null;
 		}
-	}
+
+        log.info("Finish importing service: " + serviceName);
+
+    }
 
 	public void updateServiceIdsFromXml(Document doc, Map.Entry<String, String> entry) throws Exception {
 
@@ -164,6 +180,8 @@ public class ImportXMLServices {
 
 		String serviceId = entry.getKey();
 		String generatedServiceId= entry.getValue();
+
+        log.debug("Update Service ID: " + serviceId + ". New Service ID: " + generatedServiceId);
 
 		//update service_id to generated service_id
 		if(!serviceId.equals(generatedServiceId)) {

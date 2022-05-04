@@ -53,7 +53,9 @@ public class Import {
 
 		importXMLHeaders.setHeadersFromXML(doc);
 
-		importXMLRoutes.setRoutesFromXML(doc);
+		importXMLRoutes.setRoutesFromXML(doc,"routes");
+
+        importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
 		importXMLServices.setServicesFromXML(doc);
 

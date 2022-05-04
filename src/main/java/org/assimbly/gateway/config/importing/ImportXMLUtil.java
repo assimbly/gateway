@@ -65,6 +65,7 @@ public class ImportXMLUtil {
         // Create list of Ids
         List<String> list = new ArrayList<>();
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
         for (int i = 0; i < nodes.getLength(); i++) {
             list.add(nodes.item(i).getNodeValue());
         }

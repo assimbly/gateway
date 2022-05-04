@@ -34,7 +34,7 @@ public class ImportXMLHeaders {
 	public String configuration;
 
     private Header header;
-    private final Map<String, String> headersIdMap = new HashMap<String, String>();
+    private Map<String, String> headersIdMap;
 
     private Set<HeaderKeys> headerKeys;
 
@@ -48,7 +48,9 @@ public class ImportXMLHeaders {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-		for (String headerId : headerIds) {
+        headersIdMap = new HashMap<String, String>();
+
+        for (String headerId : headerIds) {
 			setHeaderFromXML(doc, headerId);
 		}
 
@@ -78,17 +80,20 @@ public class ImportXMLHeaders {
 
 	public void setHeaderFromXML(Document doc, String headerId) throws Exception {
 
-		XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
 		String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerId + "]/name", doc);
+
+        log.info("Start importing header: " + headerName);
 
 		try {
 			Long.parseLong(headerId, 10);
 			Optional<Header> headerOptional = headerRepository.findByName(headerName);
 
 			if (!headerOptional.isPresent()) {
-				header = new Header();
+                log.debug("Create new header: " + headerName);
+                header = new Header();
 				headerKeys = new HashSet<HeaderKeys>();
 				header.setId(null);
 				if (headerName == null || headerName.isEmpty()) {
@@ -97,6 +102,7 @@ public class ImportXMLHeaders {
 					header.setName(headerName);
 				}
 			} else {
+                log.debug("Update header: " + headerName);
 				header = headerOptional.get();
 				headerKeys = header.getHeaderKeys();
 			}
@@ -110,12 +116,16 @@ public class ImportXMLHeaders {
 			}
 		}
 
-		Map<String, HeaderKeys> map = new HashMap<>();
+        log.debug("Get Header Keys: " + headerName);
+
+        Map<String, HeaderKeys> map = new HashMap<>();
 		for (HeaderKeys s : headerKeys) {
 			map.put(s.getKey(), s);
 		}
 
-		// Create XPath object
+        log.debug("Set Header Keys: " + headerName);
+
+        // Create XPath object
 		XPathExpression expr = xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/keys/*");
 
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
@@ -149,7 +159,9 @@ public class ImportXMLHeaders {
 
 		if (header != null && headerKeys != null) {
 
-			header = headerRepository.save(header);
+            log.debug("Import into database: " + headerName);
+
+            header = headerRepository.save(header);
 
 			header.setHeaderKeys(headerKeys);
 			header = headerRepository.save(header);
@@ -162,15 +174,19 @@ public class ImportXMLHeaders {
 			headerKeys = null;
 		}
 
-	}
+        log.info("Finished importing header: " + headerName);
+
+    }
 
 	public void updateHeaderIdsFromXml(Document doc, Map.Entry<String, String> entry) throws Exception {
 
-		XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
 		String headerId = entry.getKey();
 		String generatedHeaderId= entry.getValue();
+
+        log.debug("Update Header ID: " + headerId + ". New Header ID: " + generatedHeaderId);
 
 		//update header_id to generated header_id
 		if(!headerId.equals(generatedHeaderId)) {

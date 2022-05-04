@@ -1,5 +1,6 @@
 package org.assimbly.gateway.config.importing;
 
+import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.*;
 import org.assimbly.util.TransformUtil;
@@ -33,23 +34,38 @@ public class ImportXMLRoutes {
     private RouteRepository routeRepository;
 
 	private Route route;
-	private final Map<String, String> routesIdMap = new HashMap<String, String>();
+	private Map<String, String> routesIdMap;
 
 	public String xmlConfiguration;
 	public String configuration;
 
+    private String baseXpath;
+
 	private long routeIdLong;
 
 
-	public String setRoutesFromXML(Document doc) throws Exception {
+	public String setRoutesFromXML(Document doc, String type) throws Exception {
 
-        log.info("Importing routes");
+        if(type.equalsIgnoreCase("routeConfigurations")){
+            log.info("Importing " + type);
+            baseXpath = "/integrations/integration/routeConfigurations/routeConfiguration";
+
+        }else{
+            log.info("Importing " + type);
+            baseXpath = "/integrations/integration/routes/route";
+        }
 
         // create routes
-		List<String> routeIds = ImportXMLUtil.getList(doc, "/integrations/integration/routes/route/@id");
+		List<String> routeIds = ImportXMLUtil.getList(doc, baseXpath + "/@id");
+
+        if(routeIds==null || routeIds.size() == 0){
+            return "no " + type;
+        }
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
+
+        routesIdMap = new HashMap<String, String>();
 
 		for (String routeId : routeIds) {
 			setRouteFromXML(doc, routeId);
@@ -66,7 +82,7 @@ public class ImportXMLRoutes {
             routesIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        NodeList routesNodes = (NodeList) xPath.compile("/integrations/integration/routes/route").evaluate(doc, XPathConstants.NODESET);
+        NodeList routesNodes = (NodeList) xPath.compile(baseXpath).evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < routesNodes.getLength(); i++) {
             Node currentItem = routesNodes.item(i);
@@ -74,7 +90,7 @@ public class ImportXMLRoutes {
             currentItem.getAttributes().getNamedItem("id").setTextContent(updateId.replace("id",""));
         }
 
-        log.info("Importing routes finished");
+        log.info("Importing " + type + " finished");
 
         return "ok";
 
@@ -85,32 +101,42 @@ public class ImportXMLRoutes {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-        NodeList routeNodes = (NodeList) xPath.compile("/integrations/integration/routes/route[@id='" + routeId + "']").evaluate(doc, XPathConstants.NODESET);
+        String routeName = xPath.evaluate(baseXpath + "[id=" + routeId + "]/name", doc);
+
+        log.info("Start importing route: " + routeName);
+
+        NodeList routeNodes = (NodeList) xPath.compile(baseXpath + "[@id='" + routeId + "']").evaluate(doc, XPathConstants.NODESET);
         Node node = routeNodes.item(0);
         String routeContent = TransformUtil.nodeToString(node);
+
 
         try {
 			routeIdLong = Long.parseLong(routeId, 10);
 			Optional<Route> routeOptional = routeRepository.findById(routeIdLong);
 
 			if (!routeOptional.isPresent()) {
-				route = new Route();
+                log.debug("Create new route: " + routeName);
+
+                route = new Route();
 				route.setId(null);
 				route.setName(routeId);
-				route.setType("route");
+				route.setType("xml");
 				route.setContent(routeContent);
 
 			} else {
-				route = routeOptional.get();
+                log.debug("Update route: " + routeName);
+                route = routeOptional.get();
 			}
 		} catch (NumberFormatException nfe) {
 			route = new Route();
 			route.setName(routeId);
-			route.setType("route");
+			route.setType("xml");
 			route.setContent(routeContent);
 		}
 
-		if (route != null) {
+        log.debug("Import into database: " + routeName);
+
+        if (route != null) {
 
 			route = routeRepository.save(route);
 
@@ -121,27 +147,33 @@ public class ImportXMLRoutes {
 			route = null;
 		}
 
-	}
+        log.info("Finish importing route: " + routeName);
+
+    }
 
 	public void updateRouteIdsFromXml(Document doc, Map.Entry<String, String> entry) throws Exception {
 
-		XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
 		String routeId = entry.getKey();
 		String generatedRouteId= entry.getValue();
 
+        log.debug("Update Route ID: " + routeId + ". New Route ID: " + generatedRouteId);
+
 		//update route_id to generated route_id
 		if(!routeId.equals(generatedRouteId)) {
 
-			NodeList routeNodes = (NodeList) xPath.compile("/integrations/integration/routes/route[@id='" + routeId + "']").evaluate(doc, XPathConstants.NODESET);
-			routeNodes.item(0).getAttributes().getNamedItem("id").setTextContent("id" + generatedRouteId);
+			NodeList routeNodes = (NodeList) xPath.compile(baseXpath + "[@id='" + routeId + "']").evaluate(doc, XPathConstants.NODESET);
 
-			NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
+            routeNodes.item(0).getAttributes().getNamedItem("id").setTextContent("id" + generatedRouteId);
+
+            NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < servicesIdNodes.getLength(); i++) {
 				servicesIdNodes.item(i).setTextContent("id" + generatedRouteId);
 			}
+
 
         }
 
