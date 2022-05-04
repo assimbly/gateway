@@ -4,14 +4,10 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+		gradlePluginPortal()
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
-        gradlePluginPortal{ url "https://plugins.gradle.org/m2/" }
-        maven { url "https://repo.spring.io/plugins-release" }
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
-        classpath "io.spring.gradle:propdeps-plugin:0.0.10.RELEASE"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.1"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
@@ -19,9 +15,11 @@ buildscript {
 
 plugins {
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
+    id "application"
     id "java"
     id "maven-publish"
     id "idea"
+	id "eclipse"
     id "jacoco"
     id "org.springframework.boot"
     id "com.google.cloud.tools.jib"
@@ -30,26 +28,30 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
+	id 'de.undercouch.download' version '5.0.1'
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
+
 group = "org.assimbly.gateway"
-version = '3.5.0'
+version = '3.6.0'
 
 description = ""
 
-sourceCompatibility=11
-targetCompatibility=11
+//sourceCompatibility=11
+//targetCompatibility=11
 assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
+apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
+apply from: "$rootDir/scripts/resources/resources.gradle"
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
-apply plugin: 'propdeps'
+//apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 //apply plugin: 'com.palantir.graal'
@@ -59,7 +61,7 @@ apply plugin: 'eclipse'
 
 configurations.all {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'    
+    exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
   	exclude group: "org.slf4j", module: "slf4j-nop"
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
@@ -87,7 +89,7 @@ if (project.hasProperty("connector")){
     sourceSets {
         main {
             java {
-                exclude 'org/assimbly/gateway/web/rest/connector/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
             }
         }
     }
@@ -112,13 +114,6 @@ if (project.hasProperty("gae")) {
     apply plugin: 'maven'
     apply plugin: 'org.springframework.boot.experimental.thin-launcher'
     apply plugin: 'io.spring.dependency-management'
-
-    /*
-    dependencyManagement {
-        imports {
-           mavenBom 'io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}'
-        }
-    }*/
     appengineStage.dependsOn thinResolve
 }
 
@@ -142,9 +137,11 @@ eclipse {
 defaultTasks "bootRun"
 
 springBoot {
-    mainClassName = 'org.assimbly.gateway.GatewayApp'
+ 	mainClassName = "org.assimbly.gateway.GatewayApp"
 }
 
+
+// Below are common ways to use native images
 /*
 
 //https://github.com/palantir/gradle-graal (com.palantir.graal)
@@ -215,6 +212,7 @@ task getDeps(type: Copy) {
 
 project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/" + new Date().format("yyyyMMddHHmmss") + "_changelog.xml"
 
+
 liquibase {
     activities {
         main {
@@ -249,7 +247,7 @@ gitProperties {
 }
 
 checkstyle {
-    toolVersion '${checkstyle_version}'
+    toolVersion "${checkstyle_version}"
     configFile file("checkstyle.xml")
     checkstyleTest.enabled = false
 }
@@ -267,19 +265,17 @@ configurations {
         resolutionStrategy {
             // Inherited version from Spring Boot can't be used because of regressions:
             // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
-            force 'org.liquibase:liquibase-core:3.6.3'
-            
-            force 'org.liquibase:liquibase-core:1.4.2'
+            force 'org.liquibase:liquibase-core:4.6.2'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.18.0")
+                    details.useVersion("2.21.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.16.3")
+                    details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.72.Final")
+                    details.useVersion("4.1.76.Final")
                 }
             }
         }
@@ -290,39 +286,31 @@ repositories {
     mavenLocal()
     mavenCentral()
     //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
-    jcenter()
-    //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
 
 dependencies {
-    // import JHipster dependencies BOM
-    if (!project.hasProperty("gae")) {
-        //implementation platform("io.github.jhipster:jhipster-dependencies:${jhipster_dependencies_version}")
-    }
 
-    implementation group: 'io.github.jhipster', name: 'jhipster-framework', version: '3.4.0';
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
-	implementation group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
+    //implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
+	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
-    // Use ", version: jhipster_dependencies_version, changing: true" if you want
-    // to use a SNAPSHOT release instead of a stable release
-    implementation group: "io.github.jhipster", name: "jhipster-framework"
-    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation group: "tech.jhipster", name: "jhipster-framework"
+
+	implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
-    implementation "io.micrometer:micrometer-registry-prometheus"
-    // compile "io.dropwizard.metrics:metrics-jcache"
     implementation "io.dropwizard.metrics:metrics-json"
     implementation "io.dropwizard.metrics:metrics-jvm"
     implementation "io.dropwizard.metrics:metrics-servlet"
     implementation "io.dropwizard.metrics:metrics-servlets"
     implementation "io.dropwizard.metrics:metrics-annotation"
+
+    implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "io.prometheus:simpleclient"
-    // compile "io.prometheus:simpleclient_dropwizard"
-    // compile "io.prometheus:simpleclient_servlet"
     implementation "net.logstash.logback:logstash-logback-encoder"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -338,11 +326,13 @@ dependencies {
     implementation "org.hibernate:hibernate-entitymanager"
     implementation "org.hibernate:hibernate-envers"
     implementation "org.hibernate.validator:hibernate-validator"
+
     implementation "org.liquibase:liquibase-core"
-    // compile "com.mattbertolini:liquibase-slf4j"
     liquibaseRuntime "org.liquibase:liquibase-core"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
     liquibaseRuntime sourceSets.main.compileClasspath
+
+    implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-loader-tools"
     implementation "org.springframework.boot:spring-boot-starter-mail"
     implementation "org.springframework.boot:spring-boot-starter-logging"
@@ -351,12 +341,12 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation ("org.springframework.boot:spring-boot-starter-web") {
-        exclude module: 'spring-boot-starter-tomcat'
+        exclude module: "spring-boot-starter-tomcat"
     }
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.zalando:problem-spring-web:0.24.0-RC.0"
+    implementation "org.zalando:problem-spring-web:0.27.0"
     implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
     implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"
@@ -365,43 +355,33 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "io.jsonwebtoken:jjwt:0.9.1"
-    implementation ("io.springfox:springfox-swagger2") {
-        exclude module: 'mapstruct'
-    }
-    implementation "io.springfox:springfox-bean-validators"
+    //implementation "io.jsonwebtoken:jjwt:0.9.1"
+	//implementation "io.jsonwebtoken:jjwt-api"
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
+    implementation "org.mapstruct:mapstruct:${mapstruct_version}"
+    implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
-	implementation "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
-
-    // custom dependencies (non-jhipster)
-    if (!project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "connectorRestModule", version: "3.5.0", changing: true
-    }
-    if (!project.hasProperty("connector")) {
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.5.0", changing: true
-    }
-
-    //implementation fileTree(dir: 'lib', include: ['*.jar'])
 
     implementation "io.github.assimbly:docconverter:1.5.0"
-
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
     implementation "org.jdom:jdom2:2.0.6.1"
-    //implementation "io.hawt:hawtio-springboot:2.14.2"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
-    // https://mvnrepository.com/artifact/org.quartz-scheduler/quartz
-    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
+    //implementation "io.hawt:hawtio-springboot:2.14.4"
 
-    //java 9+
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
-    implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
-
-    // end custom dependencies
+    if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+    }else if (project.hasProperty("broker")) {
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+    }else{
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+    }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
@@ -419,9 +399,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest-library"
-    testImplementation "com.h2database:h2"
+    runtimeOnly "com.h2database:h2"
     liquibaseRuntime "com.h2database:h2"
-    //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
 }
 
 if (project.hasProperty("gae")) {
@@ -472,15 +451,20 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "6.9.1"
+    gradleVersion = "7.3.3"
 }
 
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "${node_version}"
-        npmVersion = "${npm_version}"
-        yarnVersion = "${yarn_version}"
+        version = "16.13.1"
+        npmVersion = "8.3.0"
+        yarnVersion = "1.22.17"
         download = true
     }
 }

@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.assimbly.gateway.domain.enumeration.ComponentType;
+import org.assimbly.gateway.domain.enumeration.ComponentTypeOLD;
 import org.assimbly.gateway.domain.enumeration.EndpointType;
 /**
  * Integration tests for the {@link EndpointResource} REST controller.
@@ -38,8 +38,8 @@ import org.assimbly.gateway.domain.enumeration.EndpointType;
 @SpringBootTest(classes = GatewayApp.class)
 public class EndpointResourceIT {
 
-    private static final ComponentType DEFAULT_COMPONENT_TYPE = ComponentType.ACTIVEMQ;
-    private static final ComponentType UPDATED_COMPONENT_TYPE = ComponentType.FILE;
+    private static final ComponentTypeOLD DEFAULT_COMPONENT_TYPE = ComponentTypeOLD.ACTIVEMQ;
+    private static final ComponentTypeOLD UPDATED_COMPONENT_TYPE = ComponentTypeOLD.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";

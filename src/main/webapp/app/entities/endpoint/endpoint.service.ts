@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
-import { createRequestOption } from 'app/shared';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IEndpoint, Endpoint } from 'app/shared/model/endpoint.model';
 import { map } from 'rxjs/operators';
 
@@ -12,11 +13,11 @@ type EntityArrayResponseType = HttpResponse<IEndpoint[]>;
 
 @Injectable({ providedIn: 'root' })
 export class EndpointService {
-    private resourceUrlEndpoint = SERVER_API_URL + 'api/endpoint';
-    private resourceUrlEndpoints = SERVER_API_URL + 'api/endpoints';
-    public resourceUrl = SERVER_API_URL + 'api/endpoints';
+    private resourceUrlEndpoint = this.applicationConfigService.getEndpointFor('api/endpoint');
+    private resourceUrlEndpoints = this.applicationConfigService.getEndpointFor('api/endpoints');
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/endpoints');
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(endpoint: IEndpoint): Observable<HttpResponse<IEndpoint>> {
         const copy = this.convert(endpoint);

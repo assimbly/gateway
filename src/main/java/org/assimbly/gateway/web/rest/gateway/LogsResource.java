@@ -1,9 +1,9 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
-import org.assimbly.gateway.web.rest.vm.LoggerVM;
+import org.assimbly.gateway.web.rest.customvm.LoggerVM;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -48,7 +48,7 @@ public class LogsResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = {"text/plain"})
-    public ResponseEntity<String> getLog(@ApiParam(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
+    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
 
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { IQueue } from 'app/shared/model/queue.model';
@@ -15,7 +15,7 @@ export class QueueDeleteDialogComponent {
     queue?: IQueue;
     address?: IAddress;
 
-    brokerType: string = '';
+    brokerType = '';
     brokers: IBroker[];
 
     message = 'Are you sure you want to delete this queue?';
@@ -24,8 +24,7 @@ export class QueueDeleteDialogComponent {
     constructor(
         protected queueService: QueueService,
         public activeModal: NgbActiveModal,
-        protected eventManager: JhiEventManager,
-        protected jhiAlertService: JhiAlertService,
+        protected eventManager: EventManager,
         protected router: Router
     ) {
         this.brokers = [];
@@ -46,13 +45,8 @@ export class QueueDeleteDialogComponent {
             this.disableDelete = true;
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
-                this.eventManager.broadcast('queueListModification');
-                //this.router.navigate(['/queue']);
-                // .then(() => {
-                //     window.location.reload();
-                // });
-                // this.activeModal.close()
-                this.activeModal.dismiss(true);
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));			
+                 this.activeModal.dismiss(true);
             });
         }
     }
@@ -61,7 +55,7 @@ export class QueueDeleteDialogComponent {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (let broker of data.body) {
+                    for (const broker of data.body) {
                         this.brokers.push(broker);
                         this.brokerType = broker.type;
                     }
@@ -69,38 +63,5 @@ export class QueueDeleteDialogComponent {
             },
             error => console.log(error)
         );
-    }
-}
-
-@Component({
-    selector: 'jhi-queue-delete-popup',
-    template: ''
-})
-export class QueueDeletePopupComponent implements OnInit, OnDestroy {
-    protected ngbModalRef: NgbModalRef;
-
-    constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
-
-    ngOnInit() {
-        this.activatedRoute.data.subscribe(({ queue }) => {
-            setTimeout(() => {
-                this.ngbModalRef = this.modalService.open(QueueDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
-                this.ngbModalRef.componentInstance.queue = queue;
-                this.ngbModalRef.result.then(
-                    result => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    },
-                    reason => {
-                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                        this.ngbModalRef = null;
-                    }
-                );
-            }, 0);
-        });
-    }
-
-    ngOnDestroy() {
-        this.ngbModalRef = null;
     }
 }

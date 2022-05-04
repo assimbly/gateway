@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
-import { createRequestOption } from 'app/shared';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IHeaderKeys } from 'app/shared/model/header-keys.model';
 
 type EntityResponseType = HttpResponse<IHeaderKeys>;
@@ -11,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IHeaderKeys[]>;
 
 @Injectable({ providedIn: 'root' })
 export class HeaderKeysService {
-    public resourceUrl = SERVER_API_URL + 'api/header-keys';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/header-keys');
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(headerKeys: IHeaderKeys): Observable<EntityResponseType> {
         return this.http.post<IHeaderKeys>(this.resourceUrl, headerKeys, { observe: 'response' });

@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 
 import { IGroup } from 'app/shared/model/group.model';
-import { AccountService } from 'app/core';
+import { GroupDeleteDialogComponent } from './group-delete-dialog.component';
+import { AccountService } from 'app/core/auth/account.service';
 import { GroupService } from './group.service';
 
 @Component({
@@ -18,8 +21,9 @@ export class GroupComponent implements OnInit, OnDestroy {
 
     constructor(
         protected groupService: GroupService,
-        protected jhiAlertService: JhiAlertService,
-        protected eventManager: JhiEventManager,
+        protected alertService: AlertService,
+		protected modalService: NgbModal,
+        protected eventManager: EventManager,
         protected accountService: AccountService
     ) {}
 
@@ -34,7 +38,7 @@ export class GroupComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadAll();
-        this.accountService.identity().then(account => {
+        this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
         this.registerChangeInGroups();
@@ -44,6 +48,17 @@ export class GroupComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+	delete(group: IGroup): void {
+		const modalRef = this.modalService.open(GroupDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.group = group;
+		// unsubscribe not needed because closed completes on modal close
+		modalRef.closed.subscribe(reason => {
+		  if (reason === 'deleted') {
+			this.loadAll();
+		  }
+		});
+	}
+	
     trackId(index: number, item: IGroup) {
         return item.id;
     }
@@ -53,6 +68,9 @@ export class GroupComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.addAlert({
+		  type: 'danger',
+		  message: errorMessage,
+		});
     }
 }

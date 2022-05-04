@@ -3,7 +3,7 @@ import org.assimbly.gateway.config.Constants;
 
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.User;
-import io.github.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipsterProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

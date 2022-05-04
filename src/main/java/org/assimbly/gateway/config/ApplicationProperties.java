@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Properties specific to Gateway.
  * <p>
  * Properties are configured in the application.yml file.
- * See {@link io.github.jhipster.config.JHipsterProperties} for a good example.
+ * See {@link tech.jhipster.config.JHipsterProperties} for a good example.
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
@@ -14,6 +14,7 @@ public class ApplicationProperties {
     public final Info info = new Info();
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
+    public final DeployDirectory deployDirectory = new DeployDirectory();
     //   public final Encryption encryption = new Encryption();
 
 
@@ -29,11 +30,14 @@ public class ApplicationProperties {
         return gateway;
     }
 
+    public DeployDirectory getDeployDirectory() {
+        return deployDirectory;
+    }
+
 
     public static class Info {
 
         private String version;
-
 
         public String getVersion() {
             return version;
@@ -109,5 +113,29 @@ public class ApplicationProperties {
         }
 
     }
+
+    public static class DeployDirectory {
+
+        private boolean deployOnStart;
+        private boolean deployOnChange;
+
+        public boolean getDeployOnStart() {
+            return deployOnStart;
+        }
+
+        public void setDeployOnStart(boolean deployOnStart) {
+            this.deployOnStart = deployOnStart;
+        }
+
+        public boolean getDeployOnChange() {
+            return deployOnChange;
+        }
+
+        public void setDeployOnChange(boolean deployOnChange) {
+            this.deployOnChange = deployOnChange;
+        }
+
+    }
+
 
 }

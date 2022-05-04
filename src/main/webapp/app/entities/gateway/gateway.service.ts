@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { SERVER_API_URL } from 'app/app.constants';
-import { createRequestOption } from 'app/shared';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+
+import { createRequestOption } from 'app/shared/util/request-util';
 import { IGateway } from 'app/shared/model/gateway.model';
 
 type EntityResponseType = HttpResponse<IGateway>;
@@ -11,18 +12,18 @@ type EntityArrayResponseType = HttpResponse<IGateway[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GatewayService {
-    public resourceUrl = SERVER_API_URL + 'api/gateways';
-    public environmentUrl = SERVER_API_URL + 'api/environment';
-    public connectorUrl = SERVER_API_URL + 'api/connector';
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/gateways');
+    public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
+    public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
 
-    constructor(protected http: HttpClient) {}
+    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
     }
 
     start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.connectorUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
+        return this.http.get(`${this.integrationUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
     }
 
     create(gateway: IGateway): Observable<EntityResponseType> {
@@ -38,7 +39,7 @@ export class GatewayService {
     }
 
     query(req?: any): Observable<EntityArrayResponseType> {
-        const options = createRequestOption(req);
+		const options = createRequestOption(req);
         return this.http.get<IGateway[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
@@ -54,13 +55,9 @@ export class GatewayService {
     }
 
     updateBackupFrequency(gatewayid, frequency, url): Observable<any> {
-        try {
-            const options = {
-                headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
-            };
-            return this.http.post(`${this.resourceUrl}/${gatewayid}/updatebackup/${frequency}`, url, options);
-        } catch (e) {
-            console.log(e);
-        }
+        const options = {
+            headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
+        };
+        return this.http.post(`${this.resourceUrl}/${gatewayid}/updatebackup/${frequency}`, url, options);
     }
 }

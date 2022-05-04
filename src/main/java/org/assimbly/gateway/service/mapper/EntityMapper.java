@@ -2,8 +2,6 @@ package org.assimbly.gateway.service.mapper;
 
 import java.util.List;
 
-import org.mapstruct.Mapping;
-
 /**
  * Contract for a generic dto to entity mapper.
  *

@@ -4,11 +4,11 @@ import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } from 'ng-jhipster';
-
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { FileLoadError, DataUtils } from 'app/core/util/data-util.service';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
-//import { AlertError } from 'app/shared/alert/alert-error.model';
+// import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
     selector: 'jhi-route-update',
@@ -26,8 +26,8 @@ export class RouteUpdateComponent implements OnInit {
     });
 
     constructor(
-        protected dataUtils: JhiDataUtils,
-        protected eventManager: JhiEventManager,
+        protected dataUtils: DataUtils,
+        protected eventManager: EventManager,
         protected routeService: RouteService,
         protected activatedRoute: ActivatedRoute,
         private fb: FormBuilder
@@ -57,10 +57,7 @@ export class RouteUpdateComponent implements OnInit {
     }
 
     setFileData(event: Event, field: string, isImage: boolean): void {
-        this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: JhiFileLoadError) => {
-            //this.eventManager.broadcast(
-            //new JhiEventWithContent<AlertError>('gatewayApp.error', { message: err.message })
-            //);
+        this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: FileLoadError) => {
         });
     }
 
