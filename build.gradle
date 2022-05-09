@@ -36,7 +36,7 @@ plugins {
 
 
 group = "org.assimbly.gateway"
-version = '3.6.0'
+version = '3.7.0'
 
 description = ""
 
@@ -269,13 +269,13 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.21.0")
+                    details.useVersion("2.22.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.76.Final")
+                    details.useVersion("4.1.77.Final")
                 }
             }
         }
@@ -375,12 +375,12 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.7.0", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.7.0", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.7.0", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -462,8 +462,8 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.13.1"
-        npmVersion = "8.3.0"
+        version = "16.15.0"
+        npmVersion = "8.9.0"
         yarnVersion = "1.22.17"
         download = true
     }
