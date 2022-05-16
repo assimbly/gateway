@@ -325,7 +325,7 @@
                                         title="Edit header" class="col-2 btn btn-primary"
                                         (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)"
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                                  <span class="padding-button"><fa-icon icon="edit"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
                                         *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value"
@@ -361,15 +361,15 @@
                                 </button>
                                 <button type="button"
                                         *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
-                                        class="col-2 btn btn-primary flow-header-button" title="New route"
+                                        class="col-2 btn btn-primary flow-header-button"
+                                        title="New route"
                                         (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)"
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                 </button>
-                                <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary"
+                                <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary flow-header-button"
                                         title="Create route"
                                         (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)"
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
                                 </button>
                               </div>
                             </div>
@@ -389,8 +389,7 @@
                                         class="col-2 btn btn-primary" title="Edit service"
                                         (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="edit"
-                                                                        style="color: white;"></fa-icon></span>&nbsp;
+                                  <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
                                         *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value"
@@ -399,7 +398,7 @@
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
                                 </button>
                                 <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary flow-header-button"
-                                        title="Create service"
+                                        title="Create connection"
                                         (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
                                         [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
                                 </button>

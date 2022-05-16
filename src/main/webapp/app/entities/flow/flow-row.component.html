@@ -215,16 +215,19 @@
         [popover]="statsTemplate">
 		<fa-icon icon="chart-bar"></fa-icon>
 	  </i>
-      <a
-        style="padding-left: 1em"
+      <a style="padding-left: 1em"
         (click)="navigateToFlowEditor('edit')"
         aria-hidden="true"
         placement="right"
-        title="Edit flow"
-      ><fa-icon icon="edit"></fa-icon></a>
+        title="Edit flow">
+        <fa-icon icon="edit"></fa-icon>
+      </a>
       <a style="padding-left: 1em" (click)="navigateToFlowEditor('clone')" placement="right" title="Clone flow">
-		<fa-icon icon="clone"></fa-icon>
-	  </a>
+		    <fa-icon icon="clone"></fa-icon>
+	    </a>
+      <a style="padding-left: 1em" (click)="exportFlow()" placement="right" title="Export flow">
+        <fa-icon icon="file-export"></fa-icon>
+      </a>
       <a style="padding-left: 1em" (click)="navigateToFlowEditor('delete')" placement="right" title="Delete flow">
 	  		<fa-icon icon="trash"></fa-icon>
 	  </a>

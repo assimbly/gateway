@@ -351,6 +351,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, endpointid: endpoint.id }]);
   }
 
+  exportFlow(){
+    console.log('export flow');
+    this.flowService.exportFlowConfiguration(this.flow);
+  }
+
   getFlowLastError(id: number, action: string, errMessage: string) {
     if (errMessage) {
       if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
