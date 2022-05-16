@@ -1079,36 +1079,30 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   createOrEditService(endpoint, serviceType: string, formService: FormControl): void {
+
     endpoint.serviceId = formService.value;
 
+    let modalRef;
+
     if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
-      modalRef.then(res => {
-        // Success
-        res.componentInstance.serviceType = serviceType;
-        res.result.then(
-          result => {
-            this.setService(endpoint, result.id, formService);
-          },
-          reason => {
-            this.setService(endpoint, reason.id, formService);
-          }
-        );
-      });
+      modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, null, serviceType);
     } else {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
-      modalRef.then(res => {
-        res.componentInstance.serviceType = serviceType;
-        res.result.then(
-          result => {
-            this.setService(endpoint, result.id, formService);
-          },
-          reason => {
-            // this.setService(endpoint, reason.id, formService);
-          }
-        );
-      });
+      modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
     }
+
+    modalRef.then(res => {
+       res.result.then(
+         result => {
+           this.setService(endpoint, result.id, formService);
+         },
+         reason => {
+             console.log('createService reason: ' + reason);
+         }
+       );
+     },(reason)=>{
+         console.log('createService reason: ' + reason);
+     });
+
   }
 
   setHeader(endpoint, id, formHeader: FormControl): void {
@@ -1189,72 +1183,84 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
     }
 
     if (this.flow.id) {
-      this.endpoints.forEach(endpoint => {
-        endpoint.flowId = this.flow.id;
-      });
-
-      this.flowService.update(this.flow).subscribe(flow => {
-        this.flow = flow.body;
-        const updateEndpoints = this.endpointService.updateMultiple(this.endpoints);
-
-        updateEndpoints.subscribe(results => {
-          this.endpoints = results.body.concat();
-
-          this.updateForm();
-
-          this.endpointService.findByFlowId(this.flow.id).subscribe(data => {
-            let endpoints = data.body;
-            endpoints = endpoints.filter(e => {
-              const s = this.endpoints.find(t => t.id === e.id);
-              if (typeof s === 'undefined') {
-                return true;
-              } else {
-                return s.id !== e.id;
-              }
-            });
-
-            if (endpoints.length > 0) {
-              endpoints.forEach(element => {
-                this.endpointService.delete(element.id).subscribe(
-                );
-              });
-            }
-          });
-          this.savingFlowSuccess = true;
-          this.isSaving = false;
-          this.router.navigate(['/']);
-        });
-      });
+      this.updateFlow();
     } else {
-      this.flow.gatewayId = this.gateways[0].id;
+      this.createFlow();
+    }
+  }
 
-      this.flowService.create(this.flow).subscribe(
-        flowUpdated => {
-          this.flow = flowUpdated.body;
+  updateFlow(){
 
-          this.endpoints.forEach(endpoint => {
-            endpoint.flowId = this.flow.id;
+    this.endpoints.forEach(endpoint => {
+      endpoint.flowId = this.flow.id;
+    });
+
+    this.flowService.update(this.flow).subscribe(flow => {
+      this.flow = flow.body;
+      const updateEndpoints = this.endpointService.updateMultiple(this.endpoints);
+
+      updateEndpoints.subscribe(results => {
+        this.endpoints = results.body.concat();
+
+        this.updateForm();
+
+        this.endpointService.findByFlowId(this.flow.id).subscribe(data => {
+          let endpoints = data.body;
+          endpoints = endpoints.filter(e => {
+            const s = this.endpoints.find(t => t.id === e.id);
+            if (typeof s === 'undefined') {
+              return true;
+            } else {
+              return s.id !== e.id;
+            }
           });
 
-          this.endpointService.createMultiple(this.endpoints).subscribe(
-            toRes => {
-              this.endpoints = toRes.body;
-              this.updateForm();
-              this.finished = true;
-              this.savingFlowSuccess = true;
-              this.isSaving = false;
-              this.router.navigate(['/']);
-            },
-            () => {
-              this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
-            }
-          );
-        },
-        () => {
-          this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
-        }
-      );
-    }
+          if (endpoints.length > 0) {
+            endpoints.forEach(element => {
+              this.endpointService.delete(element.id).subscribe(
+              );
+            });
+          }
+        });
+        this.savingFlowSuccess = true;
+        this.isSaving = false;
+        this.router.navigate(['/']);
+      });
+    });
+
+  }
+
+  createFlow(){
+
+    this.flow.gatewayId = this.gateways[0].id;
+
+    this.flowService.create(this.flow).subscribe(
+      flowUpdated => {
+        this.flow = flowUpdated.body;
+
+        this.endpoints.forEach(endpoint => {
+          endpoint.flowId = this.flow.id;
+        });
+
+        this.endpointService.createMultiple(this.endpoints).subscribe(
+          toRes => {
+            this.endpoints = toRes.body;
+            this.updateForm();
+            this.finished = true;
+            this.savingFlowSuccess = true;
+            this.isSaving = false;
+            this.router.navigate(['/']);
+          },
+          () => {
+            this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+          }
+        );
+      },
+      () => {
+        this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+      }
+    );
+
   }
 
   checkUniqueEndpoints(): boolean {

@@ -13,7 +13,7 @@
         <div class="form-group">
             <label class="form-control-label" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name" required maxlength="255" [jhiExistingServiceNames]='servicesNames'
-                [(ngModel)]="service.name" #name="ngModel" />
+                [(ngModel)]="service.name" #name="ngModel"  />
             <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
                 <span *ngIf="name.errors.required">Name is required.</span>
                 <span *ngIf="name.errors.existingServiceName">Name already exists.</span>
@@ -21,7 +21,7 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control" id="field_header" name="headerKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
+            <select class="form-control" id="type" name="field_type" [(ngModel)]="service.type"  (change)="changeType(false)" #type="ngModel">
                 <option [ngValue]="type" *ngFor="let type of services.connectionsList">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
