@@ -141,6 +141,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   numberOfResponseEndpoints = 0;
 
   modalRef: NgbModalRef | null;
+  modalRefPromise: Promise<NgbModalRef> | null;
 
   private subscription: Subscription;
   private eventSubscriber: Subscription;
@@ -1017,90 +1018,81 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   createOrEditHeader(endpoint, formHeader: FormControl): void {
+
     endpoint.headerId = formHeader.value;
 
     if (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null || !endpoint.headerId) {
-      const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
-      modalRef.then(res => {
-        res.result.then(
-          result => {
-            this.setHeader(endpoint, result.id, formHeader);
-          },
-          reason => {
-            this.setHeader(endpoint, reason.id, formHeader);
-          }
-        );
-      });
-     } else {
-      const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId);
-      modalRef.then(res => {
-        // Success
-        res.result.then(
-          result => {
-            this.setHeader(endpoint, result.id, formHeader);
-          },
-          reason => {
-            this.setHeader(endpoint, reason.id, formHeader);
-          }
-        );
-      });
+      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component);
+    }else{
+      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId);
     }
+
+    this.modalRefPromise.then(res => {
+        res.result.then(
+          result => {
+            console.log('createHeader result 1: ', result);
+            this.setHeader(endpoint, result.id, formHeader);
+          },
+          reason => {
+            console.log('createHeader result 2: ', reason);
+            this.setHeader(endpoint, reason.id, formHeader);
+          }
+        );
+    },(reason)=>{
+       console.log('createHeader result3: ', reason);
+    });
+
   }
 
   createOrEditRoute(endpoint, formRoute: FormControl): void {
     endpoint.routeId = formRoute.value;
 
     if (typeof endpoint.routeId === 'undefined' || endpoint.routeId === null || !endpoint.routeId) {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, null, this.flow.type);
-      modalRef.then(res => {
-        res.result.then(
-          result => {
-            this.setRoute(endpoint, result.id, formRoute);
-          },
-          reason => {
-            this.setRoute(endpoint, reason.id, formRoute);
-          }
-        );
-      });
-    } else {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId,this.flow.type);
-      modalRef.then(res => {
-        // Success
-        res.result.then(
-          result => {
-            this.setRoute(endpoint, result.id, formRoute);
-          },
-          reason => {
-            this.setRoute(endpoint, reason.id, formRoute);
-          }
-        );
-      });
+      this.modalRefPromise = this.routePopupService.open(RouteDialogComponent as Component, null, this.flow.type);
+    }else{
+      this.modalRefPromise = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId,this.flow.type);
     }
+
+    this.modalRefPromise.then(res => {
+        res.result.then(
+          result => {
+            console.log('createRoute result 1: ', result);
+            this.setRoute(endpoint, result.id, formRoute);
+          },
+          reason => {
+            console.log('createRoute reason 2: ', reason);
+            this.setRoute(endpoint, reason.id, formRoute);
+          }
+        );
+    },(reason)=>{
+      console.log('createRoute result 3: ', reason);
+    });
+
   }
 
   createOrEditService(endpoint, serviceType: string, formService: FormControl): void {
 
     endpoint.serviceId = formService.value;
 
-    let modalRef;
-
     if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
-      modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, null, serviceType);
+      this.modalRefPromise = this.servicePopupService.open(ServiceDialogComponent as Component, null, serviceType);
     } else {
-      modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
+      this.modalRefPromise = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
     }
 
-    modalRef.then(res => {
+    this.modalRefPromise.then(res => {
        res.result.then(
          result => {
+           console.log('createRoute result 1: ', result);
            this.setService(endpoint, result.id, formService);
          },
          reason => {
-             console.log('createService reason: ' + reason);
+             console.log('createRoute result 2: ', reason);
+             this.setService(endpoint, reason.id, formService);
          }
        );
      },(reason)=>{
-         console.log('createService reason: ' + reason);
+         console.log('createService result3: ' + reason);
      });
 
   }
