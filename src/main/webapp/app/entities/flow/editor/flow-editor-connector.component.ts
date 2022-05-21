@@ -474,6 +474,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event): void {
+
     const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
 
     if (typeof e !== 'undefined') {
@@ -562,7 +563,9 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   setURIlist(index): void {
+
     this.URIList[index] = [];
+    let updatedList = [];
 
     const tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
@@ -571,13 +574,15 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
 		  endpoint.endpointType === 'TO'   ||
 		  endpoint.endpointType === 'ERROR'   ||
 		  endpoint.endpointType === 'RESPONSE'){
-		  if (endpoint.componentType && this.selectedComponentType === endpoint.componentType.toLowerCase()) {
-				this.URIList[index].push(endpoint);
-		  }
-  	    }
+        if (endpoint.componentType && this.selectedComponentType === endpoint.componentType.toLowerCase()) {
+          updatedList.push(endpoint);
+        }
+  	  }
     });
 
-    this.URIList.sort();
+    this.URIList[index].push(...updatedList);
+
+    this.URIList[index].sort();
   }
 
   enableFields(endpointForm): void {
@@ -1030,16 +1035,14 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
     this.modalRefPromise.then(res => {
         res.result.then(
           result => {
-            console.log('createHeader result 1: ', result);
             this.setHeader(endpoint, result.id, formHeader);
           },
           reason => {
-            console.log('createHeader result 2: ', reason);
             this.setHeader(endpoint, reason.id, formHeader);
           }
         );
     },(reason)=>{
-       console.log('createHeader result3: ', reason);
+       console.log('createHeader error: ', reason);
     });
 
   }

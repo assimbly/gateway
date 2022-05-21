@@ -22,7 +22,7 @@
 		        </div>
 		        <div class="form-group">
 		            <label class="form-control-label" for="field_type">Type</label>
-		            <select class="form-control" id="field_service" name="serviceKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
+		            <select class="form-control form-select" id="field_service" name="serviceKeys-type" required [(ngModel)]="service.type" [disabled]="disableType" (change)="changeType(false)" #type="ngModel">
 		                <option [ngValue]="type" *ngFor="let type of services.connectionsList">{{type}}</option>
 		            </select>
 		            <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">

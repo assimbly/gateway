@@ -43,7 +43,7 @@
       -->
       <h2>Export Flow</h2>
       <p>Export an XML configuration per flow to file. Select a gateway to see the flows.</p>
-        <select class="form-control w-50" (change)="getFlowsForSelectedGateway($event)">
+        <select class="form-control form-select w-50" (change)="getFlowsForSelectedGateway($event)">
           <option disabled selected hidden>Choose a gateway</option>
           <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
         </select>

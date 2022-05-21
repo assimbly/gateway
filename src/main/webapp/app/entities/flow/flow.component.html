@@ -10,7 +10,7 @@
   </div>
   <div *ngIf="multipleGateways">
     <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
-    <select class="col-xl-4 col-md-4 col-sm-12 form-control" (change)="getFlowsForSelectedGateway($event)">
+    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedGateway($event)">
       <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
     </select>
   </div>

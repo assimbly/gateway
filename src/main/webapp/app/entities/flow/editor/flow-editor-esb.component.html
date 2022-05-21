@@ -236,7 +236,7 @@
                          [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
                       </i>
-                      <select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+                      <select class="form-control form-select" name="logLevel" formControlName="logLevel" id="field_logLevel">
                         <option *ngFor="let logLevel of logLevelListType"
                                 [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
                           {{logLevel}}
