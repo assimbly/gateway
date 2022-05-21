@@ -30,7 +30,7 @@
 
         <div class="form-group">
             <label class="form-control-label" for="gateway">Gateway</label>
-            <select *ngIf="gateways.length > 1; else oneGateway" class="form-control" id="gateway" formControlName="gatewayId" >
+            <select *ngIf="gateways.length > 1; else oneGateway" class="form-control form-select" id="gateway" formControlName="gatewayId" >
                 <option [ngValue]="null"></option>
                 <option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
             </select>

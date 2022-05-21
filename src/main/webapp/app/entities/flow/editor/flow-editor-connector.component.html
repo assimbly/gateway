@@ -504,7 +504,7 @@
                          [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
                       </i>
-                      <select class="form-control" name="logLevel" formControlName="logLevel" id="field_logLevel">
+                      <select class="form-control form-select" name="logLevel" formControlName="logLevel" id="field_logLevel">
                         <option *ngFor="let logLevel of logLevelListType"
                                 [ngValue]="logLevelListType[logLevel]" [value]="logLevel">
                           {{logLevel}}
@@ -518,7 +518,7 @@
                          style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
                       </i>
-                      <select type="text" class="form-control" id="field_autostart" *ngIf="flow"
+                      <select type="text" class="form-control form-select" id="field_autostart" *ngIf="flow"
                               formControlName="autoStart">
                         <option value="true">true</option>
                         <option value="false">false</option>
@@ -531,7 +531,7 @@
                          [popover]="parallelProcessingPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
                       </i>
-                      <select type="text" class="form-control" id="field_parallelprocessing" *ngIf="flow"
+                      <select type="text" class="form-control form-select" id="field_parallelprocessing" *ngIf="flow"
                               formControlName="parallelProcessing">
                         <option value="true">true</option>
                         <option value="false">false</option>
@@ -544,7 +544,7 @@
                          popoverTitle="Info" [popover]="assimblyHeadersPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
                       </i>
-                      <select type="text" class="form-control" id="field_assimbly_headers" *ngIf="flow"
+                      <select type="text" class="form-control form-select" id="field_assimbly_headers" *ngIf="flow"
                               formControlName="assimblyHeaders">
                         <option value="true">true</option>
                         <option value="false">false</option>
@@ -563,7 +563,7 @@
                     </div>
                     <div class="form-group" *ngIf="!singleGateway">
                       <label class="form-control-label" for="field_gateway" style="float: left; text-align: left;">Gateway</label>
-                      <select class="form-control" id="field_gateway" *ngIf="flow"
+                      <select class="form-control form-select" id="field_gateway" *ngIf="flow"
                               formControlName="gateway">
                         <option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
                       </select>

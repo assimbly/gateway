@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_header">Header</label>
-                    <select class="form-control" id="field_header" name="header" [(ngModel)]="headerKeys.headerId" >
+                    <select class="form-control form-select" id="field_header" name="header" [(ngModel)]="headerKeys.headerId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
                     </select>

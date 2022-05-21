@@ -54,7 +54,7 @@
           <label class="form-control-label" for="field_autoStart">Autostart</label>
           <i triggers="mouseenter:mouseleave" placement="right"
              popoverTitle="Info" [ngbPopover]="autostartPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
-          <select type="text" class="form-control" id="field_autostart" id="field_autoStart" name="autoStart"
+          <select type="text" class="form-control form-select" id="field_autostart" id="field_autoStart" name="autoStart"
                   [(ngModel)]="broker.autoStart">
             <option value="true">true</option>
             <option value="false">false</option>
@@ -64,7 +64,7 @@
           <label class="form-control-label" for="field_type">Type</label>
           <i triggers="mouseenter:mouseleave" placement="right"
              popoverTitle="Info" [ngbPopover]="typePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
-          <select type="text" class="form-control" id="field_type" name="type" [(ngModel)]="broker.type"
+          <select type="text" class="form-control form-select" id="field_type" name="type" [(ngModel)]="broker.type"
                   (ngModelChange)="onTypeChange($event)">
             <option value="classic">ActiveMQ Classic</option>
             <option value="artemis">ActiveMQ Artemis</option>
@@ -74,7 +74,7 @@
           <label class="form-control-label" for="field_type">Configuration Type</label>
           <i triggers="mouseenter:mouseleave" placement="right"
              popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
-          <select type="text" class="form-control" id="field_configuration_type" name="configurationType"
+          <select type="text" class="form-control form-select" id="field_configuration_type" name="configurationType"
                   [(ngModel)]="broker.configurationType">
             <option value="embedded">Embedded</option>
             <option value="file">File</option>

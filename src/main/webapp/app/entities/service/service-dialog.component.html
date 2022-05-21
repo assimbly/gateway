@@ -21,7 +21,7 @@
         </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control" id="type" name="field_type" [(ngModel)]="service.type"  (change)="changeType(false)" #type="ngModel">
+            <select class="form-control form-select" id="type" name="field_type" [(ngModel)]="service.type"  (change)="changeType(false)" #type="ngModel">
                 <option [ngValue]="type" *ngFor="let type of services.connectionsList">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
@@ -73,7 +73,7 @@
                             </td>
                             <ng-template #isList>
                                 <td>
-                                    <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
+                                    <select class="form-control form-select" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{idx}}" #listValue="ngModel">
                                     	<ng-container *ngIf="serviceKey.key == 'driver'">
                                    	     <option [value]="l" *ngFor="let l of driversList">{{l}}</option>
                                         </ng-container>

@@ -27,7 +27,7 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_service">Service</label>
-                    <select class="form-control" id="field_service" name="service" [(ngModel)]="serviceKeys.serviceId" >
+                    <select class="form-control form-select" id="field_service" name="service" [(ngModel)]="serviceKeys.serviceId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
                     </select>

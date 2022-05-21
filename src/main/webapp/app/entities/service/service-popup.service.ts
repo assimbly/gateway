@@ -16,7 +16,7 @@ export class ServicePopupService {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                resolve(this.ngbModalRef);
+                this.ngbModalRef = null;
             }
 
             if (id) {
