@@ -1,7 +1,7 @@
 {
   "applicationName": "gateway",
   "applicationType": "monolithic",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "jhipsterVersion": "7.7.0",
   "tempDir": "/tmp",
   "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
@@ -30,7 +30,7 @@
   },
   "projectResources": {
 	"basePath": "/",
-	"resources": [  
+	"resources": [
 	{
       "type": "dir",
       "path": "${activemq.data}",
@@ -155,7 +155,7 @@
       "type": "file",
       "path": ".gitignore",
       "action": "ignore"
-    },	
+    },
 	{
       "type": "file",
       "path": ".lintstagedrc.js",
@@ -270,11 +270,11 @@
       "type": "file",
       "path": "tsconfig.spec.json",
       "action": "replace"
-    }	
+    }
   ]
   },
   "backendResources": {
-	"basePath": "/src/main/java/org/assimbly/gateway", 
+	"basePath": "/src/main/java/org/assimbly/gateway",
 	  "resources": [
 		{
 		  "type": "dir",
@@ -440,7 +440,7 @@
 		  "type": "file",
 		  "path": "GatewayApp.java",
 		  "action": "ignore"
-		}	
+		}
 	  ]
   },
   "testBackendResources": {
@@ -475,7 +475,7 @@
   },
   "frontendResources": {
   	"basePath": "/src/main/webapp",
-	  "resources": [		
+	  "resources": [
 		{
 		  "type": "dir",
 		  "path": "app/account",
@@ -714,7 +714,7 @@
 		  "type": "file",
 		  "path": "robots.txt",
 		  "action": "replace"
-		}	
+		}
 	  ]
   },
   "testFrontendResources": {
