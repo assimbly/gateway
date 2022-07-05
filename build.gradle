@@ -375,12 +375,12 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.7.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
