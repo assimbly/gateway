@@ -270,13 +270,13 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.22.0")
+                    details.useVersion("2.23.1")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.77.Final")
+                    details.useVersion("4.1.78.Final")
                 }
             }
         }
@@ -292,7 +292,6 @@ repositories {
 dependencies {
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-    //implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
@@ -376,12 +375,12 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
-    }else{
         implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+    }else{
         implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
