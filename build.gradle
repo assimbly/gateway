@@ -355,18 +355,12 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    //implementation "io.jsonwebtoken:jjwt:0.9.1"
-	//implementation "io.jsonwebtoken:jjwt-api"
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
 
-    implementation "io.github.assimbly:docconverter:1.5.0"
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
     implementation "org.jdom:jdom2:2.0.6.1"
