@@ -291,6 +291,12 @@ repositories {
 
 dependencies {
 
+    implementation( group: 'org.mongodb', name: 'bson'){
+        version{
+            strictly "[3.12.11]"
+        }
+    }
+
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
