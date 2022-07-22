@@ -1,20 +1,20 @@
 <div>
     <h2 id="page-heading">
-        <span>Services</span>
+        <span>Connections</span>
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/service/new']">
             <fa-icon [icon]="'plus'"></fa-icon>
-            <span >Create Service</span>
+            <span >Create Connection</span>
         </button>
     </h2>
     <br/>
     <div class="form-group">
         <label>
-            <strong>Service name:</strong>
+            <strong>Name:</strong>
         </label>
         <ng-select [items]="services" bindLabel="name" labelForId="field_service" [(ngModel)]="selectedService" (change)="filterServiceKeys()"></ng-select>
         <br/>
         <label>
-            <strong>Service type:</strong>
+            <strong>Type:</strong>
         </label>
         <div class="row">
             <div class="col-md-11">

@@ -23,7 +23,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="encrypted">Encrypt value</label>
-                    <select class="form-control" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
+                    <select class="form-control form-select" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
                             formControlName="encrypted" [value]="environmentVariables.encrypted">
                         <option [ngValue]=false [selected]="!environmentVariables.encrypted">no</option>
                         <option [ngValue]=true [selected]="environmentVariables.encrypted">yes</option>
@@ -51,7 +51,7 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="gateway">Gateway</label>
-                    <select *ngIf="gateways.length > 1; else oneGateway" class="form-control" id="gateway"
+                    <select *ngIf="gateways.length > 1; else oneGateway" class="form-control form-select" id="gateway"
                             formControlName="gatewayId">
                         <option [ngValue]="null"></option>
                         <option [ngValue]="gatewayOption.id"

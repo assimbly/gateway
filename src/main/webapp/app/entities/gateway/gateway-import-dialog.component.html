@@ -6,7 +6,7 @@
     <div class="modal-body">
         <div class="form-group">
             <label class="form-control-label font-weight-bold" for="field_id">Gateway id</label>
-            <select class="form-control" name="id" [(ngModel)]="gatewayId" id="field_id" [disabled]="gateways.length === 1">
+            <select class="form-control form-select" name="id" [(ngModel)]="gatewayId" id="field_id" [disabled]="gateways.length === 1">
                 <option *ngFor="let gateway of gateways" value="{{gateway.id}}">{{gateway.id}}</option>
             </select>
         </div>

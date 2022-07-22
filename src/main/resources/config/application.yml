@@ -152,7 +152,7 @@ jhipster:
 
 application:
   info:
-    version: 3.6.0
+    version: 3.7.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest

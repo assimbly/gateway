@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "private": true,
   "description": "A message gateway based on Apache camel",
   "license": "Apache License 2.0",
@@ -71,6 +71,7 @@
     "packaging": "jar"
   },
   "dependencies": {
+    "@angular/animations": "13.2.4",
     "@angular/common": "13.2.4",
     "@angular/compiler": "13.2.4",
     "@angular/core": "13.2.4",

@@ -2,14 +2,14 @@
   <div class="row">
     <div class="col-10">
       <h2>
-        <span>Services</span>
+        <span>Connections</span>
       </h2>
     </div>
     <div class="col-2">
       <a
         role="button"
         class="btn btn-sm right-border-radius-0 assimbly-link assimbly-gateway-img"
-        href="https://github.com/assimbly/gateway/wiki/Services"
+        href="https://github.com/assimbly/gateway/wiki/connections"
         placement="right"
         title="Assimbly Documentation"
         target="_blank"
@@ -27,7 +27,7 @@
     <div class="col-2">
       <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-service" [routerLink]="['/service/new']">
         <fa-icon [icon]="'plus'"></fa-icon>
-        <span>Create Service</span>
+        <span>Create Connection</span>
       </button>
     </div>
   </div>
@@ -37,11 +37,11 @@
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
           <th jhiSortBy="name">
-            <span>Service name</span>
+            <span>Name</span>
             <span class="fa fa-sort"></span>
           </th>
           <th jhiSortBy="type">
-            <span>Service type</span>
+            <span>Type</span>
             <span class="fa fa-sort"></span>
           </th>
           <th></th>

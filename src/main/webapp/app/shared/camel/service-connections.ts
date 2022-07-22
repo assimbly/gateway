@@ -12,19 +12,19 @@ export class Services {
   ];
 
   connectionsList: string[] = [
-    'ActiveMQ Connection',
-    'AmazonMQ Connection',
-    'AMQP Connection',
-    'AMQPS Connection',
-    'IBMMQ Connection',
-    'JDBC Connection',
-    'MQ Connection',
-    'SonicMQ Connection',
+    'ActiveMQ',
+    'AmazonMQ',
+    'AMQP',
+    'AMQPS',
+    'IBMMQ',
+    'JDBC',
+    'MQ',
+    'SonicMQ',
   ];
 
   keysList = [
     {
-      name: 'JDBC Connection',
+      name: 'JDBC',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -53,7 +53,7 @@ export class Services {
       ],
     },
     {
-      name: 'ActiveMQ Connection',
+      name: 'ActiveMQ',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -77,7 +77,7 @@ export class Services {
       ],
     },
     {
-      name: 'AmazonMQ Connection',
+      name: 'AmazonMQ',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -100,7 +100,7 @@ export class Services {
       ],
     },
     {
-      name: 'AMQP Connection',
+      name: 'AMQP',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -123,7 +123,7 @@ export class Services {
       ],
     },
     {
-      name: 'AMQPS Connection',
+      name: 'AMQPS',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -146,7 +146,7 @@ export class Services {
       ],
     },
     {
-      name: 'IBMMQ Connection',
+      name: 'IBMMQ',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -169,7 +169,7 @@ export class Services {
       ],
     },
     {
-      name: 'MQ Connection',
+      name: 'MQ',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -198,7 +198,7 @@ export class Services {
       ],
     },
     {
-      name: 'SonicMQ Connection',
+      name: 'SonicMQ',
       serviceKeys: [
         {
           serviceKeyName: 'url',
@@ -224,21 +224,21 @@ export class Services {
 
   getServiceType(componentType: any) {
     if (componentType === 'activemq') {
-      return 'ActiveMQ Connection';
+      return 'ActiveMQ';
     } else if (componentType === 'amazonmq') {
-      return 'AmazonMQ Connection';
+      return 'AmazonMQ';
     } else if (componentType === 'amqp') {
-      return 'AMQP Connection';
+      return 'AMQP';
     } else if (componentType === 'amqps') {
-      return 'AMQP Connection';
+      return 'AMQP';
     } else if (componentType === 'ibmmq') {
-      return 'IBMMQ Connection';
+      return 'IBMMQ';
     } else if (componentType === 'sonicmq') {
-      return 'SonicMQ Connection';
+      return 'SonicMQ';
     } else if (componentType === 'sql') {
-      return 'JDBC Connection';
+      return 'JDBC';
     } else if (componentType === 'sjms') {
-      return 'MQ Connection';
+      return 'MQ';
     } else {
       return '';
     }

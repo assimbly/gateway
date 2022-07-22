@@ -86,7 +86,7 @@
           </td>
           <ng-template #isList>
             <td>
-              <select class="form-control" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{ idx }}" #listValue="ngModel">
+              <select class="form-control form-select" required [(ngModel)]="serviceKey.value" name="serviceKey-value-{{ idx }}" #listValue="ngModel">
                 <ng-container *ngIf="serviceKey.key == 'driver'">
                   <option [value]="l" *ngFor="let l of driversList">{{ l }}</option>
                 </ng-container>
