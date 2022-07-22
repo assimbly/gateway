@@ -1,0 +1,53 @@
+import groovy.transform.Field
+import groovy.io.FileType
+
+def json = file('scripts/version/versioned_files.json')
+def projectFile = new groovy.json.JsonSlurper().parseText(json.text)
+
+def applicationName = projectFile.applicationName
+def oldVersion = projectFile.oldVersion
+def newVersion = projectFile.newVersion
+
+
+@Field skippedResources = []
+
+tasks.register('version') {
+
+    doFirst {
+
+		println ''
+		println "Start update version for application ${applicationName} to version ${newVersion}"
+		println ''
+
+        println "RootDir= ${rootDir}"
+
+	}
+
+	doLast {
+		searchAndReplace(projectFile, oldVersion, newVersion)
+
+        println ''
+        println "Finished update version for application ${applicationName} to version ${newVersion}"
+        println ''
+
+    }
+}
+
+def searchAndReplace(projectFile, oldVersion, newVersion){
+
+    def resources = projectFile.resources
+
+    println "SearchAndReplace"
+    println "RootDir= ${rootDir}"
+    println "oldVersion= ${oldVersion}"
+    println "newVersion= ${newVersion}"
+
+    resources.each {
+        def file = rootDir.toString() + it.path;
+
+        println "Updating file: ${file}"
+        ant.replace(file: file, token: oldVersion, value: newVersion)
+
+    }
+
+}

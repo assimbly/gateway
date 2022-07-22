@@ -141,6 +141,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   numberOfResponseEndpoints = 0;
 
   modalRef: NgbModalRef | null;
+  modalRefPromise: Promise<NgbModalRef> | null;
 
   private subscription: Subscription;
   private eventSubscriber: Subscription;
@@ -473,6 +474,7 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event): void {
+
     const endpointForm = <FormGroup>(<FormArray>this.editFlowForm.controls.endpointsData).controls[endpointFormIndex];
 
     if (typeof e !== 'undefined') {
@@ -561,7 +563,9 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   setURIlist(index): void {
+
     this.URIList[index] = [];
+    let updatedList = [];
 
     const tEndpointsUnique = this.allendpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
@@ -570,13 +574,15 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
 		  endpoint.endpointType === 'TO'   ||
 		  endpoint.endpointType === 'ERROR'   ||
 		  endpoint.endpointType === 'RESPONSE'){
-		  if (endpoint.componentType && this.selectedComponentType === endpoint.componentType.toLowerCase()) {
-				this.URIList[index].push(endpoint);
-		  }
-  	    }
+        if (endpoint.componentType && this.selectedComponentType === endpoint.componentType.toLowerCase()) {
+          updatedList.push(endpoint);
+        }
+  	  }
     });
 
-    this.URIList.sort();
+    this.URIList[index].push(...updatedList);
+
+    this.URIList[index].sort();
   }
 
   enableFields(endpointForm): void {
@@ -1017,98 +1023,81 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
   }
 
   createOrEditHeader(endpoint, formHeader: FormControl): void {
+
     endpoint.headerId = formHeader.value;
 
     if (typeof endpoint.headerId === 'undefined' || endpoint.headerId === null || !endpoint.headerId) {
-      const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
-      modalRef.then(res => {
-        res.result.then(
-          result => {
-            this.setHeader(endpoint, result.id, formHeader);
-          },
-          reason => {
-            this.setHeader(endpoint, reason.id, formHeader);
-          }
-        );
-      });
-     } else {
-      const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId);
-      modalRef.then(res => {
-        // Success
-        res.result.then(
-          result => {
-            this.setHeader(endpoint, result.id, formHeader);
-          },
-          reason => {
-            this.setHeader(endpoint, reason.id, formHeader);
-          }
-        );
-      });
+      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component);
+    }else{
+      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId);
     }
+
+    this.modalRefPromise.then(res => {
+        res.result.then(
+          result => {
+            this.setHeader(endpoint, result.id, formHeader);
+          },
+          reason => {
+            this.setHeader(endpoint, reason.id, formHeader);
+          }
+        );
+    },(reason)=>{
+       console.log('createHeader error: ', reason);
+    });
+
   }
 
   createOrEditRoute(endpoint, formRoute: FormControl): void {
     endpoint.routeId = formRoute.value;
 
     if (typeof endpoint.routeId === 'undefined' || endpoint.routeId === null || !endpoint.routeId) {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, null, this.flow.type);
-      modalRef.then(res => {
-        res.result.then(
-          result => {
-            this.setRoute(endpoint, result.id, formRoute);
-          },
-          reason => {
-            this.setRoute(endpoint, reason.id, formRoute);
-          }
-        );
-      });
-    } else {
-      const modalRef = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId,this.flow.type);
-      modalRef.then(res => {
-        // Success
-        res.result.then(
-          result => {
-            this.setRoute(endpoint, result.id, formRoute);
-          },
-          reason => {
-            this.setRoute(endpoint, reason.id, formRoute);
-          }
-        );
-      });
+      this.modalRefPromise = this.routePopupService.open(RouteDialogComponent as Component, null, this.flow.type);
+    }else{
+      this.modalRefPromise = this.routePopupService.open(RouteDialogComponent as Component, endpoint.routeId,this.flow.type);
     }
+
+    this.modalRefPromise.then(res => {
+        res.result.then(
+          result => {
+            console.log('createRoute result 1: ', result);
+            this.setRoute(endpoint, result.id, formRoute);
+          },
+          reason => {
+            console.log('createRoute reason 2: ', reason);
+            this.setRoute(endpoint, reason.id, formRoute);
+          }
+        );
+    },(reason)=>{
+      console.log('createRoute result 3: ', reason);
+    });
+
   }
 
   createOrEditService(endpoint, serviceType: string, formService: FormControl): void {
+
     endpoint.serviceId = formService.value;
 
     if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
-      modalRef.then(res => {
-        // Success
-        res.componentInstance.serviceType = serviceType;
-        res.result.then(
-          result => {
-            this.setService(endpoint, result.id, formService);
-          },
-          reason => {
-            this.setService(endpoint, reason.id, formService);
-          }
-        );
-      });
+      this.modalRefPromise = this.servicePopupService.open(ServiceDialogComponent as Component, null, serviceType);
     } else {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
-      modalRef.then(res => {
-        res.componentInstance.serviceType = serviceType;
-        res.result.then(
-          result => {
-            this.setService(endpoint, result.id, formService);
-          },
-          reason => {
-            // this.setService(endpoint, reason.id, formService);
-          }
-        );
-      });
+      this.modalRefPromise = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
     }
+
+    this.modalRefPromise.then(res => {
+       res.result.then(
+         result => {
+           console.log('createRoute result 1: ', result);
+           this.setService(endpoint, result.id, formService);
+         },
+         reason => {
+             console.log('createRoute result 2: ', reason);
+             this.setService(endpoint, reason.id, formService);
+         }
+       );
+     },(reason)=>{
+         console.log('createService result3: ' + reason);
+     });
+
   }
 
   setHeader(endpoint, id, formHeader: FormControl): void {
@@ -1189,72 +1178,84 @@ export class FlowEditorConnectorComponent implements OnInit, OnDestroy {
     }
 
     if (this.flow.id) {
-      this.endpoints.forEach(endpoint => {
-        endpoint.flowId = this.flow.id;
-      });
-
-      this.flowService.update(this.flow).subscribe(flow => {
-        this.flow = flow.body;
-        const updateEndpoints = this.endpointService.updateMultiple(this.endpoints);
-
-        updateEndpoints.subscribe(results => {
-          this.endpoints = results.body.concat();
-
-          this.updateForm();
-
-          this.endpointService.findByFlowId(this.flow.id).subscribe(data => {
-            let endpoints = data.body;
-            endpoints = endpoints.filter(e => {
-              const s = this.endpoints.find(t => t.id === e.id);
-              if (typeof s === 'undefined') {
-                return true;
-              } else {
-                return s.id !== e.id;
-              }
-            });
-
-            if (endpoints.length > 0) {
-              endpoints.forEach(element => {
-                this.endpointService.delete(element.id).subscribe(
-                );
-              });
-            }
-          });
-          this.savingFlowSuccess = true;
-          this.isSaving = false;
-          this.router.navigate(['/']);
-        });
-      });
+      this.updateFlow();
     } else {
-      this.flow.gatewayId = this.gateways[0].id;
+      this.createFlow();
+    }
+  }
 
-      this.flowService.create(this.flow).subscribe(
-        flowUpdated => {
-          this.flow = flowUpdated.body;
+  updateFlow(){
 
-          this.endpoints.forEach(endpoint => {
-            endpoint.flowId = this.flow.id;
+    this.endpoints.forEach(endpoint => {
+      endpoint.flowId = this.flow.id;
+    });
+
+    this.flowService.update(this.flow).subscribe(flow => {
+      this.flow = flow.body;
+      const updateEndpoints = this.endpointService.updateMultiple(this.endpoints);
+
+      updateEndpoints.subscribe(results => {
+        this.endpoints = results.body.concat();
+
+        this.updateForm();
+
+        this.endpointService.findByFlowId(this.flow.id).subscribe(data => {
+          let endpoints = data.body;
+          endpoints = endpoints.filter(e => {
+            const s = this.endpoints.find(t => t.id === e.id);
+            if (typeof s === 'undefined') {
+              return true;
+            } else {
+              return s.id !== e.id;
+            }
           });
 
-          this.endpointService.createMultiple(this.endpoints).subscribe(
-            toRes => {
-              this.endpoints = toRes.body;
-              this.updateForm();
-              this.finished = true;
-              this.savingFlowSuccess = true;
-              this.isSaving = false;
-              this.router.navigate(['/']);
-            },
-            () => {
-              this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
-            }
-          );
-        },
-        () => {
-          this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
-        }
-      );
-    }
+          if (endpoints.length > 0) {
+            endpoints.forEach(element => {
+              this.endpointService.delete(element.id).subscribe(
+              );
+            });
+          }
+        });
+        this.savingFlowSuccess = true;
+        this.isSaving = false;
+        this.router.navigate(['/']);
+      });
+    });
+
+  }
+
+  createFlow(){
+
+    this.flow.gatewayId = this.gateways[0].id;
+
+    this.flowService.create(this.flow).subscribe(
+      flowUpdated => {
+        this.flow = flowUpdated.body;
+
+        this.endpoints.forEach(endpoint => {
+          endpoint.flowId = this.flow.id;
+        });
+
+        this.endpointService.createMultiple(this.endpoints).subscribe(
+          toRes => {
+            this.endpoints = toRes.body;
+            this.updateForm();
+            this.finished = true;
+            this.savingFlowSuccess = true;
+            this.isSaving = false;
+            this.router.navigate(['/']);
+          },
+          () => {
+            this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+          }
+        );
+      },
+      () => {
+        this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+      }
+    );
+
   }
 
   checkUniqueEndpoints(): boolean {

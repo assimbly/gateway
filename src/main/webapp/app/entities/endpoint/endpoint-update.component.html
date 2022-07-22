@@ -11,7 +11,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_type">ComponentType</label>
-                    <select class="form-control" name="componentType" [(ngModel)]="endpoint.componentType" id="field_type" >
+                    <select class="form-control form-select" name="componentType" [(ngModel)]="endpoint.componentType" id="field_type" >
                         <option value="FILE">FILE</option>
                     </select>
                 </div>
@@ -32,21 +32,21 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_flow">Flow</label>
-                    <select class="form-control" id="field_flow" name="flow" [(ngModel)]="endpoint.flowId" >
+                    <select class="form-control form-select" id="field_flow" name="flow" [(ngModel)]="endpoint.flowId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="flowOption.id" *ngFor="let flowOption of flows; trackBy: trackFlowById">{{flowOption.id}}</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_service">Service</label>
-                    <select class="form-control" id="field_service" name="service" [(ngModel)]="endpoint.serviceId" >
+                    <select class="form-control form-select" id="field_service" name="service" [(ngModel)]="endpoint.serviceId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="serviceOption.id" *ngFor="let serviceOption of services; trackBy: trackServiceById">{{serviceOption.id}}</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_header">Header</label>
-                    <select class="form-control" id="field_header" name="header" [(ngModel)]="endpoint.headerId" >
+                    <select class="form-control form-select" id="field_header" name="header" [(ngModel)]="endpoint.headerId" >
                         <option [ngValue]="null"></option>
                         <option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
                     </select>

@@ -9,20 +9,23 @@ Note: Please backup your application before running this command.
 
 To get a report first:
 
-Run: gradlew -q upgrade -Pdryrun 
+Run: gradlew -q upgrade -Pdryrun
 
 A file or directory can be upgraded by various actions
 	- delete (delete the file or folder)
 	- replace (replace the file or folder by the one of the new Jhipster version)
 	- skip (no action, but report this in the output)
 	- ignore (no action)
-	
-	
+
+
 - Resources
 
 Goal: Create a list of resources in a Jhipster project. This list can be used in a projectfile
-Run: gradlew -q resources 
+Run: gradlew -q resources
+
+- Version
+
+Goal: Update the version for the listed files in versioned_files.json
+Run: gradlew -q version
 
 
-	
-	

@@ -47,6 +47,7 @@ export class ServiceDialogComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+
         this.isSaving = false;
         this.addRequiredServiceKeys();
         this.serviceService.query().subscribe(
@@ -55,19 +56,18 @@ export class ServiceDialogComponent implements OnInit {
             },
             res => this.onError(res.body)
         );
-        if (this.activatedRoute.fragment['value'] !== 'clone' || this.serviceType === null) {
-            this.service.type = this.services.connectionsList.find(st => st === this.serviceType);
-            this.disableType = this.services.connectionsList.some(st => st === this.serviceType);
-        }
 
         if (this.activatedRoute.fragment['value'] === 'clone') {
             this.loadServiceKeys(true);
         } else {
             this.loadServiceKeys(false);
         }
+
+
     }
 
     changeType(cloneHeader: boolean) {
+
         if (typeof this.requiredType !== 'undefined') {
             this.serviceKeysRemoveList = [];
             this.requiredType.serviceKeys.forEach(rsk => {

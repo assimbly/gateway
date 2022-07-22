@@ -17,7 +17,7 @@
 
                 <div class="form-group">
                     <label for="field_user">User</label>
-                    <select class="form-control" id="field_user" multiple name="user" [(ngModel)]="group.users">
+                    <select class="form-control form-select" id="field_user" multiple name="user" [(ngModel)]="group.users">
                         <option [ngValue]="getSelected(group.users, userOption)" *ngFor="let userOption of users; trackBy: trackUserById">{{userOption.login}}</option>
                     </select>
                 </div>

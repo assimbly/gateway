@@ -36,7 +36,7 @@ plugins {
 
 
 group = "org.assimbly.gateway"
-version = '3.6.0'
+version = '3.7.0'
 
 description = ""
 
@@ -46,6 +46,7 @@ assert System.properties["java.specification.version"] == "11" || "12" || "13"
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
+apply from: "$rootDir/scripts/version/version.gradle"
 apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
@@ -269,13 +270,13 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.21.0")
+                    details.useVersion("2.23.1")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.76.Final")
+                    details.useVersion("4.1.78.Final")
                 }
             }
         }
@@ -290,8 +291,13 @@ repositories {
 
 dependencies {
 
+    implementation( group: 'org.mongodb', name: 'bson'){
+        version{
+            strictly "[3.12.11]"
+        }
+    }
+
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-    //implementation group: "io.github.jhipster", name: "jhipster-framework", version: '3.9.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
 
@@ -355,18 +361,12 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    //implementation "io.jsonwebtoken:jjwt:0.9.1"
-	//implementation "io.jsonwebtoken:jjwt-api"
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	runtimeOnly  group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
 
-    implementation "io.github.assimbly:docconverter:1.5.0"
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
     implementation "org.jdom:jdom2:2.0.6.1"
@@ -375,12 +375,12 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRestModule", version: "3.6.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRestModule", version: "3.6.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -462,8 +462,8 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.13.1"
-        npmVersion = "8.3.0"
+        version = "16.15.0"
+        npmVersion = "8.9.0"
         yarnVersion = "1.22.17"
         download = true
     }

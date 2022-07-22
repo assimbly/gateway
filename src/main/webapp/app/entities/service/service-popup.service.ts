@@ -12,11 +12,11 @@ export class ServicePopupService {
         this.ngbModalRef = null;
     }
 
-    open(component: Component, id?: number | any): Promise<NgbModalRef> {
+    open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                resolve(this.ngbModalRef);
+                this.ngbModalRef = null;
             }
 
             if (id) {
@@ -27,7 +27,11 @@ export class ServicePopupService {
             } else {
                 // setTimeout used as a workaround for getting ExpressionChangedAfterItHasBeenCheckedError
                 setTimeout(() => {
-                    this.ngbModalRef = this.serviceModalRef(component, new Service());
+                    let service = new Service();
+                    if(type){
+                      service.type = type;
+                    }
+                    this.ngbModalRef = this.serviceModalRef(component, service);
                     resolve(this.ngbModalRef);
                 }, 0);
             }

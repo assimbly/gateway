@@ -38,7 +38,7 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_flow">Flow</label>
-                    <select class="form-control" id="field_flow" name="flow" [(ngModel)]="maintenance.flowId">
+                    <select class="form-control form-select" id="field_flow" name="flow" [(ngModel)]="maintenance.flowId">
                         <option [ngValue]="null"></option>
                         <option [ngValue]="flowOption.id" *ngFor="let flowOption of flows; trackBy: trackFlowById">{{flowOption.id}}</option>
                     </select>
