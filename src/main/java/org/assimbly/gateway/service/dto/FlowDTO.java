@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.time.Instant;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.Endpoint;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 /**
@@ -17,7 +17,7 @@ public class FlowDTO implements Serializable {
     private Long id;
 
     private String name;
-    
+
     private String notes;
 
     private Boolean autoStart;
@@ -29,9 +29,9 @@ public class FlowDTO implements Serializable {
     private String type;
 
     private Boolean loadBalancing;
-    
+
     private Boolean parallelProcessing;
-    
+
     private Boolean assimblyHeaders;
 
     private LogLevelType logLevel;
@@ -46,7 +46,7 @@ public class FlowDTO implements Serializable {
 
     private Long gatewayId;
 
-    private Set<Endpoint> endpoints;
+    private Set<Step> steps;
 
     public Long getId() {
         return id;
@@ -71,7 +71,7 @@ public class FlowDTO implements Serializable {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
     public Boolean isAutoStart() {
         return autoStart;
     }
@@ -127,7 +127,7 @@ public class FlowDTO implements Serializable {
     public void setAssimblyHeaders(Boolean assimblyHeaders) {
         this.assimblyHeaders = assimblyHeaders;
     }
-    
+
     public LogLevelType getLogLevel() {
         return logLevel;
     }
@@ -177,12 +177,12 @@ public class FlowDTO implements Serializable {
         this.gatewayId = gatewayId;
     }
 
-    public Set<Endpoint> getEndpoints() {
-        return endpoints;
+    public Set<Step> getSteps() {
+        return steps;
     }
 
-    public void setEndpoints(Set<Endpoint> endpoints) {
-        this.endpoints = endpoints;
+    public void setSteps(Set<Step> steps) {
+        this.steps = steps;
     }
 
     @Override
@@ -211,7 +211,7 @@ public class FlowDTO implements Serializable {
         return "FlowDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", autoStart='" + isAutoStart() + "'" + 
+            ", autoStart='" + isAutoStart() + "'" +
             ", maximumRedeliveries=" + getMaximumRedeliveries() +
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +
@@ -221,8 +221,8 @@ public class FlowDTO implements Serializable {
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
             ", gateway=" + getGatewayId() +
-            ", endpoints=" + getEndpoints() +
+            ", steps=" + getSteps() +
             "}";
     }
-    
+
 }

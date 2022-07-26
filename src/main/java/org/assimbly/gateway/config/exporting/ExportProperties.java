@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.HeaderKeys;
-import org.assimbly.gateway.domain.Endpoint;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ExportProperties {
 
 	private TreeMap<String, String> properties;
 
-	public String endpointType;
+	public String stepType;
 	public String componentType;
 	public String uri;
 	public String options;
@@ -31,7 +31,7 @@ public class ExportProperties {
 	@Autowired
 	private FlowRepository flowRepository;
 
-	private Set<Endpoint> endpoints;
+	private Set<Step> steps;
 
 	private org.assimbly.gateway.domain.Service service;
 
@@ -76,10 +76,10 @@ public class ExportProperties {
 
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (endpoints == null) {
-			throw new Exception("Set of configuration failed. Endpoint cannot be null");
+		if (steps == null) {
+			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
-			getEndpointPropertiesFromDB(flow);
+			getStepPropertiesFromDB(flow);
 		}
 
 		return properties;
@@ -92,17 +92,17 @@ public class ExportProperties {
 
 		getGeneralFlowPropertiesFromDB(flow);
 
-		if (endpoints == null) {
-			throw new Exception("Set of configuration failed. Endpoint cannot be null");
+		if (steps == null) {
+			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
-			getEndpointPropertiesFromDB(flow);
+			getStepPropertiesFromDB(flow);
 		}
 
 		return properties;
 
 	}
 
-	public void getEndpointPropertiesFromDB(Flow flow) throws Exception {
+	public void getStepPropertiesFromDB(Flow flow) throws Exception {
 
 		// set from properties
 		getURIfromAssimblyDB("from");
@@ -150,12 +150,12 @@ public class ExportProperties {
 
 		options = "";
 
-		for (Endpoint endpoint : endpoints) {
+		for (Step step : steps) {
 
-			endpointType = endpoint.getEndpointType().name();
-			componentType = endpoint.getComponentType();
-			uri = endpoint.getUri();
-			options = endpoint.getOptions();
+			stepType = step.getStepType().name();
+			componentType = step.getComponentType();
+			uri = step.getUri();
+			options = step.getOptions();
 
 			getURIProperties(type, componentType, uri, options);
 		}
@@ -179,8 +179,8 @@ public class ExportProperties {
 
 	public void getServiceFromAssimblyDB(String type) {
 
-		for (Endpoint endpoint : endpoints) {
-			service = endpoint.getService();
+		for (Step step : steps) {
+			service = step.getService();
 		}
 
 		if (service != null) {
@@ -195,9 +195,9 @@ public class ExportProperties {
 
 	public void getHeaderFromAssimblyDB(String type) {
 
-		for (Endpoint endpoint : endpoints) {
+		for (Step step : steps) {
 
-			header = endpoint.getHeader();
+			header = step.getHeader();
 		}
 
 		if (header != null) {
@@ -211,7 +211,7 @@ public class ExportProperties {
 
 	private void getGeneralFlowPropertiesFromDB(Flow flow) throws Exception {
 
-		endpoints = flow.getEndpoints();
+		steps = flow.getSteps();
 
 	}
 

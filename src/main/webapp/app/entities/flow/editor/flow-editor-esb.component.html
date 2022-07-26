@@ -67,17 +67,17 @@
         <div class="card-header">
           <br/>
           <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active2" orientation="horizontal">
-            <li ngbNavItem="ROUTES" formArrayName="endpointsData" novalidate
+            <li ngbNavItem="ROUTES" formArrayName="stepsData" novalidate
                 [ngStyle]="{'text-align': 'left' }">
               <a ngbNavLink>ROUTES</a>
               <ng-template ngbNavContent>
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
-                  <ng-container *ngFor="let endpoint of endpoints; index as index">
+                  <ng-container *ngFor="let step of steps; index as index">
 
                     <div class="form-group container" [formGroupName]="index">
-                      <div class="card bg-light" *ngIf="endpoint.endpointType=='ROUTE'">
+                      <div class="card bg-light" *ngIf="step.stepType=='ROUTE'">
                         <div class="card-body">
                           <div class="row">
                             <div class="col-12">
@@ -87,7 +87,7 @@
                           <div class="row">
                             <div [style.display]="'none'">
                               <label for="id">ID</label>
-                              <input type="text" class="form-control" id="endpointid" formControlName="id" readonly/>
+                              <input type="text" class="form-control" id="stepid" formControlName="id" readonly/>
                             </div>
                             <div class="col-10">
                               <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
@@ -96,20 +96,20 @@
                             <button title="Edit route"  type="button"
                                     class="col-2 btn btn-primary"
                                     style="height: 37px;"
-                                    *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
-                                    (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                    *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                                     <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
                             <button title="New route" type="button"
                                     class="col-2 btn btn-primary flow-header-button"
                                     style="height: 37px;"
-                                    *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
-                                    (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                    *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                             </button>
                             <button title="Create route" type="button" *ngIf="!routeCreated"
                                     class="col-2 btn btn-primary flow-header-button"
                                     style="height: 37px;"
-                                    (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                             </button>
                           </div>
                           <div class="row">
@@ -126,21 +126,21 @@
                                          dropdownPosition="top"></ng-select>
                             </div>
                             <button type="button"
-                                    *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value"
+                                    *ngIf="serviceCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
                                     class="col-2 btn btn-primary" title="Edit service"
-                                    (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)">
+                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)">
                               <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
                             <button type="button"
-                                    *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value"
+                                    *ngIf="serviceCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
                                     class="col-2 btn btn-primary flow-header-button" title="New service"
-                                    (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
-                                    [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
+                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
                             </button>
                             <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary flow-header-button"
                                     title="Create connection"
-                                    (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
-                                    [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
+                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
                             </button>
                           </div>
                           <br/>
@@ -149,20 +149,20 @@
                             <button title="Add route" type="button"
                                     class="col-3 btn btn-success"
                                     style="height: 37px; color: white; padding-left: 30px;"
-                                    (click)="addEndpoint(endpoint, index)">
+                                    (click)="addStep(step, index)">
                               <fa-icon icon="plus" style="color: white;"></fa-icon> Add
                             </button>
                             <div class="col-0-5"></div>
                             <button title="Remove route" type="button" *ngIf="index > 0"
                                     class="col-3 btn btn-danger"
                                     style="height: 37px;"
-                                    (click)="removeEndpoint(endpoint, index)">
+                                    (click)="removeStep(step, index)">
                               <fa-icon icon="times" style="color: white;"></fa-icon> Remove
                             </button>
                             <button title="Remove route" type="button" *ngIf="index == 0"
                                     class="col-3 btn btn-secondary" disabled
                                     style="height: 37px;"
-                                    (click)="removeEndpoint(endpoint, index)">
+                                    (click)="removeStep(step, index)">
                               <fa-icon icon="times" style="color: white;"></fa-icon> Remove
                             </button>
                           </div>
@@ -181,9 +181,9 @@
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
-                  <ng-container formArrayName="endpointsData" *ngFor="let endpoint of endpoints; index as index">
+                  <ng-container formArrayName="stepsData" *ngFor="let step of steps; index as index">
                     <div class="form-group container" [formGroupName]="index">
-                      <div class="row" *ngIf="endpoint.endpointType=='ERROR'">
+                      <div class="row" *ngIf="step.stepType=='ERROR'">
                         <div [style.display]="'none'">
                           <label for="id">ID</label>
                           <input type="text" class="form-control" id="id" formControlName="id" readonly/>
@@ -200,20 +200,20 @@
                                      id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
                         </div>
                         <button type="button"
-                                *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                 title="Edit route" class="col-2 btn btn-primary"
-                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                   <span class="padding-button"><fa-icon icon="edit"
                                                         style="color: white;"></fa-icon></span>&nbsp;
                         </button>
                         <button type="button"
-                                *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                 class="col-2 btn btn-primary flow-header-button" title="New route"
-                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                         </button>
                         <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary"
                                 title="Create route"
-                                (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)">
+                                (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                           <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
                         </button>
                       </div>
