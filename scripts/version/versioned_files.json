@@ -1,7 +1,7 @@
 {
   "applicationName": "gateway",
-  "oldVersion": "3.8.0",
-  "newVersion": "3.7.0",
+  "oldVersion": "3.7.0",
+  "newVersion": "3.8.0",
   "resources": [
       {
         "path": "/package.json"
@@ -11,30 +11,6 @@
       },
       {
         "path": "/src/main/resources/config/application.yml"
-      },
-      {
-        "path": "/../modules/pom.xml"
-      },
-      {
-        "path": "/../modules/integrationRestModule/pom.xml"
-      },
-      {
-        "path": "/../modules/integrationModule/pom.xml"
-      },
-      {
-        "path": "/../modules/extraModule/pom.xml"
-      },
-      {
-        "path": "/../modules/brokerRestModule/pom.xml"
-      },
-      {
-        "path": "/../modules/brokerModule/pom.xml"
-      },
-      {
-        "path": "/../modules/baseModule/pom.xml"
-      },
-      {
-        "path": "/../modules/baseComponentsModule/pom.xml"
       }
     ]
 }
