@@ -24,7 +24,7 @@ describe('Password Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call change-password endpoint with correct values', () => {
+    it('should call change-password step with correct values', () => {
       // GIVEN
       const password1 = 'password1';
       const password2 = 'password2';

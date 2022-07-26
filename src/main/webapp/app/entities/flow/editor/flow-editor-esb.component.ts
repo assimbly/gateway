@@ -10,14 +10,14 @@ import { ServiceDialogComponent } from 'app/entities/service/service-dialog.comp
 import { ServicePopupService } from 'app/entities/service/service-popup.service';
 import { Components } from "app/shared/camel/component-type";
 import { Services } from "app/shared/camel/service-connections";
-import { Endpoint, EndpointType, IEndpoint } from "app/shared/model/endpoint.model";
+import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Gateway } from "app/shared/model/gateway.model";
 import { Route } from "app/shared/model/route.model";
 import { Service } from 'app/shared/model/service.model';
 import dayjs from "dayjs/esm";
 import { forkJoin, Observable, Subscription } from "rxjs";
-import { EndpointService } from "../../endpoint/endpoint.service";
+import { StepService } from "../../step/step.service";
 import { GatewayService } from "../../gateway/gateway.service";
 import { RouteService } from "../../route/route.service";
 import { ServiceService } from '../../service/service.service';
@@ -33,12 +33,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	routes: Route[];
   services: Service[];
 
-	URIList: Array<Array<Endpoint>> = [[]];
-	allendpoints: IEndpoint[] = new Array<Endpoint>();
-	endpoints: IEndpoint[] = new Array<Endpoint>();
-	endpoint: IEndpoint;
+	URIList: Array<Array<Step>> = [[]];
+	allsteps: IStep[] = new Array<Step>();
+	steps: IStep[] = new Array<Step>();
+	step: IStep;
 
-	public endpointTypes = ["ROUTE", "ERROR"];
+	public stepTypes = ["ROUTE", "ERROR"];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -54,14 +54,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	active: string;
 	active2: any;
 	disabled = true;
-	activeEndpoint: any;
+	activeStep: any;
 
 	isSaving: boolean;
 	savingFlowFailed = false;
 	savingFlowFailedMessage = "Saving failed (check logs)";
 	savingFlowSuccess = false;
 	savingFlowSuccessMessage = "Flow successfully saved";
-	savingCheckEndpoints = true;
+	savingCheckSteps = true;
 
 	finished = false;
 
@@ -100,7 +100,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   serviceType: Array<string> = [];
   selectedService: Service = new Service();
 
-	numberOfRouteEndpoints = 0;
+	numberOfRouteSteps = 0;
 
 	modalRef: NgbModalRef | null;
 
@@ -113,7 +113,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private eventManager: EventManager,
 		private gatewayService: GatewayService,
 		private flowService: FlowService,
-		private endpointService: EndpointService,
+		private stepService: StepService,
 		private routeService: RouteService,
     private serviceService: ServiceService,
 		private alertService: AlertService,
@@ -137,7 +137,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.subscription =
 			this.route.params.subscribe(
 				(params) => {
-					this.activeEndpoint = params["endpointid"];
+					this.activeStep = params["stepid"];
 
 					if (params["mode"] === "clone") {
 						this.load(params["id"], true);
@@ -157,11 +157,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.routeService.getAllRoutes(),
       this.serviceService.getAllServices(),
 			this.gatewayService.query(),
-			this.endpointService.query(),
+			this.stepService.query(),
 			this.flowService.getGatewayName(),
 		])
 			.subscribe(
-				([wikiDocUrl, camelDocUrl, routes, services, gateways, allendpoints, gatewayName]) => {
+				([wikiDocUrl, camelDocUrl, routes, services, gateways, allsteps, gatewayName]) => {
 					this.wikiDocUrl = wikiDocUrl.body;
 					this.camelDocUrl = camelDocUrl.body;
 
@@ -175,7 +175,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					this.singleGateway = this.gateways.length === 1;
 					this.gatewayName = gatewayName.body;
 
-					this.allendpoints = allendpoints.body;
+					this.allsteps = allsteps.body;
 
 					if (this.singleGateway) {
 						this.indexGateway = 0;
@@ -198,39 +198,39 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 									this.initializeForm(this.flow);
 
-									this.endpointService
+									this.stepService
 										.findByFlowId(id)
 										.subscribe(
-											(flowEndpointsData) => {
-												const endpoints = flowEndpointsData.body;
+											(flowStepsData) => {
+												const steps = flowStepsData.body;
 												let index = 0;
-												this.endpoints = [];
+												this.steps = [];
 
-												this.endpointTypes.forEach(
-													(endpointType, j) => {
-														let filteredEndpoints = endpoints.filter(
-															(endpoint) =>
-																endpoint.endpointType === endpointType,
+												this.stepTypes.forEach(
+													(stepType, j) => {
+														let filteredSteps = steps.filter(
+															(step) =>
+																step.stepType === stepType,
 														);
 
-														filteredEndpoints.forEach(
-															(endpoint) => {
-																this.endpoint =
-																	new Endpoint(
-																		endpoint.id,
-																		endpoint.endpointType,
-																		endpoint.flowId,
-																		endpoint.routeId,
-								                    endpoint.serviceId,
+														filteredSteps.forEach(
+															(step) => {
+																this.step =
+																	new Step(
+																		step.id,
+																		step.stepType,
+																		step.flowId,
+																		step.routeId,
+								                    step.serviceId,
 																	);
 
-																this.endpoints.push(endpoint);
+																this.steps.push(step);
 
-																const formgroup = this.initializeEndpointData(
-																	endpoint,
+																const formgroup = this.initializeStepData(
+																	step,
 																);
 																(
-																	<FormArray>this.editFlowForm.controls.endpointsData
+																	<FormArray>this.editFlowForm.controls.stepsData
 																).insert(index, formgroup);
 
 																index = index + 1;
@@ -241,9 +241,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 													this,
 												);
 
-												if (this.activeEndpoint) {
-													const activeIndex = this.endpoints.findIndex(
-														(item) => item.id.toString() === this.activeEndpoint,
+												if (this.activeStep) {
+													const activeIndex = this.steps.findIndex(
+														(item) => item.id.toString() === this.activeStep,
 													);
 													if (activeIndex === -1) {
 														this.active = "0";
@@ -293,38 +293,38 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 								this.initializeForm(this.flow);
 
-								this.numberOfRouteEndpoints = 1;
+								this.numberOfRouteSteps = 1;
 
-								// create new route endpoint
-								this.endpoint = new Endpoint();
-								this.endpoint.id = null;
-								this.endpoint.endpointType = EndpointType.ROUTE;
-								this.endpoint.componentType = "file";
-								this.endpoint.routeId = null;
-								this.endpoint.serviceId = null;
+								// create new route step
+								this.step = new Step();
+								this.step.id = null;
+								this.step.stepType = StepType.ROUTE;
+								this.step.componentType = "file";
+								this.step.routeId = null;
+								this.step.serviceId = null;
 
-								this.endpoints.push(this.endpoint);
+								this.steps.push(this.step);
 
-								const formgroupRoute = this.initializeEndpointData(
-									this.endpoint,
+								const formgroupRoute = this.initializeStepData(
+									this.step,
 								);
-								(<FormArray>this.editFlowForm.controls.endpointsData).push(
+								(<FormArray>this.editFlowForm.controls.stepsData).push(
 									formgroupRoute,
 								);
 
-								// create new error endpoint
-								this.endpoint = new Endpoint();
-								this.endpoint.id = null;
-								this.endpoint.endpointType = EndpointType.ERROR;
-								this.endpoint.componentType = "file";
-								this.endpoint.routeId = null;
+								// create new error step
+								this.step = new Step();
+								this.step.id = null;
+								this.step.stepType = StepType.ERROR;
+								this.step.componentType = "file";
+								this.step.routeId = null;
 
-								this.endpoints.push(this.endpoint);
+								this.steps.push(this.step);
 
-								const formgroupError = this.initializeEndpointData(
-									this.endpoint,
+								const formgroupError = this.initializeStepData(
+									this.step,
 								);
-								(<FormArray>this.editFlowForm.controls.endpointsData).push(
+								(<FormArray>this.editFlowForm.controls.stepsData).push(
 									formgroupError,
 								);
 
@@ -361,10 +361,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		// reset id and flow name to null
 		this.flow.id = null;
 		this.flow.name = null;
-		this.flow.endpoints = null;
+		this.flow.steps = null;
 
-		this.endpoints.forEach((endpoint) => {
-			endpoint.id = null;
+		this.steps.forEach((step) => {
+			step.id = null;
 		});
 
 		this.updateForm();
@@ -404,29 +404,29 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				redeliveryDelay: new FormControl(flow.redeliveryDelay),
 				logLevel: new FormControl(flow.logLevel),
 				gateway: new FormControl(flow.gatewayId),
-				endpointsData: new FormArray([]),
+				stepsData: new FormArray([]),
 			});
 	}
 
-	initializeEndpointData(endpoint: Endpoint): FormGroup {
+	initializeStepData(step: Step): FormGroup {
 		return new FormGroup({
-			id: new FormControl(endpoint.id),
-      componentType: new FormControl(endpoint.componentType),
-			type: new FormControl(endpoint.endpointType),
-			route: new FormControl(endpoint.routeId),
-			service: new FormControl(endpoint.serviceId),
+			id: new FormControl(step.id),
+      componentType: new FormControl(step.componentType),
+			type: new FormControl(step.stepType),
+			route: new FormControl(step.routeId),
+			service: new FormControl(step.serviceId),
 		});
 	}
 
 	updateForm(): void {
 		this.updateFlowData(this.flow);
 
-		const endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
-		this.endpoints.forEach(
-			(endpoint, i) => {
-				this.updateEndpointData(
-					endpoint,
-					endpointsData.controls[i] as FormControl,
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		this.steps.forEach(
+			(step, i) => {
+				this.updateStepData(
+					step,
+					stepsData.controls[i] as FormControl,
 				);
 			},
 		);
@@ -447,82 +447,82 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateEndpointData(endpoint: any, endpointData: FormControl): void {
-		endpointData.patchValue({
-			id: endpoint.id,
-			endpointType: endpoint.endpointType,
-			componentType: endpoint.componentType,
-			route: endpoint.routeId,
-			service: endpoint.serviceId,
+	updateStepData(step: any, stepData: FormControl): void {
+		stepData.patchValue({
+			id: step.id,
+			stepType: step.stepType,
+			componentType: step.componentType,
+			route: step.routeId,
+			service: step.serviceId,
 		});
 	}
 
-	addEndpoint(endpoint, index): void {
+	addStep(step, index): void {
 
 		let newIndex = index + 1;
 
-		if (endpoint.responseId !== undefined) {
+		if (step.responseId !== undefined) {
 			newIndex += 1;
 		}
 
-		this.endpoints.splice(newIndex, 0, new Endpoint());
+		this.steps.splice(newIndex, 0, new Step());
 
-		if (endpoint.endpointType === "ROUTE") {
-			this.numberOfRouteEndpoints = this.numberOfRouteEndpoints + 1;
+		if (step.stepType === "ROUTE") {
+			this.numberOfRouteSteps = this.numberOfRouteSteps + 1;
 		}
 
-		const newEndpoint = this.endpoints.find((e, i) => i === newIndex);
+		const newStep = this.steps.find((e, i) => i === newIndex);
 
-		newEndpoint.endpointType = endpoint.endpointType;
-		newEndpoint.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
+		newStep.stepType = step.stepType;
+		newStep.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
 
-		(<FormArray>this.editFlowForm.controls.endpointsData).insert(
+		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,
-			this.initializeEndpointData(newEndpoint),
+			this.initializeStepData(newStep),
 		);
 
 		this.active = newIndex.toString();
 	}
 
-	removeEndpoint(endpoint, index): void {
+	removeStep(step, index): void {
 
 		if (index === 0) {
   			return;
  		}
 
-		if (endpoint.endpointType === "ROUTE") {
-			this.numberOfRouteEndpoints = this.numberOfRouteEndpoints - 1;
+		if (step.stepType === "ROUTE") {
+			this.numberOfRouteSteps = this.numberOfRouteSteps - 1;
 		}
 
-		const i = this.endpoints.indexOf(endpoint);
-		this.endpoints.splice(i, 1);
+		const i = this.steps.indexOf(step);
+		this.steps.splice(i, 1);
 		this.editFlowForm.removeControl(index);
-		(<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i);
+		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
 	}
 
   // this filters services not of the correct type
-  filterServices(endpoint: any, formService: FormControl): void {
+  filterServices(step: any, formService: FormControl): void {
 
-    //this.serviceType[this.endpoints.indexOf(endpoint)] = this.servicesList.getServiceType(endpoint.componentType);
-    this.filterService[this.endpoints.indexOf(endpoint)] = this.services;
+    //this.serviceType[this.steps.indexOf(step)] = this.servicesList.getServiceType(step.componentType);
+    this.filterService[this.steps.indexOf(step)] = this.services;
 
     /*
-    this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
-      f => f.type === this.serviceType[this.endpoints.indexOf(endpoint)]
+    this.filterService[this.steps.indexOf(step)] = this.services.filter(
+      f => f.type === this.serviceType[this.steps.indexOf(step)]
     );
 
-    if (this.filterService[this.endpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
-      formService.setValue(this.filterService[this.endpoints.indexOf(endpoint)].find(fs => fs.id === endpoint.serviceId).id);
+    if (this.filterService[this.steps.indexOf(step)].length > 0 && step.serviceId) {
+      formService.setValue(this.filterService[this.steps.indexOf(step)].find(fs => fs.id === step.serviceId).id);
     }*/
   }
 
-	createOrEditRoute(endpoint, formRoute: FormControl): void {
-		endpoint.routeId = formRoute.value;
+	createOrEditRoute(step, formRoute: FormControl): void {
+		step.routeId = formRoute.value;
 
 		if (
-			typeof endpoint.routeId === "undefined" ||
-			endpoint.routeId === null ||
-			!endpoint.routeId
+			typeof step.routeId === "undefined" ||
+			step.routeId === null ||
+			!step.routeId
 		) {
 			const modalRef = this.routePopupService.open(
 				RouteDialogComponent as Component,
@@ -533,10 +533,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				(res) => {
 					res.result.then(
 						(result) => {
-							this.setRoute(endpoint, result.id, formRoute);
+							this.setRoute(step, result.id, formRoute);
 						},
 						(reason) => {
-							this.setRoute(endpoint, reason.id, formRoute);
+							this.setRoute(step, reason.id, formRoute);
 						},
 					);
 				},
@@ -544,7 +544,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		} else {
 			const modalRef = this.routePopupService.open(
 				RouteDialogComponent as Component,
-				endpoint.routeId,
+				step.routeId,
 				this.flow.type
 			);
 			modalRef.then(
@@ -552,10 +552,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					// Success
 					res.result.then(
 						(result) => {
-							this.setRoute(endpoint, result.id, formRoute);
+							this.setRoute(step, result.id, formRoute);
 						},
 						(reason) => {
-							this.setRoute(endpoint, reason.id, formRoute);
+							this.setRoute(step, reason.id, formRoute);
 						},
 					);
 				},
@@ -563,40 +563,40 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	setRoute(endpoint, id, formRoute: FormControl): void {
+	setRoute(step, id, formRoute: FormControl): void {
 		this.routeService
 			.getAllRoutes()
 			.subscribe(
 				(res) => {
 					this.routes = res.body;
 					this.routeCreated = this.routes.length > 0;
-					endpoint.routeId = id;
+					step.routeId = id;
 
 					if (formRoute.value === null) {
 						formRoute.patchValue(id);
 					}
-					endpoint = null;
+					step = null;
 				},
 				(res) => this.onError(res.body),
 			);
 	}
 
-  createOrEditService(endpoint, serviceType: string, formService: FormControl): void {
+  createOrEditService(step, serviceType: string, formService: FormControl): void {
 
-    endpoint.serviceId = formService.value;
+    step.serviceId = formService.value;
 
     let modalRef;
 
-    if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
+    if (typeof step.serviceId === 'undefined' || step.serviceId === null || !step.serviceId) {
         modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
     } else {
-        modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
+        modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, step.serviceId);
     }
 
     modalRef.then((res) => {
        res.result.then(
               result => {
-                this.setService(endpoint, result.id, formService);
+                this.setService(step, result.id, formService);
               },
               reason => {
                 console.log('createService reason: ' + reason);
@@ -610,24 +610,24 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  setService(endpoint, id, formService: FormControl): void {
+  setService(step, id, formService: FormControl): void {
     this.serviceService.getAllServices().subscribe(
       res => {
         this.services = res.body;
         this.serviceCreated = this.services.length > 0;
-        endpoint.serviceId = id;
+        step.serviceId = id;
         formService.patchValue(id);
       },
       res => this.onError(res.body)
     );
   }
 
-	handleErrorWhileCreatingFlow(flowId?: number, endpointId?: number): void {
+	handleErrorWhileCreatingFlow(flowId?: number, stepId?: number): void {
 		if (flowId !== null) {
 			this.flowService.delete(flowId);
 		}
-		if (endpointId !== null) {
-			this.endpointService.delete(endpointId);
+		if (stepId !== null) {
+			this.stepService.delete(stepId);
 		}
 		this.savingFlowFailed = true;
 		this.isSaving = false;
@@ -656,9 +656,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   updateFlow(){
 
-    this.endpoints.forEach(
-      (endpoint) => {
-        endpoint.flowId = this.flow.id;
+    this.steps.forEach(
+      (step) => {
+        step.flowId = this.flow.id;
       },
     );
 
@@ -667,25 +667,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       .subscribe(
         (flow) => {
           this.flow = flow.body;
-          const updateEndpoints = this.endpointService.updateMultiple(
-            this.endpoints,
+          const updateSteps = this.stepService.updateMultiple(
+            this.steps,
           );
 
-          updateEndpoints.subscribe(
+          updateSteps.subscribe(
             (results) => {
-              this.endpoints = results.body.concat();
+              this.steps = results.body.concat();
 
               this.updateForm();
 
-              this.endpointService
+              this.stepService
                 .findByFlowId(this.flow.id)
                 .subscribe(
                   (data) => {
-                    let endpoints = data.body;
-                    endpoints =
-                      endpoints.filter(
+                    let steps = data.body;
+                    steps =
+                      steps.filter(
                         (e) => {
-                          const s = this.endpoints.find((t) => t.id === e.id);
+                          const s = this.steps.find((t) => t.id === e.id);
                           if (typeof s === "undefined") {
                             return true;
                           } else {
@@ -694,10 +694,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                         },
                       );
 
-                    if (endpoints.length > 0) {
-                      endpoints.forEach(
+                    if (steps.length > 0) {
+                      steps.forEach(
                         (element) => {
-                          this.endpointService.delete(element.id).subscribe();
+                          this.stepService.delete(element.id).subscribe();
                         },
                       );
                     }
@@ -722,17 +722,17 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					(flowUpdated) => {
 						this.flow = flowUpdated.body;
 
-						this.endpoints.forEach(
-							(endpoint) => {
-								endpoint.flowId = this.flow.id;
+						this.steps.forEach(
+							(step) => {
+								step.flowId = this.flow.id;
 							},
 						);
 
-						this.endpointService
-							.createMultiple(this.endpoints)
+						this.stepService
+							.createMultiple(this.steps)
 							.subscribe(
 								(toRes) => {
-									this.endpoints = toRes.body;
+									this.steps = toRes.body;
 									this.updateForm();
 									this.finished = true;
 									this.savingFlowSuccess = true;
@@ -742,13 +742,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								() => {
 									this.handleErrorWhileCreatingFlow(
 										this.flow.id,
-										this.endpoint.id,
+										this.step.id,
 									);
 								},
 							);
 					},
 					() => {
-						this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+						this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
 					},
 				);
   }
@@ -765,20 +765,20 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.flow.notes = flowControls.notes.value;
 		this.flow.gatewayId = flowControls.gateway.value;
 
-		(<FormArray>flowControls.endpointsData).controls.forEach(
-			(endpoint, index) => {
-				this.setDataFromFormOnEndpoint(
-					this.endpoints[index],
-					(<FormGroup>endpoint).controls,
+		(<FormArray>flowControls.stepsData).controls.forEach(
+			(step, index) => {
+				this.setDataFromFormOnStep(
+					this.steps[index],
+					(<FormGroup>step).controls,
 				);
 			},
 		);
 	}
 
-	setDataFromFormOnEndpoint(endpoint, formEndpointData) {
-		endpoint.id = formEndpointData.id.value;
-		endpoint.routeId = formEndpointData.route.value;
-		endpoint.serviceId = formEndpointData.service.value;
+	setDataFromFormOnStep(step, formStepData) {
+		step.id = formStepData.id.value;
+		step.routeId = formStepData.route.value;
+		step.serviceId = formStepData.service.value;
 	}
 
 	setVersion(): void {
@@ -795,9 +795,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
   checkForm(){
-      this.endpoints.forEach(
-      				(endpoint: Endpoint) => {
-      					if(endpoint.routeId == null && endpoint.endpointType === EndpointType.ROUTE){
+      this.steps.forEach(
+      				(step: Step) => {
+      					if(step.routeId == null && step.stepType === StepType.ROUTE){
                     this.savingFlowFailedMessage = 'Routes cannot be empty.';
                     this.savingFlowFailed = true;
       					}

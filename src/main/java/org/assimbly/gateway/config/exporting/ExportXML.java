@@ -48,7 +48,7 @@ public class ExportXML {
 
 	private Document doc;
 
-    private Set<Endpoint> endpoints;
+    private Set<Step> steps;
 
     private Node environmentVariablesList;
 
@@ -121,11 +121,11 @@ public class ExportXML {
 		Flow flow = flowRepository.findById(id).get();
 		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
 
-		// check if endpoints are configured
-		endpoints = flow.getEndpoints();
+		// check if steps are configured
+		steps = flow.getSteps();
 
-		if (endpoints == null) {
-			throw new Exception("Set of configuration failed. Endpoint cannot be null");
+		if (steps == null) {
+			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
 		}
@@ -137,10 +137,10 @@ public class ExportXML {
 
 	public String getXMLFlowConfiguration(Flow flow) throws Exception {
 
-		endpoints = flow.getEndpoints();
+		steps = flow.getSteps();
 
-		if (endpoints == null) {
-			throw new Exception("Set of configuration failed. Endpoint cannot be null");
+		if (steps == null) {
+			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
 			setXMLFlowPropertiesFromDB(flow);
 		}
@@ -226,22 +226,22 @@ public class ExportXML {
         }
 
         // set components
-        setComponentsFromDB(endpoints);
+        setComponentsFromDB(steps);
 
-		// set endpoints
-		setEndpointsFromDB(endpoints);
+		// set steps
+		setStepsFromDB(steps);
 
 	}
 
-    public void setComponentsFromDB(Set<Endpoint> endpointsDB) throws Exception {
+    public void setComponentsFromDB(Set<Step> stepsDB) throws Exception {
 
         Set<String> componentsList = new HashSet<>();
 
 		Element components =  setElement("components", null, flow);
 
-        for (Endpoint endpointDB : endpointsDB) {
+        for (Step stepDB : stepsDB) {
 
-            String confComponentType = endpointDB.getComponentType();
+            String confComponentType = stepDB.getComponentType();
 
             if(!componentsList.contains(confComponentType)){
                 componentsList.add(confComponentType);
@@ -250,43 +250,43 @@ public class ExportXML {
         }
     }
 
-    public void setEndpointsFromDB(Set<Endpoint> endpointsDB) throws Exception {
+    public void setStepsFromDB(Set<Step> stepsDB) throws Exception {
 
-        Element endpoints = setElement("endpoints", null, flow);
+        Element steps = setElement("steps", null, flow);
 
-		for (Endpoint endpointDB : endpointsDB) {
+		for (Step stepDB : stepsDB) {
 
-			String confId = Long.toString(endpointDB.getId());
-			String flowId = Long.toString(endpointDB.getFlow().getId());
-			String confUri = endpointDB.getUri();
-            Integer confResponseId = endpointDB.getResponseId();
-            Integer confRouteId = endpointDB.getRouteId();
-			String confEndpointType = endpointDB.getEndpointType().getEndpoint();
-			String confComponentType = endpointDB.getComponentType();
-			String confOptions = endpointDB.getOptions();
-			org.assimbly.gateway.domain.Service confService = endpointDB.getService();
-			Header confHeader = endpointDB.getHeader();
+			String confId = Long.toString(stepDB.getId());
+			String flowId = Long.toString(stepDB.getFlow().getId());
+			String confUri = stepDB.getUri();
+            Integer confResponseId = stepDB.getResponseId();
+            Integer confRouteId = stepDB.getRouteId();
+			String confStepType = stepDB.getStepType().getStep();
+			String confComponentType = stepDB.getComponentType();
+			String confOptions = stepDB.getOptions();
+			org.assimbly.gateway.domain.Service confService = stepDB.getService();
+			Header confHeader = stepDB.getHeader();
 
-			Element endpoint = setElement("endpoint", null, endpoints);
+			Element step = setElement("step", null, steps);
 
-			Element id =  setElement("id", confId, endpoint);
-			Element type =  setElement("type", confEndpointType, endpoint);
+			Element id =  setElement("id", confId, step);
+			Element type =  setElement("type", confStepType, step);
 
 			if (confResponseId != null) {
-				Element resonseId =  setElement("response_id", Integer.toString(confResponseId), endpoint);
+				Element resonseId =  setElement("response_id", Integer.toString(confResponseId), step);
 			}
 
 			if (confRouteId != null) {
-				Element routeId =  setElement("route_id", Integer.toString(confRouteId), endpoint);
+				Element routeId =  setElement("route_id", Integer.toString(confRouteId), step);
 			}
 
             if(confUri!=null && !confUri.isEmpty()){
                 confUri = createUri(confUri, confComponentType, confOptions, confService);
-                Element uri =  setElement("uri", confUri, endpoint);
+                Element uri =  setElement("uri", confUri, step);
 			}
 
             if (confOptions != null && !confOptions.isEmpty()) {
-				Element options =  setElement("options", null, endpoint);
+				Element options =  setElement("options", null, step);
 
 				String[] confOptionsSplitted = confOptions.split("&");
 
@@ -300,16 +300,16 @@ public class ExportXML {
 
 			if (confService != null) {
 				String confServiceId = confService.getId().toString();
-				Element serviceId =  setElement("service_id", confServiceId, endpoint);
+				Element serviceId =  setElement("service_id", confServiceId, step);
 
-				setXMLServiceFromDB(confServiceId, confEndpointType, confService);
+				setXMLServiceFromDB(confServiceId, confStepType, confService);
 			}
 
 			if (confHeader != null) {
 				String confHeaderId = confHeader.getId().toString();
-				Element headerId =  setElement("header_id", confHeaderId, endpoint);
+				Element headerId =  setElement("header_id", confHeaderId, step);
 
-				setXMLHeaderFromDB(confHeaderId, confEndpointType, confHeader);
+				setXMLHeaderFromDB(confHeaderId, confStepType, confHeader);
 			}
 
 			if (confRouteId != null) {
@@ -317,14 +317,14 @@ public class ExportXML {
 			}
 
 			if (confResponseId != null) {
-				Element responseId =  setElement("response_id", Integer.toString(confResponseId), endpoint);
+				Element responseId =  setElement("response_id", Integer.toString(confResponseId), step);
 			}
 
         }
 
 	}
 
-    public void setXMLRouteFromDB(Integer routeid, String flowId, String endpointId) throws Exception {
+    public void setXMLRouteFromDB(Integer routeid, String flowId, String stepId) throws Exception {
 
         Long routeIdAsLong = routeid.longValue();
         String routeIdAsString = routeid.toString();

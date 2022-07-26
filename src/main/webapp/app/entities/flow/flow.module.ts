@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { SharedModule } from 'app/shared/shared.module';
-import { EndpointModule } from '../../entities/endpoint/endpoint.module';
+import { StepModule } from '../../entities/step/step.module';
 import { ServiceModule } from '../../entities/service/service.module';
 import { HeaderModule } from '../../entities/header/header.module';
 import { RouteModule } from '../../entities/route/route.module';
@@ -36,7 +36,7 @@ const ENTITY_STATES = [...flowRoute];
 @NgModule({
   imports: [
     SharedModule,
-    EndpointModule,
+    StepModule,
     ServiceModule,
     HeaderModule,
     RouteModule,

@@ -131,8 +131,8 @@ export class FlowService {
     });
   }
 
-  getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
+  getFlowStats(id: number, stepid: number, gatewayid: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${stepid}`, { observe: 'response' });
   }
 
   getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
@@ -171,7 +171,7 @@ export class FlowService {
   send(
     gatewayId: number,
     uri: string,
-    endpointId: string,
+    stepId: string,
     serviceId: string,
     serviceKeys: string,
     headerKeys: string,
@@ -180,7 +180,7 @@ export class FlowService {
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
+      stepId,
       serviceid: serviceId,
       serviceKeys,
       headerKeys,
@@ -197,7 +197,7 @@ export class FlowService {
   sendRequest(
     gatewayId: number,
     uri: string,
-    endpointId: string,
+    stepId: string,
     serviceId: string,
     serviceKeys: string,
     headerKeys: string,
@@ -205,7 +205,7 @@ export class FlowService {
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
+      stepId,
       serviceid: serviceId,
       serviceKeys,
       headerKeys,

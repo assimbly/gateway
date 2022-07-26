@@ -113,19 +113,19 @@
         <div class="card-header">
           <br/>
           <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active2" orientation="horizontal">
-            <li ngbNavItem="ENDPOINTS" novalidate>
-              <a ngbNavLink>ENDPOINTS</a>
+            <li ngbNavItem="STEPS" novalidate>
+              <a ngbNavLink>STEPS</a>
               <ng-template ngbNavContent>
                 <br/>
                 <hr/>
                 <div class="d-flex" style="min-height: 44rem;">
                   <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="vertical"
-                      formArrayName="endpointsData">
-                    <ng-container *ngFor="let endpoint of endpoints; index as index">
+                      formArrayName="stepsData">
+                    <ng-container *ngFor="let step of steps; index as index">
                       <li ngbNavItem="{{index}}"
-                          [ngStyle]="{'padding-left': (endpoint.endpointType=='RESPONSE') ? '20px' : '10px', 'text-align': 'left' }"
+                          [ngStyle]="{'padding-left': (step.stepType=='RESPONSE') ? '20px' : '10px', 'text-align': 'left' }"
                           novalidate>
-                        <a ngbNavLink>{{endpoint.endpointType}}</a>
+                        <a ngbNavLink>{{step.stepType}}</a>
                         <ng-template ngbNavContent>
 
                           <div class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
@@ -149,7 +149,7 @@
                               <div class="modal-body">
                                 <textarea class="form-control" id="field_uri" formControlName="uri"
                                           placeholder="{{uriPlaceholders[index]}}" rows="5"
-                                          [(ngModel)]="endpoint.uri"></textarea>
+                                          [(ngModel)]="step.uri"></textarea>
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -172,26 +172,26 @@
                               </div>
                               <div class="row">
                                 <div class="col-10">
-                                  <ng-select *ngIf="endpoint.endpointType==='FROM'"
+                                  <ng-select *ngIf="step.stepType==='FROM'"
                                              [ngStyle]="{'display':'inline-block', 'width':'100%'}"
                                              [items]="consumerComponentsNames" [clearable]="false"
                                              formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                  <ng-select *ngIf="endpoint.endpointType==='TO'"
+                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
+                                  <ng-select *ngIf="step.stepType==='TO'"
                                              [ngStyle]="{'display':'inline-block', 'width':'100%'}"
                                              [items]="producerComponentsNames" [clearable]="false"
                                              formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                  <ng-select *ngIf="endpoint.endpointType==='ERROR'"
+                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
+                                  <ng-select *ngIf="step.stepType==='ERROR'"
                                              [ngStyle]="{'display':'inline-block', 'width':'100%'}"
                                              [items]="producerComponentsNames" [clearable]="false"
                                              formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
-                                  <ng-select *ngIf="endpoint.endpointType==='RESPONSE'"
+                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
+                                  <ng-select *ngIf="step.stepType==='RESPONSE'"
                                              [ngStyle]="{'display':'inline-block', 'width':'100%'}"
                                              [items]="producerComponentsNames" [clearable]="false"
                                              formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(endpoint, index, $event)"></ng-select>
+                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
                                 </div>
                                 <div ngbDropdown class="col-2" placement="bottom-right">
                                   <a class="btn btn-primary"
@@ -202,12 +202,12 @@
                                   <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
                                     <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}"
                                        [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank"
-                                       title="Apache Camel online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+                                       title="Apache Camel online documentation on the component used for scheme: {{step?.componentType}}.">
                                       <span>Camel Documentation</span>
                                     </a>
                                     <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}"
                                        target="_blank"
-                                       title="Assimbly Gateway online documentation on the component used for scheme: {{endpoint?.componentType}}.">
+                                       title="Assimbly Gateway online documentation on the component used for scheme: {{step?.componentType}}.">
                                       <span>Assimbly Documentation</span>
                                     </a>
                                     <a ngbDropdownItem role="button"
@@ -218,9 +218,9 @@
                                   </div>
                                 </div>
                                 <div
-                                  *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.touched)">
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.touched)">
                                   <div
-                                    *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.errors.required"
+                                    *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors.required"
                                     class="invalid-field-message">ComponentType is required. Please select one.
                                   </div>
                                 </div>
@@ -239,7 +239,7 @@
                                 <div class="col-10">
                                   <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
                                              [ngStyle]="{'display':'inline-block', 'width':'100%'}" id="field_uri"
-                                             formControlName="uri" [(ngModel)]="endpoint.uri"
+                                             formControlName="uri" [(ngModel)]="step.uri"
                                              dropdownPosition="bottom"></ng-select>
                                 </div>
                                 <button type="button" class="col-2 btn btn-primary"
@@ -249,9 +249,9 @@
                                 </button>
                               </div>
                               <div
-                                *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.touched)">
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.touched)">
                                 <div
-                                  *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].uri.errors.required"
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors.required"
                                   class="invalid-field-message">Context path is required.
                                 </div>
                               </div>
@@ -266,13 +266,13 @@
                                     </i>
                                   </div>
                                 </div>
-                                <div class="row" *ngFor="let option of endpointsOptions[index]; index as idx" [formGroupName]="idx">
+                                <div class="row" *ngFor="let option of stepsOptions[index]; index as idx" [formGroupName]="idx">
                                   <div class="col-5">
                                     <ng-select [items]="componentOptions[index]" bindLabel="displayName"
                                                bindValue="name" [addTag]="addOptionTag" formControlName="key"
                                                [ngStyle]="{'display':'block', 'width': '250px'}"
                                                id="field_options-key-{{idx}}"
-                                               (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, endpoint)"
+                                               (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, step)"
                                                [(ngModel)]="selectedOptions[index][idx]">
                                       <ng-template ng-option-tmp let-item="item">
                                         <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip"
@@ -291,20 +291,20 @@
                                     <input type="text" class="d-inline-block form-control"
                                            style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 20px;"
                                            id="field_options-value-{{idx}}" formControlName="value"
-                                           [placeholder]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value"
+                                           [placeholder]="editFlowForm['controls'].stepsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value"
                                            data-toggle="tooltip"
                                            title="Value of the option. Click the Camel component button for documentation on valid options."/>
                                   </div>
                                   <button title="Add option" type="button"
                                           class="col-1 right-border-radius-0 btn btn-primary"
-                                          (click)="addOption(endpointsOptions[index], index)"
-                                          [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                          (click)="addOption(stepsOptions[index], index)"
+                                          [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                     <fa-icon icon="plus" style="color: white;"></fa-icon>
                                   </button>
                                   <button title="Remove option" type="button"
                                           class="col-1 left-border-radius-0 btn btn-danger"
-                                          (click)="removeOption(endpointsOptions[index], option, index)"
-                                          [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || endpointsOptions[index].length === 1">
+                                          (click)="removeOption(stepsOptions[index], option, index)"
+                                          [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || stepsOptions[index].length === 1">
                                     <fa-icon icon="times" style="color: white;"></fa-icon>
                                   </button>
                                 </div>
@@ -321,22 +321,22 @@
                                              id="field_header" dropdownPosition="top"></ng-select>
                                 </div>
                                 <button type="button"
-                                        *ngIf="headerCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value"
+                                        *ngIf="headerCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
                                         title="Edit header" class="col-2 btn btn-primary"
-                                        (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                   <span class="padding-button"><fa-icon icon="edit"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
-                                        *ngIf="headerCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].header.value"
+                                        *ngIf="headerCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
                                         class="col-2 btn btn-primary flow-header-button" title="New header"
-                                        (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                 </button>
                                 <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary"
                                         title="Create header"
-                                        (click)="createOrEditHeader(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                   <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
                                 </button>
                               </div>
@@ -352,24 +352,24 @@
                                              id="field_route" dropdownPosition="top"></ng-select>
                                 </div>
                                 <button type="button"
-                                        *ngIf="routeCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                        *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                         title="Edit route" class="col-2 btn btn-primary"
-                                        (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                   <span class="padding-button"><fa-icon icon="edit"
                                                                         style="color: white;"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
-                                        *ngIf="routeCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].route.value"
+                                        *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                         class="col-2 btn btn-primary flow-header-button"
                                         title="New route"
-                                        (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                 </button>
                                 <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary flow-header-button"
                                         title="Create route"
-                                        (click)="createOrEditRoute(endpoint, editFlowForm['controls'].endpointsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                 </button>
                               </div>
                             </div>
@@ -385,29 +385,29 @@
                                              dropdownPosition="top"></ng-select>
                                 </div>
                                 <button type="button"
-                                        *ngIf="serviceCreated && editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value"
+                                        *ngIf="serviceCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
                                         class="col-2 btn btn-primary" title="Edit service"
-                                        (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
+                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                   <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
-                                        *ngIf="serviceCreated && !editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.value"
+                                        *ngIf="serviceCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
                                         class="col-2 btn btn-primary flow-header-button" title="New service"
-                                        (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
+                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
                                 </button>
                                 <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary flow-header-button"
                                         title="Create connection"
-                                        (click)="createOrEditService(endpoint, serviceType[index], editFlowForm['controls'].endpointsData['controls'][index]['controls'].service)"
-                                        [disabled]="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.disabled">
+                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
                                 </button>
                               </div>
 
                               <div
-                                *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.touched)">
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].service.touched)">
                                 <div
-                                  *ngIf="editFlowForm['controls'].endpointsData['controls'][index]['controls'].service.errors.required"
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.errors.required"
                                   class="invalid-field-message">Service is required for this component
                                 </div>
                               </div>
@@ -417,18 +417,18 @@
                                 <div class="col-5 offset-7">
                                   <div style="position:absolute; right: 100px;">
                                     <button type="button" class="btn btn-primary ml-auto"
-                                            *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')"
-                                            (click)="addEndpoint(endpoint, index)"
-                                            [disabled]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2)"
-                                            [ngbTooltip]="(endpoint.endpointType==='FROM' && numberOfFromEndpoints > 2) ? 'Only 3 FROM type endpoints allowed' : ''"
+                                            *ngIf="step.stepType==='TO' || (step.stepType==='FROM')"
+                                            (click)="addStep(step, index)"
+                                            [disabled]="(step.stepType==='FROM' && numberOfFromSteps > 2)"
+                                            [ngbTooltip]="(step.stepType==='FROM' && numberOfFromSteps > 2) ? 'Only 3 FROM type steps allowed' : ''"
                                             placement="right">
                                       <span><fa-icon icon="pencil-alt" style="color: white;"></fa-icon></span>&nbsp;
                                       <span style="color: white;">Add</span>&nbsp;
                                     </button>
                                     <button type="button" class="btn btn-danger ml-auto"
-                                            *ngIf="endpoint.endpointType==='TO' || (endpoint.endpointType==='FROM')"
-                                            (click)="removeEndpoint(endpoint, 'endpointData'+index)"
-                                            [disabled]="!((endpoint.endpointType==='TO' && numberOfToEndpoints > 1) || (endpoint.endpointType==='FROM' && numberOfFromEndpoints > 1))">
+                                            *ngIf="step.stepType==='TO' || (step.stepType==='FROM')"
+                                            (click)="removeStep(step, 'stepData'+index)"
+                                            [disabled]="!((step.stepType==='TO' && numberOfToSteps > 1) || (step.stepType==='FROM' && numberOfFromSteps > 1))">
                                       <span><fa-icon icon="times"></fa-icon></span>&nbsp;
                                       <span>Remove</span>
                                     </button>
@@ -441,19 +441,19 @@
                                 <div class="col-6 offset-6">
                                   <div style="position:absolute; right: 100px;">
                                     <button type="button" class="btn btn-primary ml-auto"
-                                            *ngIf="(endpoint.endpointType==='TO' && endpoint.responseId==undefined)"
-                                            [disabled]="numberOfResponseEndpoints>0"
-                                            (click)="addResponseEndpoint(endpoint)">
+                                            *ngIf="(step.stepType==='TO' && step.responseId==undefined)"
+                                            [disabled]="numberOfResponseSteps>0"
+                                            (click)="addResponseStep(step)">
                                       <span><fa-icon icon="pencil-alt" style="color: white;"></fa-icon></span>&nbsp;
                                       <span
-                                        [ngbTooltip]="numberOfResponseEndpoints===0 ? '' : 'Only one Response endpoint per Flow allowed'"
-                                        placement="right" style="color: white;">Add Response Endpoint</span>
+                                        [ngbTooltip]="numberOfResponseSteps===0 ? '' : 'Only one Response step per Flow allowed'"
+                                        placement="right" style="color: white;">Add Response Step</span>
                                     </button>
                                     <button type="button" class="btn btn-danger ml-auto"
-                                            *ngIf="(endpoint.endpointType==='TO' && (endpoint.responseId!=undefined))"
-                                            (click)="removeResponseEndpoint(endpoint)">
+                                            *ngIf="(step.stepType==='TO' && (step.responseId!=undefined))"
+                                            (click)="removeResponseStep(step)">
                                       <span><fa-icon icon="times" style="color: white;"></fa-icon></span>&nbsp;
-                                      <span style="color: white;">Remove Response Endpoint</span>
+                                      <span style="color: white;">Remove Response Step</span>
                                     </button>
                                   </div>
                                 </div>

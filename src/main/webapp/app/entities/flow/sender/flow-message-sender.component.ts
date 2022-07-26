@@ -11,11 +11,11 @@ import { FlowService } from '../flow.service';
 
 import { Option, TypeLinks } from '../editor/flow-editor.component';
 
-import { Endpoint, EndpointType, IEndpoint } from 'app/shared/model/endpoint.model';
+import { Step, StepType, IStep } from 'app/shared/model/step.model';
 import { Service } from 'app/shared/model/service.model';
 import { IHeader } from 'app/shared/model/header.model';
 
-import { EndpointService } from '../../endpoint/endpoint.service';
+import { StepService } from '../../step/step.service';
 import { ServiceService } from '../../service/service.service';
 import { HeaderService } from 'app/entities/header/header.service';
 import { GatewayService } from '../../gateway/gateway.service';
@@ -44,19 +44,19 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     services: Service[];
     headers: IHeader[];
 
-    endpointsOptions: Array<Array<Option>> = [[]];
-    endpoints: IEndpoint[] = new Array<Endpoint>();
-    URIList: IEndpoint[] = new Array<Endpoint>();
+    stepsOptions: Array<Array<Option>> = [[]];
+    steps: IStep[] = new Array<Step>();
+    URIList: IStep[] = new Array<Step>();
 
-    endpoint: IEndpoint;
-    requestEndpoint: IEndpoint;
-    selectedSendEndpoint: IEndpoint;
+    step: IStep;
+    requestStep: IStep;
+    selectedSendStep: IStep;
 
     requestExchangePattern: string;
     requestNumberOfTimes: string;
     requestComponentType: string;
     requestUri: string;
-    requestEndpointId: string;
+    requestStepId: string;
     requestOptions: string;
     requestServiceId: string;
     requestHeaderId: string;
@@ -71,7 +71,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     public isCollapsed = true;
     active;
     disabled = true;
-    activeEndpoint: any;
+    activeStep: any;
 
     isSending: boolean;
     isAlert = false;
@@ -96,7 +96,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     headerCreated: boolean;
 
     namePopoverMessage: string;
-    endpointPopoverMessage: string;
+    stepPopoverMessage: string;
     exchangePatternPopoverMessage: string;
     numberOfTimesPopoverMessage: string;
 
@@ -146,7 +146,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         private eventManager: EventManager,
         private gatewayService: GatewayService,
         private flowService: FlowService,
-        private endpointService: EndpointService,
+        private stepService: StepService,
         private serviceService: ServiceService,
         private headerService: HeaderService,
         private alertService: AlertService,
@@ -179,13 +179,13 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             this.flowService.getCamelDocUrl(),
             this.serviceService.getAllServices(),
             this.headerService.getAllHeaders(),
-            this.endpointService.query()
-        ).subscribe(([wikiDocUrl, camelDocUrl, services, headers, endpoints]) => {
+            this.stepService.query()
+        ).subscribe(([wikiDocUrl, camelDocUrl, services, headers, steps]) => {
             this.wikiDocUrl = wikiDocUrl.body;
 
             this.camelDocUrl = camelDocUrl.body;
 
-            this.endpoints = endpoints.body;
+            this.steps = steps.body;
 
             this.services = services.body;
             this.serviceCreated = this.services.length > 0;
@@ -198,27 +198,27 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             this.messageSenderForm.controls.exchangepattern.setValue('FireAndForget');
             this.messageSenderForm.controls.templatefilter.setValue('ALL');
 
-            this.requestEndpoint = new Endpoint();
-            this.requestEndpoint.endpointType = EndpointType.TO;
-            this.requestEndpoint.componentType = 'file';
+            this.requestStep = new Step();
+            this.requestStep.stepType = StepType.TO;
+            this.requestStep.componentType = 'file';
             this.requestComponentType = 'file';
 
-            (<FormArray>this.messageSenderForm.controls.endpointsData).push(this.initializeEndpointData(this.requestEndpoint));
+            (<FormArray>this.messageSenderForm.controls.stepsData).push(this.initializeStepData(this.requestStep));
 
-            this.endpointsOptions[0] = [new Option()];
+            this.stepsOptions[0] = [new Option()];
 
-            this.setTypeLinks(this.requestEndpoint, 0);
+            this.setTypeLinks(this.requestStep, 0);
 
             this.finished = true;
         });
     }
 
     // this filters services not of the correct type
-    filterServices(endpoint: any, formService: FormControl) {
-        this.serviceType[0] = this.servicesList.getServiceType(endpoint.componentType);
+    filterServices(step: any, formService: FormControl) {
+        this.serviceType[0] = this.servicesList.getServiceType(step.componentType);
         this.filterService[0] = this.services.filter(f => f.type === this.serviceType[0]);
-        if (this.filterService[0].length > 0 && endpoint.serviceId) {
-            formService.setValue(this.filterService[0].find(fs => fs.id === endpoint.serviceId).id);
+        if (this.filterService[0].length > 0 && step.serviceId) {
+            formService.setValue(this.filterService[0].find(fs => fs.id === step.serviceId).id);
         }
     }
 
@@ -238,14 +238,14 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.consumerComponentsNames.sort();
     }
 
-    setTypeLinks(endpoint: any, endpointFormIndex?, e?: Event) {
-        const endpointForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.endpointsData).controls[endpointFormIndex];
+    setTypeLinks(step: any, stepFormIndex?, e?: Event) {
+        const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[stepFormIndex];
 
         if (typeof e !== 'undefined') {
-            endpoint.componentType = e;
-            this.requestComponentType = endpoint.componentType;
+            step.componentType = e;
+            this.requestComponentType = step.componentType;
         } else {
-            endpoint.componentType = 'file';
+            step.componentType = 'file';
             this.requestComponentType = 'file';
         }
 
@@ -254,22 +254,22 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         let componentType;
         let camelComponentType;
 
-        componentType = endpoint.componentType.toLowerCase();
+        componentType = step.componentType.toLowerCase();
 
         camelComponentType = this.components.getCamelComponentType(componentType);
 
-        type = this.components.types.find(x => x.name === endpoint.componentType.toString());
+        type = this.components.types.find(x => x.name === step.componentType.toString());
         camelType = this.components.types.find(x => x.name === camelComponentType.toUpperCase());
 
-        endpointForm.controls.componentType.patchValue(endpoint.componentType);
-        endpointForm.controls.service.setValue('');
-        this.filterServices(endpoint, endpointForm.controls.service as FormControl);
+        stepForm.controls.componentType.patchValue(step.componentType);
+        stepForm.controls.service.setValue('');
+        this.filterServices(step, stepForm.controls.service as FormControl);
 
-        this.componentTypeAssimblyLinks[endpointFormIndex] = this.wikiDocUrl + '/component-' + componentType;
-        this.componentTypeCamelLinks[endpointFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
+        this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
 
-        this.uriPlaceholders[endpointFormIndex] = type.syntax;
-        this.uriPopoverMessages[endpointFormIndex] = type.description;
+        this.uriPlaceholders[stepFormIndex] = type.syntax;
+        this.uriPopoverMessages[stepFormIndex] = type.description;
 
         // set options keys
         this.getComponentOptions(camelComponentType).subscribe(data => {
@@ -281,14 +281,14 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             });
         });
 
-        this.enableFields(endpointForm);
+        this.enableFields(stepForm);
 
         this.setURIlist();
     }
 
     setPopoverMessages() {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
-        this.endpointPopoverMessage = `The uris that can be selected in the request`;
+        this.stepPopoverMessage = `The uris that can be selected in the request`;
         this.exchangePatternPopoverMessage = `Fire and Forget (InOnly) or Request and Reply (InOut)`;
         this.numberOfTimesPopoverMessage = `Number of messages send (1 by default). This setting is only for FireAndForget pattern`;
         this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
@@ -303,35 +303,35 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
     }
 
-    enableFields(endpointForm) {
-        const componentHasService = this.servicesList.getServiceType(endpointForm.controls.componentType.value);
+    enableFields(stepForm) {
+        const componentHasService = this.servicesList.getServiceType(stepForm.controls.componentType.value);
 
-        if (endpointForm.controls.componentType.value === 'wastebin') {
-            endpointForm.controls.uri.disable();
-            endpointForm.controls.options.disable();
-            endpointForm.controls.service.disable();
-            endpointForm.controls.header.disable();
+        if (stepForm.controls.componentType.value === 'wastebin') {
+            stepForm.controls.uri.disable();
+            stepForm.controls.options.disable();
+            stepForm.controls.service.disable();
+            stepForm.controls.header.disable();
         } else if (componentHasService) {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.header.enable();
-            endpointForm.controls.service.enable();
+            stepForm.controls.uri.enable();
+            stepForm.controls.options.enable();
+            stepForm.controls.header.enable();
+            stepForm.controls.service.enable();
         } else {
-            endpointForm.controls.uri.enable();
-            endpointForm.controls.options.enable();
-            endpointForm.controls.header.enable();
-            endpointForm.controls.service.disable();
+            stepForm.controls.uri.enable();
+            stepForm.controls.options.enable();
+            stepForm.controls.header.enable();
+            stepForm.controls.service.disable();
         }
     }
 
     setURIlist() {
         this.URIList = [];
 
-        const tEndpointsUnique = this.endpoints.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
+        const tStepsUnique = this.steps.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
-        tEndpointsUnique.forEach((endpoint, i) => {
-            if (this.requestComponentType === endpoint.componentType.toLowerCase()) {
-                this.URIList.push(endpoint);
+        tStepsUnique.forEach((step, i) => {
+            if (this.requestComponentType === step.componentType.toLowerCase()) {
+                this.URIList.push(step);
             }
         });
     }
@@ -343,19 +343,19 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             templatefilter: new FormControl('from'),
             exchangepattern: new FormControl('FireAndForget'),
             numberoftimes: new FormControl('1'),
-            endpointsData: new FormArray([]),
+            stepsData: new FormArray([]),
 			responsebody: new FormControl('')
         });
     }
 
-    initializeEndpointData(endpoint: Endpoint): FormGroup {
+    initializeStepData(step: Step): FormGroup {
         return new FormGroup({
-            id: new FormControl(endpoint.id),
-            componentType: new FormControl(endpoint.componentType, Validators.required),
-            uri: new FormControl(endpoint.uri),
+            id: new FormControl(step.id),
+            componentType: new FormControl(step.componentType, Validators.required),
+            uri: new FormControl(step.uri),
             options: new FormArray([this.initializeOption()]),
-            header: new FormControl(endpoint.headerId),
-            service: new FormControl(endpoint.serviceId, Validators.required),
+            header: new FormControl(step.headerId),
+            service: new FormControl(step.serviceId, Validators.required),
             requestbody: new FormControl('')
         });
     }
@@ -378,9 +378,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     updateForm() {
         this.updateTemplateData();
-        const endpointsData = this.messageSenderForm.controls.endpointsData as FormArray;
-        this.endpoints.forEach((endpoint, i) => {
-            this.updateEndpointData(endpoint, endpointsData.controls[i] as FormControl);
+        const stepsData = this.messageSenderForm.controls.stepsData as FormArray;
+        this.steps.forEach((step, i) => {
+            this.updateStepData(step, stepsData.controls[i] as FormControl);
         });
     }
 
@@ -392,14 +392,14 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    updateEndpointData(endpoint: any, endpointData: FormControl) {
-        endpointData.patchValue({
-            id: endpoint.id,
-            endpointType: endpoint.endpointType,
-            componentType: endpoint.componentType,
-            uri: endpoint.uri,
-            service: endpoint.serviceId,
-            header: endpoint.headerId
+    updateStepData(step: any, stepData: FormControl) {
+        stepData.patchValue({
+            id: step.id,
+            stepType: step.stepType,
+            componentType: step.componentType,
+            uri: step.uri,
+            service: step.serviceId,
+            header: step.headerId
         });
     }
 
@@ -411,18 +411,18 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         );
     }
 
-    getOptions(endpoint: any, endpointForm: any, endpointOptions: Array<Option>) {
-        if (!endpoint.options) {
-            endpoint.options = '';
+    getOptions(step: any, stepForm: any, stepOptions: Array<Option>) {
+        if (!step.options) {
+            step.options = '';
         }
 
-        const options = endpoint.options.split('&');
+        const options = step.options.split('&');
 
         options.forEach((option, index) => {
             const o = new Option();
 
-            if (typeof endpointForm.controls.options.controls[index] === 'undefined') {
-                endpointForm.controls.options.push(this.initializeOption());
+            if (typeof stepForm.controls.options.controls[index] === 'undefined') {
+                stepForm.controls.options.push(this.initializeOption());
             }
 
             if (option.includes('=')) {
@@ -436,26 +436,26 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                 o.value = null;
             }
 
-            endpointForm.controls.options.controls[index].patchValue({
+            stepForm.controls.options.controls[index].patchValue({
                 key: o.key,
                 value: o.value
             });
 
-            endpointOptions.push(o);
+            stepOptions.push(o);
         });
     }
 
     setOptions() {
-        this.endpoints.forEach((endpoint, i) => {
-            endpoint.options = '';
-            this.setEndpointOptions(this.endpointsOptions[i], endpoint, this.selectOptions(i));
+        this.steps.forEach((step, i) => {
+            step.options = '';
+            this.setStepOptions(this.stepsOptions[i], step, this.selectOptions(i));
         });
     }
 
-    setEndpointOptions(endpointOptions: Array<Option>, endpoint, formOptions: FormArray) {
+    setStepOptions(stepOptions: Array<Option>, step, formOptions: FormArray) {
         let index = 0;
 
-        endpointOptions.forEach((option, i) => {
+        stepOptions.forEach((option, i) => {
             option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
             option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
 
@@ -467,18 +467,18 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                 index++;
             }
 
-            console.log('setEndpointOptions');
+            console.log('setStepOptions');
         });
     }
 
-    addOption(options: Array<Option>, endpointIndex) {
-        this.selectOptions(endpointIndex).push(this.initializeOption());
+    addOption(options: Array<Option>, stepIndex) {
+        this.selectOptions(stepIndex).push(this.initializeOption());
         options.push(new Option());
     }
 
-    removeOption(options: Array<Option>, option: Option, endpointIndex) {
+    removeOption(options: Array<Option>, option: Option, stepIndex) {
         const index = options.indexOf(option);
-        const formOptions = this.selectOptions(endpointIndex);
+        const formOptions = this.selectOptions(stepIndex);
         formOptions.removeAt(index);
         options.splice(index, 1);
     }
@@ -495,17 +495,17 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         option.controls.value.updateValueAndValidity();
     }
 
-    selectOptions(endpointIndex): FormArray {
-        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[endpointIndex];
-        return <FormArray>(<FormGroup>endpointData).controls.options;
+    selectOptions(stepIndex): FormArray {
+        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[stepIndex];
+        return <FormArray>(<FormGroup>stepData).controls.options;
     }
 
     changeOptionSelection(selectedOption, index, optionIndex) {
         const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
         const defaultValue = componentOption[0].defaultValue;
 
-        const endpointData = (<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
-        const formOptions = <FormArray>(<FormGroup>endpointData).controls.options;
+        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
+        const formOptions = <FormArray>(<FormGroup>stepData).controls.options;
 
         if (defaultValue) {
             (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
@@ -555,76 +555,76 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.load());
     }
 
-    createOrEditHeader(endpoint, formHeader: FormControl) {
-        endpoint.headerId = formHeader.value;
+    createOrEditHeader(step, formHeader: FormControl) {
+        step.headerId = formHeader.value;
 
-        if (endpoint.headerId === null || typeof endpoint.headerId === 'undefined' || !endpoint.headerId) {
+        if (step.headerId === null || typeof step.headerId === 'undefined' || !step.headerId) {
             const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component);
             modalRef.then(res => {
                 res.result.then(
                     result => {
-                        this.setHeader(endpoint, result.id, formHeader);
+                        this.setHeader(step, result.id, formHeader);
                     },
                     reason => {
-                        this.setHeader(endpoint, reason.id, formHeader);
+                        this.setHeader(step, reason.id, formHeader);
                     }
                 );
             });
         } else {
-            const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component, endpoint.headerId);
+            const modalRef = this.headerPopupService.open(HeaderDialogComponent as Component, step.headerId);
             modalRef.then(res => {
                 // Success
                 res.result.then(
                     result => {
-                        this.setHeader(endpoint, result.id, formHeader);
+                        this.setHeader(step, result.id, formHeader);
                     },
                     reason => {
-                        this.setHeader(endpoint, reason.id, formHeader);
+                        this.setHeader(step, reason.id, formHeader);
                     }
                 );
             });
         }
     }
 
-    createOrEditService(endpoint, serviceType: string, formService: FormControl) {
-        endpoint.serviceId = formService.value;
+    createOrEditService(step, serviceType: string, formService: FormControl) {
+        step.serviceId = formService.value;
 
-        if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
+        if (typeof step.serviceId === 'undefined' || step.serviceId === null || !step.serviceId) {
             const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
             modalRef.then(res => {
                 // Success
                 res.componentInstance.serviceType = serviceType;
                 res.result.then(
                     result => {
-                        this.setService(endpoint, result.id, formService);
+                        this.setService(step, result.id, formService);
                     },
                     reason => {
-                        this.setService(endpoint, reason.id, formService);
+                        this.setService(step, reason.id, formService);
                     }
                 );
             });
         } else {
-            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
+            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, step.serviceId);
             modalRef.then(res => {
                 res.componentInstance.serviceType = serviceType;
                 res.result.then(
                     result => {
-                        this.setService(endpoint, result.id, formService);
+                        this.setService(step, result.id, formService);
                     },
                     reason => {
-                        this.setService(endpoint, reason.id, formService);
+                        this.setService(step, reason.id, formService);
                     }
                 );
             });
         }
     }
 
-    setHeader(endpoint, id, formHeader: FormControl) {
+    setHeader(step, id, formHeader: FormControl) {
         this.headerService.getAllHeaders().subscribe(
             res => {
                 this.headers = res.body;
                 this.headerCreated = this.headers.length > 0;
-                this.requestEndpoint.headerId = id;
+                this.requestStep.headerId = id;
 
                 if (formHeader.value === null) {
                     formHeader.patchValue(id);
@@ -634,25 +634,25 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         );
     }
 
-    setService(endpoint, id, formService: FormControl) {
+    setService(step, id, formService: FormControl) {
         this.serviceService.getAllServices().subscribe(
             res => {
                 this.services = res.body;
                 this.serviceCreated = this.services.length > 0;
-                this.requestEndpoint.serviceId = id;
+                this.requestStep.serviceId = id;
                 formService.patchValue(id);
-                this.filterServices(endpoint, formService);
+                this.filterServices(step, formService);
             },
             res => this.onError(res.body)
         );
     }
 
-    handleErrorWhileCreatingFlow(flowId?: number, endpointId?: number) {
+    handleErrorWhileCreatingFlow(flowId?: number, stepId?: number) {
         if (flowId !== null) {
             this.flowService.delete(flowId);
         }
-        if (endpointId !== null) {
-            this.endpointService.delete(endpointId);
+        if (stepId !== null) {
+            this.stepService.delete(stepId);
         }
         this.savingFlowFailed = true;
         this.isSaving = false;
@@ -715,7 +715,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                 .send(
                     1,
                     this.requestUri,
-                    this.requestEndpointId,
+                    this.requestStepId,
                     this.requestServiceId,
                     requestServiceKeys,
                     requestHeaderKeys,
@@ -735,7 +735,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                 .sendRequest(
                     1,
                     this.requestUri,
-                    this.requestEndpointId,
+                    this.requestStepId,
                     this.requestServiceId,
                     requestServiceKeys,
                     requestHeaderKeys,
@@ -753,20 +753,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setRequest() {
-        const endpointForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.endpointsData).controls[0];
+        const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
 
         this.requestExchangePattern = this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
             this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        this.requestComponentType = endpointForm.controls.componentType.value;
+        this.requestComponentType = stepForm.controls.componentType.value;
         this.requestOptions = '?';
-        this.requestUri = this.requestEndpoint.uri;
-        this.requestEndpointId = this.requestEndpoint.id == null ? '0' : this.requestEndpoint.id.toString();
-        this.requestHeaderId = endpointForm.controls.header.value == null ? '' : endpointForm.controls.header.value.toString();
-        this.requestServiceId = endpointForm.controls.service.value == null ? '' : endpointForm.controls.service.value.toString();
-        this.requestBody = endpointForm.controls.requestbody.value == null ? '0' : endpointForm.controls.requestbody.value.toString();
+        this.requestUri = this.requestStep.uri;
+        this.requestStepId = this.requestStep.id == null ? '0' : this.requestStep.id.toString();
+        this.requestHeaderId = stepForm.controls.header.value == null ? '' : stepForm.controls.header.value.toString();
+        this.requestServiceId = stepForm.controls.service.value == null ? '' : stepForm.controls.service.value.toString();
+        this.requestBody = stepForm.controls.requestbody.value == null ? '0' : stepForm.controls.requestbody.value.toString();
 
-        this.setEndpointOptions(this.endpointsOptions[0], this.requestEndpoint, this.selectOptions(0));
+        this.setStepOptions(this.stepsOptions[0], this.requestStep, this.selectOptions(0));
 
         if (this.requestOptions.length < 2) {
             this.requestUri = [this.requestComponentType.toLowerCase(), '://', this.requestUri].join('');
@@ -779,7 +779,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 		this.alertService.addAlert({
 		  type: 'success',
 		  message: 'Send successfully',
-		});  
+		});
         setTimeout(() => {
             this.isSending = false;
         }, 1000);
@@ -797,7 +797,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 		this.alertService.addAlert({
 		  type: 'danger',
 		  message: 'Send failed',
-		});  
+		});
         this.responseBody = body;
         this.active = '1';
     }
@@ -814,30 +814,30 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     setValidationForm() {
         const flowControls = this.messageSenderForm.controls;
 
-        (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
-            this.setValidationOnEndpoint(this.endpoints[index], (<FormGroup>endpoint).controls);
+        (<FormArray>flowControls.stepsData).controls.forEach((step, index) => {
+            this.setValidationOnStep(this.steps[index], (<FormGroup>step).controls);
         });
     }
 
-    setValidationOnEndpoint(endpoint, formEndpointData) {
-        formEndpointData.uri.setValidators([Validators.required]);
-        formEndpointData.uri.updateValueAndValidity();
+    setValidationOnStep(step, formStepData) {
+        formStepData.uri.setValidators([Validators.required]);
+        formStepData.uri.updateValueAndValidity();
     }
 
     setDataFromForm() {
         const flowControls = this.messageSenderForm.controls;
 
-        (<FormArray>flowControls.endpointsData).controls.forEach((endpoint, index) => {
-            this.setDataFromFormOnEndpoint(this.endpoints[index], (<FormGroup>endpoint).controls);
+        (<FormArray>flowControls.stepsData).controls.forEach((step, index) => {
+            this.setDataFromFormOnStep(this.steps[index], (<FormGroup>step).controls);
         });
     }
 
-    setDataFromFormOnEndpoint(endpoint, formEndpointData) {
-        endpoint.id = formEndpointData.id.value;
-        endpoint.componentType = formEndpointData.componentType.value;
-        endpoint.uri = formEndpointData.uri.value;
-        endpoint.serviceId = formEndpointData.service.value;
-        endpoint.headerId = formEndpointData.header.value;
+    setDataFromFormOnStep(step, formStepData) {
+        step.id = formStepData.id.value;
+        step.componentType = formStepData.componentType.value;
+        step.uri = formStepData.uri.value;
+        step.serviceId = formStepData.service.value;
+        step.headerId = formStepData.header.value;
     }
 
     setVersion() {
@@ -861,31 +861,31 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         window.history.back();
     }
 
-    setInvalidUriMessage(endpointName: string) {
-        this.invalidUriMessage = `Uri for ${endpointName} is not valid.`;
+    setInvalidUriMessage(stepName: string) {
+        this.invalidUriMessage = `Uri for ${stepName} is not valid.`;
         setTimeout(() => {
             this.invalidUriMessage = '';
         }, 15000);
     }
 
-    formatUri(endpointOptions, endpoint, formEndpoint): string {
-        if (formEndpoint.controls.componentType.value === null) {
+    formatUri(stepOptions, step, formStep): string {
+        if (formStep.controls.componentType.value === null) {
             return '';
         } else {
-            const formOptions = <FormArray>formEndpoint.controls.options;
-            this.setEndpointOptions(endpointOptions, endpoint, formOptions);
-            return `${formEndpoint.controls.componentType.value.toLowerCase()}`;
+            const formOptions = <FormArray>formStep.controls.options;
+            this.setStepOptions(stepOptions, step, formOptions);
+            return `${formStep.controls.componentType.value.toLowerCase()}`;
         }
     }
 
-    validateTypeAndUri(endpoint: FormGroup) {
-        endpoint.controls.componentType.markAsTouched();
-        endpoint.controls.uri.markAsTouched();
+    validateTypeAndUri(step: FormGroup) {
+        step.controls.componentType.markAsTouched();
+        step.controls.uri.markAsTouched();
     }
 
-    markAsUntouchedTypeAndUri(endpoint: FormGroup) {
-        endpoint.controls.componentType.markAsUntouched();
-        endpoint.controls.uri.markAsUntouched();
+    markAsUntouchedTypeAndUri(step: FormGroup) {
+        step.controls.componentType.markAsUntouched();
+        step.controls.uri.markAsUntouched();
     }
 
     setEditorMode(str: string) {
@@ -938,6 +938,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.alertService.addAlert({
 		  type: 'danger',
 		  message: error.message,
-		});  
+		});
     }
 }

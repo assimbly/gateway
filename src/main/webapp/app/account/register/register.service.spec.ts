@@ -25,7 +25,7 @@ describe('RegisterService Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call register endpoint with correct values', () => {
+    it('should call register step with correct values', () => {
       // GIVEN
       const login = 'abc';
       const email = 'test@test.com';

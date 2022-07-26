@@ -40,48 +40,48 @@
   <!--
     <ngb-tabset>
 
-        <ngb-tab title="Endpoint ({{endpointIndex+1}})" id="endpointTab{{endpointIndex}}" *ngFor="let endpoint of endpoints; index as endpointIndex">
+        <ngb-tab title="Step ({{stepIndex+1}})" id="stepTab{{stepIndex}}" *ngFor="let step of steps; index as stepIndex">
             <ng-template ngbTabContent>
                 <jhi-alert-error></jhi-alert-error>
                 <div row id="tabBackground">
                     <table class="table table-sm">
-                        <tbody *ngIf="!!endpoint">
+                        <tbody *ngIf="!!step">
                             <tr>
                                 <th class="detailsTable">ID</th>
                                 <td class="detailsTable">
-                                    <a [routerLink]="['/endpoint', endpoint.id]">{{endpoint.id}}</a>
+                                    <a [routerLink]="['/step', step.id]">{{step.id}}</a>
                                 </td>
                             </tr>
                             <tr>
                                 <th>ComponentType</th>
                                 <td>
-                                    {{endpoint.componentType}}
+                                    {{step.componentType}}
                                     <span class="float-right">
-                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{componentTypeAssimblyLinks[endpointIndex]}}" target="_blank" title="Assimbly {{endpoint?.componentType}} component documentation"><span class="fa fa-question"></span></a>
-                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm flow-assimbly-button" href="{{componentTypeCamelLinks[endpointIndex]}}" target="_blank" title="Camel {{endpoint?.componentType}} component documentation">
+                                        <a role="button" class="btn btn-primary p-question-button btn-sm" href="{{componentTypeAssimblyLinks[stepIndex]}}" target="_blank" title="Assimbly {{step?.componentType}} component documentation"><span class="fa fa-question"></span></a>
+                                        <a role="button" class="btn btn-outline-secondary camel-link btn-sm flow-assimbly-button" href="{{componentTypeCamelLinks[stepIndex]}}" target="_blank" title="Camel {{step?.componentType}} component documentation">
                                         </a>
                                     </span>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Uri</th>
-                                <td>{{endpoint.uri}}</td>
+                                <td>{{step.uri}}</td>
                             </tr>
                             <tr>
                                 <th>Options</th>
-                                <td>{{endpoint.options}}</td>
+                                <td>{{step.options}}</td>
                             </tr>
                             <tr [style.display]="'none'">
                                 <th>Flow</th>
-                                <td>{{endpoint.flowId}}</td>
+                                <td>{{step.flowId}}</td>
                             </tr>
                             <tr>
                                 <th>Service</th>
-                                <td>{{endpoint.serviceId}}</td>
+                                <td>{{step.serviceId}}</td>
                             </tr>
                             <tr>
                                 <th class="lastItemBorder">Header</th>
-                                <td class="lastItemBorder">{{endpoint.headerId}}</td>
+                                <td class="lastItemBorder">{{step.headerId}}</td>
                             </tr>
                         </tbody>
                     </table>

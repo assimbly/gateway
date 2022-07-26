@@ -3,8 +3,8 @@ import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
-import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
-import { EndpointService } from '../endpoint/endpoint.service';
+import { Step, StepType } from 'app/shared/model/step.model';
+import { StepService } from '../step/step.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { NavigationEnd, Router } from '@angular/router';
@@ -33,11 +33,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   @Input() flow: Flow;
 
-  endpoints: Array<Endpoint> = [new Endpoint()];
-  fromEndpoint: Array<Endpoint> = [];
-  toEndpoints: Array<Endpoint> = [];
-  errorEndpoint: Endpoint = new Endpoint();
-  responseEndpoints: Array<Endpoint> = [];
+  steps: Array<Step> = [new Step()];
+  fromStep: Array<Step> = [];
+  toSteps: Array<Step> = [];
+  errorStep: Step = new Step();
+  responseSteps: Array<Step> = [];
 
   public isFlowStarted: boolean;
   public isFlowRestarted: boolean;
@@ -62,17 +62,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   public numberOfAlerts: any;
   public showNumberOfItems: number;
 
-  fromEndpointTooltips: Array<string> = [];
-  toEndpointsTooltips: Array<string> = [];
-  errorEndpointTooltip: string;
-  responseEndpointTooltips: Array<string> = [];
+  fromStepTooltips: Array<string> = [];
+  toStepsTooltips: Array<string> = [];
+  errorStepTooltip: string;
+  responseStepTooltips: Array<string> = [];
   public statusFlow: Status;
   public previousState: string;
   public p = false;
   lastError: string;
 
   flowRowID: string;
-  flowRowErrorEndpointID: string;
+  flowRowErrorStepID: string;
 
   statsTableRows: Array<string> = [];
 
@@ -99,7 +99,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   constructor(
     private flowService: FlowService,
-    private endpointService: EndpointService,
+    private stepService: StepService,
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
@@ -121,8 +121,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.setFlowStatusDefaults();
     this.getStatus(this.flow.id);
-    this.endpoints = this.flow.endpoints;
-    this.getEndpoints();
+    this.steps = this.flow.steps;
+    this.getSteps();
 
     this.registerTriggeredAction();
 
@@ -347,8 +347,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToEndpointEditor(mode: string, editorType: string, endpoint: Endpoint) {
-    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, endpointid: endpoint.id }]);
+  navigateToStepEditor(mode: string, editorType: string, step: Step) {
+    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, stepid: step.id }]);
   }
 
   exportFlow(){
@@ -394,10 +394,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatistic = ``;
     this.statsTableRows = [];
 
-    for (const endpoint of flow.endpoints) {
-      if (endpoint.endpointType === EndpointType.FROM || endpoint.endpointType === EndpointType.ROUTE) {
-        this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
-          this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
+    for (const step of flow.steps) {
+      if (step.stepType === StepType.FROM || step.stepType === StepType.ROUTE) {
+        this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
+          this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
       }
     }
@@ -509,7 +509,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			<table class="table">
 			  <tbody>
                  <tr>
-                    <th scope="row">Endpoint</th>
+                    <th scope="row">Step</th>
                     ${this.statsTableRows[0]}
                 </tr>
 			    <tr>
@@ -558,20 +558,20 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
   }
 
-  getEndpoints() {
-    this.endpoints.forEach(endpoint => {
-      if (endpoint.endpointType.valueOf() === 'FROM') {
-        this.fromEndpoint.push(endpoint);
-        this.fromEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-      } else if (endpoint.endpointType.valueOf() === 'TO') {
-        this.toEndpoints.push(endpoint);
-        this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-      } else if (endpoint.endpointType.valueOf() === 'ERROR') {
-        this.errorEndpoint = endpoint;
-        this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
-      } else if (endpoint.endpointType.valueOf() === 'RESPONSE') {
-        this.responseEndpoints.push(endpoint);
-        this.responseEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+  getSteps() {
+    this.steps.forEach(step => {
+      if (step.stepType.valueOf() === 'FROM') {
+        this.fromStep.push(step);
+        this.fromStepTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
+      } else if (step.stepType.valueOf() === 'TO') {
+        this.toSteps.push(step);
+        this.toStepsTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
+      } else if (step.stepType.valueOf() === 'ERROR') {
+        this.errorStep = step;
+        this.errorStepTooltip = this.stepTooltip(step.componentType, step.uri, step.options);
+      } else if (step.stepType.valueOf() === 'RESPONSE') {
+        this.responseSteps.push(step);
+        this.responseStepTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
       }
     });
   }
@@ -626,7 +626,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     return this.sslUrl;
   }
 
-  endpointTooltip(type, uri, options): string {
+  stepTooltip(type, uri, options): string {
     if (type === null) {
       return '';
     } else {
