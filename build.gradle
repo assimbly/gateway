@@ -276,7 +276,7 @@ configurations {
                     details.useVersion("5.17.1")
                 }
                 if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.78.Final")
+                    details.useVersion("4.1.79.Final")
                 }
             }
         }
