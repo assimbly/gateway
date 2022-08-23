@@ -14,11 +14,11 @@
                                  referencedColumnNames="id"
                                  referencedTableName="flow"/>
 
-        <addForeignKeyConstraint baseColumnNames="service_id"
+        <addForeignKeyConstraint baseColumnNames="connection_id"
                                  baseTableName="step"
-                                 constraintName="fk_step_service_id"
+                                 constraintName="fk_step_connection_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="service"/>
+                                 referencedTableName="connection"/>
 
         <addForeignKeyConstraint baseColumnNames="header_id"
                                  baseTableName="step"

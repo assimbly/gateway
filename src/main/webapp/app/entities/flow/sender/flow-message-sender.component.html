@@ -10,8 +10,8 @@
     <ng-template #headerPopover let-message="message">
       <div [innerHtml]="headerPopoverMessage"></div>
     </ng-template>
-    <ng-template #servicePopover let-message="message">
-      <div [innerHtml]="servicePopoverMessage"></div>
+    <ng-template #connectionPopover let-message="message">
+      <div [innerHtml]="connectionPopoverMessage"></div>
     </ng-template>
     <ng-template #popover let-message="message">
       <div [innerHtml]="popoverMessage"></div>
@@ -413,27 +413,27 @@
                     </div>
                   </div>
 
-                  <div class="border-bottom my-3"><h5>Service</h5></div>
+                  <div class="border-bottom my-3"><h5>Connection</h5></div>
                   <div class="form-group">
                     <div class="input-group">
                       <ng-select
-                        [items]="filterService[0]"
+                        [items]="filterConnection[0]"
                         bindLabel="name"
                         bindValue="id"
-                        formControlName="service"
-                        id="field_service"
+                        formControlName="connection"
+                        id="field_connection"
                         dropdownPosition="top"
                       ></ng-select>
                       <button
                         type="button"
-                        *ngIf="serviceCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.value"
+                        *ngIf="connectionCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
                         class="col-2 btn btn-primary left-border-radius-0"
-                        title="Edit service"
+                        title="Edit connection"
                         (click)="
-                          createOrEditService(
+                          createOrEditConnection(
                             requestStep,
-                            serviceType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].service
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
                           )
                         "
                         [disabled]="
@@ -444,28 +444,28 @@
                       </button>
                       <button
                         type="button"
-                        *ngIf="serviceCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.value"
+                        *ngIf="connectionCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
                         class="col-2 btn btn-primary left-border-radius-0 flow-header-button"
-                        title="New service"
+                        title="New connection"
                         (click)="
-                          createOrEditService(
+                          createOrEditConnection(
                             requestStep,
-                            serviceType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].service
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
                           )
                         "
-                        [disabled]="messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.disabled"
+                        [disabled]="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.disabled"
                       ></button>
                       <button
                         type="button"
-                        *ngIf="!serviceCreated"
+                        *ngIf="!connectionCreated"
                         class="col-2 btn btn-primary left-border-radius-0"
-                        title="Create service"
+                        title="Create connection"
                         (click)="
-                          createOrEditService(
+                          createOrEditConnection(
                             requestStep,
-                            serviceType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].service
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
                           )
                         "
                         [disabled]="
@@ -478,16 +478,16 @@
                   </div>
                   <div
                     *ngIf="
-                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.errors &&
-                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.dirty ||
-                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.touched)
+                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors &&
+                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.dirty ||
+                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.touched)
                     "
                   >
                     <div
-                      *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].service.errors.required"
+                      *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors.required"
                       class="invalid-field-message"
                     >
-                      Service is required for this component
+                      Connection is required for this component
                     </div>
                   </div>
 

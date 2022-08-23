@@ -121,26 +121,26 @@
                           </div>
                           <div class="row">
                             <div class="col-10">
-                              <ng-select [items]="services" bindLabel="name" bindValue="id"
-                                         formControlName="service" id="field_service"
+                              <ng-select [items]="connections" bindLabel="name" bindValue="id"
+                                         formControlName="connection" id="field_connection"
                                          dropdownPosition="top"></ng-select>
                             </div>
                             <button type="button"
-                                    *ngIf="serviceCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
-                                    class="col-2 btn btn-primary" title="Edit service"
-                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)">
+                                    *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                    class="col-2 btn btn-primary" title="Edit connection"
+                                    (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)">
                               <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
                             <button type="button"
-                                    *ngIf="serviceCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
-                                    class="col-2 btn btn-primary flow-header-button" title="New service"
-                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
-                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
+                                    *ngIf="connectionCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                    class="col-2 btn btn-primary flow-header-button" title="New connection"
+                                    (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
                             </button>
-                            <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary flow-header-button"
+                            <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-header-button"
                                     title="Create connection"
-                                    (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
-                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
+                                    (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                    [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
                             </button>
                           </div>
                           <br/>

@@ -49,8 +49,8 @@ public class Step implements Serializable {
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "serviceId")
-    private Service service;
+    @JoinColumn(name = "connectionId")
+    private Connection connection;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "headerId")
@@ -156,17 +156,17 @@ public class Step implements Serializable {
         this.flow = flow;
     }
 
-    public Service getService() {
-        return service;
+    public Connection getConnection() {
+        return connection;
     }
 
-    public Step service(Service service) {
-        this.service = service;
+    public Step connection(Connection connection) {
+        this.connection = connection;
         return this;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     public Header getHeader() {

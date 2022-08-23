@@ -10,8 +10,8 @@
     <ng-template #headerPopover let-message="message">
       <div [innerHtml]="headerPopoverMessage"></div>
     </ng-template>
-    <ng-template #servicePopover let-message="message">
-      <div [innerHtml]="servicePopoverMessage"></div>
+    <ng-template #connectionPopover let-message="message">
+      <div [innerHtml]="connectionPopoverMessage"></div>
     </ng-template>
     <ng-template #popover let-message="message">
       <div [innerHtml]="popoverMessage"></div>
@@ -377,40 +377,40 @@
 
                             <div class="form-group container">
                               <div class="row">
-                                <div class="border-bottom my-3"><h5>Service</h5></div>
+                                <div class="border-bottom my-3"><h5>Connection</h5></div>
                               </div>
                               <div class="row">
                                 <div class="col-10">
-                                  <ng-select [items]="filterService[index]" bindLabel="name" bindValue="id"
-                                             formControlName="service" id="field_service"
+                                  <ng-select [items]="filterConnection[index]" bindLabel="name" bindValue="id"
+                                             formControlName="connection" id="field_connection"
                                              dropdownPosition="top"></ng-select>
                                 </div>
                                 <button type="button"
-                                        *ngIf="serviceCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
-                                        class="col-2 btn btn-primary" title="Edit service"
-                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
+                                        *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                        class="col-2 btn btn-primary" title="Edit connection"
+                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
                                         [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
                                   <span class="padding-button"><fa-icon icon="edit"
                                                                         style="color: white;"></fa-icon></span>&nbsp;
                                 </button>
                                 <button type="button"
-                                        *ngIf="serviceCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].service.value"
-                                        class="col-2 btn btn-primary flow-header-button" title="New service"
-                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
+                                        *ngIf="connectionCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                        class="col-2 btn btn-primary flow-header-button" title="New connection"
+                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
                                 </button>
-                                <button type="button" *ngIf="!serviceCreated" class="col-2 btn btn-primary flow-header-button"
-                                        title="Create service"
-                                        (click)="createOrEditService(step, serviceType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].service)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.disabled">
+                                <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-header-button"
+                                        title="Create connection"
+                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
                                 </button>
                               </div>
 
                               <div
-                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].service.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].service.touched)">
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.touched)">
                                 <div
-                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].service.errors.required"
-                                  class="invalid-field-message">Service is required for this component
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.errors.required"
+                                  class="invalid-field-message">Connection is required for this component
                                 </div>
                               </div>
                               <br/>

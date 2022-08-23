@@ -43,10 +43,10 @@
                     <a [routerLink]="['/route', step.routeId, 'view']">{{step.routeId}}</a>
                   </div>
                 </dd>
-                <dt><span>Service ID</span></dt>
+                <dt><span>Connection ID</span></dt>
                 <dd>
-                  <div *ngIf="step.serviceId">
-                    <a [routerLink]="['/service', step.serviceId, 'view']">{{step.serviceId}}</a>
+                  <div *ngIf="step.connectionId">
+                    <a [routerLink]="['/connection', step.connectionId, 'view']">{{step.connectionId}}</a>
                   </div>
                 </dd>
             </dl>

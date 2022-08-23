@@ -25,7 +25,7 @@ public class StepDTO implements Serializable {
 
     private Long flowId;
 
-    private Long serviceId;
+    private Long connectionId;
 
     private Long headerId;
 
@@ -93,12 +93,12 @@ public class StepDTO implements Serializable {
         this.flowId = flowId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Long getConnectionId() {
+        return connectionId;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setConnectionId(Long connectionId) {
+        this.connectionId = connectionId;
     }
 
     public Long getHeaderId() {
@@ -140,7 +140,7 @@ public class StepDTO implements Serializable {
             ", options='" + getOptions() + "'" +
             ", responseId=" + getResponseId() +
             ", flow=" + getFlowId() +
-            ", service=" + getServiceId() +
+            ", connection=" + getConnectionId() +
             ", header=" + getHeaderId() +
             "}";
     }

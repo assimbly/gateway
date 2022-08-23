@@ -36,7 +36,7 @@ public class ImportXMLFlows {
     private HeaderRepository headerRepository;
 
     @Autowired
-    private ServiceRepository serviceRepository;
+    private ConnectionRepository connectionRepository;
 
     public String xmlConfiguration;
     public String configuration;
@@ -230,7 +230,7 @@ public class ImportXMLFlows {
 		String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
-		String serviceId = xPath.evaluate(stepXPath + "service_id", doc);
+		String connectionId = xPath.evaluate(stepXPath + "connection_id", doc);
 		String headerId = xPath.evaluate(stepXPath + "header_id", doc);
         String responseIdAsString = xPath.evaluate(stepXPath + "response_id", doc);
         String routeIdAsString = xPath.evaluate(stepXPath + "route_id", doc);
@@ -268,23 +268,23 @@ public class ImportXMLFlows {
 
 		}
 
-		// get service if configured
-		org.assimbly.gateway.domain.Service service;
+		// get connection if configured
+		Connection connection;
 		try {
 
-            Long serviceIdLong = Long.parseLong(serviceId, 10);
+            Long connectionIdLong = Long.parseLong(connectionId, 10);
 
-            String serviceName = xPath.evaluate("/integrations/integration/services/service[id=" + serviceIdLong + "]/name",doc);
+            String connectionName = xPath.evaluate("/integrations/integration/connections/connection[id=" + connectionIdLong + "]/name",doc);
 
-            Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+            Optional<Connection>connectionOptional = connectionRepository.findByName(connectionName);
 
-			if(serviceOptional.isPresent()) {
-                service = serviceOptional.get();
+			if(connectionOptional.isPresent()) {
+                connection = connectionOptional.get();
             }else {
-                service = null;
+                connection = null;
 			}
 		} catch (NumberFormatException nfe) {
-			service = null;
+			connection = null;
 		}
 
 		// get header if configured
@@ -327,8 +327,8 @@ public class ImportXMLFlows {
 		step.setFlow(flow);
 		step.setOptions(options);
 
-		if (service != null) {
-			step.setService(service);
+		if (connection != null) {
+			step.setConnection(connection);
 		}
 		if (header != null) {
 			step.setHeader(header);

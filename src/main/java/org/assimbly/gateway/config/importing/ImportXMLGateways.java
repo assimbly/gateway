@@ -40,7 +40,7 @@ public class ImportXMLGateways {
     private ImportXMLRoutes importXMLRoutes;
 
     @Autowired
-    private ImportXMLServices importXMLServices;
+    private ImportXMLConnections importXMLConnections;
 
     @Autowired
     private ImportXMLEnvironmentVariables importXMLEnvironmentVariables;
@@ -113,7 +113,7 @@ public class ImportXMLGateways {
 
             importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
-            importXMLServices.setServicesFromXML(doc);
+            importXMLConnections.setConnectionsFromXML(doc);
 
             importXMLFlows.setFlowsFromXML(doc, integrationId);
 
