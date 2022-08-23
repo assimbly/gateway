@@ -8,16 +8,16 @@ import { HeaderDialogComponent } from 'app/entities/header/header-dialog.compone
 import { HeaderPopupService } from 'app/entities/header/header-popup.service';
 import { RouteDialogComponent } from 'app/entities/route/route-dialog.component';
 import { RoutePopupService } from 'app/entities/route/route-popup.service';
-import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
-import { ServicePopupService } from 'app/entities/service/service-popup.service';
+import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
+import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Components } from 'app/shared/camel/component-type';
-import { Services } from 'app/shared/camel/service-connections';
+import { Connections } from 'app/shared/camel/connections';
 import { Step, StepType, IStep } from 'app/shared/model/step.model';
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { Gateway } from 'app/shared/model/gateway.model';
 import { IHeader } from 'app/shared/model/header.model';
 import { Route } from 'app/shared/model/route.model';
-import { Service } from 'app/shared/model/service.model';
+import { Connection } from 'app/shared/model/connection.model';
 import dayjs from 'dayjs/esm';
 import { forkJoin, from, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -25,7 +25,7 @@ import { StepService } from '../../step/step.service';
 import { GatewayService } from '../../gateway/gateway.service';
 import { HeaderService } from '../../header/header.service';
 import { RouteService } from '../../route/route.service';
-import { ServiceService } from '../../service/service.service';
+import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from '../flow.service';
 
 
@@ -38,7 +38,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
   flow: IFlow;
   headers: IHeader[];
   routes: Route[];
-  services: Service[];
+  connections: Connection[];
 
   stepsOptions: Array<Array<Option>> = [[]];
   URIList: Array<Array<Step>> = [[]];
@@ -86,7 +86,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
 
   headerCreated: boolean;
   routeCreated: boolean;
-  serviceCreated: boolean;
+  connectionCreated: boolean;
 
   namePopoverMessage: string;
   notesPopoverMessage: string;
@@ -101,7 +101,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
   optionsPopoverMessage: string;
   headerPopoverMessage: string;
   routePopoverMessage: string;
-  servicePopoverMessage: string;
+  connectionPopoverMessage: string;
   popoverMessage: string;
 
   selectedComponentType: string;
@@ -132,9 +132,9 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
   portPopoverMessage: string;
   timeoutPopoverMessage: string;
 
-  filterService: Array<Array<Service>> = [[]];
-  serviceType: Array<string> = [];
-  selectedService: Service = new Service();
+  filterConnection: Array<Array<Connection>> = [[]];
+  connectionType: Array<string> = [];
+  selectedConnection: Connection = new Connection();
   closeResult: string;
 
   numberOfFromSteps = 0;
@@ -157,16 +157,16 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     private stepService: StepService,
     private headerService: HeaderService,
     private routeService: RouteService,
-    private serviceService: ServiceService,
+    private connectionService: ConnectionService,
     private alertService: AlertService,
     private route: ActivatedRoute,
     private router: Router,
-    public servicesList: Services,
+    public connectionsList: Connections,
     public components: Components,
     private modalService: NgbModal,
     private headerPopupService: HeaderPopupService,
     private routePopupService: RoutePopupService,
-    private servicePopupService: ServicePopupService
+    private connectionPopupService: ConnectionPopupService
   ) {}
 
   ngOnInit(): void {
@@ -198,11 +198,11 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
       this.flowService.getCamelDocUrl(),
       this.headerService.getAllHeaders(),
       this.routeService.getAllRoutes(),
-      this.serviceService.getAllServices(),
+      this.connectionService.getAllConnections(),
       this.gatewayService.query(),
       this.stepService.query(),
       this.flowService.getGatewayName(),
-    ]).subscribe(([wikiDocUrl, camelDocUrl, headers, routes, services, gateways, allsteps, gatewayName]) => {
+    ]).subscribe(([wikiDocUrl, camelDocUrl, headers, routes, connections, gateways, allsteps, gatewayName]) => {
       this.wikiDocUrl = wikiDocUrl.body;
 
       this.camelDocUrl = camelDocUrl.body;
@@ -213,8 +213,8 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
       this.routes = routes.body;
       this.routeCreated = this.routes.length > 0;
 
-      this.services = services.body;
-      this.serviceCreated = this.services.length > 0;
+      this.connections = connections.body;
+      this.connectionCreated = this.connections.length > 0;
 
       this.gateways = gateways.body;
       this.singleGateway = this.gateways.length === 1;
@@ -281,7 +281,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
                     step.options,
                     step.responseId,
                     step.flowId,
-                    step.serviceId,
+                    step.connectionId,
                     step.headerId,
                     step.routeId
                   );
@@ -463,15 +463,15 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     }, 16);
   }
 
-  // this filters services not of the correct type
-  filterServices(step: any, formService: FormControl): void {
-    this.serviceType[this.steps.indexOf(step)] = this.servicesList.getServiceType(step.componentType);
-    this.filterService[this.steps.indexOf(step)] = this.services.filter(
-      f => f.type === this.serviceType[this.steps.indexOf(step)]
+  // this filters connections not of the correct type
+  filterConnections(step: any, formService: FormControl): void {
+    this.connectionType[this.steps.indexOf(step)] = this.connectionsList.getConnectionType(step.componentType);
+    this.filterConnection[this.steps.indexOf(step)] = this.connections.filter(
+      f => f.type === this.connectionType[this.steps.indexOf(step)]
     );
 
-    if (this.filterService[this.steps.indexOf(step)].length > 0 && step.serviceId) {
-      formService.setValue(this.filterService[this.steps.indexOf(step)].find(fs => fs.id === step.serviceId).id);
+    if (this.filterConnection[this.steps.indexOf(step)].length > 0 && step.connectionId) {
+      formService.setValue(this.filterConnection[this.steps.indexOf(step)].find(fs => fs.id === step.connectionId).id);
     }
   }
 
@@ -484,7 +484,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
       step.uri = null;
       step.headerId = '';
       step.routeId = '';
-      step.serviceId = '';
+      step.connectionId = '';
 
       let i;
       const numberOfOptions = this.stepsOptions[stepFormIndex].length - 1;
@@ -499,8 +499,8 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
         value: null,
       });
       stepForm.controls.header.patchValue(step.headerId);
-      stepForm.controls.service.patchValue(step.routeId);
-      stepForm.controls.service.patchValue(step.serviceId);
+      stepForm.controls.connection.patchValue(step.routeId);
+      stepForm.controls.connection.patchValue(step.connectionId);
     } else if (!step.componentType) {
       step.componentType = 'file';
     }
@@ -513,7 +513,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     const type = this.components.types.find(component => component.name === componentType);
     const camelType = this.components.types.find(component => component.name === camelComponentType);
 
-    this.filterServices(step, stepForm.controls.service as FormControl);
+    this.filterConnections(step, stepForm.controls.connection as FormControl);
 
     this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
     this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
@@ -555,8 +555,8 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     this.optionsPopoverMessage = ``;
     this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
-    this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
-                                     Use the button on the right to create or edit services.`;
+    this.connectionPopoverMessage = `If available then a connection can be selected. For example a datanase connection that sets up a connection.<br/><br/>
+                                     Use the button on the right to create or edit connections.`;
     this.popoverMessage = `Destination`;
     this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
     this.portPopoverMessage = `Number of the port. Range between 1 and 65536`;
@@ -583,26 +583,26 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
   }
 
   enableFields(stepForm): void {
-    const componentHasService = this.servicesList.getServiceType(stepForm.controls.componentType.value);
+    const componentHasConnection = this.connectionsList.getConnectionType(stepForm.controls.componentType.value);
 
     if (stepForm.controls.componentType.value === 'wastebin') {
       stepForm.controls.uri.disable();
       stepForm.controls.options.disable();
       stepForm.controls.header.disable();
       stepForm.controls.route.disable();
-      stepForm.controls.service.disable();
-    } else if (componentHasService) {
+      stepForm.controls.connection.disable();
+    } else if (componentHasConnection) {
       stepForm.controls.uri.enable();
       stepForm.controls.options.enable();
       stepForm.controls.header.enable();
       stepForm.controls.route.enable();
-      stepForm.controls.service.enable();
+      stepForm.controls.connection.enable();
     } else {
       stepForm.controls.uri.enable();
       stepForm.controls.options.enable();
       stepForm.controls.header.enable();
       stepForm.controls.route.enable();
-      stepForm.controls.service.disable();
+      stepForm.controls.connection.disable();
     }
   }
 
@@ -630,7 +630,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
       options: new FormArray([this.initializeOption()]),
       header: new FormControl(step.headerId),
       route: new FormControl(step.routeId),
-      service: new FormControl(step.serviceId, Validators.required),
+      connection: new FormControl(step.connectionId, Validators.required),
     });
   }
 
@@ -682,7 +682,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
       uri: step.uri,
       header: step.headerId,
       route: step.routeId,
-      service: step.serviceId,
+      connection: step.connectionId,
       responseId: step.responseId,
     });
   }
@@ -1081,33 +1081,33 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     }
   }
 
-  createOrEditService(step, serviceType: string, formService: FormControl): void {
-    step.serviceId = formService.value;
+  createOrEditConnection(step, connection: string, formService: FormControl): void {
+    step.connectionId = formService.value;
 
-    if (typeof step.serviceId === 'undefined' || step.serviceId === null || !step.serviceId) {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
+    if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
+      const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
       modalRef.then(res => {
         // Success
-        res.componentInstance.serviceType = serviceType;
+        res.componentInstance.connection = connection;
         res.result.then(
           result => {
-            this.setService(step, result.id, formService);
+            this.setConnection(step, result.id, formService);
           },
           reason => {
-            this.setService(step, reason.id, formService);
+            this.setConnection(step, reason.id, formService);
           }
         );
       });
     } else {
-      const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, step.serviceId);
+      const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
       modalRef.then(res => {
-        res.componentInstance.serviceType = serviceType;
+        res.componentInstance.connection = connection;
         res.result.then(
           result => {
-            this.setService(step, result.id, formService);
+            this.setConnection(step, result.id, formService);
           },
           reason => {
-            // this.setService(step, reason.id, formService);
+            // this.setConnection(step, reason.id, formService);
           }
         );
       });
@@ -1146,14 +1146,14 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     );
   }
 
-  setService(step, id, formService: FormControl): void {
-    this.serviceService.getAllServices().subscribe(
+  setConnection(step, id, formService: FormControl): void {
+    this.connectionService.getAllConnections().subscribe(
       res => {
-        this.services = res.body;
-        this.serviceCreated = this.services.length > 0;
-        step.serviceId = id;
+        this.connections = res.body;
+        this.connectionCreated = this.connections.length > 0;
+        step.connectionId = id;
         formService.patchValue(id);
-        this.filterServices(step, formService);
+        this.filterConnections(step, formService);
       },
       res => this.onError(res.body)
     );
@@ -1307,7 +1307,7 @@ export class FlowEditorApiComponent implements OnInit, OnDestroy {
     step.uri = formStepData.uri.value;
     step.headerId = formStepData.header.value;
     step.routeId = formStepData.route.value;
-    step.serviceId = formStepData.service.value;
+    step.connectionId = formStepData.connection.value;
   }
 
   setVersion(): void {

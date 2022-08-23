@@ -7,8 +7,8 @@ import { IStep } from 'app/shared/model/step.model';
 import { StepService } from './step.service';
 import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow/flow.service';
-import { IService } from 'app/shared/model/service.model';
-import { ServiceService } from 'app/entities/service/service.service';
+import { IConnection } from 'app/shared/model/connection.model';
+import { ConnectionService } from 'app/entities/connection/connection.service';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from 'app/entities/header/header.service';
 
@@ -22,7 +22,7 @@ export class StepUpdateComponent implements OnInit {
 
     flows: IFlow[];
 
-    services: IService[];
+    connections: IConnection[];
 
     headers: IHeader[];
 
@@ -30,7 +30,7 @@ export class StepUpdateComponent implements OnInit {
         protected alertService: AlertService,
         protected stepService: StepService,
         protected flowService: FlowService,
-        protected serviceService: ServiceService,
+        protected connectionService: ConnectionService,
         protected headerService: HeaderService,
         protected activatedRoute: ActivatedRoute
     ) {}
@@ -46,14 +46,14 @@ export class StepUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.serviceService.query({ filter: 'step-is-null' }).subscribe(
-            (res: HttpResponse<IService[]>) => {
-                if (!this.step.serviceId) {
-                    this.services = res.body;
+        this.connectionService.query({ filter: 'step-is-null' }).subscribe(
+            (res: HttpResponse<IConnection[]>) => {
+                if (!this.step.connectionId) {
+                    this.connections = res.body;
                 } else {
-                    this.serviceService.find(this.step.serviceId).subscribe(
-                        (subRes: HttpResponse<IService>) => {
-                            this.services = [subRes.body].concat(res.body);
+                    this.connectionService.find(this.step.connectionId).subscribe(
+                        (subRes: HttpResponse<IConnection>) => {
+                            this.connections = [subRes.body].concat(res.body);
                         },
                         (subRes: HttpErrorResponse) => this.onError(subRes.message)
                     );
@@ -118,7 +118,7 @@ export class StepUpdateComponent implements OnInit {
         return item.id;
     }
 
-    trackServiceById(index: number, item: IService) {
+    trackConnectionById(index: number, item: IConnection) {
         return item.id;
     }
 

@@ -40,7 +40,7 @@
             <column name="route_id" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="service_id" type="bigint">
+            <column name="connection_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->

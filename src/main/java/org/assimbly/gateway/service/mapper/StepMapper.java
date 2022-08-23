@@ -8,15 +8,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Step and its DTO StepDTO.
  */
-@Mapper(componentModel = "spring", uses = {ServiceMapper.class, HeaderMapper.class, FlowMapper.class})
+@Mapper(componentModel = "spring", uses = {ConnectionMapper.class, HeaderMapper.class, FlowMapper.class})
 public interface StepMapper extends EntityMapper<StepDTO, Step> {
 
-	@Mapping(source = "service.id", target = "serviceId")
+	@Mapping(source = "connection.id", target = "connectionId")
 	@Mapping(source = "header.id", target = "headerId")
 	@Mapping(source = "flow.id", target = "flowId")
     StepDTO toDto(Step step);
 
-	@Mapping(source = "serviceId", target = "service")
+	@Mapping(source = "connectionId", target = "connection")
 	@Mapping(source = "headerId", target = "header")
 	@Mapping(source = "flowId", target = "flow")
     Step toEntity(StepDTO stepDTO);

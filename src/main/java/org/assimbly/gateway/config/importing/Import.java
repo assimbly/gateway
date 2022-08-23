@@ -23,7 +23,7 @@ public class Import {
     private ImportXMLRoutes importXMLRoutes;
 
     @Autowired
-    private ImportXMLServices importXMLServices;
+    private ImportXMLConnections importXMLConnections;
 
 	// imports gateway configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
@@ -57,7 +57,7 @@ public class Import {
 
         importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
-		importXMLServices.setServicesFromXML(doc);
+		importXMLConnections.setConnectionsFromXML(doc);
 
 		importXMLFlows.setFlowFromXML(doc, gatewayId, id.toString(), id);
 

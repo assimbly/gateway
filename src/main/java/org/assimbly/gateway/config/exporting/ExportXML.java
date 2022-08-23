@@ -44,7 +44,6 @@ public class ExportXML {
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	private String xmlConfiguration;
-    private String configuration;
 
 	private Document doc;
 
@@ -52,9 +51,8 @@ public class ExportXML {
 
     private Node environmentVariablesList;
 
-    private Element integrations;
     private Element flows;
-	private Element services;
+	private Element connections;
 	private Element headers;
     private Element routes;
     private Element routeConfigurations;
@@ -65,7 +63,7 @@ public class ExportXML {
     private String flowTypeAsString;
 	private String flowNameAsString;
 
-    private List<String> servicesList;
+    private List<String> connectionsList;
 	private List<String> headersList;
     private List<String> routesList;
 
@@ -132,6 +130,12 @@ public class ExportXML {
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
 
+        System.out.println("");
+        System.out.println("xmlConfiguration: " + xmlConfiguration);
+        System.out.println("");
+
+        xmlConfiguration = StringUtils.substringBeforeLast(xmlConfiguration,"</dil>") + "</dil>";
+
 		return xmlConfiguration;
 	}
 
@@ -162,31 +166,36 @@ public class ExportXML {
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		doc = docBuilder.newDocument();
 
-		integrations = doc.createElement("integrations");
-		doc.appendChild(integrations);
+        Element dil = doc.createElement("dil");
+        doc.appendChild(dil);
 
-		Element version = setElement("version", applicationProperties.getInfo().getVersion(), integrations);
+        Element version = setElement("version", applicationProperties.getInfo().getVersion(), dil);
+        Element integrations = setElement("integrations", null, dil);
+        Element core = setElement("core", null, dil);
 
 		Element integration = setElement("integration", null, integrations);
 
 		Element id = setElement("id", integrationId, integration);
 		Element name = setElement("name", gateway.getName(), integration);
 		Element type = setElement("type", gateway.getType().toString(), integration);
-		Element environmentName = setElement("type", gateway.getEnvironmentName(), integration);
-		Element stage = setElement("stage", gateway.getStage().toString(), integration);
 
-		Element defaultFromComponentType = setElement("defaultFromComponentType", gateway.getDefaultFromComponentType(), integration);
-		Element defaultToComponentType = setElement("defaultToComponentType", gateway.getDefaultToComponentType(), integration);
-		Element defaultErrorComponentType = setElement("defaultErrorComponentType", gateway.getDefaultErrorComponentType(), integration);
+        Element options =  setElement("options", null, integration);
+
+		Element environmentName = setElement("environment", gateway.getEnvironmentName(), options);
+		Element stage = setElement("stage", gateway.getStage().toString(), options);
+
+		Element defaultFromComponentType = setElement("defaultFromComponentType", gateway.getDefaultFromComponentType(), options);
+		Element defaultToComponentType = setElement("defaultToComponentType", gateway.getDefaultToComponentType(), options);
+		Element defaultErrorComponentType = setElement("defaultErrorComponentType", gateway.getDefaultErrorComponentType(), options);
 
 		flows = setElement("flows", null, integration);
-		services = setElement("services", null, integration);
+		connections = setElement("connections", null, integration);
 		headers = setElement("headers", null, integration);
         routes = setElement("routes", null, integration);
         routeConfigurations = setElement("routeConfigurations", null, integration);
 		environmentVariablesList = setElement("environmentVariables", null, integration);
 
-		servicesList = new ArrayList<String>();
+		connectionsList = new ArrayList<String>();
 		headersList = new ArrayList<String>();
 		routesList = new  ArrayList<String>();
 
@@ -202,12 +211,12 @@ public class ExportXML {
 		Element id =  setElement("id", flowDB.getId().toString(), flow);
 		Element name =  setElement("name", flowDB.getName(), flow);
 		Element type =  setElement("type", flowDB.getType(), flow);
-		Element version =  setElement("version", flowDB.getVersion().toString(), flow);
-		Element created =  setElement("created", flowDB.getCreated().toString(), flow);
-		Element lastModified =  setElement("lastModified", flowDB.getLastModified().toString(), flow);
+        Element version =  setElement("version", flowDB.getVersion().toString(), flow);
 
-		//settings
-		Element autostart= setElement("autostart", flowDB.isAutoStart().toString(), flow);
+		//options
+        Element created =  setElement("created", flowDB.getCreated().toString(), flow);
+        Element lastModified =  setElement("lastModified", flowDB.getLastModified().toString(), flow);
+        Element autostart= setElement("autostart", flowDB.isAutoStart().toString(), flow);
         Element isAssimblyHeaders = setElement("assimblyHeaders", flowDB.isAssimblyHeaders().toString(), flow);
         Element isParallelProcessing = setElement("parallelProcessing", flowDB.isParallelProcessing().toString(), flow);
 		Element maximumRedeliveries =  setElement("maximumRedeliveries", Integer.toString(flowDB.getMaximumRedeliveries()), flow);
@@ -264,7 +273,7 @@ public class ExportXML {
 			String confStepType = stepDB.getStepType().getStep();
 			String confComponentType = stepDB.getComponentType();
 			String confOptions = stepDB.getOptions();
-			org.assimbly.gateway.domain.Service confService = stepDB.getService();
+			Connection confConnection = stepDB.getConnection();
 			Header confHeader = stepDB.getHeader();
 
 			Element step = setElement("step", null, steps);
@@ -281,7 +290,7 @@ public class ExportXML {
 			}
 
             if(confUri!=null && !confUri.isEmpty()){
-                confUri = createUri(confUri, confComponentType, confOptions, confService);
+                confUri = createUri(confUri, confComponentType, confOptions, confConnection);
                 Element uri =  setElement("uri", confUri, step);
 			}
 
@@ -298,11 +307,11 @@ public class ExportXML {
 				}
 			}
 
-			if (confService != null) {
-				String confServiceId = confService.getId().toString();
-				Element serviceId =  setElement("service_id", confServiceId, step);
+			if (confConnection != null) {
+				String confConnectionId = confConnection.getId().toString();
+				Element connectionId =  setElement("connection_id", confConnectionId, step);
 
-				setXMLServiceFromDB(confServiceId, confStepType, confService);
+				setXMLConnectionFromDB(confConnectionId, confStepType, confConnection);
 			}
 
 			if (confHeader != null) {
@@ -358,30 +367,30 @@ public class ExportXML {
         }
     }
 
-	public void setXMLServiceFromDB(String serviceid, String type, org.assimbly.gateway.domain.Service serviceDB) throws Exception {
+	public void setXMLConnectionFromDB(String connectionid, String type, Connection connectionDB) throws Exception {
 
-		if (!servicesList.contains(serviceid)) {
+		if (!connectionsList.contains(connectionid)) {
 
-			servicesList.add(serviceid);
+            connectionsList.add(connectionid);
 
-			Element service =  setElement("service", null, services);
+			Element connection =  setElement("connection", null, connections);
 
-			Element id =  setElement("id", serviceDB.getId().toString(), service);
+			Element id =  setElement("id", connectionDB.getId().toString(), connection);
 
-			Element name =  setElement("name", serviceDB.getName(), service);
+			Element name =  setElement("name", connectionDB.getName(), connection);
 
-			Element serviceType =  setElement("type", serviceDB.getType(), service);
+			Element connectionType =  setElement("type", connectionDB.getType(), connection);
 
-			Element keys =  setElement("keys", null, service);
+			Element keys =  setElement("keys", null, connection);
 
-			Set<ServiceKeys> serviceKeys = serviceDB.getServiceKeys();
+			Set<ConnectionKeys> connectionKeys = connectionDB.getConnectionKeys();
 
-			for (ServiceKeys serviceKey : serviceKeys) {
+			for (ConnectionKeys connectionKey : connectionKeys) {
 
-				String parameterName = serviceKey.getKey();
-				String parameterValue = serviceKey.getValue();
+				String parameterName = connectionKey.getKey();
+				String parameterValue = connectionKey.getValue();
 
-				Element serviceParameter =  setElement(parameterName, parameterValue, keys);
+				Element connectionParameter =  setElement(parameterName, parameterValue, keys);
 
 			}
 
@@ -462,18 +471,18 @@ public class ExportXML {
 
 	}
 
-	public String createUri(String confUri, String confComponentType, String confOptions, org.assimbly.gateway.domain.Service confService) throws Exception {
+	public String createUri(String confUri, String confComponentType, String confOptions, Connection confConnection) throws Exception {
 
 		componentType = confComponentType.toLowerCase();
 
 		componentType = setDefaultComponentType(componentType);
 
 		if (componentType.equals("sql")) {
-			String confServiceId = confService.getId().toString();
+			String confConnectionId = confConnection.getId().toString();
 			if (confOptions.isEmpty() || confOptions == null) {
-				confOptions = "dataSource=" + confServiceId;
+				confOptions = "dataSource=" + confConnectionId;
 			} else if (!confOptions.contains("dataSource")) {
-				confOptions = "&dataSource=" + confServiceId;
+				confOptions = "&dataSource=" + confConnectionId;
 			}
 		}
 

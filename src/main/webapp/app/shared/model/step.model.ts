@@ -15,7 +15,7 @@ export interface IStep {
     options?: string;
     responseId?: number;
     flowId?: number;
-    serviceId?: number;
+    connectionId?: number;
     headerId?: number;
     routeId?: number;
 }
@@ -29,7 +29,7 @@ export class Step implements IStep {
         public options?: string,
         public responseId?: number,
         public flowId?: number,
-        public serviceId?: number,
+        public connectionId?: number,
         public headerId?: number,
         public routeId?: number
     ) {}

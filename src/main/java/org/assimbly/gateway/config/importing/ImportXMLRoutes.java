@@ -168,10 +168,10 @@ public class ImportXMLRoutes {
 
             routeNodes.item(0).getAttributes().getNamedItem("id").setTextContent("id" + generatedRouteId);
 
-            NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
+            NodeList routesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
 
-			for (int i = 0; i < servicesIdNodes.getLength(); i++) {
-				servicesIdNodes.item(i).setTextContent("id" + generatedRouteId);
+			for (int i = 0; i < routesIdNodes.getLength(); i++) {
+				routesIdNodes.item(i).setTextContent("id" + generatedRouteId);
 			}
 
 

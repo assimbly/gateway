@@ -4,7 +4,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { SharedModule } from 'app/shared/shared.module';
 import { StepModule } from '../../entities/step/step.module';
-import { ServiceModule } from '../../entities/service/service.module';
+import { ConnectionModule } from '../../entities/connection/connection.module';
 import { HeaderModule } from '../../entities/header/header.module';
 import { RouteModule } from '../../entities/route/route.module';
 import { MaintenanceModule } from '../../entities/maintenance/maintenance.module';
@@ -29,7 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlowService } from 'app/entities/flow/flow.service';
 
 import { Components } from 'app/shared/camel/component-type';
-import { Services } from 'app/shared/camel/service-connections';
+import { Connections } from 'app/shared/camel/connections';
 
 const ENTITY_STATES = [...flowRoute];
 
@@ -37,7 +37,7 @@ const ENTITY_STATES = [...flowRoute];
   imports: [
     SharedModule,
     StepModule,
-    ServiceModule,
+    ConnectionModule,
     HeaderModule,
     RouteModule,
     MaintenanceModule,

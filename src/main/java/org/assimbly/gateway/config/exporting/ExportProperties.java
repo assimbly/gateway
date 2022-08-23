@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.Header;
-import org.assimbly.gateway.domain.HeaderKeys;
-import org.assimbly.gateway.domain.Step;
+import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +30,7 @@ public class ExportProperties {
 
 	private Set<Step> steps;
 
-	private org.assimbly.gateway.domain.Service service;
+	private Connection connection;
 
 	private Header header;
 	public String xmlConfiguration;
@@ -106,22 +103,22 @@ public class ExportProperties {
 
 		// set from properties
 		getURIfromAssimblyDB("from");
-		getServiceFromAssimblyDB("from");
+		getConnectionFromAssimblyDB("from");
 		getHeaderFromAssimblyDB("from");
 
 		// set to properties
 		getURIfromAssimblyDB("to");
-		getServiceFromAssimblyDB("to");
+		getConnectionFromAssimblyDB("to");
 		getHeaderFromAssimblyDB("to");
 
         // set response properties
         getURIfromAssimblyDB("response");
-        getServiceFromAssimblyDB("response");
+        getConnectionFromAssimblyDB("response");
         getHeaderFromAssimblyDB("response");
 
 		// set error properties
 		getURIfromAssimblyDB("error");
-		getServiceFromAssimblyDB("error");
+		getConnectionFromAssimblyDB("error");
 		getHeaderFromAssimblyDB("error");
 
 		// set up defaults settings if null -->
@@ -177,20 +174,20 @@ public class ExportProperties {
 		properties.put(type + ".uri", uri);
 	}
 
-	public void getServiceFromAssimblyDB(String type) {
+	public void getConnectionFromAssimblyDB(String type) {
 
 		for (Step step : steps) {
-			service = step.getService();
+			connection = step.getConnection();
 		}
 
-		if (service != null) {
-			getServiceProperties(type, service);
+		if (connection != null) {
+			getConnectionProperties(type, connection);
 		}
 
 	}
 
-	public void getServiceProperties(String type, org.assimbly.gateway.domain.Service service) {
-		properties.put(type + ".service.id", service.getId().toString());
+	public void getConnectionProperties(String type, Connection connection) {
+		properties.put(type + ".connection.id", connection.getId().toString());
 	}
 
 	public void getHeaderFromAssimblyDB(String type) {

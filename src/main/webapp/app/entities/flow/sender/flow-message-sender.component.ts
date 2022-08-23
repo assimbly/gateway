@@ -12,25 +12,25 @@ import { FlowService } from '../flow.service';
 import { Option, TypeLinks } from '../editor/flow-editor.component';
 
 import { Step, StepType, IStep } from 'app/shared/model/step.model';
-import { Service } from 'app/shared/model/service.model';
+import { Connection } from 'app/shared/model/connection.model';
 import { IHeader } from 'app/shared/model/header.model';
 
 import { StepService } from '../../step/step.service';
-import { ServiceService } from '../../service/service.service';
+import { ConnectionService } from '../../connection/connection.service';
 import { HeaderService } from 'app/entities/header/header.service';
 import { GatewayService } from '../../gateway/gateway.service';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Components } from 'app/shared/camel/component-type';
-import { Services } from 'app/shared/camel/service-connections';
+import { Connections } from 'app/shared/camel/connections';
 
 import { map } from 'rxjs/operators';
 
 import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
-import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
+import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
 
 import { HeaderPopupService } from 'app/entities/header/header-popup.service';
-import { ServicePopupService } from 'app/entities/service/service-popup.service';
+import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 
 import dayjs from 'dayjs/esm';
 
@@ -41,7 +41,7 @@ import dayjs from 'dayjs/esm';
 })
 export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     flows: IFlow[];
-    services: Service[];
+    connections: Connection[];
     headers: IHeader[];
 
     stepsOptions: Array<Array<Option>> = [[]];
@@ -58,9 +58,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     requestUri: string;
     requestStepId: string;
     requestOptions: string;
-    requestServiceId: string;
+    requestConnectionId: string;
     requestHeaderId: string;
-    requestServiceKeys: string;
+    requestConnectionKeys: string;
     requestHeaderKeys: string;
     requestBody: string;
 
@@ -92,7 +92,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     queryCount: any;
     reverse: any;
     totalItems: number;
-    serviceCreated: boolean;
+    connectionCreated: boolean;
     headerCreated: boolean;
 
     namePopoverMessage: string;
@@ -103,7 +103,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     componentPopoverMessage: string;
     optionsPopoverMessage: string;
     headerPopoverMessage: string;
-    servicePopoverMessage: string;
+    connectionPopoverMessage: string;
     popoverMessage: string;
 
     selectedOption: Array<any> = [];
@@ -130,9 +130,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     portPopoverMessage: string;
     timeoutPopoverMessage: string;
 
-    filterService: Array<Array<Service>> = [[]];
-    serviceType: Array<string> = [];
-    selectedService: Service = new Service();
+    filterConnection: Array<Array<Connection>> = [[]];
+    connectionType: Array<string> = [];
+    selectedConnection: Connection = new Connection();
     closeResult: string;
 
     private subscription: Subscription;
@@ -147,16 +147,16 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         private gatewayService: GatewayService,
         private flowService: FlowService,
         private stepService: StepService,
-        private serviceService: ServiceService,
+        private connectionService: ConnectionService,
         private headerService: HeaderService,
         private alertService: AlertService,
         private route: ActivatedRoute,
         private router: Router,
         public components: Components,
-        public servicesList: Services,
+        public connectionsList: Connections,
         private modalService: NgbModal,
         private headerPopupService: HeaderPopupService,
-        private servicePopupService: ServicePopupService
+        private connectionPopupService: ConnectionPopupService
     ) {}
 
     ngOnInit() {
@@ -177,18 +177,18 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         forkJoin(
             this.flowService.getWikiDocUrl(),
             this.flowService.getCamelDocUrl(),
-            this.serviceService.getAllServices(),
+            this.connectionService.getAllConnections(),
             this.headerService.getAllHeaders(),
             this.stepService.query()
-        ).subscribe(([wikiDocUrl, camelDocUrl, services, headers, steps]) => {
+        ).subscribe(([wikiDocUrl, camelDocUrl, connections, headers, steps]) => {
             this.wikiDocUrl = wikiDocUrl.body;
 
             this.camelDocUrl = camelDocUrl.body;
 
             this.steps = steps.body;
 
-            this.services = services.body;
-            this.serviceCreated = this.services.length > 0;
+            this.connections = connections.body;
+            this.connectionCreated = this.connections.length > 0;
 
             this.headers = headers.body;
             this.headerCreated = this.headers.length > 0;
@@ -213,12 +213,12 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    // this filters services not of the correct type
-    filterServices(step: any, formService: FormControl) {
-        this.serviceType[0] = this.servicesList.getServiceType(step.componentType);
-        this.filterService[0] = this.services.filter(f => f.type === this.serviceType[0]);
-        if (this.filterService[0].length > 0 && step.serviceId) {
-            formService.setValue(this.filterService[0].find(fs => fs.id === step.serviceId).id);
+    // this filters connections not of the correct type
+    filterConnections(step: any, formService: FormControl) {
+        this.connectionType[0] = this.connectionsList.getConnectionType(step.componentType);
+        this.filterConnection[0] = this.connections.filter(f => f.type === this.connectionType[0]);
+        if (this.filterConnection[0].length > 0 && step.connectionId) {
+            formService.setValue(this.filterConnection[0].find(fs => fs.id === step.connectionId).id);
         }
     }
 
@@ -262,8 +262,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         camelType = this.components.types.find(x => x.name === camelComponentType.toUpperCase());
 
         stepForm.controls.componentType.patchValue(step.componentType);
-        stepForm.controls.service.setValue('');
-        this.filterServices(step, stepForm.controls.service as FormControl);
+        stepForm.controls.connection.setValue('');
+        this.filterConnections(step, stepForm.controls.connection as FormControl);
 
         this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
         this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
@@ -295,8 +295,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
         this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
-        this.servicePopoverMessage = `If available then a service can be selected. For example a service that sets up a connection.<br/><br/>
-                                     Use the button on the right to create or edit services.`;
+        this.connectionPopoverMessage = `If available then a connection can be selected. For example a connection that sets up a database connection.<br/><br/>
+                                     Use the button on the right to create or edit connections.`;
         this.popoverMessage = `Destination`;
         this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
         this.portPopoverMessage = `Number of the port. Range between 1 and 65536`;
@@ -304,23 +304,23 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     enableFields(stepForm) {
-        const componentHasService = this.servicesList.getServiceType(stepForm.controls.componentType.value);
+        const componentHasConnection = this.connectionsList.getConnectionType(stepForm.controls.componentType.value);
 
         if (stepForm.controls.componentType.value === 'wastebin') {
             stepForm.controls.uri.disable();
             stepForm.controls.options.disable();
-            stepForm.controls.service.disable();
+            stepForm.controls.connection.disable();
             stepForm.controls.header.disable();
-        } else if (componentHasService) {
+        } else if (componentHasConnection) {
             stepForm.controls.uri.enable();
             stepForm.controls.options.enable();
             stepForm.controls.header.enable();
-            stepForm.controls.service.enable();
+            stepForm.controls.connection.enable();
         } else {
             stepForm.controls.uri.enable();
             stepForm.controls.options.enable();
             stepForm.controls.header.enable();
-            stepForm.controls.service.disable();
+            stepForm.controls.connection.disable();
         }
     }
 
@@ -355,7 +355,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             uri: new FormControl(step.uri),
             options: new FormArray([this.initializeOption()]),
             header: new FormControl(step.headerId),
-            service: new FormControl(step.serviceId, Validators.required),
+            connection: new FormControl(step.connectionId, Validators.required),
             requestbody: new FormControl('')
         });
     }
@@ -398,7 +398,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             stepType: step.stepType,
             componentType: step.componentType,
             uri: step.uri,
-            service: step.serviceId,
+            connection: step.connectionId,
             header: step.headerId
         });
     }
@@ -586,33 +586,33 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
     }
 
-    createOrEditService(step, serviceType: string, formService: FormControl) {
-        step.serviceId = formService.value;
+    createOrEditConnection(step, connectionType: string, formService: FormControl) {
+        step.connectionId = formService.value;
 
-        if (typeof step.serviceId === 'undefined' || step.serviceId === null || !step.serviceId) {
-            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
+        if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
+            const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
             modalRef.then(res => {
                 // Success
-                res.componentInstance.serviceType = serviceType;
+                res.componentInstance.connectionType = connectionType;
                 res.result.then(
                     result => {
-                        this.setService(step, result.id, formService);
+                        this.setConnection(step, result.id, formService);
                     },
                     reason => {
-                        this.setService(step, reason.id, formService);
+                        this.setConnection(step, reason.id, formService);
                     }
                 );
             });
         } else {
-            const modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, step.serviceId);
+            const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
             modalRef.then(res => {
-                res.componentInstance.serviceType = serviceType;
+                res.componentInstance.connectionType = connectionType;
                 res.result.then(
                     result => {
-                        this.setService(step, result.id, formService);
+                        this.setConnection(step, result.id, formService);
                     },
                     reason => {
-                        this.setService(step, reason.id, formService);
+                        this.setConnection(step, reason.id, formService);
                     }
                 );
             });
@@ -634,14 +634,14 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         );
     }
 
-    setService(step, id, formService: FormControl) {
-        this.serviceService.getAllServices().subscribe(
+    setConnection(step, id, formService: FormControl) {
+        this.connectionService.getAllConnections().subscribe(
             res => {
-                this.services = res.body;
-                this.serviceCreated = this.services.length > 0;
-                this.requestStep.serviceId = id;
+                this.connections = res.body;
+                this.connectionCreated = this.connections.length > 0;
+                this.requestStep.connectionId = id;
                 formService.patchValue(id);
-                this.filterServices(step, formService);
+                this.filterConnections(step, formService);
             },
             res => this.onError(res.body)
         );
@@ -674,15 +674,15 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.isAlert = true;
         this.setRequest();
 
-        if (this.requestHeaderId && this.requestServiceId) {
+        if (this.requestHeaderId && this.requestConnectionId) {
             forkJoin(
-                this.serviceService.getServiceKeys(parseInt(this.requestServiceId)),
+                this.connectionService.getConnectionKeys(parseInt(this.requestConnectionId)),
                 this.headerService.getHeaderKeys(parseInt(this.requestHeaderId))
             ).subscribe(([res, res2]) => {
-                const serviceKeys = JSON.stringify(res.body);
+                const connectionKeys = JSON.stringify(res.body);
                 const headerKeys = JSON.stringify(res2.body);
 
-                this.sendMessage(serviceKeys, headerKeys);
+                this.sendMessage(connectionKeys, headerKeys);
             });
         } else if (this.requestHeaderId) {
             this.headerService.getHeaderKeys(parseInt(this.requestHeaderId)).subscribe(
@@ -694,11 +694,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                     this.handleSendError(res.error);
                 }
             );
-        } else if (this.requestServiceId) {
-            this.serviceService.getServiceKeys(parseInt(this.requestServiceId)).subscribe(
+        } else if (this.requestConnectionId) {
+            this.connectionService.getConnectionKeys(parseInt(this.requestConnectionId)).subscribe(
                 res => {
-                    const serviceKeys = JSON.stringify(res.body);
-                    this.sendMessage(serviceKeys, '');
+                    const connectionKeys = JSON.stringify(res.body);
+                    this.sendMessage(connectionKeys, '');
                 },
                 res => {
                     this.handleSendError(res.error);
@@ -709,15 +709,15 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
     }
 
-    sendMessage(requestServiceKeys, requestHeaderKeys) {
+    sendMessage(requestConnectionKeys, requestHeaderKeys) {
         if (this.requestExchangePattern === 'FireAndForget') {
             this.flowService
                 .send(
                     1,
                     this.requestUri,
                     this.requestStepId,
-                    this.requestServiceId,
-                    requestServiceKeys,
+                    this.requestConnectionId,
+                    requestConnectionKeys,
                     requestHeaderKeys,
                     this.requestNumberOfTimes,
                     this.requestBody
@@ -736,8 +736,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
                     1,
                     this.requestUri,
                     this.requestStepId,
-                    this.requestServiceId,
-                    requestServiceKeys,
+                    this.requestConnectionId,
+                    requestConnectionKeys,
                     requestHeaderKeys,
                     this.requestBody
                 )
@@ -763,7 +763,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.requestUri = this.requestStep.uri;
         this.requestStepId = this.requestStep.id == null ? '0' : this.requestStep.id.toString();
         this.requestHeaderId = stepForm.controls.header.value == null ? '' : stepForm.controls.header.value.toString();
-        this.requestServiceId = stepForm.controls.service.value == null ? '' : stepForm.controls.service.value.toString();
+        this.requestConnectionId = stepForm.controls.connection.value == null ? '' : stepForm.controls.connection.value.toString();
         this.requestBody = stepForm.controls.requestbody.value == null ? '0' : stepForm.controls.requestbody.value.toString();
 
         this.setStepOptions(this.stepsOptions[0], this.requestStep, this.selectOptions(0));
@@ -836,7 +836,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         step.id = formStepData.id.value;
         step.componentType = formStepData.componentType.value;
         step.uri = formStepData.uri.value;
-        step.serviceId = formStepData.service.value;
+        step.connectionId = formStepData.connection.value;
         step.headerId = formStepData.header.value;
     }
 

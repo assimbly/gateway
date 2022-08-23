@@ -13,8 +13,8 @@ import { HeaderKeysModule } from './header-keys/header-keys.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { QueueModule } from './queue/queue.module';
 import { RouteModule } from './route/route.module';
-import { ServiceModule } from './service/service.module';
-import { ServiceKeysModule } from './service-keys/service-keys.module';
+import { ConnectionModule } from './connection/connection.module';
+import { ConnectionKeysModule } from './connection-keys/connection-keys.module';
 import { TopicModule } from './topic/topic.module';
 
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
@@ -24,38 +24,38 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
   // prettier-ignore
   imports: [
         BrokerModule,
-		CertificateModule,
+		    CertificateModule,
         StepModule,
-		EnvironmentVariablesModule,
-		FlowModule,
-		GatewayModule,
+		    EnvironmentVariablesModule,
+		    FlowModule,
+		    GatewayModule,
         GroupModule,
         HeaderModule,
         HeaderKeysModule,
         MaintenanceModule,
-		QueueModule,
+		    QueueModule,
         RouteModule,
-        ServiceModule,
-        ServiceKeysModule,
-		TopicModule,
+        ConnectionModule,
+        ConnectionKeysModule,
+		    TopicModule,
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
   exports: [
         BrokerModule,
-		CertificateModule,
+		    CertificateModule,
         StepModule,
-		EnvironmentVariablesModule,
-		FlowModule,
-		GatewayModule,
+		    EnvironmentVariablesModule,
+		    FlowModule,
+		    GatewayModule,
         GroupModule,
         HeaderModule,
         HeaderKeysModule,
         MaintenanceModule,
-		QueueModule,
+		    QueueModule,
         RouteModule,
-        ServiceModule,
-        ServiceKeysModule,
-		TopicModule,
+        ConnectionModule,
+        ConnectionKeysModule,
+		    TopicModule,
     /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
   ],
   declarations: [],
