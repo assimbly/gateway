@@ -42,7 +42,6 @@ public class ConnectionKeysDTO implements Serializable {
         this.value = value;
     }
 
-
     public String getType() {
         return type;
     }
