@@ -47,7 +47,7 @@ public class ExportXML {
 
 	private Document doc;
 
-    private Set<Step> steps;
+    private Set<Step> stepsDB;
 
     private Node environmentVariablesList;
 
@@ -74,7 +74,7 @@ public class ExportXML {
 
     public String getXMLConfiguration(Long gatewayId) throws Exception {
 
-		setXMLGeneralPropertiesFromDB(gatewayId);
+		setGeneralProperties(gatewayId);
 
 		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
 
@@ -91,7 +91,7 @@ public class ExportXML {
 
 	public String getXMLConfigurationByIds(Long gatewayId, String ids) throws Exception {
 
-		setXMLGeneralPropertiesFromDB(gatewayId);
+		setGeneralProperties(gatewayId);
 
 		List<String> idsList = Arrays.asList(ids.split(","));
 
@@ -117,15 +117,15 @@ public class ExportXML {
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
 		Flow flow = flowRepository.findById(id).get();
-		setXMLGeneralPropertiesFromDB(flow.getGateway().getId());
+		setGeneralProperties(flow.getGateway().getId());
 
 		// check if steps are configured
-		steps = flow.getSteps();
+		stepsDB = flow.getSteps();
 
-		if (steps == null) {
+		if (stepsDB == null) {
 			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
-			setXMLFlowPropertiesFromDB(flow);
+			setFlows(flow);
 		}
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
@@ -141,12 +141,12 @@ public class ExportXML {
 
 	public String getXMLFlowConfiguration(Flow flow) throws Exception {
 
-		steps = flow.getSteps();
+		stepsDB = flow.getSteps();
 
-		if (steps == null) {
+		if (stepsDB == null) {
 			throw new Exception("Set of configuration failed. Step cannot be null");
 		} else {
-			setXMLFlowPropertiesFromDB(flow);
+			setFlows(flow);
 		}
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
@@ -157,7 +157,9 @@ public class ExportXML {
 
 
 	// set methods
-	public void setXMLGeneralPropertiesFromDB(Long gatewayId) throws Exception {
+    // These methods set the XML Elements
+
+	public void setGeneralProperties(Long gatewayId) throws Exception {
 
 		integrationId = gatewayId.toString();
 		Gateway gateway = gatewayRepository.findById(gatewayId).get();
@@ -173,37 +175,34 @@ public class ExportXML {
         Element integrations = setElement("integrations", null, dil);
         Element core = setElement("core", null, dil);
 
-		Element integration = setElement("integration", null, integrations);
+        setIntegrations(integrations, gateway);
 
-		Element id = setElement("id", integrationId, integration);
-		Element name = setElement("name", gateway.getName(), integration);
-		Element type = setElement("type", gateway.getType().toString(), integration);
-
-        Element options =  setElement("options", null, integration);
-
-		Element environmentName = setElement("environment", gateway.getEnvironmentName(), options);
-		Element stage = setElement("stage", gateway.getStage().toString(), options);
-
-		Element defaultFromComponentType = setElement("defaultFromComponentType", gateway.getDefaultFromComponentType(), options);
-		Element defaultToComponentType = setElement("defaultToComponentType", gateway.getDefaultToComponentType(), options);
-		Element defaultErrorComponentType = setElement("defaultErrorComponentType", gateway.getDefaultErrorComponentType(), options);
-
-		flows = setElement("flows", null, integration);
-		connections = setElement("connections", null, integration);
-		headers = setElement("headers", null, integration);
-        routes = setElement("routes", null, integration);
-        routeConfigurations = setElement("routeConfigurations", null, integration);
-		environmentVariablesList = setElement("environmentVariables", null, integration);
-
-		connectionsList = new ArrayList<String>();
-		headersList = new ArrayList<String>();
-		routesList = new  ArrayList<String>();
-
-		setXMLEnvironmentVariablesFromDB(integrationId);
+        setCore(core);
 
 	}
 
-	public void setXMLFlowPropertiesFromDB(Flow flowDB) throws Exception {
+    public void setIntegrations(Element integrations, Gateway gateway) throws Exception {
+
+        Element integration = setElement("integration", null, integrations);
+
+        Element id = setElement("id", integrationId, integration);
+        Element name = setElement("name", gateway.getName(), integration);
+        Element type = setElement("type", gateway.getType().toString(), integration);
+
+        //Options
+        Element options =  setElement("options", null, integration);
+
+        Element environmentName = setElement("environment", gateway.getEnvironmentName(), options);
+        Element stage = setElement("stage", gateway.getStage().toString(), options);
+        Element defaultFromComponentType = setElement("defaultFromComponentType", gateway.getDefaultFromComponentType(), options);
+        Element defaultToComponentType = setElement("defaultToComponentType", gateway.getDefaultToComponentType(), options);
+        Element defaultErrorComponentType = setElement("defaultErrorComponentType", gateway.getDefaultErrorComponentType(), options);
+
+        flows = setElement("flows", null, integration);
+
+    }
+
+	public void setFlows(Flow flowDB) throws Exception {
 
 		flow = setElement("flow", null, flows);
 
@@ -214,15 +213,16 @@ public class ExportXML {
         Element version =  setElement("version", flowDB.getVersion().toString(), flow);
 
 		//options
-        Element created =  setElement("created", flowDB.getCreated().toString(), flow);
-        Element lastModified =  setElement("lastModified", flowDB.getLastModified().toString(), flow);
-        Element autostart= setElement("autostart", flowDB.isAutoStart().toString(), flow);
-        Element isAssimblyHeaders = setElement("assimblyHeaders", flowDB.isAssimblyHeaders().toString(), flow);
-        Element isParallelProcessing = setElement("parallelProcessing", flowDB.isParallelProcessing().toString(), flow);
-		Element maximumRedeliveries =  setElement("maximumRedeliveries", Integer.toString(flowDB.getMaximumRedeliveries()), flow);
-		Element redeliveryDelay =  setElement("redeliveryDelay", Integer.toString(flowDB.getRedeliveryDelay()), flow);
-		Element logLevel =  setElement("logLevel", flowDB.getLogLevel().toString(), flow);
+        Element options =  setElement("options", null, flow);
 
+        Element created =  setElement("created", flowDB.getCreated().toString(), options);
+        Element lastModified =  setElement("lastModified", flowDB.getLastModified().toString(), options);
+        Element autostart= setElement("autostart", flowDB.isAutoStart().toString(), options);
+        Element isAssimblyHeaders = setElement("assimblyHeaders", flowDB.isAssimblyHeaders().toString(), options);
+        Element isParallelProcessing = setElement("parallelProcessing", flowDB.isParallelProcessing().toString(), options);
+		Element maximumRedeliveries =  setElement("maximumRedeliveries", Integer.toString(flowDB.getMaximumRedeliveries()), options);
+		Element redeliveryDelay =  setElement("redeliveryDelay", Integer.toString(flowDB.getRedeliveryDelay()), options);
+		Element logLevel =  setElement("logLevel", flowDB.getLogLevel().toString(), options);
 
         flowNameAsString = flowDB.getName();
         flowTypeAsString = flowDB.getType();
@@ -235,31 +235,31 @@ public class ExportXML {
         }
 
         // set components
-        setComponentsFromDB(steps);
+        setDependencies(stepsDB);
 
 		// set steps
-		setStepsFromDB(steps);
+		setSteps(stepsDB);
 
 	}
 
-    public void setComponentsFromDB(Set<Step> stepsDB) throws Exception {
+    public void setDependencies(Set<Step> stepsDB) throws Exception {
 
-        Set<String> componentsList = new HashSet<>();
+        Set<String> dependenciesList = new HashSet<>();
 
-		Element components =  setElement("components", null, flow);
+		Element dependencies =  setElement("dependencies", null, flow);
 
         for (Step stepDB : stepsDB) {
 
-            String confComponentType = stepDB.getComponentType();
+            String dependency = stepDB.getComponentType();
 
-            if(!componentsList.contains(confComponentType)){
-                componentsList.add(confComponentType);
-				Element component =  setElement("component", confComponentType, components);
+            if(!dependenciesList.contains(dependency)){
+                dependenciesList.add(dependency);
+				setElement("dependency", dependency, dependencies);
             }
         }
     }
 
-    public void setStepsFromDB(Set<Step> stepsDB) throws Exception {
+    public void setSteps(Set<Step> stepsDB) throws Exception {
 
         Element steps = setElement("steps", null, flow);
 
@@ -268,26 +268,15 @@ public class ExportXML {
 			String confId = Long.toString(stepDB.getId());
 			String flowId = Long.toString(stepDB.getFlow().getId());
 			String confUri = stepDB.getUri();
-            Integer confResponseId = stepDB.getResponseId();
-            Integer confRouteId = stepDB.getRouteId();
 			String confStepType = stepDB.getStepType().getStep();
 			String confComponentType = stepDB.getComponentType();
 			String confOptions = stepDB.getOptions();
 			Connection confConnection = stepDB.getConnection();
-			Header confHeader = stepDB.getHeader();
 
 			Element step = setElement("step", null, steps);
 
 			Element id =  setElement("id", confId, step);
 			Element type =  setElement("type", confStepType, step);
-
-			if (confResponseId != null) {
-				Element resonseId =  setElement("response_id", Integer.toString(confResponseId), step);
-			}
-
-			if (confRouteId != null) {
-				Element routeId =  setElement("route_id", Integer.toString(confRouteId), step);
-			}
 
             if(confUri!=null && !confUri.isEmpty()){
                 confUri = createUri(confUri, confComponentType, confOptions, confConnection);
@@ -307,33 +296,73 @@ public class ExportXML {
 				}
 			}
 
-			if (confConnection != null) {
-				String confConnectionId = confConnection.getId().toString();
-				Element connectionId =  setElement("connection_id", confConnectionId, step);
-
-				setXMLConnectionFromDB(confConnectionId, confStepType, confConnection);
-			}
-
-			if (confHeader != null) {
-				String confHeaderId = confHeader.getId().toString();
-				Element headerId =  setElement("header_id", confHeaderId, step);
-
-				setXMLHeaderFromDB(confHeaderId, confStepType, confHeader);
-			}
-
-			if (confRouteId != null) {
-				setXMLRouteFromDB(confRouteId,flowId,confId);
-			}
-
-			if (confResponseId != null) {
-				Element responseId =  setElement("response_id", Integer.toString(confResponseId), step);
-			}
-
+            setBlocks(flowId, confId, stepDB, step);
         }
 
 	}
 
-    public void setXMLRouteFromDB(Integer routeid, String flowId, String stepId) throws Exception {
+    public void setBlocks(String flowId, String confId, Step stepDB, Element step) throws Exception {
+
+        Element blocks = setElement("blocks", null, step);
+
+        Integer confRouteId = stepDB.getRouteId();
+        Connection confConnection = stepDB.getConnection();
+        Header confHeader = stepDB.getHeader();
+        Integer confResponseId = stepDB.getResponseId();
+        String confStepType = stepDB.getStepType().getStep();
+
+        Element block = setElement("block", null, blocks);
+        Element options = setElement("options", null, block);
+
+            if (confRouteId != null) {
+                Element routeId =  setElement("route_id", Integer.toString(confRouteId), options);
+            }
+
+            if (confConnection != null) {
+                String confConnectionId = confConnection.getId().toString();
+                Element connectionId =  setElement("connection_id", confConnectionId, options);
+
+                setConnection(confConnectionId, confStepType, confConnection);
+            }
+
+            if (confHeader != null) {
+                String confHeaderId = confHeader.getId().toString();
+                Element headerId =  setElement("header_id", confHeaderId, options);
+
+                setHeader(confHeaderId, confStepType, confHeader);
+            }
+
+            if (confRouteId != null) {
+                setRoute(confRouteId,flowId,confId);
+            }
+
+            if (confResponseId != null) {
+                Element responseId =  setElement("response_id", Integer.toString(confResponseId), options);
+            }
+
+            if(confRouteId == null && confConnection == null && confHeader == null && confResponseId == null) {
+                step.removeChild(blocks);
+            }
+
+    }
+
+
+    public void setCore(Element core) throws Exception {
+        connections = setElement("connections", null, core);
+        headers = setElement("headers", null, core);
+        routes = setElement("routes", null, core);
+        routeConfigurations = setElement("routeConfigurations", null, core);
+        environmentVariablesList = setElement("environmentVariables", null, core);
+
+        connectionsList = new ArrayList<String>();
+        headersList = new ArrayList<String>();
+        routesList = new  ArrayList<String>();
+
+        setEnvironmentVariables(integrationId);
+
+    }
+
+    public void setRoute(Integer routeid, String flowId, String stepId) throws Exception {
 
         Long routeIdAsLong = routeid.longValue();
         String routeIdAsString = routeid.toString();
@@ -367,7 +396,7 @@ public class ExportXML {
         }
     }
 
-	public void setXMLConnectionFromDB(String connectionid, String type, Connection connectionDB) throws Exception {
+	public void setConnection(String connectionid, String type, Connection connectionDB) throws Exception {
 
 		if (!connectionsList.contains(connectionid)) {
 
@@ -398,7 +427,7 @@ public class ExportXML {
 
 	}
 
-	public void setXMLHeaderFromDB(String headerid, String type, Header headerDB) throws Exception {
+	public void setHeader(String headerid, String type, Header headerDB) throws Exception {
 
 		if (!headersList.contains(headerid)) {
 			headersList.add(headerid);
@@ -451,7 +480,7 @@ public class ExportXML {
 
     }
 
-	public void setXMLEnvironmentVariablesFromDB(String integrationId) throws Exception {
+	public void setEnvironmentVariables(String integrationId) throws Exception {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
 

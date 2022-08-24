@@ -1,0 +1,179 @@
+entity Integration {
+	name String,
+    type GatewayType,
+	environmentName String,
+	stage EnvironmentType,
+	connectorType ConnectorType,
+	defaultFromStepType String,
+	defaultToStepType String,
+	defaultErrorStepType String
+}
+
+entity Flow {
+	name String,
+	type String,
+	notes TextBlob,
+	autoStart Boolean,
+	offLoading Boolean,
+	maximumRedeliveries Integer,
+	redeliveryDelay Integer,
+	loadBalancing Boolean,
+	parallelProcessing Boolean,
+	logLevel LogLevelType,
+	assimblyHeaders Boolean,
+	instances Integer,
+	version Integer,
+	created Instant,
+	lastModified Instant
+}
+
+entity Step {
+	stepType StepType,
+	compponentType ComponentType,
+	uri TextBlob,
+    options TextBlob,
+}
+
+
+entity Route {
+	name String,
+	type String,
+	content TextBlob
+}
+
+
+entity RouteConfiguraiton {
+	name String,
+	type String,
+	content TextBlob
+}
+
+entity Connection {
+	name String,
+	type String
+}
+
+entity ConnectionKeys {
+	key String,
+	value TextBlob,
+	type String
+}
+
+entity Header {
+	name String
+}
+
+entity HeaderKeys {
+	key String,
+	value TextBlob,
+	type String
+}
+
+entity EnvironmentVariables {
+	key String,
+	value TextBlob,
+	encrypted Boolean
+}
+
+entity Maintenance {
+	startTime Instant,
+	endTime Instant,
+	duration Instant,
+	frequency String
+}
+
+entity Security {
+	url String,
+	certificateName String,
+	certificateFile Blob,
+	certificateExpiry Instant,
+}
+
+entity Broker {
+	name String,
+	autoStart Boolean,
+	type String,
+	configuration String,
+}
+
+entity Queue {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
+}
+
+entity Topic {
+	itemsOnPage Integer,
+	refreshInterval Integer,
+	selectedColumn String,
+	orderColumn String,
+}
+
+enum GatewayType {
+    ADAPTER, BROKER, API, SOAP
+}
+
+enum EnvironmentType {
+    DEVELOPMENT, TEST, ACCEPTANCE, PRODUCTION
+}
+
+enum ConnectorType {
+    CAMEL,SPRINGINTEGRATION,CURL
+}
+
+enum StepType {
+   FROM, TO, ERROR, WIRETAP, RESPONSE
+}
+
+enum ComponentType {
+   ACTIVEMQ, FILE, HTTP4, KAFKA, SFTP, SJMS, SMTP, SONICMQ, SQL, STREAM, VM, WASTEBIN
+}
+
+enum LogLevelType {
+   ERROR, WARN, INFO, DEBUG, TRACE, OFF
+}
+
+relationship OneToOne {
+	Gateway{wiretapStep} to WireTapStep
+}
+
+relationship OneToMany {
+	Gateway{flow} to Flow
+}
+
+relationship OneToMany {
+	Gateway{environmentVariables} to EnvironmentVariables
+}
+
+relationship OneToMany {
+	Flow{step} to Step
+}
+
+relationship ManyToOne {
+	Step{connection} to Connection
+}
+
+relationship ManyToOne {
+	Step{header} to Header
+}
+
+relationship OneToMany {
+	Connection{connectionKeys} to ConnectionKeys
+}
+
+relationship OneToMany {
+	Header{headerKeys} to HeaderKeys
+}
+
+relationship OneToOne {
+	Maintenance{flow} to Flow
+}
+
+// Set pagination options
+paginate Flow with infinite-scroll
+
+dto * with mapstruct
+
+// Set connection options to all except few
+connection all with connectionImpl
