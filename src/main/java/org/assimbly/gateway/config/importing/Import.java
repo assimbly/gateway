@@ -29,7 +29,7 @@ public class Import {
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
 
 		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+			configuration = TransformUtil.transformToDil(configuration);
 		}
 
 		// get the configuration as XML Document
@@ -46,7 +46,7 @@ public class Import {
 	public String convertFlowConfigurationToDB(Long gatewayId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
 		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+			configuration = TransformUtil.transformToDil(configuration);
 		}
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);

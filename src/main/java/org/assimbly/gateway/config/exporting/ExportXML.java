@@ -130,10 +130,6 @@ public class ExportXML {
 
 		xmlConfiguration = DocConverter.convertDocToString(doc);
 
-        System.out.println("");
-        System.out.println("xmlConfiguration: " + xmlConfiguration);
-        System.out.println("");
-
         xmlConfiguration = StringUtils.substringBeforeLast(xmlConfiguration,"</dil>") + "</dil>";
 
 		return xmlConfiguration;

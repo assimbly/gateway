@@ -275,9 +275,10 @@ configurations {
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.17.1")
                 }
+                /*
                 if (details.requested.group == 'io.netty' ) {
                     details.useVersion("4.1.79.Final")
-                }
+                }*/
             }
         }
     }
@@ -296,6 +297,8 @@ dependencies {
             strictly "[3.12.11]"
         }
     }
+
+    implementation group: 'org.assimbly', name: 'commonBase', version: '3.8.0'
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
@@ -361,7 +364,7 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.11"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "mysql:mysql-connector-java"
