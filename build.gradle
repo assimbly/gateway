@@ -42,7 +42,7 @@ description = ""
 
 //sourceCompatibility=11
 //targetCompatibility=11
-assert System.properties["java.specification.version"] == "11" || "12" || "13"
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
@@ -270,10 +270,10 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.24.0")
+                    details.useVersion("2.25.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.17.1")
+                    details.useVersion("5.17.2")
                 }
                 /*
                 if (details.requested.group == 'io.netty' ) {
@@ -459,7 +459,7 @@ wrapper {
 
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+     languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
 

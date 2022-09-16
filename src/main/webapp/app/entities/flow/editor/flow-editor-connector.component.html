@@ -243,7 +243,7 @@
                                              dropdownPosition="bottom"></ng-select>
                                 </div>
                                 <button type="button" class="col-2 btn btn-primary"
-                                        [ngStyle]="{'display':'block', 'width': '100px', 'color':'white'}"
+                                        [ngStyle]="{'display':'block', 'max-width': '100px', 'color':'white'}"
                                         title="Enlarge" (click)="openModal(uriEditor)">
                                   <fa-icon style="color: white;" icon="edit"></fa-icon>
                                 </button>
@@ -289,7 +289,7 @@
                                   </div>
                                   <div class="col-5">
                                     <input type="text" class="d-inline-block form-control"
-                                           style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 20px;"
+                                           style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 28px;"
                                            id="field_options-value-{{idx}}" formControlName="value"
                                            [placeholder]="editFlowForm['controls'].stepsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value"
                                            data-toggle="tooltip"

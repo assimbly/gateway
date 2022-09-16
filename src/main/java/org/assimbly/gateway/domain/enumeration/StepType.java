@@ -18,6 +18,7 @@ public enum StepType {
 	PUT("put"),
 	DELETE("delete"),
 	ROUTE("route"),
+    MESSAGE("message"),
 	CONNECTION("connection");
 
     private final String step;

@@ -3,8 +3,16 @@ export const enum StepType {
     TO = 'TO',
     ERROR = 'ERROR',
     RESPONSE = 'RESPONSE',
+    SOURCE = 'SOURCE',
+    SINK = 'SINK',
+    ACTION = 'ACTION',
+    ROUTER = 'ROUTER',
     ROUTE = 'ROUTE',
-    API = 'API'
+    ROUTECONFIGURATION = 'ROUTECONFIGURATION',
+    ROUTETEMPLATE = 'ROUTETEMPLATE',
+    MESSAGE = 'MESSAGE',
+    CONNECTION = 'CONNECTION',
+    API = 'API',
 }
 
 export interface IStep {
