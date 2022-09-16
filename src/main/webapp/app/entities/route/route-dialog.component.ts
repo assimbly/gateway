@@ -31,8 +31,7 @@ export class RouteDialogComponent implements OnInit {
         name: ['', Validators.required],
         type: ['xml'],
         content: [
-            '<route>\n' +
-            '</route>'
+            ''
         ]
     });
 
