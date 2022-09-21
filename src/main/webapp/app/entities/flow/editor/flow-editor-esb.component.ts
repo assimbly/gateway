@@ -385,6 +385,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
 
     if (typeof e !== 'undefined') {
+
       // set componenttype to selected component and clear other fields
       step.componentType = e;
       step.stepType = 'SOURCE'
@@ -443,6 +444,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     stepForm.patchValue({ string: componentType });
 
     this.setURIlist(stepFormIndex);
+
   }
 
 
@@ -629,10 +631,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		let newIndex = index + 1;
 
-		if (step.responseId !== undefined) {
-			newIndex += 1;
-		}
-
 		this.steps.splice(newIndex, 0, new Step());
     this.stepsOptions.splice(newIndex, 0, [new Option()]);
 
@@ -694,7 +692,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     );
   }
 
-
   getComponentOptions(componentType: string): any {
     return this.flowService.getComponentOptions(1, componentType).pipe(
       map(options => options.body)
@@ -702,6 +699,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   getOptions(step: Step, stepForm: any, stepOptions: Array<Option>, index: number): void {
+
     const optionArray: Array<string> = [];
 
     if (!step.options) {
@@ -711,63 +709,66 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const componentType = step.componentType.toLowerCase();
     const camelComponentType = this.components.getCamelComponentType(componentType);
 
+    // set options keys
+
     this.setComponentOptions(step, camelComponentType).subscribe(data => {
 
-	  let options: Array<string> = [];
+        let options: Array<string> = [];
 
-	  if(step.options.includes('&')){
-		options = step.options.match(/[^&]+(?:&&[^&]+)*/g);
-	  }else{
-		options = step.options.split('&');
-	  }
-
-      options.forEach((option, optionIndex) => {
-        const o = new Option();
-
-        if (typeof stepForm.controls.options.controls[optionIndex] === 'undefined') {
-          stepForm.controls.options.push(this.initializeOption());
+        if(step.options.includes('&')){
+          options = step.options.match(/[^&]+(?:&&[^&]+)*/g);
+        }else{
+          options = step.options.split('&');
         }
 
-        if (option.includes('=')) {
-          o.key = option.split('=')[0];
-          o.value = option.split('=').slice(1).join('=');
-        } else {
-          o.key = null;
-          o.value = null;
-        }
+        options.forEach((option, optionIndex) => {
+          const o = new Option();
 
-        optionArray.splice(optionIndex, 0, o.key);
-
-        stepForm.controls.options.controls[optionIndex].patchValue({
-          key: o.key,
-          value: o.value,
-        });
-
-        if (this.componentOptions[index]) {
-          const optionNameExist = this.componentOptions[index].some(el => el.name === o.key);
-
-          if (!optionNameExist && o.key) {
-            this.componentOptions[index].push({
-              name: o.key,
-              displayName: o.key,
-              description: 'Custom option',
-              group: 'custom',
-              type: 'string',
-              componentType: camelComponentType,
-            });
-            this.customOptions.push({
-              name: o.key,
-              displayName: o.key,
-              description: 'Custom option',
-              group: 'custom',
-              type: 'string',
-              componentType: camelComponentType,
-            });
+          if (typeof stepForm.controls.options.controls[optionIndex] === 'undefined') {
+            stepForm.controls.options.push(this.initializeOption());
           }
-        }
+
+          if (option.includes('=')) {
+            o.key = option.split('=')[0];
+            o.value = option.split('=').slice(1).join('=');
+          } else {
+            o.key = null;
+            o.value = null;
+          }
+
+          optionArray.splice(optionIndex, 0, o.key);
+
+          stepForm.controls.options.controls[optionIndex].patchValue({
+            key: o.key,
+            value: o.value,
+          });
+
+          if (this.componentOptions[index]) {
+            const optionNameExist = this.componentOptions[index].some(el => el.name === o.key);
+
+            if (!optionNameExist && o.key) {
+              this.componentOptions[index].push({
+                name: o.key,
+                displayName: o.key,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+              });
+              this.customOptions.push({
+                name: o.key,
+                displayName: o.key,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+              });
+            }
+          }
 
         stepOptions.push(o);
       });
+
     });
 
     this.selectedOptions.splice(index, 0, optionArray);
@@ -958,12 +959,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                 this.setConnection(step, result.id, formService);
               },
               reason => {
-                console.log('createConnection reason: ' + reason);
+
               }
           );
 
        }, (reason)=>{
-          console.log('createConnection reason: ' + reason);
+
        }
     )
 

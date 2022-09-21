@@ -191,9 +191,20 @@ public class FlowResource {
         integrationResource.initIntegration();
 
         integration = integrationResource.getIntegration();
+
+        System.out.println("Komt hier 1");
+
+        org.assimbly.integrationrestdt.Dovetail dovetail = new org.assimbly.integrationrestdt.Dovetail(integration.getContext());
+        dovetail.setComponents();
+        dovetail.setThreadProfile(0,5,5000);
+
+        System.out.println("Komt hier 2");
+
+
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");
         integration.setDeployDirectory(deployOnStart,deployOnChange);
+
 
         //start flows with autostart
         List<Flow> flows = flowRepository.findAll();
