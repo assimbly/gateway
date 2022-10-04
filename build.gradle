@@ -28,7 +28,8 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
-	id 'de.undercouch.download' version '5.0.1'
+	id 'de.undercouch.download' version '5.2.1'
+    id "com.github.ben-manes.versions" version "0.42.0"
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
@@ -40,9 +41,7 @@ version = '3.8.0'
 
 description = ""
 
-//sourceCompatibility=11
-//targetCompatibility=11
-assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17 || 18 || 19
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
@@ -51,7 +50,7 @@ apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'war'
+//apply plugin: 'war'
 //apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
@@ -270,7 +269,7 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.25.0")
+                    details.useVersion("2.26.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("5.17.2")
@@ -298,11 +297,11 @@ dependencies {
         }
     }
 
-    implementation group: 'org.assimbly', name: 'commonBase', version: '3.8.0'
+    implementation group: "org.assimbly", name: "commonBase", version: "${version}"
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
+	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
@@ -349,10 +348,24 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
+
+    //Only one of web server can be active: tomcat, undertow, jetty
+    //use Tomcat
+    //implementation ("org.springframework.boot:spring-boot-starter-web")
+
+    //use undertow
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.springframework.boot:spring-boot-starter-undertow"
+
+    //UseJetty
+    //implementation ("org.springframework.boot:spring-boot-starter-web") {
+    //    exclude module: "spring-boot-starter-tomcat"
+    //}
+    //implementation 'org.eclipse.jetty:jetty-quickstart:11.0.12'
+    //implementation "org.springframework.boot:spring-boot-starter-jetty"
+
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.zalando:problem-spring-web:0.27.0"
@@ -371,19 +384,50 @@ dependencies {
     liquibaseRuntime "mysql:mysql-connector-java"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4"
     implementation "org.jdom:jdom2:2.0.6.1"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
-    if (project.hasProperty("connector") || project.hasProperty("integration") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.8.0", changing: true
+    if (project.hasProperty("integration")) {
+        implementation group: "org.assimbly", name: "integrationRest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.8.0", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "${version}", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRestDT", version: "3.8.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.8.0", changing: true
+        implementation group: "org.assimbly", name: "integrationRest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "brokerRest", version: "${version}", changing: true
+    }
+
+    if (project.hasProperty("dovetail")){
+        implementation group:  "world.dovetail", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "aleris", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "amazon", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "archive", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "cookies", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "smb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "soap", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sql", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "throttling", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -419,7 +463,7 @@ if (project.hasProperty("gae")) {
 }
 
 //Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
+if (project.hasProperty("integration")){
 
     ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
@@ -454,14 +498,16 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.3.3"
+    gradleVersion = "7.5.1"
 }
 
+/*
 java {
   toolchain {
      languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
+*/
 
 if (project.hasProperty("nodeInstall")) {
     node {

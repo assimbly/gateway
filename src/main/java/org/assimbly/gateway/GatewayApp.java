@@ -26,7 +26,7 @@ import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoMetricsAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "dovetail.world.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest", "org.assimbly.integrationrestdt" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoMetricsAutoConfiguration.class})
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
@@ -80,6 +80,7 @@ public class GatewayApp {
 
         if (startApplication) {
             SpringApplication app = new SpringApplication(GatewayApp.class);
+
             DefaultProfileUtil.addDefaultProfile(app);
             Environment env = app.run(args).getEnvironment();
             logApplicationStartup(env);

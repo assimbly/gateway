@@ -19,7 +19,7 @@
   <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
     <ul class="navbar-nav ml-auto">
       <li
-        *ngIf="type === 'CONNECTOR' || type === 'FULL'"
+        *ngIf="type === 'INTEGRATION' || type === 'FULL'"
         routerLinkActive="active"
         ngbDropdown
         class="nav-item dropdown pointer"
