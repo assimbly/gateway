@@ -1,6 +1,6 @@
 <div [ngSwitch]="isAuthenticated()" class="background-parent">
 	<div *ngSwitchCase="true">
-        <div *ngIf="type==='CONNECTOR' || type==='FULL'">
+        <div *ngIf="type==='INTEGRATION' || type==='FULL'">
             <jhi-flow>Loading flows...</jhi-flow>
         </div>
         <div *ngIf="type==='BROKER'">
