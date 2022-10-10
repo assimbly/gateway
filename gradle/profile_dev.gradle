@@ -50,9 +50,11 @@ task webapp(type: NpmTask) {
 
     args = ["run", "webapp:build"]
     environment = [APP_VERSION: project.version]
+    environment = [TYPE: project.type]
 }
 
 processResources {
+    inputs.property('type', project.type)
     inputs.property('version', version)
     inputs.property('springProfiles', profiles)
     filesMatching("**/application.yml") {

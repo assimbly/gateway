@@ -19,7 +19,7 @@
   <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
     <ul class="navbar-nav ml-auto">
       <li
-        *ngIf="type === 'CONNECTOR' || type === 'FULL'"
+        *ngIf="type === 'INTEGRATION' || type === 'FULL'"
         routerLinkActive="active"
         ngbDropdown
         class="nav-item dropdown pointer"
@@ -174,7 +174,7 @@
               <span>Gateway</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a
               class="dropdown-item"
               routerLink="environment-variables"
@@ -234,7 +234,7 @@
               <span jhiTranslate="global.menu.admin.health">Health</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a class="dropdown-item" routerLink="admin/deployment" routerLinkActive="active" (click)="collapseNavbar()">
               <fa-icon icon="list" [fixedWidth]="true"></fa-icon>
               <span>Deployment</span>
@@ -247,7 +247,7 @@
               <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a class="dropdown-item" routerLink="maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
   			  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
               <span>Maintenance</span>
