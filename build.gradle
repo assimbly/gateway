@@ -8,6 +8,7 @@ buildscript {
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     }
     dependencies {
+        //classpath('com.google.cloud.tools:jib-ownership-extension-gradle:0.1.0')
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
@@ -139,6 +140,40 @@ eclipse {
         }
     }
 }
+
+//build container image
+jib {
+    from {
+        image = 'eclipse-temurin:11'
+    }
+    to {
+        image = 'assimbly/gateway-full'
+    }
+    container {
+        ports = ['1000', '2000-2003/udp', '8088','61616','61617','9000','9001']
+        format = 'OCI'
+    }
+    extraDirectories {
+        paths {
+            path {
+                // copies the contents of 'src/main/jib' into '/' on the container
+                from = file('src/main/jib')
+            }
+            path {
+                // copies the contents of 'src/main/another/dir' into '/extras' on the container
+                from = file('/src/main/data')
+                into = '/data'
+            }
+        }
+        permissions = [
+            '/entrypoint.sh': '755',
+            '/data/**': '775',
+            '/data/**/*': '775',
+        ]
+    }
+
+}
+
 
 defaultTasks "bootRun"
 
@@ -355,22 +390,23 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
 
-    //Only one of web server can be active: tomcat, undertow, jetty
-    //use Tomcat
+    //Only one of web server can be active: tomcat, undertow or jetty
+
+    //To use Tomcat
     //implementation ("org.springframework.boot:spring-boot-starter-web")
 
-    //use undertow
+    //To use Undertow
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    //implementation "org.springframework.boot:spring-boot-starter-undertow"
 
-    //UseJetty
+    //To Use Jetty
     //implementation ("org.springframework.boot:spring-boot-starter-web") {
     //    exclude module: "spring-boot-starter-tomcat"
     //}
     //implementation 'org.eclipse.jetty:jetty-quickstart:11.0.12'
-    //implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
 
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
