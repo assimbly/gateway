@@ -26,10 +26,13 @@ task webapp_test(type: NpmTask, dependsOn: "npm_install") {
 task webapp(type: NpmTask, dependsOn: "npm_install") {
     args = ["run", "webapp:prod"]
     environment = [APP_VERSION: project.version]
+    environment = [TYPE: project.type]
+
 }
 
 processResources {
     inputs.property('version', version)
+    inputs.property('type', project.type)
     inputs.property('springProfiles', profiles)
     filesMatching("**/application.yml") {
         filter {

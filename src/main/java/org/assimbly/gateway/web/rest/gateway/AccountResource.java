@@ -98,11 +98,11 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
+    public AdminUserDTO getAccount() throws SuppressableStacktraceException {
         return userService
             .getUserWithAuthorities()
             .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+            .orElseThrow(() -> new SuppressableStacktraceException("User could not be found. Login to revalidate", true));
     }
 
     /**
@@ -191,4 +191,24 @@ public class AccountResource {
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
+
+    public class SuppressableStacktraceException extends Exception {
+
+        private boolean suppressStacktrace = false;
+
+        public SuppressableStacktraceException(String message, boolean suppressStacktrace) {
+            super(message, null, suppressStacktrace, !suppressStacktrace);
+            this.suppressStacktrace = suppressStacktrace;
+        }
+
+        @Override
+        public String toString() {
+            if (suppressStacktrace) {
+                return getLocalizedMessage();
+            } else {
+                return super.toString();
+            }
+        }
+    }
+
 }
