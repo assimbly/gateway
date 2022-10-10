@@ -131,7 +131,7 @@ public class GatewayApp {
 
        log.info(
             "\n----------------------------------------------------------\n\t" +
-            "Application '{}' is running! \n\n\t" +
+            "{} is running! \n\n\t" +
             "Application Version: \t{}\n\t" +
             "Application BaseDir: \t{}\n\t" +
             "Application Startup: \t{} Seconds\n\t" +
