@@ -51,11 +51,11 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.address = address;
     modalRef.result.then(
       result => {
-		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));
         modalRef = null;
       },
       reason => {
-		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));
         modalRef = null;
       }
     );
@@ -67,10 +67,10 @@ export class QueueRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToMessageSender(addressName: string) {
-    this.router.navigate(['../broker/sender/message-sender', { stepName: addressName, stepType: 'queue', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/sender/message-sender', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
   }
 
   navigateToMessageBrowser(addressName: string) {
-    this.router.navigate(['../broker/browser/message-browser', { stepName: addressName, stepType: 'queue', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/browser/message-browser', { endpointName: addressName, endpointType: 'queue', brokerType: this.brokerType }]);
   }
 }
