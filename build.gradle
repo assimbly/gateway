@@ -451,6 +451,7 @@ dependencies {
         implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactdotweb", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
