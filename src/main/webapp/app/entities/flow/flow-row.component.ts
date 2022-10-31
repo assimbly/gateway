@@ -186,69 +186,48 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   setFlowStatus(status: string): void {
+
     switch (status) {
       case 'unconfigured':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: - <br/>
-                            Status: Flow is stopped<br/>
-            `;
+        this.flowStatusButton = `Stopped`;
 
         break;
       case 'started':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowStarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: Start <br/>
-                            Status: Started succesfullly
-                        `;
+        this.flowStatusButton = `Started`;
 
         break;
       case 'suspended':
         this.statusFlow = Status.paused;
         this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowPaused = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Pause <br/>
-                            Status:  Paused succesfully
-            `;
-
-        break;
-      case 'restarted':
-        this.statusFlow = Status.active;
-        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
-        this.isFlowResumed = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Restart <br/>
-                            Status:  Restarted succesfully
-            `;
+        this.flowStatusButton = `Paused`;
         break;
       case 'resumed':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Resume <br/>
-                            Status:  Resumed succesfully
-            `;
+        this.flowStatusButton = `Resumed`;
+        break;
+      case 'restarted':
+        this.statusFlow = Status.active;
+        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowResumed = this.isFlowStarted = true;
+        this.flowStatusButton = `Restarted`;
         break;
       case 'stopped':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: Stop <br/>
-                            Status: Stopped succesfully
-            `;
+        this.flowStatusButton = `Stopped`;
         break;
       default:
-        this.flowStatusButton = `
-                            Last action: ${this.flowStatus} <br/>
-                            Status: Stopped after error
-              `;
+        this.flowStatusButton = `${this.flowStatus}`;
         break;
     }
   }
@@ -382,6 +361,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   getFlowStats(flow: IFlow) {
+
     this.startGetFlowStats(flow);
 
     // refresh every 5 seconds
@@ -395,7 +375,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.statsTableRows = [];
 
     for (const step of flow.steps) {
-      if (step.stepType === StepType.FROM || step.stepType === StepType.ROUTE) {
+
+      if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE || step.stepType === StepType.ROUTE) {
         this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
           this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });

@@ -19,6 +19,8 @@ public enum StepType {
 	DELETE("delete"),
 	ROUTE("route"),
     MESSAGE("message"),
+    SCRIPT("script"),
+    API("api"),
 	CONNECTION("connection");
 
     private final String step;

@@ -59,7 +59,7 @@
     [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
     style="overflow-x: auto; overflow-y: hidden"
   >
-    <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%">
+    <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%; z-index: 5;">
       <thead class="transparant">
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
           <th [style.display]="'none'"><span>ID</span></th>
