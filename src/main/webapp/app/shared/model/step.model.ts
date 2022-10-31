@@ -13,6 +13,7 @@ export const enum StepType {
     MESSAGE = 'MESSAGE',
     CONNECTION = 'CONNECTION',
     API = 'API',
+    SCRIPT = 'SCRIPT',
 }
 
 export interface IStep {

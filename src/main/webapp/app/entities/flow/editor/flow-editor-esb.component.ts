@@ -41,9 +41,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	steps: IStep[] = new Array<Step>();
 	step: IStep;
 
-	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "MESSAGE", "CONNECTION", "ERROR"];
+  //Future possibilities
+	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "SCRIPT", "API", MESSAGE", "CONNECTION", "ERROR"];
 
-	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "CONNECTION", "ERROR"];
+	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT","CONNECTION", "ERROR"];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -107,6 +108,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	consumerComponentsNames: Array<any> = [];
 	producerComponentsNames: Array<any> = [];
+
+  languageComponentsNames: Array<any> = ['groovy','java','simple'];
 
 	editFlowForm: FormGroup;
 	invalidUriMessage: string;
@@ -342,10 +345,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								this.step = new Step();
 								this.step.id = null;
 								this.step.stepType = StepType.SOURCE;
-  							this.step.componentType = "file";
-								this.step.uri = null;
-								this.step.routeId = null;
-								this.step.connectionId = null;
+  							this.step.componentType = 'file';
+ 								this.step.uri = null;
+  							this.step.routeId = null;
+	  						this.step.connectionId = null;
 
                 (<FormArray>this.editFlowForm.controls.stepsData).push(this.initializeStepData(this.step));
 
@@ -411,8 +414,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         value: null,
       });
 
-    } else if (!step.componentType) {
-      step.componentType = 'file';
     }
 
     this.selectedComponentType = step.componentType.toString();
@@ -420,26 +421,31 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const componentType = step.componentType.toString().toLowerCase();
     const camelComponentType = this.components.getCamelComponentType(componentType);
 
-    const type = this.components.types.find(component => component.name === componentType);
-    const camelType = this.components.types.find(component => component.name === camelComponentType);
+    if(step.stepType === 'SOURCE' || step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTER'){
 
-    this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
-    this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
+        const type = this.components.types.find(component => component.name === componentType);
+        const camelType = this.components.types.find(component => component.name === camelComponentType);
 
-    this.uriPlaceholders[stepFormIndex] = type.syntax;
-    this.uriPopoverMessages[stepFormIndex] = type.description;
+        this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
 
-    // set options keys
-    if (typeof e !== 'undefined') {
-      this.setComponentOptions(step, camelComponentType).subscribe(data => {
-        // add custom options if available
-        this.customOptions.forEach(customOption => {
-          if (customOption.componentType === camelComponentType) {
-            this.componentOptions[stepFormIndex].push(customOption);
-          }
-        });
-      });
+        this.uriPlaceholders[stepFormIndex] = type.syntax;
+        this.uriPopoverMessages[stepFormIndex] = type.description;
+
+        // set options keys
+        if (typeof e !== 'undefined') {
+          this.setComponentOptions(step, camelComponentType).subscribe(data => {
+            // add custom options if available
+            this.customOptions.forEach(customOption => {
+              if (customOption.componentType === camelComponentType) {
+                this.componentOptions[stepFormIndex].push(customOption);
+              }
+            });
+          });
+        }
+
     }
+
 
     stepForm.patchValue({ string: componentType });
 
@@ -490,6 +496,21 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			16,
 		);
 	}
+
+  setStepComponent(step: any, stepFormIndex: number, stepType: any): void {
+
+    const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
+
+    if(stepType === 'SCRIPT'){
+        step.componentType = 'groovy';
+        stepForm.controls.componentType.patchValue(step.componentType);
+    }else{
+        step.componentType = 'file';
+        stepForm.controls.componentType.patchValue(step.componentType);
+    }
+
+
+  }
 
 	setPopoverMessages(): void {
 		this.namePopoverMessage =
@@ -1198,6 +1219,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	openModal(templateRef: TemplateRef<any>): void {
 		this.modalRef = this.modalService.open(templateRef);
 	}
+
+	openFullScreenModal(templateRef: TemplateRef<any>): void {
+  		this.modalRef = this.modalService.open(templateRef, { windowClass: 'fullscreen-modal'});
+  }
 
 	cancelModal(): void {
 		this.modalRef.dismiss();
