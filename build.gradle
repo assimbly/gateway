@@ -67,6 +67,8 @@ configurations.all {
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
+    exclude group: 'javax.servlet', module: 'servlet-api'
+    exclude group: 'javax.persistence', module: 'persistence-api'
 }
 
 //Build different jar based on property (connector or broker)
@@ -301,6 +303,7 @@ nohttp {
 configurations {
     providedRuntime
     implementation.exclude module: "spring-boot-starter-tomcat"
+
     compile { transitive = false }
     all {
         resolutionStrategy {
@@ -346,7 +349,9 @@ dependencies {
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-	implementation "javax.annotation:javax.annotation-api"
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
     implementation "io.dropwizard.metrics:metrics-jvm"
