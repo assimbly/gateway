@@ -154,7 +154,7 @@ jib {
         image = 'assimbly/gateway-full'
     }
     container {
-        ports = ['1000', '2000-2003/udp', '8088','61616','61617','9000','9001']
+        ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
         format = 'OCI'
     }
     extraDirectories {
