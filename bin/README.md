@@ -4,6 +4,34 @@ Scripts in this bin directory can be executed
 for Windows from _/bin/win_ or Mac/Linux from _/bin/mac_
 
 ---
+## Run
+
+Build and runs the project.
+
+### Usage:
+
+To build and run the project:
+
+```run```
+
+with options:
+
+```run module environment kind```
+
+* Module: valid values are 'full','integration', 'broker' or 'headless' (default is 'full' then both integration and broker are applied)
+* Environment: valid values are 'dev' or 'prod' (default=dev)
+* Kind: kind of dependencies: opensource or dovetail (default=opensource). Last option adds dovetail dependencies to build.
+
+### Examples:
+
+````
+run full
+run broker prod opensource
+run integration dovetail
+run integration
+````
+
+---
 ## build
 
 Builds the project.
@@ -16,7 +44,7 @@ To build the project:
 
 with options:
 
-```run module environment kind```
+```build module environment kind```
 
 * Module: valid values are 'full','integration', 'broker' or 'headless' (default is 'full' then both integration and broker are applied)
 * Environment: valid values are 'dev' or 'prod' (default=dev)
