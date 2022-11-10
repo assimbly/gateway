@@ -69,6 +69,7 @@ configurations.all {
     exclude module: 'netty-tcnative-classes'
     exclude group: 'javax.servlet', module: 'servlet-api'
     exclude group: 'javax.persistence', module: 'persistence-api'
+    exclude group: 'xerces', module: 'xercesImpl'
 }
 
 //Build different jar based on property (connector or broker)
@@ -395,6 +396,11 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
 
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
     //Only one of web server can be active: tomcat, undertow or jetty
 
     //To use Tomcat
@@ -461,7 +467,7 @@ dependencies {
         implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true  //*
         implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
@@ -480,6 +486,42 @@ dependencies {
         implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
     }
+
+    /*
+    if (project.hasProperty("dovetail")){
+        implementation group:  "world.dovetail", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "aleris", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "amazon", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "archive", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "cookies", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactdotweb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdftotext", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "smb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "soap", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sql", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "throttling", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
+    }*/
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
@@ -549,7 +591,6 @@ if (project.hasProperty("integration")){
         main {
             java {
                 exclude 'org/assimbly/gateway/web/rest/broker/**'
-                exclude 'org/assimbly/gateway/web/rest/integration/**'
                 exclude 'org/assimbly/gateway/web/rest/gateway/AuditResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/CertificateResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
