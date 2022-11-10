@@ -65,6 +65,7 @@ configurations.all {
     exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
   	exclude group: "org.slf4j", module: "slf4j-nop"
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.slf4j", module: "slf4j-simple"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
     exclude group: 'javax.servlet', module: 'servlet-api'
