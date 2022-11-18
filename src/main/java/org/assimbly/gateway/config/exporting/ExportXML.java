@@ -301,6 +301,7 @@ public class ExportXML {
 
         Element blocks = setElement("blocks", null, step);
 
+        String stepId = Long.toString(stepDB.getId());
         Integer confRouteId = stepDB.getRouteId();
         Connection confConnection = stepDB.getConnection();
         Header confHeader = stepDB.getHeader();
@@ -311,7 +312,7 @@ public class ExportXML {
         Element options = setElement("options", null, block);
 
             if (confRouteId != null) {
-                Element routeId =  setElement("route_id", Integer.toString(confRouteId), options);
+                Element routeId =  setElement("route_id", stepId, options);
             }
 
             if (confConnection != null) {
@@ -371,7 +372,7 @@ public class ExportXML {
 
             if (!routesList.contains(routeIdAsString)) {
 
-                routesList.add(routeIdAsString);
+                routesList.add(stepId);
 
                 String routeContent = route.getContent();
 
@@ -380,7 +381,7 @@ public class ExportXML {
                 routeContent = createLogLines(routeContent);
 
                 if(IntegrationUtil.isXML(routeContent)){
-                    Document routeDocument = getRouteDocument(routeContent, routeIdAsString);
+                    Document routeDocument = getRouteDocument(routeContent, stepId);
                     Node node = doc.importNode(routeDocument.getDocumentElement(), true);
                     if(routeContent.startsWith("<routeConfiguration")){
                         routeConfigurations.appendChild(node);

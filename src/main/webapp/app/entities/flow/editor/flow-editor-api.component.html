@@ -1,85 +1,125 @@
+<ng-template #namePopover let-message="message">
+  <div [innerHtml]="namePopoverMessage"></div>
+</ng-template>
+<ng-template #logLevelPopover let-message="message">
+  <div [innerHtml]="logLevelPopoverMessage"></div>
+</ng-template>
+<ng-template #errorHandlerPopover let-message="message">
+  <div [innerHtml]="errorHandlerPopoverMessage"></div>
+</ng-template>
+
+
+<ng-template #componentPopover let-message="message">
+  <div [innerHtml]="componentPopoverMessage"></div>
+</ng-template>
+<ng-template #optionsPopover let-message="message">
+  <div [innerHtml]="optionsPopoverMessage"></div>
+</ng-template>
+<ng-template #headerPopover let-message="message">
+  <div [innerHtml]="headerPopoverMessage"></div>
+</ng-template>
+<ng-template #connectionPopover let-message="message">
+  <div [innerHtml]="connectionPopoverMessage"></div>
+</ng-template>
+<ng-template #popover let-message="message">
+  <div [innerHtml]="popoverMessage"></div>
+</ng-template>
+<ng-template #hostnamePopover let-message="message">
+  <div [innerHtml]="hostnamePopoverMessage"></div>
+</ng-template>
+<ng-template #portPopover let-message="message">
+  <div [innerHtml]="portPopoverMessage"></div>
+</ng-template>
+<ng-template #timeoutPopover let-message="message">
+  <div [innerHtml]="timeoutPopoverMessage"></div>
+</ng-template>
+
+
+<ng-template #testConnectionModal>
+  <div class="modal-header">
+    <h4 class="modal-title">Test Connection</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" (click)="cancelModal()"></button>
+  </div>
+  <div class="modal-body" [formGroup]="testConnectionForm">
+    <div class="form-group row">
+      <div class="col-8">
+        <label class="form-control-label" for="field_header">Host name</label>
+        <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+           [popover]="hostnamePopover" container="body" placement="right"
+        >
+          <fa-icon icon="info-circle"></fa-icon>
+        </i> <input type="text"
+                    class="form-control" formControlName="connectionHost"
+                    id="connectionHost" required/>
+      </div>
+      <div class="col-3">
+        <label class="form-control-label" for="example-number-input">Port</label>
+        <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+           [popover]="portPopover" container="body" placement="right"
+        >
+          <fa-icon icon="info-circle"></fa-icon>
+        </i> <input type="number"
+                    class="form-control" min="1" max="65535"
+                    formControlName="connectionPort" id="connectionPort"/>
+      </div>
+      <div class="col-1"></div>
+    </div>
+    <div class="form-group row">
+      <div class="col-8">
+        <label class="form-control-label" for="example-number-input">Timeout</label>
+        <i triggers="mouseenter:mouseleave" popoverTitle="Info"
+           [popover]="timeoutPopover" container="body" placement="right"
+        >
+          <fa-icon icon="info-circle"></fa-icon>
+        </i> <input type="number"
+                    class="form-control" formControlName="connectionTimeout"
+                    id="connectionTimeout"/>
+      </div>
+      <div class="col-4"></div>
+    </div>
+    <div [innerHtml]="testConnectionMessage"></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary"
+            (click)="cancelModal()">Close
+    </button>
+    <button type="button" class="btn btn-primary"
+            (click)="testConnection()">Test
+    </button>
+  </div>
+</ng-template>
+
+
+
+<div class="row">
+  <div class="col-9"></div>
+  <div class="col-2-5">
+    <a
+      role="button"
+      class="btn btn-sm right-border-radius-0 camel-link camel-img"
+      href="https://camel.apache.org/docs/"
+      title="Camel Documentation"
+      target="_blank"
+    ></a>
+    <a
+      role="button"
+      class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
+      href="https://github.com/assimbly/gateway/wiki/Route"
+      title="Assimbly Documentation"
+      target="_blank"
+    >
+      <picture>
+        <source srcset="../../../content/images/assimbly_transparant.webp" />
+        <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+      </picture>
+    </a>
+  </div>
+  <div class="col-0-5"></div>
+</div>
+
 <div class="container">
+
   <div class="row">
-
-    <ng-template #componentPopover let-message="message">
-      <div [innerHtml]="componentPopoverMessage"></div>
-    </ng-template>
-    <ng-template #optionsPopover let-message="message">
-      <div [innerHtml]="optionsPopoverMessage"></div>
-    </ng-template>
-    <ng-template #headerPopover let-message="message">
-      <div [innerHtml]="headerPopoverMessage"></div>
-    </ng-template>
-    <ng-template #connectionPopover let-message="message">
-      <div [innerHtml]="connectionPopoverMessage"></div>
-    </ng-template>
-    <ng-template #popover let-message="message">
-      <div [innerHtml]="popoverMessage"></div>
-    </ng-template>
-    <ng-template #hostnamePopover let-message="message">
-      <div [innerHtml]="hostnamePopoverMessage"></div>
-    </ng-template>
-    <ng-template #portPopover let-message="message">
-      <div [innerHtml]="portPopoverMessage"></div>
-    </ng-template>
-    <ng-template #timeoutPopover let-message="message">
-      <div [innerHtml]="timeoutPopoverMessage"></div>
-    </ng-template>
-
-    <ng-template #testConnectionModal>
-      <div class="modal-header">
-        <h4 class="modal-title">Test Connection</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" (click)="cancelModal()"></button>
-      </div>
-      <div class="modal-body" [formGroup]="testConnectionForm">
-        <div class="form-group row">
-          <div class="col-8">
-            <label class="form-control-label" for="field_header">Host name</label>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info"
-               [popover]="hostnamePopover" container="body" placement="right"
-            >
-              <fa-icon icon="info-circle"></fa-icon>
-            </i> <input type="text"
-                        class="form-control" formControlName="connectionHost"
-                        id="connectionHost" required/>
-          </div>
-          <div class="col-3">
-            <label class="form-control-label" for="example-number-input">Port</label>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info"
-               [popover]="portPopover" container="body" placement="right"
-            >
-              <fa-icon icon="info-circle"></fa-icon>
-            </i> <input type="number"
-                        class="form-control" min="1" max="65535"
-                        formControlName="connectionPort" id="connectionPort"/>
-          </div>
-          <div class="col-1"></div>
-        </div>
-        <div class="form-group row">
-          <div class="col-8">
-            <label class="form-control-label" for="example-number-input">Timeout</label>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info"
-               [popover]="timeoutPopover" container="body" placement="right"
-            >
-              <fa-icon icon="info-circle"></fa-icon>
-            </i> <input type="number"
-                        class="form-control" formControlName="connectionTimeout"
-                        id="connectionTimeout"/>
-          </div>
-          <div class="col-4"></div>
-        </div>
-        <div [innerHtml]="testConnectionMessage"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary"
-                (click)="cancelModal()">Close
-        </button>
-        <button type="button" class="btn btn-primary"
-                (click)="testConnection()">Test
-        </button>
-      </div>
-    </ng-template>
-
 
     <form [formGroup]="editFlowForm" (ngSubmit)="save()" *ngIf="finished" novalidate>
       <jhi-alert-error></jhi-alert-error>
@@ -87,14 +127,12 @@
         <label for="id">ID</label>
         <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id"/>
       </div>
-      <ng-template #namePopover let-message="message">
-        <div [innerHtml]="namePopoverMessage"></div>
-      </ng-template>
+
       <div class="form-group">
         <div class="form-group row">
           <div class="col-8">
             <input
-              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em;"
+              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em; min-width: 866px;"
               type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow"
               formControlName="name"/>
             <div
@@ -113,395 +151,441 @@
         <div class="card-header">
           <br/>
           <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active2" orientation="horizontal">
-            <li ngbNavItem="STEPS" novalidate>
+            <li ngbNavItem="STEPS" formArrayName="stepsData" novalidate
+                [ngStyle]="{'text-align': 'left' }">
               <a ngbNavLink>STEPS</a>
               <ng-template ngbNavContent>
                 <br/>
                 <hr/>
-                <div class="d-flex" style="min-height: 44rem;">
-                  <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="vertical"
-                      formArrayName="stepsData">
-                    <ng-container *ngFor="let step of steps; index as index">
-                      <li ngbNavItem="{{index}}"
-                          [ngStyle]="{'padding-left': (step.stepType=='RESPONSE') ? '20px' : '10px', 'text-align': 'left' }"
-                          novalidate>
-                        <a ngbNavLink>{{step.stepType}}</a>
-                        <ng-template ngbNavContent>
+                <div style="min-height: 44rem;">
+                  <ng-container *ngFor="let step of steps; index as index">
 
-                          <div class="col-12" style="text-align: left" [formGroupName]="index" id="{{ 'tab' + index }}">
-                            <div class="form-group" [style.display]="'none'">
-                              <label for="id">ID</label>
-                              <input type="text" class="form-control" id="id" formControlName="id" readonly/>
+                    <div class="form-group container" [formGroupName]="index">
+                      <div class="card bg-light">
+                        <div class="card-body">
+
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="float-start text-start">
+                                <h5 class="border-bottom">Step</h5></div>
                             </div>
-                            <ng-template #uriPopover let-message="message">
-                              <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
-                            </ng-template>
-                            <ng-template #pathPopover let-message="message">
-                              <div style="min-width:300px;">{{uriPlaceholders[index]}}</div>
-                            </ng-template>
-                            <ng-template #uriEditor>
-                              <div class="modal-header">
-                                <h4 class="modal-title">URI (context path)</h4>
-                                <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-                              <div class="modal-body">
+                          </div>
+
+                          <div class="row">
+                            <div [style.display]="'none'">
+                              <label for="id">ID</label>
+                              <input type="text" class="form-control" id="stepid" formControlName="id" readonly/>
+                            </div>
+                            <div class="col-12">
+                              <label class="form-control-label float-start" for="field_type" style="float: left; margin-left: 6px;">Type</label>
+                            </div>
+                            <div class="col-10">
+                              <ng-select [items]="stepTypes" bindLabel="stepType" bindValue="stepType" formControlName="stepType"
+                                         id="stepType" dropdownPosition="top" [clearable]="false" (change)="setStepComponent(step, index, $event)" style="text-align: left;"></ng-select>
+                            </div>
+                          </div>
+
+                          <ng-template #uriPopover let-message="message">
+                            <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
+                          </ng-template>
+
+                          <ng-template #uriFullscreenEditor>
+                            <div class="modal-header">
+                              <h4 class="modal-title">Editor</h4>
+                              <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                                <textarea class="form-control" id="field_uri" formControlName="uri"
+                                          placeholder="{{uriPlaceholders[index]}}" rows="25"
+                                          [(ngModel)]="step.uri"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
+                              </button>
+                            </div>
+                          </ng-template>
+
+                          <ng-template #uriEditor>
+                            <div class="modal-header">
+                              <h4 class="modal-title">Path Editor</h4>
+                              <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
                                 <textarea class="form-control" id="field_uri" formControlName="uri"
                                           placeholder="{{uriPlaceholders[index]}}" rows="5"
                                           [(ngModel)]="step.uri"></textarea>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
-                                </button>
-                              </div>
-                            </ng-template>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
+                              </button>
+                            </div>
+                          </ng-template>
 
-                            <div class="form-group container">
-                              <div class="row">
-                                <div class="border-bottom my-3"><h5>URI</h5></div>
+                          <br/>
+
+                          <!-- source, action, sink, router -->
+                          <div *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ACTION' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTER' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SOURCE' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SINK'">
+
+                            <!-- component field-->
+                            <div class="row">
+                              <div class="col-12">
+                                <label class="form-control-label float-start" for="field_component_type" style="float: left; margin-left: 6px;">Component</label>
+                                <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover"
+                                   container="body" placement="right" style="float: left; margin-left: 6px;">
+                                  <fa-icon icon="info-circle"></fa-icon>
+                                </i>
                               </div>
-                              <div class="row">
-                                <div class="col-12">
-                                  <label class="form-control-label" for="field_component_type">Component</label>
-                                  <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover"
-                                     container="body" placement="right" style="margin-left: 6px;">
-                                    <fa-icon icon="info-circle"></fa-icon>
-                                  </i>
-                                </div>
+                              <div class="col-10">
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SOURCE'"
+                                           [items]="consumerComponentsNames" [clearable]="false"
+                                           formControlName="componentType" id="field_component_type"
+                                           style="text-align: left;"
+                                           (change)="setTypeLinks(step, index, $event)"></ng-select>
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SINK'"
+                                           [items]="producerComponentsNames" [clearable]="false"
+                                           formControlName="componentType" id="field_component_type"
+                                           (change)="setTypeLinks(step, index, $event)"
+                                           style="text-align: left;"></ng-select>
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ACTION'"
+                                           [items]="producerComponentsNames" [clearable]="false"
+                                           formControlName="componentType" id="field_component_type"
+                                           (change)="setTypeLinks(step, index, $event)"
+                                           style="text-align: left;"></ng-select>
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ROUTER'"
+                                           [items]="producerComponentsNames" [clearable]="false"
+                                           formControlName="componentType" id="field_component_type"
+                                           (change)="setTypeLinks(step, index, $event)"
+                                           style="text-align: left;"></ng-select>
                               </div>
-                              <div class="row">
-                                <div class="col-10">
-                                  <ng-select *ngIf="step.stepType==='FROM'"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}"
-                                             [items]="consumerComponentsNames" [clearable]="false"
-                                             formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
-                                  <ng-select *ngIf="step.stepType==='TO'"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}"
-                                             [items]="producerComponentsNames" [clearable]="false"
-                                             formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
-                                  <ng-select *ngIf="step.stepType==='ERROR'"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}"
-                                             [items]="producerComponentsNames" [clearable]="false"
-                                             formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
-                                  <ng-select *ngIf="step.stepType==='RESPONSE'"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}"
-                                             [items]="producerComponentsNames" [clearable]="false"
-                                             formControlName="componentType" id="field_component_type"
-                                             (change)="setTypeLinks(step, index, $event)"></ng-select>
-                                </div>
-                                <div ngbDropdown class="col-2" placement="bottom-right">
-                                  <a class="btn btn-primary"
-                                     [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-12px'}"
-                                     id="dropdownBasic1" ngbDropdownToggle>
-                                    <fa-icon icon="bars"></fa-icon>
-                                    Docs</a>
-                                  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                    <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}"
-                                       [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank"
-                                       title="Apache Camel online documentation on the component used for scheme: {{step?.componentType}}.">
-                                      <span>Camel Documentation</span>
-                                    </a>
-                                    <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}"
-                                       target="_blank"
-                                       title="Assimbly Gateway online documentation on the component used for scheme: {{step?.componentType}}.">
-                                      <span>Assimbly Documentation</span>
-                                    </a>
-                                    <a ngbDropdownItem role="button"
-                                       (click)="openTestConnectionModal(testConnectionModal)"
-                                       title="Test if connection is available">
-                                      <span>Test Connection</span>
-                                    </a>
-                                  </div>
-                                </div>
-                                <div
-                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.touched)">
-                                  <div
-                                    *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors.required"
-                                    class="invalid-field-message">ComponentType is required. Please select one.
-                                  </div>
+
+
+                             <div class="col-2" ngbDropdown placement="bottom-right">
+                                <a class="btn btn-primary"
+                                   [ngStyle]="{'color':'white', 'float' : 'left', 'position' : 'absolute', 'left': '0px', 'right': '0px'}"
+                                   id="dropdownBasic1" ngbDropdownToggle>
+                                  <fa-icon icon="bars"></fa-icon>
+                                  Docs</a>
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                  <a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[index]}}"
+                                     [ngClass]="{'disabled': !componentTypeCamelLinks[index]}" target="_blank"
+                                     title="Apache Camel online documentation on the component used for scheme: {{step?.componentType}}.">
+                                    <span>Camel Documentation</span>
+                                  </a>
+                                  <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}"
+                                     target="_blank"
+                                     title="Assimbly Gateway online documentation on the component used for scheme: {{step?.componentType}}.">
+                                    <span>Assimbly Documentation</span>
+                                  </a>
+                                  <a ngbDropdownItem role="button"
+                                     (click)="openTestConnectionModal(testConnectionModal)"
+                                     title="Test if connection is available">
+                                    <span>Test Connection</span>
+                                  </a>
                                 </div>
                               </div>
-                              <br/>
-                              <div class="row">
-                                <div class="col-12">
-                                  <label class="form-control-label" for="field_uri">Path</label>
-                                  <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover"
-                                     container="body" placement="right" style="margin-left: 6px;">
-                                    <fa-icon icon="info-circle"></fa-icon>
-                                  </i>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-10">
-                                  <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}" id="field_uri"
-                                             formControlName="uri" [(ngModel)]="step.uri"
-                                             dropdownPosition="bottom"></ng-select>
-                                </div>
-                                <button type="button" class="col-2 btn btn-primary"
-                                        [ngStyle]="{'display':'block', 'width': '100px', 'color':'white'}"
-                                        title="Enlarge" (click)="openModal(uriEditor)">
-                                  <fa-icon style="color: white;" icon="edit"></fa-icon>
-                                </button>
-                              </div>
+                            </div>
+                            <div class="row">
                               <div
-                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.touched)">
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.touched)">
                                 <div
-                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors.required"
-                                  class="invalid-field-message">Context path is required.
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors.required"
+                                  class="invalid-field-message">ComponentType is required. Please select one.
                                 </div>
                               </div>
-                              <br/>
-                              <div formArrayName="options">
-                                <div class="row">
-                                  <div class="col-12">
-                                    <label class="form-control-label" for="field_options">Options</label>
-                                    <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"
-                                       container="body" placement="right">
-                                      <fa-icon icon="info-circle"></fa-icon>
-                                    </i>
-                                  </div>
-                                </div>
-                                <div class="row" *ngFor="let option of stepsOptions[index]; index as idx"
-                                     [formGroupName]="idx">
-                                  <div class="col-5">
-                                    <ng-select [items]="componentOptions[index]" bindLabel="displayName"
-                                               bindValue="name" [addTag]="addOptionTag" formControlName="key"
-                                               [ngStyle]="{'display':'block', 'width': '250px'}"
-                                               id="field_options-key-{{idx}}"
-                                               (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, step)"
-                                               [(ngModel)]="selectedOptions[index][idx]">
-                                      <ng-template ng-option-tmp let-item="item">
-                                        <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip"
-                                             [openDelay]="500" placement="bottom" container="body">{{item.displayName}}
-                                        </div>
-                                        <ng-template #optionTooltip>
-                                          <div>
-                                            <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span
-                                            *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
-                                          </div>
-                                        </ng-template>
-                                      </ng-template>
-                                    </ng-select>
-                                  </div>
-                                  <div class="col-5">
-                                    <input type="text" class="d-inline-block form-control"
-                                           style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 20px;"
-                                           id="field_options-value-{{idx}}" formControlName="value"
-                                           [placeholder]="editFlowForm['controls'].stepsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value"
-                                           data-toggle="tooltip"
-                                           title="Value of the option. Click the Camel component button for documentation on valid options."/>
-                                  </div>
-                                  <button title="Add option" type="button"
-                                          class="col-1 right-border-radius-0 btn btn-primary"
-                                          (click)="addOption(stepsOptions[index], index)"
-                                          [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                    <fa-icon icon="plus" style="color: white;"></fa-icon>
-                                  </button>
-                                  <button title="Remove option" type="button"
-                                          class="col-1 left-border-radius-0 btn btn-danger"
-                                          (click)="removeOption(stepsOptions[index], option, index)"
-                                          [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN' || stepsOptions[index].length === 1">
-                                    <fa-icon icon="times" style="color: white;"></fa-icon>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="form-group container">
-                              <div class="row">
-                                <div class="border-bottom my-3"><h5>Header</h5></div>
-                              </div>
-                              <div class="row">
-                                <div class="col-10">
-                                  <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header"
-                                             id="field_header" dropdownPosition="top"></ng-select>
-                                </div>
-                                <button type="button"
-                                        *ngIf="headerCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
-                                        title="Edit header" class="col-2 btn btn-primary"
-                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
-                                </button>
-                                <button type="button"
-                                        *ngIf="headerCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
-                                        class="col-2 btn btn-primary flow-header-button" title="New header"
-                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                </button>
-                                <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary"
-                                        title="Create header"
-                                        (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
-                                </button>
-                              </div>
-                            </div>
-
-                            <div class="form-group container">
-                              <div class="row">
-                                <div class="border-bottom my-3"><h5>Route</h5></div>
-                              </div>
-                              <div class="row">
-                                <div class="col-10">
-                                  <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                                             id="field_route" dropdownPosition="top"></ng-select>
-                                </div>
-                                <button type="button"
-                                        *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
-                                        title="Edit route" class="col-2 btn btn-primary"
-                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="edit"
-                                                                        style="color: white;"></fa-icon></span>&nbsp;
-                                </button>
-                                <button type="button"
-                                        *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
-                                        class="col-2 btn btn-primary flow-header-button" title="New route"
-                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                </button>
-                                <button type="button" *ngIf="!routeCreated" class="col-2 btn btn-primary"
-                                        title="Create route"
-                                        (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="plus"></fa-icon></span>&nbsp;
-                                </button>
-                              </div>
-                            </div>
-
-                            <div class="form-group container">
-                              <div class="row">
-                                <div class="border-bottom my-3"><h5>Connection</h5></div>
-                              </div>
-                              <div class="row">
-                                <div class="col-10">
-                                  <ng-select [items]="filterConnection[index]" bindLabel="name" bindValue="id"
-                                             formControlName="connection" id="field_connection"
-                                             dropdownPosition="top"></ng-select>
-                                </div>
-                                <button type="button"
-                                        *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
-                                        class="col-2 btn btn-primary" title="Edit connection"
-                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.value === 'WASTEBIN'">
-                                  <span class="padding-button"><fa-icon icon="edit"
-                                                                        style="color: white;"></fa-icon></span>&nbsp;
-                                </button>
-                                <button type="button"
-                                        *ngIf="connectionCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
-                                        class="col-2 btn btn-primary flow-header-button" title="New connection"
-                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
-                                </button>
-                                <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-header-button"
-                                        title="Create connection"
-                                        (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
-                                        [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
-                                </button>
-                              </div>
-
-                              <div
-                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.touched)">
-                                <div
-                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.errors.required"
-                                  class="invalid-field-message">Connection is required for this component
-                                </div>
-                              </div>
-                              <br/>
-
-                              <div class="row">
-                                <div class="col-5 offset-7">
-                                  <div style="position:absolute; right: 100px;">
-                                    <button type="button" class="btn btn-primary ml-auto"
-                                            *ngIf="step.stepType==='TO' || (step.stepType==='FROM')"
-                                            (click)="addStep(step, index)"
-                                            [disabled]="(step.stepType==='FROM' && numberOfFromSteps > 2)"
-                                            [ngbTooltip]="(step.stepType==='FROM' && numberOfFromSteps > 2) ? 'Only 3 FROM type steps allowed' : ''"
-                                            placement="right">
-                                      <span><fa-icon icon="pencil-alt" style="color: white;"></fa-icon></span>&nbsp;
-                                      <span style="color: white;">Add</span>&nbsp;
-                                    </button>
-                                    <button type="button" class="btn btn-danger ml-auto"
-                                            *ngIf="step.stepType==='TO' || (step.stepType==='FROM')"
-                                            (click)="removeStep(step, 'stepData'+index)"
-                                            [disabled]="!((step.stepType==='TO' && numberOfToSteps > 1) || (step.stepType==='FROM' && numberOfFromSteps > 1))">
-                                      <span><fa-icon icon="times"></fa-icon></span>&nbsp;
-                                      <span>Remove</span>
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                              <br/>
-                              <br/>
-                              <div class="row">
-                                <div class="col-6 offset-6">
-                                  <div style="position:absolute; right: 100px;">
-                                    <button type="button" class="btn btn-primary ml-auto"
-                                            *ngIf="(step.stepType==='TO' && step.responseId==undefined)"
-                                            [disabled]="numberOfResponseSteps>0"
-                                            (click)="addResponseStep(step)">
-                                      <span><fa-icon icon="pencil-alt" style="color: white;"></fa-icon></span>&nbsp;
-                                      <span
-                                        [ngbTooltip]="numberOfResponseSteps===0 ? '' : 'Only one Response step per Flow allowed'"
-                                        placement="right" style="color: white;">Add Response Step</span>
-                                    </button>
-                                    <button type="button" class="btn btn-danger ml-auto"
-                                            *ngIf="(step.stepType==='TO' && (step.responseId!=undefined))"
-                                            (click)="removeResponseStep(step)">
-                                      <span><fa-icon icon="times" style="color: white;"></fa-icon></span>&nbsp;
-                                      <span style="color: white;">Remove Response Step</span>
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                              <br/>
                             </div>
                             <br/>
+
+                            <!-- path field-->
+                            <ng-template #pathPopover let-message="message">
+                              <div style="min-width:300px;">{{uriPlaceholders[index]}}</div>
+                            </ng-template>
+
+                            <div class="row">
+                              <div class="col-12">
+                                <label class="form-control-label" for="field_uri" style="float: left; margin-left: 6px;">Path</label>
+                                <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover"
+                                   container="body" placement="right" style="float: left; margin-left: 6px;">
+                                  <fa-icon icon="info-circle"></fa-icon>
+                                </i>
+                              </div>
+                              <div class="col-10">
+                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
+                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
+                                           formControlName="uri" [(ngModel)]="step.uri"
+                                           dropdownPosition="bottom"></ng-select>
+                              </div>
+                              <button type="button" class="col-2 btn btn-primary"
+                                      [ngStyle]="{'color':'white'}"
+                                      title="Enlarge" (click)="openModal(uriEditor)">
+                                <fa-icon style="color: white;" icon="edit"></fa-icon>
+                              </button>
+                            </div>
+                            <div
+                              *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.touched)">
+                              <div
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors.required"
+                                class="invalid-field-message">Context path is required.
+                              </div>
+                            </div>
+                            <br/>
+
+                            <!-- options fields -->
+                            <div formArrayName="options">
+                              <div class="row">
+                                <div class="col-12">
+                                  <label class="form-control-label" for="field_options"  style="float: left; margin-left: 6px;">Options</label>
+                                  <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"
+                                     container="body" placement="right" style="float: left; margin-left: 6px;">
+                                    <fa-icon icon="info-circle"></fa-icon>
+                                  </i>
+                                </div>
+                              </div>
+                              <div class="row" *ngFor="let option of stepsOptions[index]; index as idx" [formGroupName]="idx">
+                                <div class="col-5">
+                                  <ng-select [items]="componentOptions[index]" bindLabel="displayName"
+                                             bindValue="name" [addTag]="addOptionTag" formControlName="key"
+                                             [ngStyle]="{'text-align' : 'left'}"
+                                             id="field_options-key-{{idx}}"
+                                             (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, step)"
+                                             [(ngModel)]="selectedOptions[index][idx]">
+                                    <ng-template ng-option-tmp let-item="item">
+                                      <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip"
+                                           [openDelay]="500" placement="bottom" container="body">{{item.displayName}}
+                                      </div>
+                                      <ng-template #optionTooltip>
+                                        <div>
+                                          <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span
+                                          *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
+                                        </div>
+                                      </ng-template>
+                                    </ng-template>
+                                  </ng-select>
+                                </div>
+                                <div class="col-5">
+                                  <input type="text" class="d-inline-block form-control"
+                                         style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 28px;"
+                                         id="field_options-value-{{idx}}" formControlName="value"
+                                         [placeholder]="editFlowForm['controls'].stepsData['controls'][index]['controls'].options['controls'][idx]['controls'].defaultValue.value"
+                                         data-toggle="tooltip"
+                                         title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                                </div>
+                                <button title="Add option" type="button"
+                                        class="col-1 right-border-radius-0 btn btn-primary"
+                                        (click)="addOption(stepsOptions[index], index)">
+                                  <fa-icon icon="plus" style="color: white;"></fa-icon>
+                                </button>
+                                <button title="Remove option" type="button"
+                                        class="col-1 left-border-radius-0 btn btn-danger"
+                                        (click)="removeOption(stepsOptions[index], option, index)">
+                                  <fa-icon icon="times" style="color: white;"></fa-icon>
+                                </button>
+                              </div>
+                            </div>
+
                           </div>
 
-                        </ng-template>
-                      </li>
-                    </ng-container>
-                  </ul>
-                  <div [ngbNavOutlet]="nav" class="ml-4"></div>
-                </div>
+                          <!-- route -->
+                          <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTE'">
 
+                            <div class="col-12">
+                              <label class="form-control-label float-start" for="field_route" style="float: left; margin-left: 6px;">Route</label>
+                            </div>
+                            <div class="col-10">
+                              <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
+                                         id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+                            </div>
+                            <button title="Edit route"  type="button"
+                                    class="col-2 btn btn-primary"
+                                    style="height: 37px;"
+                                    *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                                    <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                            </button>
+                            <button title="New step or route" type="button"
+                                    class="col-2 btn btn-primary flow-header-button"
+                                    style="height: 37px;"
+                                    *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                            </button>
+                            <button title="Create step or route" type="button" *ngIf="!routeCreated"
+                                    class="col-2 btn btn-primary flow-header-button"
+                                    style="height: 37px;"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                            </button>
+
+                        </div>
+
+                        <!-- error -->
+                        <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ERROR'">
+
+                          <div class="col-12">
+                            <label class="form-control-label float-start" for="field_errorhandler" style="float: left; margin-left: 6px;">Error Handler</label>
+                            <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+                               [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
+                              <fa-icon icon="info-circle"></fa-icon>
+                            </i>
+                          </div>
+                          <div class="col-10">
+                            <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
+                                       id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+                          </div>
+                          <button title="Edit route"  type="button"
+                                  class="col-2 btn btn-primary"
+                                  style="height: 37px;"
+                                  *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                          </button>
+                          <button title="New step or route" type="button"
+                                  class="col-2 btn btn-primary flow-header-button"
+                                  style="height: 37px;"
+                                  *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                          </button>
+                          <button title="Create step or route" type="button" *ngIf="!routeCreated"
+                                  class="col-2 btn btn-primary flow-header-button"
+                                  style="height: 37px;"
+                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                          </button>
+
+                      </div>
+
+                      <!-- script -->
+                      <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SCRIPT'">
+
+                            <!-- component field-->
+                              <div class="col-12">
+                                <label class="form-control-label float-start" for="field_component_type" style="float: left; margin-left: 6px;">Language</label>
+                              </div>
+                              <div class="col-10">
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SCRIPT'"
+                                           [items]="languageComponentsNames" [clearable]="false"
+                                           formControlName="componentType" id="field_component_type"
+                                           style="text-align: left;"></ng-select>
+                              </div>
+                              <div class="col-2"></div>
+                              <div *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.touched)">
+                                <div
+                                  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].componentType.errors.required"
+                                  class="invalid-field-message">Language is required. Please select one.
+                                </div>
+                              </div>
+
+                            <!-- path field-->
+                            <ng-template #pathPopover let-message="message">
+                              <div style="min-width:300px;">{{uriPlaceholders[index]}}</div>
+                            </ng-template>
+
+                        <div class="row">
+                          <br/>
+                          <div class="col-12" style="padding-top: 12px;padding-bottom: 12px"></div>
+                          <br/>
+                        </div>
+
+
+                            <div class="col-12">
+                                <label class="form-control-label" for="field_uri" style="float: left; margin-left: 6px;">Script</label>
+                              </div>
+                              <div class="col-10">
+                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
+                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
+                                           formControlName="uri" [(ngModel)]="step.uri"
+                                           dropdownPosition="bottom"></ng-select>
+                              </div>
+                              <button type="button" class="col-2 btn btn-primary"
+                                      [ngStyle]="{'color':'white'}"
+                                      title="Enlarge" (click)="openFullScreenModal(uriFullscreenEditor)">
+                                <fa-icon style="color: white;" icon="edit"></fa-icon>
+                              </button>
+                            <div
+                              *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors && (editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.dirty || editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.touched)">
+                              <div
+                                *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri.errors.required"
+                                class="invalid-field-message">Script is required.
+                              </div>
+                            </div>
+
+                        </div>
+
+
+                          <!-- connection -->
+                        <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='CONNECTION'">
+                          <div class="col-12">
+                            <label class="form-control-label float-start" for="field_connection" style="float: left; margin-left: 6px;">Connection</label>
+                          </div>
+                          <div class="col-10">
+                            <ng-select [items]="connections" bindLabel="name" bindValue="id"
+                                       formControlName="connection" id="field_connection"
+                                       dropdownPosition="top"></ng-select>
+                          </div>
+                          <button type="button"
+                                  *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                  class="col-2 btn btn-primary" title="Edit connection"
+                                  (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)">
+                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                          </button>
+                          <button type="button"
+                                  *ngIf="connectionCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
+                                  class="col-2 btn btn-primary flow-header-button" title="New connection"
+                                  (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                  [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
+                          </button>
+                          <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-header-button"
+                                  title="Create connection"
+                                  (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
+                                  [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
+                          </button>
+                        </div>
+
+                        <br/>
+                        <br/>
+                          <div class="row">
+                            <div class="col-5-5"></div>
+                            <button title="Add step" type="button"
+                                    class="col-3 btn btn-success"
+                                    style="height: 37px; color: white; padding-left: 30px;"
+                                    (click)="addStep(step, index)">
+                              <fa-icon icon="plus" style="color: white;"></fa-icon> Add
+                            </button>
+                            <div class="col-0-5"></div>
+                            <button title="Remove step" type="button" *ngIf="index > 0"
+                                    class="col-3 btn btn-danger"
+                                    style="height: 37px;"
+                                    (click)="removeStep(step, index)">
+                              <fa-icon icon="times" style="color: white;"></fa-icon> Remove
+                            </button>
+                            <button title="Remove step" type="button" *ngIf="index == 0"
+                                    class="col-3 btn btn-secondary" disabled
+                                    style="height: 37px;"
+                                    (click)="removeStep(step, index)">
+                              <fa-icon icon="times" style="color: white;"></fa-icon> Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <br/>
+                    </div>
+                  </ng-container>
+                </div>
               </ng-template>
             </li>
-            <li ngbNavItem="SETTINGS" novalidate>
-              <a ngbNavLink>SETTINGS</a>
+
+            <li ngbNavItem="SETTINGS" novalidate [ngStyle]="{'text-align': 'left' }">
+            <a ngbNavLink>SETTINGS</a>
               <ng-template ngbNavContent>
-                <ng-template #autoStartPopover let-message="message">
-                  <div [innerHtml]="autoStartPopoverMessage"></div>
-                </ng-template>
-                <ng-template #assimblyHeadersPopover let-message="message">
-                  <div [innerHtml]="assimblyHeadersPopoverMessage"></div>
-                </ng-template>
-                <ng-template #parallelProcessingPopover let-message="message">
-                  <div [innerHtml]="parallelProcessingPopoverMessage"></div>
-                </ng-template>
-                <ng-template #maximumRedeliveriesPopover let-message="message">
-                  <div [innerHtml]="maximumRedeliveriesPopoverMessage"></div>
-                </ng-template>
-                <ng-template #redeliveryDelayPopover let-message="message">
-                  <div [innerHtml]="redeliveryDelayPopoverMessage"></div>
-                </ng-template>
-                <ng-template #logLevelPopover let-message="message">
-                  <div [innerHtml]="logLevelPopoverMessage"></div>
-                </ng-template>
                 <br/>
                 <hr/>
-                <div class="container" style="min-height: 44rem;">
-                  <div class="col-12" style="padding-left: 20px; padding-right: 452px;">
-                    <div class="form-group">
-                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log
-                        Level</label>
+                <div style="min-height: 44rem;">
+                  <div class="row">
+                    <div class="form-group col-10" style="margin-left: 24px;">
+                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
                       <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
                          [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
@@ -513,68 +597,14 @@
                         </option>
                       </select>
                     </div>
-                    <div class="form-group">
-                      <label class="form-control-label" for="field_autostart" style="float: left; text-align: left;">Autostart</label>
-                      <i triggers="mouseenter:mouseleave" placement="right"
-                         popoverTitle="Info" [popover]="autoStartPopover"
-                         style="float: left; margin-left: 6px;">
-                        <fa-icon icon="info-circle"></fa-icon>
-                      </i>
-                      <select type="text" class="form-control form-select" id="field_autostart" *ngIf="flow"
-                              formControlName="autoStart">
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-control-label" for="field_parallelprocessing"
-                             style="float: left; text-align: left;">Parallel Processing</label>
-                      <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-                         [popover]="parallelProcessingPopover" style="float: left; margin-left: 6px;">
-                        <fa-icon icon="info-circle"></fa-icon>
-                      </i>
-                      <select type="text" class="form-control form-select" id="field_parallelprocessing" *ngIf="flow"
-                              formControlName="parallelProcessing">
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-control-label" for="field_assimbly_headers"
-                             style="float: left; text-align: left;">Assimbly Headers</label>
-                      <i triggers="mouseenter:mouseleave" placement="right"
-                         popoverTitle="Info" [popover]="assimblyHeadersPopover" style="float: left; margin-left: 6px;">
-                        <fa-icon icon="info-circle"></fa-icon>
-                      </i>
-                      <select type="text" class="form-control form-select" id="field_assimbly_headers" *ngIf="flow"
-                              formControlName="assimblyHeaders">
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-control-label" for="field_maximumRedeliveries"
-                             style="float: left; text-align: left;">Maximum Redeliveries</label>
-                      <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-                         [popover]="maximumRedeliveriesPopover" style="float: left; margin-left: 6px;">
-                        <fa-icon icon="info-circle"></fa-icon>
-                      </i>
-                      <input min="0" max="1000" size="0" maxlength="4" type="number" name="maximumRedeliveries"
-                             class="form-control" id="maximumRedeliveries" *ngIf="flow"
-                             formControlName="maximumRedeliveries" required>
-                    </div>
-                    <div class="form-group" *ngIf="!singleGateway">
-                      <label class="form-control-label" for="field_gateway" style="float: left; text-align: left;">Gateway</label>
-                      <select class="form-control form-select" id="field_gateway" *ngIf="flow"
-                              formControlName="gateway">
-                        <option [ngValue]="gateway.id" *ngFor="let gateway of gateways">{{gateway.name}}</option>
-                      </select>
-                    </div>
+                    <div class="col-2"></div>
                   </div>
+                  <br/>
                 </div>
               </ng-template>
             </li>
-            <li ngbNavItem="FLOW3" novalidate>
+
+            <li ngbNavItem="NOTES" novalidate [ngStyle]="{'text-align': 'left' }">
               <a ngbNavLink>NOTES</a>
               <ng-template ngbNavContent>
                 <ng-template #notesPopover let-message="message">
@@ -598,18 +628,24 @@
       </div>
 
       <br/>
+      <br/>
       <div class="container">
-        <div class="row">
-          <div class="col-5 offset-6" style="padding-left: 30px;">
-            <button type="button" class="btn btn-secondary float-right" [routerLink]="['/']">
-              <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp; <span
-              style="color: white;">Cancel</span>
-            </button>
-            <button type="button" (click)="save()" class="btn btn-primary float-right" [disabled]="isSaving">
-              <span><fa-icon icon="save"></fa-icon></span>&nbsp; <span style="color: white;">Save</span>
-            </button>
+        <div class="row justify-content-center">
+          <div class="col-8 offset-4">
+            <div class="position-relative">
+              <div class="position-absolute bottom-50 end-50">
+                <button type="button" class="btn btn-secondary" [routerLink]="['/']">
+                  <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>
+                  &nbsp; <span style="color: white;">Cancel</span>
+                </button>
+                <button class="float-end" type="button" (click)="save()" class="btn btn-primary" [disabled]="isSaving">
+                  <span><fa-icon icon="save"></fa-icon></span>&nbsp;
+                  &nbsp; <span style="color: white;">Save</span>
+                </button>
+
+              </div>
+            </div>
           </div>
-          <div class="col-1"></div>
         </div>
       </div>
       <br/>

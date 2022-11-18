@@ -187,6 +187,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   setFlowStatus(status: string): void {
 
+    console.log("0");
+
     switch (status) {
       case 'unconfigured':
         this.statusFlow = Status.inactive;
@@ -227,9 +229,65 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowStatusButton = `Stopped`;
         break;
       default:
-        this.flowStatusButton = `${this.flowStatus}`;
+        console.log("0");
+        this.setErrorMessage('unknown',status);
         break;
     }
+  }
+
+  setErrorMessage(action: string, error: string){
+
+      try {
+
+          // try to parse as json
+          const data = JSON.parse(error);
+
+          if (data.flow.stepsLoaded) {
+
+                  const total = data.flow.stepsLoaded.total;
+                  const failed = data.flow.stepsLoaded.failed;
+
+                  this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
+                                           <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
+                                           <b>Details:</b> <br/>`;
+
+                  for (let i = 0; i < data.flow.steps.length; i++) {
+
+                      const id = data.flow.steps[i].id;
+                      const uri = data.flow.steps[i].uri;
+                      const status = data.flow.steps[i].status;
+
+                      if(status==='error'){
+
+                          const errorMessage = data.flow.steps[i].errorMessage;
+
+                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                            <tbody>
+                              <tr>
+                                <td><b>step id:</b></td>
+                                <td>${id}</td>
+                              </tr>
+                              <tr>
+                                <td><b>uri:</b></td>
+                                <td>${uri}</td>
+                              </tr>
+                              <tr>
+                                <td><b>error:</b></td>
+                                <td>${errorMessage}</td>
+                              </tr>
+                            </tbody>
+                          </table>`;
+                      }
+
+                  }
+
+          } else {
+              this.flowStatusButton = error;
+          }
+      } catch (e) {
+           this.flowStatusButton = error;
+      }
+
   }
 
   getFlowAlerts(id: number) {
@@ -336,28 +394,22 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   getFlowLastError(id: number, action: string, errMessage: string) {
+
     if (errMessage) {
       if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
         this.router.navigate(['/login']);
       } else {
-        this.flowStatusButton = `
-                    Last action: ${action} <br/>
-                    Status: Stopped after error <br/><br/>
-                    ${errMessage}
-                    `;
+        this.setErrorMessage(action, errMessage);
         this.statusFlow = Status.inactiveError;
       }
     } else {
       this.flowService.getFlowLastError(id).subscribe(response => {
         this.lastError = response === '0' ? '' : response.body;
-        this.flowStatusButton = `
-                Last action: ${action} <br/>
-                Status: Stopped after error <br/><br/>
-                ${this.lastError}
-                `;
+        this.setErrorMessage(action, errMessage);
         this.statusFlow = Status.inactiveError;
       });
     }
+
   }
 
   getFlowStats(flow: IFlow) {
@@ -376,10 +428,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     for (const step of flow.steps) {
 
-      if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE || step.stepType === StepType.ROUTE) {
+      if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
         this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
+          console.log('4. get stats' + JSON.stringify(res.body));
+
           this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
+      }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
+        this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
+          this.setFlowStatistic(res.body, flow.id + '-' + step.id);
+        });
+
       }
     }
   }
@@ -408,7 +467,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   setFlowStatistic(res, uri) {
-    /* Example Available stats
+          /* Example of available stats
           *
           * "maxProcessingTime": 1381,
             "lastProcessingTime": 1146,
