@@ -36,6 +36,9 @@ plugins {
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
+tasks.withType(JavaExec) {
+    systemProperty "DOVETAIL_ENV", System.getProperty("DOVETAIL_ENV")
+}
 
 group = "org.assimbly.gateway"
 version = '3.8.0'
@@ -470,6 +473,7 @@ dependencies {
         implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "oauth2token", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "pdftotext", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
