@@ -238,7 +238,7 @@
                               <div class="row">
                                 <div class="col-10">
                                   <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                             [ngStyle]="{'display':'inline-block', 'width':'100%'}" id="field_uri"
+                                             [ngStyle]="{'display':'inline-block', 'width':'100%', 'max-width': '32em'}" id="field_uri"
                                              formControlName="uri" [(ngModel)]="step.uri"
                                              dropdownPosition="bottom"></ng-select>
                                 </div>
