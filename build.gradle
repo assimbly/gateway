@@ -444,12 +444,12 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
-        implementation group: "org.assimbly", name: "integrationRest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRest", version: "${version}", changing: true
-        implementation group: "org.assimbly", name: "brokerRest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }
 
     if (project.hasProperty("dovetail")){
