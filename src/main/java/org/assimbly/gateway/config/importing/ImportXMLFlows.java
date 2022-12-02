@@ -2,7 +2,7 @@ package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.domain.enumeration.EndpointType;
+import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 import org.assimbly.gateway.repository.*;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class ImportXMLFlows {
     private HeaderRepository headerRepository;
 
     @Autowired
-    private ServiceRepository serviceRepository;
+    private ConnectionRepository connectionRepository;
 
     public String xmlConfiguration;
     public String configuration;
@@ -51,8 +51,8 @@ public class ImportXMLFlows {
     private Optional<Flow> flowOptional;
     private Flow flow;
 
-    private Set<Endpoint> endpoints;
-	private Endpoint endpoint;
+    private Set<Step> steps;
+	private Step step;
 
 	public String setFlowsFromXML(Document doc, Long integrationId) throws Exception {
 
@@ -112,11 +112,11 @@ public class ImportXMLFlows {
 				flow = new Flow();
 				flow.setId(databaseId);
 
-                endpoints = getEndpointsFromXML(flowId, doc, flow, true);
+                steps = getStepsFromXML(flowId, doc, flow, true);
 
 			} else {
 				flow = flowOptional.get();
-				endpoints = getEndpointsFromXML(flow.getId().toString(), doc, flow, false);
+				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
 			if (!gatewayOptional.isPresent()) {
@@ -174,7 +174,7 @@ public class ImportXMLFlows {
                 flow.created(Instant.now());
             }
 
-			flow.setEndpoints(endpoints);
+			flow.setSteps(steps);
 
 			flow = flowRepository.save(flow);
 
@@ -185,58 +185,58 @@ public class ImportXMLFlows {
 		}
 	}
 
-	private Set<Endpoint> getEndpointsFromXML(String id, Document doc, Flow flow, boolean newFlow)
+	private Set<Step> getStepsFromXML(String id, Document doc, Flow flow, boolean newFlow)
 			throws Exception {
 
 		if (newFlow) {
 
-            endpoints = new HashSet<Endpoint>();
+            steps = new HashSet<Step>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfEndpoints = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/endpoints/endpoint)", doc));
-			numberOfEndpoints = numberOfEndpoints + 1;
+			int numberOfSteps = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/steps/step)", doc));
+			numberOfSteps = numberOfSteps + 1;
 
-			for (int i = 1; i < numberOfEndpoints; i++) {
+			for (int i = 1; i < numberOfSteps; i++) {
 				String index = Integer.toString(i);
-				endpoint = getEndpointFromXML(id, doc, flow, null, index);
-				endpoints.add(endpoint);
+				step = getStepFromXML(id, doc, flow, null, index);
+				steps.add(step);
 			}
 		} else {
 
-			endpoints = flow.getEndpoints();
+			steps = flow.getSteps();
 
 			Integer index = 1;
 
-			for (Endpoint endpoint : endpoints) {
+			for (Step step : steps) {
 
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 id = xPath.evaluate("//flows/flow[name='" + flow.getName() + "']/id", doc);
 
-				endpoint = getEndpointFromXML(id, doc, flow, endpoint, index.toString());
-				endpoints.add(endpoint);
+				step = getStepFromXML(id, doc, flow, step, index.toString());
+				steps.add(step);
 				index++;
 			}
 
 		}
 
-        return endpoints;
+        return steps;
 	}
 
-	private Endpoint getEndpointFromXML(String id, Document doc, Flow flow, Endpoint endpoint, String index) throws Exception {
+	private Step getStepFromXML(String id, Document doc, Flow flow, Step step, String index) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String endpointXPath = "/integrations/integration/flows/flow[id='" + id + "']/endpoints/endpoint[" + index + "]/";
+		String stepXPath = "/integrations/integration/flows/flow[id='" + id + "']/steps/step[" + index + "]/";
 
-		String type = xPath.evaluate(endpointXPath + "type", doc);
-		String uri = xPath.evaluate(endpointXPath + "uri", doc);
+		String type = xPath.evaluate(stepXPath + "type", doc);
+		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
-		String serviceId = xPath.evaluate(endpointXPath + "service_id", doc);
-		String headerId = xPath.evaluate(endpointXPath + "header_id", doc);
-        String responseIdAsString = xPath.evaluate(endpointXPath + "response_id", doc);
-        String routeIdAsString = xPath.evaluate(endpointXPath + "route_id", doc);
+		String connectionId = xPath.evaluate(stepXPath + "connection_id", doc);
+		String headerId = xPath.evaluate(stepXPath + "header_id", doc);
+        String responseIdAsString = xPath.evaluate(stepXPath + "response_id", doc);
+        String routeIdAsString = xPath.evaluate(stepXPath + "route_id", doc);
 
         // get type
-		EndpointType endpointType = EndpointType.valueOf(type.toUpperCase());
+		StepType stepType = StepType.valueOf(type.toUpperCase());
 
 		// get componenType & uri
 		if(uri.contains(":")){
@@ -253,7 +253,7 @@ public class ImportXMLFlows {
 		}
 
 		// get options
-		Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, endpointXPath + "options/*");
+		Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, stepXPath + "options/*");
 
 		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
 
@@ -268,23 +268,23 @@ public class ImportXMLFlows {
 
 		}
 
-		// get service if configured
-		org.assimbly.gateway.domain.Service service;
+		// get connection if configured
+		Connection connection;
 		try {
 
-            Long serviceIdLong = Long.parseLong(serviceId, 10);
+            Long connectionIdLong = Long.parseLong(connectionId, 10);
 
-            String serviceName = xPath.evaluate("/integrations/integration/services/service[id=" + serviceIdLong + "]/name",doc);
+            String connectionName = xPath.evaluate("/integrations/integration/connections/connection[id=" + connectionIdLong + "]/name",doc);
 
-            Optional<org.assimbly.gateway.domain.Service>serviceOptional = serviceRepository.findByName(serviceName);
+            Optional<Connection>connectionOptional = connectionRepository.findByName(connectionName);
 
-			if(serviceOptional.isPresent()) {
-                service = serviceOptional.get();
+			if(connectionOptional.isPresent()) {
+                connection = connectionOptional.get();
             }else {
-                service = null;
+                connection = null;
 			}
 		} catch (NumberFormatException nfe) {
-			service = null;
+			connection = null;
 		}
 
 		// get header if configured
@@ -316,31 +316,31 @@ public class ImportXMLFlows {
             responseId = Integer.parseInt(responseIdAsString);
         }
 
-		if (endpoint == null) {
-			endpoint = new Endpoint();
+		if (step == null) {
+			step = new Step();
 		}
 
-        endpoint.setEndpointType(endpointType);
-		endpoint.setComponentType(componentType);
-        endpoint.responseId(responseId);
-        endpoint.setUri(uri);
-		endpoint.setFlow(flow);
-		endpoint.setOptions(options);
+        step.setStepType(stepType);
+		step.setComponentType(componentType);
+        step.responseId(responseId);
+        step.setUri(uri);
+		step.setFlow(flow);
+		step.setOptions(options);
 
-		if (service != null) {
-			endpoint.setService(service);
+		if (connection != null) {
+			step.setConnection(connection);
 		}
 		if (header != null) {
-			endpoint.setHeader(header);
+			step.setHeader(header);
 		}
 		if (routeId != null) {
-			endpoint.setRouteId(routeId);
+			step.setRouteId(routeId);
 		}
 		if(responseId != null){
-		    endpoint.setResponseId(responseId);
+		    step.setResponseId(responseId);
         }
 
-        return endpoint;
+        return step;
 
 	}
 

@@ -194,10 +194,10 @@ public class ImportXMLHeaders {
 			NodeList headerNodes = (NodeList) xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
 			headerNodes.item(0).setTextContent("id" + generatedHeaderId);
 
-			NodeList servicesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList headersIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
 
-			for (int i = 0; i < servicesIdNodes.getLength(); i++) {
-				servicesIdNodes.item(i).setTextContent("id" + generatedHeaderId);
+			for (int i = 0; i < headersIdNodes.getLength(); i++) {
+				headersIdNodes.item(i).setTextContent("id" + generatedHeaderId);
 			}
 		}
 	}

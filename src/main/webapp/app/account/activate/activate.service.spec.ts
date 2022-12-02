@@ -24,7 +24,7 @@ describe('ActivateService Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call api/activate endpoint with correct values', () => {
+    it('should call api/activate step with correct values', () => {
       // GIVEN
       let expectedResult;
       const key = 'key';

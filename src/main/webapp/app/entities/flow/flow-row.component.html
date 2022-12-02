@@ -16,7 +16,7 @@
   <div class="container" style="width: 200%">
     <div class="btn-group-justified row" role="group">
 	    <div class="col">
-      <div class="btn-group" role="group" *ngFor="let fromEndpoint of fromEndpoint; let i = index">
+      <div class="btn-group" role="group" *ngFor="let fromStep of fromStep; let i = index">
         <button
           [ngClass]="{
             'btn-outline-primary': statusFlow === 'inactive',
@@ -26,14 +26,15 @@
           }"
           type="button"
           class="btn btn-sm"
+          container="body"
           placement="right"
           triggers="mouseenter:mouseleave"
-          popoverTitle="From Endpoint"
-          [popover]="fromEndpointTooltips[i]"
-          (click)="navigateToEndpointEditor('edit','connector',fromEndpoint)"
+          popoverTitle="From Step"
+          [popover]="fromStepTooltips[i]"
+          (click)="navigateToStepEditor('edit','connector',fromStep)"
   		  style="min-width: 12em"
         >
-          <span>{{ fromEndpoint.componentType.toUpperCase() }}</span>
+          <span>{{ fromStep.componentType.toUpperCase() }}</span>
         </button>
       </div>
       <div class="btn-group" role="group" style="margin-left: 0.5em;">
@@ -126,7 +127,7 @@
   		  style="min-width: 20em; color: white;"
           type="button"
           class="btn btn-sm btn-block btn-arrow-right text-left"
-		  data-container="body"
+          container="body"
           placement="right"
           triggers="mouseenter:mouseleave"
           popoverTitle="Status"
@@ -136,7 +137,7 @@
           <span style="text-transform: uppercase">{{ flow.name }}</span>
         </button>
       </div>
-      <div class="btn-group" role="group" style="margin-left: 1em" *ngFor="let toEndpoint of toEndpoints; let i = index">
+      <div class="btn-group" role="group" style="margin-left: 1em" *ngFor="let toStep of toSteps; let i = index">
         <button
           [ngClass]="{
             'btn-outline-primary': statusFlow === 'inactive',
@@ -147,17 +148,19 @@
           type="button"
           class="btn btn-sm btn-block"
           placement="right"
+          container="body"
+          data-container="body"
           triggers="mouseenter:mouseleave"
-          popoverTitle="To Endpoint"
-          [popover]="toEndpointsTooltips[i]"
-          (click)="navigateToEndpointEditor('edit','connector',toEndpoint)"
+          popoverTitle="To Step"
+          [popover]="toStepsTooltips[i]"
+          (click)="navigateToStepEditor('edit','connector',toStep)"
    		  style="min-width: 12em"
 
         >
-          <span>{{ toEndpoint.componentType.toUpperCase() }}</span>
+          <span>{{ toStep.componentType.toUpperCase() }}</span>
         </button>
       </div>
-      <div class="btn-group" role="group" style="margin-left: 1em" *ngFor="let responseEndpoint of responseEndpoints; let i = index">
+      <div class="btn-group" role="group" style="margin-left: 1em" *ngFor="let responseStep of responseSteps; let i = index">
         <button
           [ngClass]="{
             'btn-outline-primary': statusFlow === 'inactive',
@@ -167,15 +170,16 @@
           }"
           type="button"
           class="btn btn-sm btn-block"
+          container="body"
           data-container="body"
           placement="right"
           triggers="mouseenter:mouseleave"
-          popoverTitle="Response Endpoint"
-          [popover]="responseEndpointTooltips[i]"
-          (click)="navigateToEndpointEditor('edit','connector',responseEndpoint)"
+          popoverTitle="Response Step"
+          [popover]="responseStepTooltips[i]"
+          (click)="navigateToStepEditor('edit','connector',responseStep)"
 		  style="width: 12em"
         >
-          <span>{{ responseEndpoint.componentType.toUpperCase() }}</span>
+          <span>{{ responseStep.componentType.toUpperCase() }}</span>
         </button>
       </div>
     </div>
@@ -184,10 +188,11 @@
     <div class="col">
       <i
         aria-hidden="true"
-        data-container="body"
         (mouseenter)="getFlowDetails()"
-        triggers="mouseenter:mouseleave"
+        data-container="body"
+        container="body"
         placement="right"
+        triggers="mouseenter:mouseleave"
         popoverTitle="Details"
         [popover]="detailsTemplate"
       ><fa-icon icon="info"></fa-icon></i>
@@ -196,6 +201,7 @@
         (mouseenter)="getFlowStats(flow)"
         (mouseleave)="stopGetFlowStats()"
         data-container="body"
+        container="body"
         [hidden]="!isFlowStatusOK"
         triggers="mouseenter:mouseleave"
         placement="right"
@@ -209,6 +215,8 @@
       <i
         [hidden]="isFlowStatusOK"
         style="padding-left: 1em"
+        data-container="body"
+        container="body"
         placement="right"
         triggers="mouseenter:mouseleave"
         popoverTitle="Stats"
@@ -240,12 +248,13 @@
   <a *ngIf="flow.gatewayId" [routerLink]="['../gateway', flow.gatewayId]">{{ flow.gatewayId }}</a>
 </td>
 
-<td id="flowErrorEndpointID" [hidden]="!flowRowErrorEndpointID"></td>
+<td id="flowErrorStepID" [hidden]="!flowRowErrorStepID"></td>
 
 <td class="text-right">
   <div class="float-right" style="margin-right: 30px">
     <ng-template #statusFlowButtonTemplate let-message="message">
-      <div [innerHtml]="flowStatusButton"></div>
+      <div [innerHtml]="flowStatusButton">
+      </div>
     </ng-template>
     <h4 class="float-right">
       <ng-template #alertsFlowButtonTemplate let-message="message">

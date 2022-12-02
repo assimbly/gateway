@@ -1,5 +1,6 @@
 package org.assimbly.gateway.config.importing;
 
+import org.assimbly.dil.transpiler.transform.Transform;
 import org.assimbly.util.TransformUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,13 @@ public class Import {
     private ImportXMLRoutes importXMLRoutes;
 
     @Autowired
-    private ImportXMLServices importXMLServices;
+    private ImportXMLConnections importXMLConnections;
 
 	// imports gateway configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
 
 		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+			configuration = Transform.transformToDil(configuration);
 		}
 
 		// get the configuration as XML Document
@@ -46,7 +47,7 @@ public class Import {
 	public String convertFlowConfigurationToDB(Long gatewayId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
 		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+			configuration = Transform.transformToDil(configuration);
 		}
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
@@ -57,7 +58,7 @@ public class Import {
 
         importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
-		importXMLServices.setServicesFromXML(doc);
+		importXMLConnections.setConnectionsFromXML(doc);
 
 		importXMLFlows.setFlowFromXML(doc, gatewayId, id.toString(), id);
 

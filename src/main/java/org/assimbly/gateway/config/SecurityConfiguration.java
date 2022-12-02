@@ -63,14 +63,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/management/hawtio/**")
             .antMatchers("/jolokia/**");
     }
-	
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
-		
+
 		String[] staticResources  =  {
                 "/**","/app/**/*.{js,html}","/i18n/**","/content/**","/h2-console/**","/swagger-ui/**","/test/**"
 		};
-		
+
         // @formatter:off
         http
             .csrf()
@@ -94,7 +94,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
             .authorizeRequests()
-			.antMatchers(HttpMethod.OPTIONS).permitAll()	
+			.antMatchers(HttpMethod.OPTIONS).permitAll()
 			.antMatchers(staticResources).permitAll()
             .antMatchers("/api/authenticate").permitAll()
             .antMatchers("/api/register").permitAll()
@@ -103,7 +103,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/account/reset-password/finish").permitAll()
             .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()
-            .antMatchers("/websocket/**").permitAll() 
+            .antMatchers("/websocket/**").permitAll()
 			.antMatchers("/ws/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/health/**").permitAll()
@@ -117,12 +117,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.and()
             .httpBasic()
         .and()
-            .apply(securityConfigurerAdapter());	
+            .apply(securityConfigurerAdapter());
         // @formatter:on
     }
-	
+
     private JWTConfigurer securityConfigurerAdapter() {
         return new JWTConfigurer(tokenProvider);
     }
-	
+
 }
