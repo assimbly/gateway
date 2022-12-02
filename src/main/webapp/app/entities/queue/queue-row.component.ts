@@ -51,11 +51,11 @@ export class QueueRowComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.address = address;
     modalRef.result.then(
       result => {
-		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));
         modalRef = null;
       },
       reason => {
-		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));			
+		this.eventManager.broadcast(new EventWithContent('queueDeleted', this.address));
         modalRef = null;
       }
     );

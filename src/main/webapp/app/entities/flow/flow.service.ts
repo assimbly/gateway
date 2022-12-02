@@ -131,8 +131,8 @@ export class FlowService {
     });
   }
 
-  getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
+  getFlowStats(id: number, stepid: number, gatewayid: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${stepid}`, { observe: 'response' });
   }
 
   getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
@@ -171,18 +171,18 @@ export class FlowService {
   send(
     gatewayId: number,
     uri: string,
-    endpointId: string,
-    serviceId: string,
-    serviceKeys: string,
+    stepId: string,
+    connectionId: string,
+    connectionKeys: string,
     headerKeys: string,
     numberOfTimes: string,
     messageBody: string
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
-      serviceid: serviceId,
-      serviceKeys,
+      stepId,
+      connectionid: connectionId,
+      connectionKeys,
       headerKeys,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
@@ -197,17 +197,17 @@ export class FlowService {
   sendRequest(
     gatewayId: number,
     uri: string,
-    endpointId: string,
-    serviceId: string,
-    serviceKeys: string,
+    stepId: string,
+    connectionId: string,
+    connectionKeys: string,
     headerKeys: string,
     messageBody: string
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
-      serviceid: serviceId,
-      serviceKeys,
+      stepId,
+      connectionid: connectionId,
+      connectionKeys,
       headerKeys,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',

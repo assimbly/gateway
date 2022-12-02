@@ -1,4 +1,4 @@
-import { IEndpoint } from 'app/shared/model/endpoint.model';
+import { IStep } from 'app/shared/model/step.model';
 import dayjs from 'dayjs/esm';
 
 export interface IFlow {
@@ -18,7 +18,7 @@ export interface IFlow {
     lastModified?: dayjs.Dayjs;
     logLevel?: LogLevelType;
     gatewayId?: number;
-    endpoints?: IEndpoint[];
+    steps?: IStep[];
 }
 
 export class Flow implements IFlow {
@@ -39,7 +39,7 @@ export class Flow implements IFlow {
         public lastModified?: dayjs.Dayjs,
         public logLevel?: LogLevelType,
         public gatewayId?: number,
-        public endpoints?: IEndpoint[]
+        public steps?: IStep[]
     ) {
         this.autoStart = this.autoStart || false;
         this.loadBalancing = this.loadBalancing || false;

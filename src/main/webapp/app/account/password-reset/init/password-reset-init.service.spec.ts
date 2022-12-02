@@ -24,7 +24,7 @@ describe('PasswordResetInit Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call reset-password/init endpoint with correct values', () => {
+    it('should call reset-password/init step with correct values', () => {
       // GIVEN
       const mail = 'test@test.com';
 

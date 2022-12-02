@@ -8,6 +8,7 @@ buildscript {
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     }
     dependencies {
+        //classpath('com.google.cloud.tools:jib-ownership-extension-gradle:0.1.0')
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
@@ -28,21 +29,23 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
-	id 'de.undercouch.download' version '5.0.1'
+	id 'de.undercouch.download' version '5.2.1'
+    id "com.github.ben-manes.versions" version "0.42.0"
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
+tasks.withType(JavaExec) {
+    systemProperty "DOVETAIL_ENV", System.getProperty("DOVETAIL_ENV")
+}
 
 group = "org.assimbly.gateway"
-version = '3.7.0'
+version = '3.8.0'
 
 description = ""
 
-//sourceCompatibility=11
-//targetCompatibility=11
-assert System.properties["java.specification.version"] == "11" || "12" || "13"
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17 || 18 || 19
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
@@ -51,7 +54,7 @@ apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'war'
+//apply plugin: 'war'
 //apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
@@ -65,12 +68,16 @@ configurations.all {
     exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
   	exclude group: "org.slf4j", module: "slf4j-nop"
   	exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.slf4j", module: "slf4j-simple"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
+    exclude group: 'javax.servlet', module: 'servlet-api'
+    exclude group: 'javax.persistence', module: 'persistence-api'
+    exclude group: 'xerces', module: 'xercesImpl'
 }
 
 //Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
+if (project.hasProperty("integration")){
 
     ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
@@ -98,6 +105,12 @@ if (project.hasProperty("connector")){
     ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
     }
+
+    /*
+    jar {
+        exclude('src/main/webapp/bootstrap.ts')
+    }*/
+
 }
 
 
@@ -134,6 +147,40 @@ eclipse {
         }
     }
 }
+
+//build container image
+jib {
+    from {
+        image = 'eclipse-temurin:11'
+    }
+    to {
+        image = 'assimbly/gateway-full'
+    }
+    container {
+        ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
+        format = 'OCI'
+    }
+    extraDirectories {
+        paths {
+            path {
+                // copies the contents of 'src/main/jib' into '/' on the container
+                from = file('src/main/jib')
+            }
+            path {
+                // copies the contents of 'src/main/another/dir' into '/extras' on the container
+                from = file('/src/main/data')
+                into = '/data'
+            }
+        }
+        permissions = [
+            '/entrypoint.sh': '755',
+            '/data/**': '775',
+            '/data/**/*': '775',
+        ]
+    }
+
+}
+
 
 defaultTasks "bootRun"
 
@@ -261,6 +308,7 @@ nohttp {
 configurations {
     providedRuntime
     implementation.exclude module: "spring-boot-starter-tomcat"
+
     compile { transitive = false }
     all {
         resolutionStrategy {
@@ -270,13 +318,10 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.23.1")
+                    details.useVersion("2.27.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.17.1")
-                }
-                if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.78.Final")
+                    details.useVersion("5.17.2")
                 }
             }
         }
@@ -297,13 +342,17 @@ dependencies {
         }
     }
 
+    implementation group: "org.assimbly", name: "commonBase", version: "${version}"
+
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
+	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-	implementation "javax.annotation:javax.annotation-api"
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
     implementation "io.dropwizard.metrics:metrics-jvm"
@@ -346,10 +395,30 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
+
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
+    //Only one of web server can be active: tomcat, undertow or jetty
+
+    //To use Tomcat
+    //implementation ("org.springframework.boot:spring-boot-starter-web")
+
+    //To use Undertow
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
+    //implementation "org.springframework.boot:spring-boot-starter-undertow"
+
+    //To Use Jetty
+    //implementation ("org.springframework.boot:spring-boot-starter-web") {
+    //    exclude module: "spring-boot-starter-tomcat"
+    //}
+    //implementation 'org.eclipse.jetty:jetty-quickstart:11.0.12'
     implementation "org.springframework.boot:spring-boot-starter-jetty"
+
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.zalando:problem-spring-web:0.27.0"
@@ -361,27 +430,100 @@ dependencies {
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.11"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "mysql:mysql-connector-java"
     liquibaseRuntime "mysql:mysql-connector-java"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4"
     implementation "org.jdom:jdom2:2.0.6.1"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
-    if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
+    if (project.hasProperty("integration") || project.hasProperty("headless")) {
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }
+
+    if (project.hasProperty("dovetail")){
+        implementation group:  "world.dovetail", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "aleris", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "amazon", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "archive", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "cookies", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactdotweb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true  //*
+        implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "googledrive", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "oauth2token", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdftotext", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "smb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "soap", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sql", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "throttling", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
+    }
+
+    /*
+    if (project.hasProperty("dovetail")){
+        implementation group:  "world.dovetail", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "aleris", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "amazon", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "archive", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "cookies", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactdotweb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "pdftotext", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "smb", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "soap", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "sql", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "throttling", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
+    }*/
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
@@ -415,10 +557,10 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
-//Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
+//Build different jar based on type of application
+if (project.hasProperty("integration")){
 
-    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=INTEGRATION', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
     }
 
@@ -436,7 +578,28 @@ if (project.hasProperty("connector")){
     sourceSets {
         main {
             java {
-                exclude 'org/assimbly/gateway/web/rest/connector/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
+                exclude 'org/assimbly/gateway/config/importing/Import.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
+            }
+        }
+    }
+}else if (project.hasProperty("headless")) {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=HEADLESS', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/broker/**'
+                exclude 'org/assimbly/gateway/web/rest/gateway/AuditResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/CertificateResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/LogsResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ManageCertificateResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ProfileInfoResource.java'
             }
         }
     }
@@ -444,6 +607,7 @@ if (project.hasProperty("connector")){
     ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
     }
+
 }
 
 task cleanResources(type: Delete) {
@@ -451,14 +615,16 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.3.3"
+    gradleVersion = "7.5.1"
 }
 
+/*
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+     languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
+*/
 
 if (project.hasProperty("nodeInstall")) {
     node {

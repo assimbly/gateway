@@ -31,7 +31,7 @@
           <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
           <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
             <button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Routes</button>
+            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button>
             <!-- uncomment to link to the api editor -->
             <!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>-->
             <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
@@ -59,7 +59,7 @@
     [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
     style="overflow-x: auto; overflow-y: hidden"
   >
-    <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%">
+    <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%; z-index: 5;">
       <thead class="transparant">
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
           <th [style.display]="'none'"><span>ID</span></th>

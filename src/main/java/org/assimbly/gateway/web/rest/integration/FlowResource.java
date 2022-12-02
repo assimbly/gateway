@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+
+import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.domain.Flow;
@@ -26,12 +28,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing flow.
  */
+@Component
 @RestController
 @RequestMapping("/api")
 public class FlowResource {
@@ -179,7 +183,16 @@ public class FlowResource {
     }
 
     @PostConstruct
-    private void initIntegration() throws Exception {
+    public void init() throws Exception {
+        System.out.println("begin init integration");
+        initIntegration();
+        System.out.println("end init integration");
+        startFlows();
+    }
+
+
+    public CamelContext initIntegration() throws Exception {
+
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
         boolean isDebuggging = gateway.getDebugging();
@@ -191,11 +204,17 @@ public class FlowResource {
         integrationResource.initIntegration();
 
         integration = integrationResource.getIntegration();
+
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");
         integration.setDeployDirectory(deployOnStart,deployOnChange);
 
-        //start flows with autostart
+        return integration.getContext();
+    }
+
+    //start flows with autostart
+    public void startFlows(){
+
         List<Flow> flows = flowRepository.findAll();
 
         try {
@@ -213,5 +232,7 @@ public class FlowResource {
             log.error("Autostart of flow failed (check configuration)");
             e.printStackTrace();
         }
+
     }
+
 }

@@ -6,21 +6,22 @@ import { AlertService } from "app/core/util/alert.service";
 import { EventManager, EventWithContent } from "app/core/util/event-manager.service";
 import { RouteDialogComponent } from "app/entities/route/route-dialog.component";
 import { RoutePopupService } from "app/entities/route/route-popup.service";
-import { ServiceDialogComponent } from 'app/entities/service/service-dialog.component';
-import { ServicePopupService } from 'app/entities/service/service-popup.service';
+import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
+import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Components } from "app/shared/camel/component-type";
-import { Services } from "app/shared/camel/service-connections";
-import { Endpoint, EndpointType, IEndpoint } from "app/shared/model/endpoint.model";
+import { Connections } from "app/shared/camel/connections";
+import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Gateway } from "app/shared/model/gateway.model";
 import { Route } from "app/shared/model/route.model";
-import { Service } from 'app/shared/model/service.model';
+import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
-import { forkJoin, Observable, Subscription } from "rxjs";
-import { EndpointService } from "../../endpoint/endpoint.service";
+import { from, forkJoin, Observable, Subscription } from "rxjs";
+import { map } from 'rxjs/operators';
+import { StepService } from "../../step/step.service";
 import { GatewayService } from "../../gateway/gateway.service";
 import { RouteService } from "../../route/route.service";
-import { ServiceService } from '../../service/service.service';
+import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
 
 @Component({
@@ -31,14 +32,19 @@ import { FlowService } from "../flow.service";
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	flow: IFlow;
 	routes: Route[];
-  services: Service[];
+  connections: Connection[];
 
-	URIList: Array<Array<Endpoint>> = [[]];
-	allendpoints: IEndpoint[] = new Array<Endpoint>();
-	endpoints: IEndpoint[] = new Array<Endpoint>();
-	endpoint: IEndpoint;
 
-	public endpointTypes = ["ROUTE", "ERROR"];
+	URIList: Array<Array<Step>> = [[]];
+	allsteps: IStep[] = new Array<Step>();
+  stepsOptions: Array<Array<Option>> = [[]];
+	steps: IStep[] = new Array<Step>();
+	step: IStep;
+
+  //Future possibilities
+	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "SCRIPT", "API", MESSAGE", "CONNECTION", "ERROR"];
+
+	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT","CONNECTION", "ERROR"];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -54,14 +60,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	active: string;
 	active2: any;
 	disabled = true;
-	activeEndpoint: any;
+	activeStep: any;
 
 	isSaving: boolean;
 	savingFlowFailed = false;
 	savingFlowFailedMessage = "Saving failed (check logs)";
 	savingFlowSuccess = false;
 	savingFlowSuccessMessage = "Flow successfully saved";
-	savingCheckEndpoints = true;
+	savingCheckSteps = true;
 
 	finished = false;
 
@@ -76,33 +82,55 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	reverse: any;
 
 	routeCreated: boolean;
-  serviceCreated: boolean;
+  connectionCreated: boolean;
 
 	namePopoverMessage: string;
 	logLevelPopoverMessage: string;
 	errorHandlerPopoverMessage: string;
 	notesPopoverMessage: string;
 
-	selectedComponentType: string;
+  componentPopoverMessage: string;
+  optionsPopoverMessage: string;
+  headerPopoverMessage: string;
+  routePopoverMessage: string;
+  connectionPopoverMessage: string;
+  popoverMessage: string;
 
-	componentTypeAssimblyLinks: Array<string> = new Array<string>();
-	componentTypeCamelLinks: Array<string> = new Array<string>();
-	uriPlaceholders: Array<string> = new Array<string>();
+  selectedComponentType: string;
+  selectedOptions: Array<Array<any>> = [[]];
+  componentOptions: Array<any> = [];
+  customOptions: Array<any> = [];
+
+  componentTypeAssimblyLinks: Array<string> = new Array<string>();
+  componentTypeCamelLinks: Array<string> = new Array<string>();
+  uriPlaceholders: Array<string> = new Array<string>();
+  uriPopoverMessages: Array<string> = new Array<string>();
 
 	consumerComponentsNames: Array<any> = [];
 	producerComponentsNames: Array<any> = [];
+
+  languageComponentsNames: Array<any> = ['groovy','java','simple'];
 
 	editFlowForm: FormGroup;
 	invalidUriMessage: string;
 	notUniqueUriMessage: string;
 
-  filterService: Array<Array<Service>> = [[]];
-  serviceType: Array<string> = [];
-  selectedService: Service = new Service();
+  filterConnection: Array<Array<Connection>> = [[]];
+  connectionType: Array<string> = [];
+  selectedConnection: Connection = new Connection();
 
-	numberOfRouteEndpoints = 0;
+	numberOfSteps = 0;
 
 	modalRef: NgbModalRef | null;
+
+  testConnectionForm: FormGroup;
+  testConnectionMessage: string;
+  connectionHost: any;
+  connectionPort: any;
+  connectionTimeout: any;
+  hostnamePopoverMessage: string;
+  portPopoverMessage: string;
+  timeoutPopoverMessage: string;
 
 	private subscription: Subscription;
 	private eventSubscriber: Subscription;
@@ -113,17 +141,17 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private eventManager: EventManager,
 		private gatewayService: GatewayService,
 		private flowService: FlowService,
-		private endpointService: EndpointService,
+		private stepService: StepService,
 		private routeService: RouteService,
-    private serviceService: ServiceService,
+    private connectionService: ConnectionService,
 		private alertService: AlertService,
 		private route: ActivatedRoute,
 		private router: Router,
-		public servicesList: Services,
+		public connectionsList: Connections,
 		public components: Components,
 		private modalService: NgbModal,
 		private routePopupService: RoutePopupService,
-    private servicePopupService: ServicePopupService,
+    private connectionPopupService: ConnectionPopupService,
 	) {}
 
 	ngOnInit(): void {
@@ -137,7 +165,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.subscription =
 			this.route.params.subscribe(
 				(params) => {
-					this.activeEndpoint = params["endpointid"];
+					this.activeStep = params["stepid"];
 
 					if (params["mode"] === "clone") {
 						this.load(params["id"], true);
@@ -155,27 +183,27 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.flowService.getWikiDocUrl(),
 			this.flowService.getCamelDocUrl(),
 			this.routeService.getAllRoutes(),
-      this.serviceService.getAllServices(),
+      this.connectionService.getAllConnections(),
 			this.gatewayService.query(),
-			this.endpointService.query(),
+			this.stepService.query(),
 			this.flowService.getGatewayName(),
 		])
 			.subscribe(
-				([wikiDocUrl, camelDocUrl, routes, services, gateways, allendpoints, gatewayName]) => {
+				([wikiDocUrl, camelDocUrl, routes, connections, gateways, allsteps, gatewayName]) => {
 					this.wikiDocUrl = wikiDocUrl.body;
 					this.camelDocUrl = camelDocUrl.body;
 
 					this.routes = routes.body;
 					this.routeCreated = this.routes.length > 0;
 
-          this.services = services.body;
-          this.serviceCreated = this.services.length > 0;
+          this.connections = connections.body;
+          this.connectionCreated = this.connections.length > 0;
 
 					this.gateways = gateways.body;
 					this.singleGateway = this.gateways.length === 1;
 					this.gatewayName = gatewayName.body;
 
-					this.allendpoints = allendpoints.body;
+					this.allsteps = allsteps.body;
 
 					if (this.singleGateway) {
 						this.indexGateway = 0;
@@ -198,40 +226,58 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 									this.initializeForm(this.flow);
 
-									this.endpointService
+									this.stepService
 										.findByFlowId(id)
 										.subscribe(
-											(flowEndpointsData) => {
-												const endpoints = flowEndpointsData.body;
+											(flowStepsData) => {
+												const steps = flowStepsData.body;
 												let index = 0;
-												this.endpoints = [];
+												this.steps = [];
 
-												this.endpointTypes.forEach(
-													(endpointType, j) => {
-														let filteredEndpoints = endpoints.filter(
-															(endpoint) =>
-																endpoint.endpointType === endpointType,
+												this.stepTypes.forEach(
+													(stepType, j) => {
+														let filteredSteps = steps.filter(
+															(step) =>
+																step.stepType === stepType,
 														);
 
-														filteredEndpoints.forEach(
-															(endpoint) => {
-																this.endpoint =
-																	new Endpoint(
-																		endpoint.id,
-																		endpoint.endpointType,
-																		endpoint.flowId,
-																		endpoint.routeId,
-								                    endpoint.serviceId,
+														filteredSteps.forEach(
+															(step) => {
+
+                                if (typeof this.stepsOptions[index] === 'undefined') {
+                                  this.stepsOptions.push([]);
+                                }
+
+																this.step =
+																	new Step(
+																		step.id,
+																		step.stepType,
+																		step.uri,
+																		step.options,
+																		step.flowId,
+																		step.routeId,
+																		step.headerId,
+								                    step.connectionId,
 																	);
 
-																this.endpoints.push(endpoint);
+																this.steps.push(step);
 
-																const formgroup = this.initializeEndpointData(
-																	endpoint,
+																const formgroup = this.initializeStepData(
+																	step,
 																);
+																this.stepsOptions[0] = [new Option()];
 																(
-																	<FormArray>this.editFlowForm.controls.endpointsData
+																	<FormArray>this.editFlowForm.controls.stepsData
 																).insert(index, formgroup);
+
+                                this.setTypeLinks(step, index);
+
+                                this.getOptions(
+                                  step,
+                                  this.editFlowForm.controls.stepsData.get(index.toString()),
+                                  this.stepsOptions[index],
+                                  index
+                                );
 
 																index = index + 1;
 															},
@@ -241,9 +287,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 													this,
 												);
 
-												if (this.activeEndpoint) {
-													const activeIndex = this.endpoints.findIndex(
-														(item) => item.id.toString() === this.activeEndpoint,
+												if (this.activeStep) {
+													const activeIndex = this.steps.findIndex(
+														(item) => item.id.toString() === this.activeStep,
 													);
 													if (activeIndex === -1) {
 														this.active = "0";
@@ -268,8 +314,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 							() => {
 								// create new flow object
 								this.flow = new Flow();
-								this.flow.type = "esb";
-								this.flow.notes = "";
+								this.flow.type = 'esb';
+								this.flow.notes = '';
 								this.flow.autoStart = false;
 								this.flow.parallelProcessing = false;
 								this.flow.assimblyHeaders = false;
@@ -293,40 +339,38 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 								this.initializeForm(this.flow);
 
-								this.numberOfRouteEndpoints = 1;
+								this.numberOfSteps = 1;
 
-								// create new route endpoint
-								this.endpoint = new Endpoint();
-								this.endpoint.id = null;
-								this.endpoint.endpointType = EndpointType.ROUTE;
-								this.endpoint.componentType = "file";
-								this.endpoint.routeId = null;
-								this.endpoint.serviceId = null;
+								// create new route step
+								this.step = new Step();
+								this.step.id = null;
+								this.step.stepType = StepType.SOURCE;
+  							this.step.componentType = 'file';
+ 								this.step.uri = null;
+  							this.step.routeId = null;
+	  						this.step.connectionId = null;
 
-								this.endpoints.push(this.endpoint);
+                (<FormArray>this.editFlowForm.controls.stepsData).push(this.initializeStepData(this.step));
 
-								const formgroupRoute = this.initializeEndpointData(
-									this.endpoint,
-								);
-								(<FormArray>this.editFlowForm.controls.endpointsData).push(
-									formgroupRoute,
-								);
+                this.stepsOptions[0] = [new Option()];
 
-								// create new error endpoint
-								this.endpoint = new Endpoint();
-								this.endpoint.id = null;
-								this.endpoint.endpointType = EndpointType.ERROR;
-								this.endpoint.componentType = "file";
-								this.endpoint.routeId = null;
+                  // set documentation links
+                  this.setTypeLinks(this.step, 0);
 
-								this.endpoints.push(this.endpoint);
+                  let componentType = this.step.componentType.toLowerCase();
+                  let camelComponentType = this.components.getCamelComponentType(componentType);
 
-								const formgroupError = this.initializeEndpointData(
-									this.endpoint,
-								);
-								(<FormArray>this.editFlowForm.controls.endpointsData).push(
-									formgroupError,
-								);
+                  // get list of options (from CamelCatalog)
+                  this.setComponentOptions(this.step, camelComponentType);
+
+  								this.numberOfSteps = 1;
+
+                  const optionArrayFrom: Array<string> = [];
+                  optionArrayFrom.splice(0, 0, '');
+                  this.selectedOptions.splice(0, 0, optionArrayFrom);
+
+
+								this.steps.push(this.step);
 
 								this.finished = true;
 							},
@@ -338,6 +382,77 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				},
 			);
 	}
+
+  setTypeLinks(step: any, stepFormIndex?, e?: Event): void {
+
+    const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
+
+    if (typeof e !== 'undefined') {
+
+      // set componenttype to selected component and clear other fields
+      step.componentType = e;
+      step.stepType = 'SOURCE'
+      step.uri = null;
+      step.headerId = '';
+      step.routeId = '';
+      step.connectionId = '';
+
+      let i;
+      const numberOfOptions = this.stepsOptions[stepFormIndex].length - 1;
+      for (i = numberOfOptions; i > 0; i--) {
+        this.stepsOptions[stepFormIndex][i] = null;
+        this.removeOption(this.stepsOptions[stepFormIndex], this.stepsOptions[stepFormIndex][i], stepFormIndex);
+      }
+
+      stepForm.controls.uri.patchValue(step.uri);
+      stepForm.controls.header.patchValue(step.headerId);
+      stepForm.controls.route.patchValue(step.routeId);
+      stepForm.controls.connection.patchValue(step.connectionId);
+
+      (<FormArray>stepForm.controls.options).controls[0].patchValue({
+        key: null,
+        value: null,
+      });
+
+    }
+
+    this.selectedComponentType = step.componentType.toString();
+
+    const componentType = step.componentType.toString().toLowerCase();
+    const camelComponentType = this.components.getCamelComponentType(componentType);
+
+    if(step.stepType === 'SOURCE' || step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTER'){
+
+        const type = this.components.types.find(component => component.name === componentType);
+        const camelType = this.components.types.find(component => component.name === camelComponentType);
+
+        this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
+        this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
+
+        this.uriPlaceholders[stepFormIndex] = type.syntax;
+        this.uriPopoverMessages[stepFormIndex] = type.description;
+
+        // set options keys
+        if (typeof e !== 'undefined') {
+          this.setComponentOptions(step, camelComponentType).subscribe(data => {
+            // add custom options if available
+            this.customOptions.forEach(customOption => {
+              if (customOption.componentType === camelComponentType) {
+                this.componentOptions[stepFormIndex].push(customOption);
+              }
+            });
+          });
+        }
+
+    }
+
+
+    stepForm.patchValue({ string: componentType });
+
+    this.setURIlist(stepFormIndex);
+
+  }
+
 
 	setComponents(): void {
 		const producerComponents = this.components.types.filter(function (component) {
@@ -361,10 +476,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		// reset id and flow name to null
 		this.flow.id = null;
 		this.flow.name = null;
-		this.flow.endpoints = null;
+		this.flow.steps = null;
 
-		this.endpoints.forEach((endpoint) => {
-			endpoint.id = null;
+		this.steps.forEach((step) => {
+			step.id = null;
 		});
 
 		this.updateForm();
@@ -382,6 +497,21 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		);
 	}
 
+  setStepComponent(step: any, stepFormIndex: number, stepType: any): void {
+
+    const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
+
+    if(stepType === 'SCRIPT'){
+        step.componentType = 'groovy';
+        stepForm.controls.componentType.patchValue(step.componentType);
+    }else{
+        step.componentType = 'file';
+        stepForm.controls.componentType.patchValue(step.componentType);
+    }
+
+
+  }
+
 	setPopoverMessages(): void {
 		this.namePopoverMessage =
 			`Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
@@ -389,7 +519,45 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			`Route or RouteConfiguration that handles errors in case of failures.`;
 		this.logLevelPopoverMessage = `Sets the log level (default=OFF). This automatically log headers and body of the first and last step of a route`;
 		this.notesPopoverMessage = `Notes to document the flow.`;
+
+    this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
+    this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
+                                     Click on the Apache Camel button to view documation on the valid options.`;
+    this.optionsPopoverMessage = ``;
+    this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
+    this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
+    this.connectionPopoverMessage = `If available then a connection can be selected. For example a database connection that sets up a connection.<br/><br/>
+                                     Use the button on the right to create or edit connections.`;
+    this.popoverMessage = `Destination`;
+
+    this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
+    this.portPopoverMessage = `Number of the port. Range between 1 and 65536.`;
+    this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
+
 	}
+
+	  setURIlist(index): void {
+
+      this.URIList[index] = [];
+      let updatedList = [];
+
+      const tStepsUnique = this.allsteps.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
+
+      tStepsUnique.forEach((step) => {
+  	   if(step.stepType === 'SOURCE' ||
+  		  step.stepType === 'ACTION'   ||
+  		  step.stepType === 'ROUTER'   ||
+  		  step.stepType === 'SINK'){
+          if (step.componentType && this.selectedComponentType === step.componentType.toLowerCase()) {
+            updatedList.push(step);
+          }
+    	  }
+      });
+
+      this.URIList[index].push(...updatedList);
+
+      this.URIList[index].sort();
+    }
 
 	initializeForm(flow: Flow): void {
 		this.editFlowForm =
@@ -404,29 +572,50 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				redeliveryDelay: new FormControl(flow.redeliveryDelay),
 				logLevel: new FormControl(flow.logLevel),
 				gateway: new FormControl(flow.gatewayId),
-				endpointsData: new FormArray([]),
+				stepsData: new FormArray([]),
 			});
 	}
 
-	initializeEndpointData(endpoint: Endpoint): FormGroup {
+	initializeStepData(step: Step): FormGroup {
 		return new FormGroup({
-			id: new FormControl(endpoint.id),
-      componentType: new FormControl(endpoint.componentType),
-			type: new FormControl(endpoint.endpointType),
-			route: new FormControl(endpoint.routeId),
-			service: new FormControl(endpoint.serviceId),
+			id: new FormControl(step.id),
+      componentType: new FormControl(step.componentType),
+			stepType: new FormControl(step.stepType),
+      uri: new FormControl(step.uri),
+      options: new FormArray([this.initializeOption()]),
+      header: new FormControl(step.headerId),
+			route: new FormControl(step.routeId),
+			connection: new FormControl(step.connectionId),
 		});
 	}
 
+  initializeOption(): FormGroup {
+    return new FormGroup({
+      key: new FormControl(null),
+      value: new FormControl(null),
+      defaultValue: new FormControl(''),
+    });
+  }
+
+  initializeTestConnectionForm(): void {
+    this.testConnectionForm = new FormGroup({
+      connectionHost: new FormControl(null, Validators.required),
+      connectionPort: new FormControl(80),
+      connectionTimeout: new FormControl(10),
+    });
+  }
+
 	updateForm(): void {
+
 		this.updateFlowData(this.flow);
 
-		const endpointsData = this.editFlowForm.controls.endpointsData as FormArray;
-		this.endpoints.forEach(
-			(endpoint, i) => {
-				this.updateEndpointData(
-					endpoint,
-					endpointsData.controls[i] as FormControl,
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+
+		this.steps.forEach(
+			(step, i) => {
+				this.updateStepData(
+					step,
+					stepsData.controls[i] as FormControl,
 				);
 			},
 		);
@@ -447,82 +636,274 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateEndpointData(endpoint: any, endpointData: FormControl): void {
-		endpointData.patchValue({
-			id: endpoint.id,
-			endpointType: endpoint.endpointType,
-			componentType: endpoint.componentType,
-			route: endpoint.routeId,
-			service: endpoint.serviceId,
+	updateStepData(step: any, stepData: FormControl): void {
+		stepData.patchValue({
+			id: step.id,
+			componentType: step.componentType,
+			stepType: step.stepType,
+			uri: step.uri,
+			header: step.headerId,
+			route: step.routeId,
+			connection: step.connectionId,
 		});
 	}
 
-	addEndpoint(endpoint, index): void {
+	addStep(step, index): void {
 
 		let newIndex = index + 1;
 
-		if (endpoint.responseId !== undefined) {
-			newIndex += 1;
-		}
+		this.steps.splice(newIndex, 0, new Step());
+    this.stepsOptions.splice(newIndex, 0, [new Option()]);
 
-		this.endpoints.splice(newIndex, 0, new Endpoint());
+		this.numberOfSteps = this.numberOfSteps + 1;
 
-		if (endpoint.endpointType === "ROUTE") {
-			this.numberOfRouteEndpoints = this.numberOfRouteEndpoints + 1;
-		}
+		const newStep = this.steps.find((e, i) => i === newIndex);
 
-		const newEndpoint = this.endpoints.find((e, i) => i === newIndex);
+		newStep.stepType = step.stepType;
+		newStep.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
 
-		newEndpoint.endpointType = endpoint.endpointType;
-		newEndpoint.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
-
-		(<FormArray>this.editFlowForm.controls.endpointsData).insert(
+		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,
-			this.initializeEndpointData(newEndpoint),
+			this.initializeStepData(newStep),
 		);
+
+    this.setTypeLinks(step, newIndex);
+
+    const optionArray: Array<string> = [];
+    optionArray.splice(0, 0, '');
+    this.selectedOptions.splice(newIndex, 0, optionArray);
 
 		this.active = newIndex.toString();
 	}
 
-	removeEndpoint(endpoint, index): void {
+	removeStep(step, index): void {
 
 		if (index === 0) {
   			return;
  		}
 
-		if (endpoint.endpointType === "ROUTE") {
-			this.numberOfRouteEndpoints = this.numberOfRouteEndpoints - 1;
-		}
+		this.numberOfSteps = this.numberOfSteps - 1;
 
-		const i = this.endpoints.indexOf(endpoint);
-		this.endpoints.splice(i, 1);
+		const i = this.steps.indexOf(step);
+		this.steps.splice(i, 1);
+		this.stepsOptions.splice(i, 1);
 		this.editFlowForm.removeControl(index);
-		(<FormArray>this.editFlowForm.controls.endpointsData).removeAt(i);
+		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
 	}
 
-  // this filters services not of the correct type
-  filterServices(endpoint: any, formService: FormControl): void {
+  setComponentOptions(step: Step, componentType: string): Observable<any> {
+    return from(
+      new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          this.getComponentOptions(componentType).subscribe(data => {
+            const componentOptions = data.properties;
 
-    //this.serviceType[this.endpoints.indexOf(endpoint)] = this.servicesList.getServiceType(endpoint.componentType);
-    this.filterService[this.endpoints.indexOf(endpoint)] = this.services;
+            this.componentOptions[this.steps.indexOf(step)] = Object.keys(componentOptions).map(key => ({
+              ...componentOptions[key],
+              ...{ name: key },
+            }));
+            this.componentOptions[this.steps.indexOf(step)].sort(function (a, b) {
+              return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+            });
 
-    /*
-    this.filterService[this.endpoints.indexOf(endpoint)] = this.services.filter(
-      f => f.type === this.serviceType[this.endpoints.indexOf(endpoint)]
+            resolve();
+          });
+        }, 10);
+      })
     );
-
-    if (this.filterService[this.endpoints.indexOf(endpoint)].length > 0 && endpoint.serviceId) {
-      formService.setValue(this.filterService[this.endpoints.indexOf(endpoint)].find(fs => fs.id === endpoint.serviceId).id);
-    }*/
   }
 
-	createOrEditRoute(endpoint, formRoute: FormControl): void {
-		endpoint.routeId = formRoute.value;
+  getComponentOptions(componentType: string): any {
+    return this.flowService.getComponentOptions(1, componentType).pipe(
+      map(options => options.body)
+    );
+  }
+
+  getOptions(step: Step, stepForm: any, stepOptions: Array<Option>, index: number): void {
+
+    const optionArray: Array<string> = [];
+
+    if (!step.options) {
+      step.options = '';
+    }
+
+    const componentType = step.componentType.toLowerCase();
+    const camelComponentType = this.components.getCamelComponentType(componentType);
+
+    // set options keys
+
+    this.setComponentOptions(step, camelComponentType).subscribe(data => {
+
+        let options: Array<string> = [];
+
+        if(step.options.includes('&')){
+          options = step.options.match(/[^&]+(?:&&[^&]+)*/g);
+        }else{
+          options = step.options.split('&');
+        }
+
+        options.forEach((option, optionIndex) => {
+          const o = new Option();
+
+          if (typeof stepForm.controls.options.controls[optionIndex] === 'undefined') {
+            stepForm.controls.options.push(this.initializeOption());
+          }
+
+          if (option.includes('=')) {
+            o.key = option.split('=')[0];
+            o.value = option.split('=').slice(1).join('=');
+          } else {
+            o.key = null;
+            o.value = null;
+          }
+
+          optionArray.splice(optionIndex, 0, o.key);
+
+          stepForm.controls.options.controls[optionIndex].patchValue({
+            key: o.key,
+            value: o.value,
+          });
+
+          if (this.componentOptions[index]) {
+            const optionNameExist = this.componentOptions[index].some(el => el.name === o.key);
+
+            if (!optionNameExist && o.key) {
+              this.componentOptions[index].push({
+                name: o.key,
+                displayName: o.key,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+              });
+              this.customOptions.push({
+                name: o.key,
+                displayName: o.key,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+              });
+            }
+          }
+
+        stepOptions.push(o);
+      });
+
+    });
+
+    this.selectedOptions.splice(index, 0, optionArray);
+  }
+
+  setOptions(): void {
+    this.steps.forEach((step, i) => {
+      step.options = '';
+      this.setStepOptions(this.stepsOptions[i], step, this.selectOptions(i));
+    });
+  }
+
+  setStepOptions(stepOptions: Array<Option>, step, formOptions: FormArray): void {
+    let index = 0;
+
+    stepOptions.forEach((option, i) => {
+      option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
+      option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
+
+      if (option.key && option.value) {
+        step.options += index > 0 ? `&${option.key}=${option.value}` : `${option.key}=${option.value}`;
+        index++;
+      }
+    });
+  }
+
+  addOption(options: Array<Option>, stepIndex): void {
+    this.selectOptions(stepIndex).push(this.initializeOption());
+
+    options.push(new Option());
+  }
+
+  removeOption(options: Array<Option>, option: Option, stepIndex): void {
+    const optionIndex = options.indexOf(option);
+    const formOptions: FormArray = this.selectOptions(stepIndex);
+
+    // remove from form
+    formOptions.removeAt(optionIndex);
+    formOptions.updateValueAndValidity();
+
+    // remove from arrays
+    options.splice(optionIndex, 1);
+    this.selectedOptions[stepIndex].splice(optionIndex, 1);
+  }
+
+  selectOptions(stepIndex): FormArray {
+    const stepData = (<FormArray>this.editFlowForm.controls.stepsData).controls[stepIndex];
+    return <FormArray>(<FormGroup>stepData).controls.options;
+  }
+
+  changeOptionSelection(selectedOption, index, optionIndex, step): void {
+    let defaultValue;
+    const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
+
+    if (componentOption[0]) {
+      defaultValue = componentOption[0].defaultValue;
+    } else {
+      const customOption = new Option();
+      customOption.key = selectedOption;
+
+      const componentType = step.componentType.toLowerCase();
+      const camelComponentType = this.components.getCamelComponentType(componentType);
+
+      const optionArray: Array<string> = [];
+      optionArray.splice(optionIndex, 0, customOption.key);
+
+      this.componentOptions[index].push({
+        name: selectedOption,
+        displayName: selectedOption,
+        description: 'Custom option',
+        group: 'custom',
+        type: 'string',
+        componentType: camelComponentType,
+      });
+
+      this.customOptions.push({
+        name: selectedOption,
+        displayName: selectedOption,
+        description: 'Custom option',
+        group: 'custom',
+        type: 'string',
+        componentType: camelComponentType,
+      });
+    }
+
+    const stepData = (<FormArray>this.editFlowForm.controls.stepsData).controls[index];
+    const formOptions = <FormArray>(<FormGroup>stepData).controls.options;
+
+    if (defaultValue) {
+      (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
+    } else {
+      (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
+    }
+  }
+
+  addOptionTag(name): any {
+    return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
+  }
+
+  // this filters connections not of the correct type
+  filterConnections(step: any, formService: FormControl): void {
+
+    //this.connectionType[this.steps.indexOf(step)] = this.connectionsList.getConnectionType(step.componentType);
+    this.filterConnection[this.steps.indexOf(step)] = this.connections;
+
+  }
+
+	createOrEditRoute(step, formRoute: FormControl): void {
+		step.routeId = formRoute.value;
 
 		if (
-			typeof endpoint.routeId === "undefined" ||
-			endpoint.routeId === null ||
-			!endpoint.routeId
+			typeof step.routeId === "undefined" ||
+			step.routeId === null ||
+			!step.routeId
 		) {
 			const modalRef = this.routePopupService.open(
 				RouteDialogComponent as Component,
@@ -533,10 +914,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				(res) => {
 					res.result.then(
 						(result) => {
-							this.setRoute(endpoint, result.id, formRoute);
+							this.setRoute(step, result.id, formRoute);
 						},
 						(reason) => {
-							this.setRoute(endpoint, reason.id, formRoute);
+							this.setRoute(step, reason.id, formRoute);
 						},
 					);
 				},
@@ -544,7 +925,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		} else {
 			const modalRef = this.routePopupService.open(
 				RouteDialogComponent as Component,
-				endpoint.routeId,
+				step.routeId,
 				this.flow.type
 			);
 			modalRef.then(
@@ -552,10 +933,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					// Success
 					res.result.then(
 						(result) => {
-							this.setRoute(endpoint, result.id, formRoute);
+							this.setRoute(step, result.id, formRoute);
 						},
 						(reason) => {
-							this.setRoute(endpoint, reason.id, formRoute);
+							this.setRoute(step, reason.id, formRoute);
 						},
 					);
 				},
@@ -563,71 +944,71 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	setRoute(endpoint, id, formRoute: FormControl): void {
+	setRoute(step, id, formRoute: FormControl): void {
 		this.routeService
 			.getAllRoutes()
 			.subscribe(
 				(res) => {
 					this.routes = res.body;
 					this.routeCreated = this.routes.length > 0;
-					endpoint.routeId = id;
+					step.routeId = id;
 
 					if (formRoute.value === null) {
 						formRoute.patchValue(id);
 					}
-					endpoint = null;
+					step = null;
 				},
 				(res) => this.onError(res.body),
 			);
 	}
 
-  createOrEditService(endpoint, serviceType: string, formService: FormControl): void {
+  createOrEditConnection(step, connectionType: string, formService: FormControl): void {
 
-    endpoint.serviceId = formService.value;
+    step.connectionId = formService.value;
 
     let modalRef;
 
-    if (typeof endpoint.serviceId === 'undefined' || endpoint.serviceId === null || !endpoint.serviceId) {
-        modalRef = this.servicePopupService.open(ServiceDialogComponent as Component);
+    if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
     } else {
-        modalRef = this.servicePopupService.open(ServiceDialogComponent as Component, endpoint.serviceId);
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
     }
 
     modalRef.then((res) => {
        res.result.then(
               result => {
-                this.setService(endpoint, result.id, formService);
+                this.setConnection(step, result.id, formService);
               },
               reason => {
-                console.log('createService reason: ' + reason);
+
               }
           );
 
        }, (reason)=>{
-          console.log('createService reason: ' + reason);
+
        }
     )
 
   }
 
-  setService(endpoint, id, formService: FormControl): void {
-    this.serviceService.getAllServices().subscribe(
+  setConnection(step, id, formService: FormControl): void {
+    this.connectionService.getAllConnections().subscribe(
       res => {
-        this.services = res.body;
-        this.serviceCreated = this.services.length > 0;
-        endpoint.serviceId = id;
+        this.connections = res.body;
+        this.connectionCreated = this.connections.length > 0;
+        step.connectionId = id;
         formService.patchValue(id);
       },
       res => this.onError(res.body)
     );
   }
 
-	handleErrorWhileCreatingFlow(flowId?: number, endpointId?: number): void {
+	handleErrorWhileCreatingFlow(flowId?: number, stepId?: number): void {
 		if (flowId !== null) {
 			this.flowService.delete(flowId);
 		}
-		if (endpointId !== null) {
-			this.endpointService.delete(endpointId);
+		if (stepId !== null) {
+			this.stepService.delete(stepId);
 		}
 		this.savingFlowFailed = true;
 		this.isSaving = false;
@@ -640,6 +1021,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		const goToOverview = true;
 
 		this.setDataFromForm();
+		this.setOptions();
 		this.setVersion();
     this.checkForm();
 
@@ -652,13 +1034,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		} else {
 		  this.createFlow();
 		}
+
 	}
 
   updateFlow(){
 
-    this.endpoints.forEach(
-      (endpoint) => {
-        endpoint.flowId = this.flow.id;
+   this.steps.forEach(
+      (step) => {
+        step.flowId = this.flow.id;
       },
     );
 
@@ -667,25 +1050,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       .subscribe(
         (flow) => {
           this.flow = flow.body;
-          const updateEndpoints = this.endpointService.updateMultiple(
-            this.endpoints,
+          const updateSteps = this.stepService.updateMultiple(
+            this.steps,
           );
 
-          updateEndpoints.subscribe(
+          updateSteps.subscribe(
             (results) => {
-              this.endpoints = results.body.concat();
+              this.steps = results.body.concat();
 
               this.updateForm();
 
-              this.endpointService
+              this.stepService
                 .findByFlowId(this.flow.id)
                 .subscribe(
                   (data) => {
-                    let endpoints = data.body;
-                    endpoints =
-                      endpoints.filter(
+                    let steps = data.body;
+                    steps =
+                      steps.filter(
                         (e) => {
-                          const s = this.endpoints.find((t) => t.id === e.id);
+                          const s = this.steps.find((t) => t.id === e.id);
                           if (typeof s === "undefined") {
                             return true;
                           } else {
@@ -694,10 +1077,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                         },
                       );
 
-                    if (endpoints.length > 0) {
-                      endpoints.forEach(
+                    if (steps.length > 0) {
+                      steps.forEach(
                         (element) => {
-                          this.endpointService.delete(element.id).subscribe();
+                          this.stepService.delete(element.id).subscribe();
                         },
                       );
                     }
@@ -714,6 +1097,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   createFlow(){
+
 		this.flow.gatewayId = this.gateways[0].id;
 
 			this.flowService
@@ -722,17 +1106,17 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					(flowUpdated) => {
 						this.flow = flowUpdated.body;
 
-						this.endpoints.forEach(
-							(endpoint) => {
-								endpoint.flowId = this.flow.id;
+						this.steps.forEach(
+							(step) => {
+								step.flowId = this.flow.id;
 							},
 						);
 
-						this.endpointService
-							.createMultiple(this.endpoints)
+						this.stepService
+							.createMultiple(this.steps)
 							.subscribe(
 								(toRes) => {
-									this.endpoints = toRes.body;
+									this.steps = toRes.body;
 									this.updateForm();
 									this.finished = true;
 									this.savingFlowSuccess = true;
@@ -742,13 +1126,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								() => {
 									this.handleErrorWhileCreatingFlow(
 										this.flow.id,
-										this.endpoint.id,
+										this.step.id,
 									);
 								},
 							);
 					},
 					() => {
-						this.handleErrorWhileCreatingFlow(this.flow.id, this.endpoint.id);
+						this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
 					},
 				);
   }
@@ -765,20 +1149,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.flow.notes = flowControls.notes.value;
 		this.flow.gatewayId = flowControls.gateway.value;
 
-		(<FormArray>flowControls.endpointsData).controls.forEach(
-			(endpoint, index) => {
-				this.setDataFromFormOnEndpoint(
-					this.endpoints[index],
-					(<FormGroup>endpoint).controls,
+		(<FormArray>flowControls.stepsData).controls.forEach(
+			(step, index) => {
+				this.setDataFromFormOnStep(
+					this.steps[index],
+					(<FormGroup>step).controls,
 				);
 			},
 		);
 	}
 
-	setDataFromFormOnEndpoint(endpoint, formEndpointData) {
-		endpoint.id = formEndpointData.id.value;
-		endpoint.routeId = formEndpointData.route.value;
-		endpoint.serviceId = formEndpointData.service.value;
+	setDataFromFormOnStep(step, formStepData) {
+		step.id = formStepData.id.value;
+    step.componentType = formStepData.componentType.value;
+    step.stepType = formStepData.stepType.value;
+		step.uri = formStepData.uri.value;
+    step.headerId = formStepData.header.value;
+		step.routeId = formStepData.route.value;
+		step.connectionId = formStepData.connection.value;
+
 	}
 
 	setVersion(): void {
@@ -795,9 +1184,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
   checkForm(){
-      this.endpoints.forEach(
-      				(endpoint: Endpoint) => {
-      					if(endpoint.routeId == null && endpoint.endpointType === EndpointType.ROUTE){
+      this.steps.forEach(
+      				(step: Step) => {
+      					if(step.routeId == null && step.stepType === StepType.ROUTE){
                     this.savingFlowFailedMessage = 'Routes cannot be empty.';
                     this.savingFlowFailed = true;
       					}
@@ -831,10 +1220,34 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.modalRef = this.modalService.open(templateRef);
 	}
 
+	openFullScreenModal(templateRef: TemplateRef<any>): void {
+  		this.modalRef = this.modalService.open(templateRef, { windowClass: 'fullscreen-modal'});
+  }
+
 	cancelModal(): void {
 		this.modalRef.dismiss();
 		this.modalRef = null;
 	}
+
+	  openTestConnectionModal(templateRef: TemplateRef<any>) {
+      this.initializeTestConnectionForm();
+      this.testConnectionMessage = '';
+      this.modalRef = this.modalService.open(templateRef);
+    }
+
+    testConnection(): void {
+      this.testConnectionMessage = '<i class="fa fa-refresh fa-spin fa-fw"></i><span class="sr-only"></span>Testing...';
+      this.connectionHost = <FormGroup>this.testConnectionForm.controls.connectionHost.value;
+      this.connectionPort = <FormGroup>this.testConnectionForm.controls.connectionPort.value;
+      this.connectionTimeout = <FormGroup>this.testConnectionForm.controls.connectionTimeout.value;
+
+      this.flowService
+        .testConnection(this.flow.gatewayId, this.connectionHost, this.connectionPort, this.connectionTimeout)
+        .subscribe(result => {
+          this.testConnectionMessage = result.body;
+        });
+    }
+
 
 	ngOnDestroy() {
 		this.subscription.unsubscribe();
@@ -850,4 +1263,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				},
 			);
 	}
+
+	getElementByXpath(xml, path) {
+    return document.evaluate(path, xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  }
+
+}
+
+export class Option {
+  constructor(public key?: string, public value?: string) {}
 }

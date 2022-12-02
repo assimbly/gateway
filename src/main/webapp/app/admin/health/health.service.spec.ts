@@ -24,7 +24,7 @@ describe('HealthService Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call management/health endpoint with correct values', () => {
+    it('should call management/health step with correct values', () => {
       // GIVEN
       let expectedResult;
       const checkHealth = {

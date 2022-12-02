@@ -358,14 +358,22 @@ ng-dropdown-panel > div {
   z-index: 100;
 }
 
+
 .popover {
   min-width: 200px;
-  max-width: 500px;
+  max-width: 60%;
   padding: 1px;
   text-align: left;
   white-space: normal;
   background-color: #fff;
 }
+
+/*
+.popover-body {
+    overflow-y: auto;
+    white-space:pre-wrap;
+}
+*/
 
 @media (min-width: 768px) {
   .flow-btns .btn {
@@ -432,9 +440,6 @@ ng-dropdown-panel > div {
   }
 }
 
-.popover {
-  max-width: 30%;
-}
 
 .border-bottom-none {
   border-bottom: none !important;

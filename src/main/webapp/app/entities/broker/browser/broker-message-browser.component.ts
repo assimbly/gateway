@@ -131,6 +131,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getMessages() {
+
     this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
       (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
       (res: HttpErrorResponse) => this.onError(res.message)

@@ -267,6 +267,9 @@ public class CertificateResource {
             certificateDetails.put("certificateUrl",certificateUrl);
 
             certificateObject.append("certificate", certificateDetails);
+
+
+
         }
 
         certificatesObject.put("certificates",certificateObject);
