@@ -342,7 +342,7 @@ dependencies {
         }
     }
 
-    implementation group: "org.assimbly", name: "commonBase", version: "${version}"
+    implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
