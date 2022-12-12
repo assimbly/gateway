@@ -74,6 +74,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   flowRowID: string;
   flowRowErrorStepID: string;
 
+  statusMessage: any;
+
   statsTableRows: Array<string> = [];
 
   intervalTime: any;
@@ -127,9 +129,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.registerTriggeredAction();
 
     this.stompClient = this.webSocketsService.getClient();
-	this.connectionSubject = this.webSocketsService.getConnectionSubject();
+	  this.connectionSubject = this.webSocketsService.getConnectionSubject();
 
-	this.subscribeToEvent(this.flow.id,'event');
+	  this.subscribeToEvent(this.flow.id,'event');
 
     this.subscribeToAlert(this.flow.id,'alert');
 
@@ -139,18 +141,18 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.subscription = this.receive().subscribe(data => {
 
-		const data2  = data.split(':');
+			if (data.startsWith('alert')) {
+        const data2  = data.split(':');
+        const alertId = Number(data2[1]);
+        if (this.flow.id === alertId) {
+          this.getFlowNumberOfAlerts(alertId);
+        }
 
-		if (Array.isArray(data2)) {
-			if (data2[0] === 'event') {
-			  this.setFlowStatus(data2[1]);
-			} else if (data2[0] === 'alert') {
-			  const alertId = Number(data2[1]);
-			  if (this.flow.id === alertId) {
-				this.getFlowNumberOfAlerts(alertId);
-			  }
+			} else {
+        const response = JSON.parse(data);
+			  this.statusMessage = response;
+			  this.setFlowStatus(response.flow.event);
 			}
-		  }
 
     });
 
@@ -187,8 +189,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   setFlowStatus(status: string): void {
 
-    console.log("0");
-
     switch (status) {
       case 'unconfigured':
         this.statusFlow = Status.inactive;
@@ -198,39 +198,45 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         break;
       case 'started':
+      case 'start':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowStarted = this.isFlowResumed = true;
         this.flowStatusButton = `Started`;
 
         break;
-      case 'suspended':
+      case 'paused':
+      case 'pause':
         this.statusFlow = Status.paused;
         this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowPaused = this.isFlowStarted = true;
         this.flowStatusButton = `Paused`;
         break;
       case 'resumed':
+      case 'resume':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
         this.flowStatusButton = `Resumed`;
         break;
       case 'restarted':
+      case 'restart':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
         this.flowStatusButton = `Restarted`;
         break;
       case 'stopped':
+      case 'stop':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
         this.flowStatusButton = `Stopped`;
         break;
       default:
-        console.log("0");
-        this.setErrorMessage('unknown',status);
+        const lastStatus = this.flowStatus;
+        this.statusFlow = Status.inactiveError;
+        this.setErrorMessage(lastStatus,this.statusMessage);
         break;
     }
   }
@@ -239,27 +245,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
       try {
 
-          // try to parse as json
-          const data = JSON.parse(error);
+          if (this.statusMessage.flow.stepsLoaded) {
 
-          if (data.flow.stepsLoaded) {
-
-                  const total = data.flow.stepsLoaded.total;
-                  const failed = data.flow.stepsLoaded.failed;
+                  const total = this.statusMessage.flow.stepsLoaded.total;
+                  const failed = this.statusMessage.flow.stepsLoaded.failed;
 
                   this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
                                            <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
                                            <b>Details:</b> <br/>`;
 
-                  for (let i = 0; i < data.flow.steps.length; i++) {
+                  console.log('this.flowStatusButton=' + this.flowStatusButton);
 
-                      const id = data.flow.steps[i].id;
-                      const uri = data.flow.steps[i].uri;
-                      const status = data.flow.steps[i].status;
 
-                      if(status==='error'){
+                  for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
 
-                          const errorMessage = data.flow.steps[i].errorMessage;
+                      const id = this.statusMessage.flow.steps[i].id;
+                      const uri = this.statusMessage.flow.steps[i].uri;
+                      const status = this.statusMessage.flow.steps[i].status;
+
+                      if(status==='error' && uri){
+
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
 
                           this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
                             <tbody>
@@ -277,12 +283,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                               </tr>
                             </tbody>
                           </table>`;
+                      }else if(status==='error'){
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+
+                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                            <tbody>
+                              <tr>
+                                <td><b>step id:</b></td>
+                                <td>${id}</td>
+                              </tr>
+                              <tr>
+                                <td><b>error:</b></td>
+                                <td>${errorMessage}</td>
+                              </tr>
+                            </tbody>
+                          </table>`;
                       }
 
                   }
 
           } else {
-              this.flowStatusButton = error;
+              this.flowStatusButton = this.statusMessage.flow.message;
           }
       } catch (e) {
            this.flowStatusButton = error;
