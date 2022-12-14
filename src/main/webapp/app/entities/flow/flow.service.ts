@@ -132,7 +132,12 @@ export class FlowService {
   }
 
   getFlowStats(id: number, stepid: number, gatewayid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${stepid}`, { observe: 'response' });
+    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/step/${stepid}`,
+        {
+          headers: new HttpHeaders({ FullStats: 'true', Accept: 'application/json' }),
+          observe: 'response'
+        })
+
   }
 
   getComponentOptions(gatewayid: number, componentType: String): Observable<any> {

@@ -513,43 +513,43 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             "startTimestamp": "2019-03-26T08:43:59.201+0100"
          */
 
-    if (res === 0) {
+    if (res.step.status != 'started') {
       this.flowStatistic = `Currently there are no statistics for this flow.`;
     } else {
       const now = dayjs();
-      const start = dayjs(res.stats.startTimestamp);
+      const start = dayjs(res.step.stats.startTimestamp);
       const flowRuningTime = dayjs.duration(now.diff(start));
       const hours = Math.floor(flowRuningTime.asHours());
       const minutes = flowRuningTime.minutes();
-      const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
-      const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
+      const completed = res.step.stats.exchangesCompleted - res.step.stats.failuresHandled;
+      const failures = res.step.stats.exchangesFailed + res.step.stats.failuresHandled;
       let processingTime = ``;
 
       if (this.statsTableRows.length === 0) {
         this.statsTableRows[0] = `<td>${uri}</td>`;
-        this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = `<td>${completed}</td>`;
         this.statsTableRows[6] = `<td>${failures}</td>`;
-        this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       } else {
         this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
-        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
         this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
-        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       }
 
-      if (res.stats.lastProcessingTime > 0) {
+      if (res.step.stats.lastProcessingTime > 0) {
         processingTime = `<tr>
 			      <th scope="row">Min</th>
 			      ${this.statsTableRows[7]}
