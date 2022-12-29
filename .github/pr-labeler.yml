@@ -1,3 +1,3 @@
 feature: ['feature/*', 'feat/*']
-fix: ['fix/*', 'bug-fix/*']
+fix: ['fix/*', 'bugfix/*']
 chore: ['chore/*', 'maintenance/*', 'wip/*']
