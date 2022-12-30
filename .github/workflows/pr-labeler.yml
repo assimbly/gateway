@@ -6,6 +6,7 @@ on:
       - develop     # matches develop branch
       - '*/*'       # matches every branch containing a single '/'
       - '!master'     # excludes master branch (production)
+      - '!workflows' # excludes workflows development branch
 
 permissions:
   contents: read
