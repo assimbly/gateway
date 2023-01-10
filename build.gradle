@@ -41,7 +41,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '3.8.1'
+version = '3.8.2'
 
 description = ""
 
@@ -441,6 +441,7 @@ dependencies {
     implementation "org.jdom:jdom2:2.0.6.1"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
+    implementation "com.warrenstrange:googleauth:1.5.0"
     //implementation "io.hawt:hawtio-springboot:2.14.4"
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
@@ -473,7 +474,7 @@ dependencies {
         implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "googledrive", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "mail", version: "${version}", changing: true
+        //implementation group:  "world.dovetail", name: "mail", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "oauth2token", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
