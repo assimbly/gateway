@@ -91,7 +91,7 @@ export class BrokerService {
     }
 
     getBrokerConfiguration(id: number, brokerType: string): Observable<any> {
-        return this.http.get(`${this.resourceUrl}/${id}/getconfiguration`, {
+        return this.http.get(`${this.resourceUrl}/${id}/configure`, {
             observe: 'response',
             responseType: 'text',
             params: { brokerType }
@@ -105,7 +105,7 @@ export class BrokerService {
         brokerConfiguration: String
     ): Observable<HttpResponse<any>> {
         const options = {};
-        return this.http.post(`${this.resourceUrl}/${id}/setconfiguration`, brokerConfiguration, {
+        return this.http.post(`${this.resourceUrl}/${id}/configure`, brokerConfiguration, {
             observe: 'response',
             responseType: 'text',
             params: { brokerType, brokerConfigurationType }

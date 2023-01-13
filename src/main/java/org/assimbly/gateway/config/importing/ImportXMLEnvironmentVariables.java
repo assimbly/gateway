@@ -39,7 +39,7 @@ public class ImportXMLEnvironmentVariables {
 			map.put(s.getKey(), s);
 		}
 
-		XPathExpression expr = xPath.compile("/integrations/integration/environmentVariables/*");
+		XPathExpression expr = xPath.compile("/dil/core/environmentVariables/*");
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
 		for (int i = 0; i < nodes.getLength(); i++) {

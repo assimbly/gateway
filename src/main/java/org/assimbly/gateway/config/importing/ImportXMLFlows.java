@@ -58,7 +58,7 @@ public class ImportXMLFlows {
 
         log.info("Importing flows");
 
-		List<String> flowIds = ImportXMLUtil.getList(doc, "/integrations/integration/flows/flow/id/text()");
+		List<String> flowIds = ImportXMLUtil.getList(doc, "/dil/integrations/integration/flows/flow/id/text()");
 
 		for (String flowId : flowIds) {
 
@@ -225,7 +225,7 @@ public class ImportXMLFlows {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String stepXPath = "/integrations/integration/flows/flow[id='" + id + "']/steps/step[" + index + "]/";
+		String stepXPath = "/dil/integrations/integration/flows/flow[id='" + id + "']/steps/step[" + index + "]/";
 
 		String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
@@ -274,7 +274,7 @@ public class ImportXMLFlows {
 
             Long connectionIdLong = Long.parseLong(connectionId, 10);
 
-            String connectionName = xPath.evaluate("/integrations/integration/connections/connection[id=" + connectionIdLong + "]/name",doc);
+            String connectionName = xPath.evaluate("/dil/core/connections/connection[id=" + connectionIdLong + "]/name",doc);
 
             Optional<Connection>connectionOptional = connectionRepository.findByName(connectionName);
 
@@ -292,7 +292,7 @@ public class ImportXMLFlows {
 		try {
 
 			Long headerIdLong = Long.parseLong(headerId, 10);
-			String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerIdLong + "]/name",doc);
+			String headerName = xPath.evaluate("/dil/core/headers/header[id=" + headerIdLong + "]/name",doc);
 			Optional<Header> headerOptional = headerRepository.findByName(headerName);
 			if(headerOptional.isPresent()) {
 				header = headerOptional.get();
