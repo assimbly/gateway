@@ -17,7 +17,7 @@ import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.integration.Integration;
-import org.assimbly.integrationrest.IntegrationResource;
+import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +62,12 @@ public class FlowResource {
 
     private Integration integration;
 
-    private final IntegrationResource integrationResource;
+    private final IntegrationRuntime integrationRuntime;
 
-     public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
+    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
         this.flowService = flowService;
         this.applicationProperties = applicationProperties;
-        this.integrationResource = integrationResource;
+        this.integrationRuntime = integrationRuntime;
     }
 
     /**
@@ -199,11 +199,11 @@ public class FlowResource {
         boolean deployOnStart = deployDirectory.getDeployOnStart();
         boolean deployOnChange = deployDirectory.getDeployOnChange();
 
-        integrationResource.setIntegration(encryptionProperties.getProperties());
+        integrationRuntime.setIntegration(encryptionProperties.getProperties());
 
-        integrationResource.initIntegration();
+        integrationRuntime.initIntegration();
 
-        integration = integrationResource.getIntegration();
+        integration = integrationRuntime.getIntegration();
 
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");

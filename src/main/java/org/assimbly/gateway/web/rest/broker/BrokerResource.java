@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
-import org.assimbly.brokerrest.ManagedBroker;
+import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -31,7 +31,7 @@ public class BrokerResource {
     private final BrokerService brokerService;
 
     @Autowired
-    private ManagedBroker managedBroker;
+    private ManagedBrokerRuntime managedBroker;
 
     public BrokerResource(BrokerService brokerService) {
         this.brokerService = brokerService;
