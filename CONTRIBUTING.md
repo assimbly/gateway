@@ -8,7 +8,7 @@ Assimbly is a community project, any help is welcome!
 
 ## Getting in touch
 
-Either use the issue list or just send an email to me (Assimbly maintainer) at r.meester at caesar.nl.
+Either use the issue list or just send an email to me (Assimbly maintainer) at raymondmeester at gmail.com.
 
 ## Improving the documentation
 
