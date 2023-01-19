@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.service.CertificateService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -8,6 +9,7 @@ import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.CertificateDTO;
 
 import org.assimbly.util.CertificatesUtil;
+import org.assimbly.util.rest.ResponseUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,7 @@ public class CertificateResource {
     public CertificateResource(CertificateService certificateService) {
         this.certificateService = certificateService;
     }
+
 
     /**
      * POST  /certificates : Create a new certificate.

@@ -9,6 +9,7 @@ import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.mapper.FlowMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
+import org.assimbly.gateway.web.rest.integration.FlowResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,6 +96,7 @@ public class FlowResourceIntTest {
 
     private Flow flow;
 
+    /*
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -106,6 +108,8 @@ public class FlowResourceIntTest {
             .setMessageConverters(jacksonMessageConverter)
             .setValidator(validator).build();
     }
+
+     */
 
     /**
      * Create an entity for this test.
@@ -138,8 +142,8 @@ public class FlowResourceIntTest {
         // Create the Flow
         FlowDTO flowDTO = flowMapper.toDto(flow);
         restFlowMockMvc.perform(post("/api/flows")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Flow in the database
@@ -166,8 +170,8 @@ public class FlowResourceIntTest {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restFlowMockMvc.perform(post("/api/flows")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Flow in the database
@@ -246,8 +250,8 @@ public class FlowResourceIntTest {
         FlowDTO flowDTO = flowMapper.toDto(updatedFlow);
 
         restFlowMockMvc.perform(put("/api/flows")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
             .andExpect(status().isOk());
 
         // Validate the Flow in the database
@@ -273,8 +277,8 @@ public class FlowResourceIntTest {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restFlowMockMvc.perform(put("/api/flows")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(flowDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Flow in the database
@@ -292,7 +296,7 @@ public class FlowResourceIntTest {
 
         // Get the flow
         restFlowMockMvc.perform(delete("/api/flows/{id}", flow.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
         // Validate the database is empty

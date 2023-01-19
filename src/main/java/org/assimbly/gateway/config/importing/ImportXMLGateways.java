@@ -57,11 +57,11 @@ public class ImportXMLGateways {
 		String gatewayId = xPath.evaluate("//integrations/integration/id", doc);
 		String name = xPath.evaluate("//integrations/integration/name", doc);
 		String type = xPath.evaluate("//integrations/integration/type", doc);
-		String environmentName = xPath.evaluate("//integrations/integration/environmentName", doc);
-		String stage = xPath.evaluate("//integrations/integration/stage", doc);
-		String defaultFromComponentType = xPath.evaluate("//integrations/integration/defaultFromComponentType", doc);
-		String defaultToComponentType = xPath.evaluate("//integrations/integration/defaultToComponentType", doc);
-		String defaultErrorComponentType = xPath.evaluate("//integrations/integration/defaultErrorComponentType", doc);
+		String environmentName = xPath.evaluate("//integrations/integration/options/environment", doc);
+		String stage = xPath.evaluate("//integrations/integration/options/stage", doc);
+		String defaultFromComponentType = xPath.evaluate("//integrations/integration/options/defaultFromComponentType", doc);
+		String defaultToComponentType = xPath.evaluate("//integrations/integration/options/defaultToComponentType", doc);
+		String defaultErrorComponentType = xPath.evaluate("//integrations/integration/options/defaultErrorComponentType", doc);
 
         if (defaultFromComponentType.isEmpty()) {defaultFromComponentType = "file";}
         if (defaultToComponentType.isEmpty()) {defaultToComponentType = "file";}

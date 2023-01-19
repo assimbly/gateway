@@ -48,11 +48,11 @@ public class ImportXMLRoutes {
 
         if(type.equalsIgnoreCase("routeConfigurations")){
             log.info("Importing " + type);
-            baseXpath = "/integrations/integration/routeConfigurations/routeConfiguration";
+            baseXpath = "/dil/core/routeConfigurations/routeConfiguration";
 
         }else{
             log.info("Importing " + type);
-            baseXpath = "/integrations/integration/routes/route";
+            baseXpath = "/dil/core/routes/route";
         }
 
         // create routes
@@ -75,7 +75,7 @@ public class ImportXMLRoutes {
 			updateRouteIdsFromXml(doc, entry);
         }
 
-        NodeList routesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*/route_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList routesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/route_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < routesIdNodes.getLength(); i++) {
             String updateId =  routesIdNodes.item(i).getTextContent();
@@ -168,7 +168,7 @@ public class ImportXMLRoutes {
 
             routeNodes.item(0).getAttributes().getNamedItem("id").setTextContent("id" + generatedRouteId);
 
-            NodeList routesIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
+            NodeList routesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*[route_id='" + routeId + "']/route_id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < routesIdNodes.getLength(); i++) {
 				routesIdNodes.item(i).setTextContent("id" + generatedRouteId);

@@ -43,7 +43,7 @@ public class ImportXMLHeaders {
         log.info("Importing headers");
 
         // create headers
-		List<String> headerIds = ImportXMLUtil.getList(doc, "/integrations/integration/headers/header/id/text()");
+		List<String> headerIds = ImportXMLUtil.getList(doc, "/dil/core/headers/header/id/text()");
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
@@ -58,14 +58,14 @@ public class ImportXMLHeaders {
 			updateHeaderIdsFromXml(doc, entry);
         }
 
-        NodeList headersIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*/header_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList headersIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/header_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < headersIdNodes.getLength(); i++) {
             String updateId =  headersIdNodes.item(i).getTextContent();
             headersIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        NodeList headersNodes = (NodeList) xPath.compile("/integrations/integration/headers/*/id").evaluate(doc, XPathConstants.NODESET);
+        NodeList headersNodes = (NodeList) xPath.compile("/dil/core/headers/*/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < headersNodes.getLength(); i++) {
             String updateId =  headersNodes.item(i).getTextContent();
@@ -83,7 +83,7 @@ public class ImportXMLHeaders {
         XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-		String headerName = xPath.evaluate("/integrations/integration/headers/header[id=" + headerId + "]/name", doc);
+		String headerName = xPath.evaluate("/dil/core/headers/header[id=" + headerId + "]/name", doc);
 
         log.info("Start importing header: " + headerName);
 
@@ -126,7 +126,7 @@ public class ImportXMLHeaders {
         log.debug("Set Header Keys: " + headerName);
 
         // Create XPath object
-		XPathExpression expr = xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/keys/*");
+		XPathExpression expr = xPath.compile("/dil/core/headers/header[id=" + headerId + "]/keys/*");
 
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 		for (int i = 0; i < nodes.getLength(); i++) {
@@ -191,10 +191,10 @@ public class ImportXMLHeaders {
 		//update header_id to generated header_id
 		if(!headerId.equals(generatedHeaderId)) {
 
-			NodeList headerNodes = (NodeList) xPath.compile("/integrations/integration/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
+			NodeList headerNodes = (NodeList) xPath.compile("/dil/core/headers/header[id=" + headerId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
 			headerNodes.item(0).setTextContent("id" + generatedHeaderId);
 
-			NodeList headersIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList headersIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*[header_id=" + headerId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < headersIdNodes.getLength(); i++) {
 				headersIdNodes.item(i).setTextContent("id" + generatedHeaderId);

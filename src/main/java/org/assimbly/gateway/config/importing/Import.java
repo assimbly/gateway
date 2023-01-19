@@ -29,7 +29,7 @@ public class Import {
 	// imports gateway configuration (complete configuration file)
 	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
 
-		if(!configuration.endsWith("</integration>")){
+		if(!configuration.endsWith("</dil>")){
 			configuration = Transform.transformToDil(configuration);
 		}
 
@@ -46,7 +46,7 @@ public class Import {
 	// imports flow configuration (specific flow)
 	public String convertFlowConfigurationToDB(Long gatewayId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
-		if(!configuration.endsWith("</integration>")){
+		if(!configuration.endsWith("</dil>")){
 			configuration = Transform.transformToDil(configuration);
 		}
 

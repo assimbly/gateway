@@ -141,3 +141,19 @@ To print a report:
 ```checkversions```
 
 ---
+
+## updateversion
+
+Update the version number of the project and its submodules.
+
+Note: This uses a gradle script ./script/version/version.gradle
+
+### Usage:
+
+To print a report:
+
+```updateversion <versionnumber>```
+
+example
+
+```updateversion 1.1.0```
