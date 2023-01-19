@@ -109,7 +109,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	consumerComponentsNames: Array<any> = [];
 	producerComponentsNames: Array<any> = [];
 
-  languageComponentsNames: Array<any> = ['groovy','java','simple'];
+  languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
 
 	editFlowForm: FormGroup;
 	invalidUriMessage: string;

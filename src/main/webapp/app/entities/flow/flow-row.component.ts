@@ -74,6 +74,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   flowRowID: string;
   flowRowErrorStepID: string;
 
+  statusMessage: any;
+
   statsTableRows: Array<string> = [];
 
   intervalTime: any;
@@ -127,9 +129,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.registerTriggeredAction();
 
     this.stompClient = this.webSocketsService.getClient();
-	this.connectionSubject = this.webSocketsService.getConnectionSubject();
+	  this.connectionSubject = this.webSocketsService.getConnectionSubject();
 
-	this.subscribeToEvent(this.flow.id,'event');
+	  this.subscribeToEvent(this.flow.id,'event');
 
     this.subscribeToAlert(this.flow.id,'alert');
 
@@ -139,18 +141,18 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.subscription = this.receive().subscribe(data => {
 
-		const data2  = data.split(':');
+			if (data.startsWith('alert')) {
+        const data2  = data.split(':');
+        const alertId = Number(data2[1]);
+        if (this.flow.id === alertId) {
+          this.getFlowNumberOfAlerts(alertId);
+        }
 
-		if (Array.isArray(data2)) {
-			if (data2[0] === 'event') {
-			  this.setFlowStatus(data2[1]);
-			} else if (data2[0] === 'alert') {
-			  const alertId = Number(data2[1]);
-			  if (this.flow.id === alertId) {
-				this.getFlowNumberOfAlerts(alertId);
-			  }
+			} else {
+        const response = JSON.parse(data);
+			  this.statusMessage = response;
+			  this.setFlowStatus(response.flow.event);
 			}
-		  }
 
     });
 
@@ -187,8 +189,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   setFlowStatus(status: string): void {
 
-    console.log("0");
-
     switch (status) {
       case 'unconfigured':
         this.statusFlow = Status.inactive;
@@ -198,39 +198,45 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
         break;
       case 'started':
+      case 'start':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowStarted = this.isFlowResumed = true;
         this.flowStatusButton = `Started`;
 
         break;
-      case 'suspended':
+      case 'paused':
+      case 'pause':
         this.statusFlow = Status.paused;
         this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowPaused = this.isFlowStarted = true;
         this.flowStatusButton = `Paused`;
         break;
       case 'resumed':
+      case 'resume':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
         this.flowStatusButton = `Resumed`;
         break;
       case 'restarted':
+      case 'restart':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
         this.flowStatusButton = `Restarted`;
         break;
       case 'stopped':
+      case 'stop':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
         this.flowStatusButton = `Stopped`;
         break;
       default:
-        console.log("0");
-        this.setErrorMessage('unknown',status);
+        const lastStatus = this.flowStatus;
+        this.statusFlow = Status.inactiveError;
+        this.setErrorMessage(lastStatus,this.statusMessage);
         break;
     }
   }
@@ -239,27 +245,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
       try {
 
-          // try to parse as json
-          const data = JSON.parse(error);
+          if (this.statusMessage.flow.stepsLoaded) {
 
-          if (data.flow.stepsLoaded) {
-
-                  const total = data.flow.stepsLoaded.total;
-                  const failed = data.flow.stepsLoaded.failed;
+                  const total = this.statusMessage.flow.stepsLoaded.total;
+                  const failed = this.statusMessage.flow.stepsLoaded.failed;
 
                   this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
                                            <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
                                            <b>Details:</b> <br/>`;
 
-                  for (let i = 0; i < data.flow.steps.length; i++) {
+                  console.log('this.flowStatusButton=' + this.flowStatusButton);
 
-                      const id = data.flow.steps[i].id;
-                      const uri = data.flow.steps[i].uri;
-                      const status = data.flow.steps[i].status;
 
-                      if(status==='error'){
+                  for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
 
-                          const errorMessage = data.flow.steps[i].errorMessage;
+                      const id = this.statusMessage.flow.steps[i].id;
+                      const uri = this.statusMessage.flow.steps[i].uri;
+                      const status = this.statusMessage.flow.steps[i].status;
+
+                      if(status==='error' && uri){
+
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
 
                           this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
                             <tbody>
@@ -277,12 +283,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                               </tr>
                             </tbody>
                           </table>`;
+                      }else if(status==='error'){
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+
+                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                            <tbody>
+                              <tr>
+                                <td><b>step id:</b></td>
+                                <td>${id}</td>
+                              </tr>
+                              <tr>
+                                <td><b>error:</b></td>
+                                <td>${errorMessage}</td>
+                              </tr>
+                            </tbody>
+                          </table>`;
                       }
 
                   }
 
           } else {
-              this.flowStatusButton = error;
+              this.flowStatusButton = this.statusMessage.flow.message;
           }
       } catch (e) {
            this.flowStatusButton = error;
@@ -492,43 +513,43 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             "startTimestamp": "2019-03-26T08:43:59.201+0100"
          */
 
-    if (res === 0) {
+    if (res.step.status != 'started') {
       this.flowStatistic = `Currently there are no statistics for this flow.`;
     } else {
       const now = dayjs();
-      const start = dayjs(res.stats.startTimestamp);
+      const start = dayjs(res.step.stats.startTimestamp);
       const flowRuningTime = dayjs.duration(now.diff(start));
       const hours = Math.floor(flowRuningTime.asHours());
       const minutes = flowRuningTime.minutes();
-      const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
-      const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
+      const completed = res.step.stats.exchangesCompleted - res.step.stats.failuresHandled;
+      const failures = res.step.stats.exchangesFailed + res.step.stats.failuresHandled;
       let processingTime = ``;
 
       if (this.statsTableRows.length === 0) {
         this.statsTableRows[0] = `<td>${uri}</td>`;
-        this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = `<td>${completed}</td>`;
         this.statsTableRows[6] = `<td>${failures}</td>`;
-        this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       } else {
         this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
-        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
         this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
-        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       }
 
-      if (res.stats.lastProcessingTime > 0) {
+      if (res.step.stats.lastProcessingTime > 0) {
         processingTime = `<tr>
 			      <th scope="row">Min</th>
 			      ${this.statsTableRows[7]}

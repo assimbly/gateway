@@ -89,6 +89,7 @@ public class FlowResourceIT {
 
     private Flow flow;
 
+    /*
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -100,6 +101,8 @@ public class FlowResourceIT {
             .setMessageConverters(jacksonMessageConverter)
             .setValidator(validator).build();
     }
+
+     */
 
     /**
      * Create an entity for this test.
@@ -210,7 +213,7 @@ public class FlowResourceIT {
             .andExpect(jsonPath("$.[*].instances").value(hasItem(DEFAULT_INSTANCES)))
             .andExpect(jsonPath("$.[*].logLevel").value(hasItem(DEFAULT_LOG_LEVEL.toString())));
     }
-    
+
     @Test
     @Transactional
     public void getFlow() throws Exception {

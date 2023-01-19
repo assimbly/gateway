@@ -36,7 +36,7 @@ public class ImportXMLConnections {
 
         log.info("Importing connections");
 
-        List<String> connectionIds = ImportXMLUtil.getList(doc, "/integrations/integration/connections/connection/id/text()");
+        List<String> connectionIds = ImportXMLUtil.getList(doc, "dil/core/connections/connection/id/text()");
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
         connectionsIdMap = new HashMap<String, String>();
@@ -49,14 +49,14 @@ public class ImportXMLConnections {
 			updateConnectionIdsFromXml(doc, entry);
         }
 
-        NodeList connectionsIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*/connection_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/connection_id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < connectionsIdNodes.getLength(); i++) {
             String updateId =  connectionsIdNodes.item(i).getTextContent();
             connectionsIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        NodeList connectionsNodes = (NodeList) xPath.compile("/integrations/integration/connections/*/id").evaluate(doc, XPathConstants.NODESET);
+        NodeList connectionsNodes = (NodeList) xPath.compile("/dil/integrations/integration/connections/*/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < connectionsNodes.getLength(); i++) {
             String updateId =  connectionsNodes.item(i).getTextContent();
@@ -73,8 +73,8 @@ public class ImportXMLConnections {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-		String connectionName = xPath.evaluate("/integrations/integration/connections/connection[id='" + connectionId + "']/name",doc);
-		String connectionType = xPath.evaluate("/integrations/integration/connections/connection[id='" + connectionId + "']/type",doc);
+		String connectionName = xPath.evaluate("/dil/core/connections/connection[id='" + connectionId + "']/name",doc);
+		String connectionType = xPath.evaluate("/dil/core/connections/connection[id='" + connectionId + "']/type",doc);
 
 		log.info("Start importing connection: " + connectionName);
 
@@ -117,7 +117,7 @@ public class ImportXMLConnections {
 
         log.debug("Get Connection Keys: " + connectionName);
 
-        Map<String, String> connectionMap = ImportXMLUtil.getMap(doc,"/integrations/integration/connections/connection[id='" + connectionId + "']/keys/*");
+        Map<String, String> connectionMap = ImportXMLUtil.getMap(doc,"/dil/core/connections/connection[id='" + connectionId + "']/keys/*");
 		Map<String, ConnectionKeys> map = new HashMap<>();
 		for (ConnectionKeys s : connectionKeys) {
 			map.put(s.getKey(), s);
@@ -186,13 +186,13 @@ public class ImportXMLConnections {
 		//update connection_id to generated connection_id
 		if(!connectionId.equals(generatedConnectionId)) {
 
-			NodeList connectionsIdNodes = (NodeList) xPath.compile("/integrations/integration/flows/flow/*/*[connection_id='" + connectionId + "']/connection_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*[connection_id='" + connectionId + "']/connection_id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < connectionsIdNodes.getLength(); i++) {
 				connectionsIdNodes.item(i).setTextContent("id" + generatedConnectionId);
 			}
 
-			NodeList connectionsNodes = (NodeList) xPath.compile("/integrations/integration/connections/connection[id='" + connectionId + "']/id").evaluate(doc, XPathConstants.NODESET);
+			NodeList connectionsNodes = (NodeList) xPath.compile("/dil/core/connections/connection[id='" + connectionId + "']/id").evaluate(doc, XPathConstants.NODESET);
 
 			connectionsNodes.item(0).setTextContent("id" + generatedConnectionId);
 
