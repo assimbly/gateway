@@ -27,7 +27,7 @@ branches:
     skip: true
 
 autoCloseIssue: true
-openPR: true
+openDraftPR: true
 
 copyIssueDescriptionToPR: true
 copyIssueLabelsToPR: true

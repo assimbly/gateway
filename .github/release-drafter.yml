@@ -17,9 +17,13 @@ categories:
     labels:
       - 'chore'
       - 'wip'
+      - 'maintenance'
+
 exclude-labels:
-  - 'skip-changelog'
-change-template: '- $TITLE (#$NUMBER)'
+  - 'skip-release'
+  
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
   major:
