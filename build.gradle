@@ -471,7 +471,7 @@ dependencies {
         implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "googledrive", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
-        //implementation group:  "world.dovetail", name: "mail", version: "${version}", changing: true
+        implementation group:  "world.dovetail", name: "mail", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "oauth2token", version: "${version}", changing: true
         implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
