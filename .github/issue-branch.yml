@@ -23,7 +23,16 @@ branches:
   - label: '*'
     prefix: issues/
 
-  - label: no-branch
+  - label: [ major ]
+    skip: true
+
+  - label: [ minor ]
+    skip: true
+    
+  - label: [ patch ]
+    skip: true
+
+  - label: skip-release
     skip: true
 
 autoCloseIssue: true
