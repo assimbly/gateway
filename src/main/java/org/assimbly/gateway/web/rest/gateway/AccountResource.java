@@ -1,5 +1,13 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.undertow.util.BadRequestException;
+import org.assimbly.gateway.authenticate.domain.Status;
+import org.assimbly.gateway.authenticate.domain.Tenant;
+import org.assimbly.gateway.authenticate.exception.InvalidTenantException;
+import org.assimbly.gateway.authenticate.exception.InvalidUserException;
+import org.assimbly.gateway.authenticate.jwt.JwtBuilder;
+import org.assimbly.gateway.authenticate.mongo.MongoDao;
+import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
@@ -8,16 +16,23 @@ import org.assimbly.gateway.service.UserService;
 import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.service.dto.PasswordChangeDTO;
 import org.assimbly.gateway.web.rest.errors.*;
+import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
+
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
+import org.assimbly.util.helper.Base64Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * REST controller for managing the current user's account.
@@ -41,10 +56,14 @@ public class AccountResource {
 
     private final MailService mailService;
 
+    private MongoDao mongoDao;
+    private String database = ConfigHelper.get("baseDatabaseName");
+
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.mongoDao = new MongoDao(database);
     }
 
     /**
@@ -80,15 +99,24 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /authenticate} : check if the user is authenticated, and return its login.
+     * {@code GET  /authenticate} : check if the user is authenticated, and return its token.
      *
      * @param request the HTTP request.
-     * @return the login if the user is authenticated.
+     * @return the token if the user is authenticated.
      */
     @GetMapping("/authenticate")
-    public String isAuthenticated(HttpServletRequest request) {
+    public ResponseEntity<String> isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
-        return request.getRemoteUser();
+        try {
+            String[] values = decodeHeader(request.getHeader("Authorization"));
+            org.assimbly.gateway.authenticate.domain.User user = authenticate(values[0], values[1]);
+            String token = buildToken(user);
+            return ResponseEntity.ok().body(token);
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid authentication");
+        }
     }
 
     /**
@@ -190,6 +218,80 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    /**
+     * Decode the base64 header containing the clients credentials and
+     * return this as an array containing the email, password and tenant name.
+     *
+     * @param base64 string to decode.
+     * @return string array with credentials.
+     * @throws BadRequestException when something is wrong with the base64 encoding
+     *                             or necessary data is missing.
+     */
+    private String[] decodeHeader(String base64) throws BadRequestException {
+        String[] values;
+
+        try {
+            String header = Base64Helper.unmarshal(base64, UTF_8);
+            values = header.split(":");
+        } catch (Exception e) {
+            throw new BadRequestException(e);
+        }
+
+        if (values.length != 2
+            || nullOrEmpty(values[0])
+            || nullOrEmpty(values[1])) {
+
+            throw new BadRequestException();
+        }
+
+        return values;
+    }
+
+    /**
+     * Authenticate a possible client by the given email and password.
+     * Return the user if one is found with the given credentials, else throw an exception.
+     *
+     * @param email    to find the client by.
+     * @param password to validate the client by.
+     * @return a User object with the authenticated client.
+     * @throws NotAuthorizedException when the user with the credentials is not found.
+     */
+
+    private org.assimbly.gateway.authenticate.domain.User authenticate(String email, String password) throws InvalidUserException, InvalidTenantException {
+        org.assimbly.gateway.authenticate.domain.User user = mongoDao.findUser(email, password);
+        if (user == null || !Status.ACTIVE.equals(user.getStatus())) {
+            throw new InvalidUserException();
+        }
+
+        Tenant tenant = mongoDao.findTenant(user);
+        if (tenant != null && tenant.getDisabled()) {
+            throw new InvalidTenantException();
+        }
+
+        return user;
+    }
+
+    /**
+     * Create a JWT belonging to the given User.
+     *
+     * @param user to create the token for.
+     * @return a valid Signed JWT.
+     * @throws UnsupportedEncodingException when the encoding used to sign the token is not supported.
+     */
+    private String buildToken(org.assimbly.gateway.authenticate.domain.User user) throws UnsupportedEncodingException {
+        return JwtBuilder.build(user.getEmail(), "role");
+    }
+
+    /**
+     * Check if a String is null or empty.
+     *
+     * @param value the String to check
+     * @return true if the given String is null or empty.
+     */
+    private static boolean nullOrEmpty(String value) {
+        return value == null || value.isEmpty();
     }
 
     public class SuppressableStacktraceException extends Exception {
