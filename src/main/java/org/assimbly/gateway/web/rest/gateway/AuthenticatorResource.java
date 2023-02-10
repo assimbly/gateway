@@ -87,4 +87,25 @@ public class AuthenticatorResource {
         }
     }
 
+    /**
+     * POST  /authentication/remove : unregister for 2 factor authentication at Google validates the two-factor authentication code
+     * @return boolean (true=valid)
+     */
+    @DeleteMapping(path = "/authentication/remove")
+    public ResponseEntity<String> removeTwoFactorAuthentication(@RequestHeader String Authorization) {
+        log.debug("REST request to delete two-factor authentication");
+        try {
+            String userEmail = JwtValidator.decode(Authorization).get("name", String.class);
+            User user = mongoDao.findUserByEmail(userEmail);
+
+            mongoDao.removeAuthenticatorSettings(user);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("The session token is invalid.");
+        }
+    }
+
 }
