@@ -1,7 +1,8 @@
-package org.assimbly.gateway.authenticate.mongo;
+package org.assimbly.gateway.db.mongo;
 
 import com.warrenstrange.googleauth.ICredentialRepository;
 import org.assimbly.gateway.authenticate.domain.User;
+import org.assimbly.gateway.db.mongo.MongoDao;
 
 import java.util.List;
 
