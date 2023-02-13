@@ -4,7 +4,7 @@ import org.assimbly.gateway.authenticate.domain.Status;
 import org.assimbly.gateway.authenticate.domain.Tenant;
 import org.assimbly.gateway.authenticate.exception.InvalidTenantException;
 import org.assimbly.gateway.authenticate.exception.InvalidUserException;
-import org.assimbly.gateway.authenticate.mongo.MongoDao;
+import org.assimbly.gateway.db.mongo.MongoDao;
 import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.assimbly.gateway.authenticate.domain.User;
 import org.assimbly.gateway.web.rest.util.TokenUtil;

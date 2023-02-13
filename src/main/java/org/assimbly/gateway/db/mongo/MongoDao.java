@@ -1,5 +1,6 @@
-package org.assimbly.gateway.authenticate.mongo;
+package org.assimbly.gateway.db.mongo;
 
+import org.assimbly.gateway.variables.domain.GlobalEnvironmentVariable;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.UpdateOperations;
@@ -9,10 +10,14 @@ import org.assimbly.gateway.authenticate.domain.User;
 public class MongoDao {
 
     private static final String ID_FIELD = "_id";
+    private static final String NAME_FIELD = "name";
     private static final String EMAIL_FIELD = "email";
     private static final String PW_FIELD = "password_digest";
 
     private String database;
+
+    public MongoDao(){
+    }
 
     public MongoDao(String database){
         this.database = database;
@@ -77,6 +82,16 @@ public class MongoDao {
                 .set("uses_two_factor", false);
 
         datastore.update(user, operations);
+    }
+
+    public GlobalEnvironmentVariable findVariableByName(String variableName, String tenant) {
+        Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
+        return datastore.find(GlobalEnvironmentVariable.class).field(NAME_FIELD).equal(variableName).get();
+    }
+
+    public void updateVariable(GlobalEnvironmentVariable globalEnvironmentVariable, String tenant){
+        Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
+        datastore.save(globalEnvironmentVariable);
     }
 
 }

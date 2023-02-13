@@ -1,4 +1,4 @@
-package org.assimbly.gateway.authenticate.mongo;
+package org.assimbly.gateway.db.mongo;
 
 import com.mongodb.MongoClient;
 import org.mongodb.morphia.Datastore;
