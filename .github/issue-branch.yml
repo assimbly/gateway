@@ -20,16 +20,13 @@ branches:
   - label: [ documentation ]
     prefix: documentation/
 
-  - label: '*'
-    prefix: issues/
-
-  - label: [ major ]
+  - label: 'major'
     skip: true
 
-  - label: [ minor ]
+  - label: 'minor'
     skip: true
     
-  - label: [ patch ]
+  - label: 'patch'
     skip: true
 
   - label: skip-release
