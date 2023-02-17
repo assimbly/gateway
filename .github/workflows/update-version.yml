@@ -13,11 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
+    
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    
     - name: Update Gradle Version
       run: |
         echo "Updating to version: $(jq -r '.pull_request.milestone.title' $GITHUB_EVENT_PATH)"
-        gradlew -q version -PnewVersion="$1" --settings-file ./../../settings.gradle
+        gradlew -q version -PnewVersion="$1" --settings-file settings.gradle
 
     - name: Diff check
       run: git diff
