@@ -37,7 +37,7 @@ plugins {
 }
 
 tasks.withType(JavaExec) {
-    systemProperty "DOVETAIL_ENV", System.getProperty("DOVETAIL_ENV")
+    systemProperty "ASSIMBLY_ENV", System.getProperty("ASSIMBLY_ENV")
 }
 
 group = "org.assimbly.gateway"
@@ -448,42 +448,42 @@ dependencies {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }
 
-    if (project.hasProperty("dovetail")){
-        implementation group:  "world.dovetail", name: "aggregate", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "aleris", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "amazon", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "archive", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "cookies", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "csvtoxml", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "docconverter", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "edi", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "edifact", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "edifactdotweb", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "edifactstandards", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "encoder", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "enrich", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "exceltoxml", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "flv", version: "${version}", changing: true  //*
-        implementation group:  "world.dovetail", name: "fmuta", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "formtoxml", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "globalvariables", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "googledrive", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "hl7", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "mail", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "multipart", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "oauth2token", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "pdf", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "pdftotext", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "replace", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "smb", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "sandbox", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "soap", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "simplereplace", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "sql", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "throttling", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "xmltocsv", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "xmltoexcel", version: "${version}", changing: true
-        implementation group:  "world.dovetail", name: "xmltojson", version: "${version}", changing: true
+    if (project.hasProperty("full")){
+        implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "aleris", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "amazon", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "archive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "cookies", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifactdotweb", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true  //*
+        implementation group:  "org.assimbly", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "globalvariables", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "hl7", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "multipart", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "throttling", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
