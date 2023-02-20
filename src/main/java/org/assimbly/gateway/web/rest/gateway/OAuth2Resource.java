@@ -60,7 +60,7 @@ public class OAuth2Resource {
         Map<String, String> tokenInfoMap = new HashMap<>();
 
         tenant = tenant.toLowerCase();
-        String environment = System.getProperty("DOVETAIL_ENV");
+        String environment = System.getProperty("ASSIMBLY_ENV");
 
         // specific global environment variables names
         String uriTokenVarName = OAUTH2_PREFIX + id + OAUTH2_URI_TOKEN_SUFFIX;

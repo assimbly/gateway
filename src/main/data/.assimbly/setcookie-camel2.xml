@@ -14,7 +14,7 @@
     </route>
     <route id="f0eda662-d06a-11ec-83f5-3747809ef661">
         <from uri="activemq:ID_627a611538c74a06a00000d7_test_f940bcd0-d060-11ec-83f5-3747809ef661"/>
-        <to uri="bean://flowCookieStore?method=addStringAsCookie(${exchange},'MyCookie','MyCookie','dovetail.world','',false)"/>
+        <to uri="bean://flowCookieStore?method=addStringAsCookie(${exchange},'MyCookie','MyCookie','org.assimbly','',false)"/>
         <to uri="activemq:ID_627a611538c74a06a00000d7_test_f0eda662-d06a-11ec-83f5-3747809ef661?timeToLive=86400000"/>
     </route>
     <route id="f940bcd1-d060-11ec-83f5-3747809ef661">
