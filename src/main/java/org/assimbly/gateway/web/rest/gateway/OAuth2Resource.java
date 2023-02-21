@@ -7,6 +7,7 @@ import org.assimbly.util.exception.OAuth2TokenException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -48,7 +49,10 @@ public class OAuth2Resource {
      * GET  /info : registers two-factor authentication by email (using GoogleAuthenticator).
      * @return the ResponseEntity with the location of the QR code to register
      */
-    @GetMapping(path = "/info", produces = {"application/json"})
+    @GetMapping(
+        path = "/info",
+        produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
     public Map<String, String> tokenInfo(
         @RequestParam("id") String id,
         @RequestParam("tenant") String tenant,
