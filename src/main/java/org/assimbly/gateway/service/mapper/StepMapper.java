@@ -19,6 +19,8 @@ public interface StepMapper extends EntityMapper<StepDTO, Step> {
 	@Mapping(source = "connectionId", target = "connection")
 	@Mapping(source = "headerId", target = "header")
 	@Mapping(source = "flowId", target = "flow")
+    @Mapping(target = "link", ignore = true)
+    @Mapping(target = "removeLink", ignore = true)
     Step toEntity(StepDTO stepDTO);
 
     default Step fromId(Long id) {
