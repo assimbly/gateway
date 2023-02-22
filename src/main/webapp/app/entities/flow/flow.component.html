@@ -5,7 +5,7 @@
   </div>
   <div class="row mt-3">
     <p style="margin-top: -1.6em">
-      <b>Stage={{ singleGatewayStage }}</b>
+      <b>{{ singleGatewayStage }}</b>
     </p>
   </div>
   <div *ngIf="multipleGateways">
@@ -15,7 +15,7 @@
     </select>
   </div>
   <div class="row">
-    <div class="col-10">
+    <div class="col-9">
       <input
         type="text"
         align="left"
@@ -26,17 +26,12 @@
         placeholder="Filter By Flow Name"
       />
     </div>
-    <div class="col-2 text-right">
-      <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button>
-            <!-- uncomment to link to the api editor -->
-            <!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>-->
-            <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
-          </div>
-      </div>
+    <div class="col-3 text-right">
+       <button class="btn btn-primary" [routerLink]="['../flow', 'message-sender']">Send Message</button>
+       <button class="btn btn-primary" (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">
+         <fa-icon [icon]="'plus'"></fa-icon>
+         <span >Create Flow</span>
+       </button>
     </div>
   </div>
 

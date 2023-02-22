@@ -227,13 +227,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string, editorType: string): void {
-	if(editorType === 'connector'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }] );
-	}else if(editorType === 'esb'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
-	}else if(editorType === 'api'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
-	}        
+	  this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
   }
   
   private onSuccess(data, headers) {

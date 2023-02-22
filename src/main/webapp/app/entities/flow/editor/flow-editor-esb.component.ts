@@ -48,11 +48,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	public logLevelListType = [
 		LogLevelType.OFF,
-		LogLevelType.INFO,
-		LogLevelType.ERROR,
-		LogLevelType.TRACE,
-		LogLevelType.WARN,
-		LogLevelType.DEBUG,
+		LogLevelType.ON,
 	];
 
 	panelCollapsed: any = "uno";
@@ -106,8 +102,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   uriPlaceholders: Array<string> = new Array<string>();
   uriPopoverMessages: Array<string> = new Array<string>();
 
-	consumerComponentsNames: Array<any> = [];
-	producerComponentsNames: Array<any> = [];
+	sourceComponentsNames: Array<any> = [];
+  actionComponentsNames: Array<any> = [];
+	sinkComponentsNames: Array<any> = [];
 
   languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
 
@@ -455,21 +452,28 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 
 	setComponents(): void {
-		const producerComponents = this.components.types.filter(function (component) {
-			return component.consumerOnly === false;
-		});
-
-		const consumerComponents = this.components.types.filter(function (component) {
+		const sourceComponents = this.components.types.filter(function (component) {
 			return component.producerOnly === false;
 		});
 
-		this.producerComponentsNames =
-			producerComponents.map((component) => component.name);
-		this.producerComponentsNames.sort();
+		this.sourceComponentsNames = sourceComponents.map((component) => component.name);
+		this.sourceComponentsNames.sort();
 
-		this.consumerComponentsNames =
-			consumerComponents.map((component) => component.name);
-		this.consumerComponentsNames.sort();
+		const sinkComponents = this.components.types.filter(function (component) {
+			return component.consumerOnly === false;
+		});
+
+		this.sinkComponentsNames = sinkComponents.map((component) => component.name);
+		this.sinkComponentsNames.sort();
+
+		const actionComponents = this.components.types.filter(function (component) {
+			return component.kind === 'action';
+		});
+
+		this.actionComponentsNames = actionComponents.map((component) => component.name);
+		this.actionComponentsNames = [ ...this.actionComponentsNames, ...this.sinkComponentsNames];
+		this.actionComponentsNames.sort();
+
 	}
 
 	clone(): void {
@@ -504,6 +508,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if(stepType === 'SCRIPT'){
         step.componentType = 'groovy';
         stepForm.controls.componentType.patchValue(step.componentType);
+    }else if(stepType === 'ACTION'){
+             step.componentType = 'print';
+             stepForm.controls.componentType.patchValue(step.componentType);
     }else{
         step.componentType = 'file';
         stepForm.controls.componentType.patchValue(step.componentType);
@@ -517,7 +524,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			`Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
 		this.errorHandlerPopoverMessage =
 			`Route or RouteConfiguration that handles errors in case of failures.`;
-		this.logLevelPopoverMessage = `Sets the log level (default=OFF). This automatically log headers and body of the first and last step of a route`;
+		this.logLevelPopoverMessage = `Logs messages for each step to the console/log file`;
 		this.notesPopoverMessage = `Notes to document the flow.`;
 
     this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
@@ -660,7 +667,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		const newStep = this.steps.find((e, i) => i === newIndex);
 
 		newStep.stepType = step.stepType;
-		newStep.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
+		if(step.stepType === 'SOURCE' || step.stepType === 'SINK'){
+  		newStep.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
+		}else if(step.stepType === 'ACTION'){
+		  newStep.componentType = 'print';
+		}
 
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,

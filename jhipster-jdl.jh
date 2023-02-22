@@ -75,6 +75,17 @@ entity EnvironmentVariables {
 	encrypted Boolean
 }
 
+entity Link {
+    name String,
+    bound String,
+    transport String,
+    rule String,
+    expression String,
+    point String,
+    format String,
+    pattern String
+}
+
 entity Maintenance {
 	startTime Instant,
 	endTime Instant,
@@ -148,6 +159,10 @@ relationship OneToMany {
 
 relationship OneToMany {
 	Flow{step} to Step
+}
+
+relationship OneToMany {
+	Step{link} to Link
 }
 
 relationship ManyToOne {

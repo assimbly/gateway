@@ -17,13 +17,7 @@ export class FlowEditorComponent implements OnInit {
     ngOnInit() {
 
 		this.route.params.subscribe(params => {
-   		    if (params['editor'] === 'connector') {
-				this.editor = 'connector';
-		    } else if(params['editor'] === 'esb'){
-			    this.editor = 'esb';
-		    } else if(params['editor'] === 'api'){
-			    this.editor = 'api';
-		    }	  
+		    this.editor = 'esb';
 		});
 		
 	}

@@ -151,7 +151,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			} else {
         const response = JSON.parse(data);
 			  this.statusMessage = response;
-			  this.setFlowStatus(response.flow.event);
+			  if(response.flow.message.startsWith('Failed')){
+			    this.setFlowStatus('error');
+			  }else{
+			    this.setFlowStatus(response.flow.event);
+			  }
+
 			}
 
     });
@@ -374,7 +379,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   navigateToFlowEditor(mode: string) {
 	console.log('type=' + this.flow.type);
 	if(!this.flow.type){
-		this.flow.type = 'connector';
+		this.flow.type = 'esb';
 	}
 
     switch (mode) {
@@ -480,9 +485,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
-                <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
-                <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
-                <b>Log Level:</b> ${this.flow.logLevel}<br/>
+                <b>Tracing:</b> ${this.flow.logLevel}<br/>
 
         `;
   }

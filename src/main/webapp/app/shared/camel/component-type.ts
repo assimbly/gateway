@@ -7918,29 +7918,7 @@ export class Components {
              "lenientProperties": true
          },
          {
-             "kind": "component",
-             "name": "wastebin",
-             "title": "WASTBIN",
-             "description": "Delete the messages",
-             "deprecated": false,
-             "firstVersion": "2.19.0",
-             "label": "mq,jms",
-             "javaType": "",
-             "supportLevel": "Stable",
-             "groupId": "org.apache.camel",
-             "artifactId": "camel-jms",
-             "version": "3.14.0",
-             "scheme": "",
-             "extendsScheme": "",
-             "syntax": "destinationType:destinationName",
-             "async": false,
-             "api": false,
-             "consumerOnly": false,
-             "producerOnly": true,
-             "lenientProperties": true
-         },
-         {
-              "kind": "block",
+              "kind": "action",
               "name": "print",
               "title": "PRINT",
               "description": "Prints a message to the log file",
@@ -7962,7 +7940,7 @@ export class Components {
               "lenientProperties": false
           },
           {
-            "kind": "block",
+            "kind": "action",
             "name": "setproperty",
             "title": "SETPROPERTY",
             "description": "Sets a property on a message",
@@ -7984,7 +7962,7 @@ export class Components {
             "lenientProperties": false
           },
           {
-             "kind": "block",
+             "kind": "action",
              "name": "setbody",
              "title": "SETBODY",
              "description": "Sets the body of a message",
@@ -8006,7 +7984,7 @@ export class Components {
              "lenientProperties": false
           },
           {
-                 "kind": "block",
+                 "kind": "action",
                  "name": "setheader",
                  "title": "SETHEADER",
                  "description": "Sets a header on a message",
@@ -8028,7 +8006,7 @@ export class Components {
                  "lenientProperties": false
           },
           {
-                 "kind": "block",
+                 "kind": "action",
                  "name": "wastebin",
                  "title": "WASTEBIN",
                  "description": "Send the message into nowhere",
@@ -8050,7 +8028,7 @@ export class Components {
                  "lenientProperties": false
           },
           {
-                 "kind": "block",
+                 "kind": "action",
                  "name": "throttle",
                  "title": "THROTTLE",
                  "description": "Throttles on or more messages in memory",
@@ -8072,7 +8050,7 @@ export class Components {
                  "lenientProperties": false
           },
           {
-                 "kind": "block",
+                 "kind": "action",
                  "name": "wiretap",
                  "title": "WIRETAP",
                  "description": "Send message to a wiretap endpoint",
@@ -8094,7 +8072,7 @@ export class Components {
                  "lenientProperties": false
           },
           {
-                 "kind": "block",
+                 "kind": "action",
                  "name": "xmltojson",
                  "title": "XMLTOJOSN",
                  "description": "Converts an XML to JSON",
