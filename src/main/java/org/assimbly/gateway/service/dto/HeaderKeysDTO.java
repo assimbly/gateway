@@ -9,13 +9,9 @@ import java.util.Objects;
 public class HeaderKeysDTO implements Serializable {
 
     private Long id;
-
     private String key;
-
     private String value;
-
     private String type;
-
     private Long headerId;
 
     public Long getId() {
