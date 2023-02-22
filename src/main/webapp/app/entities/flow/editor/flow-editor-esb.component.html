@@ -104,7 +104,7 @@
     <a
       role="button"
       class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
-      href="https://github.com/assimbly/gateway/wiki/Route"
+      href="https://github.com/assimbly/gateway/wiki/user-guide"
       title="Assimbly Documentation"
       target="_blank"
     >
@@ -244,25 +244,25 @@
                               </div>
                               <div class="col-10">
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SOURCE'"
-                                           [items]="consumerComponentsNames" [clearable]="false"
+                                           [items]="sourceComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            style="text-align: left;"
                                            (change)="setTypeLinks(step, index, $event)"></ng-select>
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SINK'"
-                                           [items]="producerComponentsNames" [clearable]="false"
+                                           [items]="sinkComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
                                            style="text-align: left;"></ng-select>
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ACTION'"
-                                           [items]="producerComponentsNames" [clearable]="false"
+                                           [items]="actionComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
                                            style="text-align: left;"></ng-select>
-                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ROUTER'"
+                                <!--<ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ROUTER'"
                                            [items]="producerComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
-                                           style="text-align: left;"></ng-select>
+                                           style="text-align: left;"></ng-select>-->
                               </div>
 
 
@@ -585,7 +585,7 @@
                 <div style="min-height: 44rem;">
                   <div class="row">
                     <div class="form-group col-10" style="margin-left: 24px;">
-                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Tracing</label>
                       <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
                          [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>

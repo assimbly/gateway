@@ -86,27 +86,5 @@
         "consumerOnly": false,
         "producerOnly": false,
         "lenientProperties": true
-    },
-    {
-        "kind": "component",
-        "name": "wastebin",
-        "title": "WASTBIN",
-        "description": "Delete the messages",
-        "deprecated": false,
-        "firstVersion": "2.19.0",
-        "label": "mq,jms",
-        "javaType": "",
-        "supportLevel": "Stable",
-        "groupId": "org.apache.camel",
-        "artifactId": "camel-jms",
-        "version": "3.14.0",
-        "scheme": "",
-        "extendsScheme": "",
-        "syntax": "destinationType:destinationName",
-        "async": false,
-        "api": false,
-        "consumerOnly": false,
-        "producerOnly": true,
-        "lenientProperties": true
     }
 ]

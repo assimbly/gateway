@@ -214,10 +214,6 @@ public class ExportXML {
         Element created =  setElement("created", flowDB.getCreated().toString(), options);
         Element lastModified =  setElement("lastModified", flowDB.getLastModified().toString(), options);
         Element autostart= setElement("autostart", flowDB.isAutoStart().toString(), options);
-        Element isAssimblyHeaders = setElement("assimblyHeaders", flowDB.isAssimblyHeaders().toString(), options);
-        Element isParallelProcessing = setElement("parallelProcessing", flowDB.isParallelProcessing().toString(), options);
-		Element maximumRedeliveries =  setElement("maximumRedeliveries", Integer.toString(flowDB.getMaximumRedeliveries()), options);
-		Element redeliveryDelay =  setElement("redeliveryDelay", Integer.toString(flowDB.getRedeliveryDelay()), options);
 		Element logLevel =  setElement("logLevel", flowDB.getLogLevel().toString(), options);
 
         flowNameAsString = flowDB.getName();
