@@ -22,6 +22,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
@@ -133,8 +134,8 @@ public class GatewayResource {
      */
     @PostMapping(
         path = "/gateways/{gatewayid}/updatebackup/{frequency}",
-        consumes = { "text/plain", "application/xml", "application/json" },
-        produces = { "text/plain", "application/xml", "application/json" }
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
     public ResponseEntity<String> updateBackup(
         @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
@@ -228,7 +229,10 @@ public class GatewayResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = { "text/plain" })
+    @GetMapping(
+        path = "/logs/{gatewayid}/log/{lines}",
+        produces = {MediaType.TEXT_PLAIN_VALUE}
+    )
     public ResponseEntity<String> getLog(
         @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
         @PathVariable Long gatewayid,
