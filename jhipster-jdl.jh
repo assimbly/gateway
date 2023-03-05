@@ -66,7 +66,8 @@ entity Header {
 entity HeaderKeys {
 	key String,
 	value TextBlob,
-	type String
+	type String,
+	language String
 }
 
 entity EnvironmentVariables {

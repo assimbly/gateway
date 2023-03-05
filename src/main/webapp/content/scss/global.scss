@@ -738,11 +738,6 @@ ng-dropdown-panel > div {
   width: 100%;
 }
 
-.CodeMirror {
-    height: 600px;
-	width: 100%;
-}
-
 .flex-wrapper {
     display: flex;
     margin-top: 10px;
@@ -766,5 +761,19 @@ ng-dropdown-panel > div {
 
 .CodeMirror {
  border: 1px solid #eee;
- height: calc(100vh - 220px);
+ height: 500px;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror {
+ border: 1px solid #eee;
+ height: auto;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror-scroll {
+    height: auto;
+    max-height:300px;
 }

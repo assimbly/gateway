@@ -195,6 +195,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   setFlowStatus(status: string): void {
 
     switch (status) {
+      case '':
       case 'unconfigured':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
@@ -377,37 +378,38 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string) {
-	console.log('type=' + this.flow.type);
-	if(!this.flow.type){
-		this.flow.type = 'esb';
-	}
+
+    console.log('type=' + this.flow.type);
+    if(!this.flow.type){
+      this.flow.type = 'flow';
+    }
 
     switch (mode) {
-      case 'edit':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'clone':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'delete':
-        let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-        if (typeof FlowDeleteDialogComponent as Component) {
-          modalRef.componentInstance.flow = this.flow;
-          modalRef.result.then(
-            result => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            },
-            reason => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            }
-          );
-        }
-        break;
-      default:
-        break;
-    }
+        case 'edit':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'clone':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'delete':
+          let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
+          if (typeof FlowDeleteDialogComponent as Component) {
+            modalRef.componentInstance.flow = this.flow;
+            modalRef.result.then(
+              result => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              },
+              reason => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              }
+            );
+          }
+          break;
+        default:
+          break;
+      }
   }
 
   navigateToStepEditor(mode: string, editorType: string, step: Step) {

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { BrokerModule } from './broker/broker.module';
 import { CertificateModule } from './certificate/certificate.module';
 import { StepModule } from './step/step.module';
+import { LinkModule } from './link/link.module';
 import { EnvironmentVariablesModule } from './environment-variables/environment-variables.module';
 import { FlowModule } from './flow/flow.module';
 import { GatewayModule } from './gateway/gateway.module';
@@ -26,6 +27,7 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
         BrokerModule,
 		    CertificateModule,
         StepModule,
+        LinkModule,
 		    EnvironmentVariablesModule,
 		    FlowModule,
 		    GatewayModule,
@@ -43,6 +45,7 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
   exports: [
         BrokerModule,
 		    CertificateModule,
+        LinkModule,
         StepModule,
 		    EnvironmentVariablesModule,
 		    FlowModule,

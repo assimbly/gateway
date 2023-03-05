@@ -1,29 +1,32 @@
 # Assimbly
 
-**Assimbly** is a message gateway.
+**Assimbly** is an integration gateway to create and run:
 
-The gateway acts as a link between steps, allow them to share information and bypass certain protocols. The purpose of Assimbly is to configure and manage these steps with the help of a webgui.
+* Dataflows
+* Camel Routes
+* Scripts
+* API's
+* Brokers
 
-On the background [Apache Camel](https://github.com/apache/camel) does the actual work. Assimbly can connect
-many [Camel components](https://camel.apache.org/components/latest/index.html).
+Assimbly is powered by [Apache Camel](https://github.com/apache/camel) and [Apache ActiveMQ](https://activemq.apache.org/).
 
 ![alt text](src/main/webapp/content/images/assimbly_screenshot.jpg?raw=true 'Flows page')
-
-## Getting started
-
-Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
 
 ## Download
 
 Download it [here](https://github.com/assimbly/gateway/releases).
 
+## Getting started
+
+Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
+
 ## Design
 
 The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 
--   Web based: Access flows from any browser.
--   Ease of use: Configure and manage flows with ease.
--   Separate-of-concerns: Seperate connections from application and other middleware.
+-   Web based: Run from any browser.
+-   Ease of use: Configure and manage integrations with ease.
+-   Separate-of-concerns: Separate integrations from application and other middleware.
 
 # Documentation
 
@@ -33,7 +36,6 @@ There you find pages like:
 
 -   The [User guide](https://github.com/assimbly/gateway/wiki/user-guide)
 -   Supported [components](https://github.com/assimbly/gateway/wiki/components)
--   Supported [services](https://github.com/assimbly/gateway/wiki/services)
 
 ## Contribute
 

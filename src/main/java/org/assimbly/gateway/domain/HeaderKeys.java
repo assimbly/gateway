@@ -32,6 +32,9 @@ public class HeaderKeys implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "language")
+    private String language;
+
     @ManyToOne
     @JsonIgnoreProperties("headerKeys")
     private Header header;
@@ -84,6 +87,20 @@ public class HeaderKeys implements Serializable {
         this.type = type;
     }
 
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public HeaderKeys language(String language) {
+        this.language = language;
+        return this;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public Header getHeader() {
         return header;
     }
@@ -96,6 +113,7 @@ public class HeaderKeys implements Serializable {
     public void setHeader(Header header) {
         this.header = header;
     }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
