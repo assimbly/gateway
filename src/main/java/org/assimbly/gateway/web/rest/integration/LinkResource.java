@@ -105,8 +105,25 @@ public class LinkResource {
      */
     @DeleteMapping("/link/{id}")
     public ResponseEntity<Void> deleteLink(@PathVariable Long id) {
+        System.out.println("-----------------hello3---------------------");
+
         log.debug("REST request to delete Link : {}", id);
         linkService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+
+    /**
+     * DELETE  /link/bystepid/id : delete the "id" link.
+     *
+     * @param stepid the stepId of the linkDTO to delete
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping("/link/bystepid/{stepid}")
+    public ResponseEntity<Void> deleteLinkByStepId(@PathVariable Long stepid) {
+        log.debug("REST request to delete Link by StepId : {}", stepid);
+        linkService.deleteByStepId(stepid);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, stepid.toString())).build();
+    }
+
 }

@@ -69,7 +69,7 @@
             <column name="component_type" type="string"/>
             <column name="uri" type="string"/>
             <column name="options" type="string"/>
-            <column name="stpe_type" type="string"/>
+            <column name="step_type" type="string"/>
             <column name="response_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>

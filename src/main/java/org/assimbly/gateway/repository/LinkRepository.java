@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface LinkRepository extends JpaRepository<Link, Long> {
+    void deleteByStepId(Long stepId);
 
 }

@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class FlowEditorComponent implements OnInit {
 
-  editor: string = 'unknown';
+  editor: string = 'esb';
 
   constructor(
 	private route: ActivatedRoute,
@@ -19,7 +19,7 @@ export class FlowEditorComponent implements OnInit {
 		this.route.params.subscribe(params => {
 		    this.editor = 'esb';
 		});
-		
+
 	}
 
 }

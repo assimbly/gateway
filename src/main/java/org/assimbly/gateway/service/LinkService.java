@@ -40,4 +40,11 @@ public interface LinkService {
      * @param id the id of the entity
      */
     void delete(Long id);
+
+    /**
+     * Delete the "stepId" link.
+     *
+     * @param stepId the stepId of the entity
+     */
+    void deleteByStepId(Long stepId);
 }

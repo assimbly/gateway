@@ -15,7 +15,7 @@
     </select>
   </div>
   <div class="row">
-    <div class="col-9">
+    <div class="col-10">
       <input
         type="text"
         align="left"
@@ -26,23 +26,25 @@
         placeholder="Filter By Flow Name"
       />
     </div>
-    <div class="col-3 text-right">
-       <button class="btn btn-primary" [routerLink]="['../flow', 'message-sender']">Send Message</button>
-       <button class="btn btn-primary" (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-         <fa-icon [icon]="'plus'"></fa-icon>
-         <span >Create Flow</span>
-       </button>
+    <div class="col-2 text-right">
+      <div ngbDropdown class="d-inline-block">
+        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Scripts</button>
+          <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
+        </div>
+      </div>
     </div>
-  </div>
-
   <br />
   <div *ngIf="flows?.length == 0">
     <div class="card-block pt-4">
       <blockquote class="card-blockquote">
         <br />
         <p class="tab" style="margin-left: 0.3em">
-          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'connector'}]">'Create flow'</a>. For more info
-          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Wiki</a>
+          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
+          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a>
         </p>
       </blockquote>
     </div>

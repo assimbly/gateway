@@ -76,7 +76,7 @@ public class Flow implements Serializable {
     private Gateway gateway;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
+    //@JsonIgnoreProperties("flows") //@JsonIgnore
     private Set<Step> steps = new HashSet<>();
 
     /*
@@ -297,6 +297,7 @@ public class Flow implements Serializable {
         this.steps = steps;
         return this;
     }
+
 
     public Flow addStep(Step step) {
         this.steps.add(step);

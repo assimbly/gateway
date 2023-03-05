@@ -87,4 +87,16 @@ public class LinkServiceImpl implements LinkService {
         log.debug("Request to delete Link : {}", id);
         linkRepository.deleteById(id);
     }
+
+    /**
+     * Delete the link by id.
+     *
+     * @param stepId the id of the entity
+     */
+    @Override
+    public void deleteByStepId(Long stepId) {
+        log.debug("Request to delete Link by stepId : {}", stepId);
+        linkRepository.deleteByStepId(stepId);
+    }
+
 }

@@ -576,7 +576,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.5.1"
+    gradleVersion = "7.6.1"
 }
 
 /*
@@ -589,8 +589,8 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.15.0"
-        npmVersion = "8.9.0"
+        version = "16.16.0"
+        npmVersion = "8.19.4"
         yarnVersion = "1.22.17"
         download = true
     }

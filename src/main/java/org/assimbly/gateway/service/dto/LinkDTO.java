@@ -100,7 +100,6 @@ public class LinkDTO implements Serializable {
         this.pattern = pattern;
     }
 
-
     public Long getStepId() {
         return stepId;
     }

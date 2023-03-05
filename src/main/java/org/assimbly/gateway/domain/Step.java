@@ -48,7 +48,7 @@ public class Step implements Serializable {
     private Integer routeId;
 
     @ManyToOne
-    @JsonIgnoreProperties("steps")
+    @JsonIgnore
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,8 +60,7 @@ public class Step implements Serializable {
     private Header header;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
-    private Set<Link> link = new HashSet<>();
+    private Set<Link> links = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -190,29 +189,27 @@ public class Step implements Serializable {
     }
 
 
-    public Set<Link> getLink() {
-        return link;
+    public Set<Link> getLinks() {
+        return links;
     }
 
-    public Step link(Set<Link> link) {
-        this.link = link;
+    public Step links(Set<Link> links) {
+        this.links = links;
         return this;
     }
 
     public Step addLink(Link link) {
-        this.link.add(link);
-        link.setStep(this);
+        this.links.add(link);
         return this;
     }
 
-    public Step removeLink(Link link) {
-        this.link.remove(link);
-        link.setStep(null);
+    public Step removeLink(Link links) {
+        this.links.remove(links);
         return this;
     }
 
-    public void setLink(Set<Link> link) {
-        this.link = link;
+    public void setLinks(Set<Link> links) {
+        this.links = links;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

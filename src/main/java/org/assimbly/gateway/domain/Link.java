@@ -1,5 +1,6 @@
 package org.assimbly.gateway.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -46,7 +47,7 @@ public class Link implements Serializable {
     private String pattern;
 
     @ManyToOne
-    @JsonIgnoreProperties("link")
+    @JsonIgnore
     private Step step;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
@@ -149,7 +150,6 @@ public class Link implements Serializable {
         this.format = format;
     }
 
-
     public String getPattern() {
         return pattern;
     }
@@ -159,7 +159,7 @@ public class Link implements Serializable {
         return this;
     }
 
-    public void setFormatPattern(String pattern) {
+    public void setPattern(String pattern) {
         this.pattern = pattern;
     }
 
@@ -175,6 +175,7 @@ public class Link implements Serializable {
     public void setStep(Step step) {
         this.step = step;
     }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -199,7 +200,7 @@ public class Link implements Serializable {
 
     @Override
     public String toString() {
-        return "HeaderKeys{" +
+        return "Links{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", bound='" + getBound() + "'" +
