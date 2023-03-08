@@ -8186,33 +8186,6 @@ export class Components {
                 "full": false
               },
               {
-                "scheme": "exceltoxml",
-                "producerOnly": true,
-                "deprecated": false,
-                "groupId": "org.assimbly",
-                "description": "Converts an Excel to XML",
-                "source": false,
-                "title": "EXCELTOXML",
-                "router": false,
-                "action": true,
-                "artifactId": "exceltoxml",
-                "api": false,
-                "consumerOnly": false,
-                "kind": "component",
-                "sink": false,
-                "label": "",
-                "supportLevel": "Stable",
-                "version": "3.18.2",
-                "javaType": "",
-                "async": false,
-                "firstVersion": "3.18.0",
-                "lenientProperties": false,
-                "name": "exceltoxml",
-                "syntax": "",
-                "extendsScheme": "",
-                "full": true
-              },
-              {
                 "scheme": "filter",
                 "producerOnly": true,
                 "deprecated": false,
@@ -8915,33 +8888,6 @@ export class Components {
                "full": true
              },
               {
-                "scheme": "setoauth2token",
-                "producerOnly": true,
-                "deprecated": false,
-                "groupId": "org.assimbly",
-                "description": "Sets oAuth2 token from endpoint",
-                "source": false,
-                "title": "SetOAUTH2TOKEN",
-                "router": false,
-                "action": true,
-                "artifactId": "oauth2token",
-                "api": false,
-                "consumerOnly": false,
-                "kind": "component",
-                "sink": false,
-                "label": "",
-                "supportLevel": "Stable",
-                "version": "3.18.2",
-                "javaType": "",
-                "async": false,
-                "firstVersion": "3.18.0",
-                "lenientProperties": false,
-                "name": "setoauth2token",
-                "syntax": "",
-                "extendsScheme": "",
-                "full": true
-              },
-              {
                 "scheme": "setpattern",
                 "producerOnly": true,
                 "deprecated": false,
@@ -9027,7 +8973,7 @@ export class Components {
                 "producerOnly": true,
                 "deprecated": false,
                 "groupId": "org.assimbly",
-                "description": "Replace headers with a simple expression",
+                "description": "Use simple expressions in the body of a message",
                 "source": false,
                 "title": "SIMPLEREPLACE",
                 "router": false,
@@ -9464,6 +9410,16 @@ export class Components {
             camelComponentType = 'rest';
         } else if (componentType === 'amqps') {
            camelComponentType = 'amqp';
+        } else if (componentType === 'coaps' || componentType === 'coap+tpc' || componentType === 'coaps+tpc') {
+           camelComponentType = 'coap';
+        } else if (componentType === 'cometds') {
+            camelComponentType = 'cometd';
+        } else if (componentType === 'imap' || componentType === 'imaps' || componentType === 'smpt'  || componentType === 'smpts' || componentType === 'pop3'  || componentType === 'pop3s') {
+           camelComponentType = 'coap';
+        } else if (componentType === 'smmps') {
+          camelComponentType = 'smmp';
+       } else if (componentType === 'solr-cloud' || componentType === 'solrs') {
+           camelComponentType = 'coap';
         } else if (componentType === 'sonicmq') {
            camelComponentType = 'sjms';
         } else if (componentType === 'wastebin') {
