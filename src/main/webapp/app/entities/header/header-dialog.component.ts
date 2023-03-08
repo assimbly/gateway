@@ -26,7 +26,8 @@ export class HeaderDialogComponent implements OnInit {
   headerKeys: Array<HeaderKeys> = [];
   headerKeysKeys: Array<string> = [];
   isSaving: boolean;
-  public typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+  public typeHeader: string[] = ['header', 'property'];
+  public languageHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -48,6 +49,21 @@ export class HeaderDialogComponent implements OnInit {
       res => this.onError(res.body)
     );
     this.loadHeaderKeys(this.route.fragment['value'] === 'clone');
+  }
+
+
+  private loadHeaderKeys(cloneHeader: boolean) {
+    if (this.header.id) {
+      this.headerKeysService.query().subscribe(res => {
+        this.headerKeys = res.body.filter(hk => hk.headerId === this.header.id);
+      });
+    } else {
+      const hk = new HeaderKeys();
+      hk.type = this.typeHeader[0];
+      hk.type = this.languageHeader[0];
+      this.headerKeys.push(hk);
+      this.header.id = cloneHeader ? null : this.header.id;
+    }
   }
 
   clear() {
@@ -73,6 +89,7 @@ export class HeaderDialogComponent implements OnInit {
     const newHeaderKeys = new HeaderKeys();
     newHeaderKeys.isDisabled = false;
     newHeaderKeys.type = this.typeHeader[0];
+    newHeaderKeys.language = this.languageHeader[0];
     this.headerKeys.push(newHeaderKeys);
     this.mapHeaderKeysKeys();
   }
@@ -103,19 +120,6 @@ export class HeaderDialogComponent implements OnInit {
     if (typeof this.headerKeys !== 'undefined') {
       this.headerKeysKeys = this.headerKeys.map(hk => hk.key);
       this.headerKeysKeys = this.headerKeysKeys.filter(k => k !== undefined);
-    }
-  }
-
-  private loadHeaderKeys(cloneHeader: boolean) {
-    if (this.header.id) {
-      this.headerKeysService.query().subscribe(res => {
-        this.headerKeys = res.body.filter(hk => hk.headerId === this.header.id);
-      });
-    } else {
-      const hk = new HeaderKeys();
-      hk.type = this.typeHeader[0];
-      this.headerKeys.push(hk);
-      this.header.id = cloneHeader ? null : this.header.id;
     }
   }
 
@@ -172,6 +176,7 @@ export class HeaderPopupComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
+      console.log('header popup');
       if (params['id']) {
         this.headerPopupService.open(HeaderDialogComponent as Component, params['id']);
       } else {

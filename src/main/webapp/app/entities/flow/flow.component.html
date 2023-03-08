@@ -5,7 +5,7 @@
   </div>
   <div class="row mt-3">
     <p style="margin-top: -1.6em">
-      <b>Stage={{ singleGatewayStage }}</b>
+      <b>{{ singleGatewayStage }}</b>
     </p>
   </div>
   <div *ngIf="multipleGateways">
@@ -28,26 +28,23 @@
     </div>
     <div class="col-2 text-right">
       <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button>
-            <!-- uncomment to link to the api editor -->
-            <!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>-->
-            <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
-          </div>
+        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Scripts</button>
+          <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
+        </div>
       </div>
     </div>
-  </div>
-
   <br />
   <div *ngIf="flows?.length == 0">
     <div class="card-block pt-4">
       <blockquote class="card-blockquote">
         <br />
         <p class="tab" style="margin-left: 0.3em">
-          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'connector'}]">'Create flow'</a>. For more info
-          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Wiki</a>
+          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
+          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a>
         </p>
       </blockquote>
     </div>

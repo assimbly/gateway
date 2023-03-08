@@ -20,6 +20,9 @@
           <th>
             <span>Type</span>
           </th>
+          <th>
+            <span>Language</span>
+          </th>
           <th [style.display]="'none'">
             <span>Header</span>
           </th>
@@ -70,13 +73,25 @@
           <td>
             <select
               class="form-control form-select"
-              id="field_header"
+              id="field_header_type"
               name="headerKeys-type-{{ idx }}"
               id="headerKeys-type-{{ idx }}"
               [(ngModel)]="headerKey.type"
               [disabled]="headerKey.isDisabled"
             >
               <option [ngValue]="type" *ngFor="let type of typeHeader">{{ type }}</option>
+            </select>
+          </td>
+          <td>
+            <select
+              class="form-control form-select"
+              id="field_header_language"
+              name="headerKeys-language-{{ idx }}"
+              id="headerKeys-language-{{ idx }}"
+              [(ngModel)]="headerKey.type"
+              [disabled]="headerKey.isDisabled"
+            >
+              <option [ngValue]="language" *ngFor="let language of languageHeader">{{ language }}</option>
             </select>
           </td>
           <td [style.display]="'none'">

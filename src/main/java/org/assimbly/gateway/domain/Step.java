@@ -1,5 +1,6 @@
 package org.assimbly.gateway.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -7,7 +8,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.assimbly.gateway.domain.enumeration.StepType;
 
@@ -45,7 +48,7 @@ public class Step implements Serializable {
     private Integer routeId;
 
     @ManyToOne
-    @JsonIgnoreProperties("steps")
+    @JsonIgnore
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,6 +58,9 @@ public class Step implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "headerId")
     private Header header;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<Link> links = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -181,6 +187,31 @@ public class Step implements Serializable {
     public void setHeader(Header header) {
         this.header = header;
     }
+
+
+    public Set<Link> getLinks() {
+        return links;
+    }
+
+    public Step links(Set<Link> links) {
+        this.links = links;
+        return this;
+    }
+
+    public Step addLink(Link link) {
+        this.links.add(link);
+        return this;
+    }
+
+    public Step removeLink(Link links) {
+        this.links.remove(links);
+        return this;
+    }
+
+    public void setLinks(Set<Link> links) {
+        this.links = links;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

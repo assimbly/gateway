@@ -50,6 +50,7 @@ export class Flow implements IFlow {
 
 export const enum LogLevelType {
     OFF = 'OFF',
+    ON = 'ON',
     INFO = 'INFO',
     WARN = 'WARN',
     ERROR = 'ERROR',

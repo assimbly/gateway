@@ -22,7 +22,8 @@ export class HeaderUpdateComponent implements OnInit {
   headerKeys: Array<HeaderKeys> = [];
   headerKeysKeys: Array<string> = [];
   isSaving: boolean;
-  public typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+  public typeHeader: string[] = ['header', 'property'];
+  public languageHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
 
   constructor(
     protected headerService: HeaderService,
@@ -65,9 +66,9 @@ export class HeaderUpdateComponent implements OnInit {
   }
 
   protected onSaveSuccess(result: IHeader) {
-    this.eventManager.broadcast(new EventWithContent('headerListModification', 'OK'));  
+    this.eventManager.broadcast(new EventWithContent('headerListModification', 'OK'));
     this.eventManager.broadcast(new EventWithContent('headerModified', result.id));
-    this.eventManager.broadcast(new EventWithContent('headerKeysUpdated', result));	
+    this.eventManager.broadcast(new EventWithContent('headerKeysUpdated', result));
     this.isSaving = false;
 
     this.headerKeys.forEach(headerKey => {
@@ -100,6 +101,7 @@ export class HeaderUpdateComponent implements OnInit {
     const newHeaderKeys = new HeaderKeys();
     newHeaderKeys.isDisabled = false;
     newHeaderKeys.type = this.typeHeader[0];
+    newHeaderKeys.language = this.languageHeader[0];
     this.headerKeys.push(newHeaderKeys);
     this.mapHeaderKeysKeys();
   }
@@ -151,6 +153,7 @@ export class HeaderUpdateComponent implements OnInit {
     } else {
       const hk = new HeaderKeys();
       hk.type = this.typeHeader[0];
+      hk.language = this.languageHeader[0];
       this.headerKeys.push(hk);
       this.header.id = cloneHeader ? null : this.header.id;
     }

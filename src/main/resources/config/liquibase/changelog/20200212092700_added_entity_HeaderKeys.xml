@@ -25,6 +25,9 @@
             <column name="type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="language" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="header_id" type="bigint">
                 <constraints nullable="true" />
             </column>

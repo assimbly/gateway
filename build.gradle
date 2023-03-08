@@ -29,8 +29,8 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
-	id 'de.undercouch.download' version '5.2.1'
-    id "com.github.ben-manes.versions" version "0.42.0"
+	id 'de.undercouch.download' version '5.3.1'
+    id "com.github.ben-manes.versions" version "0.46.0"
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
@@ -340,7 +340,7 @@ dependencies {
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.3'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
@@ -430,7 +430,7 @@ dependencies {
     liquibaseRuntime "mysql:mysql-connector-java"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
     implementation "org.jdom:jdom2:2.0.6.1"
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     implementation "com.warrenstrange:googleauth:1.5.0"
@@ -576,7 +576,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.5.1"
+    gradleVersion = "7.6.1"
 }
 
 /*
@@ -589,8 +589,8 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.15.0"
-        npmVersion = "8.9.0"
+        version = "16.16.0"
+        npmVersion = "8.19.4"
         yarnVersion = "1.22.17"
         download = true
     }

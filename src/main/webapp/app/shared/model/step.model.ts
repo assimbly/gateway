@@ -1,3 +1,5 @@
+import { ILink } from 'app/shared/model/link.model';
+
 export const enum StepType {
     FROM = 'FROM',
     TO = 'TO',
@@ -27,6 +29,7 @@ export interface IStep {
     connectionId?: number;
     headerId?: number;
     routeId?: number;
+    links?: ILink[];
 }
 
 export class Step implements IStep {
@@ -40,6 +43,7 @@ export class Step implements IStep {
         public flowId?: number,
         public connectionId?: number,
         public headerId?: number,
-        public routeId?: number
+        public routeId?: number,
+        public links?: ILink[],
     ) {}
 }

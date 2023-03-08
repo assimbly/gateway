@@ -26,7 +26,8 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     isSaving: boolean;
     headerKey: IHeaderKeys;
     headerKeyId: number;
-    typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+    languageHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+    typeHeader: string[] = ['header', 'property'];
     eventSubscriber: Subscription;
 
     constructor(
@@ -61,7 +62,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
 		  }
 		});
 	}
-	
+
     updateHeaderKeys(id: number) {
         this.headerKeys = this.headerKeys.filter(x => x.id !== id);
         this.mapHeaderKeysKeys();
@@ -76,6 +77,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
             if (this.headerKeys.length === 1 && this.headerKeys[0].id === undefined) {
                 this.headerKeys[0].isDisabled = false;
                 this.headerKeys[0].type = this.typeHeader[0];
+                this.headerKeys[0].language = this.languageHeader[0];
             } else {
                 this.headerKeys.forEach(headerKey => {
                     headerKey.isDisabled = true;
@@ -129,7 +131,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
     }
 
     cloneHeaderKey(headerKey: IHeaderKeys) {
-        const headerKeyForClone = new HeaderKeys(headerKey.headerId, headerKey.key, headerKey.value, headerKey.type, headerKey.headerId);
+        const headerKeyForClone = new HeaderKeys(headerKey.headerId, headerKey.key, headerKey.value, headerKey.type, headerKey.language, headerKey.headerId);
         this.headerKeys.push(headerKeyForClone);
     }
 
@@ -137,6 +139,7 @@ export class HeaderKeysComponent implements OnInit, OnChanges {
         const newHeaderKeys = new HeaderKeys();
         newHeaderKeys.isDisabled = false;
         newHeaderKeys.type = this.typeHeader[0];
+        newHeaderKeys.language = this.languageHeader[0];
         this.headerKeys.push(newHeaderKeys);
         this.mapHeaderKeysKeys();
     }

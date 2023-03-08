@@ -2,6 +2,9 @@ package org.assimbly.gateway.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
+
+import org.assimbly.gateway.domain.Link;
 import org.assimbly.gateway.domain.enumeration.StepType;
 
 /**
@@ -22,6 +25,8 @@ public class StepDTO implements Serializable {
     private Integer routeId;
 
     private Integer responseId;
+
+    private Set<Link> links;
 
     private Long flowId;
 
@@ -93,6 +98,14 @@ public class StepDTO implements Serializable {
         this.flowId = flowId;
     }
 
+    public Set<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(Set<Link> links) {
+        this.links = links;
+    }
+
     public Long getConnectionId() {
         return connectionId;
     }
@@ -142,6 +155,7 @@ public class StepDTO implements Serializable {
             ", flow=" + getFlowId() +
             ", connection=" + getConnectionId() +
             ", header=" + getHeaderId() +
+            ", links=" + getLinks() +
             "}";
     }
 }
