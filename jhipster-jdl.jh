@@ -66,13 +66,25 @@ entity Header {
 entity HeaderKeys {
 	key String,
 	value TextBlob,
-	type String
+	type String,
+	language String
 }
 
 entity EnvironmentVariables {
 	key String,
 	value TextBlob,
 	encrypted Boolean
+}
+
+entity Link {
+    name String,
+    bound String,
+    transport String,
+    rule String,
+    expression String,
+    point String,
+    format String,
+    pattern String
 }
 
 entity Maintenance {
@@ -148,6 +160,10 @@ relationship OneToMany {
 
 relationship OneToMany {
 	Flow{step} to Step
+}
+
+relationship OneToMany {
+	Step{link} to Link
 }
 
 relationship ManyToOne {

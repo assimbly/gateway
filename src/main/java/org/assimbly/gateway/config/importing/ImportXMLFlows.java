@@ -324,7 +324,7 @@ public class ImportXMLFlows {
 		step.setComponentType(componentType);
         step.responseId(responseId);
         step.setUri(uri);
-		step.setFlow(flow);
+		//step.setFlow(flow);
 		step.setOptions(options);
 
 		if (connection != null) {

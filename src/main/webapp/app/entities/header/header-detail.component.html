@@ -1,7 +1,7 @@
 <div class="container" *ngIf="header">
     <h2><span>Header</span> {{header.id}}</h2>
     <jhi-alert-error></jhi-alert-error>
-    
+
     <div class="table-responsive">
         <table class="table table-sm table-bordered table-striped">
             <thead>
@@ -30,6 +30,7 @@
                     <th>Key</th>
                     <th>Value</th>
                     <th>Type</th>
+                    <th>Type</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,6 +38,7 @@
                     <td>{{headerKey.key}}</td>
                     <td>{{headerKey.value}}</td>
                     <td>{{headerKey.type}}</td>
+                    <td>{{headerKey.language}}</td>
                 </tr>
             </tbody>
         </table>

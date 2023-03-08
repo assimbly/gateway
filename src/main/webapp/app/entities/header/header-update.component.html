@@ -40,6 +40,7 @@
                   <td><span>Key</span></td>
                   <td><span>Value</span></td>
                   <td><span>Type</span></td>
+                  <td><span>Language</span></td>
                   <td></td>
                 </tr>
               </thead>
@@ -91,9 +92,19 @@
                     >
                       <option [ngValue]="t" *ngFor="let t of typeHeader">{{ t }}</option>
                     </select>
-                    <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
-                      <span *ngIf="type.errors.required">Value is required.</span>
-                    </div>
+                  </td>
+                  <td>
+                    <select
+                      class="form-control form-select"
+                      required
+                      id="field_header_language"
+                      name="headerKeys-language-{{ idx }}"
+                      id="headerKeys-language-{{ idx }}"
+                      [(ngModel)]="headerKey.language"
+                      #type="ngModel"
+                    >
+                      <option [ngValue]="t" *ngFor="let t of languageHeader">{{ t }}</option>
+                    </select>
                   </td>
                   <td>
                     <div class="btn-group flex-btn-group-container">

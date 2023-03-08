@@ -151,7 +151,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			} else {
         const response = JSON.parse(data);
 			  this.statusMessage = response;
-			  this.setFlowStatus(response.flow.event);
+			  if(response.flow.message.startsWith('Failed')){
+			    this.setFlowStatus('error');
+			  }else{
+			    this.setFlowStatus(response.flow.event);
+			  }
+
 			}
 
     });
@@ -190,6 +195,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   setFlowStatus(status: string): void {
 
     switch (status) {
+      case '':
       case 'unconfigured':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
@@ -372,37 +378,38 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string) {
-	console.log('type=' + this.flow.type);
-	if(!this.flow.type){
-		this.flow.type = 'connector';
-	}
+
+    console.log('type=' + this.flow.type);
+    if(!this.flow.type){
+      this.flow.type = 'flow';
+    }
 
     switch (mode) {
-      case 'edit':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'clone':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'delete':
-        let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-        if (typeof FlowDeleteDialogComponent as Component) {
-          modalRef.componentInstance.flow = this.flow;
-          modalRef.result.then(
-            result => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            },
-            reason => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            }
-          );
-        }
-        break;
-      default:
-        break;
-    }
+        case 'edit':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'clone':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'delete':
+          let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
+          if (typeof FlowDeleteDialogComponent as Component) {
+            modalRef.componentInstance.flow = this.flow;
+            modalRef.result.then(
+              result => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              },
+              reason => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              }
+            );
+          }
+          break;
+        default:
+          break;
+      }
   }
 
   navigateToStepEditor(mode: string, editorType: string, step: Step) {
@@ -480,9 +487,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
-                <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
-                <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
-                <b>Log Level:</b> ${this.flow.logLevel}<br/>
+                <b>Tracing:</b> ${this.flow.logLevel}<br/>
 
         `;
   }

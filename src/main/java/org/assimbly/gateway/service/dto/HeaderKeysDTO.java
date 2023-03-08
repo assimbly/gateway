@@ -9,13 +9,11 @@ import java.util.Objects;
 public class HeaderKeysDTO implements Serializable {
 
     private Long id;
-
     private String key;
-
     private String value;
-
     private String type;
 
+    private String language;
     private Long headerId;
 
     public Long getId() {
@@ -48,6 +46,14 @@ public class HeaderKeysDTO implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public Long getHeaderId() {
