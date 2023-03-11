@@ -1,6 +1,8 @@
 package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -92,23 +95,24 @@ public class ImportXMLFlows {
 		String flowId = xPath.evaluate("//flows/flow[id='" + id + "']/id", doc);
 		String flowName = xPath.evaluate("//flows/flow[id='" + id + "']/name", doc);
 		String flowType = xPath.evaluate("//flows/flow[id='" + id + "']/type", doc);
-        String flowNotes = xPath.evaluate("//flows/flow[id='" + id + "']/notes", doc);
-		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id + "']/autostart", doc);
-        String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id + "']/assimblyHeaders", doc);
-        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id + "']/parallelProcessing", doc);
-
-		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id + "']/maximumRedeliveries", doc);
-		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id + "']/redeliveryDelay", doc);
-		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id + "']/logLevel", doc);
         String flowVersion = xPath.evaluate("//flows/flow[id='" + id + "']/version", doc);
-        String flowLastModified = xPath.evaluate("//flows/flow[id='" + id + "']/lastModified", doc);
+        String flowNotes = xPath.evaluate("//flows/flow[id='" + id + "']/notes", doc);
+
+        //options
+		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id + "']/options/autostart", doc);
+        String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id + "']/options/assimblyHeaders", doc);
+        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id + "']/options/parallelProcessing", doc);
+		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id + "']/options/maximumRedeliveries", doc);
+		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id + "']/options/redeliveryDelay", doc);
+		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id + "']/options/logLevel", doc);
+        String flowLastModified = xPath.evaluate("//flows/flow[id='" + id + "']/options/lastModified", doc);
 
 		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
-			flowOptional = flowRepository.findByName(flowName);
+            flowOptional = flowRepository.findByName(flowName);
 			gatewayOptional = gatewayRepository.findById(integrationId);
 
-			if (!flowOptional.isPresent()) {
+            if (!flowOptional.isPresent()) {
 				flow = new Flow();
 				flow.setId(databaseId);
 
@@ -119,14 +123,14 @@ public class ImportXMLFlows {
 				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
-			if (!gatewayOptional.isPresent()) {
+            if (!gatewayOptional.isPresent()) {
 				return "unknown gateway";
 			} else {
 				gateway = gatewayOptional.get();
 				flow.setGateway(gateway);
 			}
 
-			flow.setName(ImportXMLUtil.setStringValue(flowName, flowId));
+            flow.setName(ImportXMLUtil.setStringValue(flowName, flowId));
 
 			flow.setType(ImportXMLUtil.setStringValue(flowType,"connector"));
 
@@ -144,7 +148,7 @@ public class ImportXMLFlows {
 
             flow.setVersion(ImportXMLUtil.setIntegerValue(flowVersion, 1));
 
-			if (flowLogLevel != null && !flowLogLevel.isEmpty()) {
+            if (flowLogLevel != null && !flowLogLevel.isEmpty()) {
 				flowLogLevel = flowLogLevel.toUpperCase();
 				if(flowLogLevel.equals("ERROR")||flowLogLevel.equals("WARN")||flowLogLevel.equals("INFO")||flowLogLevel.equals("DEBUG")||flowLogLevel.equals("TRACE")) {
 					flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
@@ -174,9 +178,13 @@ public class ImportXMLFlows {
                 flow.created(Instant.now());
             }
 
-			flow.setSteps(steps);
+            flow.setSteps(steps);
 
-			flow = flowRepository.save(flow);
+            flow = flowRepository.save(flow);
+
+            flow = setLinks(doc, flowId, flow);
+
+            flowRepository.save(flow);
 
 			return "flow imported";
 
@@ -230,10 +238,10 @@ public class ImportXMLFlows {
 		String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
-		String connectionId = xPath.evaluate(stepXPath + "connection_id", doc);
-		String headerId = xPath.evaluate(stepXPath + "header_id", doc);
-        String responseIdAsString = xPath.evaluate(stepXPath + "response_id", doc);
-        String routeIdAsString = xPath.evaluate(stepXPath + "route_id", doc);
+		String connectionId = xPath.evaluate(stepXPath + "*/*/options/connection_id", doc);
+		String headerId = xPath.evaluate(stepXPath + "*/*/options/header_id", doc);
+        String responseIdAsString = xPath.evaluate(stepXPath + "*/*/options/response_id", doc);
+        String routeIdAsString = xPath.evaluate(stepXPath + "*/*/options/route_id", doc);
 
         // get type
 		StepType stepType = StepType.valueOf(type.toUpperCase());
@@ -268,7 +276,7 @@ public class ImportXMLFlows {
 
 		}
 
-		// get connection if configured
+        // get connection if configured
 		Connection connection;
 		try {
 
@@ -291,9 +299,9 @@ public class ImportXMLFlows {
 		Header header;
 		try {
 
-			Long headerIdLong = Long.parseLong(headerId, 10);
-			String headerName = xPath.evaluate("/dil/core/headers/header[id=" + headerIdLong + "]/name",doc);
-			Optional<Header> headerOptional = headerRepository.findByName(headerName);
+			Long messageIdLong = Long.parseLong(headerId, 10);
+			String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageIdLong + "]/name",doc);
+			Optional<Header> headerOptional = headerRepository.findByName(messageName);
 			if(headerOptional.isPresent()) {
 				header = headerOptional.get();
 			}else {
@@ -324,7 +332,7 @@ public class ImportXMLFlows {
 		step.setComponentType(componentType);
         step.responseId(responseId);
         step.setUri(uri);
-		//step.setFlow(flow);
+		step.setFlow(flow);
 		step.setOptions(options);
 
 		if (connection != null) {
@@ -343,5 +351,102 @@ public class ImportXMLFlows {
         return step;
 
 	}
+
+    public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
+
+        steps = flow.getSteps();
+
+        Integer index = 1;
+
+        //create a map to map old and new ids
+        Map<String,String> linkidMap = new HashMap<String,String>();
+
+        //fill the map
+        for(Step step: steps) {
+
+            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
+
+            numberOfLinks = numberOfLinks + 1;
+
+
+            for (int i = 1; i < numberOfLinks; i++) {
+
+                String linkIndex = Integer.toString(i);
+                String linkXpath =  stepXPath + "links/link[" + linkIndex + "]/";
+
+                String linkBound = xPath.evaluate(linkXpath + "bound", doc);
+                String linkId = xPath.evaluate(linkXpath + "id", doc);
+
+                if(linkBound.equals("out")){
+                    linkidMap.put(linkId,flow.getId() + "-" + step.getId());
+                }
+
+            }
+
+            index++;
+        }
+
+        index = 1;
+
+        for(Step step: steps){
+
+            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+
+            // set links
+            Set<Link> links = new HashSet<>();
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
+
+            numberOfLinks = numberOfLinks + 1;
+
+            for (int i = 1; i < numberOfLinks; i++) {
+
+                String linkIndex = Integer.toString(i);
+                String linkXpath =  stepXPath + "links/link[" + linkIndex + "]/";
+
+                String linkBound = xPath.evaluate(linkXpath + "bound", doc);
+                String linkPattern = xPath.evaluate(linkXpath + "pattern", doc);
+                String linkRule = xPath.evaluate(linkXpath + "rule", doc);
+                String linkExpression = xPath.evaluate(linkXpath + "expression", doc);
+                String linkTransport = xPath.evaluate(linkXpath + "transport", doc);
+                String linkFormat = xPath.evaluate(linkXpath + "format", doc);
+                String linkPoint = xPath.evaluate(linkXpath + "point", doc);
+
+                String linkId = xPath.evaluate(linkXpath + "id", doc);
+                String linkName = linkId;
+                if(flow.getId() != null && step.getId() != null){
+                    if(linkBound.equals("in")){
+                        linkName = linkidMap.get(linkId);
+                    }else{
+                        linkName = flow.getId() + "-" + step.getId();
+                    }
+                }
+
+                Link link = new Link();
+                link.setName(linkName);
+                link.setBound(linkBound);
+                link.setPattern(linkPattern);
+                link.setRule(linkRule);
+                link.setExpression(linkExpression);
+                link.transport(linkTransport);
+                link.setPoint(linkPoint);
+                link.setFormat(linkFormat);
+                link.setStep(step);
+
+                links.add(link);
+
+            }
+
+            step.setLinks(links);
+            index++;
+        }
+
+        return flow;
+
+    }
 
 }

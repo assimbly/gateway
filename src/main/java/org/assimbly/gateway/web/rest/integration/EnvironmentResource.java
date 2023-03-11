@@ -51,7 +51,8 @@ public class EnvironmentResource {
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Gateway configuration set");
    		} catch (Exception e) {
        		log.error("Import of configuration failed: " + e.getMessage());
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
    		}
 
     }
