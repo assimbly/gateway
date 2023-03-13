@@ -24,7 +24,7 @@
                                  baseTableName="step"
                                  constraintName="fk_step_header_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="header"/>
+                                 referencedTableName="message"/>
 
     </changeSet>
 </databaseChangeLog>

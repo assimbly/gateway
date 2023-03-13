@@ -163,7 +163,7 @@
                 <tbody infinite-scroll>
                 <tr
                   jhi-queue-row
-                  *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderKeyPipe: ascending:predicate"
+                  *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderPipe: ascending:predicate"
                 >
                   <td>{{ header.key }}</td>
                   <td>{{ header.value }}</td>
@@ -185,7 +185,7 @@
           <tbody infinite-scroll>
           <tr
             jhi-queue-row
-            *ngFor="let jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderKeyPipe: ascending:predicate"
+            *ngFor="let jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderPipe: ascending:predicate"
           >
             <td>{{ jmsheader.key }}</td>
             <td>{{ jmsheader.value }}</td>

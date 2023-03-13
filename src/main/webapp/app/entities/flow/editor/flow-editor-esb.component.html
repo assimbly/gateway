@@ -14,8 +14,8 @@
 <ng-template #optionsPopover let-message="message">
   <div [innerHtml]="optionsPopoverMessage"></div>
 </ng-template>
-<ng-template #headerPopover let-message="message">
-  <div [innerHtml]="headerPopoverMessage"></div>
+<ng-template #messagePopover let-message="message">
+  <div [innerHtml]="messagePopoverMessage"></div>
 </ng-template>
 <ng-template #connectionPopover let-message="message">
   <div [innerHtml]="connectionPopoverMessage"></div>
@@ -42,7 +42,7 @@
   <div class="modal-body" [formGroup]="testConnectionForm">
     <div class="form-group row">
       <div class="col-8">
-        <label class="form-control-label" for="field_header">Host name</label>
+        <label class="form-control-label" for="field_host">Host name</label>
         <i triggers="mouseenter:mouseleave" popoverTitle="Info"
            [popover]="hostnamePopover" container="body" placement="right"
         >
@@ -528,29 +528,29 @@
 
                         </div>
 
-                        <br [ngStyle]="{'display': enableHeader[index] ? '' : 'none'}"/>
-                        <div class="row" [ngStyle]="{'display': enableHeader[index] ? '' : 'none'}">
+                        <br [ngStyle]="{'display': enableMessage[index] ? '' : 'none'}"/>
+                        <div class="row" [ngStyle]="{'display': enableMessage[index] ? '' : 'none'}">
                           <div class="col-12">
-                            <label class="form-control-label float-start" for="field_header" style="float: left; margin-left: 6px;">Header</label>
+                            <label class="form-control-label float-start" for="field_message" style="float: left; margin-left: 6px;">Header</label>
                           </div>
                           <div class="col-10">
-                              <ng-select [items]="headers" bindLabel="name" bindValue="id" formControlName="header"
-                                         id="field_header" dropdownPosition="top"></ng-select>
+                              <ng-select [items]="messages" bindLabel="name" bindValue="id" formControlName="message"
+                                         id="message" dropdownPosition="top"></ng-select>
                           </div>
                           <button type="button"
-                                  *ngIf="headerCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
+                                  *ngIf="messageCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].message.value"
                                   title="Edit header" class="col-2 btn btn-primary"
-                                  (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)">
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
                             <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                           </button>
                           <button type="button"
-                                  *ngIf="headerCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].header.value"
+                                  *ngIf="messageCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].message.value"
                                   class="col-2 btn btn-primary flow-header-button" title="New header"
-                                  (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)">
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
                           </button>
-                          <button type="button" *ngIf="!headerCreated" class="col-2 btn btn-primary flow-header-button"
+                          <button type="button" *ngIf="!messageCreated" class="col-2 btn btn-primary flow-header-button"
                                   title="Create header"
-                                  (click)="createOrEditHeader(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].header)">
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
                           </button>
                         </div>
 

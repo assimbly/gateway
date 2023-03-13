@@ -34,7 +34,7 @@
             <column name="flow_id" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="header_id" type="bigint">
+            <column name="message_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <column name="route_id" type="bigint">

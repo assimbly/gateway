@@ -28,15 +28,15 @@ public class ImportXMLMessages {
 	public String uri;
 
 	@Autowired
-	private HeaderRepository headerRepository;
+	private MessageRepository messageRepository;
 
 	public String xmlConfiguration;
 	public String configuration;
 
-    private Header header;
+    private Message message;
     private Map<String, String> messagesIdMap;
 
-    private Set<HeaderKeys> headerKeys;
+    private Set<Header> headers;
 
 	public String setMessagesFromXML(Document doc) throws Exception {
 
@@ -58,11 +58,11 @@ public class ImportXMLMessages {
 			updateMessageIdsFromXml(doc, entry);
         }
 
-        NodeList headersIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options/header_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options/message_id").evaluate(doc, XPathConstants.NODESET);
 
-        for (int i = 0; i < headersIdNodes.getLength(); i++) {
-            String updateId =  headersIdNodes.item(i).getTextContent();
-            headersIdNodes.item(i).setTextContent(updateId.replace("id",""));
+        for (int i = 0; i < messagesIdNodes.getLength(); i++) {
+            String updateId =  messagesIdNodes.item(i).getTextContent();
+            messagesIdNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
         NodeList messageNodes = (NodeList) xPath.compile("/dil/core/messages/*/id").evaluate(doc, XPathConstants.NODESET);
@@ -72,7 +72,7 @@ public class ImportXMLMessages {
             messageNodes.item(i).setTextContent(updateId.replace("id",""));
         }
 
-        log.info("Importing headers finished");
+        log.info("Importing messages finished");
 
         return "ok";
 
@@ -89,41 +89,41 @@ public class ImportXMLMessages {
 
 		try {
 			Long.parseLong(messageId, 10);
-			Optional<Header> headerOptional = headerRepository.findByName(messageName);
+			Optional<Message> messageOptional = messageRepository.findByName(messageName);
 
-			if (!headerOptional.isPresent()) {
+			if (!messageOptional.isPresent()) {
                 log.debug("Create new message: " + messageName);
-                header = new Header();
-				headerKeys = new HashSet<HeaderKeys>();
-				header.setId(null);
+                message = new Message();
+				headers = new HashSet<Header>();
+				message.setId(null);
 				if (messageName == null || messageName.isEmpty()) {
-					header.setName(messageId);
+					message.setName(messageId);
 				} else {
-					header.setName(messageName);
+					message.setName(messageName);
 				}
 			} else {
                 log.debug("Update message: " + messageName);
-				header = headerOptional.get();
-				headerKeys = header.getHeaderKeys();
+				message = messageOptional.get();
+				headers = message.getHeaders();
 			}
 		} catch (NumberFormatException nfe) {
-			header = new Header();
-			headerKeys = new HashSet<HeaderKeys>();
+			message = new Message();
+			headers = new HashSet<Header>();
 			if (messageName == null || messageName.isEmpty()) {
-				header.setName(messageId);
+				message.setName(messageId);
 			} else {
-				header.setName(messageName);
+				message.setName(messageName);
 			}
 		}
 
-        log.debug("Get Header Keys: " + messageName);
+        log.debug("Get Header: " + messageName);
 
-        Map<String, HeaderKeys> map = new HashMap<>();
-		for (HeaderKeys s : headerKeys) {
+        Map<String, Header> map = new HashMap<>();
+		for (Header s : headers) {
 			map.put(s.getKey(), s);
 		}
 
-        log.debug("Set Header Keys: " + messageName);
+        log.debug("Set Header: " + messageName);
 
         // Create XPath object
 		XPathExpression expr = xPath.compile("/dil/core/messages/message[id='" + messageId + "']/headers/*");
@@ -134,56 +134,56 @@ public class ImportXMLMessages {
 
 			String key = nodes.item(i).getNodeName();
 			String value = nodes.item(i).getTextContent();
-			HeaderKeys headerKey;
-			Node headerKeyType = nodes.item(i).getAttributes().getNamedItem("type");
+			Header header;
+			Node headerType = nodes.item(i).getAttributes().getNamedItem("type");
 			String type = "header";
-            Node headerKeyLanguage = nodes.item(i).getAttributes().getNamedItem("language");
+            Node headerLanguage = nodes.item(i).getAttributes().getNamedItem("language");
             String language = "constant";
 
-			if (headerKeyType != null) {
-				type = headerKeyType.getTextContent();
+			if (headerType != null) {
+				type = headerType.getTextContent();
 			}
 
-            if (headerKeyLanguage != null) {
-                language = headerKeyLanguage.getTextContent();
+            if (headerLanguage != null) {
+                language = headerLanguage.getTextContent();
             }
 
 			if (map.containsKey(key)) {
-				headerKey = map.get(key);
-				headerKey.setKey(key);
-				headerKey.setValue(value);
-				headerKeys.add(headerKey);
+				header = map.get(key);
+				header.setKey(key);
+				header.setValue(value);
+				headers.add(header);
 
 			} else {
-                headerKey = new HeaderKeys();
-				headerKey.setKey(key);
-				headerKey.setValue(value);
-				headerKey.setType(type);
-                headerKey.setLanguage(language);
-                headerKey.setHeader(header);
-				headerKeys.add(headerKey);
+                header = new Header();
+				header.setKey(key);
+				header.setValue(value);
+				header.setType(type);
+                header.setLanguage(language);
+                header.setMessage(message);
+				headers.add(header);
 			}
 		}
 
-		if (header != null && headerKeys != null) {
+		if (message != null && headers != null) {
 
             log.debug("Import into database: " + messageName);
 
-            header = headerRepository.save(header);
+            message = messageRepository.save(message);
 
-			header.setHeaderKeys(headerKeys);
+			message.setHeaders(headers);
 
-			header = headerRepository.save(header);
+			message = messageRepository.save(message);
 
-			String generatedmessageId = header.getId().toString();
+			String generatedmessageId = message.getId().toString();
 
 			messagesIdMap.put(messageId, generatedmessageId);
 
-			header = null;
-			headerKeys = null;
+			message = null;
+			headers = null;
 		}
 
-        log.info("Finished importing header: " + messageName);
+        log.info("Finished importing message: " + messageName);
 
     }
 
@@ -197,16 +197,16 @@ public class ImportXMLMessages {
 
         log.debug("Update Message ID: " + messageId + ". New Message ID: " + generatedmessageId);
 
-		//update header_id to generated header_id
+		//update message_id to generated message_id
 		if(!messageId.equals(generatedmessageId)) {
 
 			NodeList messageNodes = (NodeList) xPath.compile("/dil/core/messages/message[id=" + messageId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
             messageNodes.item(0).setTextContent("id" + generatedmessageId);
 
-			NodeList headersIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options[header_id=" + messageId + "]/header_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options[message_id=" + messageId + "]/message_id").evaluate(doc, XPathConstants.NODESET);
 
-			for (int i = 0; i < headersIdNodes.getLength(); i++) {
-				headersIdNodes.item(i).setTextContent("id" + generatedmessageId);
+			for (int i = 0; i < messagesIdNodes.getLength(); i++) {
+				messagesIdNodes.item(i).setTextContent("id" + generatedmessageId);
 			}
 		}
 	}

@@ -5,8 +5,8 @@ import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysDeleteDialogComponent } from 'app/entities/header-keys/header-keys-delete-dialog.component';
-import { HeaderKeysService } from 'app/entities/header-keys/header-keys.service';
+import { HeaderKeysDeleteDialogComponent } from 'app/entities/message-keys/message-keys-delete-dialog.component';
+import { HeaderKeysService } from 'app/entities/message-keys/message-keys.service';
 
 describe('Component Tests', () => {
     describe('HeaderKeys Management Delete Component', () => {

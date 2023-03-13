@@ -1,7 +1,6 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -56,8 +55,8 @@ public class Step implements Serializable {
     private Connection connection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "headerId")
-    private Header header;
+    @JoinColumn(name = "messageId")
+    private Message message;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Link> links = new HashSet<>();
@@ -175,17 +174,17 @@ public class Step implements Serializable {
         this.connection = connection;
     }
 
-    public Header getHeader() {
-        return header;
+    public Message getMessage() {
+        return message;
     }
 
-    public Step header(Header header) {
-        this.header = header;
+    public Step message(Message message) {
+        this.message = message;
         return this;
     }
 
-    public void setHeader(Header header) {
-        this.header = header;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
 

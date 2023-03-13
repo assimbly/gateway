@@ -6,7 +6,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { IMessage } from 'app/shared/model/messsage.model';
+import { IMessage } from 'app/shared/model/message.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
@@ -14,7 +14,7 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IBroker } from 'app/shared/model/broker.model';
 
-import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { IHeader } from 'app/shared/model/header.model';
 
 import { ViewChild } from '@angular/core'
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
@@ -33,7 +33,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   selectedHighlight: string;
   allMessages: any;
   headers: any;
-  headerKeys: IHeaderKeys[];
+  headerKeys: IHeader[];
 
   brokers: IBroker[];
   brokerType: string;
@@ -218,7 +218,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.selectedMessage.messageid = message.messageid;
         this.selectedMessage.timestamp = message.timestamp;
         this.selectedMessage.headers = this.getHeaders(message);
-        this.selectedMessage.headerKeys = [];
+        this.selectedMessage.header = [];
         this.selectedMessage.jmsHeaders = this.getJMSHeaders(message);
         this.selectedMessage.body = this.getBody(message);
         this.selectedMessage.fileType = this.getFileType(this.selectedMessage.body);
