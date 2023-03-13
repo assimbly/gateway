@@ -58,9 +58,6 @@
             <column name="parallel_processing" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="assimbly_headers" type="boolean">
-                <constraints nullable="true" />
-            </column>
             <column name="gateway_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -103,7 +100,6 @@
             <column name="last_modified" type="datetime"/>
             <column name="notes" type="clob"/>
             <column name="parallel_processing" type="boolean"/>
-            <column name="assimbly_headers" type="boolean"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

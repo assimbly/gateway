@@ -1,8 +1,6 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.HeaderKeys;
 import org.assimbly.gateway.domain.Link;
-import org.assimbly.gateway.service.dto.HeaderKeysDTO;
 import org.assimbly.gateway.service.dto.LinkDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

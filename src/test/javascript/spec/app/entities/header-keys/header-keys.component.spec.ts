@@ -4,9 +4,9 @@ import { Observable, of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysComponent } from 'app/entities/header-keys/header-keys.component';
-import { HeaderKeysService } from 'app/entities/header-keys/header-keys.service';
-import { HeaderKeys } from 'app/shared/model/header-keys.model';
+import { HeaderKeysComponent } from 'app/entities/message-keys/message-keys.component';
+import { HeaderKeysService } from 'app/entities/message-keys/message-keys.service';
+import { HeaderKeys } from 'app/shared/model/message-keys.model';
 
 describe('Component Tests', () => {
     describe('HeaderKeys Management Component', () => {
@@ -45,7 +45,7 @@ describe('Component Tests', () => {
 
             // THEN
             expect(service.query).toHaveBeenCalled();
-            expect(comp.headerKeys[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+            expect(comp.header[0]).toEqual(jasmine.objectContaining({ id: 123 }));
         });
     });
 });

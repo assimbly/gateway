@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { AlertService } from "app/core/util/alert.service";
 import { EventManager, EventWithContent } from "app/core/util/event-manager.service";
-import { HeaderDialogComponent } from 'app/entities/header/header-dialog.component';
-import { HeaderPopupService } from 'app/entities/header/header-popup.service';
+import { MessageDialogComponent } from 'app/entities/message/message-dialog.component';
+import { MessagePopupService } from 'app/entities/message/message-popup.service';
 import { RouteDialogComponent } from "app/entities/route/route-dialog.component";
 import { RoutePopupService } from "app/entities/route/route-popup.service";
 import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
@@ -16,7 +16,7 @@ import { Link, ILink } from "app/shared/model/link.model";
 import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Gateway } from "app/shared/model/gateway.model";
-import { IHeader } from 'app/shared/model/header.model';
+import { IMessage } from 'app/shared/model/message.model';
 import { Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
@@ -24,7 +24,7 @@ import { from, forkJoin, Observable, Subscription } from "rxjs";
 import { map } from 'rxjs/operators';
 import { LinkService } from "../../link/link.service";
 import { StepService } from "../../step/step.service";
-import { HeaderService } from '../../header/header.service';
+import { MessageService } from '../../message/message.service';
 import { GatewayService } from "../../gateway/gateway.service";
 import { RouteService } from "../../route/route.service";
 import { ConnectionService } from '../../connection/connection.service';
@@ -38,8 +38,8 @@ import { FlowService } from "../flow.service";
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	flow: IFlow;
 	routes: Route[];
-	headers: IHeader[];
-  connections: Connection[];
+	messages: IMessage[];
+	connections: Connection[];
 
 	URIList: Array<Array<Step>> = [[]];
 	allsteps: IStep[] = new Array<Step>();
@@ -87,7 +87,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	routeCreated: boolean;
   connectionCreated: boolean;
-  headerCreated: boolean;
+  messageCreated: boolean;
   errorStep: boolean = true;
 
 	namePopoverMessage: string;
@@ -97,7 +97,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   componentPopoverMessage: string;
   optionsPopoverMessage: string;
-  headerPopoverMessage: string;
+  messagePopoverMessage: string;
   routePopoverMessage: string;
   connectionPopoverMessage: string;
   popoverMessage: string;
@@ -125,7 +125,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   selectedConnection: Connection = new Connection();
   enableConnection: Array<boolean> = [];
 
-  enableHeader: Array<boolean> = [];
+  enableMessage: Array<boolean> = [];
 
 	numberOfSteps = 0;
 
@@ -152,7 +152,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private flowService: FlowService,
 		private stepService: StepService,
 		private linkService: LinkService,
-		private headerService: HeaderService,
+		private messageService: MessageService,
 		private routeService: RouteService,
     private connectionService: ConnectionService,
 		private alertService: AlertService,
@@ -161,7 +161,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		public connectionsList: Connections,
 		public components: Components,
 		private modalService: NgbModal,
-		private headerPopupService: HeaderPopupService,
+		private MessagePopupService: MessagePopupService,
 		private routePopupService: RoutePopupService,
     private connectionPopupService: ConnectionPopupService,
 	) {}
@@ -196,7 +196,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		forkJoin([
 			this.flowService.getWikiDocUrl(),
 			this.flowService.getCamelDocUrl(),
-			this.headerService.getAllHeaders(),
+			this.messageService.getAllMessages(),
 			this.routeService.getAllRoutes(),
       this.connectionService.getAllConnections(),
 			this.gatewayService.query(),
@@ -204,13 +204,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.flowService.getGatewayName(),
 		])
 			.subscribe(
-				([wikiDocUrl, camelDocUrl, headers, routes, connections, gateways, allsteps, gatewayName]) => {
+				([wikiDocUrl, camelDocUrl, messages, routes, connections, gateways, allsteps, gatewayName]) => {
 
 					this.wikiDocUrl = wikiDocUrl.body;
 					this.camelDocUrl = camelDocUrl.body;
 
-          this.headers = headers.body;
-          this.headerCreated = this.headers.length > 0;
+          this.messages = messages.body;
+          this.messageCreated = this.messages.length > 0;
 
 					this.routes = routes.body;
 					this.routeCreated = this.routes.length > 0;
@@ -277,7 +277,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								this.flow.notes = '';
 								this.flow.autoStart = false;
 								this.flow.parallelProcessing = false;
-								this.flow.assimblyHeaders = false;
 								this.flow.maximumRedeliveries = 0;
 								this.flow.redeliveryDelay = 3000;
 								this.flow.logLevel = LogLevelType.OFF;
@@ -373,10 +372,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.enableConnection[index] = false;
         }
 
-        if(step.headerId){
-          this.enableHeader[index] = true;
+        if(step.messageId){
+          this.enableMessage[index] = true;
         }else{
-          this.enableHeader[index] = false;
+          this.enableMessage[index] = false;
         }
 
         const linkName = this.flow.id + '-' + step.id
@@ -427,7 +426,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.selectedOptions.splice(index, 0, optionArray);
 
     this.enableConnection[index] = false;
-    this.enableHeader[index] = false;
+    this.enableMessage[index] = false;
 
 		this.active = index.toString();
 
@@ -444,7 +443,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       // set componenttype to selected component and clear other fields
       step.componentType = e;
       step.uri = null;
-      step.headerId = '';
+      step.messageId = '';
       step.routeId = '';
       step.connectionId = '';
 
@@ -460,7 +459,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       }
 
       stepForm.controls.uri.patchValue(step.uri);
-      stepForm.controls.header.patchValue(step.headerId);
+      stepForm.controls.message.patchValue(step.messageId);
       stepForm.controls.route.patchValue(step.routeId);
       stepForm.controls.connection.patchValue(step.connectionId);
 
@@ -500,9 +499,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         }
 
         if(componentType === 'setheaders' || componentType === 'setmessage'){
-          this.enableHeader[stepFormIndex] = true;
+          this.enableMessage[stepFormIndex] = true;
         }else{
-          this.enableHeader[stepFormIndex] = false;
+          this.enableMessage[stepFormIndex] = false;
         }
 
     }
@@ -514,7 +513,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.setURIlist(stepFormIndex);
 
   }
-
 
 	setComponents(): void {
 
@@ -597,7 +595,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
     this.optionsPopoverMessage = ``;
-    this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
+    this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
     this.connectionPopoverMessage = `If available then a connection can be selected. For example a database connection that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit connections.`;
@@ -639,7 +637,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				name: new FormControl(flow.name, Validators.required),
 				notes: new FormControl(flow.notes),
 				autoStart: new FormControl(flow.autoStart),
-				assimblyHeaders: new FormControl(flow.assimblyHeaders),
 				parallelProcessing: new FormControl(flow.parallelProcessing),
 				maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
 				redeliveryDelay: new FormControl(flow.redeliveryDelay),
@@ -656,7 +653,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			stepType: new FormControl(step.stepType),
       uri: new FormControl(step.uri),
       options: new FormArray([this.initializeOption()]),
-      header: new FormControl(step.headerId),
+      message: new FormControl(step.messageId),
 			route: new FormControl(step.routeId),
 			connection: new FormControl(step.connectionId),
 			links: new FormControl(step.links),
@@ -701,7 +698,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			name: flow.name,
 			notes: flow.notes,
 			autoStart: flow.autoStart,
-			assimblyHeaders: flow.assimblyHeaders,
 			parallelProcessing: flow.parallelProcessing,
 			maximumRedeliveries: flow.maximumRedeliveries,
 			redeliveryDelay: flow.redeliveryDelay,
@@ -716,7 +712,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			componentType: step.componentType,
 			stepType: step.stepType,
 			uri: step.uri,
-			header: step.headerId,
+			message: step.messageId,
 			route: step.routeId,
 			connection: step.connectionId,
 			links: new FormControl(step.links),
@@ -778,8 +774,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	     this.enableConnection[index] = true;
 	}
 
-	addHeader(step, index): void {
-	     this.enableHeader[index] = true;
+	addMessage(step, index): void {
+	     this.enableMessage[index] = true;
 	}
 
   setComponentOptions(step: Step, componentType: string): Observable<any> {
@@ -988,23 +984,23 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  createOrEditHeader(step, formHeader: FormControl): void {
+  createOrEditMessage(step, formHeader: FormControl): void {
 
-    step.headerId = formHeader.value;
+    step.messageId = formHeader.value;
 
-    if (typeof step.headerId === 'undefined' || step.headerId === null || !step.headerId) {
-      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component);
+    if (typeof step.messageId === 'undefined' || step.messageId === null || !step.messageId) {
+      this.modalRefPromise = this.MessagePopupService.open(MessageDialogComponent as Component);
     }else{
-      this.modalRefPromise = this.headerPopupService.open(HeaderDialogComponent as Component, step.headerId);
+      this.modalRefPromise = this.MessagePopupService.open(MessageDialogComponent as Component, step.messageId);
     }
 
     this.modalRefPromise.then(res => {
         res.result.then(
           result => {
-            this.setHeader(step, result.id, formHeader);
+            this.setMessage(step, result.id, formHeader);
           },
           reason => {
-            this.setHeader(step, reason.id, formHeader);
+            this.setMessage(step, reason.id, formHeader);
           }
         );
     },(reason)=>{
@@ -1013,12 +1009,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  setHeader(step, id, formHeader: FormControl): void {
-    this.headerService.getAllHeaders().subscribe(
+  setMessage(step, id, formHeader: FormControl): void {
+    this.messageService.getAllMessages().subscribe(
       res => {
-        this.headers = res.body;
-        this.headerCreated = this.headers.length > 0;
-        step.headerId = id;
+        this.messages = res.body;
+        this.messageCreated = this.messages.length > 0;
+        step.messageId = id;
 
         if (formHeader.value === null) {
           formHeader.patchValue(id);
@@ -1349,10 +1345,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	setDataFromFormOnStep(step: Step, formStepData, index: number) {
 
 		step.id = formStepData.id.value;
-    step.componentType = formStepData.componentType.value;
-    step.stepType = formStepData.stepType.value;
+		step.componentType = formStepData.componentType.value;
+		step.stepType = formStepData.stepType.value;
 		step.uri = formStepData.uri.value;
-    step.headerId = formStepData.header.value;
+		step.messageId = formStepData.message.value;
 		step.routeId = formStepData.route.value;
 		step.connectionId = formStepData.connection.value;
 	}

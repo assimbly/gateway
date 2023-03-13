@@ -1,8 +1,6 @@
 package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -36,7 +34,7 @@ public class ImportXMLFlows {
 	private FlowRepository flowRepository;
 
     @Autowired
-    private HeaderRepository headerRepository;
+    private MessageRepository messageRepository;
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -100,7 +98,6 @@ public class ImportXMLFlows {
 
         //options
 		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id + "']/options/autostart", doc);
-        String flowAssimblyHeaders = xPath.evaluate("//flows/flow[id='" + id + "']/options/assimblyHeaders", doc);
         String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id + "']/options/parallelProcessing", doc);
 		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id + "']/options/maximumRedeliveries", doc);
 		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id + "']/options/redeliveryDelay", doc);
@@ -137,8 +134,6 @@ public class ImportXMLFlows {
 			flow.setNotes(ImportXMLUtil.setStringValue(flowNotes,""));
 
 			flow.setAutoStart(ImportXMLUtil.setBooleanValue(flowAutostart));
-
-            flow.setAssimblyHeaders(ImportXMLUtil.setBooleanValue(flowAssimblyHeaders));
 
             flow.setParallelProcessing(ImportXMLUtil.setBooleanValue(flowParallelProcessing));
 
@@ -239,7 +234,7 @@ public class ImportXMLFlows {
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
 		String connectionId = xPath.evaluate(stepXPath + "*/*/options/connection_id", doc);
-		String headerId = xPath.evaluate(stepXPath + "*/*/options/header_id", doc);
+		String messageId = xPath.evaluate(stepXPath + "*/*/options/message_id", doc);
         String responseIdAsString = xPath.evaluate(stepXPath + "*/*/options/response_id", doc);
         String routeIdAsString = xPath.evaluate(stepXPath + "*/*/options/route_id", doc);
 
@@ -295,21 +290,21 @@ public class ImportXMLFlows {
 			connection = null;
 		}
 
-		// get header if configured
-		Header header;
+		// get message if configured
+		Message message;
 		try {
 
-			Long messageIdLong = Long.parseLong(headerId, 10);
+			Long messageIdLong = Long.parseLong(messageId, 10);
 			String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageIdLong + "]/name",doc);
-			Optional<Header> headerOptional = headerRepository.findByName(messageName);
-			if(headerOptional.isPresent()) {
-				header = headerOptional.get();
+			Optional<Message> messageOptional = messageRepository.findByName(messageName);
+			if(messageOptional.isPresent()) {
+				message = messageOptional.get();
 			}else {
-				header = null;
+				message = null;
 			}
 
 		} catch (NumberFormatException nfe) {
-			header = null;
+			message = null;
 		}
 
 		// get route if configured
@@ -338,8 +333,8 @@ public class ImportXMLFlows {
 		if (connection != null) {
 			step.setConnection(connection);
 		}
-		if (header != null) {
-			step.setHeader(header);
+		if (message != null) {
+			step.setMessage(message);
 		}
 		if (routeId != null) {
 			step.setRouteId(routeId);

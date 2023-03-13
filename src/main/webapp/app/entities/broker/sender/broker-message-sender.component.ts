@@ -5,7 +5,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Gateway } from 'app/shared/model/gateway.model';
-import { IMessage } from 'app/shared/model/messsage.model';
+import { IMessage } from 'app/shared/model/message.model';
 import { IBroker } from 'app/shared/model/broker.model';
 import { Components } from 'app//shared/camel/component-type';
 

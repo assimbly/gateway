@@ -9,8 +9,8 @@ import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow/flow.service';
 import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from 'app/entities/connection/connection.service';
-import { IHeader } from 'app/shared/model/header.model';
-import { HeaderService } from 'app/entities/header/header.service';
+import { IMessage } from 'app/shared/model/message.model';
+import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
     selector: 'jhi-step-update',
@@ -24,14 +24,14 @@ export class StepUpdateComponent implements OnInit {
 
     connections: IConnection[];
 
-    headers: IHeader[];
+    messages: IMessage[];
 
     constructor(
         protected alertService: AlertService,
         protected stepService: StepService,
         protected flowService: FlowService,
         protected connectionService: ConnectionService,
-        protected headerService: HeaderService,
+        protected messageService: MessageService,
         protected activatedRoute: ActivatedRoute
     ) {}
 
@@ -61,14 +61,14 @@ export class StepUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.headerService.query({ filter: 'step-is-null' }).subscribe(
-            (res: HttpResponse<IHeader[]>) => {
-                if (!this.step.headerId) {
-                    this.headers = res.body;
+        this.messageService.query({ filter: 'step-is-null' }).subscribe(
+            (res: HttpResponse<IMessage[]>) => {
+                if (!this.step.messageId) {
+                    this.messages = res.body;
                 } else {
-                    this.headerService.find(this.step.headerId).subscribe(
-                        (subRes: HttpResponse<IHeader>) => {
-                            this.headers = [subRes.body].concat(res.body);
+                    this.messageService.find(this.step.messageId).subscribe(
+                        (subRes: HttpResponse<IMessage>) => {
+                            this.messages = [subRes.body].concat(res.body);
                         },
                         (subRes: HttpErrorResponse) => this.onError(subRes.message)
                     );
@@ -122,7 +122,7 @@ export class StepUpdateComponent implements OnInit {
         return item.id;
     }
 
-    trackHeaderById(index: number, item: IHeader) {
+    trackMessageById(index: number, item: IMessage) {
         return item.id;
     }
 }

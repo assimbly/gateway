@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data  repository for the HeaderKeys entity.
+ * Spring Data  repository for the Link entity.
  */
 @SuppressWarnings("unused")
 @Repository

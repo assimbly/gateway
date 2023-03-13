@@ -886,6 +886,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       return;
     }
 
+
 	const topic = '/topic/' + id + '/' + type;
 
     this.connectionEventSubscription = this.connectionSubject.subscribe(() => {

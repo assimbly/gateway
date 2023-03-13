@@ -27,7 +27,7 @@ export interface IStep {
     responseId?: number;
     flowId?: number;
     connectionId?: number;
-    headerId?: number;
+    messageId?: number;
     routeId?: number;
     links?: ILink[];
 }
@@ -42,7 +42,7 @@ export class Step implements IStep {
         public responseId?: number,
         public flowId?: number,
         public connectionId?: number,
-        public headerId?: number,
+        public messageId?: number,
         public routeId?: number,
         public links?: ILink[],
     ) {}

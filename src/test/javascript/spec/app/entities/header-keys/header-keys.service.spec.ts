@@ -4,8 +4,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
-import { HeaderKeysService } from 'app/entities/header-keys/header-keys.service';
-import { IHeaderKeys, HeaderKeys } from 'app/shared/model/header-keys.model';
+import { HeaderKeysService } from 'app/entities/message-keys/message-keys.service';
+import { IHeaderKeys, HeaderKeys } from 'app/shared/model/message-keys.model';
 
 describe('Service Tests', () => {
     describe('HeaderKeys Service', () => {

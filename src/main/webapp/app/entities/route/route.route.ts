@@ -10,8 +10,8 @@ import { RouteService } from './route.service';
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
-import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
-import { HeaderResolve } from 'app/entities/header/header.route';
+import { MessagePopupComponent } from 'app/entities/message/message-dialog.component';
+import { MessageResolve } from 'app/entities/message/message.route';
 
 @Injectable({ providedIn: 'root' })
 export class RouteResolve implements Resolve<IRoute> {
@@ -86,7 +86,7 @@ export const routeRoute: Routes = [
 export const routePopupRoute: Routes = [
   {
     path: 'route-new',
-    component: HeaderPopupComponent,
+    component: MessagePopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'Headers',
@@ -96,7 +96,7 @@ export const routePopupRoute: Routes = [
   },
   {
     path: 'route/:id/edit',
-    component: HeaderPopupComponent,
+    component: MessagePopupComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'Headers',

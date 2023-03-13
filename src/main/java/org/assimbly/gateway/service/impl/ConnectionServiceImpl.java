@@ -53,7 +53,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public Page<ConnectionDTO> findAll(Pageable pageable) {
-        log.debug("Request to get all Headers");
+        log.debug("Request to get all connections");
         return connectionRepository.findAll(pageable)
             .map(connectionMapper::toDto);
     }
