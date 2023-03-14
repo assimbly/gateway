@@ -123,8 +123,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   filterConnection: Array<Array<Connection>> = [[]];
   connectionType: Array<string> = [];
   selectedConnection: Connection = new Connection();
-  enableConnection: Array<boolean> = [];
 
+  enableConnection: Array<boolean> = [];
   enableMessage: Array<boolean> = [];
 
 	numberOfSteps = 0;
@@ -331,20 +331,22 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         this.steps = [];
         let startStep = this.flow.steps.find(step => step.stepType === 'SOURCE');
 
+        let index = 0;
+
         if(startStep){
-          this.loadStep(startStep, 0);
+          this.loadStep(startStep, index);
         }else{
-          startStep = this.flow.steps.find(step => step.stepType === 'ROUTE');
-          if(startStep){
-            this.loadStep(startStep, 0);
-          }
+            startStep = this.flow.steps.find(step => step.stepType === 'ROUTE');
+            if(startStep){
+                this.loadStep(startStep, 0);
+            }
         }
-
       }
-
   }
 
-  loadStep(step: any, index: number){
+  loadStep(loadStep: any, index: number){
+
+        const step = this.allsteps.find(step => step.id === loadStep.id);
 
         if (typeof this.stepsOptions[index] === 'undefined') {
           this.stepsOptions.push([]);
@@ -398,7 +400,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
             this.loadStep(errorStep, index + 1);
         }
-
 
   }
 
@@ -1285,7 +1286,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         this.steps.forEach(
           (step) => {
 
-              if(step.stepType === 'ACTION' || step.stepType === 'SOURCE'){
+              if(step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE'){
                   const linkName = this.flow.id + '-' + step.id;
                   const outLink = this.setLink(linkName, step.id, 'out');
                   this.linkService.create(outLink).subscribe((results) => {
@@ -1293,12 +1294,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                   );
               }
 
-              if(step.stepType === 'ACTION' || step.stepType === 'SINK'){
+              if(step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE'){
                   const linkName = this.flow.id + '-' + previousStepId;
                   const inLink = this.setLink(linkName, step.id, 'in');
-                  this.linkService.create(inLink).subscribe((results) => {
-                    },
-                  );
+                  if(previousStepId!=0){
+                    this.linkService.create(inLink).subscribe((results) => {
+                      },
+                    );
+                  }
               }
 
             previousStepId = step.id;

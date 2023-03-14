@@ -27,9 +27,13 @@ public class Step implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "stepType")
     private StepType stepType;
+
 
     @Column(name = "componentType")
     private String componentType;
@@ -68,6 +72,19 @@ public class Step implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Step name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public StepType getStepType() {
@@ -122,6 +139,20 @@ public class Step implements Serializable {
         this.options = options;
     }
 
+
+    public Flow getFlow() {
+        return flow;
+    }
+
+    public Step flow(Flow flow) {
+        this.flow = flow;
+        return this;
+    }
+
+    public void setFlow(Flow flow) {
+        this.flow = flow;
+    }
+
     public Integer getRouteId() {
         return routeId;
     }
@@ -146,19 +177,6 @@ public class Step implements Serializable {
 
     public void setResponseId(Integer responseId) {
         this.responseId = responseId;
-    }
-
-    public Flow getFlow() {
-        return flow;
-    }
-
-    public Step flow(Flow flow) {
-        this.flow = flow;
-        return this;
-    }
-
-    public void setFlow(Flow flow) {
-        this.flow = flow;
     }
 
     public Connection getConnection() {

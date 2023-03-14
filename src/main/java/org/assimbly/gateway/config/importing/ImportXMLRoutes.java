@@ -24,12 +24,6 @@ public class ImportXMLRoutes {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLRoutes.class);
 
-	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
-
-	public String options;
-	public String componentType;
-	public String uri;
-
     @Autowired
     private RouteRepository routeRepository;
 

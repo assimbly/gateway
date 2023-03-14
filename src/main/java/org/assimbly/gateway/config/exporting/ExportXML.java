@@ -567,9 +567,9 @@ public class ExportXML {
 
 		componentType = confComponentType.toLowerCase();
 
-		componentType = setDefaultComponentType(componentType);
+        componentType = setDefaultComponentType(componentType);
 
-		if (componentType.startsWith("sql")) {
+        if (componentType.startsWith("sql")) {
 			String confConnectionId = confConnection.getId().toString();
 			if (confOptions.isEmpty() || confOptions == null) {
 				confOptions = "dataSource=" + confConnectionId;
@@ -577,7 +577,9 @@ public class ExportXML {
 				confOptions = "&dataSource=" + confConnectionId;
 			}
 		}else if (componentType.startsWith("setheaders") || componentType.startsWith("setmessage")) {
-            confUri = "message:" + confMessage.getId().toString();
+            if(!confUri.startsWith("message")) {
+                confUri = "message:" + confMessage.getId().toString();
+            }
         }
 
         if(confUri!=null) {
@@ -592,7 +594,7 @@ public class ExportXML {
 			confUri = "mock:wastebin";
 		}
 
-		return confUri;
+        return confUri;
 	}
 
     private String createLogLines(String route){
@@ -611,8 +613,7 @@ public class ExportXML {
 
 	private String setDefaultComponentType(String componentType) {
 
-		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp")
-				|| componentType.equals("ftps")) {
+		if (componentType.equals("file") || componentType.equals("ftp") || componentType.equals("sftp")	|| componentType.equals("ftps")) {
 			componentType = componentType + "://";
 		} else if(!componentType.isEmpty()) {
 			componentType = componentType + ":";
