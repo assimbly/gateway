@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -89,14 +90,24 @@ public class LinkServiceImpl implements LinkService {
     }
 
     /**
-     * Delete the link by id.
+     * Delete the link by stepId.
      *
-     * @param stepId the id of the entity
+     * @param stepId the stepId of the entity
      */
     @Override
     public void deleteByStepId(Long stepId) {
         log.debug("Request to delete Link by stepId : {}", stepId);
         linkRepository.deleteByStepId(stepId);
+    }
+
+    /**
+     * Find the link by name.
+     *
+     * @param name the name of the entity
+     */
+    @Override
+    public Optional<Set<LinkDTO>> findByName(String name) {
+        return Optional.empty();
     }
 
 }

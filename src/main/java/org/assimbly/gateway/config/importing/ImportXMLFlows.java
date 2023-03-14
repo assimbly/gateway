@@ -40,6 +40,9 @@ public class ImportXMLFlows {
     @Autowired
     private ConnectionRepository connectionRepository;
 
+    @Autowired
+    private LinkRepository linkRepository;
+
     public String xmlConfiguration;
     public String configuration;
 
@@ -364,24 +367,6 @@ public class ImportXMLFlows {
         steps = flow.getSteps();
         Map<String,String> linkidMap = new HashMap<String,String>();
 
-        /*
-        //create a map to map old and new ids
-
-        Map<String,Step> stepsMap = new HashMap<String,Step>();
-
-        List<String> stepIds = new ArrayList<String>();
-
-        for(Step step: steps) {
-
-            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            String stepId = xPath.evaluate(stepXPath + "id", doc);
-            stepIds.add(stepId);
-            stepsMap.put(stepId,step);
-            index++;
-        }
-
-     */
 
         //fill the map
         for(Step step: steps) {
@@ -451,7 +436,24 @@ public class ImportXMLFlows {
                     }
                 }
 
-                Link link = new Link();
+                Optional<Set<Link>> linkSet = linkRepository.findByName(linkName);
+
+
+
+                Link link = null;
+                if(linkSet.isPresent()){
+                    for (Link existingLink : linkSet.get()) {
+                        if(existingLink.getBound().equals(linkBound)){
+                            link = existingLink;
+                        }
+                    }
+                    if(link == null){
+                        link = new Link();
+                    }
+                }else{
+                    link = new Link();
+                }
+
                 link.setName(linkName);
                 link.setBound(linkBound);
                 link.setPattern(linkPattern);

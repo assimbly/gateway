@@ -4,6 +4,7 @@ import org.assimbly.gateway.service.dto.LinkDTO;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service Interface for managing Link.
@@ -47,4 +48,13 @@ public interface LinkService {
      * @param stepId the stepId of the entity
      */
     void deleteByStepId(Long stepId);
+
+    /**
+     * Get the "name" link.
+     *
+     * @param name the name of the entity
+     * @return the entity
+     */
+    Optional<Set<LinkDTO>> findByName(String name);
+
 }
