@@ -346,6 +346,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   loadStep(loadStep: any, index: number){
 
+        this.numberOfSteps = this.numberOfSteps + 1;
+
         const step = this.allsteps.find(step => step.id === loadStep.id);
 
         if (typeof this.stepsOptions[index] === 'undefined') {
@@ -369,8 +371,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         );
 
         if(step.connectionId){
+          console.log('set to true');
+          console.log('step uri' + step.uri);
+          console.log('step type' + step.stepType);
           this.enableConnection[index] = true;
         }else{
+        console.log('set to false');
+        console.log('step uri' + step.uri);
+          console.log('step type' + step.stepType);
           this.enableConnection[index] = false;
         }
 
@@ -724,6 +732,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		let newIndex = index + 1;
 
+    //keep connections or message enabled if true
+    for (let i = this.numberOfSteps -1; i > index; i--) {
+
+        let j = i + 1;
+
+        if(this.enableConnection[i] === true){
+          this.enableConnection[j] = true;
+        }else{
+          this.enableConnection[j] = false;
+        }
+
+        if(this.enableMessage[i] === true){
+          this.enableMessage[j] = true;
+        }else{
+           this.enableMessage[j] = false;
+        }
+
+    }
+
 		this.steps.splice(newIndex, 0, new Step());
     this.stepsOptions.splice(newIndex, 0, [new Option()]);
 
@@ -749,6 +776,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
     this.setTypeLinks(newStep, newIndex);
 
+    this.enableConnection[newIndex] = false;
+    this.enableMessage[newIndex] = false;
+
     const optionArray: Array<string> = [];
     optionArray.splice(0, 0, '');
     this.selectedOptions.splice(newIndex, 0, optionArray);
@@ -763,6 +793,24 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
  		}
 
 		this.numberOfSteps = this.numberOfSteps - 1;
+
+    for (let i = index + 1; i <= this.numberOfSteps; i++) {
+
+        let j = i - 1;
+
+        if(this.enableConnection[i] === true){
+          this.enableConnection[j] = true;
+        }else{
+          this.enableConnection[j] = false;
+        }
+
+        if(this.enableMessage[i] === true){
+          this.enableMessage[j] = true;
+        }else{
+           this.enableMessage[j] = false;
+        }
+
+    }
 
 		const i = this.steps.indexOf(step);
 		this.steps.splice(i, 1);
