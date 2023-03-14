@@ -6,8 +6,6 @@ import java.util.Optional;
 import javax.persistence.OrderBy;
 
 import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.Header;
-import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;

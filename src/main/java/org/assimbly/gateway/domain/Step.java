@@ -1,7 +1,6 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -28,9 +27,13 @@ public class Step implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "stepType")
     private StepType stepType;
+
 
     @Column(name = "componentType")
     private String componentType;
@@ -56,8 +59,8 @@ public class Step implements Serializable {
     private Connection connection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "headerId")
-    private Header header;
+    @JoinColumn(name = "messageId")
+    private Message message;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Link> links = new HashSet<>();
@@ -69,6 +72,19 @@ public class Step implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Step name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public StepType getStepType() {
@@ -123,6 +139,20 @@ public class Step implements Serializable {
         this.options = options;
     }
 
+
+    public Flow getFlow() {
+        return flow;
+    }
+
+    public Step flow(Flow flow) {
+        this.flow = flow;
+        return this;
+    }
+
+    public void setFlow(Flow flow) {
+        this.flow = flow;
+    }
+
     public Integer getRouteId() {
         return routeId;
     }
@@ -149,19 +179,6 @@ public class Step implements Serializable {
         this.responseId = responseId;
     }
 
-    public Flow getFlow() {
-        return flow;
-    }
-
-    public Step flow(Flow flow) {
-        this.flow = flow;
-        return this;
-    }
-
-    public void setFlow(Flow flow) {
-        this.flow = flow;
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -175,17 +192,17 @@ public class Step implements Serializable {
         this.connection = connection;
     }
 
-    public Header getHeader() {
-        return header;
+    public Message getMessage() {
+        return message;
     }
 
-    public Step header(Header header) {
-        this.header = header;
+    public Step message(Message message) {
+        this.message = message;
         return this;
     }
 
-    public void setHeader(Header header) {
-        this.header = header;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
 

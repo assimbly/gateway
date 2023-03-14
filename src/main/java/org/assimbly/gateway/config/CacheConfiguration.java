@@ -2,9 +2,7 @@ package org.assimbly.gateway.config;
 
 import java.time.Duration;
 
-import org.assimbly.gateway.domain.Connection;
-import org.assimbly.gateway.domain.ConnectionKeys;
-import org.assimbly.gateway.domain.Step;
+import org.assimbly.gateway.domain.*;
 import org.ehcache.config.builders.*;
 import org.ehcache.jsr107.Eh107Configuration;
 import org.hibernate.cache.jcache.ConfigSettings;
@@ -62,9 +60,9 @@ public class CacheConfiguration {
             createCache(cm, Connection.class.getName());
             createCache(cm, Connection.class.getName() + ".connectionKeys");
             createCache(cm, ConnectionKeys.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Header.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Header.class.getName() + ".headerKeys");
-            createCache(cm, org.assimbly.gateway.domain.HeaderKeys.class.getName());
+            createCache(cm, Message.class.getName());
+            createCache(cm, Message.class.getName() + ".header");
+            createCache(cm, Header.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".steps");
             createCache(cm, Step.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());

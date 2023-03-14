@@ -51,7 +51,8 @@ public class EnvironmentResource {
         	return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setConfiguration", "Gateway configuration set");
    		} catch (Exception e) {
        		log.error("Import of configuration failed: " + e.getMessage());
-   			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
+            e.printStackTrace();
+            return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setConfiguration", e.getMessage());
    		}
 
     }
@@ -78,7 +79,8 @@ public class EnvironmentResource {
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getGatewayConfiguration", configuration, true);
 
    		} catch (Exception e) {
-   			log.error("Failed to get configuration: " + e.getMessage());
+            log.error("Failed to get configuration: " + e.getMessage());
+            e.printStackTrace();
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getGatewayConfiguration", e.getMessage());
    		}
 
@@ -106,6 +108,8 @@ public class EnvironmentResource {
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getConfigurationByFlowids", configuration, true);
 
    		} catch (Exception e) {
+            log.error("Failed to get configuration by flowids: " + e.getMessage());
+            e.printStackTrace();
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getConfigurationByFlowids", e.getMessage());
    		}
 
@@ -129,6 +133,8 @@ public class EnvironmentResource {
        		confImport.convertFlowConfigurationToDB(gatewayid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "setFlowConfiguration", "Flow configuration set");
    		} catch (Exception e) {
+            log.error("Failed to set configuration: " + e.getMessage() + " for flowid=" + flowid);
+            e.printStackTrace();
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "setFlowConfiguration", e.getMessage());
    		}
     }
@@ -153,6 +159,8 @@ public class EnvironmentResource {
 			}
 			return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getFlowConfiguration", configuration, true);
    		} catch (Exception e) {
+            log.error("Failed to get configuration: " + e.getMessage() + " for flowid=" + flowid);
+            e.printStackTrace();
    			return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getFlowConfiguration", e.getMessage());
    		}
     }

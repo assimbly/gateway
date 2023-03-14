@@ -12,7 +12,7 @@ type EntityArrayResponseType = HttpResponse<IHeader[]>;
 
 @Injectable({ providedIn: 'root' })
 export class HeaderService {
-    public resourceUrl = this.applicationConfigService.getEndpointFor('api/headers');
+    public resourceUrl = this.applicationConfigService.getEndpointFor('api/header');
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
@@ -31,14 +31,6 @@ export class HeaderService {
     query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
         return this.http.get<IHeader[]>(this.resourceUrl, { params: options, observe: 'response' });
-    }
-
-    getAllHeaders(): Observable<EntityArrayResponseType> {
-        return this.http.get<IHeader[]>(`${this.resourceUrl}/getallheaders`, { observe: 'response' });
-    }
-
-    getHeaderKeys(id: number): Observable<HttpResponse<any>> {
-        return this.http.get<any>(`${this.resourceUrl}/${id}/keys`, { observe: 'response' });
     }
 
     delete(id: number): Observable<HttpResponse<any>> {

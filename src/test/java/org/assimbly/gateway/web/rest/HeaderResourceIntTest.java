@@ -8,6 +8,7 @@ import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
+
 import org.assimbly.gateway.web.rest.integration.HeaderResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,8 +44,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = GatewayApp.class)
 public class HeaderResourceIntTest {
 
-    private static final String DEFAULT_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_NAME = "BBBBBBBBBB";
+    private static final String DEFAULT_KEY = "AAAAAAAAAA";
+    private static final String UPDATED_KEY = "BBBBBBBBBB";
+
+    private static final String DEFAULT_VALUE = "AAAAAAAAAA";
+    private static final String UPDATED_VALUE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_TYPE = "AAAAAAAAAA";
+    private static final String UPDATED_TYPE = "BBBBBBBBBB";
 
     @Autowired
     private HeaderRepository headerRepository;
@@ -94,7 +101,9 @@ public class HeaderResourceIntTest {
      */
     public static Header createEntity(EntityManager em) {
         Header header = new Header()
-            .name(DEFAULT_NAME);
+            .key(DEFAULT_KEY)
+            .value(DEFAULT_VALUE)
+            .type(DEFAULT_TYPE);
         return header;
     }
 
@@ -110,7 +119,7 @@ public class HeaderResourceIntTest {
 
         // Create the Header
         HeaderDTO headerDTO = headerMapper.toDto(header);
-        restHeaderMockMvc.perform(post("/api/headers")
+        restHeaderMockMvc.perform(post("/api/header-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerDTO)))
             .andExpect(status().isCreated());
@@ -119,7 +128,9 @@ public class HeaderResourceIntTest {
         List<Header> headerList = headerRepository.findAll();
         assertThat(headerList).hasSize(databaseSizeBeforeCreate + 1);
         Header testHeader = headerList.get(headerList.size() - 1);
-        assertThat(testHeader.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testHeader.getKey()).isEqualTo(DEFAULT_KEY);
+        assertThat(testHeader.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testHeader.getType()).isEqualTo(DEFAULT_TYPE);
     }
 
     @Test
@@ -132,7 +143,7 @@ public class HeaderResourceIntTest {
         HeaderDTO headerDTO = headerMapper.toDto(header);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restHeaderMockMvc.perform(post("/api/headers")
+        restHeaderMockMvc.perform(post("/api/header-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerDTO)))
             .andExpect(status().isBadRequest());
@@ -144,16 +155,18 @@ public class HeaderResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllHeaders() throws Exception {
+    public void getAllHeader() throws Exception {
         // Initialize the database
         headerRepository.saveAndFlush(header);
 
         // Get all the headerList
-        restHeaderMockMvc.perform(get("/api/headers?sort=id,desc"))
+        restHeaderMockMvc.perform(get("/api/header-keys?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(header.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+            .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
+            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE)))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)));
     }
 
     @Test
@@ -163,18 +176,20 @@ public class HeaderResourceIntTest {
         headerRepository.saveAndFlush(header);
 
         // Get the header
-        restHeaderMockMvc.perform(get("/api/headers/{id}", header.getId()))
+        restHeaderMockMvc.perform(get("/api/header-keys/{id}", header.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(header.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+            .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
+            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE));
     }
 
     @Test
     @Transactional
     public void getNonExistingHeader() throws Exception {
         // Get the header
-        restHeaderMockMvc.perform(get("/api/headers/{id}", Long.MAX_VALUE))
+        restHeaderMockMvc.perform(get("/api/header-keys/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -191,10 +206,12 @@ public class HeaderResourceIntTest {
         // Disconnect from session so that the updates on updatedHeader are not directly saved in db
         em.detach(updatedHeader);
         updatedHeader
-            .name(UPDATED_NAME);
+            .key(UPDATED_KEY)
+            .value(UPDATED_VALUE)
+            .type(UPDATED_TYPE);
         HeaderDTO headerDTO = headerMapper.toDto(updatedHeader);
 
-        restHeaderMockMvc.perform(put("/api/headers")
+        restHeaderMockMvc.perform(put("/api/header-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerDTO)))
             .andExpect(status().isOk());
@@ -203,7 +220,9 @@ public class HeaderResourceIntTest {
         List<Header> headerList = headerRepository.findAll();
         assertThat(headerList).hasSize(databaseSizeBeforeUpdate);
         Header testHeader = headerList.get(headerList.size() - 1);
-        assertThat(testHeader.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testHeader.getKey()).isEqualTo(UPDATED_KEY);
+        assertThat(testHeader.getValue()).isEqualTo(UPDATED_VALUE);
+        assertThat(testHeader.getType()).isEqualTo(UPDATED_TYPE);
     }
 
     @Test
@@ -215,7 +234,7 @@ public class HeaderResourceIntTest {
         HeaderDTO headerDTO = headerMapper.toDto(header);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restHeaderMockMvc.perform(put("/api/headers")
+        restHeaderMockMvc.perform(put("/api/header-keys")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(headerDTO)))
             .andExpect(status().isBadRequest());
@@ -234,7 +253,7 @@ public class HeaderResourceIntTest {
         int databaseSizeBeforeDelete = headerRepository.findAll().size();
 
         // Get the header
-        restHeaderMockMvc.perform(delete("/api/headers/{id}", header.getId())
+        restHeaderMockMvc.perform(delete("/api/header-keys/{id}", header.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 

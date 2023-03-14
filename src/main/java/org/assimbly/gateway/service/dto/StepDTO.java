@@ -14,6 +14,8 @@ public class StepDTO implements Serializable {
 
     private Long id;
 
+    private String name;
+
     private StepType stepType;
 
     private String componentType;
@@ -22,17 +24,17 @@ public class StepDTO implements Serializable {
 
     private String options;
 
+    private Long flowId;
+
     private Integer routeId;
 
     private Integer responseId;
 
-    private Set<Link> links;
-
-    private Long flowId;
-
     private Long connectionId;
 
-    private Long headerId;
+    private Long messageId;
+
+    private Set<Link> links;
 
     public Long getId() {
         return id;
@@ -40,6 +42,14 @@ public class StepDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public StepType getStepType() {
@@ -74,6 +84,14 @@ public class StepDTO implements Serializable {
         this.options = options;
     }
 
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
+    }
+
     public Integer getRouteId() {
         return routeId;
     }
@@ -90,22 +108,6 @@ public class StepDTO implements Serializable {
         this.responseId = responseId;
     }
 
-    public Long getFlowId() {
-        return flowId;
-    }
-
-    public void setFlowId(Long flowId) {
-        this.flowId = flowId;
-    }
-
-    public Set<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(Set<Link> links) {
-        this.links = links;
-    }
-
     public Long getConnectionId() {
         return connectionId;
     }
@@ -114,12 +116,20 @@ public class StepDTO implements Serializable {
         this.connectionId = connectionId;
     }
 
-    public Long getHeaderId() {
-        return headerId;
+    public Long getMessageId() {
+        return messageId;
     }
 
-    public void setHeaderId(Long headerId) {
-        this.headerId = headerId;
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
+    }
+
+    public Set<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(Set<Link> links) {
+        this.links = links;
     }
 
     @Override
@@ -154,7 +164,7 @@ public class StepDTO implements Serializable {
             ", responseId=" + getResponseId() +
             ", flow=" + getFlowId() +
             ", connection=" + getConnectionId() +
-            ", header=" + getHeaderId() +
+            ", message=" + getMessageId() +
             ", links=" + getLinks() +
             "}";
     }

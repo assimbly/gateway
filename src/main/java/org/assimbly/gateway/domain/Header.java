@@ -1,14 +1,12 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -25,12 +23,22 @@ public class Header implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "jhi_key")
+    private String key;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "header", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
-    private Set<HeaderKeys> headerKeys = new HashSet<>();
+    @Column(name = "`value`")
+    private String value;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "language")
+    private String language;
+
+    @ManyToOne
+    @JsonIgnoreProperties("headers")
+    private Message message;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -40,43 +48,72 @@ public class Header implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public Header name(String name) {
-        this.name = name;
+    public Header key(String key) {
+        this.key = key;
         return this;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public Set<HeaderKeys> getHeaderKeys() {
-        return headerKeys;
+    public String getValue() {
+        return value;
     }
 
-    public Header headerKeys(Set<HeaderKeys> headerKeys) {
-        this.headerKeys = headerKeys;
+    public Header value(String value) {
+        this.value = value;
         return this;
     }
 
-    public Header addHeaderKeys(HeaderKeys headerKeys) {
-        this.headerKeys.add(headerKeys);
-        headerKeys.setHeader(this);
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Header type(String type) {
+        this.type = type;
         return this;
     }
 
-    public Header removeHeaderKeys(HeaderKeys headerKeys) {
-        this.headerKeys.remove(headerKeys);
-        headerKeys.setHeader(null);
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public Header language(String language) {
+        this.language = language;
         return this;
     }
 
-    public void setHeaderKeys(Set<HeaderKeys> headerKeys) {
-        this.headerKeys = headerKeys;
+    public void setLanguage(String language) {
+        this.language = language;
     }
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public Header message(Message message) {
+        this.message = message;
+        return this;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -103,7 +140,9 @@ public class Header implements Serializable {
     public String toString() {
         return "Header{" +
             "id=" + getId() +
-            ", name='" + getName() + "'" +
+            ", key='" + getKey() + "'" +
+            ", value='" + getValue() + "'" +
+            ", type='" + getType() + "'" +
             "}";
     }
 }

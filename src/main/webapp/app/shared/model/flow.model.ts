@@ -11,7 +11,6 @@ export interface IFlow {
     type?: string;
     loadBalancing?: boolean;
     parallelProcessing?: boolean;
-    assimblyHeaders?: boolean;
     instances?: number;
     version?: number;
     created?: dayjs.Dayjs;
@@ -32,7 +31,6 @@ export class Flow implements IFlow {
         public type?: string,
         public loadBalancing?: boolean,
         public parallelProcessing?: boolean,
-        public assimblyHeaders?: boolean,
         public instances?: number,
         public version?: number,
         public created?: dayjs.Dayjs,
@@ -44,7 +42,6 @@ export class Flow implements IFlow {
         this.autoStart = this.autoStart || false;
         this.loadBalancing = this.loadBalancing || false;
         this.parallelProcessing = this.parallelProcessing || true;
-        this.assimblyHeaders = this.assimblyHeaders || true;
     }
 }
 

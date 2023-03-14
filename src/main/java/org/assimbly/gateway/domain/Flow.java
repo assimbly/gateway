@@ -1,6 +1,5 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -55,9 +54,6 @@ public class Flow implements Serializable {
 
     @Column(name = "log_level")
     private LogLevelType logLevel;
-
-    @Column(name = "assimbly_headers")
-    private Boolean assimblyHeaders;
 
     @Column(name = "instances")
     private Integer instances;
@@ -143,19 +139,6 @@ public class Flow implements Serializable {
 
     public void setParallelProcessing(Boolean parallelProcessing) {
         this.parallelProcessing = parallelProcessing;
-    }
-
-    public Boolean isAssimblyHeaders() {
-        return assimblyHeaders;
-    }
-
-    public Flow assimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-        return this;
-    }
-
-    public void setAssimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
     }
 
     public Integer getMaximumRedeliveries() {
@@ -346,7 +329,6 @@ public class Flow implements Serializable {
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
             ", parallelProcessing='" + isParallelProcessing() + "'" +
-            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", instances=" + getInstances() +
             "}";
     }
