@@ -387,7 +387,7 @@
                       <button
                         type="button"
                         *ngIf="messageCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
-                        class="col-2 btn btn-primary left-border-radius-0 flow-header-button"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
                         title="New header"
                         (click)="
                           createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
@@ -445,7 +445,7 @@
                       <button
                         type="button"
                         *ngIf="connectionCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
-                        class="col-2 btn btn-primary left-border-radius-0 flow-header-button"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
                         title="New connection"
                         (click)="
                           createOrEditConnection(
