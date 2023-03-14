@@ -577,7 +577,7 @@ public class ExportXML {
 				confOptions = "&dataSource=" + confConnectionId;
 			}
 		}else if (componentType.startsWith("setheaders") || componentType.startsWith("setmessage")) {
-            if(!confUri.startsWith("message")) {
+            if(confUri==null || !confUri.startsWith("message")) {
                 confUri = "message:" + confMessage.getId().toString();
             }
         }
