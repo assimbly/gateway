@@ -105,8 +105,6 @@ public class LinkResource {
      */
     @DeleteMapping("/link/{id}")
     public ResponseEntity<Void> deleteLink(@PathVariable Long id) {
-        System.out.println("-----------------hello3---------------------");
-
         log.debug("REST request to delete Link : {}", id);
         linkService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

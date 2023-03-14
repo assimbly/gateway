@@ -9,8 +9,8 @@ import { EnvironmentVariablesModule } from './environment-variables/environment-
 import { FlowModule } from './flow/flow.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupModule } from './group/group.module';
+import { MessageModule } from './message/message.module';
 import { HeaderModule } from './header/header.module';
-import { HeaderKeysModule } from './header-keys/header-keys.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { QueueModule } from './queue/queue.module';
 import { RouteModule } from './route/route.module';
@@ -25,40 +25,40 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
   // prettier-ignore
   imports: [
         BrokerModule,
-		    CertificateModule,
+		CertificateModule,
         StepModule,
         LinkModule,
-		    EnvironmentVariablesModule,
-		    FlowModule,
-		    GatewayModule,
+		EnvironmentVariablesModule,
+		FlowModule,
+		GatewayModule,
         GroupModule,
+        MessageModule,
         HeaderModule,
-        HeaderKeysModule,
         MaintenanceModule,
-		    QueueModule,
+		QueueModule,
         RouteModule,
         ConnectionModule,
         ConnectionKeysModule,
-		    TopicModule,
+		TopicModule,
         /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
     ],
   exports: [
         BrokerModule,
-		    CertificateModule,
+		CertificateModule,
         LinkModule,
         StepModule,
-		    EnvironmentVariablesModule,
-		    FlowModule,
-		    GatewayModule,
+		EnvironmentVariablesModule,
+		FlowModule,
+	    GatewayModule,
         GroupModule,
+        MessageModule,
         HeaderModule,
-        HeaderKeysModule,
         MaintenanceModule,
-		    QueueModule,
+	    QueueModule,
         RouteModule,
         ConnectionModule,
         ConnectionKeysModule,
-		    TopicModule,
+	    TopicModule,
     /* jhipster-needle-add-entity-module - JHipster will add entity modules here */
   ],
   declarations: [],

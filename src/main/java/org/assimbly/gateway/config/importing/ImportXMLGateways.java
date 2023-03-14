@@ -23,10 +23,6 @@ public class ImportXMLGateways {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLGateways.class);
 
-	public String options;
-	public String componentType;
-	public String uri;
-
     @Autowired
     private GatewayRepository gatewayRepository;
 
@@ -34,7 +30,7 @@ public class ImportXMLGateways {
     private ImportXMLFlows importXMLFlows;
 
     @Autowired
-    private ImportXMLHeaders importXMLHeaders;
+    private ImportXMLMessages importXMLMessages;
 
     @Autowired
     private ImportXMLRoutes importXMLRoutes;
@@ -82,12 +78,12 @@ public class ImportXMLGateways {
 			}
 
             if (type == null || type.isEmpty()) {
-                type = "connector";
+                type = "FULL";
             }else {
                 try {
                     GatewayType.valueOf(type);
                 }catch (Exception e){
-                    type = "connector";
+                    type = "FULL";
                 }
             }
 
@@ -107,7 +103,7 @@ public class ImportXMLGateways {
 
             log.info("Importing gateway finished");
 
-            importXMLHeaders.setHeadersFromXML(doc);
+            importXMLMessages.setMessagesFromXML(doc);
 
             importXMLRoutes.setRoutesFromXML(doc,"routes");
 

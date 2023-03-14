@@ -1,14 +1,13 @@
 package org.assimbly.gateway.service.impl;
 
-import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.domain.Header;
+import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.repository.HeaderRepository;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.service.mapper.HeaderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,23 +49,19 @@ public class HeaderServiceImpl implements HeaderService {
         return headerMapper.toDto(header);
     }
 
+    /**
+     * Get all the header.
+     *
+     * @return the list of entities
+     */
     @Override
     @Transactional(readOnly = true)
-    public Page<HeaderDTO> findAll(Pageable pageable) {
-        log.debug("Request to get all Headers");
-        return headerRepository.findAll(pageable)
-            .map(headerMapper::toDto);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<HeaderDTO> getAll() {
-        log.debug("Request to get all Headers");
+    public List<HeaderDTO> findAll() {
+        log.debug("Request to get all Header");
         return headerRepository.findAll().stream()
-                .map(headerMapper::toDto)
-                .collect(Collectors.toCollection(LinkedList::new));
+            .map(headerMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
     }
-
 
 
     /**
@@ -82,23 +77,6 @@ public class HeaderServiceImpl implements HeaderService {
         return headerRepository.findById(id)
             .map(headerMapper::toDto);
     }
-
-
-
-    /**
-     * Get one header by id.
-     *
-     * @param name the name of the header
-     * @return the entity
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<HeaderDTO> findByName(String name) {
-        log.debug("Request to get Header by Name : {}", name);
-        return headerRepository.findByName(name)
-            .map(headerMapper::toDto);
-    }
-
 
     /**
      * Delete the header by id.

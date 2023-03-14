@@ -1,7 +1,6 @@
 package org.assimbly.gateway.config.importing;
 
 import org.assimbly.dil.transpiler.transform.Transform;
-import org.assimbly.util.TransformUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -18,7 +17,7 @@ public class Import {
     private ImportXMLFlows importXMLFlows;
 
     @Autowired
-    private ImportXMLHeaders importXMLHeaders;
+    private ImportXMLMessages importXMLMessages;
 
     @Autowired
     private ImportXMLRoutes importXMLRoutes;
@@ -52,7 +51,7 @@ public class Import {
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
 
-		importXMLHeaders.setHeadersFromXML(doc);
+		importXMLMessages.setMessagesFromXML(doc);
 
 		importXMLRoutes.setRoutesFromXML(doc,"routes");
 

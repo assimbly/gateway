@@ -180,7 +180,7 @@ export class FlowService {
     stepId: string,
     connectionId: string,
     connectionKeys: string,
-    headerKeys: string,
+    header: string,
     numberOfTimes: string,
     messageBody: string
   ): Observable<any> {
@@ -189,7 +189,7 @@ export class FlowService {
       stepId,
       connectionid: connectionId,
       connectionKeys,
-      headerKeys,
+      header,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });
@@ -206,7 +206,7 @@ export class FlowService {
     stepId: string,
     connectionId: string,
     connectionKeys: string,
-    headerKeys: string,
+    header: string,
     messageBody: string
   ): Observable<any> {
     const options = new HttpHeaders({
@@ -214,7 +214,7 @@ export class FlowService {
       stepId,
       connectionid: connectionId,
       connectionKeys,
-      headerKeys,
+      header,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });

@@ -4,14 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderDetailComponent } from 'app/entities/header/header-detail.component';
-import { Header } from 'app/shared/model/header.model';
+import { HeaderDetailComponent } from 'app/entities/message/message-detail.component';
+import { Header } from 'app/shared/model/message.model';
 
 describe('Component Tests', () => {
     describe('Header Management Detail Component', () => {
         let comp: HeaderDetailComponent;
         let fixture: ComponentFixture<HeaderDetailComponent>;
-        const route = ({ data: of({ header: new Header(123) }) } as any) as ActivatedRoute;
+        const route = ({ data: of({ message: new Header(123) }) } as any) as ActivatedRoute;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -33,7 +33,7 @@ describe('Component Tests', () => {
                 comp.ngOnInit();
 
                 // THEN
-                expect(comp.header).toEqual(jasmine.objectContaining({ id: 123 }));
+                expect(comp.message).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });

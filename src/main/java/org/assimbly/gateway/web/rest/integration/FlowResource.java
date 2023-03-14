@@ -140,20 +140,6 @@ public class FlowResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    /*
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
-    public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
-    	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
-        List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
-        flows.sort(Comparator.comparing(Flow::getName));
-
-        for(Flow flow : flows) {
-        	System.out.println("Tname=" + flow.getName());
-        }
-
-       return flowMapper.toDto(flows);
-    }
-	*/
 
     /**
      * GET  /flows/:id : get the "id" flow.
@@ -184,10 +170,11 @@ public class FlowResource {
 
     @PostConstruct
     public void init() throws Exception {
-        System.out.println("begin init integration");
+        log.info("Start runtime");
         initIntegration();
-        System.out.println("end init integration");
-        startFlows();
+        
+		log.info("Starting flows");
+		startFlows();
     }
 
 
