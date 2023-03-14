@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -42,8 +43,6 @@ public class ImportXMLFlows {
     public String xmlConfiguration;
     public String configuration;
 
-    public String options;
-    public String componentType;
     public String uri;
 
     private Gateway gateway;
@@ -224,13 +223,15 @@ public class ImportXMLFlows {
         return steps;
 	}
 
-	private Step getStepFromXML(String id, Document doc, Flow flow, Step step, String index) throws Exception {
+	private Step getStepFromXML(String flowId, Document doc, Flow flow, Step step, String index) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		String stepXPath = "/dil/integrations/integration/flows/flow[id='" + id + "']/steps/step[" + index + "]/";
+		String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
 
-		String type = xPath.evaluate(stepXPath + "type", doc);
+        String id = xPath.evaluate(stepXPath + "id", doc);
+        String name = xPath.evaluate(stepXPath + "name", doc);
+        String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
 		String connectionId = xPath.evaluate(stepXPath + "*/*/options/connection_id", doc);
@@ -241,7 +242,8 @@ public class ImportXMLFlows {
         // get type
 		StepType stepType = StepType.valueOf(type.toUpperCase());
 
-		// get componenType & uri
+        // get componenType & uri
+        String componentType = "";
 		if(uri.contains(":")){
 			String[] uriSplitted = uri.split(":", 2);
 			componentType = uriSplitted[0];
@@ -255,7 +257,7 @@ public class ImportXMLFlows {
 			}
 		}
 
-		// get options
+        // get options
 		Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, stepXPath + "options/*");
 
 		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
@@ -293,12 +295,13 @@ public class ImportXMLFlows {
 		// get message if configured
 		Message message;
 		try {
-
 			Long messageIdLong = Long.parseLong(messageId, 10);
 			String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageIdLong + "]/name",doc);
-			Optional<Message> messageOptional = messageRepository.findByName(messageName);
+
+            Optional<Message> messageOptional = messageRepository.findByName(messageName);
+
 			if(messageOptional.isPresent()) {
-				message = messageOptional.get();
+                message = messageOptional.get();
 			}else {
 				message = null;
 			}
@@ -324,11 +327,20 @@ public class ImportXMLFlows {
 		}
 
         step.setStepType(stepType);
+
 		step.setComponentType(componentType);
         step.responseId(responseId);
         step.setUri(uri);
 		step.setFlow(flow);
 		step.setOptions(options);
+
+
+
+        if (name == null || name.isEmpty()) {
+            step.setName(id);
+        }else{
+            step.setName(name);
+        }
 
 		if (connection != null) {
 			step.setConnection(connection);
@@ -350,22 +362,36 @@ public class ImportXMLFlows {
     public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
 
         steps = flow.getSteps();
-
-        Integer index = 1;
-
-        //create a map to map old and new ids
         Map<String,String> linkidMap = new HashMap<String,String>();
+
+        /*
+        //create a map to map old and new ids
+
+        Map<String,Step> stepsMap = new HashMap<String,Step>();
+
+        List<String> stepIds = new ArrayList<String>();
+
+        for(Step step: steps) {
+
+            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            String stepId = xPath.evaluate(stepXPath + "id", doc);
+            stepIds.add(stepId);
+            stepsMap.put(stepId,step);
+            index++;
+        }
+
+     */
 
         //fill the map
         for(Step step: steps) {
 
-            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[id='" + step.getName() + "']/";
 
             XPath xPath = XPathFactory.newInstance().newXPath();
             int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
 
             numberOfLinks = numberOfLinks + 1;
-
 
             for (int i = 1; i < numberOfLinks; i++) {
 
@@ -381,24 +407,27 @@ public class ImportXMLFlows {
 
             }
 
-            index++;
+
         }
 
-        index = 1;
 
-        for(Step step: steps){
-
-            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+        for(Step step: steps) {
 
             // set links
             Set<Link> links = new HashSet<>();
 
             XPath xPath = XPathFactory.newInstance().newXPath();
+
+            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[name='" + step.getName() + "']";
+
+            int name = Integer.parseInt(xPath.evaluate("count(" + stepXPath + ")", doc));
+            if(name == 0){
+                stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[id='" + step.getName() + "']/";
+            }
+
             int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
 
-            numberOfLinks = numberOfLinks + 1;
-
-            for (int i = 1; i < numberOfLinks; i++) {
+            for (int i = 1; i <= numberOfLinks; i++) {
 
                 String linkIndex = Integer.toString(i);
                 String linkXpath =  stepXPath + "links/link[" + linkIndex + "]/";
@@ -413,7 +442,8 @@ public class ImportXMLFlows {
 
                 String linkId = xPath.evaluate(linkXpath + "id", doc);
                 String linkName = linkId;
-                if(flow.getId() != null && step.getId() != null){
+
+                if(flow.getId() != null){
                     if(linkBound.equals("in")){
                         linkName = linkidMap.get(linkId);
                     }else{
@@ -437,7 +467,6 @@ public class ImportXMLFlows {
             }
 
             step.setLinks(links);
-            index++;
         }
 
         return flow;

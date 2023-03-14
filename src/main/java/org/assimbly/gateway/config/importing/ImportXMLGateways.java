@@ -23,10 +23,6 @@ public class ImportXMLGateways {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLGateways.class);
 
-	public String options;
-	public String componentType;
-	public String uri;
-
     @Autowired
     private GatewayRepository gatewayRepository;
 

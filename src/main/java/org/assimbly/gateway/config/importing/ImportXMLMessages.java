@@ -23,10 +23,6 @@ public class ImportXMLMessages {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLMessages.class);
 
-	public String options;
-	public String componentType;
-	public String uri;
-
 	@Autowired
 	private MessageRepository messageRepository;
 

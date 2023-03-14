@@ -20,9 +20,9 @@
                                  referencedColumnNames="id"
                                  referencedTableName="connection"/>
 
-        <addForeignKeyConstraint baseColumnNames="header_id"
+        <addForeignKeyConstraint baseColumnNames="message_id"
                                  baseTableName="step"
-                                 constraintName="fk_step_header_id"
+                                 constraintName="fk_step_message_id"
                                  referencedColumnNames="id"
                                  referencedTableName="message"/>
 
