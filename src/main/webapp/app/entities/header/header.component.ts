@@ -73,7 +73,7 @@ export class HeaderComponent implements OnInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         this.mapHeaders();
-        if (changes['header'] && this.headers !== undefined) {
+        if (changes['headers'] && this.headers !== undefined) {
             if (this.headers.length === 1 && this.headers[0].id === undefined) {
                 this.headers[0].isDisabled = false;
                 this.headers[0].type = this.typeHeader[0];

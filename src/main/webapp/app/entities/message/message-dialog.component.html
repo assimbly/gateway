@@ -33,7 +33,7 @@
         <table class="table">
           <thead>
             <tr>
-              <th colspan="4" class="border-top-0">Header</th>
+              <th colspan="4" class="border-top-0">Headers</th>
             </tr>
             <tr>
               <td><span>Key</span></td>
@@ -51,8 +51,8 @@
                   class="form-control"
                   [(ngModel)]="header.key"
                   value="header.key"
-                  name="headers-{{ idx }}"
-                  id="headers-{{ idx }}"
+                  name="headers-key{{ idx }}"
+                  id="headers-key{{ idx }}"
                   required
                   maxlength="255"
                   [jhiExistingHeader]="headerArray"

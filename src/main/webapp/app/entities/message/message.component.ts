@@ -61,9 +61,9 @@ export class MessageComponent implements OnInit, OnDestroy {
     }
 
     updateHeader(id: number) {
-        this.messages = this.messages.filter(x => x.id === id);
+        this.headers = this.headers.filter(x => x.id === id);
         const newHeader = new Header();
-        this.messages.push(newHeader);
+        this.headers.push(newHeader);
     }
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
@@ -72,7 +72,7 @@ export class MessageComponent implements OnInit, OnDestroy {
     filterHeader(id) {
         this.headerService.query().subscribe(
             res => {
-                this.messages = res.body;
+                this.headers = res.body;
                 this.headers = this.headers.filter(k => k.messageId === id);
                 if (this.headers.length === 0) {
                     const newHeader = new Header();
