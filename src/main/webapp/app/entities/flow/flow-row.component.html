@@ -21,14 +21,15 @@
       placement="right"
       triggers="mouseenter:mouseleave"
       popoverTitle="Details"
+      popover-class="increase-popover-width"
       [popover]="detailsTemplate"
     ><fa-icon icon="info"></fa-icon></i>
     <i
       style="padding-left: 1em"
-      (mouseenter)="getFlowStats(flow)"
-      (mouseleave)="stopGetFlowStats()"
       data-container="body"
       container="body"
+      (mouseenter)="getFlowStats(flow)"
+      (mouseleave)="stopGetFlowStats()"
       [hidden]="!isFlowStatusOK"
       triggers="mouseenter:mouseleave"
       placement="right"
@@ -44,10 +45,12 @@
       style="padding-left: 1em"
       data-container="body"
       container="body"
-      placement="right"
       triggers="mouseenter:mouseleave"
       popoverTitle="Stats"
-      [popover]="statsTemplate">
+      popover-class="increase-popover-width"
+      [popover]="statsTemplate"
+      class="stats statsEnable"
+      >
       <fa-icon icon="chart-bar"></fa-icon>
     </i>
     <a style="padding-left: 1em"

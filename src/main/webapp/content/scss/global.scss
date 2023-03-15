@@ -358,7 +358,9 @@ ng-dropdown-panel > div {
   z-index: 100;
 }
 
+/* comment the popover as it interferes with ngb popover */
 
+/*
 .popover {
   min-width: 200px;
   max-width: 60%;
@@ -366,7 +368,8 @@ ng-dropdown-panel > div {
   text-align: left;
   white-space: normal;
   background-color: #fff;
-}
+  margin-top: 200px;
+}*/
 
 /*
 .popover-body {
@@ -609,7 +612,7 @@ ng-dropdown-panel > div {
   background-color: transparent;
 }
 
-.increase-popover-width {
+.increase-popover-width > * {
   width: 1200px;
   max-width: 1200px;
 }
