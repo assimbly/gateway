@@ -207,7 +207,7 @@
                             <div class="modal-body">
                                 <textarea class="form-control" id="field_uri" formControlName="uri"
                                           placeholder="{{uriPlaceholders[index]}}" rows="25"
-                                          [(ngModel)]="step.uri"></textarea>
+                                          [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -218,13 +218,12 @@
                           <ng-template #uriEditor>
                             <div class="modal-header">
                               <h4 class="modal-title">Edit Path</h4>
-                              <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-                                <span aria-hidden="true">&times;</span>
+                              <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()">
                               </button>
                             </div>
                             <div class="modal-body">
-                                <textarea class="form-control" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri" placeholder="{{uriPlaceholders[index]}}" rows="5"
-                                          (change)="uriEditorChange($event, index)"></textarea>
+                                <textarea class="form-control" formControlName="uri" placeholder="{{uriPlaceholders[index]}}" rows="5"
+                                          [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -244,7 +243,7 @@
                             <!-- component field-->
                             <div class="row">
                               <div class="col-12">
-                                <label class="form-control-label float-start" for="field_component_type" style="float: left; margin-left: 6px;">Component</label>
+                                <label class="form-control-label float-start" style="float: left; margin-left: 6px;">Component</label>
                                 <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover"
                                    container="body" placement="right" style="float: left; margin-left: 6px;">
                                   <fa-icon icon="info-circle"></fa-icon>
@@ -329,11 +328,10 @@
                                 </i>
                               </div>
                               <div class="col-10">
-                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                           [value]="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri"
-                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
-                                           formControlName="uri"
-                                           dropdownPosition="bottom"></ng-select>
+                                <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri" />
+                                <datalist id="urilist">
+                                  <option *ngFor="let step of URIList[index]" [value]="step.uri">{{step.uri}}</option>
+                                </datalist>
                               </div>
                               <button type="button" class="col-2 btn btn-primary"
                                       [ngStyle]="{'color':'white'}"
@@ -508,10 +506,10 @@
                                 <label class="form-control-label" for="field_uri" style="float: left; margin-left: 6px;">Script</label>
                               </div>
                               <div class="col-10">
-                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
-                                           formControlName="uri" [(ngModel)]="step.uri"
-                                           dropdownPosition="bottom"></ng-select>
+                                <input type="text" class="d-inline-block form-control" list="urilist2" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri" />
+                                <datalist id="urilist2">
+                                  <option *ngFor="let step of URIList[index]" [value]="step.uri">{{step.uri}}</option>
+                                </datalist>
                               </div>
                               <button type="button" class="col-2 btn btn-primary"
                                       [ngStyle]="{'color':'white'}"
