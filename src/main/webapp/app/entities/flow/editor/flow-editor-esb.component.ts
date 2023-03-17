@@ -372,14 +372,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         );
 
         if(step.connectionId){
-          console.log('set to true');
-          console.log('step uri' + step.uri);
-          console.log('step type' + step.stepType);
           this.enableConnection[index] = true;
         }else{
-        console.log('set to false');
-        console.log('step uri' + step.uri);
-          console.log('step type' + step.stepType);
           this.enableConnection[index] = false;
         }
 
@@ -409,13 +403,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
             this.loadStep(errorStep, index + 1);
         }
-
-              /*
-        		  this.editFlowForm.controls.stepsData.get("uri").valueChanges.subscribe(x => {
-                 console.log('uri value changed')
-                 console.log(x)
-              })
-              */
 
   }
 
@@ -556,22 +543,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.actionComponentsNames.sort();
 
 	}
-
-	uriEditorChange(e?: Event, index?: any): void {
-
-	    console.log('uriEditorChange');
-      const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[index];
-      console.log('e=' + JSON.stringify(e));
-      console.log('step.uri=' + e);
-      console.log('type=' + Object.prototype.toString.call(e));
-
-      //step.uri = e;
-      //stepForm.controls.uri.patchValue(e);
-
-	}
-
-
-
 
 	clone(): void {
 		// reset id and flow name to null
@@ -1167,12 +1138,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
     step.connectionId = formConnection.value;
 
+    connectionType = this.connectionsList.getConnectionType(step.componentType);
+
     let modalRef;
 
     if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, null, connectionType);
     } else {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId, connectionType);
     }
 
     modalRef.then((res) => {
