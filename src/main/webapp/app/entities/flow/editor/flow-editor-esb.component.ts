@@ -189,6 +189,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			);
 
 		this.registerChangeInFlows();
+
 	}
 
 	load(id, isCloning?: boolean): void {
@@ -409,6 +410,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             this.loadStep(errorStep, index + 1);
         }
 
+              /*
+        		  this.editFlowForm.controls.stepsData.get("uri").valueChanges.subscribe(x => {
+                 console.log('uri value changed')
+                 console.log(x)
+              })
+              */
+
   }
 
   createNewStep(stepType: StepType, defaultComponentType: string, index: number){
@@ -548,6 +556,22 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.actionComponentsNames.sort();
 
 	}
+
+	uriEditorChange(e?: Event, index?: any): void {
+
+	    console.log('uriEditorChange');
+      const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[index];
+      console.log('e=' + JSON.stringify(e));
+      console.log('step.uri=' + e);
+      console.log('type=' + Object.prototype.toString.call(e));
+
+      //step.uri = e;
+      //stepForm.controls.uri.patchValue(e);
+
+	}
+
+
+
 
 	clone(): void {
 		// reset id and flow name to null

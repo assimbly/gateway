@@ -217,15 +217,14 @@
 
                           <ng-template #uriEditor>
                             <div class="modal-header">
-                              <h4 class="modal-title">Path Editor</h4>
+                              <h4 class="modal-title">Edit Path</h4>
                               <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
                             <div class="modal-body">
-                                <textarea class="form-control" id="field_uri" formControlName="uri"
-                                          placeholder="{{uriPlaceholders[index]}}" rows="5"
-                                          [(ngModel)]="step.uri"></textarea>
+                                <textarea class="form-control" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri" placeholder="{{uriPlaceholders[index]}}" rows="5"
+                                          (change)="uriEditorChange($event, index)"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -331,13 +330,14 @@
                               </div>
                               <div class="col-10">
                                 <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
+                                           [value]="editFlowForm['controls'].stepsData['controls'][index]['controls'].uri"
                                            [ngStyle]="{'text-align' : 'left'}" id="field_uri"
-                                           formControlName="uri" [(ngModel)]="step.uri"
+                                           formControlName="uri"
                                            dropdownPosition="bottom"></ng-select>
                               </div>
                               <button type="button" class="col-2 btn btn-primary"
                                       [ngStyle]="{'color':'white'}"
-                                      title="Enlarge" (click)="openModal(uriEditor)">
+                                      title="Edit path" (click)="openModal(uriEditor)">
                                 <fa-icon style="color: white;" icon="edit"></fa-icon>
                               </button>
                             </div>
