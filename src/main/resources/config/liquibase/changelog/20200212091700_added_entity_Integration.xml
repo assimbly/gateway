@@ -9,10 +9,10 @@
         <property name="autoIncrement" value="true"/>
 
     <!--
-        Added the entity Gateway.
+        Added the entity Integration.
     -->
     <changeSet id="20200212091700-1" author="jhipster">
-        <createTable tableName="gateway">
+        <createTable tableName="integration">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -59,9 +59,9 @@
     -->
     <changeSet id="20200212091700-1-data" author="jhipster" context="faker">
         <loadData
-                  file="config/liquibase/fake-data/gateway.csv"
+                  file="config/liquibase/fake-data/integration.csv"
                   separator=";"
-                  tableName="gateway">
+                  tableName="integration">
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
             <column name="type" type="string"/>

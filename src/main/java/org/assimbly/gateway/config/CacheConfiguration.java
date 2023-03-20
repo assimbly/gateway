@@ -52,9 +52,9 @@ public class CacheConfiguration {
             createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".authorities");
             createCache(cm, org.assimbly.gateway.domain.PersistentToken.class.getName());
             createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".persistentTokens");
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".flows");
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".environmentVariables");
+            createCache(cm, Integration.class.getName());
+            createCache(cm, Integration.class.getName() + ".flows");
+            createCache(cm, Integration.class.getName() + ".environmentVariables");
             createCache(cm, org.assimbly.gateway.domain.EnvironmentVariables.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName());
             createCache(cm, Connection.class.getName());

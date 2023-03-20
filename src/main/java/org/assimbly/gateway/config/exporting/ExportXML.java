@@ -32,7 +32,7 @@ public class ExportXML {
 	public String uri;
 
 	@Autowired
-	private GatewayRepository gatewayRepository;
+	private IntegrationRepository integrationRepository;
 
 	@Autowired
 	private FlowRepository flowRepository;
@@ -73,11 +73,11 @@ public class ExportXML {
         this.applicationProperties = applicationProperties;
     }
 
-    public String getXMLConfiguration(Long gatewayId) throws Exception {
+    public String getXMLConfiguration(Long integrationId) throws Exception {
 
-		setGeneralProperties(gatewayId);
+		setGeneralProperties(integrationId);
 
-		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
+		List<Flow> flows = flowRepository.findAllByIntegrationId(integrationId);
 
 		for (Flow flow : flows) {
 			if (flow != null) {
@@ -90,13 +90,13 @@ public class ExportXML {
 		return xmlConfiguration;
 	}
 
-	public String getXMLConfigurationByIds(Long gatewayId, String ids) throws Exception {
+	public String getXMLConfigurationByIds(Long integrationId, String ids) throws Exception {
 
-		setGeneralProperties(gatewayId);
+		setGeneralProperties(integrationId);
 
 		List<String> idsList = Arrays.asList(ids.split(","));
 
-		List<Flow> flows = flowRepository.findAllByGatewayId(gatewayId);
+		List<Flow> flows = flowRepository.findAllByIntegrationId(integrationId);
 
 		for (Flow flow : flows) {
 			if (flow != null) {
@@ -118,7 +118,7 @@ public class ExportXML {
 	public String getXMLFlowConfiguration(Long id) throws Exception {
 
 		Flow flow = flowRepository.findById(id).get();
-		setGeneralProperties(flow.getGateway().getId());
+		setGeneralProperties(flow.getIntegration().getId());
 
 		// check if steps are configured
 		stepsDB = flow.getSteps();
@@ -156,10 +156,10 @@ public class ExportXML {
 	// set methods
     // These methods set the XML Elements
 
-	public void setGeneralProperties(Long gatewayId) throws Exception {
+	public void setGeneralProperties(Long integrationIdLong) throws Exception {
 
-		integrationId = gatewayId.toString();
-		Gateway gateway = gatewayRepository.findById(gatewayId).get();
+		integrationId = integrationIdLong.toString();
+		Integration integration = integrationRepository.findById(integrationIdLong).get();
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -172,30 +172,30 @@ public class ExportXML {
         Element integrations = setElement("integrations", null, dil);
         Element core = setElement("core", null, dil);
 
-        setIntegrations(integrations, gateway);
+        setIntegrations(integrations, integration);
 
         setCore(core);
 
 	}
 
-    public void setIntegrations(Element integrations, Gateway gateway) throws Exception {
+    public void setIntegrations(Element integrations, Integration integration) throws Exception {
 
-        Element integration = setElement("integration", null, integrations);
+        Element integrationElement = setElement("integration", null, integrations);
 
-        Element id = setElement("id", integrationId, integration);
-        Element name = setElement("name", gateway.getName(), integration);
-        Element type = setElement("type", gateway.getType().toString(), integration);
+        Element id = setElement("id", integrationId, integrationElement);
+        Element name = setElement("name", integration.getName(), integrationElement);
+        Element type = setElement("type", integration.getType().toString(), integrationElement);
 
         //Options
-        Element options =  setElement("options", null, integration);
+        Element options =  setElement("options", null, integrationElement);
 
-        Element environmentName = setElement("environment", gateway.getEnvironmentName(), options);
-        Element stage = setElement("stage", gateway.getStage().toString(), options);
-        Element defaultFromComponentType = setElement("defaultFromComponentType", gateway.getDefaultFromComponentType(), options);
-        Element defaultToComponentType = setElement("defaultToComponentType", gateway.getDefaultToComponentType(), options);
-        Element defaultErrorComponentType = setElement("defaultErrorComponentType", gateway.getDefaultErrorComponentType(), options);
+        Element environmentName = setElement("environment", integration.getEnvironmentName(), options);
+        Element stage = setElement("stage", integration.getStage().toString(), options);
+        Element defaultFromComponentType = setElement("defaultFromComponentType", integration.getDefaultFromComponentType(), options);
+        Element defaultToComponentType = setElement("defaultToComponentType", integration.getDefaultToComponentType(), options);
+        Element defaultErrorComponentType = setElement("defaultErrorComponentType", integration.getDefaultErrorComponentType(), options);
 
-        flows = setElement("flows", null, integration);
+        flows = setElement("flows", null, integrationElement);
 
     }
 

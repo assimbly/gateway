@@ -20,7 +20,7 @@ export const enum ConnectorType {
     CURL = 'CURL'
 }
 
-export interface IGateway {
+export interface IIntegration {
     id?: number;
     name?: string;
     type?: GatewayType;
@@ -34,7 +34,7 @@ export interface IGateway {
     environmentVariables?: IEnvironmentVariables[];
 }
 
-export class Gateway implements IGateway {
+export class Integration implements IIntegration {
     constructor(
         public id?: number,
         public name?: string,

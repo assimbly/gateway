@@ -13,7 +13,7 @@
 				<ng-template #defaultPopover let-message="message">
 					<div [innerHtml]="defaultPopoverMessage"></div>
 			</ng-template>
-            <h2 id="jhi-gateway-heading">Edit Gateway</h2>
+            <h2 id="jhi-integration-heading">Edit Integration</h2>
 			    <div>
 			        <jhi-alert-error></jhi-alert-error>
 			        <h4>General
@@ -23,14 +23,14 @@
 						 [popover]="generalPopover"
 						class="fa fa-info-circle"></i>
 					</h4>
-			        <div class="form-group" [hidden]="!gateway.id">
+			        <div class="form-group" [hidden]="!integration.id">
 			            <label for="id" class="font-weight-bold">ID</label>
-			            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="gateway.id" readonly />
+			            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="integration.id" readonly />
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_name">Name</label>
 			            <input type="text" class="form-control" name="name" id="field_name"
-			                [(ngModel)]="gateway.name" />
+			                [(ngModel)]="integration.name" />
 			        </div>
 			        <div class="form-group">
                       <!--  <h4>
@@ -40,10 +40,10 @@
                            class="fa fa-info-circle"></i>
                         </h4>-->
 			            <label class="form-control-label font-weight-bold" for="field_type">Type</label>
-                        <input type="text" class="form-control" name="type" id="type" [(ngModel)]="gateway.type" readonly/>
+                        <input type="text" class="form-control" name="type" id="type" [(ngModel)]="integration.type" readonly/>
                         <!--
-			            <select class="form-control form-select" name="type" [(ngModel)]="gateway.type" id="field_type" (change)="setTypeGateway()">
-			                <option *ngFor="let gatewayType of gatewayListType" [ngValue]="gatewayType">{{gatewayType}}</option>
+			            <select class="form-control form-select" name="type" [(ngModel)]="integration.type" id="field_type" (change)="setTypeIntegration()">
+			                <option *ngFor="let integrationType of integrationListType" [ngValue]="integrationType">{{integrationType}}</option>
 			            </select>-->
 			        </div>
               <br/>
@@ -55,12 +55,12 @@
 					</h4>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_environmentName">Name</label>
-			            <input type="text" class="form-control" name="environmentName" id="field_environmentName" [(ngModel)]="gateway.environmentName" />
+			            <input type="text" class="form-control" name="environmentName" id="field_environmentName" [(ngModel)]="integration.environmentName" />
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_stage">Stage</label>
-			            <select class="form-control form-select" name="stage" [(ngModel)]="gateway.stage" id="field_stage" >
-			                <option *ngFor="let gatewayStage of gatewayListStage" [ngValue]="gatewayStage">{{gatewayStage}}</option>
+			            <select class="form-control form-select" name="stage" [(ngModel)]="integration.stage" id="field_stage" >
+			                <option *ngFor="let integrationStage of integrationListStage" [ngValue]="integrationStage">{{integrationStage}}</option>
 			            </select>
 			        </div>
 					<br/>
@@ -72,19 +72,19 @@
 					</h4>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">From</label>
-			            <select class="form-control form-select" name="type"  name="defaultFromComponentType" id="field_defaultFromComponentType" [(ngModel)]="gateway.defaultFromComponentType">
+			            <select class="form-control form-select" name="type"  name="defaultFromComponentType" id="field_defaultFromComponentType" [(ngModel)]="integration.defaultFromComponentType">
 			                <option *ngFor="let fromType of consumerComponentsNames" [ngValue]="fromType">{{fromType}}</option>
 			            </select>
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultToComponentType">To</label>
-			            <select class="form-control form-select" name="type"  name="defaultToComponentType" id="field_defaultToComponentType" [(ngModel)]="gateway.defaultToComponentType">
+			            <select class="form-control form-select" name="type"  name="defaultToComponentType" id="field_defaultToComponentType" [(ngModel)]="integration.defaultToComponentType">
 			                <option *ngFor="let toType of producerComponentsNames" [ngValue]="toType">{{toType}}</option>
 			            </select>
 			        </div>
 			        <div class="form-group">
 			            <label class="form-control-label font-weight-bold" for="field_defaultErrorComponentType">Error</label>
-			            <select class="form-control form-select" name="type" name="defaultErrorComponentType" id="field_defaultErrorComponentType" [(ngModel)]="gateway.defaultErrorComponentType" >
+			            <select class="form-control form-select" name="type" name="defaultErrorComponentType" id="field_defaultErrorComponentType" [(ngModel)]="integration.defaultErrorComponentType" >
 			                <option *ngFor="let errorType of producerComponentsNames" [ngValue]="errorType">{{errorType}}</option>
 			            </select>
 			        </div>

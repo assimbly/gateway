@@ -2,7 +2,7 @@
 
 Assimbly is a community project, any help is welcome!
 
--   First if you would like a feature or run into a bug check the [issue list](https://github.com/assimbly/gateway/issues). Create a new issue
+-   First if you would like a feature or run into a bug check the [issue list](https://github.com/assimbly/integration/issues). Create a new issue
     or add a comment to an existing one.
 -   Download the code & try it out and see what you think.
 
@@ -13,11 +13,11 @@ Either use the issue list or just send an email to me (Assimbly maintainer) at r
 ## Improving the documentation
 
 Luckily Assimbly is build on top notch projects like Apache Camel which are well documented. For Assimbly we liked to
-document usage and give examples, this documentation can be found at the [wiki](https://github.com/assimbly/gateway/wiki).
+document usage and give examples, this documentation can be found at the [wiki](https://github.com/assimbly/integration/wiki).
 
 ## If you find a bug or problem
 
-Please raise a new issue in our [issue tracker](https://github.com/assimbly/gateway/issues).
+Please raise a new issue in our [issue tracker](https://github.com/assimbly/integration/issues).
 
 If you can please follow our issue guideline:
 
@@ -43,8 +43,8 @@ Page url or API url related to the issue.
 
 We recommend to work on the code from [github](https://github.com/apache/camel/).
 
-    git clone https://github.com/assimbly/gateway.git
-    cd gateway
+    git clone https://github.com/assimbly/integration.git
+    cd integration
 
 Build the project (fast build).
 

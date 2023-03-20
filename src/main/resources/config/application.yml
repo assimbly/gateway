@@ -130,7 +130,7 @@ jhipster:
     default-include-pattern: /api/**
     management-include-pattern: /management/**
     title: Assimbly API
-    description: Assimbly Gateway Application API documentation
+    description: Assimbly Gateway API documentation
     version: 3.6.0
     terms-of-service-url:
     contact-name:

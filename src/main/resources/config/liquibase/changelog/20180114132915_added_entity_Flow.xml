@@ -58,7 +58,7 @@
             <column name="parallel_processing" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="gateway_id" type="bigint">
+            <column name="integration_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->

@@ -5,13 +5,13 @@
   </div>
   <div class="row mt-3">
     <p style="margin-top: -1.6em">
-      <b>{{ singleGatewayStage }}</b>
+      <b>{{ singleIntegrationStage }}</b>
     </p>
   </div>
-  <div *ngIf="multipleGateways">
-    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
-    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedGateway($event)">
-      <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
+  <div *ngIf="multipleIntegrations">
+    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for integration</label>
+    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedIntegration($event)">
+      <option *ngFor="let integration of integrations" [value]="integration.id">{{ integration.name }}</option>
     </select>
   </div>
   <div class="row">
@@ -44,7 +44,7 @@
         <br />
         <p class="tab" style="margin-left: 0.3em">
           No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
-          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a>
+          check the <a target="_blank" href="https://github.com/assimbly/integration/wiki">Assimbly Docs</a>
         </p>
       </blockquote>
     </div>
@@ -61,7 +61,7 @@
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
           <th [style.display]="'none'"><span>ID</span></th>
           <th jhiSortBy="name" class="border-bottom-none"><span></span> <span class="fa fa-sort"></span></th>
-          <th [style.display]="'none'"><span>Gateway</span></th>
+          <th [style.display]="'none'"><span>Integration</span></th>
           <th [style.display]="'none'"><span>Error</span></th>
           <th class="border-bottom-none"></th>
         </tr>

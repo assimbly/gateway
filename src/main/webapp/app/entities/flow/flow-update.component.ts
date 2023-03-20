@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
 import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
-import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 
 @Component({
     selector: 'jhi-flow-update',
@@ -25,12 +25,12 @@ export class FlowUpdateComponent implements OnInit {
         LogLevelType.DEBUG
     ];
 
-    gateways: IGateway[];
+    integrations: IIntegration[];
 
     constructor(
 		protected alertService: AlertService,
         protected flowService: FlowService,
-        protected gatewayService: GatewayService,
+        protected integrationService: IntegrationService,
         protected activatedRoute: ActivatedRoute
     ) {}
 
@@ -39,9 +39,9 @@ export class FlowUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ flow }) => {
             this.flow = flow;
         });
-        this.gatewayService.query().subscribe(
-            (res: HttpResponse<IGateway[]>) => {
-                this.gateways = res.body;
+        this.integrationService.query().subscribe(
+            (res: HttpResponse<IIntegration[]>) => {
+                this.integrations = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -83,7 +83,7 @@ export class FlowUpdateComponent implements OnInit {
 		});
     }
 
-    trackGatewayById(index: number, item: IGateway) {
+    trackIntegrationById(index: number, item: IIntegration) {
         return item.id;
     }
 }

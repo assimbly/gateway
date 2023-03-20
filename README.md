@@ -1,6 +1,6 @@
 # Assimbly
 
-**Assimbly** is an integration gateway to create and run:
+**Assimbly** is an integration integration to create and run:
 
 * Dataflows
 * Camel Routes
@@ -14,15 +14,15 @@ Assimbly is powered by [Apache Camel](https://github.com/apache/camel) and [Apac
 
 ## Download
 
-Download it [here](https://github.com/assimbly/gateway/releases).
+Download it [here](https://github.com/assimbly/integration/releases).
 
 ## Getting started
 
-Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
+Create your first flow with the [Quick start guide](https://github.com/assimbly/integration/wiki/quick-start).
 
 ## Design
 
-The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
+The main [design](https://github.com/assimbly/integration/wiki/design) goals are:
 
 -   Web based: Run from any browser.
 -   Ease of use: Configure and manage integrations with ease.
@@ -30,17 +30,17 @@ The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 
 # Documentation
 
-You find documentation on the **[wiki](https://github.com/assimbly/gateway/wiki)**.
+You find documentation on the **[wiki](https://github.com/assimbly/integration/wiki)**.
 
 There you find pages like:
 
--   The [User guide](https://github.com/assimbly/gateway/wiki/user-guide)
--   Supported [components](https://github.com/assimbly/gateway/wiki/components)
+-   The [User guide](https://github.com/assimbly/integration/wiki/user-guide)
+-   Supported [components](https://github.com/assimbly/integration/wiki/components)
 
 ## Contribute
 
-If you like to contribute, please check the [contributing](https://github.com/assimbly/gateway/blob/master/CONTRIBUTING.md) page.
+If you like to contribute, please check the [contributing](https://github.com/assimbly/integration/blob/master/CONTRIBUTING.md) page.
 
 ## License
 
-This project is licensed under the Apache License - see the [LICENSE.md](https://github.com/assimbly/gateway/blob/master/LICENSE) file for details.
+This project is licensed under the Apache License - see the [LICENSE.md](https://github.com/assimbly/integration/blob/master/LICENSE) file for details.

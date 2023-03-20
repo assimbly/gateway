@@ -42,7 +42,7 @@ public class FlowDTO implements Serializable {
 
     private Instant lastModified;
 
-    private Long gatewayId;
+    private Long integrationId;
 
     private Set<Step> steps;
 
@@ -158,12 +158,12 @@ public class FlowDTO implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Long getGatewayId() {
-        return gatewayId;
+    public Long getintegrationId() {
+        return integrationId;
     }
 
-    public void setGatewayId(Long gatewayId) {
-        this.gatewayId = gatewayId;
+    public void setintegrationId(Long integrationId) {
+        this.integrationId = integrationId;
     }
 
     public Set<Step> getSteps() {
@@ -208,7 +208,7 @@ public class FlowDTO implements Serializable {
             ", parallelProcessing='" + isParallelProcessing() + "'" +
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
-            ", gateway=" + getGatewayId() +
+            ", integration=" + getintegrationId() +
             ", steps=" + getSteps() +
             "}";
     }

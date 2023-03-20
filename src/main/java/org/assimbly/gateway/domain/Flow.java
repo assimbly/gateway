@@ -69,7 +69,7 @@ public class Flow implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("flows")
-    private Gateway gateway;
+    private Integration integration;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Step> steps = new HashSet<>();
@@ -258,17 +258,17 @@ public class Flow implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Gateway getGateway() {
-        return gateway;
+    public Integration getIntegration() {
+        return integration;
     }
 
-    public Flow gateway(Gateway gateway) {
-        this.gateway = gateway;
+    public Flow integration(Integration integration) {
+        this.integration = integration;
         return this;
     }
 
-    public void setGateway(Gateway gateway) {
-        this.gateway = gateway;
+    public void setIntegration(Integration integration) {
+        this.integration = integration;
     }
 
     public Set<Step> getSteps() {

@@ -49,17 +49,17 @@ public class LogsResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @GetMapping(
-        path = "/logs/{gatewayid}/log/{lines}",
+        path = "/logs/{integrationid}/log/{lines}",
         produces = {MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
+    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long integrationId, @PathVariable int lines) throws Exception {
 
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
             String log = LogUtil.tail(file, lines);
-            return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getLog", log, true);
+            return ResponseUtil.createSuccessResponse(integrationId, mediaType, "getLog", log, true);
         } catch (Exception e) {
-            return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
+            return ResponseUtil.createFailureResponse(integrationId, mediaType, "getLog", e.getMessage());
         }
     }
 

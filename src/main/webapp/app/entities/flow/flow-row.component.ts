@@ -457,13 +457,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     for (const step of flow.steps) {
 
       if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
-        this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
+        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
           console.log('4. get stats' + JSON.stringify(res.body));
 
           this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
       }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
-        this.flowService.getFlowStats(flow.id, step.id, flow.gatewayId).subscribe(res => {
+        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
           this.setFlowStatistic(res.body, flow.id + '-' + step.id);
         });
 

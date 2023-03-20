@@ -7,7 +7,7 @@ import { StepModule } from './step/step.module';
 import { LinkModule } from './link/link.module';
 import { EnvironmentVariablesModule } from './environment-variables/environment-variables.module';
 import { FlowModule } from './flow/flow.module';
-import { GatewayModule } from './gateway/gateway.module';
+import { IntegrationModule } from './integration/integration.module';
 import { GroupModule } from './group/group.module';
 import { MessageModule } from './message/message.module';
 import { HeaderModule } from './header/header.module';
@@ -28,14 +28,14 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
 		CertificateModule,
         StepModule,
         LinkModule,
-		EnvironmentVariablesModule,
-		FlowModule,
-		GatewayModule,
+		    EnvironmentVariablesModule,
+		    FlowModule,
+		    IntegrationModule,
         GroupModule,
         MessageModule,
         HeaderModule,
         MaintenanceModule,
-		QueueModule,
+		    QueueModule,
         RouteModule,
         ConnectionModule,
         ConnectionKeysModule,
@@ -44,17 +44,17 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
     ],
   exports: [
         BrokerModule,
-		CertificateModule,
+		    CertificateModule,
         LinkModule,
         StepModule,
-		EnvironmentVariablesModule,
-		FlowModule,
-	    GatewayModule,
+    		EnvironmentVariablesModule,
+		    FlowModule,
+	      IntegrationModule,
         GroupModule,
         MessageModule,
         HeaderModule,
         MaintenanceModule,
-	    QueueModule,
+	      QueueModule,
         RouteModule,
         ConnectionModule,
         ConnectionKeysModule,

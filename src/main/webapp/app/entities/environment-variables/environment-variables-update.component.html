@@ -50,16 +50,16 @@
 
 
                 <div class="form-group">
-                    <label class="form-control-label" for="gateway">Gateway</label>
-                    <select *ngIf="gateways.length > 1; else oneGateway" class="form-control form-select" id="gateway"
-                            formControlName="gatewayId">
+                    <label class="form-control-label" for="integration">Integration</label>
+                    <select *ngIf="integrations.length > 1; else oneIntegration" class="form-control form-select" id="integration"
+                            formControlName="integrationId">
                         <option [ngValue]="null"></option>
-                        <option [ngValue]="gatewayOption.id"
-                                *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
+                        <option [ngValue]="integrationOption.id"
+                                *ngFor="let integrationOption of integrations; trackBy: trackIntegrationById">{{integrationOption.id}}</option>
                     </select>
-                    <ng-template #oneGateway><input type="text"
-                                                    class="form-control" id="gateway" readonly
-                                                    formControlName="gatewayId"/></ng-template>
+                    <ng-template #oneIntegration><input type="text"
+                                                    class="form-control" id="integration" readonly
+                                                    formControlName="integrationId"/></ng-template>
                 </div>
             </div>
             <div class="modal-footer">
