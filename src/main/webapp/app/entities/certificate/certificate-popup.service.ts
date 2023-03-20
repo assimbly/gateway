@@ -20,8 +20,8 @@ export class CertificatePopupService {
             }
 
             if (id) {
-                this.certificateService.find(id).subscribe(gateway => {
-                    this.ngbModalRef = this.gatewayModalRef(component, gateway.body);
+                this.certificateService.find(id).subscribe(integration => {
+                    this.ngbModalRef = this.gatewayModalRef(component, integration.body);
                     resolve(this.ngbModalRef);
                 });
             } else {

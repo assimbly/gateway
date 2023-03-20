@@ -42,10 +42,10 @@ public class ExportProperties {
 	private List<TreeMap<String, String>> propertiesList;
 
 	// Treemap get methods
-	public List<TreeMap<String, String>> getProperties(Long gatewayId) throws Exception {
+	public List<TreeMap<String, String>> getProperties(Long integrationId) throws Exception {
 
 		propertiesList = new ArrayList<>();
-		List<Flow> flows= flowRepository.findAllByGatewayId(gatewayId);
+		List<Flow> flows= flowRepository.findAllByIntegrationId(integrationId);
 
 		for (Flow flow : flows) {
 

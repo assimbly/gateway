@@ -5,26 +5,26 @@ import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayDeleteDialogComponent } from './gateway-delete-dialog.component';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { IntegrationDeleteDialogComponent } from './integration-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
-import { GatewayService } from './gateway.service';
+import { IntegrationService } from './integration.service';
 import { FlowService } from '../flow/flow.service';
 
 @Component({
-    selector: 'jhi-gateway',
-    templateUrl: './gateway.component.html'
+    selector: 'jhi-integration',
+    templateUrl: './integration.component.html'
 })
-export class GatewayComponent implements OnInit, OnDestroy {
-    gateways: IGateway[] = [];
+export class IntegrationComponent implements OnInit, OnDestroy {
+    integrations: IIntegration[] = [];
     currentAccount: any;
     eventSubscriber: Subscription;
-    restartGatewayMessage: string;
+    restartIntegrationMessage: string;
     modalRef: NgbModalRef | null;
 
     constructor(
         protected flowService: FlowService,
-        protected gatewayService: GatewayService,
+        protected integrationService: IntegrationService,
         protected alertService: AlertService,
         protected eventManager: EventManager,
         protected accountService: AccountService,
@@ -33,9 +33,9 @@ export class GatewayComponent implements OnInit, OnDestroy {
     ) {}
 
     loadAll() {
-        this.gatewayService.query().subscribe(
-            (res: HttpResponse<IGateway[]>) => {
-                this.gateways = res.body;
+        this.integrationService.query().subscribe(
+            (res: HttpResponse<IIntegration[]>) => {
+                this.integrations = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -46,24 +46,24 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
-        this.registerChangeInGateways();
+        this.registerChangeInIntegrations();
     }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: IGateway) {
+    trackId(index: number, item: IIntegration) {
         return item.id;
     }
 
-    registerChangeInGateways() {
-        this.eventSubscriber = this.eventManager.subscribe('gatewayListModification', response => this.loadAll());
+    registerChangeInIntegrations() {
+        this.eventSubscriber = this.eventManager.subscribe('integrationListModification', response => this.loadAll());
     }
 
-	delete(gateway: IGateway): void {
-		const modalRef = this.modalService.open(GatewayDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-		modalRef.componentInstance.gateway = gateway;
+	delete(integration: IIntegration): void {
+		const modalRef = this.modalService.open(IntegrationDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+		modalRef.componentInstance.integration = integration;
 		// unsubscribe not needed because closed completes on modal close
 		modalRef.closed.subscribe(reason => {
 		  if (reason === 'deleted') {
@@ -71,13 +71,13 @@ export class GatewayComponent implements OnInit, OnDestroy {
 		  }
 		});
 	}
-	
+
     openModal(templateRef: TemplateRef<any>) {
         this.modalRef = this.modalService.open(templateRef);
     }
 
-    openRestartGatewayModal(templateRef: TemplateRef<any>) {
-        this.restartGatewayMessage = '';
+    openRestartIntegrationModal(templateRef: TemplateRef<any>) {
+        this.restartIntegrationMessage = '';
         this.modalRef = this.modalService.open(templateRef);
     }
 
@@ -88,25 +88,25 @@ export class GatewayComponent implements OnInit, OnDestroy {
         }
     }
 
-    restartGateway(index: number) {
-        this.gatewayService.stop(index).subscribe(
+    restartIntegration(index: number) {
+        this.integrationService.stop(index).subscribe(
             (res: HttpResponse<string>) => {
-                this.startGateway(index);
+                this.startIntegration(index);
             },
             (res: HttpErrorResponse) => {
-                this.restartGatewayMessage = 'Assimbly Gateway failed to stop: ' + res.message;
+                this.restartIntegrationMessage = 'Assimbly Integration failed to stop: ' + res.message;
                 this.onError(res.message);
             }
         );
     }
 
-    startGateway(index: number) {
-        this.gatewayService.start(index).subscribe(
+    startIntegration(index: number) {
+        this.integrationService.start(index).subscribe(
             (res: HttpResponse<string>) => {
-                this.restartGatewayMessage = 'Assimbly Gateway is (re)started successful';
+                this.restartIntegrationMessage = 'Assimbly Integration is (re)started successful';
             },
             (res: HttpErrorResponse) => {
-                this.restartGatewayMessage = 'Assimbly Gateway failed to start: ' + res.message;
+                this.restartIntegrationMessage = 'Assimbly Integration failed to start: ' + res.message;
                 this.onError(res.message);
             }
         );
@@ -116,11 +116,11 @@ export class GatewayComponent implements OnInit, OnDestroy {
         this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,
-		});  
+		});
     }
 
     reset() {
-        this.gateways = [];
+        this.integrations = [];
         this.loadAll();
     }
 }

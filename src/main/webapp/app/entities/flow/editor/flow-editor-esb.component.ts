@@ -15,7 +15,7 @@ import { Connections } from "app/shared/camel/connections";
 import { Link, ILink } from "app/shared/model/link.model";
 import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
-import { Gateway } from "app/shared/model/gateway.model";
+import { Integration } from "app/shared/model/integration.model";
 import { IMessage } from 'app/shared/model/message.model';
 import { Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
@@ -25,7 +25,7 @@ import { map } from 'rxjs/operators';
 import { LinkService } from "../../link/link.service";
 import { StepService } from "../../step/step.service";
 import { MessageService } from '../../message/message.service';
-import { GatewayService } from "../../gateway/gateway.service";
+import { IntegrationService } from "../../integration/integration.service";
 import { RouteService } from "../../route/route.service";
 import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
@@ -75,11 +75,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	finished = false;
 
-	gateways: Gateway[];
-	configuredGateway: Gateway;
-	gatewayName: string;
-	singleGateway = false;
-	indexGateway: number;
+	integrations: Integration[];
+	configuredIntegration: Integration;
+	integrationName: string;
+	singleIntegration = false;
+	indexIntegration: number;
 
 	createRoute: number;
 	predicate: any;
@@ -148,7 +148,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private eventManager: EventManager,
-		private gatewayService: GatewayService,
+		private integrationService: IntegrationService,
 		private flowService: FlowService,
 		private stepService: StepService,
 		private linkService: LinkService,
@@ -200,12 +200,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.messageService.getAllMessages(),
 			this.routeService.getAllRoutes(),
       this.connectionService.getAllConnections(),
-			this.gatewayService.query(),
+			this.integrationService.query(),
 			this.stepService.query(),
-			this.flowService.getGatewayName(),
+			this.flowService.getIntegrationName(),
 		])
 			.subscribe(
-				([wikiDocUrl, camelDocUrl, messages, routes, connections, gateways, allsteps, gatewayName]) => {
+				([wikiDocUrl, camelDocUrl, messages, routes, connections, integrations, allsteps, integrationName]) => {
 
 					this.wikiDocUrl = wikiDocUrl.body;
 					this.camelDocUrl = camelDocUrl.body;
@@ -219,18 +219,18 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.connections = connections.body;
           this.connectionCreated = this.connections.length > 0;
 
-					this.gateways = gateways.body;
-					this.singleGateway = this.gateways.length === 1;
-					this.gatewayName = gatewayName.body;
+					this.integrations = integrations.body;
+					this.singleIntegration = this.integrations.length === 1;
+					this.integrationName = integrationName.body;
 
 					this.allsteps = allsteps.body;
 
-					if (this.singleGateway) {
-						this.indexGateway = 0;
+					if (this.singleIntegration) {
+						this.indexIntegration = 0;
 					} else {
-						this.indexGateway =
-							this.gateways.findIndex(
-								(gateway) => gateway.name === this.gatewayName,
+						this.indexIntegration =
+							this.integrations.findIndex(
+								(integration) => integration.name === this.integrationName,
 							);
 					}
 
@@ -240,8 +240,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 							.subscribe(
 								(flow) => {
 									this.flow = flow.body;
-									if (this.singleGateway) {
-										this.flow.gatewayId = this.gateways[this.indexGateway].id;
+									if (this.singleIntegration) {
+										this.flow.integrationId = this.integrations[this.indexIntegration].id;
 									}
 
 									this.initializeForm(this.flow);
@@ -281,19 +281,19 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								this.flow.maximumRedeliveries = 0;
 								this.flow.redeliveryDelay = 3000;
 								this.flow.logLevel = LogLevelType.OFF;
-								if (this.singleGateway) {
-									this.indexGateway = 0;
-									this.flow.gatewayId = this.gateways[this.indexGateway].id;
+								if (this.singleIntegration) {
+									this.indexIntegration = 0;
+									this.flow.integrationId = this.integrations[this.indexIntegration].id;
 								} else {
-									this.configuredGateway =
-										this.gateways.find(
-											(gateway) => gateway.name === this.gatewayName,
+									this.configuredIntegration =
+										this.integrations.find(
+											(integration) => integration.name === this.integrationName,
 										);
-									this.indexGateway =
-										this.gateways.findIndex(
-											(gateway) => gateway.name === this.gatewayName,
+									this.indexIntegration =
+										this.integrations.findIndex(
+											(integration) => integration.name === this.integrationName,
 										);
-									this.flow.gatewayId = this.configuredGateway.id;
+									this.flow.integrationId = this.configuredIntegration.id;
 								}
 
 								this.initializeForm(this.flow);
@@ -645,7 +645,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
 				redeliveryDelay: new FormControl(flow.redeliveryDelay),
 				logLevel: new FormControl(flow.logLevel),
-				gateway: new FormControl(flow.gatewayId),
+				integration: new FormControl(flow.integrationId),
 				stepsData: new FormArray([]),
 			});
 	}
@@ -706,7 +706,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			maximumRedeliveries: flow.maximumRedeliveries,
 			redeliveryDelay: flow.redeliveryDelay,
 			logLevel: flow.logLevel,
-			gateway: flow.gatewayId,
+			integration: flow.integrationId,
 		});
 	}
 
@@ -1282,7 +1282,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   createFlow(){
 
-		this.flow.gatewayId = this.gateways[0].id;
+		this.flow.integrationId = this.integrations[0].id;
 
 			this.flowService
 				.create(this.flow)
@@ -1381,7 +1381,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.flow.name = flowControls.name.value;
 		this.flow.logLevel = flowControls.logLevel.value;
 		this.flow.notes = flowControls.notes.value;
-		this.flow.gatewayId = flowControls.gateway.value;
+		this.flow.integrationId = flowControls.integration.value;
 
 		(<FormArray>flowControls.stepsData).controls.forEach(
 			(step, index) => {
@@ -1483,7 +1483,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       this.connectionTimeout = <FormGroup>this.testConnectionForm.controls.connectionTimeout.value;
 
       this.flowService
-        .testConnection(this.flow.gatewayId, this.connectionHost, this.connectionPort, this.connectionTimeout)
+        .testConnection(this.flow.integrationId, this.connectionHost, this.connectionPort, this.connectionTimeout)
         .subscribe(result => {
           this.testConnectionMessage = result.body;
         });

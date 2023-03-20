@@ -8,15 +8,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Flow} and its DTO {@link FlowDTO}.
  */
-@Mapper(componentModel = "spring", uses = {GatewayMapper.class, StepMapper.class})
+@Mapper(componentModel = "spring", uses = {IntegrationMapper.class, StepMapper.class})
 public interface FlowMapper extends EntityMapper<FlowDTO, Flow> {
 
-    @Mapping(source = "gateway.id", target = "gatewayId")
+    @Mapping(source = "integration.id", target = "integrationId")
     FlowDTO toDto(Flow flow);
 
     @Mapping(target = "steps", ignore = true)
 	@Mapping(target = "removeStep", ignore = true)
-	@Mapping(source = "gatewayId", target = "gateway")
+	@Mapping(source = "integrationId", target = "integration")
     Flow toEntity(FlowDTO flowDTO);
 
     default Flow fromId(Long id) {

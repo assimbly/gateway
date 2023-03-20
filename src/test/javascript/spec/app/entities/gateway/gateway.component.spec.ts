@@ -4,9 +4,9 @@ import { Observable, of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { GatewayTestModule } from '../../../test.module';
-import { GatewayComponent } from 'app/entities/gateway/gateway.component';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { GatewayComponent } from 'app/entities/integration/integration.component';
+import { GatewayService } from 'app/entities/integration/integration.service';
+import { Gateway } from 'app/shared/model/integration.model';
 
 describe('Component Tests', () => {
     describe('Gateway Management Component', () => {

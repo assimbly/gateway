@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,7 +28,7 @@ public class ImportXMLFlows {
     private final Logger log = LoggerFactory.getLogger(ImportXMLFlows.class);
 
     @Autowired
-    private GatewayRepository gatewayRepository;
+    private IntegrationRepository integrationRepository;
 
     @Autowired
 	private FlowRepository flowRepository;
@@ -48,8 +47,8 @@ public class ImportXMLFlows {
 
     public String uri;
 
-    private Gateway gateway;
-    private Optional<Gateway> gatewayOptional;
+    private Integration integration;
+    private Optional<Integration> integrationOptional;
 
     private Optional<Flow> flowOptional;
     private Flow flow;
@@ -109,7 +108,7 @@ public class ImportXMLFlows {
 		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
             flowOptional = flowRepository.findByName(flowName);
-			gatewayOptional = gatewayRepository.findById(integrationId);
+			integrationOptional = integrationRepository.findById(integrationId);
 
             if (!flowOptional.isPresent()) {
 				flow = new Flow();
@@ -122,11 +121,11 @@ public class ImportXMLFlows {
 				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
-            if (!gatewayOptional.isPresent()) {
-				return "unknown gateway";
+            if (!integrationOptional.isPresent()) {
+				return "unknown integration";
 			} else {
-				gateway = gatewayOptional.get();
-				flow.setGateway(gateway);
+				integration = integrationOptional.get();
+				flow.setIntegration(integration);
 			}
 
             flow.setName(ImportXMLUtil.setStringValue(flowName, flowId));

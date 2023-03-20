@@ -3,27 +3,27 @@ import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { GatewayService } from './gateway.service';
-import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
+import { IntegrationService } from './integration.service';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { IntegrationPopupService } from 'app/entities/integration/integration-popup.service';
 
 @Component({
-    selector: 'jhi-gateway-import-dialog',
-    templateUrl: './gateway-import-dialog.component.html'
+    selector: 'jhi-integration-import-dialog',
+    templateUrl: './integration-import-dialog.component.html'
 })
-export class GatewayImportDialogComponent implements AfterContentInit {
-    gatewayId: number;
-    gateways: Array<IGateway> = [];
+export class IntegrationImportDialogComponent implements AfterContentInit {
+    integrationId: number;
+    integrations: Array<IIntegration> = [];
     xmlConfiguration: any;
     fileName = 'Choose file';
     importError = false;
 
-    constructor(private eventManager: EventManager, private gatewayService: GatewayService, public activeModal: NgbActiveModal) {}
+    constructor(private eventManager: EventManager, private integrationService: IntegrationService, public activeModal: NgbActiveModal) {}
 
     ngAfterContentInit() {
-        this.gatewayService.query().subscribe(res => {
-            this.gateways = res.body;
-            this.gatewayId = this.gateways[0].id;
+        this.integrationService.query().subscribe(res => {
+            this.integrations = res.body;
+            this.integrationId = this.integrations[0].id;
         });
     }
 
@@ -41,11 +41,11 @@ export class GatewayImportDialogComponent implements AfterContentInit {
     }
 
     importConfiguration() {
-        this.gatewayService.setGatewayConfiguration(this.gatewayId, this.xmlConfiguration).subscribe(
+        this.integrationService.setIntegrationConfiguration(this.integrationId, this.xmlConfiguration).subscribe(
             data => {
                 this.importError = false;
                 this.activeModal.dismiss(true);
-			    this.eventManager.broadcast(new EventWithContent('gatewayListModification', 'OK'));
+			    this.eventManager.broadcast(new EventWithContent('integrationListModification', 'OK'));
             },
             err => {
                 this.importError = true;

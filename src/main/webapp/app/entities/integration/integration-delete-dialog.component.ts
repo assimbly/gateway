@@ -4,18 +4,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
-import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayService } from './gateway.service';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { IntegrationService } from './integration.service';
 
 @Component({
-    selector: 'jhi-gateway-delete-dialog',
-    templateUrl: './gateway-delete-dialog.component.html'
+    selector: 'jhi-integration-delete-dialog',
+    templateUrl: './integration-delete-dialog.component.html'
 })
-export class GatewayDeleteDialogComponent {
-    gateway: IGateway;
+export class IntegrationDeleteDialogComponent {
+    integration: IIntegration;
 
     constructor(
-        protected gatewayService: GatewayService,
+        protected integrationService: IntegrationService,
         public activeModal: NgbActiveModal,
         protected eventManager: EventManager,
         protected router: Router
@@ -26,8 +26,8 @@ export class GatewayDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.gatewayService.delete(id).subscribe(response => {
-		    this.eventManager.broadcast(new EventWithContent('gatewayListModification', 'Deleted a gateway'));
+        this.integrationService.delete(id).subscribe(response => {
+		    this.eventManager.broadcast(new EventWithContent('integrationListModification', 'Deleted a integration'));
             this.activeModal.dismiss(true);
         });
     }

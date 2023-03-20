@@ -4,12 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { Gateway } from 'app/shared/model/gateway.model';
+import { Integration } from 'app/shared/model/integration.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { IBroker } from 'app/shared/model/broker.model';
 import { Components } from 'app//shared/camel/component-type';
 
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 import { BrokerService } from 'app/entities/broker/broker.service';
 
 import dayjs from 'dayjs/esm';
@@ -64,7 +64,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     isSaving: boolean;
     finished = false;
 
-    gateways: Gateway[];
+    integrations: Integration[];
 
     createRoute: number;
     predicate: any;
@@ -87,7 +87,7 @@ export class BrokerMessageSenderComponent implements OnInit {
     modalRef: NgbModalRef | null;
 
     constructor(
-        private gatewayService: GatewayService,
+        private integrationService: IntegrationService,
         private brokerService: BrokerService,
         private alertService: AlertService,
         private formBuilder: FormBuilder,
@@ -557,5 +557,5 @@ export class BrokerMessageSenderComponent implements OnInit {
             }
         }
     }
-	
+
 }

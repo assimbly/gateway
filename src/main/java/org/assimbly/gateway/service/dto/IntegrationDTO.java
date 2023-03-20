@@ -7,9 +7,9 @@ import org.assimbly.gateway.domain.enumeration.ConnectorType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 
 /**
- * A DTO for the Gateway entity.
+ * A DTO for the Integration entity.
  */
-public class GatewayDTO implements Serializable {
+public class IntegrationDTO implements Serializable {
 
     private Long id;
 
@@ -110,11 +110,11 @@ public class GatewayDTO implements Serializable {
             return false;
         }
 
-        GatewayDTO gatewayDTO = (GatewayDTO) o;
-        if (gatewayDTO.getId() == null || getId() == null) {
+        IntegrationDTO integrationDTO = (IntegrationDTO) o;
+        if (integrationDTO.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), gatewayDTO.getId());
+        return Objects.equals(getId(), integrationDTO.getId());
     }
 
     @Override
@@ -124,7 +124,7 @@ public class GatewayDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "GatewayDTO{" +
+        return "IntegrationDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +

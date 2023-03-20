@@ -62,7 +62,7 @@ public class FlowServiceImpl implements FlowService {
             .map(flowMapper::toDto);
     }
 
-    
+
     /**
      * Get all the flows.
      *
@@ -71,11 +71,11 @@ public class FlowServiceImpl implements FlowService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid) {
+    public Page<FlowDTO> findAllByIntegrationId(Pageable pageable, Long integrationId) {
         log.debug("Request to get all Flows");
-        return flowRepository.findAllByGatewayId(pageable, gatewayid).map(flowMapper::toDto);
-    }    
-    
+        return flowRepository.findAllByIntegrationId(pageable, integrationId).map(flowMapper::toDto);
+    }
+
 
     /**
      * Get one flow by id.
@@ -101,6 +101,6 @@ public class FlowServiceImpl implements FlowService {
         log.debug("Request to delete Flow : {}", id);
         flowRepository.deleteById(id);
     }
-    
+
 
 }

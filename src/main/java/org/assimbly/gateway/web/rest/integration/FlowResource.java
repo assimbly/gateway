@@ -124,18 +124,18 @@ public class FlowResource {
     }
 
     /**
-     * GET  /flows/bygatewayid/:gatewayid : get all the flows for a specific gateway (by gatewaId).
+     * GET  /flows/byintegrationid/:integrationid : get all the flows for a specific integration (by integrationId).
      *
-     * @param gatewayid
+     * @param integrationid
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
+    @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long gatewayid
+        @PathVariable Long integrationid
     ) {
-        log.debug("REST request to get a page of flows by gatewayid");
-        Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
+        log.debug("REST request to get a page of flows by integrationid");
+        Page<FlowDTO> page = flowService.findAllByIntegrationId(pageable, integrationid);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -172,7 +172,7 @@ public class FlowResource {
     public void init() throws Exception {
         log.info("Start runtime");
         initIntegration();
-        
+
 		log.info("Starting flows");
 		startFlows();
     }

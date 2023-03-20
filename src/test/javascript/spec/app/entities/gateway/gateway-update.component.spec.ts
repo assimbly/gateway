@@ -4,9 +4,9 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { GatewayUpdateComponent } from 'app/entities/gateway/gateway-update.component';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { GatewayUpdateComponent } from 'app/entities/integration/integration-update.component';
+import { GatewayService } from 'app/entities/integration/integration.service';
+import { Gateway } from 'app/shared/model/integration.model';
 
 describe('Component Tests', () => {
     describe('Gateway Management Update Component', () => {
@@ -34,7 +34,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new Gateway(123);
                     spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.gateway = entity;
+                    comp.integration = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async
@@ -51,7 +51,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new Gateway();
                     spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.gateway = entity;
+                    comp.integration = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async

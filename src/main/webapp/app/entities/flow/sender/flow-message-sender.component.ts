@@ -5,7 +5,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { Gateway } from 'app/shared/model/gateway.model';
+import { Integration } from 'app/shared/model/integration.model';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from '../flow.service';
 
@@ -18,7 +18,7 @@ import { IMessage } from 'app/shared/model/message.model';
 import { StepService } from '../../step/step.service';
 import { ConnectionService } from '../../connection/connection.service';
 import { MessageService } from 'app/entities/message/message.service';
-import { GatewayService } from '../../gateway/gateway.service';
+import { IntegrationService } from '../../integration/integration.service';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Components } from 'app/shared/camel/component-type';
@@ -83,7 +83,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     savingFlowSuccessMessage = 'Flow successfully saved';
     finished = false;
 
-    gateways: Gateway[];
+    integrations: Integration[];
 
     embeddedBroker = false;
     createRoute: number;
@@ -144,7 +144,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     constructor(
         private eventManager: EventManager,
-        private gatewayService: GatewayService,
+        private integrationService: IntegrationService,
         private flowService: FlowService,
         private stepService: StepService,
         private connectionService: ConnectionService,

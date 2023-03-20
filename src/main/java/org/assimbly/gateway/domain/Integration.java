@@ -17,12 +17,12 @@ import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.ConnectorType;
 
 /**
- * A Gateway.
+ * A Integration.
  */
 @Entity
-@Table(name = "gateway")
+@Table(name = "integration")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Gateway implements Serializable {
+public class Integration implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,17 +57,17 @@ public class Gateway implements Serializable {
     @Column(name = "default_error_component_type")
     private String defaultErrorComponentType;
 
-    @OneToMany(mappedBy = "gateway")
+    @OneToMany(mappedBy = "integration")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Flow> flows = new HashSet<>();
 
-    @OneToMany(mappedBy = "gateway")
+    @OneToMany(mappedBy = "integration")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<EnvironmentVariables> environmentVariables = new HashSet<>();
 
     //@ManyToMany
     //private Set<Group> groups = new HashSet<>();
-    
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -81,7 +81,7 @@ public class Gateway implements Serializable {
         return name;
     }
 
-    public Gateway name(String name) {
+    public Integration name(String name) {
         this.name = name;
         return this;
     }
@@ -94,7 +94,7 @@ public class Gateway implements Serializable {
         return type;
     }
 
-    public Gateway type(GatewayType type) {
+    public Integration type(GatewayType type) {
         this.type = type;
         return this;
     }
@@ -107,7 +107,7 @@ public class Gateway implements Serializable {
         return environmentName;
     }
 
-    public Gateway environmentName(String environmentName) {
+    public Integration environmentName(String environmentName) {
         this.environmentName = environmentName;
         return this;
     }
@@ -120,7 +120,7 @@ public class Gateway implements Serializable {
         return stage;
     }
 
-    public Gateway stage(EnvironmentType stage) {
+    public Integration stage(EnvironmentType stage) {
         this.stage = stage;
         return this;
     }
@@ -133,7 +133,7 @@ public class Gateway implements Serializable {
         return connectorType;
     }
 
-    public Gateway connectorType(ConnectorType connectorType) {
+    public Integration connectorType(ConnectorType connectorType) {
         this.connectorType = connectorType;
         return this;
     }
@@ -146,7 +146,7 @@ public class Gateway implements Serializable {
         return defaultFromComponentType;
     }
 
-    public Gateway defaultFromComponentType(String defaultFromComponentType) {
+    public Integration defaultFromComponentType(String defaultFromComponentType) {
         this.defaultFromComponentType = defaultFromComponentType;
         return this;
     }
@@ -159,7 +159,7 @@ public class Gateway implements Serializable {
         return defaultToComponentType;
     }
 
-    public Gateway defaultToComponentType(String defaultToComponentType) {
+    public Integration defaultToComponentType(String defaultToComponentType) {
         this.defaultToComponentType = defaultToComponentType;
         return this;
     }
@@ -172,7 +172,7 @@ public class Gateway implements Serializable {
         return defaultErrorComponentType;
     }
 
-    public Gateway defaultErrorComponentType(String defaultErrorComponentType) {
+    public Integration defaultErrorComponentType(String defaultErrorComponentType) {
         this.defaultErrorComponentType = defaultErrorComponentType;
         return this;
     }
@@ -185,20 +185,20 @@ public class Gateway implements Serializable {
         return flows;
     }
 
-    public Gateway flows(Set<Flow> flows) {
+    public Integration flows(Set<Flow> flows) {
         this.flows = flows;
         return this;
     }
 
-    public Gateway addFlow(Flow flow) {
+    public Integration addFlow(Flow flow) {
         this.flows.add(flow);
-        flow.setGateway(this);
+        flow.setIntegration(this);
         return this;
     }
 
-    public Gateway removeFlow(Flow flow) {
+    public Integration removeFlow(Flow flow) {
         this.flows.remove(flow);
-        flow.setGateway(null);
+        flow.setIntegration(null);
         return this;
     }
 
@@ -210,20 +210,20 @@ public class Gateway implements Serializable {
         return environmentVariables;
     }
 
-    public Gateway environmentVariables(Set<EnvironmentVariables> environmentVariables) {
+    public Integration environmentVariables(Set<EnvironmentVariables> environmentVariables) {
         this.environmentVariables = environmentVariables;
         return this;
     }
 
-    public Gateway addEnvironmentVariables(EnvironmentVariables environmentVariables) {
+    public Integration addEnvironmentVariables(EnvironmentVariables environmentVariables) {
         this.environmentVariables.add(environmentVariables);
-        environmentVariables.setGateway(this);
+        environmentVariables.setIntegration(this);
         return this;
     }
 
-    public Gateway removeEnvironmentVariables(EnvironmentVariables environmentVariables) {
+    public Integration removeEnvironmentVariables(EnvironmentVariables environmentVariables) {
         this.environmentVariables.remove(environmentVariables);
-        environmentVariables.setGateway(null);
+        environmentVariables.setIntegration(null);
         return this;
     }
 
@@ -231,33 +231,6 @@ public class Gateway implements Serializable {
         this.environmentVariables = environmentVariables;
     }
 
-    /*
-    public Set<Group> getGroups() {
-        return groups;
-    }
-
-    public Gateway groups(Set<Group> groups) {
-        this.groups = groups;
-        return this;
-    }
-
-    public Gateway addGroup(Group group) {
-        this.groups.add(group);
-        group.getGateways().add(this);
-        return this;
-    }
-
-    public Gateway removeGroup(Group group) {
-        this.groups.remove(group);
-        group.getGateways().remove(this);
-        return this;
-    }
-
-    public void setGroup(Set<Group> groups) {
-        this.groups = groups;
-    }
-    */
-    
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -268,11 +241,11 @@ public class Gateway implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Gateway gateway = (Gateway) o;
-        if (gateway.getId() == null || getId() == null) {
+        Integration integration = (Integration) o;
+        if (integration.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), gateway.getId());
+        return Objects.equals(getId(), integration.getId());
     }
 
     @Override
@@ -282,7 +255,7 @@ public class Gateway implements Serializable {
 
     @Override
     public String toString() {
-        return "Gateway{" +
+        return "integration{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
