@@ -60,4 +60,16 @@ export class IntegrationService {
         };
         return this.http.post(`${this.resourceUrl}/${integrationid}/updatebackup/${frequency}`, url, options);
     }
+
+    addCollector(integrationid, collectorid, collection){
+        const options = {
+            headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/json', Accept: 'application/json' })
+        };
+        return this.http.post(`${this.integrationUrl}/${integrationid}/collector/${collectorid}/add`, collection, options);
+    }
+
+    removeCollector(integrationid, collectorid){
+          return this.http.delete(`${this.integrationUrl}/${integrationid}/collector/${collectorid}/remove`, { responseType: 'text' });
+    }
+
 }
