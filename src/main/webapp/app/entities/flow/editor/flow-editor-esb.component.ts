@@ -55,7 +55,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	public logLevelListType = [
 		LogLevelType.OFF,
-		LogLevelType.ON,
+		LogLevelType.TRACE,
 	];
 
 	panelCollapsed: any = "uno";
@@ -1028,23 +1028,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  createOrEditMessage(step, formHeader: FormControl): void {
+  createOrEditMessage(step, formMessage: FormControl): void {
 
-    step.messageId = formHeader.value;
+    step.messageId = formMessage.value;
+
+   let modalRef;
 
     if (typeof step.messageId === 'undefined' || step.messageId === null || !step.messageId) {
-      this.modalRefPromise = this.MessagePopupService.open(MessageDialogComponent as Component);
+      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component);
     }else{
-      this.modalRefPromise = this.MessagePopupService.open(MessageDialogComponent as Component, step.messageId);
+      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component, step.messageId);
     }
 
-    this.modalRefPromise.then(res => {
+    modalRef.then(res => {
         res.result.then(
           result => {
-            this.setMessage(step, result.id, formHeader);
+            this.setMessage(step, result.id, formMessage);
           },
           reason => {
-            this.setMessage(step, reason.id, formHeader);
+            this.setMessage(step, reason.id, formMessage);
           }
         );
     },(reason)=>{
@@ -1053,16 +1055,16 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  setMessage(step, id, formHeader: FormControl): void {
-    this.messageService.getAllMessages().subscribe(
+  setMessage(step, id, formMessage: FormControl): void {
+
+    this.messageService
+      .getAllMessages()
+      .subscribe(
       res => {
         this.messages = res.body;
         this.messageCreated = this.messages.length > 0;
         step.messageId = id;
-
-        if (formHeader.value === null) {
-          formHeader.patchValue(id);
-        }
+        formMessage.patchValue(id);
         step = null;
       },
       res => this.onError(res.body)

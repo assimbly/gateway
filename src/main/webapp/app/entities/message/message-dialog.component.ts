@@ -60,7 +60,7 @@ export class MessageDialogComponent implements OnInit {
     } else {
       const hk = new Header();
       hk.type = this.typeHeader[0];
-      hk.type = this.languageHeader[0];
+      hk.language = this.languageHeader[0];
       this.headers.push(hk);
       this.message.id = cloneHeader ? null : this.message.id;
     }

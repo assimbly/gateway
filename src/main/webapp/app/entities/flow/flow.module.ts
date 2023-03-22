@@ -28,6 +28,7 @@ import { FlowService } from 'app/entities/flow/flow.service';
 
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
+import { Collectors } from 'app/shared/collect/collectors';
 
 const ENTITY_STATES = [...flowRoute];
 

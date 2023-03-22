@@ -1,11 +1,14 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Flow, IFlow } from 'app/shared/model/flow.model';
+import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
 import { Step, StepType } from 'app/shared/model/step.model';
 import { StepService } from '../step/step.service';
+import { IntegrationService } from "../integration/integration.service";
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+
+import { Collectors } from 'app/shared/collect/collectors';
 
 import { NavigationEnd, Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -74,6 +77,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   flowRowID: string;
   flowRowErrorStepID: string;
 
+  filter: Filter;
+
   statusMessage: any;
 
   statsTableRows: Array<string> = [];
@@ -102,10 +107,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   constructor(
     private flowService: FlowService,
     private stepService: StepService,
+		private integrationService: IntegrationService,
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	private webSocketsService: WebSocketsService
+	  private webSocketsService: WebSocketsService,
+	  private collectors: Collectors
   ) {
 
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
@@ -417,7 +424,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   exportFlow(){
-    console.log('export flow');
     this.flowService.exportFlowConfiguration(this.flow);
   }
 
@@ -458,8 +464,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
       if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
         this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
-          console.log('4. get stats' + JSON.stringify(res.body));
-
           this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
       }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
@@ -744,12 +748,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    if(this.flow.logLevel === LogLevelType.TRACE){
+      this.enableTracing();
+    }
+
     this.flowService.getConfiguration(this.flow.id).subscribe(
       data => {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
           this.flowService.start(this.flow.id).subscribe(
             response => {
               if (response.status === 200) {
+                // below is only used for tested (by default websockets is used)
                 // this.setFlowStatus('started');
               }
               this.disableActionBtns = false;
@@ -829,6 +838,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    if(this.flow.logLevel === LogLevelType.OFF){
+      this.disableTracing();
+    }
+
     this.flowService.getConfiguration(this.flow.id).subscribe(
       data => {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
@@ -860,6 +873,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    this.disableTracing();
+
     this.flowService.stop(this.flow.id).subscribe(
       response => {
         if (response.status === 200) {
@@ -874,6 +889,45 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.disableActionBtns = false;
       }
     );
+  }
+
+  enableTracing(){
+
+      const collector = this.collectors.tracing;
+      const sourceStep = this.steps.find(step => step.stepType === 'SOURCE');
+      const sinkStep = this.steps.find(step => step.stepType === 'SINK');
+      const sourceStepId = this.flow.id.toString() + '-' + sourceStep.id.toString();
+      const sinkStepId = this.flow.id.toString() + '-' + sinkStep.id.toString();
+
+      const filters: Array<any> = [];
+      filters.push(new Filter(sourceStepId,sourceStepId));
+      filters.push(new Filter(sinkStepId,sinkStepId));
+
+      collector.id = this.flow.id.toString();
+      collector.filters = filters;
+
+      this.integrationService.addCollector('1',collector.id,collector).subscribe(
+        response => {
+          //console.log('ok configured' + JSON.stringify(response));
+        },
+        err => {
+          console.log('Failed to configure tracing: ' + err);
+        }
+      );
+
+  }
+
+  disableTracing(){
+
+   this.integrationService.removeCollector('1',this.flow.id).subscribe(
+        response => {
+          //console.log('2. Removed' + response);
+        },
+        err => {
+          console.log('Failed to remove tracing: ' + JSON.stringify(err));
+        }
+      );
+
   }
 
   receive(): Subject<string> {
@@ -929,4 +983,14 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
+}
+
+export class Filter {
+  id: string;
+  filter: string;
+
+    constructor(id: string, filter: string) {
+      this.id = id;
+      this.filter = filter;
+    }
 }
