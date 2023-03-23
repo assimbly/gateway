@@ -52,6 +52,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
   public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+  public componentsWithConnection: Array<any> = ['amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq'];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -506,6 +507,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.enableMessage[stepFormIndex] = true;
         }else{
           this.enableMessage[stepFormIndex] = false;
+        }
+
+        if(this.componentsWithConnection.includes(componentType)){
+          this.enableConnection[stepFormIndex] = true;
+        }else{
+          this.enableConnection[stepFormIndex] = false;
         }
 
     }
