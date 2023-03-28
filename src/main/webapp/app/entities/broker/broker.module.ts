@@ -22,7 +22,7 @@ import { brokerRoute } from './broker.route';
 //import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { FlowComponent } from 'app/entities/flow/flow.component';
-import { MessageSortByHeaderKeyPipePipe } from 'app/entities/broker/message.sortbyheaderkey.pipe';
+import { MessageSortByHeaderPipePipe } from 'app/entities/broker/message.sortbyheader.pipe';
 
 const ENTITY_STATES = [...brokerRoute];
 
@@ -47,7 +47,7 @@ const ENTITY_STATES = [...brokerRoute];
     BrokerMessageSenderComponent,
     BrokerMessageBrowserComponent,
     MessageSearchByMessageIdPipe,
-    MessageSortByHeaderKeyPipePipe,
+    MessageSortByHeaderPipePipe,
   ],
   entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], 

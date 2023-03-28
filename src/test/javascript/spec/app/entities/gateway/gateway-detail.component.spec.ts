@@ -4,14 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { GatewayDetailComponent } from 'app/entities/gateway/gateway-detail.component';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { GatewayDetailComponent } from 'app/entities/integration/integration-detail.component';
+import { Gateway } from 'app/shared/model/integration.model';
 
 describe('Component Tests', () => {
     describe('Gateway Management Detail Component', () => {
         let comp: GatewayDetailComponent;
         let fixture: ComponentFixture<GatewayDetailComponent>;
-        const route = ({ data: of({ gateway: new Gateway(123) }) } as any) as ActivatedRoute;
+        const route = ({ data: of({ integration: new Gateway(123) }) } as any) as ActivatedRoute;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -33,7 +33,7 @@ describe('Component Tests', () => {
                 comp.ngOnInit();
 
                 // THEN
-                expect(comp.gateway).toEqual(jasmine.objectContaining({ id: 123 }));
+                expect(comp.integration).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });

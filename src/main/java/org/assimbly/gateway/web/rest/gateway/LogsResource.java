@@ -9,6 +9,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,15 +48,18 @@ public class LogsResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @GetMapping(path = "/logs/{gatewayid}/log/{lines}", produces = {"text/plain"})
-    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long gatewayid, @PathVariable int lines) throws Exception {
+    @GetMapping(
+        path = "/logs/{integrationid}/log/{lines}",
+        produces = {MediaType.TEXT_PLAIN_VALUE}
+    )
+    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long integrationId, @PathVariable int lines) throws Exception {
 
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
             String log = LogUtil.tail(file, lines);
-            return ResponseUtil.createSuccessResponse(gatewayid, mediaType, "getLog", log, true);
+            return ResponseUtil.createSuccessResponse(integrationId, mediaType, "getLog", log, true);
         } catch (Exception e) {
-            return ResponseUtil.createFailureResponse(gatewayid, mediaType, "getLog", e.getMessage());
+            return ResponseUtil.createFailureResponse(integrationId, mediaType, "getLog", e.getMessage());
         }
     }
 

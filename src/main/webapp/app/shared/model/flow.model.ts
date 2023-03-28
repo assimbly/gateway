@@ -11,13 +11,12 @@ export interface IFlow {
     type?: string;
     loadBalancing?: boolean;
     parallelProcessing?: boolean;
-    assimblyHeaders?: boolean;
     instances?: number;
     version?: number;
     created?: dayjs.Dayjs;
     lastModified?: dayjs.Dayjs;
     logLevel?: LogLevelType;
-    gatewayId?: number;
+    integrationId?: number;
     steps?: IStep[];
 }
 
@@ -32,24 +31,23 @@ export class Flow implements IFlow {
         public type?: string,
         public loadBalancing?: boolean,
         public parallelProcessing?: boolean,
-        public assimblyHeaders?: boolean,
         public instances?: number,
         public version?: number,
         public created?: dayjs.Dayjs,
         public lastModified?: dayjs.Dayjs,
         public logLevel?: LogLevelType,
-        public gatewayId?: number,
+        public integrationId?: number,
         public steps?: IStep[]
     ) {
         this.autoStart = this.autoStart || false;
         this.loadBalancing = this.loadBalancing || false;
         this.parallelProcessing = this.parallelProcessing || true;
-        this.assimblyHeaders = this.assimblyHeaders || true;
     }
 }
 
 export const enum LogLevelType {
     OFF = 'OFF',
+    ON = 'ON',
     INFO = 'INFO',
     WARN = 'WARN',
     ERROR = 'ERROR',

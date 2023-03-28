@@ -4,9 +4,9 @@ import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { IMessage } from 'app/shared/model/messsage.model';
+import { IMessage } from 'app/shared/model/message.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
@@ -14,26 +14,33 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IBroker } from 'app/shared/model/broker.model';
 
-import { IHeaderKeys } from 'app/shared/model/header-keys.model';
+import { IHeader } from 'app/shared/model/header.model';
+
+import { ViewChild } from '@angular/core'
+import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 
 @Component({
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
+
+  @ViewChild('codeEditor') private codeEditor: CodemirrorComponent;
+
   messages: IMessage[];
   message: IMessage;
   selectedMessage: IMessage = {};
   selectedHighlight: string;
   allMessages: any;
   headers: any;
-  headerKeys: IHeaderKeys[];
+  headerKeys: IHeader[];
 
   brokers: IBroker[];
   brokerType: string;
   endpointName: string;
   endpointType: string;
   targetEndpointName: string;
+
 
   currentAccount: any;
   eventSubscriber: Subscription;
@@ -56,6 +63,8 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   descending = false;
   ascending = true;
   subtitle: string;
+
+  editorMode: any = 'text';
 
   objectKeys = Object.keys;
 
@@ -103,6 +112,16 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.eventManager.destroy(this.eventSubscriber);
   }
+
+  onNavChange(changeEvent: NgbNavChangeEvent) {
+  		console.log('nav changed');
+  		console.log(changeEvent);
+  		//this.selectedMessage.body = 'blabla';
+      //this.showMessage(this.message);
+      //document.getElementById("codemirror").click();
+      //this.subContent.nativeElement.click();
+      this.codeEditor.codeMirror.refresh()
+  	}
 
   loadMessages() {
     this.isLoading = true;
@@ -198,9 +217,9 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.selectedMessage = {};
         this.selectedMessage.messageid = message.messageid;
         this.selectedMessage.timestamp = message.timestamp;
-        this.selectedMessage.headers = message.headers;
-        this.selectedMessage.headerKeys = [];
-        this.selectedMessage.jmsHeaders = message.jmsHeaders;
+        this.selectedMessage.headers = this.getHeaders(message);
+        this.selectedMessage.header = [];
+        this.selectedMessage.jmsHeaders = this.getJMSHeaders(message);
         this.selectedMessage.body = this.getBody(message);
         this.selectedMessage.fileType = this.getFileType(this.selectedMessage.body);
       }
@@ -208,6 +227,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getBody(message: any) {
+
     let body = '';
 
     if (message.body) {
@@ -219,21 +239,30 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       body = new TextDecoder('shift-jis').decode(data.buffer);
     }
 
+    this.setEditorMode(body);
+
     return body;
   }
 
-  /*
-    getJMSHeaders(message: any){
+  getHeaders(message: any) {
 
-        const jmsHeaders = Object.keys(message).filter(key => key.startsWith('JMS'))
-            .reduce((obj, key) => {
-                obj[key] = message[key];
-                return obj;
-            }, {});
+      if(Object.keys(message.headers).length === 0){
+          return { "": ""};
+      }else{
+          return message.headers;
+      }
 
-        return jmsHeaders;
+  }
 
-    }*/
+  getJMSHeaders(message: any){
+
+      if(Object.keys(message.jmsHeaders).length === 0){
+          return { "": ""};
+      }else{
+          return message.jmsHeaders;
+      }
+
+  }
 
   private onError(errorMessage: string) {
     this.isLoading = false;
@@ -381,6 +410,20 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  setEditorContent(event: any){
+      console.log('set editor');
+  }
+
+    setEditorMode(str: any) {
+        if (str.startsWith('{') || str.startsWith('[')) {
+            this.editorMode = 'javascript';
+        } else if (str.startsWith('<') && str.endsWith('>')) {
+            this.editorMode = 'xml';
+        } else {
+            this.editorMode = 'text';
+        }
+    }
 
   timeConverter(UNIX_timestamp) {
     const a = new Date(UNIX_timestamp);

@@ -4,9 +4,9 @@ import { Observable, of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderComponent } from 'app/entities/header/header.component';
-import { HeaderService } from 'app/entities/header/header.service';
-import { Header } from 'app/shared/model/header.model';
+import { HeaderComponent } from 'app/entities/message/message.component';
+import { HeaderService } from 'app/entities/message/message.service';
+import { Header } from 'app/shared/model/message.model';
 
 describe('Component Tests', () => {
     describe('Header Management Component', () => {

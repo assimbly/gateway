@@ -4,9 +4,9 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderUpdateComponent } from 'app/entities/header/header-update.component';
-import { HeaderService } from 'app/entities/header/header.service';
-import { Header } from 'app/shared/model/header.model';
+import { HeaderUpdateComponent } from 'app/entities/message/message-update.component';
+import { HeaderService } from 'app/entities/message/message.service';
+import { Header } from 'app/shared/model/message.model';
 
 describe('Component Tests', () => {
     describe('Header Management Update Component', () => {
@@ -34,7 +34,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new Header(123);
                     spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.header = entity;
+                    comp.message = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async
@@ -51,7 +51,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new Header();
                     spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.header = entity;
+                    comp.message = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async

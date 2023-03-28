@@ -124,36 +124,22 @@ public class FlowResource {
     }
 
     /**
-     * GET  /flows/bygatewayid/:gatewayid : get all the flows for a specific gateway (by gatewaId).
+     * GET  /flows/byintegrationid/:integrationid : get all the flows for a specific integration (by integrationId).
      *
-     * @param gatewayid
+     * @param integrationid
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
+    @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long gatewayid
+        @PathVariable Long integrationid
     ) {
-        log.debug("REST request to get a page of flows by gatewayid");
-        Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
+        log.debug("REST request to get a page of flows by integrationid");
+        Page<FlowDTO> page = flowService.findAllByIntegrationId(pageable, integrationid);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    /*
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
-    public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
-    	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
-        List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
-        flows.sort(Comparator.comparing(Flow::getName));
-
-        for(Flow flow : flows) {
-        	System.out.println("Tname=" + flow.getName());
-        }
-
-       return flowMapper.toDto(flows);
-    }
-	*/
 
     /**
      * GET  /flows/:id : get the "id" flow.
@@ -184,10 +170,11 @@ public class FlowResource {
 
     @PostConstruct
     public void init() throws Exception {
-        System.out.println("begin init integration");
+        log.info("Start runtime");
         initIntegration();
-        System.out.println("end init integration");
-        startFlows();
+
+		log.info("Starting flows");
+		startFlows();
     }
 
 

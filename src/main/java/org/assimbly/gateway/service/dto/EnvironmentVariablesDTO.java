@@ -16,7 +16,7 @@ public class EnvironmentVariablesDTO implements Serializable {
 
     private Boolean encrypted;
 
-    private Long gatewayId;
+    private Long integrationId;
 
     public Long getId() {
         return id;
@@ -50,12 +50,12 @@ public class EnvironmentVariablesDTO implements Serializable {
         this.encrypted = encrypted;
     }
 
-    public Long getGatewayId() {
-        return gatewayId;
+    public Long getIntegrationId() {
+        return integrationId;
     }
 
-    public void setGatewayId(Long gatewayId) {
-        this.gatewayId = gatewayId;
+    public void setIntegrationId(Long integrationId) {
+        this.integrationId = integrationId;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class EnvironmentVariablesDTO implements Serializable {
             "id=" + getId() +
             ", key='" + getKey() + "'" +
             ", value='" + getValue() + "'" +
-            ", gateway=" + getGatewayId() +
+            ", integration=" + getIntegrationId() +
             "}";
     }
 }
