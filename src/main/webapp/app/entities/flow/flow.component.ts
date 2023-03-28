@@ -13,8 +13,8 @@ import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
-import { IGateway, GatewayType, EnvironmentType } from 'app/shared/model/gateway.model';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 
 import { WebSocketsService } from 'app/shared/websockets/websockets.service';
 
@@ -23,8 +23,8 @@ import { WebSocketsService } from 'app/shared/websockets/websockets.service';
   templateUrl: './flow.component.html',
 })
 export class FlowComponent implements OnInit, OnDestroy {
-  gateways: IGateway[];
-  gateway: IGateway;
+  integrations: IIntegration[];
+  integration: IIntegration;
   flows: IFlow[];
   flow: IFlow;
   currentAccount: any;
@@ -36,16 +36,16 @@ export class FlowComponent implements OnInit, OnDestroy {
   queryCount: any;
   reverse: any;
   totalItems = -1;
-  gatewayExists: boolean;
-  multipleGateways = false;
+  integrationExists: boolean;
+  multipleIntegrations = false;
   finished = false;
 
-  singleGatewayName: string;
-  singleGatewayId: number;
-  singleGatewayStage: string;
+  singleIntegrationName: string;
+  singleIntegrationId: number;
+  singleIntegrationStage: string;
 
-  configuredGateway: IGateway;
-  indexGateway: number;
+  configuredIntegration: IIntegration;
+  indexIntegration: number;
 
   flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
   selectedAction: string;
@@ -58,7 +58,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected eventManager: EventManager,
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
-    protected gatewayService: GatewayService,
+    protected integrationService: IntegrationService,
     protected router: Router,
 	private webSocketsService: WebSocketsService
   ) {
@@ -73,8 +73,8 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   loadFlows() {
-    if (this.gateways.length > 1) {
-      this.getFlowsForSelectedGateway(this.gateways[this.indexGateway].id);
+    if (this.integrations.length > 1) {
+      this.getFlowsForSelectedIntegration(this.integrations[this.indexIntegration].id);
     } else {
       this.flowService
         .query({
@@ -89,10 +89,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFlowsForSelectedGateway(event) {
+  getFlowsForSelectedIntegration(event) {
     let id = (event.target as HTMLSelectElement).value as string;
     this.flowService
-      .getFlowByGatewayId(Number(id), {
+      .getFlowByIntegrationId(Number(id), {
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort(),
@@ -116,14 +116,14 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.getGateways();
+    this.getIntegrations();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
 	  this.webSocketsService.connect();
     });
     this.finished = true;
     this.registerChangeInFlows();
-    this.registerChangeCreatedGateway();
+    this.registerChangeCreatedIntegration();
     this.registerDeletedFlows();
   }
 
@@ -137,58 +137,58 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventManager.destroy(this.eventSubscriber);
   }
 
-  getGateways(): void {
-    forkJoin(this.flowService.getGatewayName(), this.gatewayService.query()).subscribe(([gatewayName, gateways]) => {
-      this.gateways = gateways.body;
-      this.checkGatewayType(this.gateways, gatewayName.body);
+  getIntegrations(): void {
+    forkJoin(this.flowService.getIntegrationName(), this.integrationService.query()).subscribe(([integrationName, integrations]) => {
+      this.integrations = integrations.body;
+      this.checkIntegrationType(this.integrations, integrationName.body);
 
-      if (!this.gatewayExists) {
-        console.log('Creating gateway');
-        this.gateway = new Object();
-        this.gateway.name = gatewayName.body;
-        this.gateway.type = GatewayType.FULL;
-        this.gateway.environmentName = 'Dev1';
-        this.gateway.stage = EnvironmentType.DEVELOPMENT;
-        this.gateway.defaultFromComponentType = 'file';
-        this.gateway.defaultToComponentType = 'file';
-        this.gateway.defaultErrorComponentType = 'file';
+      if (!this.integrationExists) {
+        console.log('Creating integration');
+        this.integration = new Object();
+        this.integration.name = integrationName.body;
+        this.integration.type = GatewayType.FULL;
+        this.integration.environmentName = 'Dev1';
+        this.integration.stage = EnvironmentType.DEVELOPMENT;
+        this.integration.defaultFromComponentType = 'file';
+        this.integration.defaultToComponentType = 'file';
+        this.integration.defaultErrorComponentType = 'file';
 
-        this.gatewayService.create(this.gateway).subscribe(gateway => {
-          console.log('gateway created');
-          this.gateway = gateway.body;
-          this.gateways.push(this.gateway);
-          this.gatewayExists = true;
-          this.singleGatewayName = gateway.body.name;
-          this.singleGatewayId = gateway.body.id;
-          this.singleGatewayStage = gateway.body.stage ? gateway.body.stage.toString().toLowerCase() : '';
+        this.integrationService.create(this.integration).subscribe(integration => {
+          console.log('integration created');
+          this.integration = integration.body;
+          this.integrations.push(this.integration);
+          this.integrationExists = true;
+          this.singleIntegrationName = integration.body.name;
+          this.singleIntegrationId = integration.body.id;
+          this.singleIntegrationStage = integration.body.stage ? integration.body.stage.toString().toLowerCase() : '';
         });
       } else {
         this.loadFlows();
-        if (!this.multipleGateways) {
-          this.singleGatewayName = this.gateways[this.indexGateway].name;
-          this.singleGatewayId = this.gateways[this.indexGateway].id;
-          this.singleGatewayStage = this.gateways[this.indexGateway].stage
-            ? this.gateways[this.indexGateway].stage.toString().toLowerCase()
+        if (!this.multipleIntegrations) {
+          this.singleIntegrationName = this.integrations[this.indexIntegration].name;
+          this.singleIntegrationId = this.integrations[this.indexIntegration].id;
+          this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
+            ? this.integrations[this.indexIntegration].stage.toString().toLowerCase()
             : '';
         }
       }
     });
   }
 
-  checkGatewayType(gateways: IGateway[], gatewayName: String): void {
-    if (gatewayName === 'default') {
-      this.gatewayExists = gateways.length > 0;
-      this.indexGateway = 0;
-      this.multipleGateways = gateways.length > 1;
+  checkIntegrationType(integrations: IIntegration[], integrationName: String): void {
+    if (integrationName === 'default') {
+      this.integrationExists = integrations.length > 0;
+      this.indexIntegration = 0;
+      this.multipleIntegrations = integrations.length > 1;
     } else {
-      this.multipleGateways = false;
-      this.configuredGateway = gateways.find(gateway => gateway.name === gatewayName);
-      this.indexGateway = gateways.findIndex(gateway => gateway.name == gatewayName);
-      if (this.indexGateway > 0) {
-        this.gatewayExists = true;
+      this.multipleIntegrations = false;
+      this.configuredIntegration = integrations.find(integration => integration.name === integrationName);
+      this.indexIntegration = integrations.findIndex(integration => integration.name == integrationName);
+      if (this.indexIntegration > 0) {
+        this.integrationExists = true;
       } else {
-        this.gatewayExists = false;
-        this.indexGateway = 0;
+        this.integrationExists = false;
+        this.indexIntegration = 0;
       }
     }
   }
@@ -209,10 +209,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  registerChangeCreatedGateway() {
-    this.eventSubscriber = this.eventManager.subscribe('gatewayCreated', response => {
-      this.gatewayExists = false;
-      this.getGateways();
+  registerChangeCreatedIntegration() {
+    this.eventSubscriber = this.eventManager.subscribe('integrationCreated', response => {
+      this.integrationExists = false;
+      this.getIntegrations();
     });
   }
 
@@ -227,17 +227,11 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string, editorType: string): void {
-	if(editorType === 'connector'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }] );
-	}else if(editorType === 'esb'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
-	}else if(editorType === 'api'){
-		this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);	
-	}        
+	  this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);
   }
-  
+
   private onSuccess(data, headers) {
-    if (this.gateways.length === 1) {
+    if (this.integrations.length === 1) {
       this.links = this.parseLinks.parse(headers.get('link'));
     }
     this.flows = new Array<IFlow>();

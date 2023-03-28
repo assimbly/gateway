@@ -35,10 +35,10 @@ public class Export {
 	private String output;
 
 	// exports gateway to object (List of treemaps)
-	public List<TreeMap<String, String>> convertDBToConfiguration(Long gatewayId) throws Exception {
+	public List<TreeMap<String, String>> convertDBToConfiguration(Long integrationId) throws Exception {
 
 		propertiesList = new ArrayList<>();
-		propertiesList = exportProperties.getProperties(gatewayId);
+		propertiesList = exportProperties.getProperties(integrationId);
 
 		return propertiesList;
 	}
@@ -55,9 +55,9 @@ public class Export {
 	}
 
 	// exports gateway to XML, JSON or YAML format
-	public String convertDBToConfiguration(Long gatewayId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
+	public String convertDBToConfiguration(Long integrationId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
-		xmlConfiguration = exportXML.getXMLConfiguration(gatewayId);
+		xmlConfiguration = exportXML.getXMLConfiguration(integrationId);
 
 		if (mediaType.contains("json")) {
 			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
@@ -76,9 +76,9 @@ public class Export {
 	}
 
 	// exports gateway by flowids to XML, JSON or YAML format
-	public String convertDBToConfigurationByFlowIds(Long gatewayId, String mediaType, String flowids, boolean isPlaceHolderReplacement) throws Exception {
+	public String convertDBToConfigurationByFlowIds(Long integrationId, String mediaType, String flowids, boolean isPlaceHolderReplacement) throws Exception {
 
-		xmlConfiguration = exportXML.getXMLConfigurationByIds(gatewayId, flowids);
+		xmlConfiguration = exportXML.getXMLConfigurationByIds(integrationId, flowids);
 
 		if (mediaType.contains("json")) {
 			configuration = DocConverter.convertXmlToJson(xmlConfiguration);

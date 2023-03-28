@@ -31,9 +31,9 @@ public class Group implements Serializable {
     @ManyToMany(mappedBy = "groups")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JsonIgnore
-    private Set<Gateway> gateways = new HashSet<>();
+    private Set<Integration> integrations = new HashSet<>();
 	*/
-    
+
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "group_user",
@@ -64,33 +64,33 @@ public class Group implements Serializable {
     }
 
     /*
-    public Set<Gateway> getGateways() {
-        return gateways;
+    public Set<Integration> getIntegrations() {
+        return integrations;
     }
 
-    public Group gateways(Set<Gateway> gateways) {
-        this.gateways = gateways;
+    public Group integrations(Set<Integration> integrations) {
+        this.integrations = integrations;
         return this;
     }
 
 
-    public Group addGateway(Gateway gateway) {
-        this.gateways.add(gateway);
-        gateway.getGroups().add(this);
+    public Group addIntegration(Integration integration) {
+        this.integrations.add(integration);
+        integration.getGroups().add(this);
         return this;
     }
 
-    public Group removeGateway(Gateway gateway) {
-        this.gateways.remove(gateway);
-        gateway.getGroups().remove(this);
+    public Group removeIntegration(Integration integration) {
+        this.integrations.remove(integration);
+        integration.getGroups().remove(this);
         return this;
     }
 
-    public void setGateways(Set<Gateway> gateways) {
-        this.gateways = gateways;
+    public void setIntegrations(Set<Integration> integrations) {
+        this.integrations = integrations;
     }
 	*/
-    
+
     public Set<User> getUsers() {
         return users;
     }
@@ -113,7 +113,7 @@ public class Group implements Serializable {
         return this;
     }
 	*/
-    
+
     public void setUsers(Set<User> users) {
         this.users = users;
     }

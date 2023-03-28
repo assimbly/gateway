@@ -45,7 +45,7 @@ class MongoClientProvider implements Serializable {
      */
     private void init() {
         morphia = new Morphia();
-        morphia.mapPackage("world.dovetail.auth.domain");
+        morphia.mapPackage("org.assimbly.auth.domain");
 
         client = new MongoClient("flux-mongo", 27017);
     }

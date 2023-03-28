@@ -45,10 +45,10 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" for="field_header">Header</label>
-                    <select class="form-control form-select" id="field_header" name="header" [(ngModel)]="step.headerId" >
+                    <label class="form-control-label" for="field_message">Message</label>
+                    <select class="form-control form-select" id="field_messae" name="message" [(ngModel)]="step.messageId" >
                         <option [ngValue]="null"></option>
-                        <option [ngValue]="headerOption.id" *ngFor="let headerOption of headers; trackBy: trackHeaderById">{{headerOption.id}}</option>
+                        <option [ngValue]="message.id" *ngFor="let message of messages; trackBy: trackMessageById">{{message.id}}</option>
                     </select>
                 </div>
             </div>

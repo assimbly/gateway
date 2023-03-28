@@ -18,11 +18,6 @@ public class ImportXMLUtil {
     private static String xmlConfiguration;
     private final Logger log = LoggerFactory.getLogger(ImportXMLUtil.class);
 
-	public String options;
-	public String componentType;
-	public String uri;
-	public String configuration;
-
     public static Document getDocument(String mediaType, String configuration) throws Exception {
 
         if (mediaType.contains("json")) {

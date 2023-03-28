@@ -20,7 +20,6 @@ entity Flow {
 	loadBalancing Boolean,
 	parallelProcessing Boolean,
 	logLevel LogLevelType,
-	assimblyHeaders Boolean,
 	instances Integer,
 	version Integer,
 	created Instant,
@@ -34,6 +33,16 @@ entity Step {
     options TextBlob,
 }
 
+entity Link {
+    name String,
+    bound String,
+    transport String,
+    rule String,
+    expression String,
+    point String,
+    format String,
+    pattern String
+}
 
 entity Route {
 	name String,
@@ -59,14 +68,17 @@ entity ConnectionKeys {
 	type String
 }
 
-entity Header {
-	name String
+entity Message {
+	name String,
+	body TextBlob,
+	language String
 }
 
-entity HeaderKeys {
+entity Header {
 	key String,
 	value TextBlob,
-	type String
+	type String,
+	language String
 }
 
 entity EnvironmentVariables {
@@ -150,12 +162,16 @@ relationship OneToMany {
 	Flow{step} to Step
 }
 
+relationship OneToMany {
+	Step{link} to Link
+}
+
 relationship ManyToOne {
 	Step{connection} to Connection
 }
 
 relationship ManyToOne {
-	Step{header} to Header
+	Step{message} to Message
 }
 
 relationship OneToMany {
@@ -163,7 +179,7 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-	Header{headerKeys} to HeaderKeys
+	Message{message} to Header
 }
 
 relationship OneToOne {
