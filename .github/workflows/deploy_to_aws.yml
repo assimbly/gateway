@@ -1,0 +1,126 @@
+name: Build and push Docker image to AWS
+
+on:
+  push:
+    branches:
+      - 'aws-tests'
+
+jobs:
+  deploy_aws:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Configure cache for Maven
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurium'
+          cache: 'maven'
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        env:
+          MAVEN_USER: ${{ secrets.GITHUB_ACTOR }}
+          MAVEN_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          
+          repositories: >
+            [
+              {
+                "id": "maven",
+                "name": "Maven Central",
+                "url": "https://repo1.maven.org/maven2"
+              },
+              {
+                "id": "github",
+                "name": "Assimbly Base Repository",
+                "url": "https://maven.pkg.github.com/assimbly/base",
+                "snapshots": {
+                  "enabled": "true"
+                }
+              },
+              {
+                "id": "github",
+                "name": "Assimbly Runtime Repository",
+                "url": "https://maven.pkg.github.com/assimbly/runtime",
+                "snapshots": {
+                  "enabled": "true"
+                }
+              },
+              {
+                "id": "github",
+                "name": "Assimbly Custom-Components Repository",
+                "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                "snapshots": {
+                  "enabled": "true"
+                }
+              },
+              {
+                "id": "aurea",
+                "name": "Aurea Sonic Repository",
+                "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+              }
+            ]
+
+          servers: >
+            [
+              {
+                "id": "github",
+                "username": "$MAVEN_USER",
+                "password": "$MAVEN_TOKEN"
+              }
+            ]
+
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo "this is the path: $MAVEN_PATH"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+          cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build the docker image
+        env:
+          BUILD_TYPE: 'full'
+          VERSION_TAG: 'beta'
+          MAVEN_USER: ${{ secrets.GITHUB_ACTOR }}
+          MAVEN_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ $BUILD == true ]]; then
+            clear & ./gradlew clean bootJar jibDockerBuild -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -P$BUILD_TYPE -P$MAVEN_TOKEN -P$MAVEN_USER
+          fi
+
+          if [[ $BUILD == false ]]; then
+            echo "Skipped docker image build!"
+          fi
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          BUILD_TYPE: 'full'
+          VERSION_TAG: 'development'
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          ./gradlew clean bootJar jib -Djib.to.credHelper=ecr-login -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -P$BUILD_TYPE -Pfull
