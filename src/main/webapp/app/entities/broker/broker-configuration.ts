@@ -135,7 +135,7 @@ export const activemqBrokerConfiguration = `<beans
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" useJmx="true" dataDirectory="$\{activemq.data}">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" useJmx="true" dataDirectory="$\{activemq.data}/data">
 
         <!--
             For better performances use VM cursor and small memory limit.
@@ -199,7 +199,7 @@ export const activemqBrokerConfiguration = `<beans
             http://activemq.apache.org/persistence.html
         -->
         <persistenceAdapter>
-            <kahaDB directory="$\{activemq.data}/kahadb"/>
+            <kahaDB directory="$\{activemq.data}/data"/>
         </persistenceAdapter>
 
 
