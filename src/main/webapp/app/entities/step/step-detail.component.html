@@ -31,10 +31,10 @@
                         <a [routerLink]="['/flow', step.flowId, 'view']">{{step.flowId}}</a>
                     </div>
                 </dd>
-                <dt><span>Header ID</span></dt>
+                <dt><span>Message ID</span></dt>
                 <dd>
-                    <div *ngIf="step.headerId">
-                        <a [routerLink]="['/header', step.headerId, 'view']">{{step.headerId}}</a>
+                    <div *ngIf="step.messageId">
+                        <a [routerLink]="['/message', step.messageId, 'view']">{{step.messageId}}</a>
                     </div>
                 </dd>
                 <dt><span>Route ID</span></dt>

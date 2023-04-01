@@ -13,6 +13,7 @@ export class ConnectionPopupService {
     }
 
     open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
+
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {

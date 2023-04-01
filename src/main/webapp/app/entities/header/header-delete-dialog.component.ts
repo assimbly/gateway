@@ -13,27 +13,21 @@ import { HeaderService } from './header.service';
 })
 export class HeaderDeleteDialogComponent {
     header: IHeader;
-    errorMessage = false;
-    deleteMode = true;
 
-    constructor(protected headerService: HeaderService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
+    constructor(
+        protected headerService: HeaderService,
+        public activeModal: NgbActiveModal,
+        protected eventManager: EventManager
+    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.headerService.delete(id).subscribe(
-            response => {
-				this.eventManager.broadcast(new EventWithContent('headerListModification', 'Deleted an header'));
-                this.activeModal.dismiss(true);
-            },
-            r => this.onDeleteError(r)
-        );
-    }
-
-    private onDeleteError(error) {
-        this.errorMessage = true;
-        this.deleteMode = false;
+        this.headerService.delete(id).subscribe(response => {
+		    this.eventManager.broadcast(new EventWithContent('headerListModification', 'Deleted an header'));
+            this.activeModal.dismiss(true);
+        });
     }
 }

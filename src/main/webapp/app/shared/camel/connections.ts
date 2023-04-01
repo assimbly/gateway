@@ -9,6 +9,9 @@ export class Connections {
     'oracle.jdbc.driver.OracleDriver',
     'org.postgresql.Driver',
     'com.microsoft.sqlserver.jdbc.SQLServerDriver',
+    'com.ibm.db2.jcc.DB2Driver',
+    'com.informix.jdbc.IfxDriver',
+    'org.sqlite.JDBC',
   ];
 
   connectionsList: string[] = [

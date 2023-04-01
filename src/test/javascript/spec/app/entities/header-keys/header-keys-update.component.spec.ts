@@ -4,9 +4,9 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysUpdateComponent } from 'app/entities/header-keys/header-keys-update.component';
-import { HeaderKeysService } from 'app/entities/header-keys/header-keys.service';
-import { HeaderKeys } from 'app/shared/model/header-keys.model';
+import { HeaderKeysUpdateComponent } from 'app/entities/message-keys/message-keys-update.component';
+import { HeaderKeysService } from 'app/entities/message-keys/message-keys.service';
+import { HeaderKeys } from 'app/shared/model/message-keys.model';
 
 describe('Component Tests', () => {
     describe('HeaderKeys Management Update Component', () => {
@@ -34,7 +34,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new HeaderKeys(123);
                     spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.headerKeys = entity;
+                    comp.header = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async
@@ -51,7 +51,7 @@ describe('Component Tests', () => {
                     // GIVEN
                     const entity = new HeaderKeys();
                     spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
-                    comp.headerKeys = entity;
+                    comp.header = entity;
                     // WHEN
                     comp.save();
                     tick(); // simulate async

@@ -33,7 +33,7 @@ public class EnvironmentVariables implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("environmentVariables")
-    private Gateway gateway;
+    private Integration integration;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -78,17 +78,17 @@ public class EnvironmentVariables implements Serializable {
         this.encrypted = encrypted;
     }
 
-    public Gateway getGateway() {
-        return gateway;
+    public Integration getIntegration() {
+        return integration;
     }
 
-    public EnvironmentVariables gateway(Gateway gateway) {
-        this.gateway = gateway;
+    public EnvironmentVariables integration(Integration integration) {
+        this.integration = integration;
         return this;
     }
 
-    public void setGateway(Gateway gateway) {
-        this.gateway = gateway;
+    public void setIntegration(Integration integration) {
+        this.integration = integration;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

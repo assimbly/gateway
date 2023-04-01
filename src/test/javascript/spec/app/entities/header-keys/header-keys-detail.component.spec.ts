@@ -4,14 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GatewayTestModule } from '../../../test.module';
-import { HeaderKeysDetailComponent } from 'app/entities/header-keys/header-keys-detail.component';
-import { HeaderKeys } from 'app/shared/model/header-keys.model';
+import { HeaderKeysDetailComponent } from 'app/entities/message-keys/message-keys-detail.component';
+import { HeaderKeys } from 'app/shared/model/message-keys.model';
 
 describe('Component Tests', () => {
     describe('HeaderKeys Management Detail Component', () => {
         let comp: HeaderKeysDetailComponent;
         let fixture: ComponentFixture<HeaderKeysDetailComponent>;
-        const route = ({ data: of({ headerKeys: new HeaderKeys(123) }) } as any) as ActivatedRoute;
+        const route = ({ data: of({ header: new HeaderKeys(123) }) } as any) as ActivatedRoute;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -33,7 +33,7 @@ describe('Component Tests', () => {
                 comp.ngOnInit();
 
                 // THEN
-                expect(comp.headerKeys).toEqual(jasmine.objectContaining({ id: 123 }));
+                expect(comp.header).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });

@@ -7,12 +7,12 @@
         Added the constraints for entity HeaderKeys.
     -->
     <changeSet id="20200212092700-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="header_id"
                                  baseTableName="header_keys"
                                  constraintName="fk_header_keys_header_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="header"/>
+                                 referencedTableName="message"/>
 
     </changeSet>
 </databaseChangeLog>

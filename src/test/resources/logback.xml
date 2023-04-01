@@ -4,7 +4,7 @@
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-    <logger name="org.assimbly.gateway" level="INFO"/>
+    <logger name="org.assimbly.integration" level="INFO"/>
 
     <logger name="io.github.jhipster" level="WARN"/>
 

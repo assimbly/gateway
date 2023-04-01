@@ -54,7 +54,7 @@
             <a ngbNavLink>Body</a>
             <br />
             <ng-template ngbNavContent>
-				<div style="border:1px solid black;">
+				<div style="min-height: 500px !important; border:1px solid black;">
 					<ngx-codemirror
 						[formControl]="$any(messageSenderForm.controls['requestbody'])"
 						name="codemirror"
@@ -64,11 +64,11 @@
 							theme: 'default',
 							mode: requestEditorMode
 						  }"
-						(drop)="drop($event)" 
+						(drop)="drop($event)"
 						(dragover)="allowDrop($event)"
-						style="min-height: 500px; width: 760px;">
-					</ngx-codemirror>					
-				</div>	
+						style="width: 760px;">
+					</ngx-codemirror>
+				</div>
             </ng-template>
           </li>
           <li ngbNavItem="1">

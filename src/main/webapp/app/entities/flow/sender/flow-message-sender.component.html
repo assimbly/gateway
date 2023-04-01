@@ -7,8 +7,8 @@
     <ng-template #optionsPopover let-message="message">
       <div [innerHtml]="optionsPopoverMessage"></div>
     </ng-template>
-    <ng-template #headerPopover let-message="message">
-      <div [innerHtml]="headerPopoverMessage"></div>
+    <ng-template #messagePopover let-message="message">
+      <div [innerHtml]="messagePopoverMessage"></div>
     </ng-template>
     <ng-template #connectionPopover let-message="message">
       <div [innerHtml]="connectionPopoverMessage"></div>
@@ -35,7 +35,7 @@
       <div class="modal-body" [formGroup]="testConnectionForm">
         <div class="form-group row">
           <div class="col-8">
-            <label class="form-control-label" for="field_header">Host name</label>
+            <label class="form-control-label" for="field_host">Host name</label>
             <i
               triggers="mouseenter:mouseleave"
               popoverTitle="Info"
@@ -208,7 +208,7 @@
 								<a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[0]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[0]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{step?.componentType}}.">
 									<span>Camel Documentation</span>
 								</a>
-								<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[0]}}" target="_blank" title="Assimbly Gateway online documentation on the component used for scheme: {{step?.componentType}}.">
+								<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[0]}}" target="_blank" title="Assimbly Integration online documentation on the component used for scheme: {{step?.componentType}}.">
 									<span>Assimbly Documentation</span>
 								</a>
 								<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
@@ -363,20 +363,20 @@
                   <div class="form-group">
                     <div class="input-group">
                       <ng-select
-                        [items]="headers"
+                        [items]="messages"
                         bindLabel="name"
                         bindValue="id"
-                        formControlName="header"
-                        id="field_header"
+                        formControlName="message"
+                        id="field_message"
                         dropdownPosition="top"
                       ></ng-select>
                       <button
                         type="button"
-                        *ngIf="headerCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
+                        *ngIf="messageCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
                         title="Edit header"
                         class="col-2 btn btn-primary left-border-radius-0"
                         (click)="
-                          createOrEditHeader(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
                         "
                         [disabled]="
                           messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
@@ -386,11 +386,11 @@
                       </button>
                       <button
                         type="button"
-                        *ngIf="headerCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
-                        class="col-2 btn btn-primary left-border-radius-0 flow-header-button"
+                        *ngIf="messageCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
                         title="New header"
                         (click)="
-                          createOrEditHeader(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
                         "
                         [disabled]="
                           messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
@@ -398,11 +398,11 @@
                       ></button>
                       <button
                         type="button"
-                        *ngIf="!headerCreated"
+                        *ngIf="!messageCreated"
                         class="col-2 btn btn-primary left-border-radius-0"
                         title="Create header"
                         (click)="
-                          createOrEditHeader(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].message)
                         "
                         [disabled]="
                           messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
@@ -445,7 +445,7 @@
                       <button
                         type="button"
                         *ngIf="connectionCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
-                        class="col-2 btn btn-primary left-border-radius-0 flow-header-button"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
                         title="New connection"
                         (click)="
                           createOrEditConnection(
