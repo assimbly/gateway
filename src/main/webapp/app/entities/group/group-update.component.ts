@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
 import { IGroup } from 'app/shared/model/group.model';
 import { GroupService } from './group.service';
-import { IGateway } from 'app/shared/model/gateway.model';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 import { UserService } from 'app/entities/user/user.service';
 import { IUser } from 'app/entities/user/user.model';
 
@@ -18,14 +18,14 @@ export class GroupUpdateComponent implements OnInit {
   group: IGroup;
   isSaving: boolean;
 
-  gateways: IGateway[];
+  integrations: IIntegration[];
 
   users: IUser[];
 
   constructor(
     protected alertService: AlertService,
     protected groupService: GroupService,
-    protected gatewayService: GatewayService,
+    protected integrationService: IntegrationService,
     protected userService: UserService,
     protected activatedRoute: ActivatedRoute
   ) {}
@@ -35,9 +35,9 @@ export class GroupUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ group }) => {
       this.group = group;
     });
-    this.gatewayService.query().subscribe(
-      (res: HttpResponse<IGateway[]>) => {
-        this.gateways = res.body;
+    this.integrationService.query().subscribe(
+      (res: HttpResponse<IIntegration[]>) => {
+        this.integrations = res.body;
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );
@@ -85,7 +85,7 @@ export class GroupUpdateComponent implements OnInit {
 	});
   }
 
-  trackGatewayById(index: number, item: IGateway) {
+  trackIntegrationById(index: number, item: IIntegration) {
     return item.id;
   }
 

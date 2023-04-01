@@ -2,14 +2,14 @@ import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
-    selector: '[jhiExistingHeaderNames]',
-    providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenHeaderNamesValidatorDirective, multi: true }]
+    selector: '[jhiExistingHeader]',
+    providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenHeaderValidatorDirective, multi: true }]
 })
-export class ForbiddenHeaderNamesValidatorDirective implements Validator {
+export class ForbiddenHeaderValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingHeaderNames') existingNames: Array<string>;
+    @Input('jhiExistingHeader') existingKeys: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.existingNames.some(k => k === control.value) ? { existingHeaderName: true } : null;
+        return this.existingKeys.some(k => k === control.value) ? { existingHeader: true } : null;
     }
 }

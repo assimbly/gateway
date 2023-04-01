@@ -32,7 +32,7 @@ public class ExportProperties {
 
 	private Connection connection;
 
-	private Header header;
+	private Message message;
 	public String xmlConfiguration;
 	private Flow flow;
 	public String integrationId;
@@ -42,10 +42,10 @@ public class ExportProperties {
 	private List<TreeMap<String, String>> propertiesList;
 
 	// Treemap get methods
-	public List<TreeMap<String, String>> getProperties(Long gatewayId) throws Exception {
+	public List<TreeMap<String, String>> getProperties(Long integrationId) throws Exception {
 
 		propertiesList = new ArrayList<>();
-		List<Flow> flows= flowRepository.findAllByGatewayId(gatewayId);
+		List<Flow> flows= flowRepository.findAllByIntegrationId(integrationId);
 
 		for (Flow flow : flows) {
 
@@ -104,22 +104,22 @@ public class ExportProperties {
 		// set from properties
 		getURIfromAssimblyDB("from");
 		getConnectionFromAssimblyDB("from");
-		getHeaderFromAssimblyDB("from");
+		getMessageFromAssimblyDB("from");
 
 		// set to properties
 		getURIfromAssimblyDB("to");
 		getConnectionFromAssimblyDB("to");
-		getHeaderFromAssimblyDB("to");
+		getMessageFromAssimblyDB("to");
 
         // set response properties
         getURIfromAssimblyDB("response");
         getConnectionFromAssimblyDB("response");
-        getHeaderFromAssimblyDB("response");
+        getMessageFromAssimblyDB("response");
 
 		// set error properties
 		getURIfromAssimblyDB("error");
 		getConnectionFromAssimblyDB("error");
-		getHeaderFromAssimblyDB("error");
+		getMessageFromAssimblyDB("error");
 
 		// set up defaults settings if null -->
 		properties.put("id", Long.toString(flow.getId()));
@@ -139,7 +139,7 @@ public class ExportProperties {
 			properties.put("to.uri", uri);
 		}
 
-		properties.put("header.contenttype", "text/xml;charset=UTF-8");
+		properties.put("message.contenttype", "text/xml;charset=UTF-8");
 
 	}
 
@@ -190,18 +190,18 @@ public class ExportProperties {
 		properties.put(type + ".connection.id", connection.getId().toString());
 	}
 
-	public void getHeaderFromAssimblyDB(String type) {
+	public void getMessageFromAssimblyDB(String type) {
 
 		for (Step step : steps) {
 
-			header = step.getHeader();
+			message = step.getMessage();
 		}
 
-		if (header != null) {
-			Set<HeaderKeys> headerKeys = header.getHeaderKeys();
+		if (message != null) {
+			Set<Header> headers = message.getHeaders();
 
-			for (HeaderKeys headerKey : headerKeys) {
-				properties.put(type + ".header." + headerKey.getKey(), headerKey.getValue());
+			for (Header header : headers) {
+				properties.put(type + ".message." + header.getKey(), header.getValue());
 			}
 		}
 	}

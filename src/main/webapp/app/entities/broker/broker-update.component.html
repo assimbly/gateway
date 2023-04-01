@@ -83,11 +83,14 @@
         <div class="form-group mt-2" *ngIf="broker.configurationType == 'file' ">
           <label class="form-control-label" for="field_type">Configuration</label>
           <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+             popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon>
+          </i>
           <span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
-					<i class="fa fa-exclamation-circle" popoverClass="increase-popover-width" triggers="mouseenter:mouseleave"
-             placement="right"
-             popoverTitle="Error" [ngbPopover]="brokerErrorConfigurationPopover" #p="ngbPopover"></i>
+     					<i popoverClass="increase-popover-width" triggers="mouseenter:mouseleave"
+                         placement="right" container="body"
+                         popoverTitle="Error" [popover]="brokerErrorConfigurationPopover">
+                <fa-icon icon="circle-exclamation"></fa-icon>
+              </i>
 					</span>
           <div>
             <ngx-codemirror
