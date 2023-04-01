@@ -431,9 +431,9 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     const year = a.getFullYear();
     const month = months[a.getMonth()];
     const date = a.getDate();
-    const hour = a.getHours();
-    const min = a.getMinutes();
-    const sec = a.getSeconds();
+    const hour = ("0" + a.getHours()).slice(-2); // add "0" prefix and take last 2 digits
+    const min = ("0" + a.getMinutes()).slice(-2); // add "0" prefix and take last 2 digits
+    const sec = ("0" + a.getSeconds()).slice(-2); // add "0" prefix and take last 2 digits
     const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
     return time;
   }
