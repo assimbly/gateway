@@ -103,7 +103,7 @@ jobs:
 
       - name: Push image to Amazon ECR
         run: |
-          ./gradlew clean bootJar jib -Djib.to.credHelper=login-ecr -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE -Pfull
+          ./gradlew clean bootJar jib -Djib.to.credHelper=login-ecr -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
 
       - name: Logout of Amazon ECR
         if: always()
