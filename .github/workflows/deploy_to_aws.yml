@@ -23,7 +23,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Setup Maven settings.xml
         uses: whelk-io/maven-settings-xml-action@v20
@@ -102,3 +104,9 @@ jobs:
       - name: Push image to Amazon ECR
         run: |
           ./gradlew clean bootJar jib -Djib.to.credHelper=login-ecr -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE -Pfull
+
+      - name: Logout of Amazon ECR
+        if: always()
+        run: |
+          docker logout ${{ steps.login-ecr.outputs.registry }}
+          rm dovetail_build.log
