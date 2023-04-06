@@ -11,7 +11,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'headless'
-      VERSION_TAG: 'development'
+      VERSION_TAG: 'beta'
 
     steps:
       - name: Checkout the repository
