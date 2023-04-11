@@ -100,6 +100,10 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build docker image
+        run: |
+            clear & ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
 
       - name: Push image to Amazon ECR
         run: |
