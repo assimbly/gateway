@@ -32,7 +32,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
       
       - name: Install cred helper
-        run: sudo apt install amazon-ecr-credential-helper
+        run: |
+          sudo apt update
+          sudo apt install docker
+          sudo apt install amazon-ecr-credential-helper
 
       - name: Setup Maven settings.xml
         uses: whelk-io/maven-settings-xml-action@v20
