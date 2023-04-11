@@ -99,14 +99,8 @@ jobs:
 
       - name: Build docker image
         run: |
-          if [[ $BUILD == true ]]; then
-            clear & ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
-          fi
-  
-          if [[ $BUILD == false ]]; then
-            echo "Skipped docker image build!"
-          fi
-      
+          ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+          
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
