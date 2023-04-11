@@ -34,7 +34,6 @@ jobs:
       - name: Install cred helper
         run: |
           sudo apt update
-          sudo apt install docker
           sudo apt install amazon-ecr-credential-helper
 
       - name: Setup Maven settings.xml
@@ -105,9 +104,9 @@ jobs:
           aws-region: eu-west-1
 
       - name: Login to Amazon ECR
-        id: aws-login-ecr
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Push image to Amazon ECR
         run: |
-          ./gradlew clean bootJar jib -Djib.to.credHelper=aws-login-ecr -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
