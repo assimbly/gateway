@@ -6,7 +6,7 @@ on:
       - 'aws-tests'
 
 jobs:
-  deploy_aws:
+  deploy_gateway_to_aws:
     runs-on: ubuntu-latest
 
     env:
@@ -107,6 +107,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Push image to Amazon ECR
+      - name: Push gateway image to Amazon ECR
         run: |
-          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -Pheadless -Pfull
+      
+      - name: Push broker image to Amazon ECR
+        run: |
+          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/broker:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -Pbroker -Pdefault   
