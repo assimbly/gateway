@@ -68,7 +68,7 @@
   </div>
 
   <div class="table-responsive" *ngIf="brokers?.length > 0" style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute; z-index: 1000;">
+    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute;">
       <thead>
         <tr>
           <th [style.display]="'none'"><span>ID</span></th>
@@ -99,7 +99,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
-					style="color: white;"
+					          style="color: white;"
                     (click)="start()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
@@ -115,7 +115,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
-					style="color: white;"
+					          style="color: white;"
                     (click)="restart()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
