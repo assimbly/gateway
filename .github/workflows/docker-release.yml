@@ -62,7 +62,7 @@ jobs:
                 "url": "https://repo1.maven.org/maven2"
               },
               {
-                "id": "base",
+                "id": "github",
                 "name": "Assimbly Base Repository",
                 "url": "https://maven.pkg.github.com/assimbly/base",
                 "releases": {
@@ -73,7 +73,7 @@ jobs:
                 }
               },
               {
-                "id": "runtime",
+                "id": "github",
                 "name": "Assimbly Runtime Repository",
                 "url": "https://maven.pkg.github.com/assimbly/runtime",
                 "releases": {
@@ -84,7 +84,7 @@ jobs:
                 }
               },
               {
-                "id": "custom-components",
+                "id": "github",
                 "name": "Assimbly Custom-Components Repository",
                 "url": "https://maven.pkg.github.com/assimbly/custom-components",
                 "releases": {
