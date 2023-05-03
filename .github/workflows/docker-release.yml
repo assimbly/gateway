@@ -65,6 +65,9 @@ jobs:
                 "id": "base",
                 "name": "Assimbly Base Repository",
                 "url": "https://maven.pkg.github.com/assimbly/base",
+                "releases": {
+                  "enabled": "true"
+                },
                 "snapshots": {
                   "enabled": "true"
                 }
@@ -73,6 +76,9 @@ jobs:
                 "id": "runtime",
                 "name": "Assimbly Runtime Repository",
                 "url": "https://maven.pkg.github.com/assimbly/runtime",
+                "releases": {
+                  "enabled": "true"
+                },
                 "snapshots": {
                   "enabled": "true"
                 }
@@ -81,6 +87,9 @@ jobs:
                 "id": "custom-components",
                 "name": "Assimbly Custom-Components Repository",
                 "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                "releases": {
+                  "enabled": "true"
+                },
                 "snapshots": {
                   "enabled": "true"
                 }
@@ -91,6 +100,11 @@ jobs:
                 "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
               }
             ]
+
+          active_profiles: >
+              [
+                "github"
+              ]
 
           servers: >
             [
