@@ -81,8 +81,8 @@ jobs:
             [
               {
                 "id": "github",
-                "username": "$GITHUB_ACTOR",
-                "password": "$GITHUB_TOKEN"
+                "username": ${{ secrets.GITHUB_ACTOR }},
+                "password": ${{ secrets.GITHUB_TOKEN }}
               }
             ]
 
@@ -186,8 +186,8 @@ jobs:
             [
               {
                 "id": "github",
-                "username": "$GITHUB_ACTOR",
-                "password": "$GITHUB_TOKEN"
+                "username": ${{ secrets.GITHUB_ACTOR }},
+                "password": ${{ secrets.GITHUB_TOKEN }}
               }
             ]
 
