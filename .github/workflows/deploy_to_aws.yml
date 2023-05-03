@@ -1,9 +1,8 @@
 name: Build and push Docker image to AWS
 
 on:
-  push:
-    branches:
-      - 'aws-tests'
+  release:
+    types: [ released ]
 
 jobs:
   deploy_gateway_to_aws:
