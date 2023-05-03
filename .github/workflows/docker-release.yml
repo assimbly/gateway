@@ -116,7 +116,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       
-      
+      - name: Build docker image
+        run: |
+          if [[ $BUILD == true ]]; then
+            clear & ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+          fi
+
+          if [[ $BUILD == false ]]; then
+            echo "Skipped docker image build!"
+          fi
 
       - name: Push the docker image
         env:
