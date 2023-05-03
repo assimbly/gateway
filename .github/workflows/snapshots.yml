@@ -1,0 +1,422 @@
+name: Publish Snapshots
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - 'snapshots-tests'
+
+jobs:
+  delete_older_snapshots:
+    
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Delete older snapshots
+        uses: smartsquaregmbh/delete-old-packages@v0.7.0
+        with:
+          organization: assimbly
+          type: maven
+          keep: 0
+          version-pattern: "^\\S+\\-SNAPSHOT$"
+          names: |
+            org.assimbly.gateway.gateway-full
+            org.assimbly.gateway.gateway-headless
+            org.assimbly.gateway.gateway-integration
+            org.assimbly.gateway.gateway-broker
+
+  publish_full_snapshot:
+    needs: [delete_older_snapshots]
+
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: 'full'
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v3
+        with:
+          ref: "develop"
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          
+          repositories: >
+              [
+                  {
+                      "id": "maven",
+                      "name": "Maven Central",
+                      "url": "https://repo1.maven.org/maven2"
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Base Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/base",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Runtime Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/runtime",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Custom-Components Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                      "id": "aurea",
+                      "name": "Aurea Sonic Repository",
+                      "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+                  }
+              ]
+  
+          servers: >
+              [
+                  {
+                      "id": "github",
+                      "username": "$GITHUB_ACTOR",
+                      "password": "$GITHUB_TOKEN"
+                  }
+              ]
+      
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo "this is the path: $MAVEN_PATH"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+          cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Publish to Github Packages
+        env:
+          VERSION_TAG: '-SNAPSHOT'
+          PUSH_PKGS: true
+        run: |
+          if [[ $PUSH_PKGS == true ]]; then
+            ./gradlew clean publish --settings-file ./settings.gradle -Pprod
+          fi
+          
+          if [[ $PUSH_PKGS == false ]]; then
+            echo "Skipped snapshot package push!"
+          fi
+
+  publish_headless_snapshot:
+    needs: [delete_older_snapshots]
+
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: 'headless'
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          
+          repositories: >
+              [
+                  {
+                      "id": "maven",
+                      "name": "Maven Central",
+                      "url": "https://repo1.maven.org/maven2"
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Base Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/base",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Runtime Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/runtime",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Custom-Components Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                      "id": "aurea",
+                      "name": "Aurea Sonic Repository",
+                      "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+                  }
+              ]
+  
+          servers: >
+              [
+                  {
+                      "id": "github",
+                      "username": "$GITHUB_ACTOR",
+                      "password": "$GITHUB_TOKEN"
+                  }
+              ]
+      
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo "this is the path: $MAVEN_PATH"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+          cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Publish to Github Packages
+        env:
+          VERSION_TAG: '-SNAPSHOT'
+          PUSH_PKGS: true
+        run: |
+          if [[ $PUSH_PKGS == true ]]; then
+            ./gradlew clean publish --settings-file ./settings.gradle -Pprod
+          fi
+          
+          if [[ $PUSH_PKGS == false ]]; then
+            echo "Skipped snapshot package push!"
+          fi
+
+  publish_integration_snapshot:
+    needs: [delete_older_snapshots]
+
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: 'integration'
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          
+          repositories: >
+              [
+                  {
+                      "id": "maven",
+                      "name": "Maven Central",
+                      "url": "https://repo1.maven.org/maven2"
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Base Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/base",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Runtime Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/runtime",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Custom-Components Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                      "id": "aurea",
+                      "name": "Aurea Sonic Repository",
+                      "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+                  }
+              ]
+  
+          servers: >
+              [
+                  {
+                      "id": "github",
+                      "username": "$GITHUB_ACTOR",
+                      "password": "$GITHUB_TOKEN"
+                  }
+              ]
+      
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo "this is the path: $MAVEN_PATH"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+          cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Publish to Github Packages
+        env:
+          VERSION_TAG: '-SNAPSHOT'
+          PUSH_PKGS: true
+        run: |
+          if [[ $PUSH_PKGS == true ]]; then
+            ./gradlew clean publish --settings-file ./settings.gradle -Pprod
+          fi
+          
+          if [[ $PUSH_PKGS == false ]]; then
+            echo "Skipped snapshot package push!"
+          fi
+
+  publish_broker_snapshot:
+    needs: [delete_older_snapshots]
+
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: 'broker'
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          
+          repositories: >
+              [
+                  {
+                      "id": "maven",
+                      "name": "Maven Central",
+                      "url": "https://repo1.maven.org/maven2"
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Base Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/base",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Runtime Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/runtime",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                    "id": "github",
+                    "name": "Assimbly Custom-Components Repository",
+                    "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                    "snapshots": {
+                      "enabled": "true"
+                    }
+                  },
+                  {
+                      "id": "aurea",
+                      "name": "Aurea Sonic Repository",
+                      "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+                  }
+              ]
+  
+          servers: >
+              [
+                  {
+                      "id": "github",
+                      "username": "$GITHUB_ACTOR",
+                      "password": "$GITHUB_TOKEN"
+                  }
+              ]
+      
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo "this is the path: $MAVEN_PATH"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+          cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Publish to Github Packages
+        env:
+          VERSION_TAG: '-SNAPSHOT'
+          PUSH_PKGS: true
+        run: |
+          if [[ $PUSH_PKGS == true ]]; then
+            ./gradlew clean publish --settings-file ./settings.gradle -Pprod
+          fi
+          
+          if [[ $PUSH_PKGS == false ]]; then
+            echo "Skipped snapshot package push!"
+          fi
