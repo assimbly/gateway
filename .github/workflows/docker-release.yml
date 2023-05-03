@@ -126,7 +126,7 @@ jobs:
       - name: Build docker image
         run: |
           if [[ $BUILD == true ]]; then
-            clear & ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE --settings ~/.m2/settingsAssimbly.xml
+            clear & ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE --settings .m2/settingsAssimbly.xml
           fi
 
           if [[ $BUILD == false ]]; then
