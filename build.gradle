@@ -155,7 +155,7 @@ jib {
             path {
                 // copies the contents of 'src/main/another/dir' into '/extras' on the container
                 from = file('src/main/data')
-                into = './data'
+                into = '/data'
             }
         }
         permissions = [
