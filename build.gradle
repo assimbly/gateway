@@ -5,6 +5,30 @@ buildscript {
         mavenLocal()
         mavenCentral()
 		gradlePluginPortal()
+        maven{  name = "Aurea"
+                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/" 
+        }
+
+        maven{ name = "Assimbly Base"
+                url = uri("https://maven.pkg.github.com/assimbly/base")
+                credentials {
+                    username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+
+        maven{ name = "Assimbly Runtime"
+                url = uri("https://maven.pkg.github.com/assimbly/runtime")
+                credentials {
+                    username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+
+        maven{  name = "Assimbly Custom Components"
+                url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+                credentials {
+                    username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     }
     dependencies {
@@ -293,6 +317,31 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
+
+    maven{  name = "Aurea"
+                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/" 
+    }
+
+    maven{ name = "Assimbly Base"
+            url = uri("https://maven.pkg.github.com/assimbly/base")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+
+    maven{ name = "Assimbly Runtime"
+            url = uri("https://maven.pkg.github.com/assimbly/runtime")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+    
+    maven{  name = "Assimbly Custom Components"
+            url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
     //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
 }
 
