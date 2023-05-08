@@ -105,8 +105,7 @@ jobs:
       - name: Build docker image
         run: |
           if [[ $BUILD == true ]]; then
-            clear & mvn install
-            ./gradlew clean bootJar --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+            ./gradlew clean bootJar jibDockerBuild -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
           fi
 
           if [[ $BUILD == false ]]; then
