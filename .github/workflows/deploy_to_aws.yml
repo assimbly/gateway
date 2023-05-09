@@ -4,13 +4,16 @@ on:
   release:
     types: [ released ]
 
+env:
+  VERSION: ${{  github.ref_name }}
+
 jobs:
   deploy_gateway_to_aws:
     runs-on: ubuntu-latest
 
     env:
       BUILD_TYPE: 'headless'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -106,14 +109,14 @@ jobs:
 
       - name: Push gateway image to Amazon ECR
         run: |
-          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=${BUILD_TYPE} -Pfull
+          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE -Pfull
  
   deploy_broker_to_aws:
     runs-on: ubuntu-latest
 
     env:
       BUILD_TYPE: 'broker'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -209,4 +212,4 @@ jobs:
 
       - name: Push broker image to Amazon ECR
         run: |
-          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/broker:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=${BUILD_TYPE} -Pdefault   
+          ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/broker:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE -Pdefault   
