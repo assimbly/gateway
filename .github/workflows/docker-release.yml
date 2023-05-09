@@ -11,7 +11,7 @@ env:
   VERSION: ${{  github.ref_name }}
   BUILD: true
   PUSH: true
-  PUSH_PKGS: false
+  PUSH_PKGS: true
 
 jobs:
   deploy_full:
