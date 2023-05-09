@@ -8,10 +8,10 @@
       <thead>
         <tr>
           <th><span>ID</span></th>
+          <th><span>Flow ID</span></th>
           <th><span>StepType</span></th>
           <th><span>ComponentType</span></th>
           <th><span>Uri</span></th>
-          <th><span>Options</span></th>
         </tr>
       </thead>
       <tbody>
@@ -19,10 +19,10 @@
           <td>
             <a [routerLink]="['/step', step.id, 'view']">{{ step.id }}</a>
           </td>
+          <td>{{ step.flowId }}</td>
           <td>{{ step.stepType }}</td>
           <td>{{ step.componentType }}</td>
           <td>{{ step.uri }}</td>
-          <td>{{ step.options }}</td>
           <td class="text-right">
             <div class="btn-group flex-btn-group-container">
               <button type="submit" [routerLink]="['/step', step.id, 'view']" class="btn btn-info btn-sm">

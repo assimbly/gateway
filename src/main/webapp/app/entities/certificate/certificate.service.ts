@@ -15,6 +15,7 @@ type EntityArrayResponseType = HttpResponse<ICertificate[]>;
 
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
+
   public resourceUrl = this.applicationConfigService.getEndpointFor('api/certificates');
 
   constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}

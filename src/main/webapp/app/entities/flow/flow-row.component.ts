@@ -218,6 +218,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowStatusButton = `Started`;
 
         break;
+      case 'suspended':
+      case 'suspend':
       case 'paused':
       case 'pause':
         this.statusFlow = Status.paused;
