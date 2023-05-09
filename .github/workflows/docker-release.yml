@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - 'docker-tests'
+    release:
+      types: [ released ]
 
 env:
+  VERSION: ${{  github.ref_name }}
   BUILD: true
   PUSH: true
   PUSH_PKGS: false
@@ -16,7 +19,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'full'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -119,7 +122,7 @@ jobs:
 
         run: |
           if [[ $PUSH == true ]]; then
-            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-${BUILD_TYPE}:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
           fi
 
           if [[ $PUSH == false ]]; then
@@ -141,7 +144,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'integration'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -242,7 +245,7 @@ jobs:
 
         run: |
           if [[ $PUSH == true ]]; then
-            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-${BUILD_TYPE}:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
           fi
 
           if [[ $PUSH == false ]]; then
@@ -264,7 +267,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'headless'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -365,7 +368,7 @@ jobs:
 
         run: |
           if [[ $PUSH == true ]]; then
-            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-${BUILD_TYPE}:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
           fi
 
           if [[ $PUSH == false ]]; then
@@ -387,7 +390,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'broker'
-      VERSION_TAG: 'beta'
+      VERSION_TAG: $VERSION
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -488,7 +491,7 @@ jobs:
 
         run: |
           if [[ $PUSH == true ]]; then
-            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-${BUILD_TYPE}:${VERSION_TAG} --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
+            clear & ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle  -Papi-docs -Pprod -PbuildType=$BUILD_TYPE
           fi
 
           if [[ $PUSH == false ]]; then
