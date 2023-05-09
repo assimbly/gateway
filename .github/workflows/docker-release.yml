@@ -2,8 +2,6 @@ name: Build and push Docker image with Jib
 
 on:
   push:
-    branches:
-      - 'docker-tests'
     release:
       types: [ released ]
 
