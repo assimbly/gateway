@@ -532,8 +532,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       const flowRuningTime = dayjs.duration(now.diff(start));
       const hours = Math.floor(flowRuningTime.asHours());
       const minutes = flowRuningTime.minutes();
-      const completed = res.step.stats.exchangesCompleted - res.step.stats.failuresHandled;
-      const failures = res.step.stats.exchangesFailed + res.step.stats.failuresHandled;
+      const completed = parseInt(res.step.stats.exchangesCompleted) - parseInt(res.step.stats.failuresHandled);
+      const failures = parseInt(res.step.stats.exchangesFailed) + parseInt(res.step.stats.failuresHandled);
       let processingTime = ``;
 
       if (this.statsTableRows.length === 0) {
