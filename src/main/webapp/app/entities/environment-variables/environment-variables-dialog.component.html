@@ -2,7 +2,7 @@
 
     <div class="modal-header">
         <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit an Environment Variables</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>		
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
 	</div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
@@ -29,13 +29,13 @@
         </div>
 
         <div class="form-group">
-            <label class="form-control-label" for="gateway">Gateway</label>
-            <select *ngIf="gateways.length > 1; else oneGateway" class="form-control form-select" id="gateway" formControlName="gatewayId" >
+            <label class="form-control-label" for="integration">Integration</label>
+            <select *ngIf="integrations.length > 1; else oneIntegration" class="form-control form-select" id="integration" formControlName="integrationId" >
                 <option [ngValue]="null"></option>
-                <option [ngValue]="gatewayOption.id" *ngFor="let gatewayOption of gateways; trackBy: trackGatewayById">{{gatewayOption.id}}</option>
+                <option [ngValue]="integrationOption.id" *ngFor="let integrationOption of integrations; trackBy: trackIntegrationById">{{integrationOption.id}}</option>
             </select>
-            <ng-template #oneGateway>
-                <input type="text" class="form-control" id="gateway" readonly formControlName="gatewayId"/>
+            <ng-template #oneIntegration>
+                <input type="text" class="form-control" id="integration" readonly formControlName="integrationId"/>
             </ng-template>
         </div>
     </div>

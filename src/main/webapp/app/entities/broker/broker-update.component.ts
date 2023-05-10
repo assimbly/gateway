@@ -116,8 +116,8 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     setPopoverMessages() {
-        this.namePopoverMessage = `Name of the broker. Usually the same as the gateway name.`;
-        this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
+        this.namePopoverMessage = `Name of the broker. Usually the same as the integration name.`;
+        this.autostartPopoverMessage = `If true then the broker starts automatically when the integration starts.`;
         this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic (5.x) or ActiveMQ Artemis. Artemis is default`;
         this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
         this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ documentation how to configure the brokers.`;

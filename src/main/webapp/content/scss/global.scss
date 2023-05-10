@@ -297,7 +297,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   float: end;
 }
 
-.assimbly-gateway-img img {
+.assimbly-integration-img img {
   background-repeat: no-repeat;
   background-size: 100%;
   width: 60px;
@@ -358,7 +358,9 @@ ng-dropdown-panel > div {
   z-index: 100;
 }
 
+/* comment the popover as it interferes with ngb popover */
 
+/*
 .popover {
   min-width: 200px;
   max-width: 60%;
@@ -366,7 +368,9 @@ ng-dropdown-panel > div {
   text-align: left;
   white-space: normal;
   background-color: #fff;
+  margin-top: 200px;
 }
+*/
 
 /*
 .popover-body {
@@ -412,7 +416,7 @@ ng-dropdown-panel > div {
   width: 60%;
 }
 
-.flow-header-button {
+.flow-new-button {
   background-image: url('../images/new_page.png');
   background-repeat: no-repeat;
   background-size: 20px 20px;
@@ -610,9 +614,10 @@ ng-dropdown-panel > div {
 }
 
 .increase-popover-width {
-  width: 1200px;
+  width: 1000px;
   max-width: 1200px;
 }
+
 
 .dropdown-toggle::after {
   display: none;
@@ -738,11 +743,6 @@ ng-dropdown-panel > div {
   width: 100%;
 }
 
-.CodeMirror {
-    height: 600px;
-	width: 100%;
-}
-
 .flex-wrapper {
     display: flex;
     margin-top: 10px;
@@ -766,5 +766,19 @@ ng-dropdown-panel > div {
 
 .CodeMirror {
  border: 1px solid #eee;
- height: calc(100vh - 220px);
+ height: 500px;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror {
+ border: 1px solid #eee;
+ height: auto;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror-scroll {
+    height: auto;
+    max-height:300px;
 }

@@ -4,8 +4,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { take, map } from 'rxjs/operators';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { IGateway, Gateway, GatewayType, EnvironmentType, ConnectorType } from 'app/shared/model/gateway.model';
+import { GatewayService } from 'app/entities/integration/integration.service';
+import { IGateway, Gateway, GatewayType, EnvironmentType, ConnectorType } from 'app/shared/model/integration.model';
 
 describe('Service Tests', () => {
     describe('Gateway Service', () => {

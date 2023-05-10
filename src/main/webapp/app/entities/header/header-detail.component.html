@@ -1,51 +1,45 @@
-<div class="container" *ngIf="header">
-    <h2><span>Header</span> {{header.id}}</h2>
-    <jhi-alert-error></jhi-alert-error>
-    
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th colspan="2">Details for {{header.name}} header</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="detailsTable">ID</th>
-                    <td class="detailsTable">{{header.id}}</td>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <td>{{header.name}}</td>
-                </tr>
-            </tbody>
-        </table>
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="header">
+            <h2><span>Header</span> {{header.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Key</span></dt>
+                <dd>
+                    <span>{{header.key}}</span>
+                </dd>
+                <dt><span>Value</span></dt>
+                <dd>
+                    <span>{{header.value}}</span>
+                </dd>
+                <dt><span>Type</span></dt>
+                <dd>
+                    <span>{{header.type}}</span>
+                </dd>
+                <dt><span>Language</span></dt>
+                <dd>
+                  <span>{{header.language}}</span>
+                </dd>
+                <dt><span>Message</span></dt>
+                <dd>
+                    <div *ngIf="header.messageId">
+                        <a [routerLink]="['/message', header.messageId, 'view']">{{header.messageId}}</a>
+                    </div>
+                </dd>
+            </dl>
 
-        <table class="table table-sm table-bordered" colspan="2">
-            <thead>
-                <tr class="table-active">
-                    <th colspan="3">Header Keys</th>
-                </tr>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let headerKey of headerKeys; let i = index" [ngClass]="{'lastItemBorder' : (headerKeys.length - 1 === i)}">
-                    <td>{{headerKey.key}}</td>
-                    <td>{{headerKey.value}}</td>
-                    <td>{{headerKey.type}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+            </button>
 
-    <div class="float-right">
-        <button type="button" [routerLink]="['/header']" class="btn btn-info">
-            <span class="fa fa-arrow-left"></span>&nbsp;
-            <span> Back</span>
-        </button>
+            <button type="button"
+                    [routerLink]="['/header', header.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span> Edit</span>
+            </button>
+        </div>
     </div>
 </div>

@@ -32,8 +32,6 @@ public class FlowDTO implements Serializable {
 
     private Boolean parallelProcessing;
 
-    private Boolean assimblyHeaders;
-
     private LogLevelType logLevel;
 
     private Integer instances;
@@ -44,7 +42,7 @@ public class FlowDTO implements Serializable {
 
     private Instant lastModified;
 
-    private Long gatewayId;
+    private Long integrationId;
 
     private Set<Step> steps;
 
@@ -120,14 +118,6 @@ public class FlowDTO implements Serializable {
         this.parallelProcessing = parallelProcessing;
     }
 
-    public Boolean isAssimblyHeaders() {
-        return assimblyHeaders;
-    }
-
-    public void setAssimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-    }
-
     public LogLevelType getLogLevel() {
         return logLevel;
     }
@@ -135,7 +125,6 @@ public class FlowDTO implements Serializable {
     public void setLogLevel(LogLevelType logLevel) {
         this.logLevel = logLevel;
     }
-
 
     public Integer getInstances() {
         return instances;
@@ -169,12 +158,12 @@ public class FlowDTO implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Long getGatewayId() {
-        return gatewayId;
+    public Long getintegrationId() {
+        return integrationId;
     }
 
-    public void setGatewayId(Long gatewayId) {
-        this.gatewayId = gatewayId;
+    public void setintegrationId(Long integrationId) {
+        this.integrationId = integrationId;
     }
 
     public Set<Step> getSteps() {
@@ -217,10 +206,9 @@ public class FlowDTO implements Serializable {
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
             ", parallelProcessing='" + isParallelProcessing() + "'" +
-            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
-            ", gateway=" + getGatewayId() +
+            ", integration=" + getintegrationId() +
             ", steps=" + getSteps() +
             "}";
     }

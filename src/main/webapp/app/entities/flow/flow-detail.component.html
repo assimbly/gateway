@@ -28,9 +28,9 @@
           <td>{{ flow.logLevel }}</td>
         </tr>
         <tr>
-          <th class="lastItemBorder">Gateway name</th>
+          <th class="lastItemBorder">Integration name</th>
           <td class="lastItemBorder">
-            <a [routerLink]="['/gateway', flow.gatewayId, 'view']" *ngIf="!!gateway">{{ gateway.name }}</a>
+            <a [routerLink]="['/integration', flow.integrationId, 'view']" *ngIf="!!integration">{{ integration.name }}</a>
           </td>
         </tr>
       </tbody>
@@ -81,7 +81,8 @@
                             </tr>
                             <tr>
                                 <th class="lastItemBorder">Header</th>
-                                <td class="lastItemBorder">{{step.headerId}}</td>
+                                <td class="lastItemBorder">{{step.messageId}}</td>
+                                <td class="lastItemBorder">{{step.messageId}}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity Link.
+    -->
+    <changeSet id="20200212093100-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="step_id"
+                                 baseTableName="link"
+                                 constraintName="fk_link_step_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="step"/>
+
+    </changeSet>
+</databaseChangeLog>

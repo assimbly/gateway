@@ -61,19 +61,28 @@ public class CertificateResource {
     public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws Exception {
         log.debug("REST request to save Certificate : {}", certificateDTO);
 
+        System.out.println("0");
+
         if (certificateDTO.getId() != null) {
             throw new BadRequestAlertException("A new certificate cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
+        System.out.println("1");
         try {
+            System.out.println("2");
+
             CertificateDTO saved = certificateService.save(certificateDTO);
 
-	        return ResponseEntity.ok()
+            System.out.println("3");
+
+            System.out.println("4" + saved.getCertificateName());
+
+            return ResponseEntity.ok()
 	                .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, "Added certificateDTO"))
 	                .body(saved);
 
         } catch (Exception e) {
-            log.debug("Add certificateDTO failed: ", e.getMessage());
+            log.error("Add certificateDTO failed: ", e.getMessage());
             throw new BadRequestAlertException("Adding certificateDTO failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
 

@@ -1,7 +1,5 @@
 package org.assimbly.gateway.repository;
 
-import java.util.Optional;
-
 import org.assimbly.gateway.domain.Header;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -13,9 +11,5 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface HeaderRepository extends JpaRepository<Header, Long> {
-
-	Optional<Header> findByName(String name);
-
-    Optional<Header> findById(Long id);
 
 }

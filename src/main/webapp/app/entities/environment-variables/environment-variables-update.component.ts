@@ -6,8 +6,8 @@ import { AlertService } from 'app/core/util/alert.service';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { IGateway } from 'app/shared/model/gateway.model';
+import { IntegrationService } from 'app/entities/integration/integration.service';
+import { IIntegration } from 'app/shared/model/integration.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 
@@ -19,14 +19,14 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
     isSaving: boolean;
 
-    gateways: IGateway[] = [];
+    integrations: IIntegration[] = [];
     environmentVariablesForm: FormGroup;
     private allEnvironmentVariablesKeys: Array<string> = [];
 
     constructor(
         protected alertService: AlertService,
         protected environmentVariablesService: EnvironmentVariablesService,
-        protected gatewayService: GatewayService,
+        protected integrationService: IntegrationService,
         protected activatedRoute: ActivatedRoute,
         protected router: Router
     ) {}
@@ -50,13 +50,13 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             });
         }
 
-        this.gatewayService.query().subscribe(
-            (res: HttpResponse<IGateway[]>) => {
-                this.gateways = res.body;
-                this.environmentVariables.gatewayId = this.gateways[0].id;
-                if (!this.environmentVariablesForm.controls.gatewayId.value) {
+        this.integrationService.query().subscribe(
+            (res: HttpResponse<IIntegration[]>) => {
+                this.integrations = res.body;
+                this.environmentVariables.integrationId = this.integrations[0].id;
+                if (!this.environmentVariablesForm.controls.integrationId.value) {
                     this.environmentVariablesForm.patchValue({
-                        gatewayId: this.environmentVariables.gatewayId
+                        integrationId: this.environmentVariables.integrationId
                     });
                 }
             },
@@ -75,7 +75,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
             key: new FormControl(this.environmentVariables.key, Validators.required),
             value: new FormControl(this.environmentVariables.value, Validators.required),
             encrypted: new FormControl(this.environmentVariables.encrypted),
-            gatewayId: new FormControl(this.environmentVariables.gatewayId)
+            integrationId: new FormControl(this.environmentVariables.integrationId)
         });
     }
 
@@ -141,7 +141,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     }
 
-    trackGatewayById(index: number, item: IGateway) {
+    trackIntegrationById(index: number, item: IIntegration) {
         return item.id;
     }
 }

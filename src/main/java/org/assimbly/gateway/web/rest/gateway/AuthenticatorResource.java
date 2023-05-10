@@ -11,6 +11,7 @@ import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,7 +73,10 @@ public class AuthenticatorResource {
      * POST  /authentication/validate : validates the two-factor authentication code
      * @return boolean (true=valid)
      */
-    @PostMapping(path = "/authentication/validate", consumes = {"application/json"})
+    @PostMapping(
+        path = "/authentication/validate",
+        consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
     public boolean validateTwoFactorAuthentication(@RequestBody String body) {
         log.debug("REST request to validate two-factor authentication");
         try {

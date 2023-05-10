@@ -7,12 +7,12 @@
         Added the constraints for entity Flow.
     -->
     <changeSet id="20180114132915-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="gateway_id"
                                  baseTableName="flow"
                                  constraintName="fk_flow_gateway_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="gateway"/>
+                                 referencedTableName="integration"/>
 
     </changeSet>
 </databaseChangeLog>

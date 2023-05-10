@@ -8,13 +8,13 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Header and its DTO HeaderDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {MessageMapper.class})
 public interface HeaderMapper extends EntityMapper<HeaderDTO, Header> {
 
-	//@Mappings({
-	//})
-    @Mapping(target = "headerKeys", ignore = true)
-    @Mapping(target = "removeHeaderKeys", ignore = true)
+    @Mapping(source = "message.id", target = "messageId")
+    HeaderDTO toDto(Header header);
+
+    @Mapping(source = "messageId", target = "message")
     Header toEntity(HeaderDTO headerDTO);
 
     default Header fromId(Long id) {
