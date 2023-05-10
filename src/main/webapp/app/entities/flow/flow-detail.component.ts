@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { Step } from 'app/shared/model/step.model';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { Integration } from 'app/shared/model/integration.model';
 
 import { FlowService } from './flow.service';
 import { StepService } from '../step/step.service';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 import { forkJoin } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 })
 export class FlowDetailComponent implements OnInit {
   flow: IFlow;
-  gateway: Gateway;
+  integration: Integration;
   steps: Array<Step>;
 
   // typesLinks: Array<TypeLinks>;
@@ -38,7 +38,7 @@ export class FlowDetailComponent implements OnInit {
   private camelDocUrl: string;
 
   constructor(
-    protected gatewayService: GatewayService,
+    protected integrationService: IntegrationService,
     protected stepService: StepService,
     protected eventManager: EventManager,
     protected flowService: FlowService,
@@ -60,17 +60,17 @@ export class FlowDetailComponent implements OnInit {
 
     this.flowService.find(id).subscribe(flow => {
       this.flow = flow.body;
-      this.getGateway(flow.body.gatewayId);
+      this.getIntegration(flow.body.integrationId);
       this.getStepByFlowId(flow.body.id);
     });
   }
 
-  getGateway(id) {
+  getIntegration(id) {
     if (!id) {
       return;
     }
 
-    this.gatewayService.find(id).subscribe(gateway => (this.gateway = gateway.body));
+    this.integrationService.find(id).subscribe(integration => (this.integration = integration.body));
   }
 
   getStepByFlowId(id) {

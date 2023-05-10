@@ -8,15 +8,14 @@
   <div [innerHtml]="errorHandlerPopoverMessage"></div>
 </ng-template>
 
-
 <ng-template #componentPopover let-message="message">
   <div [innerHtml]="componentPopoverMessage"></div>
 </ng-template>
 <ng-template #optionsPopover let-message="message">
   <div [innerHtml]="optionsPopoverMessage"></div>
 </ng-template>
-<ng-template #headerPopover let-message="message">
-  <div [innerHtml]="headerPopoverMessage"></div>
+<ng-template #messagePopover let-message="message">
+  <div [innerHtml]="messagePopoverMessage"></div>
 </ng-template>
 <ng-template #connectionPopover let-message="message">
   <div [innerHtml]="connectionPopoverMessage"></div>
@@ -43,7 +42,7 @@
   <div class="modal-body" [formGroup]="testConnectionForm">
     <div class="form-group row">
       <div class="col-8">
-        <label class="form-control-label" for="field_header">Host name</label>
+        <label class="form-control-label" for="field_host">Host name</label>
         <i triggers="mouseenter:mouseleave" popoverTitle="Info"
            [popover]="hostnamePopover" container="body" placement="right"
         >
@@ -89,8 +88,6 @@
   </div>
 </ng-template>
 
-
-
 <div class="row">
   <div class="col-9"></div>
   <div class="col-2-5">
@@ -103,8 +100,8 @@
     ></a>
     <a
       role="button"
-      class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
-      href="https://github.com/assimbly/gateway/wiki/Route"
+      class="btn btn-sm left-border-radius-0 assimbly-link assimbly-integration-img"
+      href="https://github.com/assimbly/integration/wiki/user-guide"
       title="Assimbly Documentation"
       target="_blank"
     >
@@ -165,28 +162,39 @@
                         <div class="card-body">
 
                           <div class="row">
-                            <div class="col-12">
+                            <div class="col-10">
                               <div class="float-start text-start">
-                                <h5 class="border-bottom">Step</h5></div>
+                                <h5 class="border-bottom">{{step.stepType}}</h5></div>
+                            </div>
+                            <div class="col-2" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ACTION' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTER' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SCRIPT' ||
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTE'">
+                              <button title="Remove step" type="button" *ngIf="index > 0"
+                                      class="btn btn-close" aria-label="Close"
+                                      (click)="removeStep(step, index)">
+                              </button>
                             </div>
                           </div>
+
 
                           <div class="row">
                             <div [style.display]="'none'">
                               <label for="id">ID</label>
                               <input type="text" class="form-control" id="stepid" formControlName="id" readonly/>
                             </div>
+                            <!-- This can be used to let user choose between types of steps.
                             <div class="col-12">
                               <label class="form-control-label float-start" for="field_type" style="float: left; margin-left: 6px;">Type</label>
                             </div>
                             <div class="col-10">
-                              <ng-select [items]="stepTypes" bindLabel="stepType" bindValue="stepType" formControlName="stepType"
-                                         id="stepType" dropdownPosition="top" [clearable]="false" (change)="setStepComponent(step, index, $event)" style="text-align: left;"></ng-select>
-                            </div>
+                              <ng-select [items]="stepTypes" bindLabel="stepType" bindValue="stepType" formControlName="stepType" id="stepType" dropdownPosition="top" [clearable]="false" [readonly]="true" (change)="setStepComponent(step, index, $event)" style="text-align: left;"></ng-select>
+                            </div>-->
                           </div>
 
+
                           <ng-template #uriPopover let-message="message">
-                            <div style="min-width:300px;" [innerHtml]="uriPopoverMessages[index]"></div>
+                            <div style="min-width:200px; overflow-y: auto;" [innerHtml]="uriPopoverMessages[index]"></div>
                           </ng-template>
 
                           <ng-template #uriFullscreenEditor>
@@ -199,7 +207,7 @@
                             <div class="modal-body">
                                 <textarea class="form-control" id="field_uri" formControlName="uri"
                                           placeholder="{{uriPlaceholders[index]}}" rows="25"
-                                          [(ngModel)]="step.uri"></textarea>
+                                          [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -209,15 +217,13 @@
 
                           <ng-template #uriEditor>
                             <div class="modal-header">
-                              <h4 class="modal-title">Path Editor</h4>
-                              <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-                                <span aria-hidden="true">&times;</span>
+                              <h4 class="modal-title">Edit Path</h4>
+                              <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()">
                               </button>
                             </div>
                             <div class="modal-body">
-                                <textarea class="form-control" id="field_uri" formControlName="uri"
-                                          placeholder="{{uriPlaceholders[index]}}" rows="5"
-                                          [(ngModel)]="step.uri"></textarea>
+                                <textarea class="form-control" formControlName="uri" placeholder="{{uriPlaceholders[index]}}" rows="5"
+                                          [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close
@@ -231,12 +237,13 @@
                           <div *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ACTION' ||
                                            editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTER' ||
                                            editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SOURCE' ||
-                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SINK'">
+                                           editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SINK' ||
+                                           (editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ERROR' && (activeEditor == 'flow' || activeEditor == 'script'))">
 
                             <!-- component field-->
                             <div class="row">
                               <div class="col-12">
-                                <label class="form-control-label float-start" for="field_component_type" style="float: left; margin-left: 6px;">Component</label>
+                                <label class="form-control-label float-start" style="float: left; margin-left: 6px;">Component</label>
                                 <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover"
                                    container="body" placement="right" style="float: left; margin-left: 6px;">
                                   <fa-icon icon="info-circle"></fa-icon>
@@ -244,22 +251,22 @@
                               </div>
                               <div class="col-10">
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SOURCE'"
-                                           [items]="consumerComponentsNames" [clearable]="false"
+                                           [items]="sourceComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            style="text-align: left;"
                                            (change)="setTypeLinks(step, index, $event)"></ng-select>
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='SINK'"
-                                           [items]="producerComponentsNames" [clearable]="false"
+                                           [items]="sinkComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
                                            style="text-align: left;"></ng-select>
                                 <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ACTION'"
-                                           [items]="producerComponentsNames" [clearable]="false"
+                                           [items]="actionComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
                                            style="text-align: left;"></ng-select>
-                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ROUTER'"
-                                           [items]="producerComponentsNames" [clearable]="false"
+                                <ng-select *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ERROR'"
+                                           [items]="sinkComponentsNames" [clearable]="false"
                                            formControlName="componentType" id="field_component_type"
                                            (change)="setTypeLinks(step, index, $event)"
                                            style="text-align: left;"></ng-select>
@@ -280,7 +287,7 @@
                                   </a>
                                   <a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[index]}}"
                                      target="_blank"
-                                     title="Assimbly Gateway online documentation on the component used for scheme: {{step?.componentType}}.">
+                                     title="Assimbly Integration online documentation on the component used for scheme: {{step?.componentType}}.">
                                     <span>Assimbly Documentation</span>
                                   </a>
                                   <a ngbDropdownItem role="button"
@@ -316,14 +323,14 @@
                                 </i>
                               </div>
                               <div class="col-10">
-                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
-                                           formControlName="uri" [(ngModel)]="step.uri"
-                                           dropdownPosition="bottom"></ng-select>
+                                <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri" />
+                                <datalist id="urilist">
+                                  <option *ngFor="let step of URIList[index]" [value]="step.uri">{{step.uri}}</option>
+                                </datalist>
                               </div>
                               <button type="button" class="col-2 btn btn-primary"
                                       [ngStyle]="{'color':'white'}"
-                                      title="Enlarge" (click)="openModal(uriEditor)">
+                                      title="Edit path" (click)="openModal(uriEditor)">
                                 <fa-icon style="color: white;" icon="edit"></fa-icon>
                               </button>
                             </div>
@@ -409,13 +416,13 @@
                                     <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
                             <button title="New step or route" type="button"
-                                    class="col-2 btn btn-primary flow-header-button"
+                                    class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                             </button>
                             <button title="Create step or route" type="button" *ngIf="!routeCreated"
-                                    class="col-2 btn btn-primary flow-header-button"
+                                    class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                             </button>
@@ -423,7 +430,7 @@
                         </div>
 
                         <!-- error -->
-                        <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ERROR'">
+                        <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ERROR' && activeEditor =='route'">
 
                           <div class="col-12">
                             <label class="form-control-label float-start" for="field_errorhandler" style="float: left; margin-left: 6px;">Error Handler</label>
@@ -432,30 +439,31 @@
                               <fa-icon icon="info-circle"></fa-icon>
                             </i>
                           </div>
-                          <div class="col-10">
-                            <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                                       id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
-                          </div>
-                          <button title="Edit route"  type="button"
-                                  class="col-2 btn btn-primary"
-                                  style="height: 37px;"
-                                  *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
-                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
-                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
-                          </button>
-                          <button title="New step or route" type="button"
-                                  class="col-2 btn btn-primary flow-header-button"
-                                  style="height: 37px;"
-                                  *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
-                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
-                          </button>
-                          <button title="Create step or route" type="button" *ngIf="!routeCreated"
-                                  class="col-2 btn btn-primary flow-header-button"
-                                  style="height: 37px;"
-                                  (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
-                          </button>
 
-                      </div>
+                          <div class="col-10" >
+                              <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
+                                         id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+                            </div>
+                            <button title="Edit route"  type="button"
+                                    class="col-2 btn btn-primary"
+                                    style="height: 37px;"
+                                    *ngIf="routeCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                              <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                            </button>
+                            <button title="New step or route" type="button"
+                                    class="col-2 btn btn-primary flow-new-button"
+                                    style="height: 37px;"
+                                    *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                            </button>
+                            <button title="Create step or route" type="button" *ngIf="!routeCreated"
+                                    class="col-2 btn btn-primary flow-new-button"
+                                    style="height: 37px;"
+                                    (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                            </button>
+                          </div>
+
 
                       <!-- script -->
                       <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SCRIPT'">
@@ -489,15 +497,14 @@
                           <br/>
                         </div>
 
-
-                            <div class="col-12">
+                          <div class="col-12">
                                 <label class="form-control-label" for="field_uri" style="float: left; margin-left: 6px;">Script</label>
                               </div>
                               <div class="col-10">
-                                <ng-select [items]="URIList[index]" bindLabel="uri" bindValue="uri" [addTag]="true"
-                                           [ngStyle]="{'text-align' : 'left'}" id="field_uri"
-                                           formControlName="uri" [(ngModel)]="step.uri"
-                                           dropdownPosition="bottom"></ng-select>
+                                <input type="text" class="d-inline-block form-control" list="urilist2" formControlName="uri" [value]="editFlowForm['controls'].stepsData['controls'][index].value.uri" />
+                                <datalist id="urilist2">
+                                  <option *ngFor="let step of URIList[index]" [value]="step.uri">{{step.uri}}</option>
+                                </datalist>
                               </div>
                               <button type="button" class="col-2 btn btn-primary"
                                       [ngStyle]="{'color':'white'}"
@@ -514,9 +521,34 @@
 
                         </div>
 
+                          <br [ngStyle]="{'display': enableMessage[index] ? '' : 'none'}"/>
+                        <div class="row" [ngStyle]="{'display': enableMessage[index] ? '' : 'none'}">
+                          <div class="col-12">
+                            <label class="form-control-label float-start" for="field_message" style="float: left; margin-left: 6px;">Header</label>
+                          </div>
+                          <div class="col-10">
+                              <ng-select [items]="messages" bindLabel="name" bindValue="id" formControlName="message"
+                                         id="message" dropdownPosition="top"></ng-select>
+                          </div>
+                          <button type="button"
+                                  *ngIf="messageCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].message.value"
+                                  title="Edit header" class="col-2 btn btn-primary"
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
+                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                          </button>
+                          <button type="button"
+                                  *ngIf="messageCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].message.value"
+                                  class="col-2 btn btn-primary flow-new-button" title="New header"
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
+                          </button>
+                          <button type="button" *ngIf="!messageCreated" class="col-2 btn btn-primary flow-new-button"
+                                  title="Create header"
+                                  (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
+                          </button>
+                        </div>
 
-                          <!-- connection -->
-                        <div class="row" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='CONNECTION'">
+                        <br [ngStyle]="{'display': enableConnection[index] ? '' : 'none'}"/>
+                        <div class="row" [ngStyle]="{'display': enableConnection[index] ? '' : 'none'}">
                           <div class="col-12">
                             <label class="form-control-label float-start" for="field_connection" style="float: left; margin-left: 6px;">Connection</label>
                           </div>
@@ -529,15 +561,15 @@
                                   *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
                                   class="col-2 btn btn-primary" title="Edit connection"
                                   (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)">
-                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
+                            <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>
                           </button>
                           <button type="button"
                                   *ngIf="connectionCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
-                                  class="col-2 btn btn-primary flow-header-button" title="New connection"
+                                  class="col-2 btn btn-primary flow-new-button" title="New connection"
                                   (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
                                   [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
                           </button>
-                          <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-header-button"
+                          <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-new-button"
                                   title="Create connection"
                                   (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
                                   [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
@@ -547,26 +579,41 @@
                         <br/>
                         <br/>
                           <div class="row">
-                            <div class="col-5-5"></div>
-                            <button title="Add step" type="button"
-                                    class="col-3 btn btn-success"
-                                    style="height: 37px; color: white; padding-left: 30px;"
-                                    (click)="addStep(step, index)">
-                              <fa-icon icon="plus" style="color: white;"></fa-icon> Add
-                            </button>
+                            <div class="col-9-5"></div>
+                            <div class="col-2" ngbDropdown placement="bottom-right">
+                              <a class="btn btn-success"
+                                 [ngStyle]="{'color':'white', 'min-width': '140px'}"
+                                 id="dropdownBasic3" ngbDropdownToggle>
+                                <fa-icon icon="bars"></fa-icon>
+                                Add</a>
+                              <div ngbDropdownMenu aria-labelledby="dropdownBasic3">
+                                <a ngbDropdownItem role="button"
+                                   (click)="addConnection(step, index)">
+                                  <span>Connection</span>
+                                </a>
+                                <a ngbDropdownItem role="button"
+                                   (click)="addStep(step, index)" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ACTION'">
+                                  <span>Action</span>
+                                </a>
+                                <a ngbDropdownItem role="button"
+                                   (click)="addStep(step, index)" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SOURCE' && activeEditor == 'flow'">
+                                  <span>Action</span>
+                                </a>
+                                <a ngbDropdownItem role="button"
+                                   (click)="addStep(step, index)" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SCRIPT'">
+                                  <span>Script</span>
+                                </a>
+                                <a ngbDropdownItem role="button"
+                                   (click)="addStep(step, index)" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='SOURCE' && activeEditor == 'script'">
+                                  <span>Script</span>
+                                </a>
+                                <a ngbDropdownItem role="button"
+                                   (click)="addStep(step, index)" *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value =='ROUTE'">
+                                  <span>Route</span>
+                                </a>
+                              </div>
+                            </div>
                             <div class="col-0-5"></div>
-                            <button title="Remove step" type="button" *ngIf="index > 0"
-                                    class="col-3 btn btn-danger"
-                                    style="height: 37px;"
-                                    (click)="removeStep(step, index)">
-                              <fa-icon icon="times" style="color: white;"></fa-icon> Remove
-                            </button>
-                            <button title="Remove step" type="button" *ngIf="index == 0"
-                                    class="col-3 btn btn-secondary" disabled
-                                    style="height: 37px;"
-                                    (click)="removeStep(step, index)">
-                              <fa-icon icon="times" style="color: white;"></fa-icon> Remove
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -585,7 +632,7 @@
                 <div style="min-height: 44rem;">
                   <div class="row">
                     <div class="form-group col-10" style="margin-left: 24px;">
-                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Log Level</label>
+                      <label class="form-control-label" for="field_logLevel" style="float: left; margin-left: 6px;">Tracing</label>
                       <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
                          [popover]="logLevelPopover" style="float: left; margin-left: 6px;">
                         <fa-icon icon="info-circle"></fa-icon>
@@ -642,7 +689,6 @@
                   <span><fa-icon icon="save"></fa-icon></span>&nbsp;
                   &nbsp; <span style="color: white;">Save</span>
                 </button>
-
               </div>
             </div>
           </div>

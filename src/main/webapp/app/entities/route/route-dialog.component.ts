@@ -50,13 +50,6 @@ export class RouteDialogComponent implements OnInit {
         // route is injected in the component (see RoutePopupService);
         if (!this.route.id) {
             this.route = this.createFromForm();
-
-            if(this.type === 'connector'){
-              this.route.content = '<route>\n' +
-                      '        <!-- Please do not remove the from statement. -->\n' +
-                      '        <from uri="direct:generated"/>\n' +
-                      '</route>'
-            }
         }
 
         this.updateForm(this.route);

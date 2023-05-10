@@ -1,0 +1,157 @@
+<div>
+  <h2>
+    <span>Link</span>
+  </h2>
+  <jhi-alert></jhi-alert>
+  <br />
+  <div class="table-responsive" *ngIf="link">
+    <table class="table">
+      <thead>
+        <tr>
+          <th [style.display]="'none'">
+            <span>ID</span>
+          </th>
+          <th>
+            <span>Name</span>
+          </th>
+          <th>
+            <span>Bound</span>
+          </th>
+          <th>
+            <span>Transport</span>
+          </th>
+          <th>
+            <span>Rule</span>
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let link of links; trackBy: trackId; let idx = index">
+          <td [style.display]="'none'">
+            <a [routerLink]="['../link', link.id]">{{ link.id }}</a>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="link.name"
+              value="link.name"
+              name="link-name-{{ idx }}"
+              id="link-name-{{ idx }}"
+              required
+              maxlength="255"
+              #name="ngModel"
+            />
+            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
+              <span *ngIf="name.errors.required">Name is required.</span>
+              <span *ngIf="name.errors.existingLink">Name already exists.</span>
+            </div>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="link.bound"
+              name="link-bound-{{ idx }}"
+              id="link-bound-{{ idx }}"
+              required
+              maxlength="1000"
+              bound="link.bound"
+              #bound="ngModel"
+            />
+            <div *ngIf="bound.invalid && (bound.dirty || bound.touched)" class="invalid-field-message">
+              <span *ngIf="bound.errors.required">Bound is required.</span>
+            </div>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="link.transport"
+              name="link-transport-{{ idx }}"
+              id="link-transport-{{ idx }}"
+              required
+              maxlength="1000"
+              transport="link.transport"
+              #transport="ngModel"
+            />
+            <div *ngIf="transport.invalid && (transport.dirty || transport.touched)" class="invalid-field-message">
+              <span *ngIf="transport.errors.required">Transport is required.</span>
+            </div>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="link.rule"
+              name="link-rule-{{ idx }}"
+              id="link-rule-{{ idx }}"
+              required
+              maxlength="1000"
+              rule="link.rule"
+              #rule="ngModel"
+            />
+            <div *ngIf="rule.invalid && (rule.dirty || rule.touched)" class="invalid-field-message">
+              <span *ngIf="rule.errors.required">Rule is required.</span>
+            </div>
+          </td>
+          <td>
+            <div class="btn-group flex-btn-group-container">
+              <button type="button" class="btn btn-success" title="Add" (click)="addLink()">
+                <span class="fa fa-plus"></span>
+              </button>
+              <button type="button" title="Remove" *ngIf="!link.id" class="btn btn-danger" (click)="removeLink(idx)">
+                <span class="fa fa-remove"></span>
+              </button>
+              <button type="button" title="Save" *ngIf="!link.id" class="btn btn-primary" (click)="save(link, idx)">
+                <span class="fa fa-save"></span>
+              </button>
+              <button type="button" title="View" *ngIf="link.id" class="btn btn-info" [routerLink]="['../link', link.id]">
+                <span class="fa fa-eye"></span>
+              </button>
+              <button
+                type="button"
+                title="Update"
+                *ngIf="link.id"
+                class="btn btn-primary"
+                (click)="save(link, idx)"
+              >
+                <span class="fa fa-check"></span>
+              </button>
+              <button
+                type="button"
+                title="Edit"
+                *ngIf="link.id"
+                queryParamsHandling="merge"
+                class="btn btn-primary"
+                (click)="editHeaderKey(link)"
+              >
+                <span class="fa fa-pencil"></span>
+              </button>
+              <button
+                type="button"
+                title="Clone"
+                *ngIf="link.id"
+                queryParamsHandling="merge"
+                class="btn btn-info"
+                (click)="cloneHeaderKey(link)"
+              >
+                <span class="fa fa-clone"></span>
+              </button>
+              <button
+                type="submit"
+                title="Delete"
+                *ngIf="link.id"
+                class="btn btn-danger"
+				(click)="delete(link)"
+				>
+                <span class="fa fa-trash"></span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

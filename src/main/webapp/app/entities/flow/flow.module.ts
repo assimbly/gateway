@@ -19,8 +19,6 @@ import { FlowPopupService } from './flow-popup.service';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowEditorComponent } from './editor/flow-editor.component';
-import { FlowEditorApiComponent } from './editor/flow-editor-api.component';
-import { FlowEditorConnectorComponent } from './editor/flow-editor-connector.component';
 import { FlowEditorEsbComponent } from './editor/flow-editor-esb.component';
 import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
 
@@ -30,6 +28,7 @@ import { FlowService } from 'app/entities/flow/flow.service';
 
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
+import { Collectors } from 'app/shared/collect/collectors';
 
 const ENTITY_STATES = [...flowRoute];
 
@@ -55,9 +54,7 @@ const ENTITY_STATES = [...flowRoute];
     FlowRowComponent,
     FlowUpdateComponent,
     FlowEditorComponent,
-	FlowEditorApiComponent,
-	FlowEditorConnectorComponent,
-	FlowEditorEsbComponent,
+	  FlowEditorEsbComponent,
     FlowMessageSenderComponent,
     FlowDetailComponent,
     FlowDeleteDialogComponent,

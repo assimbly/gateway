@@ -4,22 +4,28 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { AlertService } from "app/core/util/alert.service";
 import { EventManager, EventWithContent } from "app/core/util/event-manager.service";
+import { MessageDialogComponent } from 'app/entities/message/message-dialog.component';
+import { MessagePopupService } from 'app/entities/message/message-popup.service';
 import { RouteDialogComponent } from "app/entities/route/route-dialog.component";
 import { RoutePopupService } from "app/entities/route/route-popup.service";
 import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Components } from "app/shared/camel/component-type";
 import { Connections } from "app/shared/camel/connections";
+import { Link, ILink } from "app/shared/model/link.model";
 import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
-import { Gateway } from "app/shared/model/gateway.model";
+import { Integration } from "app/shared/model/integration.model";
+import { IMessage } from 'app/shared/model/message.model';
 import { Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
 import { from, forkJoin, Observable, Subscription } from "rxjs";
 import { map } from 'rxjs/operators';
+import { LinkService } from "../../link/link.service";
 import { StepService } from "../../step/step.service";
-import { GatewayService } from "../../gateway/gateway.service";
+import { MessageService } from '../../message/message.service';
+import { IntegrationService } from "../../integration/integration.service";
 import { RouteService } from "../../route/route.service";
 import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
@@ -32,8 +38,8 @@ import { FlowService } from "../flow.service";
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	flow: IFlow;
 	routes: Route[];
-  connections: Connection[];
-
+	messages: IMessage[];
+	connections: Connection[];
 
 	URIList: Array<Array<Step>> = [[]];
 	allsteps: IStep[] = new Array<Step>();
@@ -44,15 +50,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   //Future possibilities
 	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "SCRIPT", "API", MESSAGE", "CONNECTION", "ERROR"];
 
-	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT","CONNECTION", "ERROR"];
+	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
+  public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+  public componentsWithConnection: Array<any> = ['amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq'];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
-		LogLevelType.INFO,
-		LogLevelType.ERROR,
 		LogLevelType.TRACE,
-		LogLevelType.WARN,
-		LogLevelType.DEBUG,
 	];
 
 	panelCollapsed: any = "uno";
@@ -61,6 +65,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	active2: any;
 	disabled = true;
 	activeStep: any;
+	activeEditor: string;
 
 	isSaving: boolean;
 	savingFlowFailed = false;
@@ -71,11 +76,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	finished = false;
 
-	gateways: Gateway[];
-	configuredGateway: Gateway;
-	gatewayName: string;
-	singleGateway = false;
-	indexGateway: number;
+	integrations: Integration[];
+	configuredIntegration: Integration;
+	integrationName: string;
+	singleIntegration = false;
+	indexIntegration: number;
 
 	createRoute: number;
 	predicate: any;
@@ -83,6 +88,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	routeCreated: boolean;
   connectionCreated: boolean;
+  messageCreated: boolean;
+  errorStep: boolean = true;
 
 	namePopoverMessage: string;
 	logLevelPopoverMessage: string;
@@ -91,7 +98,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   componentPopoverMessage: string;
   optionsPopoverMessage: string;
-  headerPopoverMessage: string;
+  messagePopoverMessage: string;
   routePopoverMessage: string;
   connectionPopoverMessage: string;
   popoverMessage: string;
@@ -106,10 +113,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   uriPlaceholders: Array<string> = new Array<string>();
   uriPopoverMessages: Array<string> = new Array<string>();
 
-	consumerComponentsNames: Array<any> = [];
-	producerComponentsNames: Array<any> = [];
-
-  languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+	sourceComponentsNames: Array<any> = [];
+  actionComponentsNames: Array<any> = [];
+	sinkComponentsNames: Array<any> = [];
 
 	editFlowForm: FormGroup;
 	invalidUriMessage: string;
@@ -119,9 +125,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   connectionType: Array<string> = [];
   selectedConnection: Connection = new Connection();
 
+  enableConnection: Array<boolean> = [];
+  enableMessage: Array<boolean> = [];
+
 	numberOfSteps = 0;
 
 	modalRef: NgbModalRef | null;
+	modalRefPromise: Promise<NgbModalRef> | null;
 
   testConnectionForm: FormGroup;
   testConnectionMessage: string;
@@ -139,9 +149,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private eventManager: EventManager,
-		private gatewayService: GatewayService,
+		private integrationService: IntegrationService,
 		private flowService: FlowService,
 		private stepService: StepService,
+		private linkService: LinkService,
+		private messageService: MessageService,
 		private routeService: RouteService,
     private connectionService: ConnectionService,
 		private alertService: AlertService,
@@ -150,6 +162,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		public connectionsList: Connections,
 		public components: Components,
 		private modalService: NgbModal,
+		private MessagePopupService: MessagePopupService,
 		private routePopupService: RoutePopupService,
     private connectionPopupService: ConnectionPopupService,
 	) {}
@@ -166,6 +179,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.route.params.subscribe(
 				(params) => {
 					this.activeStep = params["stepid"];
+					this.activeEditor = params["editor"];
 
 					if (params["mode"] === "clone") {
 						this.load(params["id"], true);
@@ -176,22 +190,29 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			);
 
 		this.registerChangeInFlows();
+
 	}
 
 	load(id, isCloning?: boolean): void {
+
 		forkJoin([
 			this.flowService.getWikiDocUrl(),
 			this.flowService.getCamelDocUrl(),
+			this.messageService.getAllMessages(),
 			this.routeService.getAllRoutes(),
       this.connectionService.getAllConnections(),
-			this.gatewayService.query(),
+			this.integrationService.query(),
 			this.stepService.query(),
-			this.flowService.getGatewayName(),
+			this.flowService.getIntegrationName(),
 		])
 			.subscribe(
-				([wikiDocUrl, camelDocUrl, routes, connections, gateways, allsteps, gatewayName]) => {
+				([wikiDocUrl, camelDocUrl, messages, routes, connections, integrations, allsteps, integrationName]) => {
+
 					this.wikiDocUrl = wikiDocUrl.body;
 					this.camelDocUrl = camelDocUrl.body;
+
+          this.messages = messages.body;
+          this.messageCreated = this.messages.length > 0;
 
 					this.routes = routes.body;
 					this.routeCreated = this.routes.length > 0;
@@ -199,18 +220,18 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.connections = connections.body;
           this.connectionCreated = this.connections.length > 0;
 
-					this.gateways = gateways.body;
-					this.singleGateway = this.gateways.length === 1;
-					this.gatewayName = gatewayName.body;
+					this.integrations = integrations.body;
+					this.singleIntegration = this.integrations.length === 1;
+					this.integrationName = integrationName.body;
 
 					this.allsteps = allsteps.body;
 
-					if (this.singleGateway) {
-						this.indexGateway = 0;
+					if (this.singleIntegration) {
+						this.indexIntegration = 0;
 					} else {
-						this.indexGateway =
-							this.gateways.findIndex(
-								(gateway) => gateway.name === this.gatewayName,
+						this.indexIntegration =
+							this.integrations.findIndex(
+								(integration) => integration.name === this.integrationName,
 							);
 					}
 
@@ -220,93 +241,33 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 							.subscribe(
 								(flow) => {
 									this.flow = flow.body;
-									if (this.singleGateway) {
-										this.flow.gatewayId = this.gateways[this.indexGateway].id;
+									if (this.singleIntegration) {
+										this.flow.integrationId = this.integrations[this.indexIntegration].id;
 									}
 
 									this.initializeForm(this.flow);
 
-									this.stepService
-										.findByFlowId(id)
-										.subscribe(
-											(flowStepsData) => {
-												const steps = flowStepsData.body;
-												let index = 0;
-												this.steps = [];
+                  this.loadSteps();
 
-												this.stepTypes.forEach(
-													(stepType, j) => {
-														let filteredSteps = steps.filter(
-															(step) =>
-																step.stepType === stepType,
-														);
+                  if (this.activeStep) {
+                    const activeIndex = this.steps.findIndex(
+                      (item) => item.id.toString() === this.activeStep,
+                    );
+                    if (activeIndex === -1) {
+                      this.active = "0";
+                    } else {
+                      this.active = activeIndex.toString();
+                    }
+                  } else {
+                    this.active = "0";
+                  }
 
-														filteredSteps.forEach(
-															(step) => {
+                  if (isCloning) {
+                    this.clone();
+                  }
 
-                                if (typeof this.stepsOptions[index] === 'undefined') {
-                                  this.stepsOptions.push([]);
-                                }
+                  this.finished = true;
 
-																this.step =
-																	new Step(
-																		step.id,
-																		step.stepType,
-																		step.uri,
-																		step.options,
-																		step.flowId,
-																		step.routeId,
-																		step.headerId,
-								                    step.connectionId,
-																	);
-
-																this.steps.push(step);
-
-																const formgroup = this.initializeStepData(
-																	step,
-																);
-																this.stepsOptions[0] = [new Option()];
-																(
-																	<FormArray>this.editFlowForm.controls.stepsData
-																).insert(index, formgroup);
-
-                                this.setTypeLinks(step, index);
-
-                                this.getOptions(
-                                  step,
-                                  this.editFlowForm.controls.stepsData.get(index.toString()),
-                                  this.stepsOptions[index],
-                                  index
-                                );
-
-																index = index + 1;
-															},
-															this,
-														);
-													},
-													this,
-												);
-
-												if (this.activeStep) {
-													const activeIndex = this.steps.findIndex(
-														(item) => item.id.toString() === this.activeStep,
-													);
-													if (activeIndex === -1) {
-														this.active = "0";
-													} else {
-														this.active = activeIndex.toString();
-													}
-												} else {
-													this.active = "0";
-												}
-
-												if (isCloning) {
-													this.clone();
-												}
-
-												this.finished = true;
-											},
-										);
 								},
 							);
 					} else if (!this.finished) {
@@ -314,27 +275,26 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 							() => {
 								// create new flow object
 								this.flow = new Flow();
-								this.flow.type = 'esb';
+								this.flow.type = this.activeEditor;
 								this.flow.notes = '';
 								this.flow.autoStart = false;
 								this.flow.parallelProcessing = false;
-								this.flow.assimblyHeaders = false;
 								this.flow.maximumRedeliveries = 0;
 								this.flow.redeliveryDelay = 3000;
 								this.flow.logLevel = LogLevelType.OFF;
-								if (this.singleGateway) {
-									this.indexGateway = 0;
-									this.flow.gatewayId = this.gateways[this.indexGateway].id;
+								if (this.singleIntegration) {
+									this.indexIntegration = 0;
+									this.flow.integrationId = this.integrations[this.indexIntegration].id;
 								} else {
-									this.configuredGateway =
-										this.gateways.find(
-											(gateway) => gateway.name === this.gatewayName,
+									this.configuredIntegration =
+										this.integrations.find(
+											(integration) => integration.name === this.integrationName,
 										);
-									this.indexGateway =
-										this.gateways.findIndex(
-											(gateway) => gateway.name === this.gatewayName,
+									this.indexIntegration =
+										this.integrations.findIndex(
+											(integration) => integration.name === this.integrationName,
 										);
-									this.flow.gatewayId = this.configuredGateway.id;
+									this.flow.integrationId = this.configuredIntegration.id;
 								}
 
 								this.initializeForm(this.flow);
@@ -342,35 +302,18 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								this.numberOfSteps = 1;
 
 								// create new route step
-								this.step = new Step();
-								this.step.id = null;
-								this.step.stepType = StepType.SOURCE;
-  							this.step.componentType = 'file';
- 								this.step.uri = null;
-  							this.step.routeId = null;
-	  						this.step.connectionId = null;
-
-                (<FormArray>this.editFlowForm.controls.stepsData).push(this.initializeStepData(this.step));
-
-                this.stepsOptions[0] = [new Option()];
-
-                  // set documentation links
-                  this.setTypeLinks(this.step, 0);
-
-                  let componentType = this.step.componentType.toLowerCase();
-                  let camelComponentType = this.components.getCamelComponentType(componentType);
-
-                  // get list of options (from CamelCatalog)
-                  this.setComponentOptions(this.step, camelComponentType);
-
-  								this.numberOfSteps = 1;
-
-                  const optionArrayFrom: Array<string> = [];
-                  optionArrayFrom.splice(0, 0, '');
-                  this.selectedOptions.splice(0, 0, optionArrayFrom);
-
-
-								this.steps.push(this.step);
+                if(this.activeEditor === 'flow'){
+                    this.createNewStep(StepType.SOURCE,'file',0);
+                    this.createNewStep(StepType.SINK,'file',1);
+                    this.createNewStep(StepType.ERROR,'file',2);
+                }else if(this.activeEditor === 'script'){
+                    this.createNewStep(StepType.SOURCE,'scheduler',0);
+                    this.createNewStep(StepType.SCRIPT,'groovy',1);
+                    this.createNewStep(StepType.ERROR,'file',2);
+                }else if(this.activeEditor === 'route'){
+                    this.createNewStep(StepType.ROUTE,'',0);
+                    this.createNewStep(StepType.ERROR,'',1);
+                }
 
 								this.finished = true;
 							},
@@ -383,6 +326,119 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			);
 	}
 
+  loadSteps(){
+
+      if(this.flow.steps.length > 0){
+
+        this.steps = [];
+        let startStep = this.flow.steps.find(step => step.stepType === 'SOURCE');
+
+        let index = 0;
+
+        if(startStep){
+          this.loadStep(startStep, index);
+        }else{
+            startStep = this.flow.steps.find(step => step.stepType === 'ROUTE');
+            if(startStep){
+                this.loadStep(startStep, 0);
+            }
+        }
+      }
+  }
+
+  loadStep(loadStep: any, index: number){
+
+        this.numberOfSteps = this.numberOfSteps + 1;
+
+        const step = this.allsteps.find(step => step.id === loadStep.id);
+
+        if (typeof this.stepsOptions[index] === 'undefined') {
+          this.stepsOptions.push([]);
+        }
+
+        this.steps.push(step);
+
+        const formgroup = this.initializeStepData(step);
+
+        this.stepsOptions[0] = [new Option()];
+        (<FormArray>this.editFlowForm.controls.stepsData).insert(index, formgroup);
+
+        this.setTypeLinks(step, index);
+
+        this.getOptions(
+          step,
+          this.editFlowForm.controls.stepsData.get(index.toString()),
+          this.stepsOptions[index],
+          index
+        );
+
+        if(step.connectionId){
+          this.enableConnection[index] = true;
+        }else{
+          this.enableConnection[index] = false;
+        }
+
+        if(step.messageId){
+          this.enableMessage[index] = true;
+        }else{
+          this.enableMessage[index] = false;
+        }
+
+        const linkName = this.flow.id + '-' + step.id
+
+        this.flow.steps.forEach((nextStep) => {
+              if(nextStep.id!==step.id){
+                const found = nextStep.links.find(link => {
+                  return (link.name === linkName);
+                });
+                if(found){
+                  index = index + 1;
+                  //recursively call itself when nextStep is found
+                  this.loadStep(nextStep, index);
+                }
+            }
+        });
+
+        if(this.errorStep){
+            this.errorStep = false;
+            let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
+            this.loadStep(errorStep, index + 1);
+        }
+
+  }
+
+  createNewStep(stepType: StepType, defaultComponentType: string, index: number){
+
+		this.steps.splice(index, 0, new Step());
+    this.stepsOptions.splice(index, 0, [new Option()]);
+
+		this.numberOfSteps = this.numberOfSteps + 1;
+
+		const newStep = this.steps.find((e, i) => i === index);
+
+    newStep.stepType = stepType;
+    newStep.componentType = defaultComponentType;
+
+		(<FormArray>this.editFlowForm.controls.stepsData).insert(
+			index,
+			this.initializeStepData(newStep),
+		);
+
+    this.setTypeLinks(newStep, index);
+
+    const optionArray: Array<string> = [];
+    optionArray.splice(0, 0, '');
+    this.selectedOptions.splice(index, 0, optionArray);
+
+    this.enableConnection[index] = false;
+    this.enableMessage[index] = false;
+
+		this.active = index.toString();
+
+  }
+
+
+
   setTypeLinks(step: any, stepFormIndex?, e?: Event): void {
 
     const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
@@ -391,11 +447,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
       // set componenttype to selected component and clear other fields
       step.componentType = e;
-      step.stepType = 'SOURCE'
       step.uri = null;
-      step.headerId = '';
+      step.messageId = '';
       step.routeId = '';
       step.connectionId = '';
+
+      if(Object.keys(step.stepType).length === 0){
+         step.stepType = 'SOURCE';
+      }
 
       let i;
       const numberOfOptions = this.stepsOptions[stepFormIndex].length - 1;
@@ -405,7 +464,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       }
 
       stepForm.controls.uri.patchValue(step.uri);
-      stepForm.controls.header.patchValue(step.headerId);
+      stepForm.controls.message.patchValue(step.messageId);
       stepForm.controls.route.patchValue(step.routeId);
       stepForm.controls.connection.patchValue(step.connectionId);
 
@@ -444,32 +503,52 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           });
         }
 
+        if(componentType === 'setheaders' || componentType === 'setmessage'){
+          this.enableMessage[stepFormIndex] = true;
+        }else{
+          this.enableMessage[stepFormIndex] = false;
+        }
+
+        if(this.componentsWithConnection.includes(componentType)){
+          this.enableConnection[stepFormIndex] = true;
+        }else{
+          this.enableConnection[stepFormIndex] = false;
+        }
+
     }
 
-
-    stepForm.patchValue({ string: componentType });
+    if(stepForm){
+      stepForm.patchValue({ string: componentType });
+    }
 
     this.setURIlist(stepFormIndex);
 
   }
 
-
 	setComponents(): void {
-		const producerComponents = this.components.types.filter(function (component) {
-			return component.consumerOnly === false;
-		});
 
-		const consumerComponents = this.components.types.filter(function (component) {
+		const sourceComponents = this.components.types.filter(function (component) {
 			return component.producerOnly === false;
 		});
 
-		this.producerComponentsNames =
-			producerComponents.map((component) => component.name);
-		this.producerComponentsNames.sort();
+		this.sourceComponentsNames = sourceComponents.map((component) => component.name);
+		this.sourceComponentsNames.sort();
 
-		this.consumerComponentsNames =
-			consumerComponents.map((component) => component.name);
-		this.consumerComponentsNames.sort();
+		const sinkComponents = this.components.types.filter(function (component) {
+			return component.consumerOnly === false;
+		});
+
+		this.sinkComponentsNames = sinkComponents.map((component) => component.name);
+		this.sinkComponentsNames.sort();
+
+		const actionComponents = this.components.types.filter(function (component) {
+			return component.kind === 'action';
+		});
+
+		this.actionComponentsNames = actionComponents.map((component) => component.name);
+		this.actionComponentsNames = [ ...this.actionComponentsNames, ...this.sinkComponentsNames];
+		this.actionComponentsNames.sort();
+
 	}
 
 	clone(): void {
@@ -504,6 +583,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if(stepType === 'SCRIPT'){
         step.componentType = 'groovy';
         stepForm.controls.componentType.patchValue(step.componentType);
+    }else if(stepType === 'ACTION'){
+             step.componentType = 'print';
+             stepForm.controls.componentType.patchValue(step.componentType);
     }else{
         step.componentType = 'file';
         stepForm.controls.componentType.patchValue(step.componentType);
@@ -517,14 +599,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			`Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
 		this.errorHandlerPopoverMessage =
 			`Route or RouteConfiguration that handles errors in case of failures.`;
-		this.logLevelPopoverMessage = `Sets the log level (default=OFF). This automatically log headers and body of the first and last step of a route`;
+		this.logLevelPopoverMessage = `Logs messages for each step to the console/log file`;
 		this.notesPopoverMessage = `Notes to document the flow.`;
 
     this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
     this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
                                      Click on the Apache Camel button to view documation on the valid options.`;
     this.optionsPopoverMessage = ``;
-    this.headerPopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
+    this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
     this.connectionPopoverMessage = `If available then a connection can be selected. For example a database connection that sets up a connection.<br/><br/>
                                      Use the button on the right to create or edit connections.`;
@@ -566,12 +648,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				name: new FormControl(flow.name, Validators.required),
 				notes: new FormControl(flow.notes),
 				autoStart: new FormControl(flow.autoStart),
-				assimblyHeaders: new FormControl(flow.assimblyHeaders),
 				parallelProcessing: new FormControl(flow.parallelProcessing),
 				maximumRedeliveries: new FormControl(flow.maximumRedeliveries),
 				redeliveryDelay: new FormControl(flow.redeliveryDelay),
 				logLevel: new FormControl(flow.logLevel),
-				gateway: new FormControl(flow.gatewayId),
+				integration: new FormControl(flow.integrationId),
 				stepsData: new FormArray([]),
 			});
 	}
@@ -583,9 +664,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			stepType: new FormControl(step.stepType),
       uri: new FormControl(step.uri),
       options: new FormArray([this.initializeOption()]),
-      header: new FormControl(step.headerId),
+      message: new FormControl(step.messageId),
 			route: new FormControl(step.routeId),
 			connection: new FormControl(step.connectionId),
+			links: new FormControl(step.links),
 		});
 	}
 
@@ -627,12 +709,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			name: flow.name,
 			notes: flow.notes,
 			autoStart: flow.autoStart,
-			assimblyHeaders: flow.assimblyHeaders,
 			parallelProcessing: flow.parallelProcessing,
 			maximumRedeliveries: flow.maximumRedeliveries,
 			redeliveryDelay: flow.redeliveryDelay,
 			logLevel: flow.logLevel,
-			gateway: flow.gatewayId,
+			integration: flow.integrationId,
 		});
 	}
 
@@ -642,15 +723,35 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			componentType: step.componentType,
 			stepType: step.stepType,
 			uri: step.uri,
-			header: step.headerId,
+			message: step.messageId,
 			route: step.routeId,
 			connection: step.connectionId,
+			links: new FormControl(step.links),
 		});
 	}
 
 	addStep(step, index): void {
 
 		let newIndex = index + 1;
+
+    //keep connections or message enabled if true
+    for (let i = this.numberOfSteps -1; i > index; i--) {
+
+        let j = i + 1;
+
+        if(this.enableConnection[i] === true){
+          this.enableConnection[j] = true;
+        }else{
+          this.enableConnection[j] = false;
+        }
+
+        if(this.enableMessage[i] === true){
+          this.enableMessage[j] = true;
+        }else{
+           this.enableMessage[j] = false;
+        }
+
+    }
 
 		this.steps.splice(newIndex, 0, new Step());
     this.stepsOptions.splice(newIndex, 0, [new Option()]);
@@ -659,15 +760,26 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		const newStep = this.steps.find((e, i) => i === newIndex);
 
-		newStep.stepType = step.stepType;
-		newStep.componentType =	this.gateways[this.indexGateway].defaultToComponentType;
+    if(this.activeEditor === 'flow'){
+      newStep.stepType = StepType.ACTION;
+      newStep.componentType = 'print';
+    }else if(this.activeEditor === 'script'){
+      newStep.stepType = StepType.SCRIPT;
+      newStep.componentType = '';
+    }else if(this.activeEditor === 'route'){
+      newStep.stepType = StepType.ROUTE;
+      newStep.componentType = '';
+    }
 
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,
 			this.initializeStepData(newStep),
 		);
 
-    this.setTypeLinks(step, newIndex);
+    this.setTypeLinks(newStep, newIndex);
+
+    this.enableConnection[newIndex] = false;
+    this.enableMessage[newIndex] = false;
 
     const optionArray: Array<string> = [];
     optionArray.splice(0, 0, '');
@@ -684,11 +796,37 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		this.numberOfSteps = this.numberOfSteps - 1;
 
+    for (let i = index + 1; i <= this.numberOfSteps; i++) {
+
+        let j = i - 1;
+
+        if(this.enableConnection[i] === true){
+          this.enableConnection[j] = true;
+        }else{
+          this.enableConnection[j] = false;
+        }
+
+        if(this.enableMessage[i] === true){
+          this.enableMessage[j] = true;
+        }else{
+           this.enableMessage[j] = false;
+        }
+
+    }
+
 		const i = this.steps.indexOf(step);
 		this.steps.splice(i, 1);
 		this.stepsOptions.splice(i, 1);
 		this.editFlowForm.removeControl(index);
 		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
+	}
+
+	addConnection(step, index): void {
+	     this.enableConnection[index] = true;
+	}
+
+	addMessage(step, index): void {
+	     this.enableMessage[index] = true;
 	}
 
   setComponentOptions(step: Step, componentType: string): Observable<any> {
@@ -890,11 +1028,54 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   // this filters connections not of the correct type
-  filterConnections(step: any, formService: FormControl): void {
+  filterConnections(step: any, formConnection: FormControl): void {
 
     //this.connectionType[this.steps.indexOf(step)] = this.connectionsList.getConnectionType(step.componentType);
     this.filterConnection[this.steps.indexOf(step)] = this.connections;
 
+  }
+
+  createOrEditMessage(step, formMessage: FormControl): void {
+
+    step.messageId = formMessage.value;
+
+   let modalRef;
+
+    if (typeof step.messageId === 'undefined' || step.messageId === null || !step.messageId) {
+      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component);
+    }else{
+      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component, step.messageId);
+    }
+
+    modalRef.then(res => {
+        res.result.then(
+          result => {
+            this.setMessage(step, result.id, formMessage);
+          },
+          reason => {
+            this.setMessage(step, reason.id, formMessage);
+          }
+        );
+    },(reason)=>{
+       console.log('createHeader error: ', reason);
+    });
+
+  }
+
+  setMessage(step, id, formMessage: FormControl): void {
+
+    this.messageService
+      .getAllMessages()
+      .subscribe(
+      res => {
+        this.messages = res.body;
+        this.messageCreated = this.messages.length > 0;
+        step.messageId = id;
+        formMessage.patchValue(id);
+        step = null;
+      },
+      res => this.onError(res.body)
+    );
   }
 
 	createOrEditRoute(step, formRoute: FormControl): void {
@@ -962,42 +1143,44 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			);
 	}
 
-  createOrEditConnection(step, connectionType: string, formService: FormControl): void {
+  createOrEditConnection(step, connectionType: string, formConnection: FormControl): void {
 
-    step.connectionId = formService.value;
+    step.connectionId = formConnection.value;
+
+    connectionType = this.connectionsList.getConnectionType(step.componentType);
 
     let modalRef;
 
     if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, null, connectionType);
     } else {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
+        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId, connectionType);
     }
 
     modalRef.then((res) => {
        res.result.then(
               result => {
-                this.setConnection(step, result.id, formService);
+                this.setConnection(step, result.id, formConnection);
               },
               reason => {
-
+                this.setConnection(step, reason.id, formConnection);
               }
           );
 
        }, (reason)=>{
-
+          console.log('Set connection failed');
        }
     )
 
   }
 
-  setConnection(step, id, formService: FormControl): void {
+  setConnection(step, id, formConnection: FormControl): void {
     this.connectionService.getAllConnections().subscribe(
       res => {
         this.connections = res.body;
         this.connectionCreated = this.connections.length > 0;
         step.connectionId = id;
-        formService.patchValue(id);
+        formConnection.patchValue(id);
       },
       res => this.onError(res.body)
     );
@@ -1038,7 +1221,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
   updateFlow(){
-
    this.steps.forEach(
       (step) => {
         step.flowId = this.flow.id;
@@ -1049,22 +1231,29 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       .update(this.flow)
       .subscribe(
         (flow) => {
+
           this.flow = flow.body;
+
+          //update steps
           const updateSteps = this.stepService.updateMultiple(
             this.steps,
           );
 
           updateSteps.subscribe(
             (results) => {
+
               this.steps = results.body.concat();
 
               this.updateForm();
+
+              this.updateLinks();
 
               this.stepService
                 .findByFlowId(this.flow.id)
                 .subscribe(
                   (data) => {
                     let steps = data.body;
+
                     steps =
                       steps.filter(
                         (e) => {
@@ -1077,15 +1266,19 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                         },
                       );
 
+                    /*
                     if (steps.length > 0) {
                       steps.forEach(
-                        (element) => {
-                          this.stepService.delete(element.id).subscribe();
+                        (step) => {
+                          this.stepService.delete(step.id).subscribe();
                         },
                       );
                     }
+                    */
+
                   },
                 );
+
               this.savingFlowSuccess = true;
               this.isSaving = false;
               this.router.navigate(["/"]);
@@ -1098,13 +1291,15 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   createFlow(){
 
-		this.flow.gatewayId = this.gateways[0].id;
+		this.flow.integrationId = this.integrations[0].id;
 
 			this.flowService
 				.create(this.flow)
 				.subscribe(
 					(flowUpdated) => {
 						this.flow = flowUpdated.body;
+
+              let previousStepId = 0;
 
 						this.steps.forEach(
 							(step) => {
@@ -1117,6 +1312,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 							.subscribe(
 								(toRes) => {
 									this.steps = toRes.body;
+									this.createLinks();
 									this.updateForm();
 									this.finished = true;
 									this.savingFlowSuccess = true;
@@ -1137,6 +1333,53 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				);
   }
 
+  createLinks(){
+
+        let previousStepId = 0;
+
+        this.steps.forEach(
+          (step) => {
+
+              if(step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE'){
+                  const linkName = this.flow.id + '-' + step.id;
+                  const outLink = this.setLink(linkName, step.id, 'out');
+                  this.linkService.create(outLink).subscribe((results) => {
+                  },
+                  );
+              }
+
+              if(step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE'){
+                  const linkName = this.flow.id + '-' + previousStepId;
+                  const inLink = this.setLink(linkName, step.id, 'in');
+                  if(previousStepId!=0){
+                    this.linkService.create(inLink).subscribe((results) => {
+                      },
+                    );
+                  }
+              }
+
+            previousStepId = step.id;
+
+          },
+        );
+
+  }
+
+  updateLinks(){
+      this.deleteLinks();
+      this.createLinks();
+  }
+
+  deleteLinks(){
+        this.steps.forEach(async (step) => {
+            const contents = await this.linkService.deleteByStepId(step.id).subscribe((result) => {
+            });
+          },
+        );
+  }
+
+
+
 	setDataFromForm(): void {
 		const flowControls = this.editFlowForm.controls;
 
@@ -1147,27 +1390,34 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.flow.name = flowControls.name.value;
 		this.flow.logLevel = flowControls.logLevel.value;
 		this.flow.notes = flowControls.notes.value;
-		this.flow.gatewayId = flowControls.gateway.value;
+		this.flow.integrationId = flowControls.integration.value;
 
 		(<FormArray>flowControls.stepsData).controls.forEach(
 			(step, index) => {
-				this.setDataFromFormOnStep(
-					this.steps[index],
-					(<FormGroup>step).controls,
-				);
+				this.setDataFromFormOnStep(this.steps[index],	(<FormGroup>step).controls, index);
 			},
 		);
 	}
 
-	setDataFromFormOnStep(step, formStepData) {
+	setDataFromFormOnStep(step: Step, formStepData, index: number) {
+
 		step.id = formStepData.id.value;
-    step.componentType = formStepData.componentType.value;
-    step.stepType = formStepData.stepType.value;
+		step.componentType = formStepData.componentType.value;
+		step.stepType = formStepData.stepType.value;
 		step.uri = formStepData.uri.value;
-    step.headerId = formStepData.header.value;
+		step.messageId = formStepData.message.value;
 		step.routeId = formStepData.route.value;
 		step.connectionId = formStepData.connection.value;
+	}
 
+	setLink(name: string, stepId: number, bound: string): ILink {
+	    const link = new Link();
+      link.name = name;
+      link.bound = bound;
+      link.transport = 'sync';
+      link.stepId = stepId;
+
+      return link;
 	}
 
 	setVersion(): void {
@@ -1242,7 +1492,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       this.connectionTimeout = <FormGroup>this.testConnectionForm.controls.connectionTimeout.value;
 
       this.flowService
-        .testConnection(this.flow.gatewayId, this.connectionHost, this.connectionPort, this.connectionTimeout)
+        .testConnection(this.flow.integrationId, this.connectionHost, this.connectionPort, this.connectionTimeout)
         .subscribe(result => {
           this.testConnectionMessage = result.body;
         });

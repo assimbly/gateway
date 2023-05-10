@@ -20,14 +20,14 @@ with options:
 
 * Module: valid values are 'full','integration', 'broker' or 'headless' (default is 'full' then both integration and broker are applied)
 * Environment: valid values are 'dev' or 'prod' (default=dev)
-* Kind: kind of dependencies: opensource or dovetail (default=opensource). Last option adds dovetail dependencies to build.
+* Kind: kind of dependencies: default or full. Last option adds dependencies from Assimbly custom-components to the build.
 
 ### Examples:
 
 ````
 run full
-run broker prod opensource
-run integration dovetail
+run broker prod default
+run integration full
 run integration
 ````
 
@@ -48,14 +48,14 @@ with options:
 
 * Module: valid values are 'full','integration', 'broker' or 'headless' (default is 'full' then both integration and broker are applied)
 * Environment: valid values are 'dev' or 'prod' (default=dev)
-* Kind: kind of dependencies: opensource or dovetail (default=opensource). Last option adds dovetail dependencies to build.
+* Kind: kind of dependencies: default or full. Last option adds dependencies from Asismbly custom-components to build.
 
 ### Examples:
 
 ````
 build full
-build broker opensource
-build integration dovetail
+build broker default
+build integration full
 build integration
 ````
 
@@ -73,19 +73,19 @@ To build the Docker image:
 
 * Module: valid values are 'integration', 'broker' or 'headless' (default is both integration and broker are applied)
 * Environment: valid values are 'dev' or 'prod' (default=dev)
-* Kind: kind of dependencies: opensource or dovetail (default=opensource). Last option adds dovetail dependencies to build.
+* Kind: kind of dependencies: default or full. Last option adds extra dependencies from Assimbly custom-components to build.
 * Tag: A label for the release (default=latest). For example beta, latest or 3.8.0
 
 ### Examples:
 
 ````
-buildDocker full dev opensource beta
-buildDocker headless prod dovetail 3.8.0
+buildDocker full dev default beta
+buildDocker headless prod full 3.8.0
 ````
 
 ---
 
-## releaseDocker
+## releaseDockerToDockerHub
 
 Releases the Docker image to Docker Hub.
 
@@ -93,18 +93,18 @@ Releases the Docker image to Docker Hub.
 
 To release the Docker image:
 
-```releaseDocker {module} {environment} {kind} {tag}```
+```releaseDockerToDockerHub {module} {environment} {kind} {tag}```
 
 * Module: valid values are 'integration', 'broker' or 'headless' (default is both integration and broker are applied)
 * Environment: valid values are 'dev' or 'prod' (default=dev)
-* Kind: kind of dependencies: opensource or dovetail. Last add dovetail dependencies to build.
+* Kind: kind of dependencies: default or full. Last add extra dependencies from custom-components to build.
 * Tag: A label for the release. For example beta, latest or 3.8.0
 
 ### Examples:
 
 ````
-releaseDocker full dev opensource beta
-releaseDocker headless prod dovetail 3.8.0
+releaseDockerToDockerHub full dev default beta
+releaseDockerToDockerHub headless prod full 3.8.0
 ````
 
 Note: For authentication to Docker hub you need a credentialhelper on your computer:

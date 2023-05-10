@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { IGateway } from 'app/shared/model/gateway.model';
+import { IIntegration } from 'app/shared/model/integration.model';
 import { Router } from '@angular/router';
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
-import { GatewayPopupService } from 'app/entities/gateway/gateway-popup.service';
-import { GatewayExportDialogComponent } from 'app/entities/gateway/gateway-export-dialog.component';
-import { GatewayImportDialogComponent } from 'app/entities/gateway/gateway-import-dialog.component';
+import { IntegrationService } from 'app/entities/integration/integration.service';
+import { IntegrationPopupService } from 'app/entities/integration/integration-popup.service';
+import { IntegrationExportDialogComponent } from 'app/entities/integration/integration-export-dialog.component';
+import { IntegrationImportDialogComponent } from 'app/entities/integration/integration-import-dialog.component';
 
 import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from 'app/entities/flow/flow.service';
@@ -16,32 +16,32 @@ import { FlowService } from 'app/entities/flow/flow.service';
   templateUrl: './deployment.component.html',
 })
 export class DeploymentComponent implements OnInit {
-  gateways: IGateway[] = [];
+  integrations: IIntegration[] = [];
   flows: IFlow[];
   frequencies: String[] = ['Never', 'Daily', 'Weekly', 'Monthly'];
   selectedFrequency: String = 'Never';
-  gatewayId: number = null;
+  integrationId: number = null;
   url: String;
   constructor(
     private router: Router,
-    protected gatewayService: GatewayService,
-	protected gatewayPopupService: GatewayPopupService,
+    protected integrationService: IntegrationService,
+	protected integrationPopupService: IntegrationPopupService,
     protected flowService: FlowService
   ) {}
 
   ngOnInit(): void {
-    this.loadAllGateways();
+    this.loadAllIntegrations();
   }
 
-  updateBackupFrequency(gatewayId, frequency, url) {
-    this.gatewayService.updateBackupFrequency(gatewayId, frequency, url).subscribe(res => {
+  updateBackupFrequency(integrationId, frequency, url) {
+    this.integrationService.updateBackupFrequency(integrationId, frequency, url).subscribe(res => {
       console.log(res);
     });
   }
 
-  loadAllGateways() {
-    this.gatewayService.query().subscribe((res: HttpResponse<IGateway[]>) => {
-      this.gateways = res.body;
+  loadAllIntegrations() {
+    this.integrationService.query().subscribe((res: HttpResponse<IIntegration[]>) => {
+      this.integrations = res.body;
     });
   }
 
@@ -49,18 +49,18 @@ export class DeploymentComponent implements OnInit {
     this.flowService.exportFlowConfiguration(flow);
   }
 
-  getFlowsForSelectedGateway(event) {
+  getFlowsForSelectedIntegration(event) {
     let id = (event.target as HTMLSelectElement).value as string;
-    this.flowService.getFlowByGatewayId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
+    this.flowService.getFlowByIntegrationId(Number(id)).subscribe((res: HttpResponse<IFlow[]>) => {
       this.flows = res.body;
     });
   }
 
   downloadConfiguration() {
-    this.gatewayPopupService.open(GatewayExportDialogComponent as Component);
+    this.integrationPopupService.open(IntegrationExportDialogComponent as Component);
   }
 
   uploadConfiguration() {
-	  this.gatewayPopupService.open(GatewayImportDialogComponent as Component);
+	  this.integrationPopupService.open(IntegrationImportDialogComponent as Component);
   }
 }

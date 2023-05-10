@@ -28,12 +28,12 @@ public interface FlowService {
     Page<FlowDTO> findAll(Pageable pageable);
 
     /**
-     * Get all the flows by gateway ID.
+     * Get all the flows by integration ID.
      *
      * @param pageable the pagination information
      * @return the list of entities
      */
-	Page<FlowDTO> findAllByGatewayId(Pageable pageable, Long gatewayid);
+	Page<FlowDTO> findAllByIntegrationId(Pageable pageable, Long integrationId);
     
     /**
      * Get the "id" flow.

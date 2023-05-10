@@ -1,6 +1,5 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -56,9 +55,6 @@ public class Flow implements Serializable {
     @Column(name = "log_level")
     private LogLevelType logLevel;
 
-    @Column(name = "assimbly_headers")
-    private Boolean assimblyHeaders;
-
     @Column(name = "instances")
     private Integer instances;
 
@@ -73,10 +69,9 @@ public class Flow implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("flows")
-    private Gateway gateway;
+    private Integration integration;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
     private Set<Step> steps = new HashSet<>();
 
     /*
@@ -144,19 +139,6 @@ public class Flow implements Serializable {
 
     public void setParallelProcessing(Boolean parallelProcessing) {
         this.parallelProcessing = parallelProcessing;
-    }
-
-    public Boolean isAssimblyHeaders() {
-        return assimblyHeaders;
-    }
-
-    public Flow assimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-        return this;
-    }
-
-    public void setAssimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
     }
 
     public Integer getMaximumRedeliveries() {
@@ -276,17 +258,17 @@ public class Flow implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Gateway getGateway() {
-        return gateway;
+    public Integration getIntegration() {
+        return integration;
     }
 
-    public Flow gateway(Gateway gateway) {
-        this.gateway = gateway;
+    public Flow integration(Integration integration) {
+        this.integration = integration;
         return this;
     }
 
-    public void setGateway(Gateway gateway) {
-        this.gateway = gateway;
+    public void setIntegration(Integration integration) {
+        this.integration = integration;
     }
 
     public Set<Step> getSteps() {
@@ -297,6 +279,7 @@ public class Flow implements Serializable {
         this.steps = steps;
         return this;
     }
+
 
     public Flow addStep(Step step) {
         this.steps.add(step);
@@ -346,7 +329,6 @@ public class Flow implements Serializable {
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
             ", parallelProcessing='" + isParallelProcessing() + "'" +
-            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", instances=" + getInstances() +
             "}";
     }

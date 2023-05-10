@@ -5,13 +5,13 @@
   </div>
   <div class="row mt-3">
     <p style="margin-top: -1.6em">
-      <b>Stage={{ singleGatewayStage }}</b>
+      <b>{{ singleIntegrationStage }}</b>
     </p>
   </div>
-  <div *ngIf="multipleGateways">
-    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for gateway</label>
-    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedGateway($event)">
-      <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.name }}</option>
+  <div *ngIf="multipleIntegrations">
+    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for integration</label>
+    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedIntegration($event)">
+      <option *ngFor="let integration of integrations" [value]="integration.id">{{ integration.name }}</option>
     </select>
   </div>
   <div class="row">
@@ -28,26 +28,23 @@
     </div>
     <div class="col-2 text-right">
       <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','connector')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Connector</button>
-            <button ngbDropdownItem (click)="navigateToFlowEditor('edit','esb')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Service</button>
-            <!-- uncomment to link to the api editor -->
-            <!--<button ngbDropdownItem (click)="navigateToFlowEditor('edit','api')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create API</button>-->
-            <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
-          </div>
+        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Scripts</button>
+          <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
+        </div>
       </div>
     </div>
-  </div>
-
   <br />
   <div *ngIf="flows?.length == 0">
     <div class="card-block pt-4">
       <blockquote class="card-blockquote">
         <br />
         <p class="tab" style="margin-left: 0.3em">
-          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'connector'}]">'Create flow'</a>. For more info
-          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Wiki</a>
+          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
+          check the <a target="_blank" href="https://github.com/assimbly/integration/wiki">Assimbly Docs</a>
         </p>
       </blockquote>
     </div>
@@ -64,7 +61,7 @@
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
           <th [style.display]="'none'"><span>ID</span></th>
           <th jhiSortBy="name" class="border-bottom-none"><span></span> <span class="fa fa-sort"></span></th>
-          <th [style.display]="'none'"><span>Gateway</span></th>
+          <th [style.display]="'none'"><span>Integration</span></th>
           <th [style.display]="'none'"><span>Error</span></th>
           <th class="border-bottom-none"></th>
         </tr>

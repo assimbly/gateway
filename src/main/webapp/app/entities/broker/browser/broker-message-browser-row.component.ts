@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Message } from 'app/shared/model/messsage.model';
+import { Message } from 'app/shared/model/message.model';
 
 @Component({
   selector: '[jhi-broker-message-browser-row]',

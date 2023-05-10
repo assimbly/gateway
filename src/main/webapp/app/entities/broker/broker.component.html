@@ -32,8 +32,8 @@
       ></a>
       <a
         role="button"
-        class="btn btn-sm left-border-radius-0 assimbly-link assimbly-gateway-img"
-        href="https://github.com/assimbly/gateway/wiki/Broker"
+        class="btn btn-sm left-border-radius-0 assimbly-link assimbly-integration-img"
+        href="https://github.com/assimbly/integration/wiki/Broker"
         title="Assimbly Documentation"
         target="_blank"
       >
@@ -68,7 +68,7 @@
   </div>
 
   <div class="table-responsive" *ngIf="brokers?.length > 0" style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute; z-index: 1000;">
+    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute;">
       <thead>
         <tr>
           <th [style.display]="'none'"><span>ID</span></th>
@@ -99,7 +99,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
-					style="color: white;"
+					          style="color: white;"
                     (click)="start()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
@@ -115,7 +115,7 @@
                       'btn-danger': brokerStatus === 'inactiveError'
                     }"
                     type="button"
-					style="color: white;"
+					          style="color: white;"
                     (click)="restart()"
                     class="btn btn-lg"
                     [disabled]="disableActionBtns"
@@ -163,7 +163,7 @@
 			  <div class="row">
               <div class="col">
                 <ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
-                <a 
+                <a
 				  style="padding-left: 1em;"
                   (mouseenter)="getBrokerDetails()"
                   aria-hidden="true"
@@ -173,7 +173,7 @@
                   [ngbPopover]="detailsTemplate"
                   popoverTitle="Details"
                 >
-					<fa-icon icon="info"></fa-icon>				
+					<fa-icon icon="info"></fa-icon>
 				</a>
                 <a
                   style="padding-left: 1em;"
@@ -189,7 +189,7 @@
                 <a
                   style="padding-left: 1em"
                   type="submit"
-                  [routerLink]="['/broker', broker.id, 'edit']"                  
+                  [routerLink]="['/broker', broker.id, 'edit']"
                   aria-hidden="true"
                   placement="right"
                   title="Edit broker"

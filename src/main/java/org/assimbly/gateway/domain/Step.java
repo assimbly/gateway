@@ -1,13 +1,15 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.assimbly.gateway.domain.enumeration.StepType;
 
@@ -25,9 +27,13 @@ public class Step implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "stepType")
     private StepType stepType;
+
 
     @Column(name = "componentType")
     private String componentType;
@@ -45,7 +51,7 @@ public class Step implements Serializable {
     private Integer routeId;
 
     @ManyToOne
-    @JsonIgnoreProperties("steps")
+    @JsonIgnore
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,8 +59,11 @@ public class Step implements Serializable {
     private Connection connection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "headerId")
-    private Header header;
+    @JoinColumn(name = "messageId")
+    private Message message;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<Link> links = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -63,6 +72,19 @@ public class Step implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Step name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public StepType getStepType() {
@@ -117,6 +139,20 @@ public class Step implements Serializable {
         this.options = options;
     }
 
+
+    public Flow getFlow() {
+        return flow;
+    }
+
+    public Step flow(Flow flow) {
+        this.flow = flow;
+        return this;
+    }
+
+    public void setFlow(Flow flow) {
+        this.flow = flow;
+    }
+
     public Integer getRouteId() {
         return routeId;
     }
@@ -143,19 +179,6 @@ public class Step implements Serializable {
         this.responseId = responseId;
     }
 
-    public Flow getFlow() {
-        return flow;
-    }
-
-    public Step flow(Flow flow) {
-        this.flow = flow;
-        return this;
-    }
-
-    public void setFlow(Flow flow) {
-        this.flow = flow;
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -169,18 +192,43 @@ public class Step implements Serializable {
         this.connection = connection;
     }
 
-    public Header getHeader() {
-        return header;
+    public Message getMessage() {
+        return message;
     }
 
-    public Step header(Header header) {
-        this.header = header;
+    public Step message(Message message) {
+        this.message = message;
         return this;
     }
 
-    public void setHeader(Header header) {
-        this.header = header;
+    public void setMessage(Message message) {
+        this.message = message;
     }
+
+
+    public Set<Link> getLinks() {
+        return links;
+    }
+
+    public Step links(Set<Link> links) {
+        this.links = links;
+        return this;
+    }
+
+    public Step addLink(Link link) {
+        this.links.add(link);
+        return this;
+    }
+
+    public Step removeLink(Link links) {
+        this.links.remove(links);
+        return this;
+    }
+
+    public void setLinks(Set<Link> links) {
+        this.links = links;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

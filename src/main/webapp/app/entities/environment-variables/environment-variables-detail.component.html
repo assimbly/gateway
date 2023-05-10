@@ -13,10 +13,10 @@
                 <dd>
                     <span>{{environmentVariables.value}}</span>
                 </dd>
-                <dt><span>Gateway</span></dt>
+                <dt><span>Integration</span></dt>
                 <dd>
-                    <div *ngIf="environmentVariables.gatewayId">
-                        <a [routerLink]="['/gateway', environmentVariables.gatewayId, 'view']">{{environmentVariables.gatewayId}}</a>
+                    <div *ngIf="environmentVariables.integrationId">
+                        <a [routerLink]="['/integration', environmentVariables.integrationId, 'view']">{{environmentVariables.integrationId}}</a>
                     </div>
                 </dd>
             </dl>

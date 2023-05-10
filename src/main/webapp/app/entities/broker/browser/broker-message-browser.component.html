@@ -36,14 +36,14 @@
 </div>
 
 <div class="row">
-  <div class="col-8">
+  <div class="col-7">
     <h4 style="margin-left: 0.3em">
       <b
         ><i>{{ subtitle }}</i></b
       >
     </h4>
   </div>
-  <div class="col-3-5 text-right">
+  <div class="col-4-5 text-right">
     <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
       <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
       <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
@@ -122,87 +122,77 @@
       </button>
       <br />
     </div>
-    <div class="col-6" style="position: fixed; left: 50%; width 90%;">
-      <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="horizontal">
-        <li ngbNavItem="0">
-          <a ngbNavLink>Body</a>
-          <ng-template ngbNavContent>
-            <br />
-			<div style="overflow-y: auto; height: 475px; border: 1px solid #ced4da; width: 98%">
-			<ngx-codemirror
-					name="codemirror"
-				  [(ngModel)]="selectedMessage.body"
-				  [options]="{
-					lineNumbers: true,
-					theme: 'default',
-					mode: 'xml'
-				  }"
-				  ></ngx-codemirror>
-				</div>
-          </ng-template>
-        </li>
-        <li ngbNavItem="1">
-          <a ngbNavLink>Headers</a>
-          <ng-template ngbNavContent>
-            <br />
-            <div
-              class="table-responsive"
-              [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; min-height: 475px; border: 1px solid #ced4da; width: 98%"
-            >
+    <div class="col-6" class="overflow-auto" style="position: fixed; left: 50%; height: 65%; width: 48%;">
+
+      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+        <table class="table table-striped table-condensed">
+          <thead class="transparant">
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
+            <th scope="col" >Body</th>
+          </tr>
+          </thead>
+          <tbody infinite-scroll style=" max-height: 100px;">
+          <tr>
+            <td>
+              <ngx-codemirror id="messageBrowserEditor"
+                  name="codemirror"
+                  [(ngModel)]="this.selectedMessage.body"
+                  [options]="{
+                  lineNumbers: true,
+                  height: 'auto',
+                  theme: 'default',
+                  mode: editorMode
+                  }"
+            ></ngx-codemirror>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <br/>
+      <h3>Headers</h3>
+      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
               <table class="table table-striped table-condensed">
-                <thead class="transparant">
-                  <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
-                    <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
-                    <th scope="col" jhisortby="value"><span>Value</span></th>
-                    <th class="border-bottom-none"></th>
-                  </tr>
+                <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
+                  <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
+                  <th scope="col" jhisortby="value"><span>Value</span></th>
+                  <th class="border-bottom-none"></th>
+                </tr>
                 </thead>
-                <tbody>
-                  <tr
-                    jhi-queue-row
-                    *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderKeyPipe: ascending:predicate"
-                  >
-                    <td>{{ header.key }}</td>
-                    <td>{{ header.value }}</td>
-                  </tr>
+                <tbody infinite-scroll>
+                <tr
+                  jhi-queue-row
+                  *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderPipe: ascending:predicate"
+                >
+                  <td>{{ header.key }}</td>
+                  <td>{{ header.value }}</td>
+                </tr>
                 </tbody>
               </table>
             </div>
-          </ng-template>
-        </li>
-        <li ngbNavItem="2">
-          <a ngbNavLink>JMS Headers</a>
-          <ng-template ngbNavContent>
-            <br />
-            <div
-              class="table-responsive"
-              [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
-              style="overflow-y: auto; min-height: 475px; border: 1px solid #ced4da; width: 98%"
-            >
-              <table class="table table-striped table-condensed">
-                <thead class="transparant">
-                  <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
-                    <th jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
-                    <th><span>Value</span></th>
-                    <th class="border-bottom-none"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    jhi-queue-row
-                    *ngFor="let header of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderKeyPipe: ascending:predicate"
-                  >
-                    <td>{{ header.key }}</td>
-                    <td>{{ header.value }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </ng-template>
-        </li>
-      </ul>
-      <div [ngbNavOutlet]="nav" class="ml-4"></div>
+      <br/>
+      <h3>JMS Headers</h3>
+      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+        <table class="table table-striped table-condensed">
+          <thead>
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
+            <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><span class="fa fa-sort"></span></th>
+            <th scope="col" jhisortby="value"><span>Value</span></th>
+            <th class="border-bottom-none"></th>
+          </tr>
+          </thead>
+          <tbody infinite-scroll>
+          <tr
+            jhi-queue-row
+            *ngFor="let jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderPipe: ascending:predicate"
+          >
+            <td>{{ jmsheader.key }}</td>
+            <td>{{ jmsheader.value }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

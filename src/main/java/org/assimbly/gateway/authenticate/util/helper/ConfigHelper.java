@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public final class ConfigHelper {
 
-    private static final String FILE_NAME = "world.dovetail.auth.cfg";
+    private static final String FILE_NAME = "org.assimbly.auth.cfg";
 
     private ConfigHelper() {
         //Static class cannot be instantiated.

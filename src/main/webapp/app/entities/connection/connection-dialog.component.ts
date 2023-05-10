@@ -21,6 +21,7 @@ import { Connections } from '../../shared/camel/connections';
     templateUrl: './connection-dialog.component.html'
 })
 export class ConnectionDialogComponent implements OnInit {
+
     public connectionKeys: Array<ConnectionKeys> = [];
     public connection: Connection;
     public connectionNames: Array<string> = [];
@@ -63,7 +64,6 @@ export class ConnectionDialogComponent implements OnInit {
             this.loadConnectionKeys(false);
         }
 
-
     }
 
     changeType(cloneHeader: boolean) {
@@ -80,6 +80,7 @@ export class ConnectionDialogComponent implements OnInit {
             });
         }
 
+        console.log('3. this.connection.type' + this.connection.type);
         this.requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
 
         const requiredConnectionKeys = new Array<ConnectionKeys>();
