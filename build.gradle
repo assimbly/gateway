@@ -143,7 +143,6 @@ jib {
         image = 'assimbly/gateway-full'
     }
     container {
-        jvmFlags = ['-XX:MaxRAMPercentage=40','-XX:MinRAMPercentage=80','-XX:InitialRAMPercentage=10']
         ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
         format = 'OCI'
     }
