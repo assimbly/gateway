@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
 		gradlePluginPortal()
         maven{  name = "Aurea"
-                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/" 
+                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
         }
 
         maven{ name = "Assimbly Base"
@@ -143,6 +143,7 @@ jib {
         image = 'assimbly/gateway-full'
     }
     container {
+        jvmFlags = ['-XX:MaxRAMPercentage=40','-XX:MinRAMPercentage=80','-XX:InitialRAMPercentage=10']
         ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
         format = 'OCI'
     }
@@ -319,7 +320,7 @@ repositories {
     mavenCentral()
 
     maven{  name = "Aurea"
-                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/" 
+                url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
 
     maven{ name = "Assimbly Base"
@@ -335,7 +336,7 @@ repositories {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
     }
-    
+
     maven{  name = "Assimbly Custom Components"
             url = uri("https://maven.pkg.github.com/assimbly/custom-components")
             credentials {
