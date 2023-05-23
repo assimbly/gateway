@@ -61,7 +61,7 @@ build integration
 
 ---
 
-##  cker
+##  BuildDocker
 
 Build a local Docker image to Docker Desktop. (Docker Desktop needs to be installed).
 
