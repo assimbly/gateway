@@ -1,8 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
 import org.assimbly.gateway.db.mongo.MongoDao;
-import org.assimbly.gateway.variables.domain.GlobalEnvironmentVariable;
-import org.assimbly.gateway.variables.utils.GlobalEnvironmentUtils;
 import org.assimbly.util.exception.OAuth2TokenException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -26,8 +24,6 @@ public class OAuth2Resource {
 
     private static final Logger log = LoggerFactory.getLogger(OAuth2Resource.class);
 
-    private MongoDao mongoDao = new MongoDao();
-
     public static String OAUTH2_PREFIX = "oauth2_";
     public static String OAUTH2_URI_TOKEN_SUFFIX = "_uri_token";
     public static String OAUTH2_SCOPE_SUFFIX = "_scope";
@@ -46,8 +42,8 @@ public class OAuth2Resource {
     private static String SERVICE_PARAM_ERROR_DESCRIPTION = "error_description";
 
     /**
-     * GET  /info : registers two-factor authentication by email (using GoogleAuthenticator).
-     * @return the ResponseEntity with the location of the QR code to register
+     * GET  /info : requests oauth2 access token info
+     * @return Map token information
      */
     @GetMapping(
         path = "/info",
@@ -60,11 +56,10 @@ public class OAuth2Resource {
     ) {
         log.debug("REST request to register two-factor authentication");
 
-        MongoDao mongoDao = new MongoDao();
         Map<String, String> tokenInfoMap = new HashMap<>();
 
         tenant = tenant.toLowerCase();
-        String environment = System.getProperty("ASSIMBLY_ENV");
+        String environment = System.getenv("ASSIMBLY_ENV");
 
         // specific global environment variables names
         String uriTokenVarName = OAUTH2_PREFIX + id + OAUTH2_URI_TOKEN_SUFFIX;
@@ -77,42 +72,40 @@ public class OAuth2Resource {
         String refreshFlagVarName = OAUTH2_PREFIX + id + OAUTH2_REFRESH_FLAG_SUFFIX;
         String redirectUriVarName = OAUTH2_PREFIX + id + OAUTH2_REDIRECT_URI_SUFFIX;
 
-        // get global environment variables from a specific id
-        GlobalEnvironmentVariable uriTokenGlobVar = mongoDao.findVariableByName(uriTokenVarName, tenant);
-        GlobalEnvironmentVariable scopeGlobVar = mongoDao.findVariableByName(scopeVarName, tenant);
-        GlobalEnvironmentVariable clientIdGlobVar = mongoDao.findVariableByName(clientIdVarName, tenant);
-        GlobalEnvironmentVariable clientSecretGlobVar = mongoDao.findVariableByName(clientSecretVarName, tenant);
-        GlobalEnvironmentVariable redirectUriGlobVar = mongoDao.findVariableByName(redirectUriVarName, tenant);
-
         // check if there's a global variable inside globalVar, and return real value
-        String clientId = GlobalEnvironmentUtils.getGlobalEnvironmentValue(clientIdGlobVar, mongoDao, tenant, environment);
-        String clientSecret = GlobalEnvironmentUtils.getGlobalEnvironmentValue(clientSecretGlobVar, mongoDao, tenant, environment);
-        String scope = GlobalEnvironmentUtils.getGlobalEnvironmentValue(scopeGlobVar, mongoDao, tenant, environment);
-        String redirectUri = GlobalEnvironmentUtils.getGlobalEnvironmentValue(redirectUriGlobVar, mongoDao, tenant, environment);
-        String uriToken = GlobalEnvironmentUtils.getGlobalEnvironmentValue(uriTokenGlobVar, mongoDao, tenant, environment);
+        String scope = MongoDao.getGlobalEnvironmentValue(scopeVarName, tenant, environment);
+        String clientId = MongoDao.getGlobalEnvironmentValue(clientIdVarName, tenant, environment);
+        String clientSecret = MongoDao.getGlobalEnvironmentValue(clientSecretVarName, tenant, environment);
+        String redirectUri = MongoDao.getGlobalEnvironmentValue(redirectUriVarName, tenant, environment);
+        String uriToken = MongoDao.getGlobalEnvironmentValue(uriTokenVarName, tenant, environment);
 
         // prepare data to send
-        String urlParameters  = "client_id=" + clientId +
-            (scope!=null && !scope.trim().equals("") ? "&scope="+scope : "") + "&redirect_uri="+redirectUri +
-            "&grant_type=authorization_code" + "&client_secret="+clientSecret + "&code="+code;
+        String urlParameters  = "client_id="+clientId+
+            (scope!=null && !scope.trim().equals("") ? "&scope="+scope : "")+
+            "&redirect_uri="+redirectUri+
+            "&grant_type=authorization_code"+
+            "&client_secret="+clientSecret+
+            "&code="+code;
 
         // call service
         callService(tokenInfoMap, uriToken, urlParameters);
 
         // save token info into global vars
-        GlobalEnvironmentUtils.saveGlobalEnvironmentVariable(expireDateVarName, mongoDao, tenant, environment,
-            tokenInfoMap, SERVICE_PARAM_EXPIRES_IN
-        );
-        GlobalEnvironmentUtils.saveGlobalEnvironmentVariable(accessTokenVarName, mongoDao, tenant, environment,
-            tokenInfoMap, SERVICE_PARAM_ACCESS_TOKEN
-        );
-        GlobalEnvironmentUtils.saveGlobalEnvironmentVariable(refreshTokenVarName, mongoDao, tenant, environment,
-            tokenInfoMap, SERVICE_PARAM_REFRESH_TOKEN
-        );
+        String expiresIn = tokenInfoMap.get(SERVICE_PARAM_EXPIRES_IN);
+        if(expiresIn!=null && !expiresIn.isEmpty()) {
+            MongoDao.saveGlobalEnvironmentVariable(expireDateVarName, expiresIn, tenant, environment);
+        }
+        String accessToken = tokenInfoMap.get(SERVICE_PARAM_ACCESS_TOKEN);
+        if(accessToken!=null && !accessToken.isEmpty()) {
+            MongoDao.saveGlobalEnvironmentVariable(accessTokenVarName, accessToken, tenant, environment);
+        }
+        String refreshToken = tokenInfoMap.get(SERVICE_PARAM_REFRESH_TOKEN);
+        if(refreshToken!=null && !refreshToken.isEmpty()) {
+            MongoDao.saveGlobalEnvironmentVariable(refreshTokenVarName, refreshToken, tenant, environment);
+        }
 
         // set refresh flag to inactive
-        GlobalEnvironmentUtils.setRefreshFlagGlobalEnvironmentVariable(refreshFlagVarName, mongoDao, tenant,
-            environment, "0");
+        MongoDao.saveGlobalEnvironmentVariable(refreshFlagVarName, "0", tenant, environment);
 
         // return token info hashmap
         return tokenInfoMap;
@@ -156,8 +149,14 @@ public class OAuth2Resource {
             if (tokenInfoResp != null) {
                 JSONObject tokenInfoJson = new JSONObject(tokenInfoResp);
                 if (!tokenInfoJson.isNull(SERVICE_PARAM_ERROR)) {
-                    String error = tokenInfoJson.getString(SERVICE_PARAM_ERROR);
-                    String errorDescription = tokenInfoJson.getString(SERVICE_PARAM_ERROR_DESCRIPTION);
+                    log.info("tokenInfoResp > "+tokenInfoResp);
+                    String error = (
+                        tokenInfoJson.has(SERVICE_PARAM_ERROR) ? tokenInfoJson.getString(SERVICE_PARAM_ERROR) : ""
+                    );
+                    String errorDescription = (
+                        tokenInfoJson.has(SERVICE_PARAM_ERROR_DESCRIPTION) ?
+                            tokenInfoJson.getString(SERVICE_PARAM_ERROR_DESCRIPTION) : ""
+                    );
                     throw new OAuth2TokenException(error + " - " + errorDescription);
                 } else {
                     // expire_date

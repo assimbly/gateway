@@ -98,6 +98,7 @@ configurations.all {
     exclude group: 'javax.servlet', module: 'servlet-api'
     exclude group: 'javax.persistence', module: 'persistence-api'
     exclude group: 'xerces', module: 'xercesImpl'
+    exclude group: 'org.eclipse.angus', module: 'angus-activation'
 }
 
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
