@@ -298,16 +298,15 @@ configurations {
     compile { transitive = false }
     all {
         resolutionStrategy {
-            // Inherited version from Spring Boot can't be used because of regressions:
-            // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
-            force 'org.liquibase:liquibase-core:4.6.2'
+            // force to use latest liquibase instead of default by Spring dependencies
+            force 'org.liquibase:liquibase-core:4.22.0'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.27.1")
+                    details.useVersion("2.28.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.17.3")
+                    details.useVersion("5.18.1")
                 }
             }
         }
@@ -389,7 +388,7 @@ dependencies {
     implementation "org.hibernate.validator:hibernate-validator"
 
     implementation "org.liquibase:liquibase-core"
-    liquibaseRuntime "org.liquibase:liquibase-core"
+    liquibaseRuntime "org.liquibase:liquibase-core:4.22.0"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
     liquibaseRuntime sourceSets.main.compileClasspath
 
@@ -437,11 +436,11 @@ dependencies {
     implementation "org.springframework.security:spring-security-messaging"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    implementation "mysql:mysql-connector-java"
-    liquibaseRuntime "mysql:mysql-connector-java"
+    implementation "com.mysql:mysql-connector-j"
+    liquibaseRuntime "com.mysql:mysql-connector-j"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "org.jdom:jdom2:2.0.6.1"
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
     implementation "com.warrenstrange:googleauth:1.5.0"
@@ -602,7 +601,7 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.16.0"
+        version = "16.20.0"
         npmVersion = "8.19.4"
         yarnVersion = "1.22.17"
         download = true
