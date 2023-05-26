@@ -53,7 +53,7 @@ public final class JwtValidator {
      * @throws UnsupportedEncodingException when the encoding used to sign the token is not supported.
      */
     public static Claims decode(String jwt) throws JwtException, UnsupportedEncodingException {
-        String key = ConfigHelper.get("secretKey");
+        String key = System.getenv("MONGO_SECRET_KEY");
 
         return Jwts.parser()
                 .setSigningKey(key.getBytes("UTF-8"))
