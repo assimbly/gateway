@@ -600,9 +600,9 @@ java {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.20.0"
-        npmVersion = "8.19.4"
-        yarnVersion = "1.22.17"
+        version = "18.16.0"
+        npmVersion = "9.5.1"
+        yarnVersion = "1.22.19"
         download = true
     }
 }
