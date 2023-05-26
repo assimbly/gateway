@@ -69,7 +69,7 @@ version = '4.0.0'
 
 description = ""
 
-assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17 || 18 || 19
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17 || 18 || 19 || 20 || 21
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
@@ -206,7 +206,7 @@ test {
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
-    reports.html.enabled = false
+    reports.html.required = false
 }
 
 task integrationTest(type: Test) {
@@ -221,18 +221,18 @@ task integrationTest(type: Test) {
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
-    reports.html.enabled = false
+    reports.html.required = false
 }
 
 check.dependsOn integrationTest
 task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn test
+    destinationDirectory = file("$buildDir/reports/tests")
+    getTestResults()
 }
 
 task integrationTestReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn integrationTest
+    destinationDirectory = file("$buildDir/reports/tests")
+    getTestResults()
 }
 
 if (!project.hasProperty("runList")) {
@@ -296,6 +296,8 @@ configurations {
     providedRuntime
     implementation.exclude module: "spring-boot-starter-tomcat"
 
+    liquibaseRuntime.extendsFrom(sourceSets.main.compileClasspath)
+
     compile { transitive = false }
     all {
         resolutionStrategy {
@@ -347,10 +349,9 @@ repositories {
 
 dependencies {
 
-
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
-    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.9.3'
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.3'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
@@ -391,7 +392,6 @@ dependencies {
     implementation "org.liquibase:liquibase-core:4.22.0"
     liquibaseRuntime "org.liquibase:liquibase-core:4.22.0"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
-    liquibaseRuntime sourceSets.main.compileClasspath
 
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-loader-tools"
@@ -587,7 +587,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.6.1"
+    gradleVersion = "8.1.1"
 }
 
 /*
