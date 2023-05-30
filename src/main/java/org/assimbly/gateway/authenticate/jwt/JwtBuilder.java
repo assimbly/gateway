@@ -26,7 +26,7 @@ public final class JwtBuilder {
      * @throws UnsupportedEncodingException when the encoding used to sign the token is not supported.
      */
     public static String build(String name, String scope) throws UnsupportedEncodingException {
-        String key = ConfigHelper.get("secretKey");
+        String key = System.getenv("MONGO_SECRET_KEY");
         int expiration = Integer.parseInt(ConfigHelper.get("expiration"));
 
         return Jwts.builder()
