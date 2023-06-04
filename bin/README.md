@@ -52,12 +52,12 @@ with options:
 
 ### Examples:
 
-````
+```
 build full
 build broker default
 build integration full
 build integration
-````
+```
 
 ---
 
