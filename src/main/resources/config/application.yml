@@ -22,7 +22,7 @@ management:
         hawtio: /hawtio/console
       exposure:
         include:
-          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump', 'hawtio', 'jolokia']
+          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'startup', 'threaddump', 'hawtio', 'jolokia']
   endpoint:
     health:
       show-details: when-authorized
@@ -68,10 +68,17 @@ spring:
     # Otherwise, it will be filled in by gradle when building the WAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode=lazy:
   jpa:
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
     hibernate:
       ddl-auto: none
       naming: # org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -82,6 +89,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
+    lazy-initialization: true
   mvc:
     favicon:
       enabled: true
@@ -102,6 +110,11 @@ server:
       cookie:
         http-only: true
         max-age: 28800
+  jetty:
+    httpConfig:
+      generateOrigin: true
+
+
 
 # ===================================================================
 # JHipster specific properties

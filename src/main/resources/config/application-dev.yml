@@ -61,6 +61,7 @@ spring:
       # hibernate.cache.region.factory_class: io.github.jhipster.config.jcache.BeanClassLoaderAwareJCacheRegionFactory
   liquibase:
     contexts: dev
+    enabled: true
   mail:
     host: localhost
     port: 25
