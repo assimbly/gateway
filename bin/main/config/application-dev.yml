@@ -49,7 +49,7 @@ spring:
     console:
       enabled: false
   jpa:
-    database-platform: tech.jhipster.domain.util.FixedH2Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
     database: H2
     show-sql: true
     properties:
@@ -118,7 +118,7 @@ jhipster:
   #enabled: false
   #report-frequency: 60 # in seconds
   logging:
-    use-json-format: false # By default, logs are not in Json format  
+    use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false
       host: localhost

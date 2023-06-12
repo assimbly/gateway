@@ -64,6 +64,7 @@ public class CacheConfiguration {
             createCache(cm, Message.class.getName() + ".header");
             createCache(cm, Header.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".steps");
+            createCache(cm, Link.class.getName());
             createCache(cm, Step.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows");
