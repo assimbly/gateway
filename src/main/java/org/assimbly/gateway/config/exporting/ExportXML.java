@@ -1,6 +1,7 @@
 package org.assimbly.gateway.config.exporting;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;
@@ -161,9 +162,7 @@ public class ExportXML {
 		integrationId = integrationIdLong.toString();
 		Integration integration = integrationRepository.findById(integrationIdLong).get();
 
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		doc = docBuilder.newDocument();
+		doc = new DocumentImpl();
 
         Element dil = doc.createElement("dil");
         doc.appendChild(dil);
