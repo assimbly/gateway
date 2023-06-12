@@ -354,7 +354,7 @@ dependencies {
     implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.9.3'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.3'
 
-    implementation 'com.mattbertolini:liquibase-slf4j:4.0.1'
+    implementation 'com.mattbertolini:liquibase-slf4j:4.0.0'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
