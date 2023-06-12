@@ -4,13 +4,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 
 import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
-import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.repository.FlowRepository;
+
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -22,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,19 +38,13 @@ import tech.jhipster.web.util.ResponseUtil;
 @Component
 @RestController
 @RequestMapping("/api")
-public class FlowResource {
+public class FlowResource implements ApplicationListener {
 
     private final Logger log = LoggerFactory.getLogger(FlowResource.class);
 
     private static final String ENTITY_NAME = "flow";
 
     private final FlowService flowService;
-
-    @Autowired
-    private org.assimbly.gateway.config.exporting.Export confExport;
-
-    @Autowired
-    FlowRepository flowRepository;
 
     @Autowired
     EncryptionProperties encryptionProperties;
@@ -63,6 +57,7 @@ public class FlowResource {
     private Integration integration;
 
     private final IntegrationRuntime integrationRuntime;
+    private CamelContext context;
 
     public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
         this.flowService = flowService;
@@ -168,20 +163,21 @@ public class FlowResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    @PostConstruct
     public void init() throws Exception {
-        log.info("Start runtime");
         initIntegration();
 
-		log.info("Starting flows");
-		startFlows();
+		//log.info("Starting flows");
+		//startFlows();
     }
 
 
     public CamelContext initIntegration() throws Exception {
 
+        log.info("Integration runtime starting");
+
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
+
         boolean isDebuggging = gateway.getDebugging();
         boolean deployOnStart = deployDirectory.getDeployOnStart();
         boolean deployOnChange = deployDirectory.getDeployOnChange();
@@ -193,13 +189,25 @@ public class FlowResource {
         integration = integrationRuntime.getIntegration();
 
         integration.setDebugging(isDebuggging);
-        //integration.setTracing(isTracing, "default");
         integration.setDeployDirectory(deployOnStart,deployOnChange);
 
         return integration.getContext();
     }
 
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+
+        if(context == null){
+            try {
+                context = initIntegration();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     //start flows with autostart
+    /*
     public void startFlows(){
 
         List<Flow> flows = flowRepository.findAll();
@@ -221,5 +229,7 @@ public class FlowResource {
         }
 
     }
+
+     */
 
 }

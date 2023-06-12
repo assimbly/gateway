@@ -52,16 +52,16 @@ with options:
 
 ### Examples:
 
-````
+```
 build full
 build broker default
 build integration full
 build integration
-````
+```
 
 ---
 
-## buildDocker
+##  BuildDocker
 
 Build a local Docker image to Docker Desktop. (Docker Desktop needs to be installed).
 
