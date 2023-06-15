@@ -102,6 +102,11 @@ spring:
 
 springdoc:
   show-actuator: true
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    doc-expansion: none
 
 server:
   servlet:
