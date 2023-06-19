@@ -65,7 +65,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '4.0.1'
+version = '4.0.2'
 
 description = ""
 
@@ -358,7 +358,7 @@ dependencies {
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.2'
     implementation 'javax.validation:validation-api:2.0.1.Final'
 
     implementation "javax.annotation:javax.annotation-api"
