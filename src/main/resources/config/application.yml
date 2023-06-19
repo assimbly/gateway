@@ -89,7 +89,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
-    lazy-initialization: true
+    lazy-initialization: false
   mvc:
     favicon:
       enabled: true
@@ -102,6 +102,11 @@ spring:
 
 springdoc:
   show-actuator: true
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    doc-expansion: none
 
 server:
   servlet:
