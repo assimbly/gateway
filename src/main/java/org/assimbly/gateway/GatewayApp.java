@@ -82,7 +82,7 @@ public class GatewayApp {
 
         if (startApplication) {
             SpringApplication app = new SpringApplication(GatewayApp.class);
-            app.setApplicationStartup(new BufferingApplicationStartup(2048));
+            //app.setApplicationStartup(new BufferingApplicationStartup(2048));
 
             DefaultProfileUtil.addDefaultProfile(app);
             Environment env = app.run(args).getEnvironment();
