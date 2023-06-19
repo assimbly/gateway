@@ -1,9 +1,8 @@
 name: Build and push Docker image with Jib
 
 on:
-  push:
-    release:
-      types: [ released ]
+  release:
+    types: [ released ]
 
 env:
   BUILD: true
