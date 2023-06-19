@@ -6,7 +6,6 @@ on:
       types: [ released ]
 
 env:
-  VERSION: ${{  github.ref_name }}
   BUILD: true
   PUSH: true
   PUSH_PKGS: true
@@ -17,7 +16,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'full'
-      VERSION_TAG: $VERSION
+      VERSION_TAG: ${{  github.ref_name }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -142,7 +141,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'integration'
-      VERSION_TAG: $VERSION
+      VERSION_TAG: ${{  github.ref_name }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -265,7 +264,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'headless'
-      VERSION_TAG: $VERSION
+      VERSION_TAG: ${{  github.ref_name }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -388,7 +387,7 @@ jobs:
 
     env:
       BUILD_TYPE: 'broker'
-      VERSION_TAG: $VERSION
+      VERSION_TAG: ${{  github.ref_name }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -505,3 +504,9 @@ jobs:
           if [[ $PUSH_PKGS == false ]]; then
             echo "Skipped packages push!"
           fi
+
+
+          ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-full:4.0.1 --settings-file ./settings.gradle  -Papi-docs -Pprod -Pfull
+          ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-integration:4.0.1 --settings-file ./settings.gradle  -Papi-docs -Pprod -Pintegration
+          ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-headless:4.0.1 --settings-file ./settings.gradle  -Papi-docs -Pprod -Pheadless
+          ./gradlew clean bootJar jib -Djib.to.image=assimbly/gateway-broker:4.0.1 --settings-file ./settings.gradle  -Papi-docs -Pprod -Pbroker
