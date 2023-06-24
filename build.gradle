@@ -99,6 +99,14 @@ configurations.all {
     exclude group: 'javax.persistence', module: 'persistence-api'
     exclude group: 'xerces', module: 'xercesImpl'
     exclude group: 'org.eclipse.angus', module: 'angus-activation'
+    resolutionStrategy.dependencySubstitution {
+        substitute(platform(module("org.mongodb:mongodb-driver-legacy"))).
+            using module("org.mongodb:mongo-java-driver:3.5.0")
+        substitute(platform(module("org.mongodb:mongodb-driver-core"))).
+            using module("org.mongodb:mongo-java-driver:3.5.0")
+        substitute(platform(module("org.mongodb:bson"))).
+            using module("org.mongodb:mongo-java-driver:3.5.0")
+    }
 }
 
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
