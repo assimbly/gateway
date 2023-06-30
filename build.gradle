@@ -507,6 +507,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
