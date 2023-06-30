@@ -366,7 +366,7 @@ dependencies {
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-    compileOnly 'javax.servlet:javax.servlet-api:4.0.2'
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
     implementation 'javax.validation:validation-api:2.0.1.Final'
 
     implementation "javax.annotation:javax.annotation-api"
