@@ -5,6 +5,7 @@ import org.assimbly.gateway.variables.domain.EnvironmentValue;
 import org.assimbly.gateway.variables.domain.GlobalEnvironmentVariable;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.assimbly.gateway.authenticate.domain.Tenant;
 import org.assimbly.gateway.authenticate.domain.User;
@@ -54,7 +55,7 @@ public class MongoDao {
         return datastore.createQuery(User.class)
                 .field(EMAIL_FIELD).equal(email)
                 .field(PW_FIELD).equal(password)
-                .get();
+            .get(new FindOptions());
     }
 
     static public User findUser(String id) {
