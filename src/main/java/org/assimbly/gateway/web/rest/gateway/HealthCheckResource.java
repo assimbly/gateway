@@ -39,9 +39,10 @@ public class HealthCheckResource {
         path = "/jvm",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long integrationId) throws Exception {
+    public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
 
         plainResponse = true;
+        long integrationId = 1;
 
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
