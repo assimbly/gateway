@@ -79,4 +79,26 @@ public class HealthResource {
             return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/jvm",e.getMessage());
         }
     }
+
+    @GetMapping(
+        path = "/flow",
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
+    )
+    public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
+
+        plainResponse = true;
+        long integrationId = 1;
+        integration = integrationRuntime.getIntegration();
+
+        try {
+            final org.assimbly.dil.validation.stats.BackendResponse backendResponse = new org.assimbly.dil.validation.stats.BackendResponse();
+
+            String stats = integration.getStats(mediaType);
+            if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/flow", stats, plainResponse);
+        } catch (Exception e) {
+            log.error("Get flow failed",e);
+            return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/flow",e.getMessage());
+        }
+    }
 }
