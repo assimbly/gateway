@@ -3,7 +3,7 @@ package org.assimbly.gateway.service;
 /**
  * Service Interface for managing Integration.
  */
-public interface HealthCheckService {
+public interface HealthService {
 
     /**
      * Convert double size to long Kb
