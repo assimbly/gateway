@@ -2,11 +2,14 @@ package org.assimbly.gateway.web.rest.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.assimbly.dil.validation.stats.BackendResponse;
 import org.assimbly.gateway.service.HealthService;
+import org.assimbly.gateway.service.dto.JvmDTO;
+import org.assimbly.integration.Integration;
+import org.assimbly.integrationrest.IntegrationRuntime;
 import org.assimbly.util.rest.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +36,11 @@ public class HealthResource {
         this.healthService = healthService;
     }
 
+    @Autowired
+    private IntegrationRuntime integrationRuntime;
+
+    private Integration integration;
+
     private boolean plainResponse;
 
     @GetMapping(
@@ -47,7 +55,7 @@ public class HealthResource {
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
-            final BackendResponse backendResponse = new BackendResponse();
+            final JvmDTO backendResponse = new JvmDTO();
             final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
             MemoryUsage mem = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
