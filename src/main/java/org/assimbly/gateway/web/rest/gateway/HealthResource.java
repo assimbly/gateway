@@ -91,8 +91,6 @@ public class HealthResource {
         integration = integrationRuntime.getIntegration();
 
         try {
-            final org.assimbly.dil.validation.stats.BackendResponse backendResponse = new org.assimbly.dil.validation.stats.BackendResponse();
-
             String stats = integration.getStats(mediaType);
             if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
             return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/flow", stats, plainResponse);
