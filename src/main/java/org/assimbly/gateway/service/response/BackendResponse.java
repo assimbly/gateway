@@ -1,27 +1,13 @@
-package org.assimbly.gateway.service.dto;
+package org.assimbly.gateway.service.response;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadMXBean;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JvmDTO {
-
-    public enum StatusTag {
-        OK, TROUBLING, FAILING
-    }
-
-    @JsonIgnore
-    private final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-    private final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+public class BackendResponse {
 
     private Map<String, Object> jvm = new HashMap<>();
     private Map<String, Long> memory = new HashMap<>();
     private Map<String, Integer> threads = new HashMap<>();
-
 
     public Map<String, Long> getMemory() {
         return memory;

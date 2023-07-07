@@ -3,7 +3,7 @@ package org.assimbly.gateway.web.rest.gateway;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.service.HealthService;
-import org.assimbly.gateway.service.dto.JvmDTO;
+import org.assimbly.gateway.service.response.BackendResponse;
 import org.assimbly.integration.Integration;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.assimbly.util.rest.ResponseUtil;
@@ -55,7 +55,7 @@ public class HealthResource {
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
-            final JvmDTO backendResponse = new JvmDTO();
+            final BackendResponse backendResponse = new BackendResponse();
             final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
             MemoryUsage mem = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
