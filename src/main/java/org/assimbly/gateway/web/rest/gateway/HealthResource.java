@@ -40,8 +40,9 @@ public class HealthResource {
 
     @Autowired
     private IntegrationRuntime integrationRuntime;
+
     @Autowired
-    private ManagedBrokerRuntime broker;
+    private ManagedBrokerRuntime managedBroker;
 
     private Integration integration;
 
@@ -113,13 +114,12 @@ public class HealthResource {
 
         plainResponse = true;
         long connectorId = 1;
-        integration = integrationRuntime.getIntegration();
 
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
 
-            Map<String, Object> statsMap = broker.getStats("classic");
+            Map<String, Object> statsMap = managedBroker.getStats("classic");
 
             mapper.writeValue(out, statsMap);
 
