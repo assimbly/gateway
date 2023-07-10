@@ -2,8 +2,10 @@ package org.assimbly.gateway.web.rest.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.HealthService;
 import org.assimbly.gateway.service.response.BackendResponse;
+import org.assimbly.gateway.service.response.BrokerResponse;
 import org.assimbly.integration.Integration;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.assimbly.util.rest.ResponseUtil;
@@ -38,6 +40,8 @@ public class HealthResource {
 
     @Autowired
     private IntegrationRuntime integrationRuntime;
+    @Autowired
+    private ManagedBrokerRuntime broker;
 
     private Integration integration;
 
@@ -50,7 +54,7 @@ public class HealthResource {
     public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
 
         plainResponse = true;
-        long integrationId = 1;
+        long connectorId = 1;
 
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -73,10 +77,10 @@ public class HealthResource {
             backendResponse.addJvm("maxFileDescriptors", healthService.invokeMethod("getMaxFileDescriptorCount"));
 
             mapper.writeValue(out, backendResponse);
-            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/jvm", out.toString(StandardCharsets.UTF_8), plainResponse);
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/jvm", out.toString(StandardCharsets.UTF_8), plainResponse);
         } catch (Exception e) {
             log.error("Get jvm failed",e);
-            return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/jvm",e.getMessage());
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/jvm",e.getMessage());
         }
     }
 
@@ -97,6 +101,31 @@ public class HealthResource {
         } catch (Exception e) {
             log.error("Get flow failed",e);
             return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/flow",e.getMessage());
+        }
+    }
+
+
+    @GetMapping(
+        path = "/broker",
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
+    )
+    public ResponseEntity<String> getBrokerStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
+
+        plainResponse = true;
+        long integrationId = 1;
+        integration = integrationRuntime.getIntegration();
+
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final ObjectMapper mapper = new ObjectMapper();
+            final BrokerResponse brokerResponse = new BrokerResponse();
+
+            broker.getStatus("");
+
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/jvm", out.toString(StandardCharsets.UTF_8), plainResponse);
+        } catch (Exception e) {
+            log.error("Get broker failed",e);
+            return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/broker",e.getMessage());
         }
     }
 }
