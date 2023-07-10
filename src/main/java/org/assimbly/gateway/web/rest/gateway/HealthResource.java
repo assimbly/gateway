@@ -22,6 +22,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * REST controller for getting the {@link AuditEvent}s.
@@ -91,16 +92,16 @@ public class HealthResource {
     public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
 
         plainResponse = true;
-        long integrationId = 1;
+        long connectorId = 1;
         integration = integrationRuntime.getIntegration();
 
         try {
             String stats = integration.getStats(mediaType);
             if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
-            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/flow", stats, plainResponse);
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/flow", stats, plainResponse);
         } catch (Exception e) {
             log.error("Get flow failed",e);
-            return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/flow",e.getMessage());
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/flow",e.getMessage());
         }
     }
 
@@ -112,7 +113,7 @@ public class HealthResource {
     public ResponseEntity<String> getBrokerStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
 
         plainResponse = true;
-        long integrationId = 1;
+        long connectorId = 1;
         integration = integrationRuntime.getIntegration();
 
         try {
@@ -120,12 +121,14 @@ public class HealthResource {
             final ObjectMapper mapper = new ObjectMapper();
             final BrokerResponse brokerResponse = new BrokerResponse();
 
-            broker.getStatus("");
+            Map<String, Object> statsMap = broker.getStats("classic");
 
-            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(integrationId, mediaType, "/health/jvm", out.toString(StandardCharsets.UTF_8), plainResponse);
+            mapper.writeValue(out, statsMap);
+
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/broker", out.toString(StandardCharsets.UTF_8), plainResponse);
         } catch (Exception e) {
             log.error("Get broker failed",e);
-            return ResponseUtil.createFailureResponse(integrationId, mediaType,"/health/broker",e.getMessage());
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/broker",e.getMessage());
         }
     }
 }
