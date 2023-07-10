@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.HealthService;
 import org.assimbly.gateway.service.response.BackendResponse;
-import org.assimbly.gateway.service.response.BrokerResponse;
 import org.assimbly.integration.Integration;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.assimbly.util.rest.ResponseUtil;
@@ -119,7 +118,6 @@ public class HealthResource {
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
-            final BrokerResponse brokerResponse = new BrokerResponse();
 
             Map<String, Object> statsMap = broker.getStats("classic");
 
