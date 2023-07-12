@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
  * REST controller for getting the {@link AuditEvent}s.
  */
 @RestController
-@RequestMapping("/health")
+@RequestMapping("/health/backend")
 public class HealthIntegrationResource {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
@@ -42,6 +42,26 @@ public class HealthIntegrationResource {
     private Integration integration;
 
     private boolean plainResponse;
+
+    @GetMapping(
+        path = "/flows",
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
+    )
+    public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
+
+        plainResponse = true;
+        long connectorId = 1;
+        integration = integrationRuntime.getIntegration();
+
+        try {
+            String stats = integration.getStats(mediaType);
+            if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/flow", stats, plainResponse);
+        } catch (Exception e) {
+            log.error("Get flow failed",e);
+            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/flow",e.getMessage());
+        }
+    }
 
     @GetMapping(
         path = "/jvm",
@@ -77,26 +97,6 @@ public class HealthIntegrationResource {
         } catch (Exception e) {
             log.error("Get jvm failed",e);
             return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/jvm",e.getMessage());
-        }
-    }
-
-    @GetMapping(
-        path = "/flow",
-        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
-    )
-    public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
-
-        plainResponse = true;
-        long connectorId = 1;
-        integration = integrationRuntime.getIntegration();
-
-        try {
-            String stats = integration.getStats(mediaType);
-            if(stats.startsWith("Error")||stats.startsWith("Warning")) {plainResponse = false;}
-            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/flow", stats, plainResponse);
-        } catch (Exception e) {
-            log.error("Get flow failed",e);
-            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/flow",e.getMessage());
         }
     }
 }
