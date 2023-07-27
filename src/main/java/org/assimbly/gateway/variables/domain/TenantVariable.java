@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Entity(concern = "GlobalEnvironmentVariable", noClassnameStored = true, value = "global_environment_variables")
+@Entity(concern = "TenantVariable", noClassnameStored = true, value = "tenant_variables")
 @Indexes(
         @Index(value = "name", fields = @Field("name"))
 )
-public class GlobalEnvironmentVariable {
+public class TenantVariable {
     @Id
     private ObjectId _id;
     private String name;
@@ -21,12 +21,12 @@ public class GlobalEnvironmentVariable {
     @Embedded
     private List<EnvironmentValue> values;
 
-    public GlobalEnvironmentVariable(){
+    public TenantVariable(){
         this._id = new ObjectId();
         this.values = new ArrayList<>();
     }
 
-    public GlobalEnvironmentVariable(String name){
+    public TenantVariable(String name){
         this._id = new ObjectId();
         this.name = name;
         this.values = new ArrayList<>();
