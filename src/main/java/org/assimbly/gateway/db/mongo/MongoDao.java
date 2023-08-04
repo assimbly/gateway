@@ -2,7 +2,7 @@ package org.assimbly.gateway.db.mongo;
 
 import org.assimbly.gateway.exception.EnvironmentValueNotFoundException;
 import org.assimbly.gateway.variables.domain.EnvironmentValue;
-import org.assimbly.gateway.variables.domain.GlobalEnvironmentVariable;
+import org.assimbly.gateway.variables.domain.TenantVariable;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.FindOptions;
@@ -30,7 +30,7 @@ public class MongoDao {
     private static final String CREATED_BY_SYSTEM = "System";
     private static final String UPDATED_BY_SYSTEM = "System";
 
-    private static final String GLOBAL_EXPRESSION = "@\\{(.*?)}";
+    private static final String TENANT_VARIABLE_EXPRESSION = "@\\{(.*?)}";
 
     private static String database;
 
@@ -82,70 +82,70 @@ public class MongoDao {
                 .get();
     }
 
-    static public GlobalEnvironmentVariable findVariableByName(String variableName, String tenant) {
+    static public TenantVariable findVariableByName(String variableName, String tenant) {
         Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
-        return datastore.find(GlobalEnvironmentVariable.class).field(NAME_FIELD).equal(variableName).get();
+        return datastore.find(TenantVariable.class).field(NAME_FIELD).equal(variableName).get();
     }
 
-    static public String getGlobalEnvironmentValue(String globVarName, String tenant, String environment) {
+    static public String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
 
-        GlobalEnvironmentVariable globVar = MongoDao.findVariableByName(globVarName, tenant);
-        if(globVar==null) {
-            LOG.info(String.format("globVar %s is NULL", globVarName));
+        TenantVariable tenantVar = MongoDao.findVariableByName(tenantVarName, tenant);
+        if(tenantVar==null) {
+            LOG.info(String.format("tenantVar %s is NULL", tenantVarName));
             return null;
         }
 
         StringBuffer output = new StringBuffer();
-        String globalEnvironmentValue = globVar.find(environment)
-            .orElseThrow(() -> new EnvironmentValueNotFoundException("Global variable (" + globVarName + ") value not found for environment: " + environment))
+        String tenantVariableValue = tenantVar.find(environment)
+            .orElseThrow(() -> new EnvironmentValueNotFoundException("Tenant variable (" + tenantVarName + ") value not found for environment: " + environment))
             .getValue();
 
-        Pattern pattern = Pattern.compile(GLOBAL_EXPRESSION);
-        Matcher matcher = pattern.matcher(globalEnvironmentValue);
+        Pattern pattern = Pattern.compile(TENANT_VARIABLE_EXPRESSION);
+        Matcher matcher = pattern.matcher(tenantVariableValue);
 
         while(matcher.find()) {
-            String internalGlobalVarName = matcher.group(1);
+            String internalTenantVarName = matcher.group(1);
 
-            GlobalEnvironmentVariable internalGlobalVar = findVariableByName(internalGlobalVarName, tenant);
-            if(internalGlobalVar != null) {
-                Optional<EnvironmentValue> optionalEnvironmentValue = internalGlobalVar.find(environment);
+            TenantVariable internalTenantVar = findVariableByName(internalTenantVarName, tenant);
+            if(internalTenantVar != null) {
+                Optional<EnvironmentValue> optionalEnvironmentValue = internalTenantVar.find(environment);
                 if(optionalEnvironmentValue.isPresent()) {
-                    internalGlobalVarName = optionalEnvironmentValue.get().getValue();
+                    internalTenantVarName = optionalEnvironmentValue.get().getValue();
                 } else {
-                    internalGlobalVarName = "";
+                    internalTenantVarName = "";
                 }
             } else {
-                internalGlobalVarName = "";
+                internalTenantVarName = "";
             }
 
-            matcher.appendReplacement(output, Matcher.quoteReplacement(internalGlobalVarName));
+            matcher.appendReplacement(output, Matcher.quoteReplacement(internalTenantVarName));
         }
         matcher.appendTail(output);
         return output.toString();
     }
 
-    static public void saveGlobalEnvironmentVariable(
-        String globVarName, String globVarValue, String tenant, String environment
+    static public void saveTenantVariable(
+        String tenantVarName, String tenantVarValue, String tenant, String environment
     ) {
-        GlobalEnvironmentVariable globalEnvironmentVariable = findVariableByName(globVarName, tenant);
+        TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant);
 
-        if(Objects.isNull(globalEnvironmentVariable)) {
-            globalEnvironmentVariable = new GlobalEnvironmentVariable(globVarName);
-            globalEnvironmentVariable.setCreatedAt(new Date().getTime());
-            globalEnvironmentVariable.setCreatedBy(CREATED_BY_SYSTEM);
+        if(Objects.isNull(tenantVariable)) {
+            tenantVariable = new TenantVariable(tenantVarName);
+            tenantVariable.setCreatedAt(new Date().getTime());
+            tenantVariable.setCreatedBy(CREATED_BY_SYSTEM);
         }
 
-        if(!globalEnvironmentVariable.find(environment).isPresent())
-            globalEnvironmentVariable.put(new EnvironmentValue(environment));
+        if(!tenantVariable.find(environment).isPresent())
+            tenantVariable.put(new EnvironmentValue(environment));
 
-        EnvironmentValue variable = globalEnvironmentVariable.find(environment).get();
+        EnvironmentValue variable = tenantVariable.find(environment).get();
 
         variable.setEncrypted(false);
-        variable.setValue(globVarValue);
+        variable.setValue(tenantVarValue);
         variable.setUpdatedAt(new Date().getTime());
         variable.setUpdatedBy(UPDATED_BY_SYSTEM);
 
-        updateVariable(globalEnvironmentVariable, tenant);
+        updateTenantVariable(tenantVariable, tenant);
     }
 
     static public void updateAuthenticatorSettings(User user, String secretKey, Boolean usesTwoFactor) {
@@ -158,9 +158,9 @@ public class MongoDao {
         datastore.update(user, operations);
     }
 
-    static public void updateVariable(GlobalEnvironmentVariable globalEnvironmentVariable, String tenant){
+    static public void updateTenantVariable(TenantVariable tenantVariable, String tenant){
         Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
-        datastore.save(globalEnvironmentVariable);
+        datastore.save(tenantVariable);
     }
 
     static public void removeAuthenticatorSettings(User user){
