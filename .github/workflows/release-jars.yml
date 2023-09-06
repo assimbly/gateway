@@ -3,14 +3,23 @@ name: Release Jars
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      module:
+        description: 'Kind of module to build'
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - integration
+          - broker
+          - headless
 
-jobs:
   publish_jar:
 
     runs-on: ubuntu-latest
 
     env:
-      BUILD_TYPE: 'full'
+      BUILD_TYPE: ${{ inputs.print_tags }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -93,12 +102,5 @@ jobs:
       - name: Publish to Github Packages
         env:
           VERSION_TAG: '-SNAPSHOT'
-          PUSH_PKGS: true
         run: |
-          if [[ $PUSH_PKGS == true ]]; then
-            ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -Pfull -Pprod -Pfull -P4.0.3-SNAPSHOT
-          fi
-
-          if [[ $PUSH_PKGS == false ]]; then
-            echo "Skipped snapshot package push!"
-          fi
+          ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -P${{ inputs.print_tags }} -Pprod -Pfull
