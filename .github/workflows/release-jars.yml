@@ -7,12 +7,7 @@ on:
       module:
         description: 'Kind of module to build'
         default: 'full'
-        type: choice
-        options:
-          - full
-          - integration
-          - broker
-          - headless
+        type: string
 
 jobs:
   release_jars:
