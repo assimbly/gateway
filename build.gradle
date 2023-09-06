@@ -595,6 +595,11 @@ if (project.hasProperty("integration")){
 }
 
 publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
     repositories {
         maven {
             name = "GitHubPackages"
