@@ -132,7 +132,7 @@
     "eslint": "8.9.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-webpack-plugin": "3.1.1",
-    "folder-hash": "4.0.3-SNAPSHOT",
+    "folder-hash": "4.0.3",
     "generator-jhipster": "7.7.0",
     "husky": "7.0.4",
     "jest": "27.5.1",
