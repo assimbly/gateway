@@ -96,7 +96,7 @@ jobs:
           PUSH_PKGS: true
         run: |
           if [[ $PUSH_PKGS == true ]]; then
-            ./gradlew clean publish --settings-file ./settings.gradle -Pprod
+            ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -Pfull -Pprod -Pfull -P4.0.3-SNAPSHOT
           fi
 
           if [[ $PUSH_PKGS == false ]]; then
