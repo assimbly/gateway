@@ -1,0 +1,34 @@
+name: Release Snapshots
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  delete_old_snapshots:
+
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Delete older snapshots
+        uses: smartsquaregmbh/delete-old-packages@v0.7.0
+        with:
+          organization: assimbly
+          type: maven
+          keep: 0
+          version-pattern: "^\\S+\\-SNAPSHOT$"
+          names: |
+            org.assimbly.gateway.gateway-full
+            org.assimbly.gateway.gateway-headless
+            org.assimbly.gateway.gateway-integration
+            org.assimbly.gateway.gateway-broker
+
+  call-release-jars:
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
