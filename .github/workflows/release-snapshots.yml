@@ -3,7 +3,7 @@ name: Release Snapshots
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 2 * * *'
 
 jobs:
   delete_old_snapshots:

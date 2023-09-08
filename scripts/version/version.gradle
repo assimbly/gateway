@@ -64,12 +64,23 @@ def searchAndReplace(projectFile, oldVersion, newVersion){
 
         println "Updating file: ${file}"
 
-        if(file.equals("package.json")){
+        def originalOldVersion = oldVersion
+        def originalNewVersion = newVersion
+
+        if(file.endsWith("package.json")){
             oldVersion = '"version": "' + oldVersion + '"'
             newVersion = '"version": "' + newVersion + '"'
+        }else if(file.endsWith("build.gradle")){
+
+            oldVersion = 'version = \'' + oldVersion + '\''
+            newVersion = 'version = \'' + newVersion + '\''
+
         }
 
         ant.replace(file: file, token: oldVersion, value: newVersion)
+
+        oldVersion = originalOldVersion
+        newVersion = originalNewVersion
 
     }
 
