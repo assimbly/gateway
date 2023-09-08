@@ -65,7 +65,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '4.0.1'
+version = '4.0.3-SNAPSHOT'
 
 description = ""
 
@@ -362,7 +362,7 @@ dependencies {
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.3-SNAPSHOT'
     implementation 'javax.validation:validation-api:2.0.1.Final'
 
     implementation "javax.annotation:javax.annotation-api"
@@ -461,7 +461,6 @@ dependencies {
 
     implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
 
-    /*
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
@@ -511,9 +510,6 @@ dependencies {
         //implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
     }
 
-
-     */
-
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
@@ -546,17 +542,8 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
-sourceSets {
-    main {
-        java {
-            exclude 'org/assimbly/gateway/web/rest/broker/**'
-        }
-    }
-}
-
 
 //Build different jar based on type of application
-/*
 if (project.hasProperty("integration")){
 
     ant.replaceregexp(match:'type=(.*)', replace:'type=INTEGRATION', flags:'g', byline:true) {
@@ -609,8 +596,6 @@ if (project.hasProperty("integration")){
     }
 
 }
-
- */
 
 publishing {
     publications {

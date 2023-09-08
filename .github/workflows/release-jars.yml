@@ -99,4 +99,4 @@ jobs:
         env:
           VERSION_TAG: '-SNAPSHOT'
         run: |
-          ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -Pdefault
+          ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
