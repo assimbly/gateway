@@ -29,6 +29,33 @@ jobs:
             org.assimbly.gateway.integration
             org.assimbly.gateway.broker
 
+  call-full-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'full'
+
+  call-integration-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+
+  call-broker-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+
+  call-headless-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'headless'
 
   call-full-release-docker-image:
     needs: delete_old_snapshots
