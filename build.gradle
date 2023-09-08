@@ -597,6 +597,17 @@ if (project.hasProperty("integration")){
 publishing {
     publications {
         mavenJava(MavenPublication) {
+
+            if (project.hasProperty("integration")) {
+                artifactId = 'integration'
+            }else if (project.hasProperty("broker")) {
+                artifactId = 'broker'
+            }else if (project.hasProperty("headless")) {
+                artifactId = 'headless'
+            }else{
+                artifactId = 'full'
+            }
+
             from components.java
         }
     }
