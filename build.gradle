@@ -546,6 +546,15 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'org/assimbly/gateway/web/rest/broker/**'
+        }
+    }
+}
+
+
 //Build different jar based on type of application
 if (project.hasProperty("integration")){
 
