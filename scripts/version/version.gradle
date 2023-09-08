@@ -32,6 +32,13 @@ tasks.register('version') {
             newVersion = projectFile.newVersion
         }
 
+        print("projectfile=" + projectFile)
+
+        if(projectFile.equals("package.json")){
+            oldVersion = '"version": "' + oldVersion + '"'
+            newVersion = '"version": "' + newVersion + '"'
+        }
+
         searchAndReplace(projectFile, oldVersion, newVersion)
 
         projectBuilder.content.oldVersion = newVersion
