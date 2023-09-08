@@ -29,6 +29,26 @@ jobs:
             org.assimbly.gateway.gateway-integration
             org.assimbly.gateway.gateway-broker
 
-  call-release-jars:
+  call-full-release-jars:
     uses: ./.github/workflows/release-jars.yml
     secrets: inherit
+    with:
+      module: 'full'
+
+  call-integration-release-jars:
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+
+  call-broker-release-jars:
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+
+  call-headless-release-jars:
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'headless'
