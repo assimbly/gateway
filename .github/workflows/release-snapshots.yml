@@ -17,32 +17,31 @@ jobs:
     steps:
 
       - name: Delete older snapshots
-        run: echo "hello"
 
-  call-full-release-jars:
+  call-full-release-docker-image:
     needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
+    uses: ./.github/workflows/release-docker-images.yml
     secrets: inherit
     with:
       module: 'full'
 
-  call-integration-release-jars:
+  call-integration-release-docker-image:
     needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
+    uses: ./.github/workflows/release-docker-images.yml
     secrets: inherit
     with:
       module: 'integration'
 
-  call-broker-release-jars:
+  call-broker-release-docker-image:
     needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
+    uses: ./.github/workflows/release-docker-images.yml
     secrets: inherit
     with:
       module: 'broker'
 
-  call-headless-release-jars:
+  call-headless-release-docker-image:
     needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
+    uses: ./.github/workflows/release-docker-images.yml
     secrets: inherit
     with:
       module: 'headless'
