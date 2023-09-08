@@ -9,7 +9,6 @@ def oldVersion = projectFile.oldVersion
 def newVersion = project.newVersion
 
 
-
 @Field skippedResources = []
 
 tasks.register('version') {
@@ -33,11 +32,6 @@ tasks.register('version') {
         }
 
         print("projectfile=" + projectFile)
-
-        if(projectFile.equals("package.json")){
-            oldVersion = '"version": "' + oldVersion + '"'
-            newVersion = '"version": "' + newVersion + '"'
-        }
 
         searchAndReplace(projectFile, oldVersion, newVersion)
 
@@ -69,6 +63,12 @@ def searchAndReplace(projectFile, oldVersion, newVersion){
         def file = rootDir.toString() + it.path;
 
         println "Updating file: ${file}"
+
+        if(file.equals("package.json")){
+            oldVersion = '"version": "' + oldVersion + '"'
+            newVersion = '"version": "' + newVersion + '"'
+        }
+
         ant.replace(file: file, token: oldVersion, value: newVersion)
 
     }
