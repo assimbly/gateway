@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
-import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -41,10 +40,6 @@ public class JDBCResource {
 
         try {
             ConnectionType connectionType = ConnectionType.valueOf(type.toUpperCase());
-            host = URLDecoder.decode(host, "UTF-8");
-            userName = URLDecoder.decode(userName, "UTF-8");
-            password = URLDecoder.decode(password, "UTF-8");
-            database = URLDecoder.decode(database, "UTF-8");
 
             JDBCConnection jdbcConnection = JDBCConnection.builder()
                 .setUsername(userName)
@@ -60,7 +55,7 @@ public class JDBCResource {
             DatabaseAdapter adapter = connectionType.getAdapter();
 
             connection = jdbcConnection.connect(adapter);
-        } catch (SQLException | UnsupportedEncodingException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             return new ValidationErrorMessage(e.getMessage());
         } finally {
             close(connection);
