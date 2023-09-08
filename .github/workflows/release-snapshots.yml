@@ -24,30 +24,34 @@ jobs:
           keep: 0
           version-pattern: "^\\S+\\-SNAPSHOT$"
           names: |
-            org.assimbly.gateway.gateway-full
-            org.assimbly.gateway.gateway-headless
-            org.assimbly.gateway.gateway-integration
-            org.assimbly.gateway.gateway-broker
+            org.assimbly.gateway.full
+            org.assimbly.gateway.headless
+            org.assimbly.gateway.integration
+            org.assimbly.gateway.broker
 
   call-full-release-jars:
+    needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
     secrets: inherit
     with:
       module: 'full'
 
   call-integration-release-jars:
+    needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
     secrets: inherit
     with:
       module: 'integration'
 
   call-broker-release-jars:
+    needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
     secrets: inherit
     with:
       module: 'broker'
 
   call-headless-release-jars:
+    needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
     secrets: inherit
     with:
