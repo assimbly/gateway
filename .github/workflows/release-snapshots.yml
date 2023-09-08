@@ -17,6 +17,18 @@ jobs:
     steps:
 
       - name: Delete older snapshots
+        uses: smartsquaregmbh/delete-old-packages@v0.7.0
+        with:
+          organization: assimbly
+          type: maven
+          keep: 0
+          version-pattern: "^\\S+\\-SNAPSHOT$"
+          names: |
+            org.assimbly.gateway.full
+            org.assimbly.gateway.headless
+            org.assimbly.gateway.integration
+            org.assimbly.gateway.broker
+
 
   call-full-release-docker-image:
     needs: delete_old_snapshots
