@@ -487,12 +487,12 @@ dependencies {
         implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true  //*
         implementation group:  "org.assimbly", name: "fmuta", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "hl7", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "multipart", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
@@ -502,10 +502,10 @@ dependencies {
         implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "throttling", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
