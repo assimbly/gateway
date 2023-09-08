@@ -556,6 +556,7 @@ sourceSets {
 
 
 //Build different jar based on type of application
+/*
 if (project.hasProperty("integration")){
 
     ant.replaceregexp(match:'type=(.*)', replace:'type=INTEGRATION', flags:'g', byline:true) {
@@ -608,6 +609,8 @@ if (project.hasProperty("integration")){
     }
 
 }
+
+ */
 
 publishing {
     publications {
