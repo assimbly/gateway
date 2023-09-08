@@ -14,21 +14,6 @@ jobs:
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    steps:
-
-      - name: Delete older snapshots
-        uses: smartsquaregmbh/delete-old-packages@v0.7.0
-        with:
-          organization: assimbly
-          type: maven
-          keep: 0
-          version-pattern: "^\\S+\\-SNAPSHOT$"
-          names: |
-            org.assimbly.gateway.full
-            org.assimbly.gateway.headless
-            org.assimbly.gateway.integration
-            org.assimbly.gateway.broker
-
   call-full-release-jars:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
