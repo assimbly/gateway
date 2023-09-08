@@ -14,6 +14,11 @@ jobs:
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    steps:
+
+      - name: Delete older snapshots
+        run: echo "hello"
+
   call-full-release-jars:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
