@@ -29,65 +29,9 @@ jobs:
             org.assimbly.gateway.integration
             org.assimbly.gateway.broker
 
-  call-full-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'full'
-      branch: 'develop'
-
-  call-integration-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'integration'
-      branch: 'develop'
-
-  call-broker-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'broker'
-      branch: 'develop'
-
-  call-headless-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'headless'
-      branch: 'develop'
-
-  call-full-release-docker-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-docker-images.yml
-    secrets: inherit
-    with:
-      module: 'full'
-      branch: 'develop'
-
-  call-integration-release-docker-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-docker-images.yml
-    secrets: inherit
-    with:
-      module: 'integration'
-      branch: 'develop'
-
-  call-broker-release-docker-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-docker-images.yml
-    secrets: inherit
-    with:
-      module: 'broker'
-      branch: 'develop'
-
   call-headless-release-docker-image:
     needs: delete_old_snapshots
-    uses: ./.github/workflows/release-docker-images.yml
+    uses: ./.github/workflows/release-aws-images.yml
     secrets: inherit
     with:
       module: 'headless'
