@@ -1,6 +1,7 @@
 @echo off
 
 if [%1]==[] goto usage
+git pull
 git add -A
 git commit -m %1
 git push
