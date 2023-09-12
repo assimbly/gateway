@@ -29,6 +29,7 @@ public class JDBCResource {
         @RequestParam("type") String type,
         @RequestParam("user") String userName,
         @RequestParam("host") String host,
+        @RequestParam("instance") String instance,
         @RequestParam("pwd") String password,
         @RequestParam("port") int port,
         @RequestParam("useSSL") boolean useSSL,
@@ -45,6 +46,7 @@ public class JDBCResource {
                 .setUsername(userName)
                 .setPassword(password)
                 .setHost(host)
+                .setInstance(instance)
                 .setPort(port)
                 .setSecure(useSSL)
                 .setEnabledTLSProtocols(enabledTLSProtocols)
