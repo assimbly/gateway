@@ -16,6 +16,10 @@ on:
         description: 'Tag to use'
         default: 'develop'
         type: string
+      type:
+        description: 'Type: default or full (includes custom components)'
+        default: 'default'
+        type: string
 
 jobs:
   publish_docker_images:

@@ -69,6 +69,7 @@ jobs:
       module: 'full'
       branch: 'develop'
       tag: 'develop'
+      type: 'full'
 
   call-integration-release-dockerhub-image:
     needs: delete_old_snapshots
@@ -78,6 +79,7 @@ jobs:
       module: 'integration'
       branch: 'develop'
       tag: 'develop'
+      type: 'default'
 
   call-broker-release-dockerhub-image:
     needs: delete_old_snapshots
@@ -87,6 +89,7 @@ jobs:
       module: 'broker'
       branch: 'develop'
       tag: 'develop'
+      type: 'default'
 
   call-headless-release-dockerhub-image:
     needs: delete_old_snapshots
@@ -96,6 +99,7 @@ jobs:
       module: 'headless'
       branch: 'develop'
       tag: 'develop'
+      type: 'full'
 
   call-headless-release-aws-image:
     needs: delete_old_snapshots
@@ -105,6 +109,7 @@ jobs:
       module: 'headless'
       branch: 'develop'
       tag: 'develop'
+      type: 'full'
 
   call-broker-release-aws-image:
     needs: delete_old_snapshots
@@ -114,3 +119,4 @@ jobs:
       module: 'broker'
       branch: 'develop'
       tag: 'develop'
+      type: 'default'
