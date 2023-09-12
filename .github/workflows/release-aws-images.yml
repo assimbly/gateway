@@ -12,6 +12,11 @@ on:
         description: 'Branch to use'
         default: 'develop'
         type: string
+      tag:
+        description: 'Tag to use'
+        default: 'develop'
+        type: string
+
 jobs:
   publish_docker_images:
     runs-on: ubuntu-latest
@@ -111,4 +116,4 @@ jobs:
 
       - name: Push gateway image to Amazon ECR
         run: |
-          clear & ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway:development --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
+          clear & ./gradlew clean bootJar jib -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway-${{ inputs.module }}:${{ inputs.tag }} --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -Pfull

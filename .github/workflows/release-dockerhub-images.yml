@@ -12,12 +12,16 @@ on:
         description: 'Branch to use'
         default: 'develop'
         type: string
+      tag:
+        description: 'Tag to use'
+        default: 'develop'
+        type: string
+
 jobs:
   publish_docker_images:
     runs-on: ubuntu-latest
 
     env:
-      VERSION_TAG: ${{ inputs.module }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -106,6 +110,7 @@ jobs:
       - name: Build docker image
         env:
           BUILD_TYPE: ${{ inputs.module }}
+          VERSION_TAG: ${{ inputs.tag }}
 
         run: |
           ./gradlew clean bootJar jibDockerBuild -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG --settings-file ./settings.gradle -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull
@@ -113,6 +118,7 @@ jobs:
       - name: Push the docker image
         env:
           BUILD_TYPE: ${{ inputs.module }}
+          VERSION_TAG: ${{ inputs.tag }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
