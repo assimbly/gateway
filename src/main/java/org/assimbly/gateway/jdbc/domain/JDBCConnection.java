@@ -10,6 +10,7 @@ public class JDBCConnection {
     private String username;
     private String password;
     private String host;
+    private String instance;
     private int port;
     private String database;
     private boolean isSecure;
@@ -20,6 +21,7 @@ public class JDBCConnection {
         this.username = builder.username;
         this.password = builder.password;
         this.host = builder.host;
+        this.instance = builder.instance;
         this.port = builder.port;
         this.database = builder.database;
         this.isSecure = builder.isSecure;
@@ -41,6 +43,10 @@ public class JDBCConnection {
 
     public String getHost() {
         return host;
+    }
+
+    public String getInstance() {
+        return instance;
     }
 
     public int getPort() {
@@ -68,6 +74,7 @@ public class JDBCConnection {
         private String username;
         private String password;
         private String host;
+        private String instance;
         private int port;
         private String database;
         private boolean isSecure;
@@ -90,6 +97,11 @@ public class JDBCConnection {
 
         public Builder setHost(String host) {
             this.host = host;
+            return this;
+        }
+
+        public Builder setInstance(String instance) {
+            this.instance = instance;
             return this;
         }
 
