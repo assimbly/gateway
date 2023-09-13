@@ -21,3 +21,17 @@ jobs:
     secrets: inherit
     with:
       branch: 'develop'
+
+  call-runtime-release:
+    needs: call-base-release
+    uses: assimbly/runtime/.github/workflows/release.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+
+  call-custom-components-release:
+    needs: call-base-release
+    uses: assimbly/custom-components/.github/workflows/release.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
