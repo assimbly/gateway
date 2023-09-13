@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - name: Start release
+        run: echo "Start release of gateway"
+
+  call-base-release:
+    uses: assimbly/base/.github/workflows/release.yml
+    secrets: inherit
+    with:
+      branch: 'develop'
