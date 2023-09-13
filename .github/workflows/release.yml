@@ -17,7 +17,7 @@ jobs:
         run: echo "Start release of gateway"
 
   call-base-release:
-    uses: assimbly/base/.github/workflows/release.yml@v1
+    uses: assimbly/base/.github/workflows/release.yml@develop
     secrets: inherit
     with:
       branch: 'develop'
