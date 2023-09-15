@@ -108,7 +108,7 @@ jobs:
     with:
       module: 'headless'
       branch: 'develop'
-      tag: 'develop'
+      tag: 'development'
       type: 'full'
 
   call-broker-release-aws-image:
@@ -118,5 +118,5 @@ jobs:
     with:
       module: 'broker'
       branch: 'develop'
-      tag: 'develop'
+      tag: 'development'
       type: 'default'
