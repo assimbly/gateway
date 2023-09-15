@@ -8,7 +8,7 @@ on:
 jobs:
   release:
 
-    if: (github.event.label.name == 'major' || github.event.label.name == 'minor' || github.event.label.name == 'patch') && github.event.milestone != null
+    if: (github.event.label.name == 'major' || github.event.label.name == 'minor' || github.event.label.name == 'patch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
