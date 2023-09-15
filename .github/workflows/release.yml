@@ -9,7 +9,10 @@ jobs:
 
   release:
 
-    if: github.event.labels.name == 'major'
+    if: |
+      contains(github.event.issue.labels.*.name, 'major') ||
+      contains(github.event.issue.labels.*.name, 'minor') ||
+      contains(github.event.issue.labels.*.name, 'patch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
