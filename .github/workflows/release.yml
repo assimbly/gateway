@@ -10,9 +10,10 @@ jobs:
   release:
 
     if: |
-      contains(github.event.issue.labels.*.name, 'major') ||
+      (contains(github.event.issue.labels.*.name, 'major') ||
       contains(github.event.issue.labels.*.name, 'minor') ||
-      contains(github.event.issue.labels.*.name, 'patch')
+      contains(github.event.issue.labels.*.name, 'patch')) &&
+      github.event.issue.milestone.title != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
