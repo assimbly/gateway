@@ -2,10 +2,13 @@ name: Release
 
 on:
   workflow_dispatch:
+  issues:
+    types: [  created, assigned, closed ]
 
 jobs:
   release:
 
+    if: (github.event.label.name == 'major' || github.event.label.name == 'minor' || github.event.label.name == 'patch') && github.event.milestone.name != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,6 +20,7 @@ jobs:
         run: echo "Start release of gateway"
 
   call-base-release:
+    needs: release
     uses: assimbly/base/.github/workflows/release.yml@develop
     secrets: inherit
     with:
