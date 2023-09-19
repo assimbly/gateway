@@ -22,7 +22,7 @@ jobs:
     - name: Update Gradle Version
       run: |
         echo "Updating to version: $(milestone)"
-        ./gradlew -q version -PnewVersion=$(milestone) --settings-file ./settings.gradle
+        ./gradlew -q version -PnewVersion=${{inputs.milestone}} --settings-file ./settings.gradle
 
     - name: Diff check
       run: git diff
