@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  release_version:
+  release-new-version:
 
     if: |
       (contains(github.event.issue.labels.*.name, 'major') ||
@@ -25,7 +25,7 @@ jobs:
         run: echo "Start release of gateway"
 
   call-base-release-version:
-    needs: release_version
+    needs: release-new-version
     uses: assimbly/base/.github/workflows/release-start.yml@develop
     secrets: inherit
     with:
