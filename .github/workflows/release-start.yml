@@ -24,7 +24,7 @@ jobs:
       - name: Start release
         run: echo "Start release of gateway"
 
-  call-update-version:
+  call-gateway-update-version:
     needs: release-new-version
     uses: ./.github/workflows/update-version.yml
     secrets: inherit
