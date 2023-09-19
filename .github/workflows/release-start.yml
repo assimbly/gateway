@@ -30,7 +30,7 @@ jobs:
     secrets: inherit
     with:
       branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}-SNAPSHOT'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
 
   call-base-release-version:
     needs: release-new-version
@@ -38,7 +38,7 @@ jobs:
     secrets: inherit
     with:
       branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}-SNAPSHOT'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
 
   call-runtime-release-version:
     needs: call-base-release-version
@@ -46,7 +46,7 @@ jobs:
     secrets: inherit
     with:
       branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}-SNAPSHOT'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
 
   call-custom-components-release-version:
     needs: call-base-release-version
@@ -54,4 +54,4 @@ jobs:
     secrets: inherit
     with:
       branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}-SNAPSHOT'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
