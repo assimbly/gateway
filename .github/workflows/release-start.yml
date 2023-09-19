@@ -1,0 +1,49 @@
+name: Start Release
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [  opened, reopened, edited ]
+
+jobs:
+
+  release_version:
+
+    if: |
+      (contains(github.event.issue.labels.*.name, 'major') ||
+      contains(github.event.issue.labels.*.name, 'minor') ||
+      contains(github.event.issue.labels.*.name, 'patch')) &&
+      github.event.issue.milestone.title != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - name: Start release
+        run: echo "Start release of gateway"
+
+  call-base-release-version:
+    needs: release_version
+    uses: assimbly/base/.github/workflows/release-start.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'
+
+  call-runtime-release-version:
+    needs: call-base-release-version
+    uses: assimbly/runtime/.github/workflows/release-start.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'
+
+  call-custom-components-release-version:
+    needs: call-base-release-version
+    uses: assimbly/custom-components/.github/workflows/release-start.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'

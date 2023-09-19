@@ -1,9 +1,9 @@
-name: Release
+name: Finish Release
 
 on:
   workflow_dispatch:
   issues:
-    types: [  created, assigned, closed ]
+    types: [ closed ]
 
 jobs:
 
@@ -26,21 +26,24 @@ jobs:
 
   call-base-release:
     needs: release
-    uses: assimbly/base/.github/workflows/release.yml@develop
+    uses: assimbly/base/.github/workflows/release-start.yml@develop
     secrets: inherit
     with:
       branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'
 
   call-runtime-release:
     needs: call-base-release
-    uses: assimbly/runtime/.github/workflows/release.yml@develop
+    uses: assimbly/runtime/.github/workflows/release-start.yml@develop
     secrets: inherit
     with:
       branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'
 
   call-custom-components-release:
     needs: call-base-release
-    uses: assimbly/custom-components/.github/workflows/release.yml@develop
+    uses: assimbly/custom-components/.github/workflows/release-start.yml@develop
     secrets: inherit
     with:
       branch: 'develop'
+      milestone: '${github.event.issue.milestone.title}'
