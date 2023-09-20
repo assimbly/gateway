@@ -27,9 +27,8 @@ jobs:
 
   call-base-release-version:
     needs: release-new-version
-    uses: assimbly/base/.github/workflows/release-start.yml@develop
+    uses: assimbly/base/.github/workflows/update-version.yml@develop
+    secrets: inherit
     with:
       branch: 'develop'
       milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
-    secrets:
-      my-token: "${{ secrets.GITHUB_TOKEN }}"
