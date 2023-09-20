@@ -65,7 +65,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '4.0.4-SNAPSHOT'
+version = '4.0.3-SNAPSHOT'
 
 description = ""
 
