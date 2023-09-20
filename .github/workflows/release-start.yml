@@ -31,4 +31,5 @@ jobs:
     with:
       branch: 'develop'
       milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+    secrets:
       my-token: "${{ secrets.GITHUB_TOKEN }}"
