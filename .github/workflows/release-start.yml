@@ -29,4 +29,5 @@ jobs:
     uses: assimbly/base/.github/workflows/release-start.yml@develop
     with:
       branch: 'develop'
+      repository: assimbly/base
       milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
