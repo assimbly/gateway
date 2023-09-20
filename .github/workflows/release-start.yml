@@ -32,3 +32,19 @@ jobs:
     with:
       branch: 'develop'
       milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+
+  call-runtime-release-version:
+    needs: release-new-version
+    uses: assimbly/runtime/.github/workflows/update-version.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+
+  call-custom-components-release-version:
+    needs: release-new-version
+    uses: assimbly/custom-components/.github/workflows/update-version.yml@develop
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
