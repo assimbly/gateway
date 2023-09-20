@@ -25,6 +25,14 @@ jobs:
       - name: Start release
         run: echo "Start release of gateway"
 
+  call-gateway-update-version:
+    needs: release-new-version
+    uses: ./.github/workflows/update-version.yml
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+
   call-base-release-version:
     needs: release-new-version
     uses: assimbly/base/.github/workflows/update-version.yml@develop

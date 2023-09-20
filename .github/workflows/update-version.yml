@@ -2,6 +2,15 @@ name: Update Version Number
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
+
   workflow_call:
     inputs:
       branch:
