@@ -48,9 +48,10 @@ jobs:
     - name: Create branch
       if: ${{inputs.new_branch}} != ''
       run: |
+        git fetch
         git checkout -b ${{ inputs.new_branch }}
         git add .
-        git commit "Updating to version: ${{inputs.milestone}}"
+        git commit -m "Updating to version: ${{inputs.milestone}}"
         git push
 
     - name: Add & Commit
