@@ -27,6 +27,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        repository: assimbly/gateway
+        ref: ${{ inputs.branch }}
 
     - name: Update Gradle Version
       run: |
