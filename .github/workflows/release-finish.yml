@@ -37,7 +37,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        branch: 'release-notes'
+        branch: "${{github.event.issue.milestone.title}}"
         sha: '${{ github.event.pull_request.head.sha }}'
 
   call-gateway-update-version:
