@@ -24,11 +24,27 @@ jobs:
       - name: Finish release
         run: echo "Start release of gateway"
 
+  create-new-branch:
+
+    update_version:
+      runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - uses: peterjgrainger/action-create-branch@v2.2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        branch: 'release-notes'
+        sha: '${{ github.event.pull_request.head.sha }}'
+
   call-gateway-update-version:
-    needs: release-new-version
+    needs: create-new-branch
     uses: ./.github/workflows/update-version.yml
     secrets: inherit
     with:
-      branch: "develop"
-      new_branch: "${{github.event.issue.milestone.title}}"
+      branch: "${{github.event.issue.milestone.title}}"
       milestone: "${{github.event.issue.milestone.title}}"

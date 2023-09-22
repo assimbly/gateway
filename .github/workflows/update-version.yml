@@ -20,10 +20,6 @@ on:
       milestone:
         description: 'Milestone to use as version'
         type: string
-      new_branch:
-        description: 'Create a new branch for the version'
-        default: ''
-        type: string
 
 jobs:
   update_version:
@@ -35,8 +31,6 @@ jobs:
         repository: assimbly/gateway
         ref: ${{ inputs.branch }}
 
-
-
     - name: Update Gradle Version
       run: |
         echo "Updating to version: ${{inputs.milestone}}"
@@ -44,15 +38,6 @@ jobs:
 
     - name: Diff check
       run: git diff
-
-    - name: Create branch
-      if: ${{inputs.new_branch}} != ''
-      run: |
-        git fetch
-        git checkout -b ${{ inputs.new_branch }}
-        git add .
-        git commit -m "Updating to version: ${{inputs.milestone}}"
-        git push
 
     - name: Add & Commit
       if: ${{inputs.new_branch}} == ''
