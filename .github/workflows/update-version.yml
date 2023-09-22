@@ -35,9 +35,7 @@ jobs:
         repository: assimbly/gateway
         ref: ${{ inputs.branch }}
 
-    - name: Create branch
-      if: ${{inputs.new_branch}} != ''
-      run: git checkout -b ${{ inputs.new_branch }}
+
 
     - name: Update Gradle Version
       run: |
@@ -47,7 +45,16 @@ jobs:
     - name: Diff check
       run: git diff
 
+    - name: Create branch
+      if: ${{inputs.new_branch}} != ''
+      run: |
+        git checkout -b ${{ inputs.new_branch }}
+        git add .
+        git commit "Updating to version: ${{inputs.milestone}}"
+        git push
+
     - name: Add & Commit
+      if: ${{inputs.new_branch}} == ''
       uses: EndBug/add-and-commit@v9.1.3
       with:
         add: '.'
