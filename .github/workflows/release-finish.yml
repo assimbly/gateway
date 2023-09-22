@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  release:
+  release-new-version:
 
     if: |
       (contains(github.event.issue.labels.*.name, 'major') ||
@@ -16,34 +16,18 @@ jobs:
       github.event.issue.milestone.title != ''
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
 
-      - name: Start release
+      - name: Finish release
         run: echo "Start release of gateway"
 
-  call-base-release:
-    needs: release
-    uses: assimbly/base/.github/workflows/release-start.yml@develop
+  call-gateway-update-version:
+    needs: release-new-version
+    uses: ./.github/workflows/update-version.yml
     secrets: inherit
     with:
-      branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}'
-
-  call-runtime-release:
-    needs: call-base-release
-    uses: assimbly/runtime/.github/workflows/release-start.yml@develop
-    secrets: inherit
-    with:
-      branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}'
-
-  call-custom-components-release:
-    needs: call-base-release
-    uses: assimbly/custom-components/.github/workflows/release-start.yml@develop
-    secrets: inherit
-    with:
-      branch: 'develop'
-      milestone: '${github.event.issue.milestone.title}'
+      branch: "${{github.event.issue.milestone.title}}"
+      milestone: "${{github.event.issue.milestone.title}}"
