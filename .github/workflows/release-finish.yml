@@ -74,6 +74,7 @@ jobs:
 
   delete_old_snapshots:
 
+    needs: call-custom-components-release-version
     runs-on: ubuntu-latest
 
     env:
