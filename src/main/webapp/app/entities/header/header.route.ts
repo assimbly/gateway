@@ -10,8 +10,6 @@ import { HeaderComponent } from './header.component';
 import { HeaderDetailComponent } from './header-detail.component';
 import { HeaderUpdateComponent } from './header-update.component';
 import { IHeader } from 'app/shared/model/header.model';
-import { HeaderAllComponent } from './header-all.component';
-import { HeaderPopupComponent } from 'app/entities/header/header-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class HeaderResolve implements Resolve<IHeader> {
@@ -31,17 +29,8 @@ export class HeaderResolve implements Resolve<IHeader> {
 
 export const headerRoute: Routes = [
   {
-    path: 'header/all',
-    component: HeaderAllComponent,
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-  },
-  {
     path: 'header',
-    component: HeaderAllComponent,
+    component: HeaderComponent,
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
@@ -67,7 +56,7 @@ export const headerRoute: Routes = [
       header: HeaderResolve,
     },
     data: {
-      authorities: ['ROLE_ADMIN'],
+      authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
@@ -79,32 +68,9 @@ export const headerRoute: Routes = [
       header: HeaderResolve,
     },
     data: {
-      authorities: ['ROLE_ADMIN'],
+      authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
     canActivate: [UserRouteAccessService],
   },
-];
-
-export const headerPopupRoute: Routes = [
-  {
-    path: 'header-new',
-    component: HeaderPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'header/:id/edit',
-    component: HeaderPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup',
-  }
 ];

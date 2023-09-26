@@ -60,7 +60,7 @@ describe('Account Service', () => {
   });
 
   describe('save', () => {
-    it('should call account saving endpoint with correct values', () => {
+    it('should call account saving step with correct values', () => {
       // GIVEN
       const account = accountWithAuthorities([]);
 

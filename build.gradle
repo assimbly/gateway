@@ -4,10 +4,35 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-		gradlePluginPortal()
+        gradlePluginPortal()
+        maven{  name = "Aurea"
+            url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+        }
+
+        maven{ name = "Assimbly Base"
+            url = uri("https://maven.pkg.github.com/assimbly/base")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+
+        maven{ name = "Assimbly Runtime"
+            url = uri("https://maven.pkg.github.com/assimbly/runtime")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+
+        maven{  name = "Assimbly Custom Components"
+            url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     }
     dependencies {
+        //classpath('com.google.cloud.tools:jib-ownership-extension-gradle:0.1.0')
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
@@ -19,7 +44,7 @@ plugins {
     id "java"
     id "maven-publish"
     id "idea"
-	id "eclipse"
+    id "eclipse"
     id "jacoco"
     id "org.springframework.boot"
     id "com.google.cloud.tools.jib"
@@ -28,21 +53,23 @@ plugins {
     id "org.liquibase.gradle"
     id "org.sonarqube"
     id "io.spring.nohttp"
-	id 'de.undercouch.download' version '5.0.1'
+    id 'de.undercouch.download' version '5.4.0'
+    id "com.github.ben-manes.versions" version "0.46.0"
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
+tasks.withType(JavaExec) {
+    systemProperty "ASSIMBLY_ENV", System.getProperty("ASSIMBLY_ENV")
+}
 
 group = "org.assimbly.gateway"
-version = '3.7.0'
+version = '4.0.3'
 
 description = ""
 
-//sourceCompatibility=11
-//targetCompatibility=11
-assert System.properties["java.specification.version"] == "11" || "12" || "13"
+assert System.properties["java.specification.version"] == "11" || "12" || "13" || 14 || 15 || 16 || 17 || 18 || 19 || 20 || 21
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
@@ -51,7 +78,7 @@ apply from: "gradle/docker.gradle"
 apply from: "gradle/sonar.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'war'
+//apply plugin: 'war'
 //apply plugin: 'propdeps'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
@@ -63,43 +90,20 @@ apply plugin: 'eclipse'
 configurations.all {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
-  	exclude group: "org.slf4j", module: "slf4j-nop"
-  	exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.slf4j", module: "slf4j-nop"
+    exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.slf4j", module: "slf4j-simple"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude module: 'netty-tcnative-classes'
+    exclude group: 'javax.servlet', module: 'servlet-api'
+    exclude group: 'javax.persistence', module: 'persistence-api'
+    exclude group: 'xerces', module: 'xercesImpl'
+    exclude group: 'org.eclipse.angus', module: 'angus-activation'
+    exclude group: 'org.mongodb', module: 'mongodb-driver-legacy'
+    exclude group: 'org.mongodb', module: 'mongodb-driver-core'
+    exclude group: 'org.mongodb', module: 'mongodb-driver-sync'
+    exclude group: 'org.mongodb', module: 'bson'
 }
-
-//Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
-
-    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-
-    sourceSets {
-        main {
-            java {
-                exclude 'org/assimbly/gateway/web/rest/broker/**'
-            }
-        }
-    }
-}else if (project.hasProperty("broker")) {
-    ant.replaceregexp(match:'type=(.*)', replace:'type=BROKER', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-    sourceSets {
-        main {
-            java {
-                exclude 'org/assimbly/gateway/web/rest/integration/**'
-            }
-        }
-    }
-}else {
-    ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
-        fileset(dir: '.', includes: 'gradle.properties')
-    }
-}
-
 
 if (project.hasProperty("prod") || project.hasProperty("gae")) {
     apply from: "gradle/profile_prod.gradle"
@@ -135,10 +139,44 @@ eclipse {
     }
 }
 
+//build container image
+jib {
+    from {
+        image = 'eclipse-temurin:11'
+    }
+    to {
+        image = 'assimbly/gateway-full'
+    }
+    container {
+        ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
+        format = 'OCI'
+    }
+    extraDirectories {
+        paths {
+            path {
+                // copies the contents of 'src/main/jib' into '/' on the container
+                from = file('src/main/jib')
+            }
+            path {
+                // copies the contents of 'src/main/another/dir' into '/extras' on the container
+                from = file('src/main/data')
+                into = '/data'
+            }
+        }
+        permissions = [
+            '/entrypoint.sh': '755',
+            '/data/**': '775',
+            '/data/**/*': '775',
+        ]
+    }
+
+}
+
+
 defaultTasks "bootRun"
 
 springBoot {
- 	mainClassName = "org.assimbly.gateway.GatewayApp"
+    mainClassName = "org.assimbly.gateway.GatewayApp"
 }
 
 
@@ -172,7 +210,7 @@ test {
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
-    reports.html.enabled = false
+    reports.html.required = false
 }
 
 task integrationTest(type: Test) {
@@ -187,18 +225,18 @@ task integrationTest(type: Test) {
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
     // ignoreFailures true
-    reports.html.enabled = false
+    reports.html.required = false
 }
 
 check.dependsOn integrationTest
 task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn test
+    destinationDirectory = file("$buildDir/reports/tests")
+    getTestResults()
 }
 
 task integrationTestReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/tests")
-    reportOn integrationTest
+    destinationDirectory = file("$buildDir/reports/tests")
+    getTestResults()
 }
 
 if (!project.hasProperty("runList")) {
@@ -206,8 +244,8 @@ if (!project.hasProperty("runList")) {
 }
 
 task getDeps(type: Copy) {
-  from sourceSets.main.runtimeClasspath
-  into 'runtime/'
+    from sourceSets.main.runtimeClasspath
+    into 'runtime/'
 }
 
 
@@ -261,22 +299,21 @@ nohttp {
 configurations {
     providedRuntime
     implementation.exclude module: "spring-boot-starter-tomcat"
+
+    liquibaseRuntime.extendsFrom(sourceSets.main.compileClasspath)
+
     compile { transitive = false }
     all {
         resolutionStrategy {
-            // Inherited version from Spring Boot can't be used because of regressions:
-            // https://liquibase.jira.com/browse/CORE-3536 and https://liquibase.jira.com/browse/CORE-3522
-            force 'org.liquibase:liquibase-core:4.6.2'
+            // force to use latest liquibase instead of default by Spring dependencies
+            force 'org.liquibase:liquibase-core:4.22.0'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.23.1")
+                    details.useVersion("2.28.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("5.17.1")
-                }
-                if (details.requested.group == 'io.netty' ) {
-                    details.useVersion("4.1.78.Final")
+                    details.useVersion("5.18.1")
                 }
             }
         }
@@ -286,24 +323,49 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
+
+    maven{  name = "Aurea"
+        url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
+    }
+
+    maven{ name = "Assimbly Base"
+        url = uri("https://maven.pkg.github.com/assimbly/base")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+
+    maven{ name = "Assimbly Runtime"
+        url = uri("https://maven.pkg.github.com/assimbly/runtime")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+
+    maven{  name = "Assimbly Custom Components"
+        url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
     //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
 }
 
 dependencies {
 
-    implementation( group: 'org.mongodb', name: 'bson'){
-        version{
-            strictly "[3.12.11]"
-        }
-    }
+    implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
-    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.8.1'
-	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
-	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.9.3'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.3'
+
+    implementation 'com.mattbertolini:liquibase-slf4j:4.0.0'
 
     implementation group: "tech.jhipster", name: "jhipster-framework"
 
-	implementation "javax.annotation:javax.annotation-api"
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
+    implementation "javax.annotation:javax.annotation-api"
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
     implementation "io.dropwizard.metrics:metrics-jvm"
@@ -333,10 +395,9 @@ dependencies {
     implementation "org.hibernate:hibernate-envers"
     implementation "org.hibernate.validator:hibernate-validator"
 
-    implementation "org.liquibase:liquibase-core"
-    liquibaseRuntime "org.liquibase:liquibase-core"
+    implementation "org.liquibase:liquibase-core:4.23.2"
+    liquibaseRuntime "org.liquibase:liquibase-core:4.23.2"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibase_hibernate5_version}"
-    liquibaseRuntime sourceSets.main.compileClasspath
 
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-loader-tools"
@@ -346,41 +407,107 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-security"
+
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+
+    //Only one of web server can be active: tomcat, undertow or jetty
+
+    //To use Tomcat
+    //implementation ("org.springframework.boot:spring-boot-starter-web")
+
+    //To use Undertow
+    //implementation ("org.springframework.boot:spring-boot-starter-web") {
+    //    exclude module: "spring-boot-starter-tomcat"
+    //}
+    //implementation "org.springframework.boot:spring-boot-starter-undertow"
+
+    //To Use Jetty
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
     implementation "org.springframework.boot:spring-boot-starter-jetty"
+    //https://www.eclipse.org/jetty/documentation/jetty-9/index.html#quickstart-webapp
+    implementation 'org.eclipse.jetty:jetty-quickstart'
+
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.zalando:problem-spring-web:0.27.0"
-    implementation "org.springframework.boot:spring-boot-starter-cloud-connectors:2.2.13.RELEASE"
-    implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
+    //implementation "org.springframework.boot:spring-boot-starter-cloud-connectors"
+    //implementation "org.springframework.cloud:spring-cloud-spring-service-connector"
     implementation "org.springframework:spring-context-support"
     implementation "org.springframework:spring-messaging"
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-data"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.security:spring-security-messaging"
-    implementation "org.springdoc:springdoc-openapi-ui:1.6.4"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    implementation "mysql:mysql-connector-java"
-    liquibaseRuntime "mysql:mysql-connector-java"
+    implementation "com.mysql:mysql-connector-j"
+    liquibaseRuntime "com.mysql:mysql-connector-j"
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "org.jdom:jdom2:2.0.6.1"
-    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
-    //implementation "io.hawt:hawtio-springboot:2.14.4"
+    implementation "com.warrenstrange:googleauth:1.5.0"
 
-    if (project.hasProperty("connector") || project.hasProperty("esb") || project.hasProperty("api")) {
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
+    implementation "org.mongodb.morphia:morphia:1.3.2"
+    implementation "org.mongodb:mongo-java-driver:3.12.14"
+    implementation "dev.morphia.morphia:core:1.6.1"
+
+    implementation 'org.yaml:snakeyaml:2.0'
+    //implementation "io.hawt:hawtio-springboot:2.17.2"
+    //implementation 'org.crac:crac:1.3.0'
+
+    implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
+
+    if (project.hasProperty("integration") || project.hasProperty("headless")) {
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "database-drivers", version: "${version}", changing: true
     }else{
-        implementation group: "org.assimbly", name: "integrationRest", version: "3.7.0", changing: true
-        implementation group: "org.assimbly", name: "brokerRest", version: "3.7.0", changing: true
+        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+    }
+
+    if (project.hasProperty("full")){
+        implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "aleris", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "amazon", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "archive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "cookies", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifactdotweb", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "edifactstandards", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true  //*
+        implementation group:  "org.assimbly", name: "fmuta", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "hl7", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "multipart", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "throttling", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
     }
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -415,10 +542,11 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
-//Build different jar based on property (connector or broker)
-if (project.hasProperty("connector")){
 
-    ant.replaceregexp(match:'type=(.*)', replace:'type=CONNECTOR', flags:'g', byline:true) {
+//Build different jar based on type of application
+if (project.hasProperty("integration")){
+
+    ant.replaceregexp(match:'type=(.*)', replace:'type=INTEGRATION', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
     }
 
@@ -430,19 +558,71 @@ if (project.hasProperty("connector")){
         }
     }
 }else if (project.hasProperty("broker")) {
+
     ant.replaceregexp(match:'type=(.*)', replace:'type=BROKER', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
     }
     sourceSets {
         main {
             java {
-                exclude 'org/assimbly/gateway/web/rest/connector/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
+                exclude 'org/assimbly/gateway/config/importing/Import.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
+            }
+        }
+    }
+}else if (project.hasProperty("headless")) {
+    ant.replaceregexp(match:'type=(.*)', replace:'type=HEADLESS', flags:'g', byline:true) {
+        fileset(dir: '.', includes: 'gradle.properties')
+    }
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/web/rest/broker/**'
+                exclude 'org/assimbly/gateway/web/rest/gateway/AuditResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/CertificateResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/LogsResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ManageCertificateResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ProfileInfoResource.java'
             }
         }
     }
 }else {
     ant.replaceregexp(match:'type=(.*)', replace:'type=FULL', flags:'g', byline:true) {
         fileset(dir: '.', includes: 'gradle.properties')
+    }
+
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+
+            if (project.hasProperty("integration")) {
+                artifactId = 'integration'
+            }else if (project.hasProperty("broker")) {
+                artifactId = 'broker'
+            }else if (project.hasProperty("headless")) {
+                artifactId = 'headless'
+            }else{
+                artifactId = 'full'
+            }
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/assimbly/gateway"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 
@@ -451,20 +631,22 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "7.3.3"
+    gradleVersion = "8.1.1"
 }
 
+/*
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+     languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
+*/
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "16.15.0"
-        npmVersion = "8.9.0"
-        yarnVersion = "1.22.17"
+        version = "18.16.0"
+        npmVersion = "9.5.1"
+        yarnVersion = "1.22.19"
         download = true
     }
 }

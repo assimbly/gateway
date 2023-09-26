@@ -1,0 +1,42 @@
+mode: auto
+
+silent: false
+
+commentMessage: 'Branch ${branchName} created for issue: ${issue.number}-${issue.title}'
+
+defaultBranch: 'develop'
+
+branchName: 'issue-${issue.number}/${issue.title,}'
+
+gitSafeReplacementChar: '-'
+
+branches:
+  - label: [ feature ]
+    prefix: feature/
+
+  - label: [ bug ]
+    prefix: bugfix/
+
+  - label: [ documentation ]
+    prefix: documentation/
+
+  - label: 'major'
+    skip: true
+
+  - label: 'minor'
+    skip: true
+    
+  - label: 'patch'
+    skip: true
+
+  - label: skip-release
+    skip: true
+
+autoCloseIssue: true
+openDraftPR: true
+
+copyIssueDescriptionToPR: true
+copyIssueLabelsToPR: true
+copyIssueAssigneeToPR: true
+copyIssueProjectsToPR: false
+copyIssueMilestoneToPR: false

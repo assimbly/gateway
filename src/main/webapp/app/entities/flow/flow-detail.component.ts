@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { IFlow, Flow } from 'app/shared/model/flow.model';
-import { Endpoint } from 'app/shared/model/endpoint.model';
-import { Gateway } from 'app/shared/model/gateway.model';
+import { Step } from 'app/shared/model/step.model';
+import { Integration } from 'app/shared/model/integration.model';
 
 import { FlowService } from './flow.service';
-import { EndpointService } from '../endpoint/endpoint.service';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { StepService } from '../step/step.service';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 import { forkJoin } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
@@ -20,8 +20,8 @@ import { Subscription } from 'rxjs';
 })
 export class FlowDetailComponent implements OnInit {
   flow: IFlow;
-  gateway: Gateway;
-  endpoints: Array<Endpoint>;
+  integration: Integration;
+  steps: Array<Step>;
 
   // typesLinks: Array<TypeLinks>;
 
@@ -38,8 +38,8 @@ export class FlowDetailComponent implements OnInit {
   private camelDocUrl: string;
 
   constructor(
-    protected gatewayService: GatewayService,
-    protected endpointService: EndpointService,
+    protected integrationService: IntegrationService,
+    protected stepService: StepService,
     protected eventManager: EventManager,
     protected flowService: FlowService,
     protected activatedRoute: ActivatedRoute,
@@ -60,28 +60,28 @@ export class FlowDetailComponent implements OnInit {
 
     this.flowService.find(id).subscribe(flow => {
       this.flow = flow.body;
-      this.getGateway(flow.body.gatewayId);
-      this.getEndpointByFlowId(flow.body.id);
+      this.getIntegration(flow.body.integrationId);
+      this.getStepByFlowId(flow.body.id);
     });
   }
 
-  getGateway(id) {
+  getIntegration(id) {
     if (!id) {
       return;
     }
 
-    this.gatewayService.find(id).subscribe(gateway => (this.gateway = gateway.body));
+    this.integrationService.find(id).subscribe(integration => (this.integration = integration.body));
   }
 
-  getEndpointByFlowId(id) {
+  getStepByFlowId(id) {
     if (!id) {
       return;
     }
 
-    this.endpointService.findByFlowId(id).subscribe(endpoints => {
-      this.endpoints = endpoints.body;
-      this.endpoints.forEach(endpoint => {
-        this.setTypeLinks(endpoint);
+    this.stepService.findByFlowId(id).subscribe(steps => {
+      this.steps = steps.body;
+      this.steps.forEach(step => {
+        this.setTypeLinks(step);
       });
     });
   }
@@ -99,16 +99,16 @@ export class FlowDetailComponent implements OnInit {
     this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.load(this.flow.id));
   }
 
-  private setTypeLinks(endpoint: any) {
+  private setTypeLinks(step: any) {
     let type;
     let componentType;
     let camelComponentType;
 
-    componentType = endpoint.componentType.toString();
+    componentType = step.componentType.toString();
     camelComponentType = this.components.getCamelComponentType(componentType);
-    type = this.components.types.find(x => x.name === endpoint.componentType.toString());
+    type = this.components.types.find(x => x.name === step.componentType.toString());
 
-    this.componentTypeAssimblyLinks[this.endpoints.indexOf(endpoint)] = this.wikiDocUrl + '/component-' + componentType;
-    this.componentTypeCamelLinks[this.endpoints.indexOf(endpoint)] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
+    this.componentTypeAssimblyLinks[this.steps.indexOf(step)] = this.wikiDocUrl + '/component-' + componentType;
+    this.componentTypeCamelLinks[this.steps.indexOf(step)] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
   }
 }

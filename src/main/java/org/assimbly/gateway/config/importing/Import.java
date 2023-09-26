@@ -1,6 +1,6 @@
 package org.assimbly.gateway.config.importing;
 
-import org.assimbly.util.TransformUtil;
+import org.assimbly.dil.transpiler.transform.Transform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -17,49 +17,49 @@ public class Import {
     private ImportXMLFlows importXMLFlows;
 
     @Autowired
-    private ImportXMLHeaders importXMLHeaders;
+    private ImportXMLMessages importXMLMessages;
 
     @Autowired
     private ImportXMLRoutes importXMLRoutes;
 
     @Autowired
-    private ImportXMLServices importXMLServices;
+    private ImportXMLConnections importXMLConnections;
 
 	// imports gateway configuration (complete configuration file)
-	public String convertConfigurationToDB(Long gatewayId, String mediaType, String configuration) throws Exception {
+	public String convertConfigurationToDB(Long integrationId, String mediaType, String configuration) throws Exception {
 
-		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+		if(!configuration.endsWith("</dil>")){
+			configuration = Transform.transformToDil(configuration);
 		}
 
 		// get the configuration as XML Document
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
 
 		// create gateway
-        importXMLGateways.setGatewayFromXML(doc, gatewayId);
+        importXMLGateways.setGatewayFromXML(doc, integrationId);
 
 		return "ok";
 
 	}
 
 	// imports flow configuration (specific flow)
-	public String convertFlowConfigurationToDB(Long gatewayId, Long id, String mediaType, String flowConfiguration)	throws Exception {
+	public String convertFlowConfigurationToDB(Long integrationId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
-		if(!configuration.endsWith("</integration>")){
-			configuration = TransformUtil.convertCamelToAssimblyFormat(configuration);
+		if(!configuration.endsWith("</dil>")){
+			configuration = Transform.transformToDil(configuration);
 		}
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
 
-		importXMLHeaders.setHeadersFromXML(doc);
+		importXMLMessages.setMessagesFromXML(doc);
 
 		importXMLRoutes.setRoutesFromXML(doc,"routes");
 
         importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
-		importXMLServices.setServicesFromXML(doc);
+		importXMLConnections.setConnectionsFromXML(doc);
 
-		importXMLFlows.setFlowFromXML(doc, gatewayId, id.toString(), id);
+		importXMLFlows.setFlowFromXML(doc, integrationId, id.toString(), id);
 
 		return "ok";
 

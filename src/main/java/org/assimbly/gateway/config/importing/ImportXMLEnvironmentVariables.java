@@ -28,18 +28,18 @@ public class ImportXMLEnvironmentVariables {
 	public String configuration;
 
 
-	public void setEnvironmentVariablesFromXML(Document doc, Long integrationId, Gateway gateway) throws Exception {
+	public void setEnvironmentVariablesFromXML(Document doc, Long integrationId, Integration integration) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
-		Set<EnvironmentVariables> environmentVariablesList = gateway.getEnvironmentVariables();
+		Set<EnvironmentVariables> environmentVariablesList = integration.getEnvironmentVariables();
 
 		Map<String, EnvironmentVariables> map = new HashMap<>();
 		for (EnvironmentVariables s : environmentVariablesList) {
 			map.put(s.getKey(), s);
 		}
 
-		XPathExpression expr = xPath.compile("/integrations/integration/environmentVariables/*");
+		XPathExpression expr = xPath.compile("/dil/core/environmentVariables/*");
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
 		for (int i = 0; i < nodes.getLength(); i++) {
@@ -57,14 +57,14 @@ public class ImportXMLEnvironmentVariables {
 				environmentVariable.setKey(key);
 				environmentVariable.setValue(value);
                 environmentVariable.setEncrypted(encryptedBoolean);
-				environmentVariable.setGateway(gateway);
+				environmentVariable.setIntegration(integration);
 				environmentVariablesList.add(environmentVariable);
 			} else {
 				EnvironmentVariables environmentVariable = map.get(key);
 				environmentVariable.setKey(key);
 				environmentVariable.setValue(value);
                 environmentVariable.setEncrypted(encryptedBoolean);
-				environmentVariable.setGateway(gateway);
+				environmentVariable.setIntegration(integration);
 				environmentVariablesList.add(environmentVariable);
 			}
 		}

@@ -8,13 +8,13 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity EnvironmentVariables and its DTO EnvironmentVariablesDTO.
  */
-@Mapper(componentModel = "spring", uses = {GatewayMapper.class})
+@Mapper(componentModel = "spring", uses = {IntegrationMapper.class})
 public interface EnvironmentVariablesMapper extends EntityMapper<EnvironmentVariablesDTO, EnvironmentVariables> {
 
-    @Mapping(source = "gateway.id", target = "gatewayId")
+    @Mapping(source = "integration.id", target = "integrationId")
     EnvironmentVariablesDTO toDto(EnvironmentVariables environmentVariables);
 
-    @Mapping(source = "gatewayId", target = "gateway")
+    @Mapping(source = "integrationId", target = "integration")
     EnvironmentVariables toEntity(EnvironmentVariablesDTO environmentVariablesDTO);
 
     default EnvironmentVariables fromId(Long id) {

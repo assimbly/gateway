@@ -4,10 +4,10 @@
 <div class="form-group" contenteditable="true">
 	<code contenteditable="true" *ngFor="let logLine of (logLines | SearchByName: searchText)">
 		<div>
-			  <span *ngIf="logLine.includes('ERROR') else logLineWarning" style="color: red">{{logLine}}</span>
+			  <span *ngIf="logLine.includes(' ERROR ') else logLineWarning" style="color: red">{{logLine}}</span>
 		</div>
 		<ng-template #logLineWarning>
-			<span *ngIf="logLine.includes('WARN') else logLineDefault" style="color: orange">{{logLine}}</span>
+			<span *ngIf="logLine.includes(' WARN ') else logLineDefault" style="color: orange">{{logLine}}</span>
 		</ng-template>
 		<ng-template #logLineDefault>
 			<span style="color: green">{{logLine}}</span>

@@ -1,0 +1,179 @@
+<div>
+  <ng-template #restartIntegrationModal>
+    <div class="modal-header">
+      <h4 class="modal-title">Restart Integration</h4>
+      <button type="button" class="close" aria-label="Close" (click)="cancelModal()" style="color: white;">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-12">Are you sure? This will restart Assimbly gateway (and shutdown its flows).</div>
+      </div>
+      <div [innerHtml]="restartIntegrationMessage"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
+      <button type="button" class="btn btn-primary" (click)="restartIntegration(1)">Restart</button>
+    </div>
+  </ng-template>
+  <div class="row">
+    <div class="col-6">
+      <h2>
+        <span>Integration</span>
+      </h2>
+    </div>
+    <div class="col-6" *ngIf="integrations.length > 0">
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 assimbly-link assimbly-integration-img"
+        href="https://github.com/assimbly/integration/wiki/Integration"
+        placement="right"
+        title="Assimbly Documentation"
+        target="_blank"
+      >
+        <picture>
+          <source srcset="../../../content/images/assimbly_transparant.webp" />
+          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+        </picture>
+      </a>
+    </div>
+    <div class="col-6" *ngIf="integrations.length === 0">
+      <button
+        type="submit"
+        class="btn btn-primary float-right jh-create-entity create-integration"
+        id="newButton"
+        [routerLink]="['/integration/new']"
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
+      >
+        <fa-icon [icon]="'plus'"></fa-icon>
+        <span>Create Integration</span>
+      </button>
+    </div>
+  </div>
+  <hr />
+  <div class="d-block pull-right">
+    <button
+      type="button"
+      (click)="openRestartIntegrationModal(restartIntegrationModal)"
+      style="margin-right: 5px; color: white;"
+      class="btn btn-info btn-sm mb-3"
+      *jhiHasAnyAuthority="'ROLE_ADMIN'"
+    >
+      <span class="fa fa-refresh"></span>
+      <span class="d-none d-md-inline">Restart</span>
+    </button>
+  </div>
+
+  <!-- <jhi-alert></jhi-alert>-->
+  <div class="table-responsive" *ngIf="integrations">
+    <table class="table table-bordered table-sm" *ngFor="let integration of integrations; trackBy: trackId" style="margin-bottom: 30px">
+      <thead>
+        <tr>
+          <th class="bg-secondary text-white font-weight-bold" colspan="2">
+            <span>
+              <h4>General</h4>
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="w-25">
+            <span class="font-weight-bold">ID:</span>
+          </td>
+          <td class="w-75">
+            {{ integration.id }}
+          </td>
+        </tr>
+        <tr>
+          <td lass="w-25">
+            <span class="font-weight-bold">Name:</span>
+          </td>
+          <td class="w-75">
+            {{ integration.name }}
+          </td>
+        </tr>
+        <tr>
+          <td lass="w-25">
+            <span class="font-weight-bold">Type:</span>
+          </td>
+          <td class="w-75">
+            {{ integration.type }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="font-weight-bold">Environment Name:</span>
+          </td>
+          <td>
+            {{ integration.environmentName }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="font-weight-bold">Stage:</span>
+          </td>
+          <td>
+            {{ integration.stage }}
+          </td>
+        </tr>
+        <tr>
+          <td class="bg-secondary text-white font-weight-bold" colspan="2">
+            <span><h5>Step defaults</h5></span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="font-weight-bold">From:</span>
+          </td>
+          <td>
+            {{ integration.defaultFromComponentType }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="font-weight-bold">To:</span>
+          </td>
+          <td>
+            {{ integration.defaultToComponentType }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="font-weight-bold">Error:</span>
+          </td>
+          <td>
+            {{ integration.defaultErrorComponentType }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">
+            <div class="d-block pull-right">
+              <button
+                type="submit"
+                *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                [routerLink]="['/integration', integration.id, 'edit']"
+                queryParamsHandling="merge"
+                class="btn btn-primary btn-sm"
+              >
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </button>
+              <button
+                type="submit"
+                 (click)="delete(integration)"
+                class="btn btn-danger btn-sm"
+              >
+                <fa-icon [icon]="'times'"></fa-icon>
+                <span class="d-none d-md-inline">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

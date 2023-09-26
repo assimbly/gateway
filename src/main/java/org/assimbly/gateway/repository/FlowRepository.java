@@ -6,8 +6,6 @@ import java.util.Optional;
 import javax.persistence.OrderBy;
 
 import org.assimbly.gateway.domain.Flow;
-import org.assimbly.gateway.domain.Header;
-import org.assimbly.gateway.service.dto.FlowDTO;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
@@ -21,10 +19,10 @@ import org.springframework.data.domain.Pageable;
 public interface FlowRepository extends JpaRepository<Flow, Long> {
 
 	@OrderBy("name ASC")
-	Page<Flow> findAllByGatewayId(Pageable pageable, Long gatewayid);
+	Page<Flow> findAllByIntegrationId(Pageable pageable, Long integrationid);
 
 	@OrderBy("name ASC")
-	List<Flow> findAllByGatewayId(Long gatewayid);
+	List<Flow> findAllByIntegrationId(Long integrationid);
 
     Optional<Flow> findByName(String flowName);
 

@@ -2,10 +2,10 @@ package org.assimbly.gateway.config.importing;
 
 import java.util.*;
 
-import org.assimbly.gateway.domain.Gateway;
+import org.assimbly.gateway.domain.Integration;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
-import org.assimbly.gateway.repository.GatewayRepository;
+import org.assimbly.gateway.repository.IntegrationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,24 +23,20 @@ public class ImportXMLGateways {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLGateways.class);
 
-	public String options;
-	public String componentType;
-	public String uri;
-
     @Autowired
-    private GatewayRepository gatewayRepository;
+    private IntegrationRepository integrationRepository;
 
     @Autowired
     private ImportXMLFlows importXMLFlows;
 
     @Autowired
-    private ImportXMLHeaders importXMLHeaders;
+    private ImportXMLMessages importXMLMessages;
 
     @Autowired
     private ImportXMLRoutes importXMLRoutes;
 
     @Autowired
-    private ImportXMLServices importXMLServices;
+    private ImportXMLConnections importXMLConnections;
 
     @Autowired
     private ImportXMLEnvironmentVariables importXMLEnvironmentVariables;
@@ -48,80 +44,80 @@ public class ImportXMLGateways {
 	public String xmlConfiguration;
 	public String configuration;
 
-    private Optional<Gateway> gatewayOptional;
-    private Gateway gateway;
+    private Optional<Integration> integrationOptional;
+    private Integration integration;
 
-	public void setGatewayFromXML(Document doc, Long integrationId) throws Exception {
+	public void setGatewayFromXML(Document doc, Long integrationIdLong) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String gatewayId = xPath.evaluate("//integrations/integration/id", doc);
+		String integrationId = xPath.evaluate("//integrations/integration/id", doc);
 		String name = xPath.evaluate("//integrations/integration/name", doc);
 		String type = xPath.evaluate("//integrations/integration/type", doc);
-		String environmentName = xPath.evaluate("//integrations/integration/environmentName", doc);
-		String stage = xPath.evaluate("//integrations/integration/stage", doc);
-		String defaultFromComponentType = xPath.evaluate("//integrations/integration/defaultFromComponentType", doc);
-		String defaultToComponentType = xPath.evaluate("//integrations/integration/defaultToComponentType", doc);
-		String defaultErrorComponentType = xPath.evaluate("//integrations/integration/defaultErrorComponentType", doc);
+		String environmentName = xPath.evaluate("//integrations/integration/options/environment", doc);
+		String stage = xPath.evaluate("//integrations/integration/options/stage", doc);
+		String defaultFromComponentType = xPath.evaluate("//integrations/integration/options/defaultFromComponentType", doc);
+		String defaultToComponentType = xPath.evaluate("//integrations/integration/options/defaultToComponentType", doc);
+		String defaultErrorComponentType = xPath.evaluate("//integrations/integration/options/defaultErrorComponentType", doc);
 
         if (defaultFromComponentType.isEmpty()) {defaultFromComponentType = "file";}
         if (defaultToComponentType.isEmpty()) {defaultToComponentType = "file";}
         if (defaultErrorComponentType.isEmpty()) {defaultErrorComponentType = "file";}
 
-		log.info("GatewayID=" + gatewayId);
+		log.info("IntegrationId=" + integrationId);
 
-		if (!gatewayId.isEmpty()) {
+		if (!integrationId.isEmpty()) {
 
-			log.info("Importing gateway: " + name);
+			log.info("Importing integration: " + name);
 
-			gatewayOptional = gatewayRepository.findById(integrationId);
+			integrationOptional = integrationRepository.findById(integrationIdLong);
 
-			if (!gatewayOptional.isPresent()) {
-				gateway = new Gateway();
+			if (!integrationOptional.isPresent()) {
+				integration = new Integration();
 			}else {
-				gateway = gatewayOptional.get();
+				integration = integrationOptional.get();
 			}
 
             if (type == null || type.isEmpty()) {
-                type = "connector";
+                type = "FULL";
             }else {
                 try {
                     GatewayType.valueOf(type);
                 }catch (Exception e){
-                    type = "connector";
+                    type = "FULL";
                 }
             }
 
-			gateway.setId(integrationId);
-			gateway.setName(name);
-			gateway.setEnvironmentName(environmentName);
-			gateway.setType(GatewayType.valueOf(type));
-			gateway.setStage(EnvironmentType.valueOf(stage));
-			gateway.setDefaultFromComponentType(defaultFromComponentType);
-			gateway.setDefaultToComponentType(defaultToComponentType);
-			gateway.setDefaultErrorComponentType(defaultErrorComponentType);
+			integration.setId(integrationIdLong);
+			integration.setName(name);
+			integration.setEnvironmentName(environmentName);
+			integration.setType(GatewayType.valueOf(type));
+			integration.setStage(EnvironmentType.valueOf(stage));
+			integration.setDefaultFromComponentType(defaultFromComponentType);
+			integration.setDefaultToComponentType(defaultToComponentType);
+			integration.setDefaultErrorComponentType(defaultErrorComponentType);
 
             // create environment variables
-            importXMLEnvironmentVariables.setEnvironmentVariablesFromXML(doc, integrationId, gateway);
+            importXMLEnvironmentVariables.setEnvironmentVariablesFromXML(doc, integrationIdLong, integration);
 
-            gatewayRepository.save(gateway);
+            integrationRepository.save(integration);
 
-            log.info("Importing gateway finished");
+            log.info("Importing integrations finished");
 
-            importXMLHeaders.setHeadersFromXML(doc);
+            importXMLMessages.setMessagesFromXML(doc);
 
             importXMLRoutes.setRoutesFromXML(doc,"routes");
 
             importXMLRoutes.setRoutesFromXML(doc,"routeConfigurations");
 
-            importXMLServices.setServicesFromXML(doc);
+            importXMLConnections.setConnectionsFromXML(doc);
 
-            importXMLFlows.setFlowsFromXML(doc, integrationId);
+            importXMLFlows.setFlowsFromXML(doc, integrationIdLong);
 
 			log.info("Importing finished");
 
 		}else {
-			log.error("Can't import gateway. No valid gateway id found.");
-			throw new Exception("Can't import gateway. No valid gateway id found.");
+			log.error("Can't import integration. No valid integration id found.");
+			throw new Exception("Can't import integration. No valid integration id found.");
 		}
 	}
 

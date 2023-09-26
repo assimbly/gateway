@@ -58,10 +58,7 @@
             <column name="parallel_processing" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="assimbly_headers" type="boolean">
-                <constraints nullable="true" />
-            </column>
-            <column name="gateway_id" type="bigint">
+            <column name="integration_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
@@ -74,38 +71,5 @@
 
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->
-
-    <!--
-        Load sample data generated with Faker.js
-        - This data can be easily edited using a CSV editor (or even MS Excel) and
-          is located in the 'src/main/resources/config/liquibase/fake-data' directory
-        - By default this data is applied when running with the JHipster 'dev' profile.
-          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
-          Spring Boot configuration key.
-    -->
-    <changeSet id="20180114132915-1-data" author="jhipster" context="faker">
-        <loadData
-                  file="config/liquibase/fake-data/flow.csv"
-                  separator=";"
-                  tableName="flow">
-            <column name="id" type="numeric"/>
-            <column name="name" type="string"/>
-            <column name="auto_start" type="boolean"/>
-            <column name="off_loading" type="boolean"/>
-            <column name="maximum_redeliveries" type="numeric"/>
-            <column name="redelivery_delay" type="numeric"/>
-            <column name="type" type="string"/>
-            <column name="load_balancing" type="boolean"/>
-            <column name="instances" type="numeric"/>
-            <column name="log_level" type="string"/>
-            <column name="version" type="numeric"/>
-            <column name="created" type="datetime"/>
-            <column name="last_modified" type="datetime"/>
-            <column name="notes" type="clob"/>
-            <column name="parallel_processing" type="boolean"/>
-            <column name="assimbly_headers" type="boolean"/>
-            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
-        </loadData>
-    </changeSet>
 
 </databaseChangeLog>

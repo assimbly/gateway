@@ -1,0 +1,32 @@
+<div>
+    <h2 id="page-heading">
+        <span>Connections</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-connection" [routerLink]="['/connection/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
+            <span >Create Connection</span>
+        </button>
+    </h2>
+    <br/>
+    <div class="form-group">
+        <label>
+            <strong>Name:</strong>
+        </label>
+        <ng-select [items]="connections" bindLabel="name" labelForId="field_connection" [(ngModel)]="selectedConnection" (change)="filterConnectionKeys()"></ng-select>
+        <br/>
+        <label>
+            <strong>Type:</strong>
+        </label>
+        <div class="row">
+            <div class="col-md-11">
+                <ng-select [items]="connectionsLists.connectionsList" bindLabel="type" bindValue="type" labelForId="field_connection_type" [(ngModel)]="selectedConnection.type" [disabled]="disabledConnectionType"></ng-select>
+            </div>
+            <div class="col-md-1 text-right">
+              	<button type="submit" [routerLink]="['../connection', selectedConnection.id ]" class="btn btn-info" [disabled]="!selectedConnection.id">
+	            	<span class="fa fa-eye"></span>
+        		</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<jhi-connection-keys *ngIf="connections.length > 0" [connectionKeys]="connectionKeys" [connection]="selectedConnection">Loading routes...</jhi-connection-keys>

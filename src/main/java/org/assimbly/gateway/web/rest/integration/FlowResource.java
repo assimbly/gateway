@@ -5,9 +5,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+
+import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
-import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.dto.FlowDTO;
@@ -15,7 +16,7 @@ import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.integration.Integration;
-import org.assimbly.integrationrest.IntegrationResource;
+import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing flow.
  */
+@Component
 @RestController
 @RequestMapping("/api")
 public class FlowResource {
@@ -58,12 +61,12 @@ public class FlowResource {
 
     private Integration integration;
 
-    private final IntegrationResource integrationResource;
+    private final IntegrationRuntime integrationRuntime;
 
-     public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationResource integrationResource) {
+    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
         this.flowService = flowService;
         this.applicationProperties = applicationProperties;
-        this.integrationResource = integrationResource;
+        this.integrationRuntime = integrationRuntime;
     }
 
     /**
@@ -120,36 +123,22 @@ public class FlowResource {
     }
 
     /**
-     * GET  /flows/bygatewayid/:gatewayid : get all the flows for a specific gateway (by gatewaId).
+     * GET  /flows/byintegrationid/:integrationid : get all the flows for a specific integration (by integrationId).
      *
-     * @param gatewayid
+     * @param integrationid
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
+    @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long gatewayid
+        @PathVariable Long integrationid
     ) {
-        log.debug("REST request to get a page of flows by gatewayid");
-        Page<FlowDTO> page = flowService.findAllByGatewayId(pageable, gatewayid);
+        log.debug("REST request to get a page of flows by integrationid");
+        Page<FlowDTO> page = flowService.findAllByIntegrationId(pageable, integrationid);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/flows");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    /*
-    @GetMapping("/flows/bygatewayid/{gatewayid}")
-    public List<FlowDTO> getAllflowsByGatewayId(@PathVariable Long gatewayid) {
-    	log.debug("REST request to get flows by gateway ID : {}", gatewayid);
-        List<Flow> flows = flowRepository.findAllByGatewayId(gatewayid);
-        flows.sort(Comparator.comparing(Flow::getName));
-
-        for(Flow flow : flows) {
-        	System.out.println("Tname=" + flow.getName());
-        }
-
-       return flowMapper.toDto(flows);
-    }
-	*/
 
     /**
      * GET  /flows/:id : get the "id" flow.
@@ -179,23 +168,37 @@ public class FlowResource {
     }
 
     @PostConstruct
-    private void initIntegration() throws Exception {
+    public void init() throws Exception {
+        log.info("Start runtime");
+        initIntegration();
+    }
+
+
+    public CamelContext initIntegration() throws Exception {
+
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
         boolean isDebuggging = gateway.getDebugging();
         boolean deployOnStart = deployDirectory.getDeployOnStart();
         boolean deployOnChange = deployDirectory.getDeployOnChange();
 
-        integrationResource.setIntegration(encryptionProperties.getProperties());
+        integrationRuntime.setIntegration(encryptionProperties.getProperties());
 
-        integrationResource.initIntegration();
+        integrationRuntime.initIntegration();
 
-        integration = integrationResource.getIntegration();
+        integration = integrationRuntime.getIntegration();
+
         integration.setDebugging(isDebuggging);
         //integration.setTracing(isTracing, "default");
         integration.setDeployDirectory(deployOnStart,deployOnChange);
 
-        //start flows with autostart
+        return integration.getContext();
+    }
+
+    //start flows with autostart
+    /*
+    public void startFlows(){
+
         List<Flow> flows = flowRepository.findAll();
 
         try {
@@ -213,5 +216,7 @@ public class FlowResource {
             log.error("Autostart of flow failed (check configuration)");
             e.printStackTrace();
         }
-    }
+
+    }*/
+
 }

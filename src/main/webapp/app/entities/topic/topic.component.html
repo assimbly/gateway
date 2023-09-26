@@ -4,22 +4,26 @@
     <br />
   </div>
 
-  <div class="row">
+  <div class="row" *ngIf="isBroker && addresses?.length === 0">
     <div class="col-10"></div>
-    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length === 0">
+    <div class="col-2 text-right" >
       <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
       </button>
     </div>
-    <div class="col-2 text-right" *ngIf="isBroker && addresses?.length > 0">
-      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
-        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
-      </button>
-      <button class="btn btn-primary" type="submit" (click)="updateAllTopics()" style="margin-right: -2em">
-        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline">Refresh</span>
-      </button>
-    </div>
-    
+  </div>
+
+    <div class="row" *ngIf="isBroker && addresses?.length > 0">
+      <div class="col-9"></div>
+      <div class="col-3 text-right" *ngIf="isBroker && addresses?.length > 0">
+        <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/topic/new']">
+          <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
+        </button>
+        <button class="btn btn-primary" type="submit" (click)="updateAllTopics()" style="margin-right: -2em">
+          <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline">Refresh</span>
+        </button>
+      </div>
+
   </div>
 
   <div>

@@ -1,11 +1,14 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Flow, IFlow } from 'app/shared/model/flow.model';
+import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
-import { Endpoint, EndpointType } from 'app/shared/model/endpoint.model';
-import { EndpointService } from '../endpoint/endpoint.service';
+import { Step, StepType } from 'app/shared/model/step.model';
+import { StepService } from '../step/step.service';
+import { IntegrationService } from "../integration/integration.service";
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+
+import { Collectors } from 'app/shared/collect/collectors';
 
 import { NavigationEnd, Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -33,11 +36,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   @Input() flow: Flow;
 
-  endpoints: Array<Endpoint> = [new Endpoint()];
-  fromEndpoint: Array<Endpoint> = [];
-  toEndpoints: Array<Endpoint> = [];
-  errorEndpoint: Endpoint = new Endpoint();
-  responseEndpoints: Array<Endpoint> = [];
+  steps: Array<Step> = [new Step()];
+  fromStep: Array<Step> = [];
+  toSteps: Array<Step> = [];
+  errorStep: Step = new Step();
+  responseSteps: Array<Step> = [];
 
   public isFlowStarted: boolean;
   public isFlowRestarted: boolean;
@@ -62,17 +65,21 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   public numberOfAlerts: any;
   public showNumberOfItems: number;
 
-  fromEndpointTooltips: Array<string> = [];
-  toEndpointsTooltips: Array<string> = [];
-  errorEndpointTooltip: string;
-  responseEndpointTooltips: Array<string> = [];
+  fromStepTooltips: Array<string> = [];
+  toStepsTooltips: Array<string> = [];
+  errorStepTooltip: string;
+  responseStepTooltips: Array<string> = [];
   public statusFlow: Status;
   public previousState: string;
   public p = false;
   lastError: string;
 
   flowRowID: string;
-  flowRowErrorEndpointID: string;
+  flowRowErrorStepID: string;
+
+  filter: Filter;
+
+  statusMessage: any;
 
   statsTableRows: Array<string> = [];
 
@@ -99,11 +106,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   constructor(
     private flowService: FlowService,
-    private endpointService: EndpointService,
+    private stepService: StepService,
+		private integrationService: IntegrationService,
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	private webSocketsService: WebSocketsService
+	  private webSocketsService: WebSocketsService,
+	  private collectors: Collectors
   ) {
 
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
@@ -121,15 +130,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.setFlowStatusDefaults();
     this.getStatus(this.flow.id);
-    this.endpoints = this.flow.endpoints;
-    this.getEndpoints();
+    this.steps = this.flow.steps;
+    this.getSteps();
 
     this.registerTriggeredAction();
 
     this.stompClient = this.webSocketsService.getClient();
-	this.connectionSubject = this.webSocketsService.getConnectionSubject();
+	  this.connectionSubject = this.webSocketsService.getConnectionSubject();
 
-	this.subscribeToEvent(this.flow.id,'event');
+	  this.subscribeToEvent(this.flow.id,'event');
 
     this.subscribeToAlert(this.flow.id,'alert');
 
@@ -139,18 +148,23 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.subscription = this.receive().subscribe(data => {
 
-		const data2  = data.split(':');
+			if (data.startsWith('alert')) {
+        const data2  = data.split(':');
+        const alertId = Number(data2[1]);
+        if (this.flow.id === alertId) {
+          this.getFlowNumberOfAlerts(alertId);
+        }
 
-		if (Array.isArray(data2)) {
-			if (data2[0] === 'event') {
-			  this.setFlowStatus(data2[1]);
-			} else if (data2[0] === 'alert') {
-			  const alertId = Number(data2[1]);
-			  if (this.flow.id === alertId) {
-				this.getFlowNumberOfAlerts(alertId);
+			} else {
+        const response = JSON.parse(data);
+			  this.statusMessage = response;
+			  if(response.flow.message.startsWith('Failed')){
+			    this.setFlowStatus('error');
+			  }else{
+			    this.setFlowStatus(response.flow.event);
 			  }
+
 			}
-		  }
 
     });
 
@@ -186,71 +200,130 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   setFlowStatus(status: string): void {
+
     switch (status) {
+      case '':
       case 'unconfigured':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: - <br/>
-                            Status: Flow is stopped<br/>
-            `;
+        this.flowStatusButton = `Stopped`;
 
         break;
       case 'started':
+      case 'start':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowStarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: Start <br/>
-                            Status: Started succesfullly
-                        `;
+        this.flowStatusButton = `Started`;
 
         break;
       case 'suspended':
+      case 'suspend':
+      case 'paused':
+      case 'pause':
         this.statusFlow = Status.paused;
         this.isFlowResumed = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowPaused = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Pause <br/>
-                            Status:  Paused succesfully
-            `;
-
-        break;
-      case 'restarted':
-        this.statusFlow = Status.active;
-        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
-        this.isFlowResumed = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Restart <br/>
-                            Status:  Restarted succesfully
-            `;
+        this.flowStatusButton = `Paused`;
         break;
       case 'resumed':
+      case 'resume':
         this.statusFlow = Status.active;
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowResumed = this.isFlowStarted = true;
-        this.flowStatusButton = `
-                            Last action: Resume <br/>
-                            Status:  Resumed succesfully
-            `;
+        this.flowStatusButton = `Resumed`;
+        break;
+      case 'restarted':
+      case 'restart':
+        this.statusFlow = Status.active;
+        this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
+        this.isFlowResumed = this.isFlowStarted = true;
+        this.flowStatusButton = `Restarted`;
         break;
       case 'stopped':
+      case 'stop':
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
-        this.flowStatusButton = `
-                            Last action: Stop <br/>
-                            Status: Stopped succesfully
-            `;
+        this.flowStatusButton = `Stopped`;
         break;
       default:
-        this.flowStatusButton = `
-                            Last action: ${this.flowStatus} <br/>
-                            Status: Stopped after error
-              `;
+        const lastStatus = this.flowStatus;
+        this.statusFlow = Status.inactiveError;
+        this.setErrorMessage(lastStatus,this.statusMessage);
         break;
     }
+  }
+
+  setErrorMessage(action: string, error: string){
+
+      try {
+
+          if (this.statusMessage.flow.stepsLoaded) {
+
+                  const total = this.statusMessage.flow.stepsLoaded.total;
+                  const failed = this.statusMessage.flow.stepsLoaded.failed;
+
+                  this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
+                                           <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
+                                           <b>Details:</b> <br/>`;
+
+                  console.log('this.flowStatusButton=' + this.flowStatusButton);
+
+
+                  for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
+
+                      const id = this.statusMessage.flow.steps[i].id;
+                      const uri = this.statusMessage.flow.steps[i].uri;
+                      const status = this.statusMessage.flow.steps[i].status;
+
+                      if(status==='error' && uri){
+
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+
+                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                            <tbody>
+                              <tr>
+                                <td><b>step id:</b></td>
+                                <td>${id}</td>
+                              </tr>
+                              <tr>
+                                <td><b>uri:</b></td>
+                                <td>${uri}</td>
+                              </tr>
+                              <tr>
+                                <td><b>error:</b></td>
+                                <td>${errorMessage}</td>
+                              </tr>
+                            </tbody>
+                          </table>`;
+                      }else if(status==='error'){
+                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+
+                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                            <tbody>
+                              <tr>
+                                <td><b>step id:</b></td>
+                                <td>${id}</td>
+                              </tr>
+                              <tr>
+                                <td><b>error:</b></td>
+                                <td>${errorMessage}</td>
+                              </tr>
+                            </tbody>
+                          </table>`;
+                      }
+
+                  }
+
+          } else {
+              this.flowStatusButton = this.statusMessage.flow.message;
+          }
+      } catch (e) {
+           this.flowStatusButton = error;
+      }
+
   }
 
   getFlowAlerts(id: number) {
@@ -314,74 +387,69 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string) {
-	console.log('type=' + this.flow.type);
-	if(!this.flow.type){
-		this.flow.type = 'connector';
-	}
+
+    console.log('type=' + this.flow.type);
+    if(!this.flow.type){
+      this.flow.type = 'flow';
+    }
 
     switch (mode) {
-      case 'edit':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'clone':
-        this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
-        break;
-      case 'delete':
-        let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-        if (typeof FlowDeleteDialogComponent as Component) {
-          modalRef.componentInstance.flow = this.flow;
-          modalRef.result.then(
-            result => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            },
-            reason => {
-              this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-              modalRef = null;
-            }
-          );
-        }
-        break;
-      default:
-        break;
-    }
+        case 'edit':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'clone':
+          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          break;
+        case 'delete':
+          let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
+          if (typeof FlowDeleteDialogComponent as Component) {
+            modalRef.componentInstance.flow = this.flow;
+            modalRef.result.then(
+              result => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              },
+              reason => {
+                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
+                modalRef = null;
+              }
+            );
+          }
+          break;
+        default:
+          break;
+      }
   }
 
-  navigateToEndpointEditor(mode: string, editorType: string, endpoint: Endpoint) {
-    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, endpointid: endpoint.id }]);
+  navigateToStepEditor(mode: string, editorType: string, step: Step) {
+    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, stepid: step.id }]);
   }
 
   exportFlow(){
-    console.log('export flow');
     this.flowService.exportFlowConfiguration(this.flow);
   }
 
   getFlowLastError(id: number, action: string, errMessage: string) {
+
     if (errMessage) {
       if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
         this.router.navigate(['/login']);
       } else {
-        this.flowStatusButton = `
-                    Last action: ${action} <br/>
-                    Status: Stopped after error <br/><br/>
-                    ${errMessage}
-                    `;
+        this.setErrorMessage(action, errMessage);
         this.statusFlow = Status.inactiveError;
       }
     } else {
       this.flowService.getFlowLastError(id).subscribe(response => {
         this.lastError = response === '0' ? '' : response.body;
-        this.flowStatusButton = `
-                Last action: ${action} <br/>
-                Status: Stopped after error <br/><br/>
-                ${this.lastError}
-                `;
+        this.setErrorMessage(action, errMessage);
         this.statusFlow = Status.inactiveError;
       });
     }
+
   }
 
   getFlowStats(flow: IFlow) {
+
     this.startGetFlowStats(flow);
 
     // refresh every 5 seconds
@@ -394,11 +462,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatistic = ``;
     this.statsTableRows = [];
 
-    for (const endpoint of flow.endpoints) {
-      if (endpoint.endpointType === EndpointType.FROM || endpoint.endpointType === EndpointType.ROUTE) {
-        this.flowService.getFlowStats(flow.id, endpoint.id, flow.gatewayId).subscribe(res => {
-          this.setFlowStatistic(res.body, endpoint.componentType.toString() + '://' + endpoint.uri);
+    for (const step of flow.steps) {
+
+      if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
+        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
+          this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
+      }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
+        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
+          this.setFlowStatistic(res.body, flow.id + '-' + step.id);
+        });
+
       }
     }
   }
@@ -419,15 +493,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Autostart:</b> ${this.flow.autoStart}<br/>
-                <b>Maximum Redeliveries:</b> ${this.flow.maximumRedeliveries}<br/>
-                <b>Redelivery Delay:</b> ${this.flow.redeliveryDelay}<br/>
-                <b>Log Level:</b> ${this.flow.logLevel}<br/>
+                <b>Tracing:</b> ${this.flow.logLevel}<br/>
 
         `;
   }
 
   setFlowStatistic(res, uri) {
-    /* Example Available stats
+          /* Example of available stats
           *
           * "maxProcessingTime": 1381,
             "lastProcessingTime": 1146,
@@ -452,43 +524,43 @@ export class FlowRowComponent implements OnInit, OnDestroy {
             "startTimestamp": "2019-03-26T08:43:59.201+0100"
          */
 
-    if (res === 0) {
+    if (res.step.status != 'started') {
       this.flowStatistic = `Currently there are no statistics for this flow.`;
     } else {
       const now = dayjs();
-      const start = dayjs(res.stats.startTimestamp);
+      const start = dayjs(res.step.stats.startTimestamp);
       const flowRuningTime = dayjs.duration(now.diff(start));
       const hours = Math.floor(flowRuningTime.asHours());
       const minutes = flowRuningTime.minutes();
-      const completed = res.stats.exchangesCompleted - res.stats.failuresHandled;
-      const failures = res.stats.exchangesFailed + res.stats.failuresHandled;
+      const completed = parseInt(res.step.stats.exchangesCompleted) - parseInt(res.step.stats.failuresHandled);
+      const failures = parseInt(res.step.stats.exchangesFailed) + parseInt(res.step.stats.failuresHandled);
       let processingTime = ``;
 
       if (this.statsTableRows.length === 0) {
         this.statsTableRows[0] = `<td>${uri}</td>`;
-        this.statsTableRows[1] = `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = `<td>${completed}</td>`;
         this.statsTableRows[6] = `<td>${failures}</td>`;
-        this.statsTableRows[7] = `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       } else {
         this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
-        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.stats.startTimestamp)}</td>`;
+        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
         this.statsTableRows[2] = this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.stats.lastExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
+        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
         this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
         this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
-        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.stats.meanProcessingTime} ms</td>`;
+        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.step.stats.minProcessingTime} ms</td>`;
+        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.step.stats.maxProcessingTime} ms</td>`;
+        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.step.stats.meanProcessingTime} ms</td>`;
       }
 
-      if (res.stats.lastProcessingTime > 0) {
+      if (res.step.stats.lastProcessingTime > 0) {
         processingTime = `<tr>
 			      <th scope="row">Min</th>
 			      ${this.statsTableRows[7]}
@@ -509,7 +581,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 			<table class="table">
 			  <tbody>
                  <tr>
-                    <th scope="row">Endpoint</th>
+                    <th scope="row">Step</th>
                     ${this.statsTableRows[0]}
                 </tr>
 			    <tr>
@@ -558,20 +630,20 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
   }
 
-  getEndpoints() {
-    this.endpoints.forEach(endpoint => {
-      if (endpoint.endpointType.valueOf() === 'FROM') {
-        this.fromEndpoint.push(endpoint);
-        this.fromEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-      } else if (endpoint.endpointType.valueOf() === 'TO') {
-        this.toEndpoints.push(endpoint);
-        this.toEndpointsTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
-      } else if (endpoint.endpointType.valueOf() === 'ERROR') {
-        this.errorEndpoint = endpoint;
-        this.errorEndpointTooltip = this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options);
-      } else if (endpoint.endpointType.valueOf() === 'RESPONSE') {
-        this.responseEndpoints.push(endpoint);
-        this.responseEndpointTooltips.push(this.endpointTooltip(endpoint.componentType, endpoint.uri, endpoint.options));
+  getSteps() {
+    this.steps.forEach(step => {
+      if (step.stepType.valueOf() === 'FROM') {
+        this.fromStep.push(step);
+        this.fromStepTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
+      } else if (step.stepType.valueOf() === 'TO') {
+        this.toSteps.push(step);
+        this.toStepsTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
+      } else if (step.stepType.valueOf() === 'ERROR') {
+        this.errorStep = step;
+        this.errorStepTooltip = this.stepTooltip(step.componentType, step.uri, step.options);
+      } else if (step.stepType.valueOf() === 'RESPONSE') {
+        this.responseSteps.push(step);
+        this.responseStepTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
       }
     });
   }
@@ -626,7 +698,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     return this.sslUrl;
   }
 
-  endpointTooltip(type, uri, options): string {
+  stepTooltip(type, uri, options): string {
     if (type === null) {
       return '';
     } else {
@@ -678,12 +750,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    if(this.flow.logLevel === LogLevelType.TRACE){
+      this.enableTracing();
+    }
+
     this.flowService.getConfiguration(this.flow.id).subscribe(
       data => {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
           this.flowService.start(this.flow.id).subscribe(
             response => {
               if (response.status === 200) {
+                // below is only used for tested (by default websockets is used)
                 // this.setFlowStatus('started');
               }
               this.disableActionBtns = false;
@@ -763,6 +840,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    if(this.flow.logLevel === LogLevelType.OFF){
+      this.disableTracing();
+    }
+
     this.flowService.getConfiguration(this.flow.id).subscribe(
       data => {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
@@ -794,6 +875,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
+    this.disableTracing();
+
     this.flowService.stop(this.flow.id).subscribe(
       response => {
         if (response.status === 200) {
@@ -808,6 +891,45 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.disableActionBtns = false;
       }
     );
+  }
+
+  enableTracing(){
+
+      const collector = this.collectors.tracing;
+      const sourceStep = this.steps.find(step => step.stepType === 'SOURCE');
+      const sinkStep = this.steps.find(step => step.stepType === 'SINK');
+      const sourceStepId = this.flow.id.toString() + '-' + sourceStep.id.toString();
+      const sinkStepId = this.flow.id.toString() + '-' + sinkStep.id.toString();
+
+      const filters: Array<any> = [];
+      filters.push(new Filter(sourceStepId,sourceStepId));
+      filters.push(new Filter(sinkStepId,sinkStepId));
+
+      collector.id = this.flow.id.toString();
+      collector.filters = filters;
+
+      this.integrationService.addCollector('1',collector.id,collector).subscribe(
+        response => {
+          //console.log('ok configured' + JSON.stringify(response));
+        },
+        err => {
+          console.log('Failed to configure tracing: ' + err);
+        }
+      );
+
+  }
+
+  disableTracing(){
+
+   this.integrationService.removeCollector('1',this.flow.id).subscribe(
+        response => {
+          //console.log('2. Removed' + response);
+        },
+        err => {
+          console.log('Failed to remove tracing: ' + JSON.stringify(err));
+        }
+      );
+
   }
 
   receive(): Subject<string> {
@@ -863,4 +985,14 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
+}
+
+export class Filter {
+  id: string;
+  filter: string;
+
+    constructor(id: string, filter: string) {
+      this.id = id;
+      this.filter = filter;
+    }
 }

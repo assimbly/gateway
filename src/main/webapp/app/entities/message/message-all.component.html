@@ -1,0 +1,80 @@
+<div>
+  <div class="row">
+    <div class="col-10">
+      <h2>
+        <span>Messages</span>
+      </h2>
+    </div>
+    <div class="col-2">
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 assimbly-link assimbly-integration-img"
+        href="https://github.com/assimbly/integration/wiki/Message"
+        placement="right"
+        title="Assimbly Documentation"
+        target="_blank"
+      >
+        <picture>
+          <source srcset="../../../content/images/assimbly_transparant.webp" />
+          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+        </picture>
+      </a>
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-10"></div>
+    <div class="col-2">
+      <button class="btn btn-primary float-right jh-create-entity create-message" [routerLink]="['/message/new']">
+        <fa-icon icon="plus"></fa-icon> <span>Create Message</span>
+      </button>
+    </div>
+  </div>
+  <br />
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+          <th jhiSortBy="name"><span>Message name</span> <span class="fa fa-sort"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody infinite-scroll>
+        <tr *ngFor="let message of messages">
+          <td style="width:85%">{{ message.name }}</td>
+          <td style="width:15%" class="text-right">
+            <div class="btn-group flex-btn-group-container">
+              <button
+                type="button"
+                [routerLink]="['/message', message.id, 'edit']"
+                queryParamsHandling="merge"
+                class="btn btn-primary btn-sm"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+				<span class="d-none d-md-inline">Edit</span>
+              </button>
+              <button
+                type="button"
+                [routerLink]="['/message', message.id, 'edit']"
+                queryParamsHandling="merge"
+                fragment="clone"
+                class="btn btn-info btn-sm"
+              >
+                <fa-icon icon="clone"></fa-icon>
+				<span class="d-none d-md-inline">Clone</span>
+              </button>
+              <button
+                type="button"
+                 (click)="delete(message)"
+                class="btn btn-danger btn-sm"
+              >
+                <fa-icon icon="times"></fa-icon>
+				<span class="d-none d-md-inline">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

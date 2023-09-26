@@ -1,8 +1,8 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { IHeader, Header } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
-import { Header } from 'app/shared/model/header.model';
 
 @Injectable()
 export class HeaderPopupService {
@@ -16,9 +16,8 @@ export class HeaderPopupService {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                this.ngbModalRef = null;
+                resolve(this.ngbModalRef);
             }
-
             if (id) {
                 this.headerService.find(id).subscribe(header => {
                     this.ngbModalRef = this.headerModalRef(component, header.body);
@@ -34,10 +33,20 @@ export class HeaderPopupService {
         });
     }
 
-    headerModalRef(component: any, header: Header): NgbModalRef {
+    headerModalRef(component: any, header: IHeader): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
         if (typeof component as Component) {
             modalRef.componentInstance.header = header;
+            modalRef.result.then(
+                result => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                },
+                reason => {
+                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                    this.ngbModalRef = null;
+                }
+            );
         }
         return modalRef;
     }

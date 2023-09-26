@@ -5,8 +5,8 @@ import { Observable, of } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { GatewayTestModule } from '../../../test.module';
-import { GatewayDeleteDialogComponent } from 'app/entities/gateway/gateway-delete-dialog.component';
-import { GatewayService } from 'app/entities/gateway/gateway.service';
+import { GatewayDeleteDialogComponent } from 'app/entities/integration/integration-delete-dialog.component';
+import { GatewayService } from 'app/entities/integration/integration.service';
 
 describe('Component Tests', () => {
     describe('Gateway Management Delete Component', () => {

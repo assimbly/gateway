@@ -9,8 +9,11 @@ import java.util.Objects;
 public class HeaderDTO implements Serializable {
 
     private Long id;
-
-    private String name;
+    private String key;
+    private String value;
+    private String type;
+    private String language;
+    private Long messageId;
 
     public Long getId() {
         return id;
@@ -20,12 +23,44 @@ public class HeaderDTO implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public Long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
     }
 
     @Override
@@ -53,7 +88,10 @@ public class HeaderDTO implements Serializable {
     public String toString() {
         return "HeaderDTO{" +
             "id=" + getId() +
-            ", name='" + getName() + "'" +
+            ", key='" + getKey() + "'" +
+            ", value='" + getValue() + "'" +
+            ", type='" + getType() + "'" +
+            ", messageId=" + getMessageId() +
             "}";
     }
 }

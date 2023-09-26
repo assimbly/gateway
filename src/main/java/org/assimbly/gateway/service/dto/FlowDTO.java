@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.time.Instant;
 import java.util.Set;
 
-import org.assimbly.gateway.domain.Endpoint;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 /**
@@ -17,7 +17,7 @@ public class FlowDTO implements Serializable {
     private Long id;
 
     private String name;
-    
+
     private String notes;
 
     private Boolean autoStart;
@@ -29,10 +29,8 @@ public class FlowDTO implements Serializable {
     private String type;
 
     private Boolean loadBalancing;
-    
+
     private Boolean parallelProcessing;
-    
-    private Boolean assimblyHeaders;
 
     private LogLevelType logLevel;
 
@@ -44,9 +42,9 @@ public class FlowDTO implements Serializable {
 
     private Instant lastModified;
 
-    private Long gatewayId;
+    private Long integrationId;
 
-    private Set<Endpoint> endpoints;
+    private Set<Step> steps;
 
     public Long getId() {
         return id;
@@ -71,7 +69,7 @@ public class FlowDTO implements Serializable {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
     public Boolean isAutoStart() {
         return autoStart;
     }
@@ -120,14 +118,6 @@ public class FlowDTO implements Serializable {
         this.parallelProcessing = parallelProcessing;
     }
 
-    public Boolean isAssimblyHeaders() {
-        return assimblyHeaders;
-    }
-
-    public void setAssimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-    }
-    
     public LogLevelType getLogLevel() {
         return logLevel;
     }
@@ -135,7 +125,6 @@ public class FlowDTO implements Serializable {
     public void setLogLevel(LogLevelType logLevel) {
         this.logLevel = logLevel;
     }
-
 
     public Integer getInstances() {
         return instances;
@@ -169,20 +158,20 @@ public class FlowDTO implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Long getGatewayId() {
-        return gatewayId;
+    public Long getintegrationId() {
+        return integrationId;
     }
 
-    public void setGatewayId(Long gatewayId) {
-        this.gatewayId = gatewayId;
+    public void setintegrationId(Long integrationId) {
+        this.integrationId = integrationId;
     }
 
-    public Set<Endpoint> getEndpoints() {
-        return endpoints;
+    public Set<Step> getSteps() {
+        return steps;
     }
 
-    public void setEndpoints(Set<Endpoint> endpoints) {
-        this.endpoints = endpoints;
+    public void setSteps(Set<Step> steps) {
+        this.steps = steps;
     }
 
     @Override
@@ -211,18 +200,17 @@ public class FlowDTO implements Serializable {
         return "FlowDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", autoStart='" + isAutoStart() + "'" + 
+            ", autoStart='" + isAutoStart() + "'" +
             ", maximumRedeliveries=" + getMaximumRedeliveries() +
             ", redeliveryDelay=" + getRedeliveryDelay() +
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
             ", parallelProcessing='" + isParallelProcessing() + "'" +
-            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
-            ", gateway=" + getGatewayId() +
-            ", endpoints=" + getEndpoints() +
+            ", integration=" + getintegrationId() +
+            ", steps=" + getSteps() +
             "}";
     }
-    
+
 }

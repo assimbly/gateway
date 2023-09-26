@@ -9,7 +9,7 @@ import { createRequestOption } from 'app/shared/util/request-util';
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared/window/window.service';
 import { saveAs } from 'file-saver/FileSaver';
-import { IGateway } from 'app/shared/model/gateway.model';
+import { IIntegration } from 'app/shared/model/integration.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 
 type EntityResponseType = HttpResponse<IFlow>;
@@ -19,9 +19,10 @@ type EntityArrayResponseType = HttpResponse<IFlow[]>;
 export class FlowService {
   public resourceUrl = this.applicationConfigService.getEndpointFor('api/flows');
   public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
+  public validationUrl = this.applicationConfigService.getEndpointFor('api/validation');
   public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
 
-  private gatewayid = 1;
+  private integrationid = 1;
 
   constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService) {
   }
@@ -34,8 +35,8 @@ export class FlowService {
     return this.http.put<IFlow>(this.resourceUrl, flow, { observe: 'response' });
   }
 
-  find(id: number): Observable<EntityResponseType> {
-    return this.http.get<IFlow>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(flowId: number): Observable<EntityResponseType> {
+    return this.http.get<IFlow>(`${this.resourceUrl}/${flowId}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -43,17 +44,17 @@ export class FlowService {
     return this.http.get<IFlow[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<any>> {
-    return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.delete<any>(`${this.resourceUrl}/${flowId}`, { observe: 'response' });
   }
 
-  getFlowByGatewayId(gatewayid: Number, req?: any): Observable<EntityArrayResponseType> {
+  getFlowByIntegrationId(integrationid: Number, req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
-    return this.http.get<IFlow[]>(`${this.resourceUrl}/bygatewayid/${gatewayid}`, { params: options, observe: 'response' });
+    return this.http.get<IFlow[]>(`${this.resourceUrl}/byintegrationid/${integrationid}`, { params: options, observe: 'response' });
   }
 
   getConfiguration(flowid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.environmentUrl}/${this.gatewayid}/flow/${flowid}`, {
+    return this.http.get(`${this.environmentUrl}/${this.integrationid}/flow/${flowid}`, {
       headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
       observe: 'response',
       responseType: 'text',
@@ -62,13 +63,13 @@ export class FlowService {
 
   setConfiguration(id: number, xmlconfiguration: string, header?: string): Observable<any> {
     if (header) {
-      return this.http.post(`${this.integrationUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+      return this.http.post(`${this.integrationUrl}/${this.integrationid}/flow/${id}/configure`, xmlconfiguration, {
         headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
         observe: 'response',
         responseType: 'text',
       });
     } else {
-      return this.http.post(`${this.integrationUrl}/${this.gatewayid}/setflowconfiguration/${id}`, xmlconfiguration, {
+      return this.http.post(`${this.integrationUrl}/${this.integrationid}/flow/${id}/configure`, xmlconfiguration, {
         observe: 'response',
         responseType: 'text',
       });
@@ -79,64 +80,69 @@ export class FlowService {
     const options = {
       headers: new HttpHeaders({ Accept: 'application/xml' }),
     };
-    return this.http.post<any>(`${this.environmentUrl}/${this.gatewayid}/flow/${id}`, xmlconfiguration, options);
+    return this.http.post<any>(`${this.environmentUrl}/${this.integrationid}/flow/${id}`, xmlconfiguration, options);
   }
 
   validateFlowsUri(integrationId: number, uri: string): Observable<EntityResponseType> {
     const options = {
       headers: new HttpHeaders({ Accept: 'application/xml' }),
     };
-    return this.http.get<any>(`${this.integrationUrl}/${integrationId}/flow/validateUri`, options);
+    return this.http.get<any>(`${this.validationUrl}/${integrationId}/uri`, options);
   }
 
-  start(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/start/${id}`, { observe: 'response', responseType: 'text' });
+  start(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/start`, { observe: 'response', responseType: 'text' });
   }
 
-  pause(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/pause/${id}`, { observe: 'response', responseType: 'text' });
+  pause(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/pause`, { observe: 'response', responseType: 'text' });
   }
 
-  resume(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/resume/${id}`, { observe: 'response', responseType: 'text' });
+  resume(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/resume`, { observe: 'response', responseType: 'text' });
   }
 
-  restart(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/restart/${id}`, { observe: 'response', responseType: 'text' });
+  restart(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/restart`, { observe: 'response', responseType: 'text' });
   }
 
-  stop(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/stop/${id}`, { observe: 'response', responseType: 'text' });
+  stop(flowId: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text' });
   }
 
-  getFlowStatus(id: number): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/status/${id}`, { observe: 'response', responseType: 'text' });
+  getFlowStatus(flowId: number): Observable<any> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/status`, { observe: 'response', responseType: 'text' });
   }
 
-  getFlowAlerts(id: number): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/alerts/${id}`, { observe: 'response', responseType: 'text' });
+  getFlowAlerts(flowId: number): Observable<any> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/alerts`, { observe: 'response', responseType: 'text' });
   }
 
-  getFlowNumberOfAlerts(id: number): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/numberofalerts/${id}`, {
+  getFlowNumberOfAlerts(flowId: number): Observable<any> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/alerts/count`, {
       observe: 'response',
       responseType: 'text',
     });
   }
 
-  getFlowLastError(id: number): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/flow/lasterror/${id}`, {
+  getFlowLastError(flowId: number): Observable<any> {
+    return this.http.get(`${this.integrationUrl}/${this.integrationid}/flow/${flowId}/lasterror`, {
       observe: 'response',
       responseType: 'text',
     });
   }
 
-  getFlowStats(id: number, endpointid: number, gatewayid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/stats/${id}/${endpointid}`, { observe: 'response' });
+  getFlowStats(flowId: number, stepid: number, integrationid: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.integrationUrl}/${integrationid}/flow/${flowId}/step/${stepid}/stats`,
+        {
+          headers: new HttpHeaders({ FullStats: 'true', Accept: 'application/json' }),
+          observe: 'response'
+        })
+
   }
 
-  getComponentOptions(gatewayid: number, componentType: String): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/${gatewayid}/flow/schema/` + componentType, { observe: 'response' });
+  getComponentOptions(integrationid: number, componentType: String): Observable<any> {
+    return this.http.get(`${this.integrationUrl}/${integrationid}/flow/schema/` + componentType, { observe: 'response' });
   }
 
   getWikiDocUrl(): Observable<HttpResponse<any>> {
@@ -149,45 +155,45 @@ export class FlowService {
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
-  getGatewayName(): Observable<HttpResponse<any>> {
+  getIntegrationName(): Observable<HttpResponse<any>> {
 	const url = this.applicationConfigService.getEndpointFor('/api/gateway-name');
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
-    return this.http.post(`${this.integrationUrl}/${this.gatewayid}/maintenance/${time}`, flowsIds, {
+    return this.http.post(`${this.integrationUrl}/${this.integrationid}/flow/maintenance/${time}`, flowsIds, {
       observe: 'response',
       responseType: 'text',
     });
   }
 
-  testConnection(gatewayid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/${this.gatewayid}/testconnection/${host}/${port}/${timeout}`, {
+  testConnection(integrationid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
+    return this.http.get(`${this.validationUrl}/${this.integrationid}/connection/${host}/${port}/${timeout}`, {
       observe: 'response',
       responseType: 'text',
     });
   }
 
   send(
-    gatewayId: number,
+    integrationId: number,
     uri: string,
-    endpointId: string,
-    serviceId: string,
-    serviceKeys: string,
-    headerKeys: string,
+    stepId: string,
+    connectionId: string,
+    connectionKeys: string,
+    header: string,
     numberOfTimes: string,
     messageBody: string
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
-      serviceid: serviceId,
-      serviceKeys,
-      headerKeys,
+      stepId,
+      connectionid: connectionId,
+      connectionKeys,
+      header,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });
-    return this.http.post(`${this.integrationUrl}/${gatewayId}/send/${numberOfTimes}`, messageBody, {
+    return this.http.post(`${this.integrationUrl}/${integrationId}/send/${numberOfTimes}`, messageBody, {
       headers: options,
       observe: 'response',
       responseType: 'text',
@@ -195,32 +201,32 @@ export class FlowService {
   }
 
   sendRequest(
-    gatewayId: number,
+    integrationId: number,
     uri: string,
-    endpointId: string,
-    serviceId: string,
-    serviceKeys: string,
-    headerKeys: string,
+    stepId: string,
+    connectionId: string,
+    connectionKeys: string,
+    header: string,
     messageBody: string
   ): Observable<any> {
     const options = new HttpHeaders({
       uri,
-      endpointId,
-      serviceid: serviceId,
-      serviceKeys,
-      headerKeys,
+      stepId,
+      connectionid: connectionId,
+      connectionKeys,
+      header,
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });
-    return this.http.post(`${this.integrationUrl}/${gatewayId}/sendrequest`, messageBody, {
+    return this.http.post(`${this.integrationUrl}/${integrationId}/sendrequest`, messageBody, {
       headers: options,
       observe: 'response',
       responseType: 'text',
     });
   }
 
-  exportGatewayConfiguration(gateway: IGateway) {
-    const url = `${this.environmentUrl}/${gateway.id}`;
+  exportIntegrationConfiguration(integration: IIntegration) {
+    const url = `${this.environmentUrl}/${integration.id}`;
     const exportDate = this.getDate();
 
     return this.http
@@ -236,7 +242,7 @@ export class FlowService {
       .subscribe(
         data => {
           const blob = new Blob([data.body], { type: 'application/xml' });
-          saveAs(blob, `export_gateway_${gateway.name}_${exportDate}.xml`);
+          saveAs(blob, `export_integration_${integration.name}_${exportDate}.xml`);
         },
         error => console.log(error)
       );
