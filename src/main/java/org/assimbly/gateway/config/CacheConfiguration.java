@@ -1,6 +1,8 @@
 package org.assimbly.gateway.config;
 
 import java.time.Duration;
+
+import org.assimbly.gateway.domain.*;
 import org.ehcache.config.builders.*;
 import org.ehcache.jsr107.Eh107Configuration;
 import org.hibernate.cache.jcache.ConfigSettings;
@@ -50,19 +52,20 @@ public class CacheConfiguration {
             createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".authorities");
             createCache(cm, org.assimbly.gateway.domain.PersistentToken.class.getName());
             createCache(cm, org.assimbly.gateway.domain.User.class.getName() + ".persistentTokens");
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".flows");
-            createCache(cm, org.assimbly.gateway.domain.Gateway.class.getName() + ".environmentVariables");
+            createCache(cm, Integration.class.getName());
+            createCache(cm, Integration.class.getName() + ".flows");
+            createCache(cm, Integration.class.getName() + ".environmentVariables");
             createCache(cm, org.assimbly.gateway.domain.EnvironmentVariables.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Service.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Service.class.getName() + ".serviceKeys");
-            createCache(cm, org.assimbly.gateway.domain.ServiceKeys.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Header.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Header.class.getName() + ".headerKeys");
-            createCache(cm, org.assimbly.gateway.domain.HeaderKeys.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".endpoints");
-            createCache(cm, org.assimbly.gateway.domain.Endpoint.class.getName());
+            createCache(cm, Connection.class.getName());
+            createCache(cm, Connection.class.getName() + ".connectionKeys");
+            createCache(cm, ConnectionKeys.class.getName());
+            createCache(cm, Message.class.getName());
+            createCache(cm, Message.class.getName() + ".header");
+            createCache(cm, Header.class.getName());
+            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".steps");
+            createCache(cm, Link.class.getName());
+            createCache(cm, Step.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows");
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".maintenances");

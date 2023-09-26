@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
-import org.assimbly.brokerrest.ManagedBroker;
+import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -31,7 +31,7 @@ public class BrokerResource {
     private final BrokerService brokerService;
 
     @Autowired
-    private ManagedBroker managedBroker;
+    private ManagedBrokerRuntime managedBroker;
 
     public BrokerResource(BrokerService brokerService) {
         this.brokerService = brokerService;
@@ -130,14 +130,25 @@ public class BrokerResource {
 
     @PostConstruct
     private void init() throws Exception {
+
+        System.out.println("Broker startup");
+
         List<BrokerDTO> brokers = brokerService.findAll();
 
         for (BrokerDTO broker : brokers) {
+
+            System.out.println("Broker startup2");
+
+
             if (broker.isAutoStart()) {
+                System.out.println("Broker startup3");
+
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
                 log.debug("Autostart broker: " + brokerType);
+
+                System.out.println("Broker startup4");
 
                 managedBroker.start(brokerType, brokerConfigurationType);
             }

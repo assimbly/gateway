@@ -3,10 +3,10 @@ import groovy.io.FileType
 
 def json = file('scripts/version/versioned_files.json')
 def projectFile = new groovy.json.JsonSlurper().parseText(json.text)
-
+def projectBuilder = new groovy.json.JsonBuilder(projectFile)
 def applicationName = projectFile.applicationName
 def oldVersion = projectFile.oldVersion
-def newVersion = projectFile.newVersion
+def newVersion = project.newVersion
 
 
 @Field skippedResources = []
@@ -16,15 +16,32 @@ tasks.register('version') {
     doFirst {
 
 		println ''
-		println "Start update version for application ${applicationName} to version ${newVersion}"
-		println ''
-
+        println "Start update version for application ${applicationName}"
         println "RootDir= ${rootDir}"
+        println ''
+        println "Old version: ${oldVersion}"
+		println "New version ${newVersion}"
+		println ''
 
 	}
 
 	doLast {
-		searchAndReplace(projectFile, oldVersion, newVersion)
+
+        if(newVersion==null){
+            newVersion = projectFile.newVersion
+        }
+
+        print("projectfile=" + projectFile)
+
+        searchAndReplace(projectFile, oldVersion, newVersion)
+
+        projectBuilder.content.oldVersion = newVersion
+        projectBuilder.content.newVersion = newVersion
+
+        json.newWriter().withWriter { w ->
+            w << projectBuilder.toPrettyString()
+        }
+
 
         println ''
         println "Finished update version for application ${applicationName} to version ${newVersion}"
@@ -46,7 +63,24 @@ def searchAndReplace(projectFile, oldVersion, newVersion){
         def file = rootDir.toString() + it.path;
 
         println "Updating file: ${file}"
+
+        def originalOldVersion = oldVersion
+        def originalNewVersion = newVersion
+
+        if(file.endsWith("package.json")){
+            oldVersion = '"version": "' + oldVersion + '"'
+            newVersion = '"version": "' + newVersion + '"'
+        }else if(file.endsWith("build.gradle")){
+
+            oldVersion = 'version = \'' + oldVersion + '\''
+            newVersion = 'version = \'' + newVersion + '\''
+
+        }
+
         ant.replace(file: file, token: oldVersion, value: newVersion)
+
+        oldVersion = originalOldVersion
+        newVersion = originalNewVersion
 
     }
 

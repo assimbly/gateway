@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.service.CertificateService;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -8,6 +9,7 @@ import org.assimbly.gateway.web.rest.util.PaginationUtil;
 import org.assimbly.gateway.service.dto.CertificateDTO;
 
 import org.assimbly.util.CertificatesUtil;
+import org.assimbly.util.rest.ResponseUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ public class CertificateResource {
         this.certificateService = certificateService;
     }
 
+
     /**
      * POST  /certificates : Create a new certificate.
      *
@@ -58,19 +61,28 @@ public class CertificateResource {
     public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws Exception {
         log.debug("REST request to save Certificate : {}", certificateDTO);
 
+        System.out.println("0");
+
         if (certificateDTO.getId() != null) {
             throw new BadRequestAlertException("A new certificate cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
+        System.out.println("1");
         try {
+            System.out.println("2");
+
             CertificateDTO saved = certificateService.save(certificateDTO);
 
-	        return ResponseEntity.ok()
+            System.out.println("3");
+
+            System.out.println("4" + saved.getCertificateName());
+
+            return ResponseEntity.ok()
 	                .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, "Added certificateDTO"))
 	                .body(saved);
 
         } catch (Exception e) {
-            log.debug("Add certificateDTO failed: ", e.getMessage());
+            log.error("Add certificateDTO failed: ", e.getMessage());
             throw new BadRequestAlertException("Adding certificateDTO failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
 
@@ -267,6 +279,9 @@ public class CertificateResource {
             certificateDetails.put("certificateUrl",certificateUrl);
 
             certificateObject.append("certificate", certificateDetails);
+
+
+
         }
 
         certificatesObject.put("certificates",certificateObject);

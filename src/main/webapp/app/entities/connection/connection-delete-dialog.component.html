@@ -1,0 +1,19 @@
+<form name="deleteForm" (ngSubmit)="confirmDelete(connection.id)">
+    <div class="modal-header">
+        <h4 class="modal-title">Confirm delete operation</h4>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
+    </div>
+    <div class="modal-body">
+        <p id="jhi-delete-connection-heading" *ngIf="!errorMessage">Are you sure you want to delete this connection?</p>
+        <p id="jhi-delete-connection-heading" *ngIf="errorMessage">Cannot delete connection. The connection is used by a flow</p>
+        <jhi-alert-error></jhi-alert-error>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+        <button id="jhi-confirm-delete-connection" type="submit" class="btn btn-danger" [disabled]="!deleteMode">
+            <fa-icon [icon]="'times'"></fa-icon>&nbsp;<span>Delete</span>
+        </button>
+    </div>
+</form>

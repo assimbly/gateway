@@ -22,7 +22,7 @@ management:
         hawtio: /hawtio/console
       exposure:
         include:
-          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump', 'hawtio', 'jolokia']
+          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'startup', 'threaddump', 'hawtio', 'jolokia']
   endpoint:
     health:
       show-details: when-authorized
@@ -68,10 +68,17 @@ spring:
     # Otherwise, it will be filled in by gradle when building the WAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode=lazy:
   jpa:
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
     hibernate:
       ddl-auto: none
       naming: # org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -82,6 +89,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
+    lazy-initialization: false
   mvc:
     favicon:
       enabled: true
@@ -94,6 +102,11 @@ spring:
 
 springdoc:
   show-actuator: true
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    doc-expansion: none
 
 server:
   servlet:
@@ -102,6 +115,11 @@ server:
       cookie:
         http-only: true
         max-age: 28800
+  jetty:
+    httpConfig:
+      generateOrigin: true
+
+
 
 # ===================================================================
 # JHipster specific properties
@@ -130,7 +148,7 @@ jhipster:
     default-include-pattern: /api/**
     management-include-pattern: /management/**
     title: Assimbly API
-    description: Assimbly Gateway Application API documentation
+    description: Assimbly Gateway API documentation
     version: 3.6.0
     terms-of-service-url:
     contact-name:
@@ -152,7 +170,7 @@ jhipster:
 
 application:
   info:
-    version: 3.7.0
+    version: 4.0.3
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
@@ -160,7 +178,7 @@ application:
     name: default
     tracing: false
     debugging: false
-    base-directory: default
+    base-directory: /app
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true

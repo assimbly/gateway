@@ -1,0 +1,73 @@
+name: Finish Release
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [ closed ]
+
+jobs:
+
+  release-new-version:
+
+    if: |
+      (contains(github.event.issue.labels.*.name, 'major') ||
+      contains(github.event.issue.labels.*.name, 'minor') ||
+      contains(github.event.issue.labels.*.name, 'patch')) &&
+      github.event.issue.milestone.title != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+
+      - name: Finish release
+        run: echo "Finish release of gateway"
+
+  create-new-branch:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - uses: peterjgrainger/action-create-branch@v2.2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        branch: "${{github.event.issue.milestone.title}}"
+        sha: '${{ github.event.pull_request.head.sha }}'
+
+  call-gateway-update-version:
+    needs: create-new-branch
+    uses: ./.github/workflows/update-version.yml
+    secrets: inherit
+    with:
+      branch: "${{github.event.issue.milestone.title}}"
+      milestone: "${{github.event.issue.milestone.title}}"
+
+  call-base-release-version:
+    needs: release-new-version
+    uses: assimbly/base/.github/workflows/release-finish.yml@develop
+    secrets: inherit
+    with:
+      branch: "${{github.event.issue.milestone.title}}"
+      milestone: "${{github.event.issue.milestone.title}}"
+
+  call-runtime-release-version:
+    needs: release-new-version
+    uses: assimbly/runtime/.github/workflows/release-finish.yml@develop
+    secrets: inherit
+    with:
+      branch: "${{github.event.issue.milestone.title}}"
+      milestone: "${{github.event.issue.milestone.title}}"
+
+  call-custom-components-release-version:
+    needs: release-new-version
+    uses: assimbly/custom-components/.github/workflows/release-finish.yml@develop
+    secrets: inherit
+    with:
+      branch: "${{github.event.issue.milestone.title}}"
+      milestone: "${{github.event.issue.milestone.title}}"

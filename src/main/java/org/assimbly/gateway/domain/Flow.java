@@ -1,6 +1,5 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -46,7 +45,7 @@ public class Flow implements Serializable {
 
     @Column(name = "notes")
     private String notes;
-    
+
     @Column(name = "load_balancing")
     private Boolean loadBalancing;
 
@@ -55,9 +54,6 @@ public class Flow implements Serializable {
 
     @Column(name = "log_level")
     private LogLevelType logLevel;
-
-    @Column(name = "assimbly_headers")
-    private Boolean assimblyHeaders;
 
     @Column(name = "instances")
     private Integer instances;
@@ -70,21 +66,20 @@ public class Flow implements Serializable {
 
     @Column(name = "last_modified")
     private Instant lastModified;
-    
+
     @ManyToOne
     @JsonIgnoreProperties("flows")
-    private Gateway gateway;
- 
+    private Integration integration;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
-    private Set<Endpoint> endpoints = new HashSet<>();
-    
+    private Set<Step> steps = new HashSet<>();
+
     /*
     @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(unique = true)
-    private Maintenance maintenance; 
-    */ 
-    
+    private Maintenance maintenance;
+    */
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -119,7 +114,7 @@ public class Flow implements Serializable {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
     public Boolean isAutoStart() {
         return autoStart;
     }
@@ -132,7 +127,7 @@ public class Flow implements Serializable {
     public void setAutoStart(Boolean autoStart) {
         this.autoStart = autoStart;
     }
-    
+
     public Boolean isParallelProcessing() {
         return parallelProcessing;
     }
@@ -145,20 +140,7 @@ public class Flow implements Serializable {
     public void setParallelProcessing(Boolean parallelProcessing) {
         this.parallelProcessing = parallelProcessing;
     }
-    
-    public Boolean isAssimblyHeaders() {
-        return assimblyHeaders;
-    }
 
-    public Flow assimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-        return this;
-    }
-
-    public void setAssimblyHeaders(Boolean assimblyHeaders) {
-        this.assimblyHeaders = assimblyHeaders;
-    }    
-    
     public Integer getMaximumRedeliveries() {
         return maximumRedeliveries;
     }
@@ -223,7 +205,7 @@ public class Flow implements Serializable {
     public void setLogLevel(LogLevelType logLevel) {
         this.logLevel = logLevel;
     }
-    
+
     public Integer getInstances() {
         return instances;
     }
@@ -236,7 +218,7 @@ public class Flow implements Serializable {
     public void setInstances(Integer instances) {
         this.instances = instances;
     }
-    
+
     public Integer getVersion() {
         return version;
     }
@@ -274,44 +256,45 @@ public class Flow implements Serializable {
 
     public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
-    }     
-
-    public Gateway getGateway() {
-        return gateway;
     }
 
-    public Flow gateway(Gateway gateway) {
-        this.gateway = gateway;
+    public Integration getIntegration() {
+        return integration;
+    }
+
+    public Flow integration(Integration integration) {
+        this.integration = integration;
         return this;
     }
 
-    public void setGateway(Gateway gateway) {
-        this.gateway = gateway;
+    public void setIntegration(Integration integration) {
+        this.integration = integration;
     }
 
-    public Set<Endpoint> getEndpoints() {
-        return endpoints;
+    public Set<Step> getSteps() {
+        return steps;
     }
 
-    public Flow endpoints(Set<Endpoint> endpoints) {
-        this.endpoints = endpoints;
+    public Flow steps(Set<Step> steps) {
+        this.steps = steps;
         return this;
     }
 
-    public Flow addEndpoint(Endpoint endpoint) {
-        this.endpoints.add(endpoint);
-        endpoint.setFlow(this);
+
+    public Flow addStep(Step step) {
+        this.steps.add(step);
+        step.setFlow(this);
         return this;
     }
 
-    public Flow removeEndpoint(Endpoint endpoint) {
-        this.endpoints.remove(endpoint);
-        endpoint.setFlow(null);
+    public Flow removeStep(Step step) {
+        this.steps.remove(step);
+        step.setFlow(null);
         return this;
     }
 
-    public void setEndpoints(Set<Endpoint> endpoints) {
-        this.endpoints = endpoints;
+    public void setSteps(Set<Step> steps) {
+        this.steps = steps;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
@@ -346,7 +329,6 @@ public class Flow implements Serializable {
             ", type='" + getType() + "'" +
             ", loadBalancing='" + isLoadBalancing() + "'" +
             ", parallelProcessing='" + isParallelProcessing() + "'" +
-            ", isAssimblyHeaders='" + isAssimblyHeaders() + "'" +
             ", instances=" + getInstances() +
             "}";
     }

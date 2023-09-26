@@ -24,7 +24,7 @@ describe('PasswordResetFinish Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call reset-password/finish endpoint with correct values', () => {
+    it('should call reset-password/finish step with correct values', () => {
       // GIVEN
       const key = 'abc';
       const newPassword = 'password';

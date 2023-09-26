@@ -19,7 +19,7 @@
   <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
     <ul class="navbar-nav ml-auto">
       <li
-        *ngIf="type === 'CONNECTOR' || type === 'FULL'"
+        *ngIf="type === 'INTEGRATION' || type === 'FULL'"
         routerLinkActive="active"
         ngbDropdown
         class="nav-item dropdown pointer"
@@ -47,43 +47,19 @@
           <li>
             <a
               class="dropdown-item"
-              routerLink="endpoint"
+              routerLink="step"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
             >
               <fa-icon icon="asterisk"></fa-icon>
-              <span>Endpoints</span>
+              <span>Steps</span>
             </a>
           </li>
           <li>
             <a
               class="dropdown-item"
-              routerLink="header"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              (click)="collapseNavbar()"
-            >
-              <fa-icon icon="asterisk"></fa-icon>
-              <span>Headers</span>
-            </a>
-          </li>
-          <li>
-            <a
-              class="dropdown-item"
-              routerLink="route"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              (click)="collapseNavbar()"
-            >
-              <fa-icon icon="asterisk"></fa-icon>
-              <span>Routes</span>
-            </a>
-          </li>
-          <li>
-            <a
-              class="dropdown-item"
-              routerLink="service"
+              routerLink="connection"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
@@ -165,7 +141,7 @@
           <li>
             <a
               class="dropdown-item"
-              routerLink="gateway"
+              routerLink="integration"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="collapseNavbar()"
@@ -174,7 +150,7 @@
               <span>Gateway</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a
               class="dropdown-item"
               routerLink="environment-variables"
@@ -234,7 +210,7 @@
               <span jhiTranslate="global.menu.admin.health">Health</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a class="dropdown-item" routerLink="admin/deployment" routerLinkActive="active" (click)="collapseNavbar()">
               <fa-icon icon="list" [fixedWidth]="true"></fa-icon>
               <span>Deployment</span>
@@ -247,7 +223,7 @@
               <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
             <a class="dropdown-item" routerLink="maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
   			  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
               <span>Maintenance</span>
@@ -267,7 +243,7 @@
             </a>
           </li>
           <li>
-            <a class="dropdown-item" routerLink="admin/docs" routerLinkActive="active" (click)="collapseNavbar()">
+            <a class="dropdown-item"  href="swagger-ui/index.html" target="_blank" (click)="collapseNavbar()">
               <fa-icon icon="book" [fixedWidth]="true"></fa-icon>
               <span jhiTranslate="global.menu.admin.apidocs">API</span>
             </a>
