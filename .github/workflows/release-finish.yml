@@ -40,7 +40,7 @@ jobs:
         branch: "${{github.event.issue.milestone.title}}"
         sha: '${{ github.event.pull_request.head.sha }}'
 
-  call-gateway-update-version:
+  call-update-version:
     needs: create-new-branch
     uses: ./.github/workflows/update-version.yml
     secrets: inherit
@@ -57,7 +57,7 @@ jobs:
       milestone: "${{github.event.issue.milestone.title}}"
 
   call-runtime-release-version:
-    needs: release-new-version
+    needs: call-base-release-version
     uses: assimbly/runtime/.github/workflows/release-finish.yml@develop
     secrets: inherit
     with:
@@ -65,7 +65,7 @@ jobs:
       milestone: "${{github.event.issue.milestone.title}}"
 
   call-custom-components-release-version:
-    needs: release-new-version
+    needs: call-runtime-release-version
     uses: assimbly/custom-components/.github/workflows/release-finish.yml@develop
     secrets: inherit
     with:
