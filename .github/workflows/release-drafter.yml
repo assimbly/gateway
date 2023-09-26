@@ -10,8 +10,6 @@ on:
       milestone:
         description: 'Milestone to use as version'
         type: string
-    branches:
-      - main
 
 permissions:
   contents: read
