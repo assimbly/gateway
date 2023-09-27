@@ -14,7 +14,8 @@ Assimbly is powered by [Apache Camel](https://github.com/apache/camel) and [Apac
 
 ## Download
 
-Download it [here](https://github.com/assimbly/integration/releases).
+- [Jar files](https://github.com/orgs/assimbly/packages?repo_name=gateway)
+- [Docker images](https://hub.docker.com/u/assimbly)
 
 ## Getting started
 
