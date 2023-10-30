@@ -5,6 +5,8 @@ buildscript {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
+
+        /*
         maven{  name = "Aurea"
             url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
         }
@@ -29,8 +31,11 @@ buildscript {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
         }
+         */
         //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
     }
+
+
     dependencies {
         //classpath('com.google.cloud.tools:jib-ownership-extension-gradle:0.1.0')
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
@@ -55,6 +60,7 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.4.0'
     id "com.github.ben-manes.versions" version "0.46.0"
+    id("org.openrewrite.rewrite") version("6.4.1")
     //id "com.palantir.graal" version "0.6.0-114-gfe95739"
     //id "org.mikeneck.graalvm-native-image" version "0.3.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
@@ -65,7 +71,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '4.1.0'
+version = '4.1.0-SNAPSHOT'
 
 description = ""
 
@@ -324,6 +330,7 @@ repositories {
     mavenLocal()
     mavenCentral()
 
+    /*
     maven{  name = "Aurea"
         url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
@@ -348,6 +355,8 @@ repositories {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
     }
+
+     */
     //maven{ url "http://artifactory-p.svb.org:80/artifactory/repo"}
 }
 
@@ -459,6 +468,7 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:2.17.2"
     //implementation 'org.crac:crac:1.3.0'
 
+
     implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
@@ -529,6 +539,11 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library"
     runtimeOnly "com.h2database:h2"
     liquibaseRuntime "com.h2database:h2"
+
+    rewrite("org.openrewrite.recipe:rewrite-spring:5.0.11")
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.4.0"))
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:2.1.1")
+
 }
 
 if (project.hasProperty("gae")) {
@@ -631,9 +646,18 @@ task cleanResources(type: Delete) {
     delete "build/resources"
 }
 
+rewrite {
+    activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_1")
+    activeRecipe("org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration")
+    activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE10")
+}
+
+
 wrapper {
     gradleVersion = "8.1.1"
 }
+
+
 
 /*
 java {
