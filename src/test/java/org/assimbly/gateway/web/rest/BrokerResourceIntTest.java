@@ -7,6 +7,7 @@ import org.assimbly.gateway.repository.BrokerRepository;
 import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.service.mapper.BrokerMapper;
+import org.assimbly.gateway.web.rest.broker.BrokerResource;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;

@@ -5,6 +5,7 @@ import org.assimbly.gateway.config.audit.AuditEventConverter;
 import org.assimbly.gateway.domain.PersistentAuditEvent;
 import org.assimbly.gateway.repository.PersistenceAuditEventRepository;
 import org.assimbly.gateway.service.AuditEventService;
+import org.assimbly.gateway.web.rest.gateway.AuditResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

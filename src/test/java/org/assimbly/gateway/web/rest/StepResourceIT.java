@@ -8,6 +8,7 @@ import org.assimbly.gateway.service.dto.StepDTO;
 import org.assimbly.gateway.service.mapper.StepMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
+import org.assimbly.gateway.web.rest.integration.StepResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -30,7 +31,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.assimbly.gateway.domain.enumeration.ComponentTypeOLD;
 import org.assimbly.gateway.domain.enumeration.StepType;
 /**
  * Integration tests for the {@link StepResource} REST controller.
@@ -38,8 +38,6 @@ import org.assimbly.gateway.domain.enumeration.StepType;
 @SpringBootTest(classes = GatewayApp.class)
 public class StepResourceIT {
 
-    private static final ComponentTypeOLD DEFAULT_COMPONENT_TYPE = ComponentTypeOLD.ACTIVEMQ;
-    private static final ComponentTypeOLD UPDATED_COMPONENT_TYPE = ComponentTypeOLD.FILE;
 
     private static final String DEFAULT_URI = "AAAAAAAAAA";
     private static final String UPDATED_URI = "BBBBBBBBBB";
@@ -84,7 +82,7 @@ public class StepResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final StepResource stepResource = new StepResource(stepService);
+        final StepResource stepResource = new StepResource(stepService, stepRepository, stepMapper);
         this.restStepMockMvc = MockMvcBuilders.standaloneSetup(stepResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -101,7 +99,7 @@ public class StepResourceIT {
      */
     public static Step createEntity(EntityManager em) {
         Step step = new Step()
-            .componentType(DEFAULT_COMPONENT_TYPE)
+            .componentType("ActiveMQ")
             .uri(DEFAULT_URI)
             .options(DEFAULT_OPTIONS)
             .stepType(DEFAULT_STEP_TYPE)
@@ -116,7 +114,7 @@ public class StepResourceIT {
      */
     public static Step createUpdatedEntity(EntityManager em) {
         Step step = new Step()
-            .componentType(UPDATED_COMPONENT_TYPE)
+            .componentType("File")
             .uri(UPDATED_URI)
             .options(UPDATED_OPTIONS)
             .stepType(UPDATED_STEP_TYPE)
@@ -137,7 +135,7 @@ public class StepResourceIT {
         // Create the Step
         StepDTO stepDTO = stepMapper.toDto(step);
         restStepMockMvc.perform(post("/api/steps")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(stepDTO)))
             .andExpect(status().isCreated());
 
@@ -145,7 +143,7 @@ public class StepResourceIT {
         List<Step> stepList = stepRepository.findAll();
         assertThat(stepList).hasSize(databaseSizeBeforeCreate + 1);
         Step testStep = stepList.get(stepList.size() - 1);
-        assertThat(testStep.getComponentType()).isEqualTo(DEFAULT_COMPONENT_TYPE);
+        assertThat(testStep.getComponentType()).isEqualTo("ActiveMQ");
         assertThat(testStep.getUri()).isEqualTo(DEFAULT_URI);
         assertThat(testStep.getOptions()).isEqualTo(DEFAULT_OPTIONS);
         assertThat(testStep.getStepType()).isEqualTo(DEFAULT_STEP_TYPE);
@@ -163,7 +161,7 @@ public class StepResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restStepMockMvc.perform(post("/api/steps")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(stepDTO)))
             .andExpect(status().isBadRequest());
 
@@ -184,7 +182,7 @@ public class StepResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(step.getId().intValue())))
-            .andExpect(jsonPath("$.[*].componentType").value(hasItem(DEFAULT_COMPONENT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].componentType").value(hasItem("ActiveMQ".toString())))
             .andExpect(jsonPath("$.[*].uri").value(hasItem(DEFAULT_URI)))
             .andExpect(jsonPath("$.[*].options").value(hasItem(DEFAULT_OPTIONS)))
             .andExpect(jsonPath("$.[*].stepType").value(hasItem(DEFAULT_STEP_TYPE.toString())))
@@ -202,7 +200,7 @@ public class StepResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(step.getId().intValue()))
-            .andExpect(jsonPath("$.componentType").value(DEFAULT_COMPONENT_TYPE.toString()))
+            .andExpect(jsonPath("$.componentType").value("ActiveMQ".toString()))
             .andExpect(jsonPath("$.uri").value(DEFAULT_URI))
             .andExpect(jsonPath("$.options").value(DEFAULT_OPTIONS))
             .andExpect(jsonPath("$.stepType").value(DEFAULT_STEP_TYPE.toString()))
@@ -230,7 +228,7 @@ public class StepResourceIT {
         // Disconnect from session so that the updates on updatedStep are not directly saved in db
         em.detach(updatedStep);
         updatedStep
-            .componentType(UPDATED_COMPONENT_TYPE)
+            .componentType("File")
             .uri(UPDATED_URI)
             .options(UPDATED_OPTIONS)
             .stepType(UPDATED_STEP_TYPE)
@@ -238,7 +236,7 @@ public class StepResourceIT {
         StepDTO stepDTO = stepMapper.toDto(updatedStep);
 
         restStepMockMvc.perform(put("/api/steps")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(stepDTO)))
             .andExpect(status().isOk());
 
@@ -246,7 +244,7 @@ public class StepResourceIT {
         List<Step> stepList = stepRepository.findAll();
         assertThat(stepList).hasSize(databaseSizeBeforeUpdate);
         Step testStep = stepList.get(stepList.size() - 1);
-        assertThat(testStep.getComponentType()).isEqualTo(UPDATED_COMPONENT_TYPE);
+        assertThat(testStep.getComponentType()).isEqualTo("File");
         assertThat(testStep.getUri()).isEqualTo(UPDATED_URI);
         assertThat(testStep.getOptions()).isEqualTo(UPDATED_OPTIONS);
         assertThat(testStep.getStepType()).isEqualTo(UPDATED_STEP_TYPE);
@@ -263,7 +261,7 @@ public class StepResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStepMockMvc.perform(put("/api/steps")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(stepDTO)))
             .andExpect(status().isBadRequest());
 
@@ -282,7 +280,7 @@ public class StepResourceIT {
 
         // Delete the step
         restStepMockMvc.perform(delete("/api/steps/{id}", step.getId())
-            .accept(TestUtil.APPLICATION_JSON))
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

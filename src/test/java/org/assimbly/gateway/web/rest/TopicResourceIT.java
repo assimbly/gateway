@@ -6,6 +6,7 @@ import org.assimbly.gateway.repository.TopicRepository;
 import org.assimbly.gateway.service.TopicService;
 import org.assimbly.gateway.service.dto.TopicDTO;
 import org.assimbly.gateway.service.mapper.TopicMapper;
+import org.assimbly.gateway.web.rest.broker.TopicResource;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -130,7 +131,7 @@ public class TopicResourceIT {
         // Create the Topic
         TopicDTO topicDTO = topicMapper.toDto(topic);
         restTopicMockMvc.perform(post("/api/topics")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(topicDTO)))
             .andExpect(status().isCreated());
 
@@ -155,7 +156,7 @@ public class TopicResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTopicMockMvc.perform(post("/api/topics")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(topicDTO)))
             .andExpect(status().isBadRequest());
 
@@ -181,7 +182,7 @@ public class TopicResourceIT {
             .andExpect(jsonPath("$.[*].selectedColumn").value(hasItem(DEFAULT_SELECTED_COLUMN)))
             .andExpect(jsonPath("$.[*].orderColumn").value(hasItem(DEFAULT_ORDER_COLUMN)));
     }
-    
+
     @Test
     @Transactional
     public void getTopic() throws Exception {
@@ -227,7 +228,7 @@ public class TopicResourceIT {
         TopicDTO topicDTO = topicMapper.toDto(updatedTopic);
 
         restTopicMockMvc.perform(put("/api/topics")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(topicDTO)))
             .andExpect(status().isOk());
 
@@ -251,7 +252,7 @@ public class TopicResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTopicMockMvc.perform(put("/api/topics")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(topicDTO)))
             .andExpect(status().isBadRequest());
 
@@ -270,7 +271,7 @@ public class TopicResourceIT {
 
         // Delete the topic
         restTopicMockMvc.perform(delete("/api/topics/{id}", topic.getId())
-            .accept(TestUtil.APPLICATION_JSON))
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -9,6 +9,7 @@ import org.assimbly.gateway.service.dto.GroupDTO;
 import org.assimbly.gateway.service.mapper.GroupMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
+import org.assimbly.gateway.web.rest.gateway.GroupResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
