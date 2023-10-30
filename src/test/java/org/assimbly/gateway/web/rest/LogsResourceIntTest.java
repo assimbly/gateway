@@ -1,7 +1,7 @@
 package org.assimbly.gateway.web.rest;
 
 import org.assimbly.gateway.GatewayApp;
-import org.assimbly.gateway.web.rest.vm.LoggerVM;
+import org.assimbly.gateway.web.rest.gateway.LogsResource;
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.LoggerContext;
 import org.junit.Before;
@@ -44,18 +44,6 @@ public class LogsResourceIntTest {
         restLogsMockMvc.perform(get("/management/logs"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
-    }
-
-    @Test
-    public void changeLogs() throws Exception {
-        LoggerVM logger = new LoggerVM();
-        logger.setLevel("INFO");
-        logger.setName("ROOT");
-
-        restLogsMockMvc.perform(put("/management/logs")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(logger)))
-            .andExpect(status().isNoContent());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest;
 
+import org.assimbly.gateway.web.rest.gateway.ProfileInfoResource;
 import tech.jhipster.config.JHipsterProperties;
 import org.assimbly.gateway.GatewayApp;
 import org.junit.Before;

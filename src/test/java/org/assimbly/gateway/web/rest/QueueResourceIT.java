@@ -6,6 +6,7 @@ import org.assimbly.gateway.repository.QueueRepository;
 import org.assimbly.gateway.service.QueueService;
 import org.assimbly.gateway.service.dto.QueueDTO;
 import org.assimbly.gateway.service.mapper.QueueMapper;
+import org.assimbly.gateway.web.rest.broker.QueueResource;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -130,7 +131,7 @@ public class QueueResourceIT {
         // Create the Queue
         QueueDTO queueDTO = queueMapper.toDto(queue);
         restQueueMockMvc.perform(post("/api/queues")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(queueDTO)))
             .andExpect(status().isCreated());
 
@@ -155,7 +156,7 @@ public class QueueResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restQueueMockMvc.perform(post("/api/queues")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(queueDTO)))
             .andExpect(status().isBadRequest());
 
@@ -181,7 +182,7 @@ public class QueueResourceIT {
             .andExpect(jsonPath("$.[*].selectedColumn").value(hasItem(DEFAULT_SELECTED_COLUMN)))
             .andExpect(jsonPath("$.[*].orderColumn").value(hasItem(DEFAULT_ORDER_COLUMN)));
     }
-    
+
     @Test
     @Transactional
     public void getQueue() throws Exception {
@@ -227,7 +228,7 @@ public class QueueResourceIT {
         QueueDTO queueDTO = queueMapper.toDto(updatedQueue);
 
         restQueueMockMvc.perform(put("/api/queues")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(queueDTO)))
             .andExpect(status().isOk());
 
@@ -251,7 +252,7 @@ public class QueueResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restQueueMockMvc.perform(put("/api/queues")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(queueDTO)))
             .andExpect(status().isBadRequest());
 
@@ -270,7 +271,7 @@ public class QueueResourceIT {
 
         // Delete the queue
         restQueueMockMvc.perform(delete("/api/queues/{id}", queue.getId())
-            .accept(TestUtil.APPLICATION_JSON))
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 /**
- * Integration tests for the {@link FlowResource} REST controller.
+ * Integration tests for the {@link FlowResourceIT} REST controller.
  */
 @SpringBootTest(classes = GatewayApp.class)
 public class FlowResourceIT {

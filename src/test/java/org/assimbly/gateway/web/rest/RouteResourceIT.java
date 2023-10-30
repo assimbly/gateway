@@ -8,6 +8,7 @@ import org.assimbly.gateway.service.dto.RouteDTO;
 import org.assimbly.gateway.service.mapper.RouteMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
+import org.assimbly.gateway.web.rest.integration.RouteResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -126,7 +127,7 @@ public class RouteResourceIT {
         // Create the Route
         RouteDTO routeDTO = routeMapper.toDto(route);
         restRouteMockMvc.perform(post("/api/routes")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(routeDTO)))
             .andExpect(status().isCreated());
 
@@ -150,7 +151,7 @@ public class RouteResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRouteMockMvc.perform(post("/api/routes")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(routeDTO)))
             .andExpect(status().isBadRequest());
 
@@ -219,7 +220,7 @@ public class RouteResourceIT {
         RouteDTO routeDTO = routeMapper.toDto(updatedRoute);
 
         restRouteMockMvc.perform(put("/api/routes")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(routeDTO)))
             .andExpect(status().isOk());
 
@@ -242,7 +243,7 @@ public class RouteResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRouteMockMvc.perform(put("/api/routes")
-            .contentType(TestUtil.APPLICATION_JSON)
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(routeDTO)))
             .andExpect(status().isBadRequest());
 
@@ -261,7 +262,7 @@ public class RouteResourceIT {
 
         // Delete the route
         restRouteMockMvc.perform(delete("/api/routes/{id}", route.getId())
-            .accept(TestUtil.APPLICATION_JSON))
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

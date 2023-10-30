@@ -11,9 +11,11 @@ import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.assimbly.gateway.service.MailService;
 import org.assimbly.gateway.service.UserService;
+import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.service.dto.PasswordChangeDTO;
 import org.assimbly.gateway.service.dto.UserDTO;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
+import org.assimbly.gateway.web.rest.gateway.AccountResource;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -91,10 +93,10 @@ public class AccountResourceIntTest {
         MockitoAnnotations.initMocks(this);
         doNothing().when(mockMailService).sendActivationEmail(any());
         AccountResource accountResource =
-            new AccountResource(userRepository, userService, mockMailService, persistentTokenRepository);
+            new AccountResource(userRepository, userService, mockMailService);
 
         AccountResource accountUserMockResource =
-            new AccountResource(userRepository, mockUserService, mockMailService, persistentTokenRepository);
+            new AccountResource(userRepository, mockUserService, mockMailService);
         this.restMvc = MockMvcBuilders.standaloneSetup(accountResource)
             .setMessageConverters(httpMessageConverters)
             .setControllerAdvice(exceptionTranslator)
@@ -410,7 +412,7 @@ public class AccountResourceIntTest {
         assertThat(testUser4.get().getEmail()).isEqualTo("test-register-duplicate-email@example.com");
 
         testUser4.get().setActivated(true);
-        userService.updateUser((new UserDTO(testUser4.get())));
+        userService.updateUser((new AdminUserDTO(testUser4.get())));
 
         // Register 4th (already activated) user
         restMvc.perform(
@@ -448,26 +450,6 @@ public class AccountResourceIntTest {
 
     @Test
     @Transactional
-    public void testActivateAccount() throws Exception {
-        final String activationKey = "some activation key";
-        User user = new User();
-        user.setLogin("activate-account");
-        user.setEmail("activate-account@example.com");
-        user.setPassword(RandomStringUtils.random(60));
-        user.setActivated(false);
-        user.setActivationKey(activationKey);
-
-        userRepository.saveAndFlush(user);
-
-        restMvc.perform(get("/api/activate?key={activationKey}", activationKey))
-            .andExpect(status().isOk());
-
-        user = userRepository.findOneByLogin(user.getLogin()).orElse(null);
-        assertThat(user.getActivated()).isTrue();
-    }
-
-    @Test
-    @Transactional
     public void testActivateAccountWithWrongKey() throws Exception {
         restMvc.perform(get("/api/activate?key=wrongActivationKey"))
             .andExpect(status().isInternalServerError());
@@ -485,7 +467,7 @@ public class AccountResourceIntTest {
 
         userRepository.saveAndFlush(user);
 
-        UserDTO userDTO = new UserDTO();
+        AdminUserDTO userDTO = new AdminUserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -508,7 +490,6 @@ public class AccountResourceIntTest {
         assertThat(updatedUser.getLangKey()).isEqualTo(userDTO.getLangKey());
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
         assertThat(updatedUser.getImageUrl()).isEqualTo(userDTO.getImageUrl());
-        assertThat(updatedUser.getActivated()).isEqualTo(true);
         assertThat(updatedUser.getAuthorities()).isEmpty();
     }
 
@@ -524,7 +505,7 @@ public class AccountResourceIntTest {
 
         userRepository.saveAndFlush(user);
 
-        UserDTO userDTO = new UserDTO();
+        AdminUserDTO userDTO = new AdminUserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -563,7 +544,7 @@ public class AccountResourceIntTest {
 
         userRepository.saveAndFlush(anotherUser);
 
-        UserDTO userDTO = new UserDTO();
+        AdminUserDTO userDTO = new AdminUserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -595,7 +576,7 @@ public class AccountResourceIntTest {
 
         userRepository.saveAndFlush(user);
 
-        UserDTO userDTO = new UserDTO();
+        AdminUserDTO userDTO = new AdminUserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");

@@ -9,6 +9,7 @@ import org.assimbly.gateway.service.dto.MaintenanceDTO;
 import org.assimbly.gateway.service.mapper.MaintenanceMapper;
 import org.assimbly.gateway.web.rest.errors.ExceptionTranslator;
 
+import org.assimbly.gateway.web.rest.integration.MaintenanceResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
