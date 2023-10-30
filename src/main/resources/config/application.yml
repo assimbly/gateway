@@ -170,7 +170,7 @@ jhipster:
 
 application:
   info:
-    version: 4.0.4-SNAPSHOT
+    version: 4.1.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
