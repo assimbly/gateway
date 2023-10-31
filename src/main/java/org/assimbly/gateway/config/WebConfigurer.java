@@ -62,8 +62,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     }
 
     private void setLocationForStaticAssets(WebServerFactory server) {
-        if (server instanceof ConfigurableServletWebServerFactory) {
-            ConfigurableServletWebServerFactory servletWebServer = (ConfigurableServletWebServerFactory) server;
+        if (server instanceof ConfigurableServletWebServerFactory servletWebServer) {
             File root;
             String prefixPath = resolvePathPrefix();
             root = new File(prefixPath + "target/classes/static/");
@@ -106,6 +105,6 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
      */
     private void initH2Console(ServletContext servletContext) {
         log.debug("Initialize H2 console");
-        H2ConfigurationHelper.initH2Console((javax.servlet.ServletContext) servletContext);
+        H2ConfigurationHelper.initH2Console(servletContext);
     }
 }
