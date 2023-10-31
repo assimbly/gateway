@@ -1,7 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.assimbly.gateway.security.jwt.JWTFilter;
 import org.assimbly.gateway.security.jwt.TokenProvider;
 import org.assimbly.gateway.web.rest.vm.LoginVM;
