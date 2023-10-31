@@ -371,7 +371,7 @@ dependencies {
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
-    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '7.9.3'
+    implementation group: 'tech.jhipster', name: 'jhipster-framework', version: '8.0.0-rc.1'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
 
     implementation 'com.mattbertolini:liquibase-slf4j:5.0.0'
@@ -380,6 +380,8 @@ dependencies {
 
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'com.sun.mail:jakarta.mail:2.0.1'
+    implementation 'com.sun.activation:jakarta.activation:2.0.1'
 
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -561,6 +563,9 @@ if (project.hasProperty("gae")) {
     bootJar.dependsOn = [createPom]
 }
 
+tasks.named('bootJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 //Build different jar based on type of application
 if (project.hasProperty("integration")){

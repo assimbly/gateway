@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
@@ -92,7 +92,6 @@ public class GatewayApp {
     }
 
     private static void logApplicationStartup(Environment env) {
-
 
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
