@@ -473,9 +473,8 @@ dependencies {
 
     if (project.hasProperty("full")){
         implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "aleris", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "amazon", version: "${version}", changing: true
-        //implementation group:  "org.assimbly", name: "archive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "archive", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "cookies", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
