@@ -94,7 +94,7 @@ configurations.all {
     exclude group: "org.slf4j", module: "slf4j-log4j12"
     exclude group: "org.slf4j", module: "slf4j-simple"
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
-    exclude module: 'netty-tcnative-classes'
+ //   exclude module: 'netty-tcnative-classes'
     exclude group: 'javax.servlet', module: 'servlet-api'
     exclude group: 'javax.persistence', module: 'persistence-api'
     exclude group: 'xerces', module: 'xercesImpl'
@@ -427,7 +427,7 @@ dependencies {
     }
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     //https://www.eclipse.org/jetty/documentation/jetty-9/index.html#quickstart-webapp
-    implementation 'org.eclipse.jetty:jetty-quickstart'
+    //implementation 'org.eclipse.jetty:jetty-quickstart'
 
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
