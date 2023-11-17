@@ -29,7 +29,7 @@ public class Import {
 	public String convertConfigurationToDB(Long integrationId, String mediaType, String configuration) throws Exception {
 
 		if(!configuration.endsWith("</dil>")){
-			configuration = Transform.transformToDil(configuration);
+			configuration = Transform.transformToDil(configuration, "");
 		}
 
 		// get the configuration as XML Document
@@ -46,7 +46,7 @@ public class Import {
 	public String convertFlowConfigurationToDB(Long integrationId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
 		if(!configuration.endsWith("</dil>")){
-			configuration = Transform.transformToDil(configuration);
+			configuration = Transform.transformToDil(configuration, Long.toString(id));
 		}
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
