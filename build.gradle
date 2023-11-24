@@ -466,6 +466,7 @@ dependencies {
     }else if (project.hasProperty("broker")) {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
         implementation group: "org.assimbly", name: "database-drivers", version: "${version}", changing: true
+        implementation group: "org.assimbly", name: "mail", version: "${version}", changing: true
     }else{
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
