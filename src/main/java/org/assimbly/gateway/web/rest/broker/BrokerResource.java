@@ -131,24 +131,16 @@ public class BrokerResource {
     @PostConstruct
     private void init() throws Exception {
 
-        System.out.println("Broker startup");
-
         List<BrokerDTO> brokers = brokerService.findAll();
 
         for (BrokerDTO broker : brokers) {
 
-            System.out.println("Broker startup2");
-
-
             if (broker.isAutoStart()) {
-                System.out.println("Broker startup3");
 
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
                 log.debug("Autostart broker: " + brokerType);
-
-                System.out.println("Broker startup4");
 
                 managedBroker.start(brokerType, brokerConfigurationType);
             }
