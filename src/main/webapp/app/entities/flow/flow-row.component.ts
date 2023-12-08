@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
@@ -17,9 +17,6 @@ import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } 
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import { WebSocketsService } from 'app/shared/websockets/websockets.service';
-import Stomp, { Client, Subscription as StompSubscription, ConnectionHeaders, Message } from 'webstomp-client';
-
 enum Status {
   active = 'active',
   paused = 'paused',
@@ -30,7 +27,7 @@ enum Status {
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
 })
-export class FlowRowComponent implements OnInit, OnDestroy {
+export class FlowRowComponent implements OnInit {
   sslUrl: any;
   mySubscription: Subscription;
 
@@ -85,20 +82,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   intervalTime: any;
 
-  stompClient = null;
-  subscriber = null;
-
-  connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
-  connectionEventSubscription: Subscription | null = null;
-  connectionAlertSubscription: Subscription | null = null;
-  stompSubscription: StompSubscription | null = null;
-
-  connection: Promise<any>;
-  connectedPromise: any;
-  private listenerSubject: Subject<string> = new Subject();
-  listener: Observable<any>;
-  listenerObserver: Observer<any>;
-
   alreadyConnectedOnce = false;
   private subscription: Subscription;
 
@@ -111,7 +94,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	  private webSocketsService: WebSocketsService,
 	  private collectors: Collectors
   ) {
 
@@ -130,48 +112,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.setFlowStatusDefaults();
     this.getStatus(this.flow.id);
+
     this.steps = this.flow.steps;
     this.getSteps();
 
     this.registerTriggeredAction();
 
-    this.stompClient = this.webSocketsService.getClient();
-	  this.connectionSubject = this.webSocketsService.getConnectionSubject();
-
-	  this.subscribeToEvent(this.flow.id,'event');
-
-    this.subscribeToAlert(this.flow.id,'alert');
-
-  }
-
-  ngAfterViewInit() {
-
-    this.subscription = this.receive().subscribe(data => {
-
-			if (data.startsWith('alert')) {
-        const data2  = data.split(':');
-        const alertId = Number(data2[1]);
-        if (this.flow.id === alertId) {
-          this.getFlowNumberOfAlerts(alertId);
-        }
-
-			} else {
-        const response = JSON.parse(data);
-			  this.statusMessage = response;
-			  if(response.flow.message.startsWith('Failed')){
-			    this.setFlowStatus('error');
-			  }else{
-			    this.setFlowStatus(response.flow.event);
-			  }
-
-			}
-
-    });
-
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe();
   }
 
   getStatus(id: number) {
@@ -456,6 +402,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.intervalTime = setInterval(() => {
       this.startGetFlowStats(flow);
     }, 5000);
+
   }
 
   startGetFlowStats(flow: IFlow) {
@@ -465,11 +412,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     for (const step of flow.steps) {
 
       if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
-        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
+        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
           this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
         });
       }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
-        this.flowService.getFlowStats(flow.id, step.id, flow.integrationId).subscribe(res => {
+        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
           this.setFlowStatistic(res.body, flow.id + '-' + step.id);
         });
 
@@ -759,13 +706,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
           this.flowService.start(this.flow.id).subscribe(
             response => {
-              if (response.status === 200) {
-                // below is only used for tested (by default websockets is used)
-                // this.setFlowStatus('started');
-              }
+              this.statusMessage = JSON.parse(response.body);
+   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
             },
             err => {
+     			    this.setFlowStatus(err.error);
               this.getFlowLastError(this.flow.id, 'Start', err.error);
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
@@ -790,15 +736,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.disableActionBtns = true;
     this.flowService.pause(this.flow.id).subscribe(
       response => {
-        if (response.status === 200) {
-          // this.setFlowStatus('suspended');
-        }
+        this.statusMessage = JSON.parse(response.body);
+	      this.setFlowStatus(this.statusMessage.flow.event);
         this.disableActionBtns = false;
       },
       err => {
-        this.getFlowLastError(this.flow.id, 'Pause', err.error);
+		    this.setFlowStatus('error');
+        this.getFlowLastError(this.flow.id, 'Start', err.error);
         this.isFlowStatusOK = false;
-        this.flowStatusError = `Flow with id=${this.flow.id} is not paused.`;
+        this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
         this.disableActionBtns = false;
       }
     );
@@ -814,13 +760,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
           this.flowService.resume(this.flow.id).subscribe(
             response => {
-              if (response.status === 200) {
-                // this.setFlowStatus('resumed');
-              }
+              this.statusMessage = JSON.parse(response.body);
+   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
             },
             err => {
-              this.getFlowLastError(this.flow.id, 'Resume', err.error);
+     			    this.setFlowStatus('error');
+              this.getFlowLastError(this.flow.id, 'Start', err.error);
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
               this.disableActionBtns = false;
@@ -849,15 +795,15 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
           this.flowService.restart(this.flow.id).subscribe(
             response => {
-              if (response.status === 200) {
-                // this.setFlowStatus('restarted');
-              }
+              this.statusMessage = JSON.parse(response.body);
+   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
             },
             err => {
-              this.getFlowLastError(this.flow.id, 'Restart', err.error);
+     			    this.setFlowStatus('error');
+              this.getFlowLastError(this.flow.id, 'Start', err.error);
               this.isFlowStatusOK = false;
-              this.flowStatusError = `Flow with id=${this.flow.id} is not restarted.`;
+              this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
               this.disableActionBtns = false;
             }
           );
@@ -879,13 +825,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.flowService.stop(this.flow.id).subscribe(
       response => {
-        if (response.status === 200) {
-          // this.setFlowStatus('stopped');
-        }
+        this.statusMessage = JSON.parse(response.body);
+	      this.setFlowStatus(this.statusMessage.flow.event);
         this.disableActionBtns = false;
       },
       err => {
-        this.getFlowLastError(this.flow.id, 'Stop', err.error);
+		    this.setFlowStatus('error');
+        this.getFlowLastError(this.flow.id, 'Start', err.error);
         this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
         this.disableActionBtns = false;
@@ -908,7 +854,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       collector.id = this.flow.id.toString();
       collector.filters = filters;
 
-      this.integrationService.addCollector('1',collector.id,collector).subscribe(
+      this.integrationService.addCollector(collector.id,collector).subscribe(
         response => {
           //console.log('ok configured' + JSON.stringify(response));
         },
@@ -921,7 +867,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   disableTracing(){
 
-   this.integrationService.removeCollector('1',this.flow.id).subscribe(
+   this.integrationService.removeCollector(this.flow.id).subscribe(
         response => {
           //console.log('2. Removed' + response);
         },
@@ -930,59 +876,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }
       );
 
-  }
-
-  receive(): Subject<string> {
-    return this.listenerSubject;
-  }
-
-  subscribeToEvent(id, type): void {
-
-    if (this.connectionEventSubscription) {
-      return;
-    }
-
-
-	const topic = '/topic/' + id + '/' + type;
-
-    this.connectionEventSubscription = this.connectionSubject.subscribe(() => {
-
-      if (this.stompClient) {
-
-        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
-          this.listenerSubject.next(data.body);
-        });
-      }
-    });
-  }
-
-   subscribeToAlert(id, type): void {
-
-    if (this.connectionAlertSubscription) {
-      return;
-    }
-
-
-	const topic = '/topic/' + id + '/' + type;
-
-    this.connectionAlertSubscription = this.connectionSubject.subscribe(() => {
-
-      if (this.stompClient) {
-
-        this.stompSubscription = this.stompClient.subscribe(topic, (data: Message) => {
-          this.listenerSubject.next(data.body);
-        });
-      }
-    });
-  }
-
-
-  unsubscribe(): void {
-
-    if (this.connectionEventSubscription) {
-      this.connectionEventSubscription.unsubscribe();
-      this.connectionEventSubscription = null;
-    }
   }
 
 }

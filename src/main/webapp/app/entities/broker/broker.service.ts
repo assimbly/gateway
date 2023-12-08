@@ -14,8 +14,6 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 export class BrokerService {
     public resourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
 
-    private gatewayid = 1;
-
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
     create(broker: IBroker): Observable<EntityResponseType> {

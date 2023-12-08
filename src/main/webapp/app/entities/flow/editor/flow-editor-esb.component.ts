@@ -852,7 +852,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   getComponentOptions(componentType: string): any {
-    return this.flowService.getComponentOptions(1, componentType).pipe(
+    return this.flowService.getComponentOptions(componentType).pipe(
       map(options => options.body)
     );
   }

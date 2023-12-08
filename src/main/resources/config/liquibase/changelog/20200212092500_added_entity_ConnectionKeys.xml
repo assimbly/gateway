@@ -13,7 +13,7 @@
     -->
     <changeSet id="20200212092500-1" author="jhipster">
         <createTable tableName="connection_keys">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="jhi_key" type="varchar(255)">

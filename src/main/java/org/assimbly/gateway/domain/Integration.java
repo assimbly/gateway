@@ -15,6 +15,8 @@ import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 
 import org.assimbly.gateway.domain.enumeration.ConnectorType;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 /**
  * A Integration.
@@ -27,7 +29,10 @@ public class Integration implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "sequenceGenerator")
+    @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")})
     private Long id;
 
     @Column(name = "name")
