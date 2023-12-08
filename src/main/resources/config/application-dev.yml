@@ -40,7 +40,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE
     username: gateway
     password:
     hikari:
@@ -49,11 +49,9 @@ spring:
     console:
       enabled: false
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     database: H2
     show-sql: true
     properties:
-      hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false

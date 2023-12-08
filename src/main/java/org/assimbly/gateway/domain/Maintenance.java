@@ -4,6 +4,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -20,7 +22,11 @@ public class Maintenance implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "sequenceGenerator")
+    @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")})
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "start_time")
@@ -34,7 +40,7 @@ public class Maintenance implements Serializable {
 
     @Column(name = "frequency")
     private String frequency;
-    
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -81,7 +87,7 @@ public class Maintenance implements Serializable {
 
     public void setDuration(Instant duration) {
         this.duration = duration;
-    }    
+    }
 
     public String getFrequency() {
         return frequency;
@@ -94,8 +100,8 @@ public class Maintenance implements Serializable {
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
-    } 
-    
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

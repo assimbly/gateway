@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
+
 /**
  * Mapper for the entity {@link User} and its DTO called {@link UserDTO}.
  *
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class UserMapper {
 
     public List<UserDTO> usersToUserDTOs(List<User> users) {
-        return users.stream().filter(Objects::nonNull).map(this::userToUserDTO).collect(Collectors.toList());
+        return users.stream().filter(Objects::nonNull).map(this::userToUserDTO).toList();
     }
 
     public UserDTO userToUserDTO(User user) {
@@ -29,7 +30,7 @@ public class UserMapper {
     }
 
     public List<AdminUserDTO> usersToAdminUserDTOs(List<User> users) {
-        return users.stream().filter(Objects::nonNull).map(this::userToAdminUserDTO).collect(Collectors.toList());
+        return users.stream().filter(Objects::nonNull).map(this::userToAdminUserDTO).toList();
     }
 
     public AdminUserDTO userToAdminUserDTO(User user) {
@@ -37,7 +38,7 @@ public class UserMapper {
     }
 
     public List<User> userDTOsToUsers(List<AdminUserDTO> userDTOs) {
-        return userDTOs.stream().filter(Objects::nonNull).map(this::userDTOToUser).collect(Collectors.toList());
+        return userDTOs.stream().filter(Objects::nonNull).map(this::userDTOToUser).toList();
     }
 
     public User userDTOToUser(AdminUserDTO userDTO) {
@@ -66,13 +67,11 @@ public class UserMapper {
             authorities =
                 authoritiesAsString
                     .stream()
-                    .map(
-                        string -> {
-                            Authority auth = new Authority();
-                            auth.setName(string);
-                            return auth;
-                        }
-                    )
+                    .map(string -> {
+                        Authority auth = new Authority();
+                        auth.setName(string);
+                        return auth;
+                    })
                     .collect(Collectors.toSet());
         }
 

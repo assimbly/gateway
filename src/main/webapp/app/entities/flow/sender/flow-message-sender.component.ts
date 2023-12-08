@@ -404,7 +404,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     getComponentOptions(componentType: String): any {
-        return this.flowService.getComponentOptions(1, componentType).pipe(
+        return this.flowService.getComponentOptions(componentType).pipe(
             map(options => {
                 return options.body;
             })

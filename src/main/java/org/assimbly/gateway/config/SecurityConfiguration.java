@@ -2,6 +2,7 @@ package org.assimbly.gateway.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.assimbly.gateway.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
@@ -9,12 +10,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -35,7 +39,6 @@ public class SecurityConfiguration {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,38 +66,38 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz
-                .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
-                .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
-                .requestMatchers(mvc.pattern("/app/**")).permitAll()
-                .requestMatchers(mvc.pattern("/i18n/**")).permitAll()
-                .requestMatchers(mvc.pattern("/content/**")).permitAll()
-                .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
-                .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
-                .requestMatchers(mvc.pattern("/startup-report")).permitAll()
-                .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
-                .requestMatchers(mvc.pattern("/api/register")).permitAll()
-                .requestMatchers(mvc.pattern("/api/activate")).permitAll()
-                .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
-                .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
-                .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                .requestMatchers(mvc.pattern("/api/**")).authenticated()
-                .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
-                .requestMatchers(mvc.pattern("/management/health")).permitAll()
-                .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
-                .requestMatchers(mvc.pattern("/management/info")).permitAll()
-                .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
-                .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                .requestMatchers(mvc.pattern("/management/jolokia")).permitAll()
-                .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll()
-                .requestMatchers(mvc.pattern("/management/hawtio")).permitAll()
-                .requestMatchers(mvc.pattern("/management/hawtio/**")).permitAll()
-                .requestMatchers(mvc.pattern("/websocket/**")).permitAll()
-                .requestMatchers(mvc.pattern("/ws/**")).permitAll())
-            .httpBasic(withDefaults())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
+                    .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
+                    .requestMatchers(mvc.pattern("/app/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/i18n/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/content/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/register")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/activate")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/**")).authenticated()
+                    .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/health")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/info")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/jhiopenapigroups")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/**")).authenticated()
+                    .requestMatchers(mvc.pattern("/management/jolokia")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exceptions ->
+                exceptions
+                    .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                    .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             http.authorizeHttpRequests(authz -> authz.requestMatchers(antMatcher("/h2-console/**")).permitAll());
+        }
 
         return http.build();
     }

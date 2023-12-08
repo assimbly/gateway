@@ -5,6 +5,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -20,13 +22,17 @@ public class Header implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "sequenceGenerator")
+    @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")})
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "jhi_key")
     private String key;
 
-    @Column(name = "`value`")
+    @Column(name = "\"value\"")
     private String value;
 
     @Column(name = "type")

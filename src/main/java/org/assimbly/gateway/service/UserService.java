@@ -30,11 +30,17 @@ import tech.jhipster.security.RandomUtil;
 @Service
 @Transactional
 public class UserService {
+
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
     private final AuthorityRepository authorityRepository;
+
     private final CacheManager cacheManager;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
@@ -46,6 +52,7 @@ public class UserService {
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
     }
+
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
         return userRepository
@@ -59,6 +66,7 @@ public class UserService {
                 return user;
             });
     }
+
     public Optional<User> completePasswordReset(String newPassword, String key) {
         log.debug("Reset user password for reset key {}", key);
         return userRepository
@@ -72,6 +80,7 @@ public class UserService {
                 return user;
             });
     }
+
     public Optional<User> requestPasswordReset(String mail) {
         return userRepository
             .findOneByEmailIgnoreCase(mail)
@@ -83,6 +92,7 @@ public class UserService {
                 return user;
             });
     }
+
     public User registerUser(AdminUserDTO userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
@@ -124,6 +134,7 @@ public class UserService {
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
+
     private boolean removeNonActivatedUser(User existingUser) {
         if (existingUser.isActivated()) {
             return false;
@@ -133,6 +144,7 @@ public class UserService {
         this.clearUserCaches(existingUser);
         return true;
     }
+
     public User createUser(AdminUserDTO userDTO) {
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
@@ -167,6 +179,7 @@ public class UserService {
         log.debug("Created Information for User: {}", user);
         return user;
     }
+
     /**
      * Update all information for a specific user, and return the modified user.
      *
@@ -205,6 +218,7 @@ public class UserService {
             })
             .map(AdminUserDTO::new);
     }
+
     public void deleteUser(String login) {
         userRepository
             .findOneByLogin(login)
@@ -214,6 +228,7 @@ public class UserService {
                 log.debug("Deleted User: {}", user);
             });
     }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -240,6 +255,7 @@ public class UserService {
                 log.debug("Changed Information for User: {}", user);
             });
     }
+
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils
@@ -256,22 +272,27 @@ public class UserService {
                 log.debug("Changed password for User: {}", user);
             });
     }
+
     @Transactional(readOnly = true)
     public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(AdminUserDTO::new);
     }
+
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllPublicUsers(Pageable pageable) {
         return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
     }
+
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);
     }
+
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
     }
+
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
@@ -287,6 +308,7 @@ public class UserService {
                 this.clearUserCaches(user);
             });
     }
+
     /**
      * Gets a list of all the authorities.
      * @return a list of all the authorities.
@@ -295,6 +317,7 @@ public class UserService {
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
+
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
         if (user.getEmail() != null) {

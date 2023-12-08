@@ -83,7 +83,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/brokers/{id}")
-    public ResponseEntity<Void> deleteBroker(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBroker(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Broker : {}", id);
         brokerService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
@@ -107,7 +107,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}")
-    public ResponseEntity<BrokerDTO> getBroker(@PathVariable Long id) {
+    public ResponseEntity<BrokerDTO> getBroker(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
         return ResponseUtil.wrapOrNotFound(brokerDTO);
@@ -120,7 +120,7 @@ public class BrokerResource {
      * @return the brokerType (artemis or classic) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/type")
-    public String getBrokerType(@PathVariable Long id) {
+    public String getBrokerType(@PathVariable(value = "brokerType") Long id) {
         log.debug("REST request to get status of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
         String brokerType = brokerDTO.get().getType();
@@ -131,24 +131,16 @@ public class BrokerResource {
     @PostConstruct
     private void init() throws Exception {
 
-        System.out.println("Broker startup");
-
         List<BrokerDTO> brokers = brokerService.findAll();
 
         for (BrokerDTO broker : brokers) {
 
-            System.out.println("Broker startup2");
-
-
             if (broker.isAutoStart()) {
-                System.out.println("Broker startup3");
 
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
                 log.debug("Autostart broker: " + brokerType);
-
-                System.out.println("Broker startup4");
 
                 managedBroker.start(brokerType, brokerConfigurationType);
             }
