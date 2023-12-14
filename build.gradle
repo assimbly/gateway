@@ -278,6 +278,9 @@ configurations {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
             force 'org.liquibase:liquibase-core:4.25.0'
+            force 'implementation "org.hibernate.orm:hibernate-core:6.3.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-jcache:6.3.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-envers:6.3.2.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
@@ -333,10 +336,9 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.0.0'
+    implementation 'tech.jhipster:jhipster-framework:8.1.0'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
-    implementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
 
     implementation "com.sun.mail:jakarta.mail:2.0.1"
     implementation "com.sun.activation:jakarta.activation:2.0.1"
@@ -354,7 +356,7 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
@@ -362,12 +364,15 @@ dependencies {
     implementation "com.zaxxer:HikariCP"
     implementation "org.apache.commons:commons-lang3"
     implementation "commons-io:commons-io"
-    implementation "jakarta.transaction:jakarta.transaction-api"
+
+
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    //implementation "jakarta.transaction:jakarta.transaction-api"
     implementation "org.ehcache:ehcache"
-    implementation "org.hibernate.orm:hibernate-core"
-    implementation "org.hibernate.orm:hibernate-jcache"
-    implementation "org.hibernate.orm:hibernate-envers"
-    implementation "org.hibernate.validator:hibernate-validator"
+    implementation "org.hibernate.orm:hibernate-core:${hibernate_version}"
+    implementation "org.hibernate.orm:hibernate-jcache:${hibernate_version}"
+    implementation "org.hibernate.orm:hibernate-envers:${hibernate_version}"
+    implementation "org.hibernate.validator:hibernate-validator:8.0.1.Final"
 
     implementation "org.liquibase:liquibase-core:${liquibase_version}"
     liquibaseRuntime "org.liquibase:liquibase-core:${liquibase_version}"
@@ -390,22 +395,21 @@ dependencies {
     //implementation ("org.springframework.boot:spring-boot-starter-web")
 
     //To use Undertow
-    //implementation ("org.springframework.boot:spring-boot-starter-web") {
-    //    exclude module: "spring-boot-starter-tomcat"
-    //}
-    //implementation "org.springframework.boot:spring-boot-starter-undertow"
-
-    //To Use Jetty
     implementation ("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
-        exclude module: "commons-logging"
     }
-    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.springframework.boot:spring-boot-starter-undertow"
+
+    //To Use Jetty
+    //implementation ("org.springframework.boot:spring-boot-starter-web") {
+    //    exclude module: "spring-boot-starter-tomcat"
+    //    exclude module: "commons-logging"
+    //}
+    //implementation "org.springframework.boot:spring-boot-starter-jetty"
     //https://www.eclipse.org/jetty/documentation/jetty-9/index.html#quickstart-webapp
     //implementation 'org.eclipse.jetty:jetty-quickstart'
 
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.zalando:problem-spring-web:0.29.1"
     implementation "org.springframework:spring-context-support"
     implementation "org.springframework:spring-messaging"
     implementation "org.springframework.security:spring-security-config"
