@@ -436,12 +436,21 @@ dependencies {
     implementation "org.mongodb:mongo-java-driver:3.12.14"
     implementation "dev.morphia.morphia:core:1.6.1"
 
+    //quarkus extension
+    implementation "io.quarkus:quarkus-spring-data-jpa:3.6.3"
+    implementation "io.quarkus:quarkus-spring-di:3.6.3"
+    implementation "io.quarkus:quarkus-spring-web:3.6.3"
+    implementation "io.quarkus:quarkus-resteasy-reactive-jackson:3.6.3"
+    implementation "io.quarkus:quarkus-spring-boot-properties:3.6.3"
+    implementation "io.quarkus:quarkus-spring-cache:3.6.3"
+    implementation "io.quarkus:quarkus-spring-security:3.6.3"
+    implementation "io.quarkus:quarkus-elytron-security-properties-file:3.6.3"
+
     implementation group: "org.assimbly", name: "database-drivers", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
-
     }else if (project.hasProperty("broker")) {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }else{

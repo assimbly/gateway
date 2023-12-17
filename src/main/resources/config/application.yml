@@ -144,7 +144,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
-    lazy-initialization: false
+    lazy-initialization: true
   mvc:
     favicon:
       enabled: true
@@ -153,8 +153,9 @@ spring:
   thymeleaf:
     mode: HTML
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
-
+    exclude:
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
 server:
   servlet:
     session:

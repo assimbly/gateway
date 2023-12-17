@@ -39,7 +39,7 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE
     username: gateway
     password:
     hikari:
