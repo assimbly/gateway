@@ -1,4 +1,4 @@
-package org.assimbly.gateway.config;
+package org.assimbly.gateway.config.database;
 
 import java.time.Duration;
 

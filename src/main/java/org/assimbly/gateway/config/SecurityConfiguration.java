@@ -3,7 +3,6 @@ package org.assimbly.gateway.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.assimbly.gateway.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,8 +61,23 @@ public class SecurityConfiguration {
                             "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
                         )
                     )
-            )
-            .authorizeHttpRequests(authz ->
+            );
+
+        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
+
+            //enable database on dev
+            http.authorizeHttpRequests(authz -> authz.requestMatchers(antMatcher("/h2-console/**")).permitAll());
+
+            //permit all for easier testing
+            http.authorizeHttpRequests(authz ->
+                // prettier-ignore
+                authz
+                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
+                    .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
+                    .requestMatchers(mvc.pattern("/**")).permitAll());
+        }else{
+
+            http.authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
@@ -87,17 +101,16 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/management/jhiopenapigroups")).permitAll()
                     .requestMatchers(mvc.pattern("/management/**")).authenticated()
                     .requestMatchers(mvc.pattern("/management/jolokia")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll());
+        }
+
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exceptions ->
                 exceptions
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
-            http.authorizeHttpRequests(authz -> authz.requestMatchers(antMatcher("/h2-console/**")).permitAll());
-        }
 
         return http.build();
     }
