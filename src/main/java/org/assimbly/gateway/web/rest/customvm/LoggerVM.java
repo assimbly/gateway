@@ -7,6 +7,7 @@ import ch.qos.logback.classic.Logger;
  */
 public class LoggerVM {
 
+
     private String name;
 
     private String level;

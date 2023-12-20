@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import jakarta.annotation.PostConstruct;
 
-import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.repository.FlowRepository;
@@ -166,57 +164,5 @@ public class FlowResource {
         flowService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-
-    @PostConstruct
-    public void init() throws Exception {
-        log.info("Start runtime");
-        initIntegration();
-    }
-
-
-    public CamelContext initIntegration() throws Exception {
-
-        ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
-        ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
-        boolean isDebuggging = gateway.getDebugging();
-        boolean deployOnStart = deployDirectory.getDeployOnStart();
-        boolean deployOnChange = deployDirectory.getDeployOnChange();
-
-        integrationRuntime.setIntegration(encryptionProperties.getProperties());
-
-        integrationRuntime.initIntegration();
-
-        integration = integrationRuntime.getIntegration();
-
-        integration.setDebugging(isDebuggging);
-        //integration.setTracing(isTracing, "default");
-        integration.setDeployDirectory(deployOnStart,deployOnChange);
-
-        return integration.getContext();
-    }
-
-    //start flows with autostart
-    /*
-    public void startFlows(){
-
-        List<Flow> flows = flowRepository.findAll();
-
-        try {
-            for (Flow flow : flows) {
-                if (flow.isAutoStart()) {
-                    String configuration;
-                    log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
-                    configuration = confExport.convertDBToFlowConfiguration(flow.getId(), "xml/application", true);
-
-                    integration.setFlowConfiguration(flow.getId().toString(), "application/xml", configuration);
-                    integration.startFlow(flow.getId().toString());
-                }
-            }
-        } catch (Exception e) {
-            log.error("Autostart of flow failed (check configuration)");
-            e.printStackTrace();
-        }
-
-    }*/
 
 }

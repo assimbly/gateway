@@ -99,7 +99,10 @@ configurations.all {
     exclude group: 'org.mongodb', module: 'bson'
 }
 
-if (project.hasProperty("prod") || project.hasProperty("gae")) {
+if (project.hasProperty("headless")) {
+    apply from: "gradle/profile_headless.gradle"
+}
+else if (project.hasProperty("prod") || project.hasProperty("gae")) {
     apply from: "gradle/profile_prod.gradle"
 } else {
     apply from: "gradle/profile_dev.gradle"
@@ -536,6 +539,8 @@ if (project.hasProperty("integration")){
     sourceSets {
         main {
             java {
+                exclude 'org/assimbly/gateway/config/memory/**'
+                exclude 'org/assimbly/gateway/web/rest/headless/**'
                 exclude 'org/assimbly/gateway/web/rest/broker/**'
             }
         }
@@ -544,8 +549,11 @@ if (project.hasProperty("integration")){
     sourceSets {
         main {
             java {
-                exclude 'org/assimbly/gateway/web/rest/integration/**'
+                exclude 'org/assimbly/gateway/camel/**'
                 exclude 'org/assimbly/gateway/config/importing/Import.java'
+                exclude 'org/assimbly/gateway/config/memory/**'
+                exclude 'org/assimbly/gateway/web/rest/headless/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
                 exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
             }
@@ -555,14 +563,36 @@ if (project.hasProperty("integration")){
     sourceSets {
         main {
             java {
+
+
                 exclude 'org/assimbly/gateway/web/rest/broker/**'
-                exclude 'org/assimbly/gateway/web/rest/gateway/AuditResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/CertificateResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/LogsResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/ManageCertificateResource.java'
-                exclude 'org/assimbly/gateway/web/rest/gateway/ProfileInfoResource.java'
+                exclude 'org/assimbly/gateway/web/rest/gateway/**'
+                exclude 'org/assimbly/gateway/web/rest/integration/**'
+
+                exclude 'org/assimbly/gateway/config/database/**'
+
+                exclude 'org/assimbly/gateway/config/audit/*'
+                exclude 'org/assimbly/gateway/config/exporting/*'
+                exclude 'org/assimbly/gateway/config/importing/*'
+                exclude 'org/assimbly/gateway/config/scheduling/*'
+
+                exclude 'org/assimbly/gateway/domain/*'
+                exclude 'org/assimbly/gateway/repository/*'
+                exclude 'org/assimbly/gateway/service/*'
+
+                exclude 'org/assimbly/gateway/security/DomainUserDetailsService.java'
+                exclude 'org/assimbly/gateway/web/rest/vm/ManagedUserVM.java'
+                exclude 'org/assimbly/gateway/web/rest/errors/ExceptionTranslator.java'
+
+            }
+        }
+    }
+}else {
+    sourceSets {
+        main {
+            java {
+                exclude 'org/assimbly/gateway/config/memory/**'
+                exclude 'org/assimbly/gateway/web/rest/headless/**'
             }
         }
     }
