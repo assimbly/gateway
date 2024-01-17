@@ -634,13 +634,11 @@ wrapper {
     gradleVersion = "8.4"
 }
 
-/*
 java {
   toolchain {
      languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
-*/
 
 if (project.hasProperty("nodeInstall")) {
     node {
