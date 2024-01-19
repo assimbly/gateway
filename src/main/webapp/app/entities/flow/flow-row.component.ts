@@ -162,6 +162,7 @@ export class FlowRowComponent implements OnInit {
         this.isFlowPaused = this.isFlowStopped = this.isFlowRestarted = false;
         this.isFlowStarted = this.isFlowResumed = true;
         this.flowStatusButton = `Started`;
+        this.getFlowAlertsPoll();
 
         break;
       case 'suspended':
@@ -194,10 +195,19 @@ export class FlowRowComponent implements OnInit {
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
         this.flowStatusButton = `Stopped`;
         break;
-      default:
+      case 'error':
+      case 'failed':
         const lastStatus = this.flowStatus;
         this.statusFlow = Status.inactiveError;
+        this.isFlowStarted = this.isFlowPaused = false;
         this.setErrorMessage(lastStatus,this.statusMessage);
+        break;
+      default:
+        const unknownStatus = this.flowStatus;
+        this.statusFlow = Status.inactive;
+        this.isFlowStarted = this.isFlowPaused = false;
+        this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
+        this.setErrorMessage(unknownStatus,this.statusMessage);
         break;
     }
   }
@@ -214,9 +224,6 @@ export class FlowRowComponent implements OnInit {
                   this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
                                            <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
                                            <b>Details:</b> <br/>`;
-
-                  console.log('this.flowStatusButton=' + this.flowStatusButton);
-
 
                   for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
 
@@ -272,7 +279,20 @@ export class FlowRowComponent implements OnInit {
 
   }
 
+  async getFlowAlertsPoll() {
+
+    this.getFlowNumberOfAlerts(this.flow.id);
+
+    if(this.isFlowStarted) {
+      setTimeout(() => {
+        this.getFlowAlertsPoll();
+      }, 10000);
+    }
+
+  }
+
   getFlowAlerts(id: number) {
+
     this.clickButton = true;
     this.flowService.getFlowAlerts(id).subscribe(response => {
       this.setFlowAlerts(response.body);
@@ -280,19 +300,21 @@ export class FlowRowComponent implements OnInit {
   }
 
   setFlowAlerts(flowAlertsItems: string): void {
-    if (flowAlertsItems !== null) {
+
+    if (flowAlertsItems !== null && flowAlertsItems!== '0') {
+
+	    const flowAlertsList = flowAlertsItems.split(',');
+      const flowAlertLength = flowAlertsList.length;
+
       let alertStartItem;
       let alertEndItem;
 
-	  const flowAlertsList = flowAlertsItems.split(',');
       if (flowAlertsList.length < 4) {
-        this.showNumberOfItems = flowAlertsList.length;
-        alertStartItem = flowAlertsList.length - 1;
+        alertStartItem = flowAlertLength - 1;
         alertEndItem = 0;
       } else {
-        this.showNumberOfItems = 3;
-        alertStartItem = flowAlertsList.length - 1;
-        alertEndItem = flowAlertsList.length - 3;
+        alertStartItem = flowAlertLength - 1;
+        alertEndItem = flowAlertLength - 3;
       }
 
       let i;
@@ -302,8 +324,7 @@ export class FlowRowComponent implements OnInit {
       }
 
       this.flowAlertsButton = `<div class="list-group">` + alertItems + `</div>`;
-    } else {
-      this.flowAlertsButton = `Can't retrieve alert details`;
+
     }
   }
 
@@ -311,30 +332,35 @@ export class FlowRowComponent implements OnInit {
     this.clickButton = true;
 
     this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
-      this.setFlowNumberOfAlerts(response.body);
+      this.setFlowNumberOfAlertsString(response.body);
     });
   }
 
-  setFlowNumberOfAlerts(numberOfAlerts: string): void {
-    let numberOfAlerts2 = parseInt(numberOfAlerts, 10);
-    if (numberOfAlerts2 === 0) {
+  setFlowNumberOfAlertsString(numberOfAlertsString: string): void {
+    let numberOfAlerts = parseInt(numberOfAlertsString, 10);
+    this.setFlowNumberOfAlerts(numberOfAlerts);
+  }
+
+  setFlowNumberOfAlerts(numberOfAlerts: number): void {
+
+    if (numberOfAlerts == 0) {
       this.flowAlerts = `false`;
       this.numberOfAlerts = `0`;
       this.showNumberOfItems = 3;
     } else {
       this.flowAlerts = `true`;
       this.numberOfAlerts = numberOfAlerts;
-      if (numberOfAlerts2 < 4) {
-        this.showNumberOfItems = numberOfAlerts.length;
+      if (numberOfAlerts < 4) {
+        this.showNumberOfItems = numberOfAlerts;
       } else {
         this.showNumberOfItems = 3;
       }
     }
+
   }
 
   navigateToFlowEditor(mode: string) {
 
-    console.log('type=' + this.flow.type);
     if(!this.flow.type){
       this.flow.type = 'flow';
     }
