@@ -79,12 +79,6 @@ public class Flow implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Step> steps = new HashSet<>();
 
-    /*
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private Maintenance maintenance;
-    */
-
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

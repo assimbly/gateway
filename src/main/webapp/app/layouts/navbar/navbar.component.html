@@ -223,13 +223,6 @@
               <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
             </a>
           </li>
-          <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
-            <a class="dropdown-item" routerLink="maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
-  			  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-              <span>Maintenance</span>
-            </a>
-          </li>
-
           <li>
             <a class="dropdown-item" routerLink="admin/logs" routerLinkActive="active" (click)="collapseNavbar()">
               <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
