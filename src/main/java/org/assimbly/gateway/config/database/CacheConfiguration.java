@@ -66,13 +66,7 @@ public class CacheConfiguration {
             createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".steps");
             createCache(cm, Link.class.getName());
             createCache(cm, Step.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Maintenance.class.getName() + ".flows");
-            createCache(cm, org.assimbly.gateway.domain.Flow.class.getName() + ".maintenances");
             createCache(cm, org.assimbly.gateway.domain.Certificate.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Group.class.getName());
-            createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".gateways");
-            createCache(cm, org.assimbly.gateway.domain.Group.class.getName() + ".users");
             createCache(cm, org.assimbly.gateway.domain.Broker.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Route.class.getName());
             createCache(cm, org.assimbly.gateway.domain.Queue.class.getName());

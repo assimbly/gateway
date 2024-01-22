@@ -158,13 +158,6 @@ export class FlowService {
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
-  setMaintenance(time: number, flowsIds: Array<number>): Observable<HttpResponse<any>> {
-    return this.http.post(`${this.integrationUrl}/flow/maintenance/${time}`, flowsIds, {
-      observe: 'response',
-      responseType: 'text',
-    });
-  }
-
   testConnection(integrationid: number, host: string, port: number, timeout: number): Observable<HttpResponse<any>> {
     return this.http.get(`${this.validationUrl}/connection/${host}/${port}/${timeout}`, {
       observe: 'response',

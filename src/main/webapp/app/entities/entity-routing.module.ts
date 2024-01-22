@@ -8,10 +8,8 @@ import { LinkModule } from './link/link.module';
 import { EnvironmentVariablesModule } from './environment-variables/environment-variables.module';
 import { FlowModule } from './flow/flow.module';
 import { IntegrationModule } from './integration/integration.module';
-import { GroupModule } from './group/group.module';
 import { MessageModule } from './message/message.module';
 import { HeaderModule } from './header/header.module';
-import { MaintenanceModule } from './maintenance/maintenance.module';
 import { QueueModule } from './queue/queue.module';
 import { RouteModule } from './route/route.module';
 import { ConnectionModule } from './connection/connection.module';
@@ -31,10 +29,8 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
 		    EnvironmentVariablesModule,
 		    FlowModule,
 		    IntegrationModule,
-        GroupModule,
         MessageModule,
         HeaderModule,
-        MaintenanceModule,
 		    QueueModule,
         RouteModule,
         ConnectionModule,
@@ -50,10 +46,8 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
     		EnvironmentVariablesModule,
 		    FlowModule,
 	      IntegrationModule,
-        GroupModule,
         MessageModule,
         HeaderModule,
-        MaintenanceModule,
 	      QueueModule,
         RouteModule,
         ConnectionModule,
