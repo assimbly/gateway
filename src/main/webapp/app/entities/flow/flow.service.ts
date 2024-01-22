@@ -184,7 +184,7 @@ export class FlowService {
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });
-    return this.http.post(`${this.integrationUrl}/${integrationId}/send/${numberOfTimes}`, messageBody, {
+    return this.http.post(`${this.integrationUrl}/send/${numberOfTimes}`, messageBody, {
       headers: options,
       observe: 'response',
       responseType: 'text',
@@ -209,7 +209,7 @@ export class FlowService {
       'Content-Type': 'text/plain',
       Accept: 'text/plain',
     });
-    return this.http.post(`${this.integrationUrl}/${integrationId}/sendrequest`, messageBody, {
+    return this.http.post(`${this.integrationUrl}/sendrequest`, messageBody, {
       headers: options,
       observe: 'response',
       responseType: 'text',
