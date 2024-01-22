@@ -47,7 +47,9 @@ export class UserManagementUpdateComponent implements OnInit {
         this.updateForm(user);
       }
     });
+
     this.userService.authorities().subscribe(authorities => (this.authorities = authorities));
+
   }
 
   previousState(): void {
