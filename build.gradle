@@ -53,7 +53,7 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.5.0'
-    id "com.github.ben-manes.versions" version "0.50.0"
+    id "com.github.ben-manes.versions" version "0.50.1"
     // id 'org.graalvm.buildtools.native' version '0.9.28'
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
@@ -282,9 +282,9 @@ configurations {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
             force 'org.liquibase:liquibase-core:4.25.1'
-            force 'implementation "org.hibernate.orm:hibernate-core:6.4.1.Final'
-            force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.1.Final'
-            force 'implementation "org.hibernate.orm:hibernate-envers:6.4.1.Final'
+            force 'implementation "org.hibernate.orm:hibernate-core:6.4.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-envers:6.4.2.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
