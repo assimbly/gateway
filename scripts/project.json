@@ -39,7 +39,7 @@
 	{
       "type": "dir",
       "path": "build",
-      "action": "delete"
+      "action": "ignore"
     },
 	{
       "type": "dir",

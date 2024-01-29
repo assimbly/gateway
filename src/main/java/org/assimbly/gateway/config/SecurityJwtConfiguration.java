@@ -5,9 +5,9 @@ import static org.assimbly.gateway.security.SecurityUtils.JWT_ALGORITHM;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
+import org.assimbly.gateway.management.SecurityMetersService;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.assimbly.gateway.management.SecurityMetersService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +17,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
-import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 
 @Configuration
 public class SecurityJwtConfiguration {
@@ -61,13 +59,6 @@ public class SecurityJwtConfiguration {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
-    }
-
-    @Bean
-    public BearerTokenResolver bearerTokenResolver() {
-        var bearerTokenResolver = new DefaultBearerTokenResolver();
-        bearerTokenResolver.setAllowUriQueryParameter(true);
-        return bearerTokenResolver;
     }
 
     private SecretKey getSecretKey() {

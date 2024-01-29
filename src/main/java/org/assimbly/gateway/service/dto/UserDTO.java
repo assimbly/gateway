@@ -3,7 +3,6 @@ package org.assimbly.gateway.service.dto;
 import org.assimbly.gateway.domain.User;
 import java.io.Serializable;
 
-
 /**
  * A DTO representing a user, with only the public attributes.
  */
