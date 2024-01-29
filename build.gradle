@@ -386,7 +386,7 @@ dependencies {
     implementation "javax.cache:cache-api"
     implementation "org.hibernate:hibernate-core"
     implementation "com.zaxxer:HikariCP"
-    implementation "org.apache.commons:commons-lang3:3.13.0"
+    implementation "org.apache.commons:commons-lang3:3.14.0"
     implementation "commons-io:commons-io"
     implementation "javax.transaction:javax.transaction-api"
     implementation "org.ehcache:ehcache"
