@@ -12,22 +12,28 @@ const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
 const custom = require('./custom');
 
+
 module.exports = async (config, options, targetOptions) => {
   const languagesHash = await hashElement(path.resolve(__dirname, '../src/main/webapp/i18n'), {
     algo: 'md5',
     encoding: 'hex',
     files: { include: ['*.json'] },
   });
+
   // PLUGINS
   if (config.mode === 'development') {
     config.plugins.push(
       new ESLintPlugin({
-        extensions: ['js', 'ts'],
+        baseConfig: {
+          parserOptions: {
+            project: ['../tsconfig.app.json'],
+          },
+        },
       }),
       new WebpackNotifierPlugin({
-        title: 'Gateway',
+        title: 'Jhipster Sample Application',
         contentImage: path.join(__dirname, 'logo-jhipster.png'),
-      })
+      }),
     );
   }
 
@@ -45,7 +51,7 @@ module.exports = async (config, options, targetOptions) => {
           port: 9000,
           https: tls,
           proxy: {
-            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '4200' : '8080'}`,
+            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '9060' : '8080'}`,
             ws: true,
             proxyOptions: {
               changeOrigin: false, //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
@@ -67,8 +73,8 @@ module.exports = async (config, options, targetOptions) => {
         },
         {
           reload: targetOptions.target === 'build', // enabled for build --watch
-        }
-      )
+        },
+      ),
     );
   }
 
@@ -77,8 +83,8 @@ module.exports = async (config, options, targetOptions) => {
       new BundleAnalyzerPlugin({
         analyzerMode: 'static',
         openAnalyzer: false,
-        // Webpack statistics in target folder
-        reportFilename: '../stats.html',
+        // Webpack statistics in temporary folder
+        reportFilename: '../../stats.html',
       }),
     );
   }
@@ -98,9 +104,11 @@ module.exports = async (config, options, targetOptions) => {
     { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
     // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array
   ];
+
   if (patterns.length > 0) {
     config.plugins.push(new CopyWebpackPlugin({ patterns }));
   }
+
   config.plugins.push(
     new webpack.DefinePlugin({
       I18N_HASH: JSON.stringify(languagesHash.hash),
@@ -112,7 +120,6 @@ module.exports = async (config, options, targetOptions) => {
       // If you use an API server, in `prod` mode, you will need to enable CORS
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
       SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
-      __TYPE__: JSON.stringify(custom.__TYPE__),
     }),
     new MergeJsonWebpackPlugin({
       output: {
@@ -123,9 +130,11 @@ module.exports = async (config, options, targetOptions) => {
       },
     }),
   );
+
   config = merge(
     config,
     // jhipster-needle-add-webpack-config - JHipster will add custom config
   );
+
   return config;
 };

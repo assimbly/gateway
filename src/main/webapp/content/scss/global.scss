@@ -1,0 +1,792 @@
+@import 'bootstrap-variables';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+
+/* ==============================================================
+Bootstrap tweaks
+===============================================================*/
+
+body,
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 300;
+}
+
+/* Increase contrast of links to get 100% on Lighthouse Accessibility Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
+a {
+  color: #533f03;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #533f03;
+}
+
+/* override hover color for dropdown-item forced by bootstrap to all a:not([href]):not([tabindex]) elements in _reboot.scss */
+a:not([href]):not([tabindex]):hover.dropdown-item {
+  color: $dropdown-link-hover-color;
+}
+
+/* override .dropdown-item.active background-color on hover */
+.dropdown-item.active:hover {
+  background-color: mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
+}
+
+a:hover {
+  /* make sure browsers use the pointer cursor for anchors, even with no href */
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  color: $dropdown-link-hover-color;
+}
+
+/* ==========================================================================
+Browser Upgrade Prompt
+========================================================================== */
+.browserupgrade {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+/* ==========================================================================
+Generic styles
+========================================================================== */
+
+/* Error highlight on input fields */
+.ng-valid[required],
+.ng-valid.required {
+  border-left: 5px solid green;
+}
+
+.ng-invalid:not(form) {
+  border-left: 5px solid red;
+}
+
+/* other generic styles */
+
+.jh-card {
+  padding: 1.5%;
+  margin-top: 20px;
+  border: none;
+}
+
+.error {
+  color: white;
+  background-color: red;
+}
+
+.pad {
+  padding: 10px;
+}
+
+.w-40 {
+  width: 40% !important;
+}
+
+.w-60 {
+  width: 60% !important;
+}
+
+.break {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.form-control {
+  background-color: #fff;
+}
+
+.readonly {
+  background-color: #eee;
+  opacity: 1;
+}
+
+.footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.hand,
+[jhisortby] {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+Custom alerts for notification
+========================================================================== */
+.alerts {
+  .alert {
+    text-overflow: ellipsis;
+    pre {
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      padding: 0;
+      margin: 0;
+    }
+    .popover pre {
+      font-size: 10px;
+    }
+  }
+  .jhi-toast {
+    position: fixed;
+    width: 100%;
+    &.left {
+      left: 5px;
+    }
+    &.right {
+      right: 5px;
+    }
+    &.top {
+      top: 55px;
+    }
+    &.bottom {
+      bottom: 55px;
+    }
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .alerts .jhi-toast {
+    width: 50%;
+  }
+}
+
+/* ==========================================================================
+entity list page css
+========================================================================== */
+
+.table-entities thead th .d-flex > * {
+  margin: auto 0;
+}
+
+/* ==========================================================================
+entity detail page css
+========================================================================== */
+.row-md.jh-entity-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  line-height: 1.5;
+}
+
+@media screen and (min-width: 768px) {
+  .row-md.jh-entity-details > {
+    dt {
+      float: left;
+      overflow: hidden;
+      clear: left;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0.5em 0;
+    }
+    dd {
+      border-bottom: 1px solid #eee;
+      padding: 0.5em 0;
+      margin-left: 0;
+    }
+  }
+}
+
+/* ==========================================================================
+ui bootstrap tweaks
+========================================================================== */
+.nav,
+.pagination,
+.carousel,
+.panel-title a {
+  cursor: pointer;
+}
+
+.thread-dump-modal-lock {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-menu {
+  padding-left: 0px;
+}
+
+/* ==========================================================================
+angular-cli removes postcss-rtl processed inline css, processed rules must be added here instead
+========================================================================== */
+/* page-ribbon.component.scss */
+.ribbon {
+  left: -3.5em;
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+/* navbar.component.scss */
+.navbar {
+  ul.navbar-nav {
+    .nav-item {
+      margin-left: 0.5em;
+    }
+  }
+}
+/* jhipster-needle-scss-add-main JHipster will add new css style */
+
+/* ========================================================================== custom assimbly css ========================================================================== */
+
+@import '~@ng-select/ng-select/scss/default.theme';
+@import '~codemirror/lib/codemirror';
+
+#fromTab.active,
+#toTab.active,
+#toTab0.active,
+#toTab1.active,
+#toTab2.active,
+#errorTab.active {
+  background-color: crimson;
+  border-color: white;
+  color: white;
+}
+
+#fromTab,
+#toTab,
+#toTab0,
+#toTab1,
+#toTab2,
+#errorTab {
+  background-color: grey;
+  border-color: white;
+  color: white;
+}
+
+#tabBackground {
+  background-color: whitesmoke;
+  border-color: black;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-bottom: 3px solid whitesmoke;
+}
+
+.detailsTable {
+  width: 50%;
+}
+
+.lastItemBorder {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.btn {
+  &.disabled,
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.input-group-append button.btn,
+.left-border-radius-0 {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.right-border-radius-0 {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.assimbly-link {
+  align: right;
+  float: end;
+}
+
+.assimbly-integration-img img {
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 60px;
+  height: 50px;
+}
+
+.activemq-link {
+  align: right;
+  float: end;
+}
+
+.activemq-broker-img {
+  background-image: url('../images/activemq.png');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 60px;
+  height: 50px;
+}
+
+.activemq-link img {
+  width: 50px;
+  height: 50px;
+  vertical-align: text-bottom;
+}
+
+
+.camel-img {
+  background-image: url('../images/apache-camel.png');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 60px;
+  height: 50px;
+}
+
+.camel-link img {
+  width: 50px;
+  height: 50px;
+  vertical-align: text-bottom;
+}
+
+.input-group {
+  ng-select {
+    flex: 1 1 auto;
+  }
+
+  .ng-select-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 38px;
+}
+
+ng-dropdown-panel > div {
+  position: relative;
+  z-index: 100;
+}
+
+/* comment the popover as it interferes with ngb popover */
+
+/*
+.popover {
+  min-width: 200px;
+  max-width: 60%;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  background-color: #fff;
+  margin-top: 200px;
+}
+*/
+
+/*
+.popover-body {
+    overflow-y: auto;
+    white-space:pre-wrap;
+}
+*/
+
+@media (min-width: 768px) {
+  .flow-btns .btn {
+    width: 80px;
+  }
+}
+
+.bg-gray {
+  background-color: #dee2e6;
+}
+
+.h-20 {
+  height: 20px;
+}
+
+.padding-button {
+  padding-left: 11px;
+  padding-right: 10px;
+}
+
+.p-button-camel {
+  padding: 5px 7px !important;
+}
+
+.p-question-button {
+  padding-left: 25px;
+  padding-right: 28px;
+}
+
+.flow-camel-button img {
+  margin-top: 5px;
+  width: 80%;
+}
+
+.flow-assimbly-button img {
+  width: 60%;
+}
+
+.flow-new-button {
+  background-image: url('../images/new_page.png');
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: center center;
+}
+
+.assimbly {
+  display: inline-block;
+  width: 347px;
+  height: 497px;
+  background: url('../images/assimbly.png') no-repeat center top;
+  background-size: contain;
+}
+
+/* wait autoprefixer update to allow simple generation of high pixel density media query */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+  only screen and (min--moz-device-pixel-ratio: 2),
+  only screen and (-o-min-device-pixel-ratio: 2 / 1),
+  only screen and (min-device-pixel-ratio: 2),
+  only screen and (min-resolution: 192dpi),
+  only screen and (min-resolution: 2dppx) {
+  .assimbly {
+    background: url('../images/assimbly.png') no-repeat center top;
+    background-size: contain;
+  }
+}
+
+
+.border-bottom-none {
+  border-bottom: none !important;
+}
+
+.nounderline {
+  text-decoration: none !important;
+}
+
+.highlight {
+  background-color: #0275d8 !important;
+  color: white;
+}
+
+.btn-primary {
+  color: white !important;
+}
+
+.btn-info {
+  color: white !important;
+}
+
+
+.btn-transparent {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: default;
+  overflow: hidden;
+  outline: none;
+}
+
+.btn-arrow-right,
+.btn-arrow-left {
+  position: relative;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.btn-arrow-right {
+  padding-left: 36px;
+}
+
+.btn-arrow-left {
+  padding-right: 36px;
+}
+
+.btn-arrow-right {
+  &:before,
+  &:after {
+    /* make two squares (before and after), looking similar to the button */
+    content: '';
+    position: absolute;
+    top: 3.5px;
+
+    /* move it down because of rounded corners */
+    width: 22px;
+
+    /* same as height */
+    height: 22px;
+
+    /* button_outer_height / sqrt(2) */
+    background: inherit;
+
+    /* use parent background */
+    border: inherit;
+
+    /* use parent border */
+    border-left-color: transparent;
+
+    /* hide left border */
+    border-bottom-color: transparent;
+
+    /* hide bottom border */
+    border-radius: 0px 4px 0px 0px;
+
+    /* round arrow corner, the shorthand property doesn't accept "inherit" so it is set to 4px */
+    -webkit-border-radius: 0px 4px 0px 0px;
+    -moz-border-radius: 0px 4px 0px 0px;
+  }
+}
+
+.btn-arrow-left {
+  &:before,
+  &:after {
+    /* make two squares (before and after), looking similar to the button */
+    content: '';
+    position: absolute;
+    top: 3.5px;
+
+    /* move it down because of rounded corners */
+    width: 22px;
+
+    /* same as height */
+    height: 22px;
+
+    /* button_outer_height / sqrt(2) */
+    background: inherit;
+
+    /* use parent background */
+    border: inherit;
+
+    /* use parent border */
+    border-left-color: transparent;
+
+    /* hide left border */
+    border-bottom-color: transparent;
+
+    /* hide bottom border */
+    border-radius: 0px 4px 0px 0px;
+
+    /* round arrow corner, the shorthand property doesn't accept "inherit" so it is set to 4px */
+    -webkit-border-radius: 0px 4px 0px 0px;
+    -moz-border-radius: 0px 4px 0px 0px;
+  }
+}
+
+.btn-arrow-right {
+  &:before,
+  &:after {
+    transform: rotate(45deg);
+
+    /* rotate right arrow squares 45 deg to point right */
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+  }
+}
+
+.btn-arrow-left {
+  &:before,
+  &:after {
+    transform: rotate(225deg);
+
+    /* rotate left arrow squares 225 deg to point left */
+    -webkit-transform: rotate(225deg);
+    -moz-transform: rotate(225deg);
+    -o-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
+  }
+}
+
+.btn-arrow-right:before,
+.btn-arrow-left:before {
+  /* align the "before" square to the left */
+  left: -10px;
+}
+
+.btn-arrow-right:after,
+.btn-arrow-left:after {
+  /* align the "after" square to the right */
+  right: -10px;
+}
+
+.btn-arrow-right:after,
+.btn-arrow-left:before {
+  /* bring arrow pointers to front */
+  z-index: 1;
+}
+
+.btn-arrow-right:before,
+.btn-arrow-left:after {
+  /* hide arrow tails background */
+  background-color: transparent;
+}
+
+.increase-popover-width {
+  width: 1000px;
+  max-width: 1200px;
+}
+
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.option-tooltip .tooltip-inner {
+  max-width: 400px;
+  width: 400px;
+  text-align: left;
+  position: relative;
+  z-index: 1000 !important;
+}
+
+//Set half collumn size
+.extra-col {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.col-0-5 {
+  @extend .extra-col;
+  flex: 0 0 4.16666667%;
+  max-width: 4.16666667%;
+}
+
+.col-1-5 {
+  @extend .extra-col;
+  flex: 0 0 12.5%;
+  max-width: 12.5%;
+}
+
+.col-2-5 {
+  @extend .extra-col;
+  flex: 0 0 20.833333325%;
+  max-width: 20.833333325%;
+}
+
+.col-3-5 {
+  @extend .extra-col;
+  flex: 0 0 29.166666655%;
+  max-width: 29.166666655%;
+}
+
+.col-4-5 {
+  @extend .extra-col;
+  flex: 0 0 37.499999985%;
+  max-width: 37.499999985%;
+}
+
+.col-5-5 {
+  @extend .extra-col;
+  flex: 0 0 45.833333315%;
+  max-width: 45.833333315%;
+}
+
+.col-6-5 {
+  @extend .extra-col;
+  flex: 0 0 54.166666645%;
+  max-width: 54.166666645%;
+}
+
+.col-7-5 {
+  @extend .extra-col;
+  flex: 0 0 62.499999975%;
+  max-width: 62.499999975%;
+}
+
+.col-8-5 {
+  @extend .extra-col;
+  flex: 0 0 70.833333305%;
+  max-width: 70.833333305%;
+}
+
+.col-9-5 {
+  @extend .extra-col;
+  flex: 0 0 79.166666635%;
+  max-width: 79.166666635%;
+}
+
+.col-10-5 {
+  @extend .extra-col;
+  flex: 0 0 87.499999965%;
+  max-width: 87.499999965%;
+}
+
+.col-11-5 {
+  @extend .extra-col;
+  flex: 0 0 95.8333333%;
+  max-width: 95.8333333%;
+}
+
+.editor-container {
+  height: 300px;
+  margin: 20px;
+}
+
+.fullscreen-modal {
+  padding: 0 !important; // override inline padding-right added from js
+}
+
+.fullscreen-modal .modal-dialog {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+}
+
+.fullscreen-modal .modal-content {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.fullscreen-modal .modal-body {
+  overflow-y: auto;
+}
+
+.fullscreen-modal .modal-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.flex-wrapper {
+    display: flex;
+    margin-top: 10px;
+    min-height: 95vh;
+    flex-direction: column;
+    justify-content: space-between;
+    display: table;
+}
+
+.jh-card {
+    background-color: white;
+    min-height: calc(100vh - 118px);
+    height: 100%;
+}
+
+.editor-nav {
+    background-color: #E0E0E0;
+    min-height: 70rem;
+    width: 54rem;
+}
+
+.CodeMirror {
+ border: 1px solid #eee;
+ height: 500px;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror {
+ border: 1px solid #eee;
+ height: auto;
+ width: 100%;
+}
+
+#messageBrowserEditor
+.CodeMirror-scroll {
+    height: auto;
+    max-height:300px;
+}
