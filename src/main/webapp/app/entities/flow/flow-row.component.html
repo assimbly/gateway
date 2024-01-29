@@ -1,0 +1,207 @@
+<ng-template #detailsTemplate let-message="message">
+	<div [innerHtml]="flowDetails"></div>
+</ng-template>
+<ng-template #statsTemplate let-message="message">
+	<div class="container-fluid">
+	  <div class="row" [innerHtml]="flowStatistic"></div>
+	</div>
+</ng-template>
+
+
+<td id="flowRowID" [hidden]="!flowRowID">
+  <a [routerLink]="['../flow', flow.id]">{{ flow.id }}</a>
+</td>
+
+<td>
+    <i
+      aria-hidden="true"
+      (mouseenter)="getFlowDetails()"
+      data-container="body"
+      container="body"
+      placement="right"
+      triggers="mouseenter:mouseleave"
+      popoverTitle="Details"
+      popover-class="increase-popover-width"
+      [popover]="detailsTemplate"
+    ><fa-icon icon="info"></fa-icon></i>
+    <i
+      style="padding-left: 1em"
+      data-container="body"
+      container="body"
+      (mouseenter)="getFlowStats(flow)"
+      (mouseleave)="stopGetFlowStats()"
+      [hidden]="!isFlowStatusOK"
+      triggers="mouseenter:mouseleave"
+      placement="right"
+      popoverTitle="Stats"
+      [popover]="statsTemplate"
+      class="stats"
+    >
+      <fa-icon icon="chart-bar"></fa-icon>
+    </i>
+    <i
+      [hidden]="isFlowStatusOK"
+      style="padding-left: 1em"
+      data-container="body"
+      container="body"
+      triggers="mouseenter:mouseleave"
+      popoverTitle="Stats"
+      [popover]="statsTemplate"
+      class="stats statsEnable"
+      >
+      <fa-icon icon="chart-bar"></fa-icon>
+    </i>
+    <a style="padding-left: 1em"
+       (click)="navigateToFlowEditor('edit')"
+       aria-hidden="true"
+       placement="right"
+       title="Edit flow">
+      <fa-icon icon="edit"></fa-icon>
+    </a>
+    <a style="padding-left: 1em" (click)="navigateToFlowEditor('clone')" placement="right" title="Clone flow">
+      <fa-icon icon="clone"></fa-icon>
+    </a>
+    <a style="padding-left: 1em" (click)="exportFlow()" placement="right" title="Export flow">
+      <fa-icon icon="file-export"></fa-icon>
+    </a>
+    <a style="padding-left: 1em" (click)="navigateToFlowEditor('delete')" placement="right" title="Delete flow">
+      <fa-icon icon="trash"></fa-icon>
+    </a>
+    <div class="btn-group" role="group" style="margin-left: 1em;">
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+		  style="color: white;"
+          type="button"
+          (click)="start()"
+          class="btn btn-sm"
+          [disabled]="disableActionBtns"
+          *ngIf="!isFlowStarted"
+        >
+		 <fa-icon icon="play"></fa-icon>
+        </button>
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+ 		  style="color: white;"
+          type="button"
+          (click)="restart()"
+          class="btn btn-sm"
+          [disabled]="disableActionBtns"
+          *ngIf="!isFlowRestarted"
+        >
+          <fa-icon icon="sync"></fa-icon>
+        </button>
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+  		  style="color: white;"
+          type="button"
+          (click)="pause()"
+          class="btn btn-sm"
+          [disabled]="(!isFlowPaused && isFlowStopped) || disableActionBtns"
+          *ngIf="!isFlowPaused"
+        >
+          <fa-icon icon="pause"></fa-icon>
+        </button>
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+  		  style="color: white;"
+          type="button"
+          (click)="resume()"
+          class="btn btn-sm"
+          [disabled]="disableActionBtns"
+          *ngIf="!isFlowResumed"
+        >
+          <fa-icon icon="step-forward"></fa-icon>
+        </button>
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+  		  style="color: white;"
+          type="button"
+          (click)="stop()"
+          class="btn btn-sm"
+          [disabled]="isFlowStopped || disableActionBtns"
+        >
+          <fa-icon icon="stop"></fa-icon>
+        </button>
+        <button
+          [ngClass]="{
+            'btn-primary': statusFlow === 'inactive',
+            'btn-success': statusFlow === 'active',
+            'btn-secondary': statusFlow === 'paused',
+            'btn-danger': statusFlow === 'inactiveError'
+          }"
+  		  style="min-width: 20em; color: white;"
+          type="button"
+          class="btn btn-sm btn-block btn-arrow-right text-left"
+          container="body"
+          placement="right"
+          triggers="mouseenter:mouseleave"
+          popoverTitle="Status"
+          [ngbPopover]="statusFlowButtonTemplate"
+          [autoClose]="'outside'"
+        >
+          <span style="text-transform: uppercase">{{ flow.name }}</span>
+        </button>
+      </div>
+</td>
+
+<td id="flowRowID" [hidden]="!flowRowID">
+  <a *ngIf="flow.integrationId" [routerLink]="['../integration', flow.integrationId]">{{ flow.integrationId }}</a>
+</td>
+
+<td id="flowErrorStepID" [hidden]="!flowRowErrorStepID"></td>
+
+<td class="text-right">
+  <div class="float-right" style="margin-right: 30px">
+    <ng-template #statusFlowButtonTemplate let-message="message">
+      <div [innerHtml]="flowStatusButton">
+      </div>
+    </ng-template>
+    <h4 class="float-right">
+      <ng-template #alertsFlowButtonTemplate let-message="message">
+        <div [innerHtml]="flowAlertsButton"></div>
+      </ng-template>
+    </h4>
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; vertical-align: top">
+      <span
+        class="badge bg-warning text-dark"
+        *ngIf="flowAlerts === 'true'"
+        (mouseenter)="(p != p)"
+        placement="left"
+        on-mouseover="getFlowAlerts(flow.id)"
+        triggers="mouseenter"
+        popoverTitle="Show last alerts"
+        [ngbPopover]="alertsFlowButtonTemplate"
+        [autoClose]="'outside'"
+      >
+			<fa-icon icon="exclamation-triangle"></fa-icon>
+        <span *ngIf="numberOfAlerts > 1">{{ numberOfAlerts }} Alerts</span>
+        <span *ngIf="numberOfAlerts == 1">1 Alert</span>
+      </span>
+    </h5>
+  </div>
+</td>

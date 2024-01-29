@@ -1,0 +1,124 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+      <div class="row">
+        <div class="col-10">
+          <h2 id="jhi-broker-heading">Create or edit a Broker</h2>
+        </div>
+        <div class="col-2">
+          <a role="button" class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
+             href="http://activemq.apache.org/" title="ActiveMQ Website" target="_blank"></a>
+        </div>
+      </div>
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <ng-template #namePopover let-message="message">
+          <div [innerHtml]="namePopoverMessage"></div>
+        </ng-template>
+        <ng-template #autostartPopover let-message="message">
+          <div [innerHtml]="autostartPopoverMessage"></div>
+        </ng-template>
+        <ng-template #typePopover let-message="message">
+          <div [innerHtml]="typePopoverMessage"></div>
+        </ng-template>
+        <ng-template #configurationTypePopover let-message="message">
+          <div [innerHtml]="configurationTypePopoverMessage"></div>
+        </ng-template>
+        <ng-template #brokerConfigurationPopover let-message="message">
+          <div [innerHtml]="brokerConfigurationPopoverMessage"></div>
+        </ng-template>
+        <ng-template #brokerErrorConfigurationPopover let-message="message">
+          <div class="row">
+            <div class="col-12 alert alert-secondary" role="alert">
+              <div [innerHtml]="brokerConfigurationFailed"></div>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="form-group" [style.display]="'none'" [hidden]="!broker.id">
+          <label for="id">ID</label>
+          <input type="text" class="form-control" id="id" name="id"
+                 [(ngModel)]="broker.id" readonly/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" for="field_name">Name</label>
+          <i triggers="mouseenter:mouseleave" placement="right"
+             popoverTitle="Info" [ngbPopover]="namePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <input type="text" class="form-control" name="name" id="field_name" required minlength="3"
+                 [(ngModel)]="broker.name"/>
+        </div>
+        <div class="form-group mt-2">
+          <label class="form-control-label" for="field_autoStart">Autostart</label>
+          <i triggers="mouseenter:mouseleave" placement="right"
+             popoverTitle="Info" [ngbPopover]="autostartPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <select type="text" class="form-control form-select" id="field_autostart" id="field_autoStart" name="autoStart"
+                  [(ngModel)]="broker.autoStart">
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
+        </div>
+        <div class="form-group mt-2">
+          <label class="form-control-label" for="field_type">Type</label>
+          <i triggers="mouseenter:mouseleave" placement="right"
+             popoverTitle="Info" [ngbPopover]="typePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <select type="text" class="form-control form-select" id="field_type" name="type" [(ngModel)]="broker.type"
+                  (ngModelChange)="onTypeChange($event)">
+            <option value="classic">ActiveMQ Classic</option>
+            <option value="artemis">ActiveMQ Artemis</option>
+          </select>
+        </div>
+        <div class="form-group mt-2">
+          <label class="form-control-label" for="field_type">Configuration Type</label>
+          <i triggers="mouseenter:mouseleave" placement="right"
+             popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <select type="text" class="form-control form-select" id="field_configuration_type" name="configurationType"
+                  [(ngModel)]="broker.configurationType">
+            <option value="embedded">Embedded</option>
+            <option value="file">File</option>
+          </select>
+        </div>
+        <div class="form-group mt-2" *ngIf="broker.configurationType == 'file' ">
+          <label class="form-control-label" for="field_type">Configuration</label>
+          <i triggers="mouseenter:mouseleave" placement="right"
+             popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon>
+          </i>
+          <span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
+     					<i popoverClass="increase-popover-width" triggers="mouseenter:mouseleave"
+                         placement="right" container="body"
+                         popoverTitle="Error" [popover]="brokerErrorConfigurationPopover">
+                <fa-icon icon="circle-exclamation"></fa-icon>
+              </i>
+					</span>
+          <div>
+            <ngx-codemirror
+              name="codemirror"
+              [(ngModel)]="brokerConfiguration"
+              [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: 'xml',
+              autoCloseTags: true
+						  }"
+              style="min-height: 500px;"></ngx-codemirror>
+          </div>
+          <br/>
+        </div>
+
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+          <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+      <br/>
+    </form>
+
+  </div>
+</div>
