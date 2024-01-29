@@ -53,7 +53,7 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.5.0'
-    id "com.github.ben-manes.versions" version "0.50.1"
+    id "com.github.ben-manes.versions" version "0.50.0"
     // id 'org.graalvm.buildtools.native' version '0.9.28'
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
