@@ -211,7 +211,6 @@
       "path": "jest.conf.js",
       "action": "replace"
     },
-    ,
     {
       "type": "file",
       "path": "jhipster-jdl.jh",
