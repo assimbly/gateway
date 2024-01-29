@@ -12,7 +12,6 @@ public class JacksonConfiguration {
 
     /**
      * Support for Java date and time API.
-     *
      * @return the corresponding Jackson module.
      */
     @Bean
@@ -32,5 +31,4 @@ public class JacksonConfiguration {
     public Hibernate6Module hibernate6Module() {
         return new Hibernate6Module().configure(Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, true);
     }
-
 }

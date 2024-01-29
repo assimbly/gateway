@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.gateway;
+package org.assimbly.gateway.web.rest;
 
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
@@ -10,10 +10,8 @@ import org.assimbly.gateway.service.dto.PasswordChangeDTO;
 import org.assimbly.gateway.web.rest.errors.*;
 import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
-
-import java.util.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,29 +79,17 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /authenticate} : check if the user is authenticated, and return its login.
-     *
-     * @param request the HTTP request.
-     * @return the login if the user is authenticated.
-     */
-    @GetMapping("/authenticate")
-    public String isAuthenticated(HttpServletRequest request) {
-        log.debug("REST request to check if the current user is authenticated");
-        return request.getRemoteUser();
-    }
-
-    /**
      * {@code GET  /account} : get the current user.
      *
      * @return the current user.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() throws SuppressableStacktraceException {
+    public AdminUserDTO getAccount() {
         return userService
             .getUserWithAuthorities()
             .map(AdminUserDTO::new)
-            .orElseThrow(() -> new SuppressableStacktraceException("User could not be found. Login to revalidate", true));
+            .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
     /**
@@ -119,7 +105,7 @@ public class AccountResource {
             .getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
+        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
         }
         Optional<User> user = userRepository.findOneByLogin(userLogin);
@@ -158,7 +144,7 @@ public class AccountResource {
     public void requestPasswordReset(@RequestBody String mail) {
         Optional<User> user = userService.requestPasswordReset(mail);
         if (user.isPresent()) {
-            mailService.sendPasswordResetMail(user.get());
+            mailService.sendPasswordResetMail(user.orElseThrow());
         } else {
             // Pretend the request has been successful to prevent checking which emails really exist
             // but log that an invalid attempt has been made
@@ -192,24 +178,4 @@ public class AccountResource {
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
-
-    public class SuppressableStacktraceException extends Exception {
-
-        private boolean suppressStacktrace = false;
-
-        public SuppressableStacktraceException(String message, boolean suppressStacktrace) {
-            super(message, null, suppressStacktrace, !suppressStacktrace);
-            this.suppressStacktrace = suppressStacktrace;
-        }
-
-        @Override
-        public String toString() {
-            if (suppressStacktrace) {
-                return getLocalizedMessage();
-            } else {
-                return super.toString();
-            }
-        }
-    }
-
 }

@@ -124,7 +124,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
-                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
+            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
         ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
@@ -226,12 +226,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException
             ? HeaderUtil.createFailureAlert(
-            applicationName,
-            true,
-            badRequestAlertException.getEntityName(),
-            badRequestAlertException.getErrorKey(),
-            badRequestAlertException.getMessage()
-        )
+                applicationName,
+                true,
+                badRequestAlertException.getEntityName(),
+                badRequestAlertException.getErrorKey(),
+                badRequestAlertException.getMessage()
+            )
             : null;
     }
 
@@ -259,7 +259,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             "com.",
             "io.",
             "de.",
-            "io.github.jhipster.sample"
+            "org.assimbly.gateway"
         );
     }
 }
