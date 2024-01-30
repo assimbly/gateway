@@ -421,12 +421,32 @@
 		  "type": "dir",
 		  "path": "repository",
 		  "action": "ignore"
-		},
-		{
-		  "type": "dir",
-		  "path": "security",
-		  "action": "replace"
-		},
+		},{
+      "type": "dir",
+      "path": "security/jwt",
+      "action": "ignore"
+    },{
+      "type": "file",
+      "path": "security/AuthoritiesConstants.java",
+      "action": "replace"
+    }
+  ,{
+      "type": "file",
+      "path": "security/DomainUserDetailsService.java",
+      "action": "replace"
+    },{
+      "type": "file",
+      "path": "security/SecurityUtils.java",
+      "action": "replace"
+    },{
+      "type": "file",
+      "path": "security/SpringSecurityAuditorAware.java",
+      "action": "replace"
+    },{
+      "type": "file",
+      "path": "security/UserNotActivatedException.java",
+      "action": "replace"
+    },
 		{
 		  "type": "dir",
 		  "path": "service",
