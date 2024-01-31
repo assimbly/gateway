@@ -1,0 +1,53 @@
+<div class="container" *ngIf="connection">
+    <h2><span>Connection</span> {{connection.id}}</h2>
+    <jhi-alert-error></jhi-alert-error>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th colspan="2">Details for {{connection.name}} connection</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="detailsTable">ID</th>
+                    <td class="detailsTable">{{connection.id}}</td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>{{connection.name}}</td>
+                </tr>
+                <tr class="lastItemBorder">
+                    <th>Type</th>
+                    <td>{{connection.type}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="table table-sm table-bordered" colspan="2">
+            <thead>
+                <tr class="table-active">
+                    <th colspan="2">Connection Keys</th>
+                </tr>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let connectionKey of connectionKeys; let i = index" [ngClass]="{'lastItemBorder' : (connectionKeys.length - 1 === i)}">
+                    <td>{{connectionKey.key}}</td>
+                    <td>{{connectionKey.value}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="float-right">
+        <button type="button" [routerLink]="['/connection']" class="btn btn-info">
+            <span class="fa fa-arrow-left"></span>&nbsp;
+            <span> Back</span>
+        </button>
+    </div>
+</div>
