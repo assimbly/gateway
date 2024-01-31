@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import SharedModule from 'app/shared/shared.module';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
-import { VERSION } from 'app/app.constants';
+import { VERSION, TYPE } from 'app/app.constants';
 import { LANGUAGES } from 'app/config/language.constants';
 import { Account } from 'app/core/auth/account.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -30,6 +30,7 @@ export default class NavbarComponent implements OnInit {
   version = '';
   account: Account | null = null;
   entitiesNavbarItems: NavbarItem[] = [];
+  type: string;
 
   constructor(
     private loginService: LoginService,
@@ -78,4 +79,6 @@ export default class NavbarComponent implements OnInit {
   toggleNavbar(): void {
     this.isNavbarCollapsed = !this.isNavbarCollapsed;
   }
+
+
 }
