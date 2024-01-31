@@ -19,8 +19,13 @@
     </a>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed">
       <ul class="navbar-nav ms-auto">
-        <li *ngIf="type === 'INTEGRATION' || type === 'FULL'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <a class="nav-link" routerLink="/" (click)="collapseNavbar()">
+        <li *ngIf="type === 'INTEGRATION' || type === 'FULL'"
+            routerLinkActive="active"
+            ngbDropdown
+            class="nav-item dropdown pointer"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
+          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
             <span>
               <fa-icon icon="exchange-alt"></fa-icon>
               <span>Flows</span>
@@ -41,7 +46,7 @@
             <li>
               <a
                 class="dropdown-item"
-                routerLink="step"
+                routerLink="/step"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -53,7 +58,7 @@
             <li>
               <a
                 class="dropdown-item"
-                routerLink="connection"
+                routerLink="/connection"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -82,7 +87,7 @@
             <li>
               <a
                 class="dropdown-item"
-                routerLink="broker"
+                routerLink="/broker"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -93,7 +98,7 @@
             <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
               <a
                 class="dropdown-item"
-                routerLink="queue"
+                routerLink="/queue"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -105,7 +110,7 @@
             <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
               <a
                 class="dropdown-item"
-                routerLink="topic"
+                routerLink="/topic"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -114,7 +119,6 @@
                 <span>Topics</span>
               </a>
             </li>
-            <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
           </ul>
         </li>
 
@@ -137,7 +141,7 @@
             <li>
               <a
                 class="dropdown-item"
-                routerLink="integration"
+                routerLink="/integration"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -149,7 +153,7 @@
             <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">
               <a
                 class="dropdown-item"
-                routerLink="environment-variables"
+                routerLink="/environment-variables"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -161,7 +165,7 @@
             <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
               <a
                 class="dropdown-item"
-                routerLink="certificate"
+                routerLink="/certificate"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
@@ -219,7 +223,7 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="admin/log-viewer" routerLinkActive="active" (click)="collapseNavbar()">
+              <a class="dropdown-item" routerLink="/admin/logviewer" routerLinkActive="active" (click)="collapseNavbar()">
                 <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
                 <span>Log viewer</span>
               </a>

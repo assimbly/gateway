@@ -43,6 +43,7 @@ export default class NavbarComponent implements OnInit {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
     }
+    this.type = TYPE;
   }
 
   ngOnInit(): void {

@@ -240,8 +240,8 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* ========================================================================== custom assimbly css ========================================================================== */
 
-// @import '~@ng-select/ng-select/scss/default.theme';
-// @import '~codemirror/lib/codemirror';
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import '~codemirror/lib/codemirror.css';
 
 #fromTab.active,
 #toTab.active,
@@ -305,11 +305,12 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   float: end;
 }
 
-.assimbly-integration-img img {
+.assimbly-integration-img {
   background-repeat: no-repeat;
   background-size: 100%;
   width: 60px;
   height: 50px;
+  background: url('/content/images/assimbly_transparant.png')
 }
 
 .activemq-link {
@@ -318,7 +319,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .activemq-broker-img {
-  background-image: url('../images/activemq.png');
+  background-image: url('/content/images/activemq.png');
   background-repeat: no-repeat;
   background-size: 100%;
   width: 60px;
@@ -333,8 +334,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 
 .camel-img {
-  background-image: url('../images/apache-camel.png');
-  background-repeat: no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  background: url('/content/images/apache-camel.png') no-repeat center center;
+  background-size: contain;
   background-size: 100%;
   width: 60px;
   height: 50px;

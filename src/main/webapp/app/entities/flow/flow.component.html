@@ -18,7 +18,6 @@
     <div class="col-10">
       <input
         type="text"
-        align="left"
         style="margin-left: 0.3em"
         [(ngModel)]="searchText"
         id="searchTextId"
@@ -30,9 +29,9 @@
       <div ngbDropdown class="d-inline-block">
         <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
         <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Flow</button>
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Route</button>
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Scripts</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')">Create Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')">Create Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')">Create Scripts</button>
           <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
         </div>
       </div>

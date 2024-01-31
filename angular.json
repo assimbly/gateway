@@ -24,7 +24,7 @@
               "path": "./webpack/webpack.custom.js"
             },
 			"allowedCommonJsDependencies": [
-				"sockjs-client", "codemirror"
+				"codemirror", "buffer", "file-saver/FileSaver"
 			],
             "outputPath": "build/resources/main/static/",
             "index": "src/main/webapp/index.html",
