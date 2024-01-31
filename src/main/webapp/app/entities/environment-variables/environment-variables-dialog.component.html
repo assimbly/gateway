@@ -1,0 +1,50 @@
+<form [formGroup]="environmentVariablesForm" (ngSubmit)="save()" class="needs-validation">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myEnvironmentVariablesLabel">Create or edit an Environment Variables</h4>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
+	</div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [style.display]="'none'">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" formControlName="id" readonly />
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label" for="key">Key</label>
+            <input type="text" class="form-control" id="key" formControlName="key"/>
+            <div *ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)" class="invalid-field-message">
+                <span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span>
+                <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.!!!!!!!!</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label" for="value">Value</label>
+            <input type="text" class="form-control" id="value" formControlName="value"/>
+            <div *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)" class="invalid-field-message">
+                <span *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label" for="integration">Integration</label>
+            <select *ngIf="integrations.length > 1; else oneIntegration" class="form-control form-select" id="integration" formControlName="integrationId" >
+                <option [ngValue]="null"></option>
+                <option [ngValue]="integrationOption.id" *ngFor="let integrationOption of integrations; trackBy: trackIntegrationById">{{integrationOption.id}}</option>
+            </select>
+            <ng-template #oneIntegration>
+                <input type="text" class="form-control" id="integration" readonly formControlName="integrationId"/>
+            </ng-template>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="button" (click)="save()" [disabled]="environmentVariablesForm.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

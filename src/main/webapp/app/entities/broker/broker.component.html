@@ -1,0 +1,215 @@
+<div style="margin: 2em; min-height: 30em">
+  <div class="row">
+    <div class="col-9">
+      <h2 id="page-heading">
+        <span>Broker</span>
+      </h2>
+    </div>
+    <div class="col-2-5">
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
+        *ngIf="brokers?.length === 0"
+        href="http://activemq.apache.org/"
+        title="ActiveMQ Website"
+        target="_blank"
+      ></a>
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
+        *ngIf="broker?.type === 'classic'"
+        href="https://activemq.apache.org/components/classic/documentation"
+        title="ActiveMQ Classic Documentation"
+        target="_blank"
+      ></a>
+      <a
+        role="button"
+        class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
+        *ngIf="broker?.type === 'artemis'"
+        href="https://activemq.apache.org/components/artemis/documentation/"
+        title="ActiveMQ Artemis Documentation"
+        target="_blank"
+      ></a>
+      <a
+        role="button"
+        class="btn btn-sm left-border-radius-0 assimbly-link assimbly-integration-img"
+        href="https://github.com/assimbly/gateway/wiki/Broker"
+        title="Assimbly Documentation"
+        target="_blank"
+      >
+        <picture>
+          <source srcset="../../../content/images/assimbly_transparant.webp" />
+          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
+        </picture>
+      </a>
+    </div>
+    <div class="col-0-5"></div>
+  </div>
+  <br />
+  <div class="mt-3" *ngIf="brokers?.length === 0">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <b>No broker is configured</b>
+          </div>
+          <div class="card-block pt-4">
+            <blockquote class="card-blockquote text-center">
+              <button id="jh-create-entity" class="btn btn-primary jh-create-entity create-broker" [routerLink]="['/broker/new']">
+                <fa-icon [icon]="'plus'"></fa-icon>
+                <span> Create Broker </span>
+              </button>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 text-center"></div>
+    </div>
+  </div>
+
+  <div class="table-responsive" *ngIf="brokers?.length > 0" style="overflow-x: auto; overflow-y: hidden">
+    <table class="table table-striped" style="word-wrap: break-word; table-layout: fixed; width: 90%; position: absolute;">
+      <thead>
+        <tr>
+          <th [style.display]="'none'"><span>ID</span></th>
+          <th class="border-bottom-none"><span></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let broker of brokers; trackBy: trackId">
+          <td [style.display]="'none'">
+            <a [routerLink]="['/broker', broker.id, 'view']">{{ broker.id }}</a>
+          </td>
+          <td>
+            <ng-template #detailsTemplate>
+              <div [innerHtml]="brokerDetails"></div>
+            </ng-template>
+            <ng-template #statsTemplate let-message="message">
+              <div [innerHtml]="brokerInfo"></div>
+            </ng-template>
+
+            <div class="float-left">
+              <div class="btn-group-justified" role="group">
+                <div class="btn-group" role="group" style="margin-left: 0.5em">
+                  <button
+                    [ngClass]="{
+                      'btn-primary': brokerStatus === 'inactive',
+                      'btn-success': brokerStatus === 'active',
+                      'btn-warning': brokerStatus === 'activeError',
+                      'btn-danger': brokerStatus === 'inactiveError'
+                    }"
+                    type="button"
+					          style="color: white;"
+                    (click)="start()"
+                    class="btn btn-lg"
+                    [disabled]="disableActionBtns"
+                    *ngIf="!isBrokerStarted"
+                  >
+               		 <fa-icon icon="play"></fa-icon>
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': brokerStatus === 'inactive',
+                      'btn-success': brokerStatus === 'active',
+                      'btn-warning': brokerStatus === 'activeError',
+                      'btn-danger': brokerStatus === 'inactiveError'
+                    }"
+                    type="button"
+					          style="color: white;"
+                    (click)="restart()"
+                    class="btn btn-lg"
+                    [disabled]="disableActionBtns"
+                    *ngIf="!isBrokerRestarted"
+                  >
+               		 <fa-icon icon="sync"></fa-icon>
+                  </button>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': brokerStatus === 'inactive',
+                      'btn-success': brokerStatus === 'active',
+                      'btn-warning': brokerStatus === 'activeError',
+                      'btn-danger': brokerStatus === 'inactiveError'
+                    }"
+                    type="button"
+					style="color: white;"
+                    (click)="stop()"
+                    class="btn btn-lg"
+                    [disabled]="isBrokerStopped || disableActionBtns"
+                  >
+               		 <fa-icon icon="stop"></fa-icon>
+				 </button>
+                  <ng-template #brokerStatusButtonTemplate><div [innerHtml]="brokerStatusButton"></div></ng-template>
+                  <button
+                    [ngClass]="{
+                      'btn-primary': brokerStatus === 'inactive',
+                      'btn-success': brokerStatus === 'active',
+                      'btn-warning': brokerStatus === 'activeError',
+                      'btn-danger': brokerStatus === 'inactiveError'
+                    }"
+                    type="button"
+                    style="min-width: 20em; color: white;"
+                    data-container="body"
+                    class="btn btn-lg btn-block"
+                    placement="right"
+                    popoverTitle="Status"
+                    [ngbPopover]="brokerStatusButtonTemplate"
+                    [autoClose]="'outside'"
+                  >
+                    <span style="text-transform: uppercase">{{ broker.name }}</span>
+                  </button>
+                </div>
+              </div>
+
+			  <div class="row">
+              <div class="col">
+                <ng-template #detailsTemplate><div [innerHtml]="brokerDetails"></div></ng-template>
+                <a
+				  style="padding-left: 1em;"
+                  (mouseenter)="getBrokerDetails()"
+                  aria-hidden="true"
+                  data-container="body"
+                  triggers="mouseenter:mouseleave"
+                  placement="right"
+                  [ngbPopover]="detailsTemplate"
+                  popoverTitle="Details"
+                >
+					<fa-icon icon="info"></fa-icon>
+				</a>
+                <a
+                  style="padding-left: 1em;"
+                  (mouseenter)="getBrokerInfo(broker.id)"
+                  data-container="body"
+                  triggers="mouseenter:mouseleave"
+                  placement="right"
+                  popoverTitle="Stats & Info"
+                  [ngbPopover]="statsTemplate"
+                >
+					<fa-icon icon="chart-bar"></fa-icon>
+				</a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
+                  [routerLink]="['/broker', broker.id, 'edit']"
+                  aria-hidden="true"
+                  placement="right"
+                  title="Edit broker"
+                >
+					<fa-icon icon="edit"></fa-icon>
+				</a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
+                  (click)="delete(broker)"
+                  placement="right"
+                  title="Delete broker">
+				  	<fa-icon icon="trash"></fa-icon>
+				  </a>
+              </div>
+			  </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

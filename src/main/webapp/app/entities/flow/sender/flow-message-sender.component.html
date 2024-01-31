@@ -1,0 +1,601 @@
+<br />
+<div class="container">
+  <div class="row">
+    <ng-template #componentPopover let-message="message">
+      <div [innerHtml]="componentPopoverMessage"></div>
+    </ng-template>
+    <ng-template #optionsPopover let-message="message">
+      <div [innerHtml]="optionsPopoverMessage"></div>
+    </ng-template>
+    <ng-template #messagePopover let-message="message">
+      <div [innerHtml]="messagePopoverMessage"></div>
+    </ng-template>
+    <ng-template #connectionPopover let-message="message">
+      <div [innerHtml]="connectionPopoverMessage"></div>
+    </ng-template>
+    <ng-template #popover let-message="message">
+      <div [innerHtml]="popoverMessage"></div>
+    </ng-template>
+    <ng-template #hostnamePopover let-message="message">
+      <div [innerHtml]="hostnamePopoverMessage"></div>
+    </ng-template>
+    <ng-template #portPopover let-message="message">
+      <div [innerHtml]="portPopoverMessage"></div>
+    </ng-template>
+    <ng-template #timeoutPopover let-message="message">
+      <div [innerHtml]="timeoutPopoverMessage"></div>
+    </ng-template>
+    <ng-template #testConnectionModal>
+      <div class="modal-header">
+        <h4 class="modal-title">Test Connection</h4>
+        <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" [formGroup]="testConnectionForm">
+        <div class="form-group row">
+          <div class="col-8">
+            <label class="form-control-label" for="field_host">Host name</label>
+            <i
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Info"
+              [popover]="hostnamePopover"
+              container="body"
+              placement="right"><fa-icon icon="info-circle"></fa-icon></i>
+            <input type="text" class="form-control" formControlName="connectionHost" id="connectionHost" required />
+          </div>
+          <div class="col-3">
+            <label class="form-control-label" for="example-number-input">Port</label>
+            <i
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Info"
+              [popover]="portPopover"
+              container="body"
+              placement="right"><fa-icon icon="info-circle"></fa-icon></i>
+            <input type="number" class="form-control" min="1" max="65535" formControlName="connectionPort" id="connectionPort" />
+          </div>
+          <div class="col-1"></div>
+        </div>
+        <div class="form-group row">
+          <div class="col-8">
+            <label class="form-control-label" for="example-number-input">Timeout</label>
+            <i
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Info"
+              [popover]="timeoutPopover"
+              container="body"
+              placement="right"><fa-icon icon="info-circle"></fa-icon></i>
+            <input type="number" class="form-control" formControlName="connectionTimeout" id="connectionTimeout" />
+          </div>
+          <div class="col-4"></div>
+        </div>
+        <div [innerHtml]="testConnectionMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="testConnection()">Test</button>
+      </div>
+    </ng-template>
+
+    <ng-template #stepPopover let-message="message">
+      <div [innerHtml]="stepPopoverMessage"></div>
+    </ng-template>
+    <ng-template #exchangePatternPopover let-message="message">
+      <div [innerHtml]="exchangePatternPopoverMessage"></div>
+    </ng-template>
+    <ng-template #numberOfTimesPopover let-message="message">
+      <div [innerHtml]="numberOfTimesPopoverMessage"></div>
+    </ng-template>
+
+    <form [formGroup]="messageSenderForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">
+      <div class="form-group">
+        <div class="form-group">
+          <div class="row">
+			<div class="col-12">
+				<label class="form-control-label" for="field_exchangepattern">Exchange Pattern </label>
+				<i
+				  triggers="mouseenter:mouseleave"
+				  popoverTitle="Info"
+				  [popover]="exchangePatternPopover"
+				  style="margin-left: 0.5em"
+				><fa-icon icon="info-circle"></fa-icon></i>
+			</div>
+          </div>
+          <div class="row">
+			<div class="col-8">
+            <select type="text" class="form-control" id="field_exchangepattern" formControlName="exchangepattern">
+              <option value="FireAndForget">FireAndForget</option>
+              <option value="RequestAndReply">RequestAndReply</option>
+            </select>
+			</div>
+			<div class="col-4"></div>
+          </div>
+          <div class="row" style="margin-top: 1em">
+			<div class="col-8">
+            <label class="form-control-label" for="field_numberOfTimes">Number of times </label>
+            <i
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Info"
+              [popover]="numberOfTimesPopover"
+              style="margin-left: 0.5em"
+            ><fa-icon icon="info-circle"></fa-icon></i>
+			</div>
+			<div class="col-4"></div>
+          </div>
+          <div class="row" style="margin-top: 1em">
+			<div class="col-8">
+            <input
+              min="0"
+              max="1000"
+              size="0"
+              maxlength="4"
+              type="number"
+              name="numberOfMessages"
+              class="form-control"
+              id="numberOfTimes"
+              formControlName="numberoftimes"
+              required
+            />
+			</div>
+			<div class="col-4"></div>
+          </div>
+        </div>
+      </div>
+
+	  <br/>
+      <div class="d-flex" style="margin-top: 3em">
+        <ul ngbNav #nav="ngbNav" class="nav-pills" [(activeId)]="active" orientation="vertical">
+          <ng-container>
+            <li ngbNavItem="0" formArrayName="stepsData">
+              <a ngbNavLink>Request</a>
+              <ng-template ngbNavContent>
+                <div style="padding-left: 20px" [formGroupName]="0" id="{{ 'tab' + 0 }}">
+                  <div class="form-group" [style.display]="'none'">
+                    <label for="id">ID</label>
+                    <input type="text" class="form-control" id="id" formControlName="id" readonly />
+                  </div>
+                  <ng-template #uriPopover let-message="message">
+                    <div style="min-width: 300px" [innerHtml]="uriPopoverMessages[0]"></div>
+                  </ng-template>
+				  	 <ng-template #pathPopover let-message="message">
+						<div style="min-width:300px;">{{uriPlaceholders[0]}}</div>
+					</ng-template>
+                  <ng-template #uriEditor>
+                    <div class="modal-header">
+                      <h4 class="modal-title">URI (context path)</h4>
+                      <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <textarea
+                        class="form-control"
+                        id="field_uri"
+                        formControlName="uri"
+                        placeholder="{{ uriPlaceholders[0] }}"
+                        rows="5"
+                      ></textarea>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close</button>
+                    </div>
+                  </ng-template>
+
+                  <div class="form-group" style="width: 600px">
+                    <div class="input-group border-bottom my-3">
+                      <h5>URI&ensp;</h5>
+                    </div>
+					<div class="row">
+						<div class="col-12">
+							<label class="form-control-label" for="field_component_type">Component</label>
+							<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
+						</div>
+					</div>
+                    <div class="row">
+						<div class="col-10">
+						  <ng-select
+							*ngIf="requestStep.stepType === 'TO'"
+							[items]="producerComponentsNames"
+							[clearable]="false"
+							formControlName="componentType"
+							id="field_component_type"
+							(change)="setTypeLinks(requestStep, 0, $event)"
+						  ></ng-select>
+					    </div>
+						<div ngbDropdown class="col-2" placement="bottom-right" >
+							<a class="btn btn-primary" [ngStyle]="{'display':'block', 'width': '100px', 'color':'white', 'margin-left':'-24px'}" id="dropdownBasic1" ngbDropdownToggle><fa-icon icon="bars"></fa-icon> Docs</a>
+							<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+								<a ngbDropdownItem role="button" href="{{componentTypeCamelLinks[0]}}" [ngClass]="{'disabled': !componentTypeCamelLinks[0]}" target="_blank" title="Apache Camel online documentation on the component used for scheme: {{step?.componentType}}.">
+									<span>Camel Documentation</span>
+								</a>
+								<a ngbDropdownItem role="button" href="{{componentTypeAssimblyLinks[0]}}" target="_blank" title="Assimbly Integration online documentation on the component used for scheme: {{step?.componentType}}.">
+									<span>Assimbly Documentation</span>
+								</a>
+								<a ngbDropdownItem role="button" (click)="openTestConnectionModal(testConnectionModal)" title="Test if connection is available">
+									<span>Test Connection</span>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="row" style="margin-top: 1em">
+						<div class="col-12">
+							<label class="form-control-label" for="field_uri">Path</label>
+							<i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right" style="margin-left: 6px;"><fa-icon icon="info-circle"></fa-icon></i>
+						</div>
+					</div>
+                    <div class="row">
+						<div class="col-10">
+						  <ng-select
+							[items]="URIList"
+							[addTag]="true"
+							bindLabel="uri"
+							bindValue="uri"
+							id="field_uri"
+							formControlName="uri"
+							placeholder="{{uriPlaceholders[0]}}"
+							[(ngModel)]="requestStep.uri"
+							dropdownPosition="bottom"
+						  ></ng-select>
+						</div>
+						  <button
+							type="button"
+							class="btn btn-primary col-2"
+							title="Enlarge"
+							(click)="openModal(uriEditor)"
+							style="margin-left: -12px; width: 100px; float: left">
+							<fa-icon style="color: white;" icon="edit"></fa-icon>
+						  </button>
+                    </div>
+                  </div>
+                  <div
+                    *ngIf="
+                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.errors &&
+                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.dirty ||
+                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.touched)
+                    "
+                  >
+                    <div
+                      *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.errors.required"
+                      class="invalid-field-message"
+                    >
+                      ComponentType is required. Please select one.
+                    </div>
+                  </div>
+                  <div
+                    *ngIf="
+                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.errors &&
+                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.dirty ||
+                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.touched)
+                    "
+                  >
+                    <div
+                      *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.errors.required"
+                      class="invalid-field-message"
+                    >
+                      Context path is required.
+                    </div>
+                  </div>
+                  <div class="form-group" formArrayName="options">
+                    <div class="row" style="margin-top: 1em">
+                      <div class="col-12">
+                        <label class="form-control-label" for="field_options">Options</label>
+                        <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"
+                           container="body" placement="right">
+                          <fa-icon icon="info-circle"></fa-icon>
+                        </i>
+                      </div>
+                    </div>
+
+                    <div class="row" *ngFor="let option of stepsOptions[0]; index as idx" [formGroupName]="idx">
+                      <div class="col-5">
+                        <ng-select
+                          [items]="componentOptions[0]"
+                          bindLabel="displayName"
+                          bindValue="name"
+                          formControlName="key"
+                          [addTag]="true"
+                          [ngStyle]="{'display':'block', 'width': '250px'}"
+                          (change)="changeOptionSelection(selectedOption[idx], 0, idx)"
+                          id="field_options-key-{{ idx }}"
+                          (focusout)="
+                            validateOptions(messageSenderForm['controls'].stepsData['controls'][0]['controls'].options['controls'][idx])
+                          ">
+                          <ng-template ng-option-tmp let-item="item">
+                            <div
+                              [ngbTooltip]="optionTooltip"
+                              tooltipClass="option-tooltip"
+                              [openDelay]="500"
+                              placement="bottom"
+                              container="body"
+                            >
+                              {{ item.displayName }}
+                            </div>
+                            <ng-template #optionTooltip>
+                              <div>
+                                <b>Description: </b>{{ item.description }}<br/><br/><b>Group: </b>{{ item.group}}
+                                <br/><b>DataType: </b>{{ item.type }}<br/><span *ngIf="item.hasOwnProperty('defaultValue')">
+                                <b>DefaultValue:</b> {{ item.defaultValue }}</span>
+                              </div>
+                            </ng-template>
+                          </ng-template>
+                        </ng-select>
+                      </div>
+                      <div class="col-5" style="margin-right: -12px;">
+                        <input
+                          type="text"
+                          class="col-4 rounded-0 d-inline-block form-control"
+                          style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 20px;"
+                          id="field_options-value-{{ idx }}"
+                          formControlName="value"
+                          [placeholder]="
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].options['controls'][idx]['controls']
+                              .defaultValue.value
+                          "
+                          (focusout)="
+                            validateOptions(messageSenderForm['controls'].stepsData['controls'][0]['controls'].options['controls'][idx])
+                          "
+                          data-toggle="tooltip"
+                          title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                      </div>
+                      <button title="Add option" type="button"
+                        class="col-1 rounded-0 btn btn-primary"
+                        (click)="addOption(stepsOptions[0], 0)"
+                        [disabled]="
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                          "
+                      >
+                        <fa-icon icon="plus" style="color: white;"></fa-icon>
+                      </button>
+                      <button title="Remove option" type="button"
+                        class="col-1 left-border-radius-0 btn btn-danger"
+                        (click)="removeOption(stepsOptions[0], option, 0)"
+                        [disabled]="
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN' ||
+                            stepsOptions[0].length === 1
+                          "
+                      >
+                        <fa-icon icon="times" style="color: white;"></fa-icon>
+                      </button>
+                      </div>
+                    </div>
+
+                  <div class="border-bottom my-3"><h5>Header</h5></div>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <ng-select
+                        [items]="messages"
+                        bindLabel="name"
+                        bindValue="id"
+                        formControlName="message"
+                        id="field_message"
+                        dropdownPosition="top"
+                      ></ng-select>
+                      <button
+                        type="button"
+                        *ngIf="messageCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
+                        title="Edit header"
+                        class="col-2 btn btn-primary left-border-radius-0"
+                        (click)="
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
+                        "
+                        [disabled]="
+                          messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                        "
+                      >
+                        <fa-icon style="color: white;" icon="pencil-alt"></fa-icon>
+                      </button>
+                      <button
+                        type="button"
+                        *ngIf="messageCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].header.value"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
+                        title="New header"
+                        (click)="
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].header)
+                        "
+                        [disabled]="
+                          messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                        "
+                      ></button>
+                      <button
+                        type="button"
+                        *ngIf="!messageCreated"
+                        class="col-2 btn btn-primary left-border-radius-0"
+                        title="Create header"
+                        (click)="
+                          createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].message)
+                        "
+                        [disabled]="
+                          messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                        "
+                      >
+                        <fa-icon icon="plus" style="color: white;"></fa-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="border-bottom my-3"><h5>Connection</h5></div>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <ng-select
+                        [items]="filterConnection[0]"
+                        bindLabel="name"
+                        bindValue="id"
+                        formControlName="connection"
+                        id="field_connection"
+                        dropdownPosition="top"
+                      ></ng-select>
+                      <button
+                        type="button"
+                        *ngIf="connectionCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
+                        class="col-2 btn btn-primary left-border-radius-0"
+                        title="Edit connection"
+                        (click)="
+                          createOrEditConnection(
+                            requestStep,
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
+                          )
+                        "
+                        [disabled]="
+                          messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                        "
+                      >
+                        <fa-icon style="color: white;" icon="pencil-alt"></fa-icon>
+                      </button>
+                      <button
+                        type="button"
+                        *ngIf="connectionCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
+                        class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
+                        title="New connection"
+                        (click)="
+                          createOrEditConnection(
+                            requestStep,
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
+                          )
+                        "
+                        [disabled]="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.disabled"
+                      ></button>
+                      <button
+                        type="button"
+                        *ngIf="!connectionCreated"
+                        class="col-2 btn btn-primary left-border-radius-0"
+                        title="Create connection"
+                        (click)="
+                          createOrEditConnection(
+                            requestStep,
+                            connectionType[0],
+                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
+                          )
+                        "
+                        [disabled]="
+                          messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.value === 'WASTEBIN'
+                        "
+                      >
+                        <fa-icon icon="plus" style="color: white;"></fa-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    *ngIf="
+                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors &&
+                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.dirty ||
+                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.touched)
+                    "
+                  >
+                    <div
+                      *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors.required"
+                      class="invalid-field-message"
+                    >
+                      Connection is required for this component
+                    </div>
+                  </div>
+
+                  <br />
+
+                  <div class="form-group">
+                    <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
+                    <div style="border: 1px solid #ced4da">
+                      <ngx-codemirror
+                        name="codemirror"
+                        formControlName="requestbody"
+                        [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: 'text'
+						  }"
+                        (drop)="drop($event)"
+                        (dragover)="allowDrop($event)"
+                        style="min-height: 200px; width: 100%; overflow: auto;"></ngx-codemirror>
+                    </div>
+                  </div>
+
+                  </div>
+
+                <br />
+
+
+              </ng-template>
+            </li>
+
+            <li ngbNavItem="1">
+              <a ngbNavLink>Response</a>
+              <ng-template ngbNavContent>
+			    <div class="form-group">
+                <div class="container">
+                   <div class="row">
+                      <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
+                    </div>
+                    <div class="row">
+						<ngx-codemirror
+							name="codemirror"
+							formControlName="responsebody"
+						  [options]="{
+							lineNumbers: true,
+							theme: 'default',
+							mode: responseEditorMode
+						  }"
+						style="min-height: 500px; width: 560px; overflow: auto; border: 1px solid #ced4da"></ngx-codemirror>
+                    </div>
+                </div>
+                </div>
+
+              </ng-template>
+            </li>
+          </ng-container>
+        </ul>
+        <div [ngbNavOutlet]="nav" class="ml-4"></div>
+      </div>
+
+      <br />
+
+      <div class="row">
+        <div class="col-2">
+          <span></span>
+        </div>
+        <div class="col-10">
+          <jhi-alert *ngIf="isAlert"></jhi-alert>
+        </div>
+      </div>
+
+      <br />
+
+	<div class="container">
+		<div class="row">
+			<div class="col-5 offset-6">
+				<button type="button" class="btn btn-secondary" [routerLink]="['/']">
+				  <fa-icon icon="ban" style="color: white;"></fa-icon> <span>Cancel</span>
+				</button>
+				<button type="button" (click)="send()" [disabled]="messageSenderForm.invalid || isSending" class="btn btn-primary">
+				  <fa-icon icon="paper-plane" style="color: white;"></fa-icon>
+				  <span *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending" style="color: white;">Send</span>
+				  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending" style="color: white;"></span>
+				  <span *ngIf="isSending" style="color: white;">Sending</span>
+				</button>
+			</div>
+			<div class="col-1"></div>
+		</div>
+	</div>
+
+      <br />
+
+	<div class="container">
+		<div class="row">
+			<div class="col-5 offset-6">
+			  <div *ngIf="savingFlowFailed">
+				<span class="text-danger">*{{ savingFlowFailedMessage }}</span>
+			  </div>
+			  <div *ngIf="savingFlowSuccess">
+				<span class="text-success">*{{ savingFlowSuccessMessage }}</span>
+			  </div>
+			  <div *ngIf="!!invalidUriMessage">
+				<span class="text-danger">*{{ invalidUriMessage }}</span>
+			  </div>
+			</div>
+			<div class="col-1"></div>
+		</div>
+	</div>
+
+    </form>
+  </div>
+</div>

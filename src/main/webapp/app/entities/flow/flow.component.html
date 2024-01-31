@@ -1,0 +1,88 @@
+<div style="padding: 2em">
+  <div class="row mt-3">
+    <h2>Flows</h2>
+    <br />
+  </div>
+  <div class="row mt-3">
+    <p style="margin-top: -1.6em">
+      <b>{{ singleIntegrationStage }}</b>
+    </p>
+  </div>
+  <div *ngIf="multipleIntegrations">
+    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for integration</label>
+    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedIntegration($event)">
+      <option *ngFor="let integration of integrations" [value]="integration.id">{{ integration.name }}</option>
+    </select>
+  </div>
+  <div class="row">
+    <div class="col-10">
+      <input
+        type="text"
+        align="left"
+        style="margin-left: 0.3em"
+        [(ngModel)]="searchText"
+        id="searchTextId"
+        name="searchText"
+        placeholder="Filter By Flow Name"
+      />
+    </div>
+    <div class="col-2 text-right">
+      <div ngbDropdown class="d-inline-block">
+        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')" *jhiHasAnyAuthority="'ROLE_ADMIN'">Create Scripts</button>
+          <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
+        </div>
+      </div>
+    </div>
+  <br />
+  <div *ngIf="flows?.length == 0">
+    <div class="card-block pt-4">
+      <blockquote class="card-blockquote">
+        <br />
+        <p class="tab" style="margin-left: 0.3em">
+          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
+          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a>
+        </p>
+      </blockquote>
+    </div>
+  </div>
+
+  <div
+    class="table-responsive"
+    *ngIf="flows?.length > 0"
+    [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }"
+    style="overflow-x: auto; overflow-y: hidden"
+  >
+    <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%; z-index: 5;">
+      <thead class="transparant">
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
+          <th [style.display]="'none'"><span>ID</span></th>
+          <th jhiSortBy="name" class="border-bottom-none"><span></span> <span class="fa fa-sort"></span></th>
+          <th [style.display]="'none'"><span>Integration</span></th>
+          <th [style.display]="'none'"><span>Error</span></th>
+          <th class="border-bottom-none"></th>
+        </tr>
+      </thead>
+      <tbody
+        *ngIf="flows"
+        infinite-scroll
+        (scrolled)="loadPage(page + 1)"
+        (scrolledUp)="loadPage(page - 1)"
+        [infiniteScrollDisabled]="page >= links['last']"
+        [infiniteScrollDistance]="0"
+        [infiniteScrollUpDistance]="0"
+      >
+        <tr
+          jhi-flow-row
+          *ngFor="let flow of flows | FlowSearchByName: searchText; trackBy: trackId"
+          [flow]="flow"
+          ng-init="$last && finished()"
+        ></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
