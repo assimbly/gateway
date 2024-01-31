@@ -15,9 +15,11 @@ if (!DEBUG_INFO_ENABLED) {
   enableProdMode();
 }
 
+console.log('Application type: ' + TYPE);
+
 if(TYPE.toLowerCase() === 'headless'){
   //Don't bootstrap Angular in headless mode
-  console.log('Headless mode. Angular GUI not started')
+  console.log('Headless mode (No GUI)');
 }else{
   bootstrapApplication(AppComponent, appConfig)
     // eslint-disable-next-line no-console

@@ -9,7 +9,7 @@
 
 
 <td id="flowRowID" [hidden]="!flowRowID">
-  <a [routerLink]="['../flow', flow.id]">{{ flow.id }}</a>
+  <a [routerLink]="['/flow', flow.id]">{{ flow.id }}</a>
 </td>
 
 <td>
@@ -170,7 +170,7 @@
 </td>
 
 <td id="flowRowID" [hidden]="!flowRowID">
-  <a *ngIf="flow.integrationId" [routerLink]="['../integration', flow.integrationId]">{{ flow.integrationId }}</a>
+  <a *ngIf="flow.integrationId" [routerLink]="['/integration', flow.integrationId]">{{ flow.integrationId }}</a>
 </td>
 
 <td id="flowErrorStepID" [hidden]="!flowRowErrorStepID"></td>
