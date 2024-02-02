@@ -94,7 +94,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       this.currentAccount = account;
     });
 
-    this.route.params.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       this.endpointType = params['endpointType'];
       this.endpointName = params['endpointName'];
       this.brokerType = params['brokerType'];

@@ -16,7 +16,9 @@
       "livenessState": "Liveness state",
       "readinessState": "Readiness state",
       "ping": "Application",
-      "db": "Database"
+      "db": "Database",
+      "jms": "ActiveMQ",
+      "rabbit": "Rabbit"
     },
     "table": {
       "service": "Service name",

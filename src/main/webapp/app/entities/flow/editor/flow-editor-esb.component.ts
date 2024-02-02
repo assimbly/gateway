@@ -177,7 +177,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.setComponents();
 
 		this.subscription =
-			this.route.params.subscribe(
+			this.route.queryParams.subscribe(
 				(params) => {
 					this.activeStep = params["stepid"];
 					this.activeEditor = params["editor"];

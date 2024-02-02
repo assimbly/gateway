@@ -150,13 +150,33 @@
                 <a
                   style="padding-left: 1em"
                   type="submit"
+                  routerLink="/queue"
+                  aria-hidden="true"
+                  placement="right"
+                  title="Queues"
+                >
+                  <fa-icon icon="envelope"></fa-icon>
+                </a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
+                  routerLink="/topic"
+                  aria-hidden="true"
+                  placement="right"
+                  title="Topics"
+                >
+                  <fa-icon icon="envelope"></fa-icon>
+                </a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
                   [routerLink]="['/broker', broker.id, 'edit']"
                   aria-hidden="true"
                   placement="right"
                   title="Edit broker"
                 >
-					<fa-icon icon="edit"></fa-icon>
-				</a>
+                  <fa-icon icon="edit"></fa-icon>
+				       </a>
                 <a
                   style="padding-left: 1em"
                   type="submit"

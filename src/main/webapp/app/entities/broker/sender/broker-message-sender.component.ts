@@ -112,7 +112,7 @@ export class BrokerMessageSenderComponent implements OnInit {
 
         this.headers = this.messageSenderForm.get('headers') as FormArray;
 
-        this.route.params.subscribe(params => {
+        this.route.queryParams.subscribe(params => {
             this.endpointType = params['endpointType'];
             this.endpointName = params['endpointName'];
             this.brokerType = params['brokerType'];

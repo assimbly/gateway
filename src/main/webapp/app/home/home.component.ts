@@ -6,6 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import LoginComponent from 'app/login/login.component';
+
 
 import { EntityRoutingModule } from 'app/entities/entity-routing.module';
 import { TYPE } from 'app/app.constants';
@@ -15,7 +17,7 @@ import { TYPE } from 'app/app.constants';
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [SharedModule, EntityRoutingModule, RouterModule],
+  imports: [SharedModule, LoginComponent, EntityRoutingModule, RouterModule],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;

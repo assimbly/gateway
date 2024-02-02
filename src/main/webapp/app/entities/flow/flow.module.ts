@@ -15,7 +15,7 @@ import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowDeleteDialogComponent } from './flow-delete-dialog.component';
-import { flowRoute } from './flow.route';
+import flowRoute from './flow.route';
 import { FlowPopupService } from './flow-popup.service';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
