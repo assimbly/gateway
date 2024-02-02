@@ -3,49 +3,35 @@
     <h2>Flows</h2>
     <br />
   </div>
-  <div class="row mt-3">
-    <p style="margin-top: -1.6em">
-      <b>{{ singleIntegrationStage }}</b>
-    </p>
-  </div>
-  <div *ngIf="multipleIntegrations">
-    <label class="col-xl-2 col-md-4 col-12 col-form-label">Showing flows for integration</label>
-    <select class="col-xl-4 col-md-4 col-sm-12 form-control form-select" (change)="getFlowsForSelectedIntegration($event)">
-      <option *ngFor="let integration of integrations" [value]="integration.id">{{ integration.name }}</option>
-    </select>
-  </div>
   <div class="row">
-    <div class="col-10">
-      <input
-        type="text"
-        style="margin-left: 0.3em"
-        [(ngModel)]="searchText"
-        id="searchTextId"
-        name="searchText"
-        placeholder="Filter By Flow Name"
-      />
-    </div>
-    <div class="col-2 text-right">
+    <div class="col-12">
       <div ngbDropdown class="d-inline-block">
-        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="bars"></fa-icon> Actions</button>
+        <button class="btn btn-outline-dark" id="dropdownMenuActions" ngbDropdownToggle><fa-icon icon="bars"></fa-icon></button>
         <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')">Create Flow</button>
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')">Create Route</button>
-          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')">Create Scripts</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','flow')">New Flow</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','route')">New Route</button>
+          <button ngbDropdownItem (click)="navigateToFlowEditor('edit','script')">New Script</button>
+          <button ngbDropdownItem routerLink="/connection">New connection</button>
           <button ngbDropdownItem [routerLink]="['../flow', 'message-sender']">Send Message</button>
         </div>
       </div>
+        <input
+          type="text"
+          style="vertical-align: top; height: 38px;"
+          [(ngModel)]="searchText"
+          id="searchTextId"
+          name="searchText"
+          placeholder="Filter By Flow Name"
+        />
     </div>
+  </div>
   <br />
   <div *ngIf="flows?.length == 0">
-    <div class="card-block pt-4">
-      <blockquote class="card-blockquote">
-        <br />
-        <p class="tab" style="margin-left: 0.3em">
-          No flows yet. Start creating new flows by clicking on <a [routerLink]="['../flow', 'editor', {mode: 'edit', editor: 'flow'}]">'Create flow'</a>. For more info
-          check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a>
-        </p>
-      </blockquote>
+    <div class="mt-3 alert alert-warning">
+      No flows yet. Click on the <fa-icon icon="bars"></fa-icon> menu to create a new flow, route or script.
+      <br/>
+      <br/>
+      Check the <a target="_blank" href="https://github.com/assimbly/gateway/wiki">Assimbly Docs</a> for full documentation.
     </div>
   </div>
 

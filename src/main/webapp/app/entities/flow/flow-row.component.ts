@@ -367,10 +367,10 @@ export class FlowRowComponent implements OnInit {
 
     switch (mode) {
         case 'edit':
-          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type }});
           break;
         case 'clone':
-          this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: this.flow.type }]);
+          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type }});
           break;
         case 'delete':
           let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
@@ -394,7 +394,7 @@ export class FlowRowComponent implements OnInit {
   }
 
   navigateToStepEditor(mode: string, editorType: string, step: Step) {
-    this.router.navigate(['../../flow/editor', this.flow.id, { mode: mode, editor: editorType, stepid: step.id }]);
+    this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: editorType, stepid: step.id }});
   }
 
   exportFlow(){

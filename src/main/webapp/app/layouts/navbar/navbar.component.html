@@ -1,9 +1,7 @@
 <nav data-cy="navbar" class="navbar navbar-dark navbar-expand-md bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
-      <span class="logo-img"></span>
       <span jhiTranslate="global.title" class="navbar-title">Gateway</span>
-      <span class="navbar-version">{{ version }}</span>
     </a>
     <a
       class="navbar-toggler d-lg-none"
@@ -19,111 +17,34 @@
     </a>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed">
       <ul class="navbar-nav ms-auto">
+        @if (account !== null) {
         <li *ngIf="type === 'INTEGRATION' || type === 'FULL'"
             routerLinkActive="active"
-            ngbDropdown
+            routerLink="/"
             class="nav-item dropdown pointer"
-            routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }">
-          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
+          <a class="nav-link" href="javascript:void(0);" id="entity-menu">
             <span>
               <fa-icon icon="exchange-alt"></fa-icon>
               <span>Flows</span>
             </span>
           </a>
-          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
-            <li>
-              <a
-                class="dropdown-item"
-                routerLink="/"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <span>Manage</span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="dropdown-item"
-                routerLink="/step"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <fa-icon icon="asterisk"></fa-icon>
-                <span>Steps</span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="dropdown-item"
-                routerLink="/connection"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <fa-icon icon="asterisk"></fa-icon>
-                <span>Connections</span>
-              </a>
-            </li>
-          </ul>
         </li>
         <li
           *ngIf="type === 'BROKER' || type === 'FULL'"
           routerLinkActive="active"
-          ngbDropdown
-          class="nav-item dropdown pointer"
+          routerLink="/broker"
+          class="nav-item"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
+          <a class="nav-link" href="javascript:void(0);" id="entity-menu">
             <span>
               <fa-icon icon="envelope"></fa-icon>
               <span>Broker</span>
             </span>
           </a>
-          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
-            <li>
-              <a
-                class="dropdown-item"
-                routerLink="/broker"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <span>Manage</span>
-              </a>
-            </li>
-            <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
-              <a
-                class="dropdown-item"
-                routerLink="/queue"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <fa-icon icon="asterisk"></fa-icon>
-                <span>Queues</span>
-              </a>
-            </li>
-            <li *jhiHasAnyAuthority="'ROLE_ADMIN'">
-              <a
-                class="dropdown-item"
-                routerLink="/topic"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-              >
-                <fa-icon icon="asterisk"></fa-icon>
-                <span>Topics</span>
-              </a>
-            </li>
-          </ul>
         </li>
-
-        <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
-        @if (account !== null) {
         <li
           ngbDropdown
           class="nav-item dropdown pointer"
@@ -146,8 +67,8 @@
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
               >
-                <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span>Gateway</span>
+                <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
+                <span>Overview</span>
               </a>
             </li>
             <li *ngIf="type === 'INTEGRATION' || type === 'FULL'">

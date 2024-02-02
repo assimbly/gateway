@@ -47,7 +47,7 @@ management:
           - jolokia
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: "ALWAYS"
       roles: 'ROLE_ADMIN'
       probes:
         enabled: true

@@ -20,23 +20,10 @@
   <div class="row">
     <div class="col-6">
       <h2>
-        <span>Integration</span>
+        <span>Settings</span>
       </h2>
     </div>
     <div class="col-6" *ngIf="integrations.length > 0">
-      <a
-        role="button"
-        class="btn btn-sm right-border-radius-0 assimbly-link assimbly-integration-img"
-        href="https://github.com/assimbly/integration/wiki/Integration"
-        placement="right"
-        title="Assimbly Documentation"
-        target="_blank"
-      >
-        <picture>
-          <source srcset="../../../content/images/assimbly_transparant.webp" />
-          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
-        </picture>
-      </a>
     </div>
     <div class="col-6" *ngIf="integrations.length === 0">
       <button
@@ -47,7 +34,7 @@
         *jhiHasAnyAuthority="'ROLE_ADMIN'"
       >
         <fa-icon [icon]="'plus'"></fa-icon>
-        <span>Create Integration</span>
+        <span>Create Gateway</span>
       </button>
     </div>
   </div>
@@ -58,7 +45,6 @@
       (click)="openRestartIntegrationModal(restartIntegrationModal)"
       style="margin-right: 5px; color: white;"
       class="btn btn-info btn-sm mb-3"
-      *jhiHasAnyAuthority="'ROLE_ADMIN'"
     >
       <span class="fa fa-refresh"></span>
       <span class="d-none d-md-inline">Restart</span>
@@ -154,7 +140,6 @@
             <div class="d-block pull-right">
               <button
                 type="submit"
-                *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 [routerLink]="['/integration', integration.id, 'edit']"
                 queryParamsHandling="merge"
                 class="btn btn-primary btn-sm"
