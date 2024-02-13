@@ -69,7 +69,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '4.1.0-SNAPSHOT'
+version = '5.0.0'
 description = "A message gateway"
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
