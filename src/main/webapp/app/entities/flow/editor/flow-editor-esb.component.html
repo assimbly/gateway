@@ -391,16 +391,18 @@
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                                     <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
-                            <button title="New step or route" type="button"
+                            <button title="New route" type="button"
                                     class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                                    <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                             </button>
-                            <button title="Create step or route" type="button" *ngIf="!routeCreated"
+                            <button title="Create route" type="button" *ngIf="!routeCreated"
                                     class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                                  <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                             </button>
 
                         </div>
@@ -427,16 +429,18 @@
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
                               <span class="padding-button"><fa-icon icon="edit" style="color: white;"></fa-icon></span>&nbsp;
                             </button>
-                            <button title="New step or route" type="button"
+                            <button title="New route" type="button"
                                     class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     *ngIf="routeCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].route.value"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                                    <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                             </button>
-                            <button title="Create step or route" type="button" *ngIf="!routeCreated"
+                            <button title="Create route" type="button" *ngIf="!routeCreated"
                                     class="col-2 btn btn-primary flow-new-button"
                                     style="height: 37px;"
                                     (click)="createOrEditRoute(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].route)">
+                                    <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                             </button>
                           </div>
 
@@ -516,10 +520,12 @@
                                   *ngIf="messageCreated && !editFlowForm['controls'].stepsData['controls'][index]['controls'].message.value"
                                   class="col-2 btn btn-primary flow-new-button" title="New header"
                                   (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
+                                  <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                           </button>
                           <button type="button" *ngIf="!messageCreated" class="col-2 btn btn-primary flow-new-button"
                                   title="Create header"
                                   (click)="createOrEditMessage(step, editFlowForm['controls'].stepsData['controls'][index]['controls'].message)">
+                                  <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                           </button>
                         </div>
 
@@ -544,11 +550,13 @@
                                   class="col-2 btn btn-primary flow-new-button" title="New connection"
                                   (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
                                   [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
+                                <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                           </button>
                           <button type="button" *ngIf="!connectionCreated" class="col-2 btn btn-primary flow-new-button"
                                   title="Create connection"
                                   (click)="createOrEditConnection(step, connectionType[index], editFlowForm['controls'].stepsData['controls'][index]['controls'].connection)"
                                   [disabled]="editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.disabled">
+                                 <span class="padding-button"><fa-icon icon="plus" style="color: white;"></fa-icon></span>
                           </button>
                         </div>
 

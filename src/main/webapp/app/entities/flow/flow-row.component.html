@@ -11,31 +11,6 @@
 </td>
 
 <td>
-    <i
-      aria-hidden="true"
-      (mouseenter)="getFlowDetails()"
-      data-container="body"
-      container="body"
-      placement="right"
-      triggers="mouseenter:mouseleave"
-      popoverTitle="Details"
-      popover-class="increase-popover-width"
-      [popover]="detailsTemplate"
-    ><fa-icon icon="info"></fa-icon></i>
-    <i
-      style="padding-left: 1em"
-      aria-hidden="true"
-      data-container="body"
-      container="body"
-      placement="right"
-      (mouseenter)="getFlowStatistic(flow)"
-      triggers="mouseenter:mouseleave"
-      popoverTitle="Stats"
-      popover-class="increase-popover-width"
-      [popover]="statsTemplate"
-    >
-      <fa-icon icon="chart-bar"></fa-icon>
-    </i>
     <a style="padding-left: 1em"
        (click)="navigateToFlowEditor('edit')"
        aria-hidden="true"
@@ -141,15 +116,35 @@
           }"
   		  style="min-width: 20em; color: white;"
           type="button"
-          class="btn btn-sm btn-block btn-arrow-right text-left"
-          container="body"
-          placement="right"
-          triggers="mouseenter:mouseleave"
-          popoverTitle="Status"
-          [ngbPopover]="statusFlowButtonTemplate"
-          [autoClose]="'outside'"
+          class="btn btn-sm btn-block btn-arrow-right"
         >
-          <span style="text-transform: uppercase">{{ flow.name }}</span>
+          <span style="padding-left: 2em; text-transform: uppercase; float:left">{{ flow.name }}</span>
+          <i
+            style="padding-left: 1em"
+            aria-hidden="true"
+            (mouseenter)="getFlowDetails()"
+            data-container="body"
+            container="body"
+            placement="right"
+            triggers="mouseenter:mouseleave"
+            popoverTitle="Details"
+            popover-class="increase-popover-width"
+            [popover]="detailsTemplate"
+          ><fa-icon icon="info"></fa-icon></i>
+          <i
+            style="padding-left: 1em"
+            aria-hidden="true"
+            data-container="body"
+            container="body"
+            placement="right"
+            (mouseenter)="getFlowStatistic(flow)"
+            triggers="mouseenter:mouseleave"
+            popoverTitle="Stats"
+            popover-class="increase-popover-width"
+            [popover]="statsTemplate"
+          >
+            <fa-icon icon="chart-bar"></fa-icon>
+          </i>
         </button>
       </div>
 </td>
@@ -162,10 +157,27 @@
 
 <td class="text-right">
   <div class="float-right" style="margin-right: 30px">
-    <ng-template #statusFlowButtonTemplate let-message="message">
-      <div [innerHtml]="flowStatusButton">
-      </div>
-    </ng-template>
+    <h4 class="float-right">
+      <ng-template #errorFlowButtonTemplate let-message="message">
+        <div [innerHtml]="flowErrorButton"></div>
+      </ng-template>
+    </h4>
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; vertical-align: top">
+      <span
+        class="badge bg-danger text-dark"
+        *ngIf="flowError === 'true'"
+        placement="left"
+        triggers="mouseenter"
+        popoverTitle="Install error"
+        [ngbPopover]="errorFlowButtonTemplate"
+        popover-class="increase-popover-width"
+        [autoClose]="'outside'"
+      >
+			<fa-icon style="color: white;" icon="exclamation-triangle"></fa-icon>
+      </span>
+    </h5>
+  </div>
+  <div class="float-right" style="margin-right: 30px">
     <h4 class="float-right">
       <ng-template #alertsFlowButtonTemplate let-message="message">
         <div [innerHtml]="flowAlertsButton"></div>
@@ -179,7 +191,7 @@
         placement="left"
         on-mouseover="getFlowAlerts(flow.id)"
         triggers="mouseenter"
-        popoverTitle="Show last alerts"
+        popoverTitle="Last alerts"
         [ngbPopover]="alertsFlowButtonTemplate"
         [autoClose]="'outside'"
       >
