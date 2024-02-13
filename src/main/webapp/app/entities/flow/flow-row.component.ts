@@ -367,10 +367,10 @@ export class FlowRowComponent implements OnInit {
 
     switch (mode) {
         case 'edit':
-          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type }});
+          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
           break;
         case 'clone':
-          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type }});
+          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
           break;
         case 'delete':
           let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
@@ -420,39 +420,6 @@ export class FlowRowComponent implements OnInit {
 
   }
 
-  getFlowStats(flow: IFlow) {
-
-    this.startGetFlowStats(flow);
-
-    // refresh every 5 seconds
-    this.intervalTime = setInterval(() => {
-      this.startGetFlowStats(flow);
-    }, 5000);
-
-  }
-
-  startGetFlowStats(flow: IFlow) {
-    this.flowStatistic = ``;
-    this.statsTableRows = [];
-
-    for (const step of flow.steps) {
-
-      if (step.stepType === StepType.FROM || step.stepType === StepType.SOURCE) {
-        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
-          this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri);
-        });
-      }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
-        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
-          this.setFlowStatistic(res.body, flow.id + '-' + step.id);
-        });
-
-      }
-    }
-  }
-
-  stopGetFlowStats() {
-    clearInterval(this.intervalTime);
-  }
 
   getFlowDetails() {
     const createdFormatted = dayjs(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
@@ -471,35 +438,62 @@ export class FlowRowComponent implements OnInit {
         `;
   }
 
-  setFlowStatistic(res, uri) {
-          /* Example of available stats
-          *
-          * "maxProcessingTime": 1381,
-            "lastProcessingTime": 1146,
-            "meanProcessingTime": 1262,
-            "lastExchangeFailureExchangeId": "",
-            "firstExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
-            "firstExchangeCompletedExchangeId": "ID-win81-1553585873482-0-1",
-            "lastExchangeCompletedTimestamp": "2019-03-26T08:44:04.510+0100",
-            "exchangesCompleted": 3,
-            "deltaProcessingTime": -114,
-            "firstExchangeCompletedTimestamp": "2019-03-26T08:44:01.955+0100",
-            "externalRedeliveries": 0,
-            "firstExchangeFailureExchangeId": "",
-            "lastExchangeCompletedExchangeId": "ID-win81-1553585873482-0-9",
-            "lastExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
-            "exchangesFailed": 0,
-            "redeliveries": 0,
-            "minProcessingTime": 1146,
-            "resetTimestamp": "2019-03-26T08:43:59.201+0100",
-            "failuresHandled": 3,
-            "totalProcessingTime": 3787,
-            "startTimestamp": "2019-03-26T08:43:59.201+0100"
-         */
+  getFlowStatistic(flow: IFlow) {
+
+    console.log('get flow stats');
+
+    this.flowStatistic = ``;
+    this.statsTableRows = [];
+
+    for (const step of flow.steps) {
+
+       console.log('get flow stats step=' + step.stepType);
+
+      if (step.stepType === StepType.SOURCE) {
+        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
+          this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri, step.stepType);
+        });
+      }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
+        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
+          this.setFlowStatistic(res.body, flow.id + '-' + step.id, step.stepType);
+        });
+
+      }
+    }
+
+  }
+
+ /* Example of available stats
+  *
+  * "maxProcessingTime": 1381,
+    "lastProcessingTime": 1146,
+    "meanProcessingTime": 1262,
+    "lastExchangeFailureExchangeId": "",
+    "firstExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
+    "firstExchangeCompletedExchangeId": "ID-win81-1553585873482-0-1",
+    "lastExchangeCompletedTimestamp": "2019-03-26T08:44:04.510+0100",
+    "exchangesCompleted": 3,
+    "deltaProcessingTime": -114,
+    "firstExchangeCompletedTimestamp": "2019-03-26T08:44:01.955+0100",
+    "externalRedeliveries": 0,
+    "firstExchangeFailureExchangeId": "",
+    "lastExchangeCompletedExchangeId": "ID-win81-1553585873482-0-9",
+    "lastExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
+    "exchangesFailed": 0,
+    "redeliveries": 0,
+    "minProcessingTime": 1146,
+    "resetTimestamp": "2019-03-26T08:43:59.201+0100",
+    "failuresHandled": 3,
+    "totalProcessingTime": 3787,
+    "startTimestamp": "2019-03-26T08:43:59.201+0100"
+ */
+  setFlowStatistic(res, uri, stepType) {
 
     if (res.step.status != 'started') {
-      this.flowStatistic = `Currently there are no statistics for this flow.`;
+      this.flowStatistic = `There are no stats yet.`;
     } else {
+
+      const step = this.capitalizeFirstLetter(stepType);
       const now = dayjs();
       const start = dayjs(res.step.stats.startTimestamp);
       const flowRuningTime = dayjs.duration(now.diff(start));
@@ -507,88 +501,24 @@ export class FlowRowComponent implements OnInit {
       const minutes = flowRuningTime.minutes();
       const completed = parseInt(res.step.stats.exchangesCompleted) - parseInt(res.step.stats.failuresHandled);
       const failures = parseInt(res.step.stats.exchangesFailed) + parseInt(res.step.stats.failuresHandled);
-      let processingTime = ``;
-
-      if (this.statsTableRows.length === 0) {
-        this.statsTableRows[0] = `<td>${uri}</td>`;
-        this.statsTableRows[1] = `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
-        this.statsTableRows[2] = `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[5] = `<td>${completed}</td>`;
-        this.statsTableRows[6] = `<td>${failures}</td>`;
-        this.statsTableRows[7] = `<td>${res.step.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = `<td>${res.step.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = `<td>${res.step.stats.meanProcessingTime} ms</td>`;
-      } else {
-        this.statsTableRows[0] = this.statsTableRows[0] + `<td>${uri}</td>`;
-        this.statsTableRows[1] = this.statsTableRows[1] + `<td>${this.checkDate(res.step.stats.startTimestamp)}</td>`;
-        this.statsTableRows[2] = this.statsTableRows[2] + `<td>${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}</td>`;
-        this.statsTableRows[3] = this.statsTableRows[3] + `<td>${this.checkDate(res.step.stats.firstExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[4] = this.statsTableRows[4] + `<td>${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}</td>`;
-        this.statsTableRows[5] = this.statsTableRows[5] + `<td>${completed}</td>`;
-        this.statsTableRows[6] = this.statsTableRows[6] + `<td>${failures}</td>`;
-        this.statsTableRows[7] = this.statsTableRows[7] + `<td>${res.step.stats.minProcessingTime} ms</td>`;
-        this.statsTableRows[8] = this.statsTableRows[8] + `<td>${res.step.stats.maxProcessingTime} ms</td>`;
-        this.statsTableRows[9] = this.statsTableRows[9] + `<td>${res.step.stats.meanProcessingTime} ms</td>`;
-      }
-
-      if (res.step.stats.lastProcessingTime > 0) {
-        processingTime = `<tr>
-			      <th scope="row">Min</th>
-			      ${this.statsTableRows[7]}
-			    </tr>
-			    <tr>
-			      <th scope="row">Max</th>
-			      ${this.statsTableRows[8]}
-			    </tr>
-			    <tr>
-			      <th scope="row">Average</th>
-			      ${this.statsTableRows[9]}
-			    </tr>`;
-      }
 
       this.flowStatistic =
         `
-            <div class="col-12">
-			<table class="table">
-			  <tbody>
-                 <tr>
-                    <th scope="row">Step</th>
-                    ${this.statsTableRows[0]}
-                </tr>
-			    <tr>
-			      <th scope="row">Start time</th>
-                    ${this.statsTableRows[1]}
-			    </tr>
-			    <tr>
-			      <th scope="row">Running</th>
-                    ${this.statsTableRows[2]}
-			    </tr>
-			    <tr>
-			      <th scope="row">First Message</th>
-                    ${this.statsTableRows[3]}
-			    </tr>
-			    <tr>
-			      <th scope="row">Last Message</th>
-			       ${this.statsTableRows[4]}
-			    </tr>` +
-        processingTime +
-        `
-			    <tr>
-			      <th scope="row">Completed</th>
-                  ${this.statsTableRows[5]}
-			    </tr>
-			    <tr>
-			      <th scope="row">Failed</th>
-                  ${this.statsTableRows[6]}
-			    </tr>
-               </tbody>
-			</table>
-			<div>
+          <b>${step}:</b> ${uri}<br/>
+          <b>Start time:</b> ${this.checkDate(res.step.stats.startTimestamp)}<br/>
+          <b>Running:</b> ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}<br/><br/>
+          <b>Last message:</b> ${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}<br/>
+          <b>Completed:</b> ${completed}<br/>
+          <b>Failed:</b> ${failures}<br/>
+
         `;
     }
+
   }
+
+    capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
 
   checkDate(r) {
     if (r) {
