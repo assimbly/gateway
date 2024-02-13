@@ -2,9 +2,7 @@
 	<div [innerHtml]="flowDetails"></div>
 </ng-template>
 <ng-template #statsTemplate let-message="message">
-	<div class="container-fluid">
-	  <div class="row" [innerHtml]="flowStatistic"></div>
-	</div>
+  <div [innerHtml]="flowStatistic"></div>
 </ng-template>
 
 
@@ -26,29 +24,16 @@
     ><fa-icon icon="info"></fa-icon></i>
     <i
       style="padding-left: 1em"
+      aria-hidden="true"
       data-container="body"
       container="body"
-      (mouseenter)="getFlowStats(flow)"
-      (mouseleave)="stopGetFlowStats()"
-      [hidden]="!isFlowStatusOK"
-      triggers="mouseenter:mouseleave"
       placement="right"
-      popoverTitle="Stats"
-      [popover]="statsTemplate"
-      class="stats"
-    >
-      <fa-icon icon="chart-bar"></fa-icon>
-    </i>
-    <i
-      [hidden]="isFlowStatusOK"
-      style="padding-left: 1em"
-      data-container="body"
-      container="body"
+      (mouseenter)="getFlowStatistic(flow)"
       triggers="mouseenter:mouseleave"
       popoverTitle="Stats"
+      popover-class="increase-popover-width"
       [popover]="statsTemplate"
-      class="stats statsEnable"
-      >
+    >
       <fa-icon icon="chart-bar"></fa-icon>
     </i>
     <a style="padding-left: 1em"

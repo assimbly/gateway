@@ -753,7 +753,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
         this.requestExchangePattern = this.messageSenderForm.controls.exchangepattern.value;
         this.requestNumberOfTimes =
-            this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
+        this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
         this.requestComponentType = stepForm.controls.componentType.value;
         this.requestOptions = '?';
         this.requestUri = this.requestStep.uri;
@@ -772,10 +772,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
-		this.alertService.addAlert({
-		  type: 'success',
-		  message: 'Send successfully',
-		});
+        this.alertService.addAlert({
+          type: 'success',
+          message: 'Send successfully',
+        });
         setTimeout(() => {
             this.isSending = false;
         }, 1000);
@@ -790,10 +790,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     handleSendError(body: any) {
         this.isSending = false;
-		this.alertService.addAlert({
-		  type: 'danger',
-		  message: 'Send failed',
-		});
+        this.alertService.addAlert({
+          type: 'danger',
+          message: 'Send failed',
+        });
         this.responseBody = body;
         this.active = '1';
     }

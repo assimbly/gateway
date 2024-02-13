@@ -136,6 +136,8 @@ eclipse {
     }
 }
 
+// docker pull container-registry.oracle.com/graalvm/jdk:21
+// icr.io/appcafe/open-liberty full-java21-openj9-ubi-minimal
 //build container image
 jib {
     from {
@@ -623,7 +625,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "8.5"
+    gradleVersion = "8.6"
 }
 
 if (project.hasProperty("nodeInstall")) {
