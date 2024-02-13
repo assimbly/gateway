@@ -57,6 +57,9 @@ export class FlowRowComponent implements OnInit {
   public flowStartTime: any;
   public clickButton = false;
 
+  public flowError: string;
+  public flowErrorButton: string;
+
   public flowAlerts: string;
   public flowAlertsButton: string;
   public numberOfAlerts: any;
@@ -200,6 +203,7 @@ export class FlowRowComponent implements OnInit {
         const lastStatus = this.flowStatus;
         this.statusFlow = Status.inactiveError;
         this.isFlowStarted = this.isFlowPaused = false;
+        this.flowStatusButton = `Failed`;
         this.setErrorMessage(lastStatus,this.statusMessage);
         break;
       default:
@@ -207,12 +211,15 @@ export class FlowRowComponent implements OnInit {
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
+        this.flowStatusButton = `Unknown`;
         this.setErrorMessage(unknownStatus,this.statusMessage);
         break;
     }
   }
 
   setErrorMessage(action: string, error: string){
+
+      this.flowError = `true`;
 
       try {
 
@@ -221,8 +228,7 @@ export class FlowRowComponent implements OnInit {
                   const total = this.statusMessage.flow.stepsLoaded.total;
                   const failed = this.statusMessage.flow.stepsLoaded.failed;
 
-                  this.flowStatusButton = `<b>Last action:</b> ${action} <br/>
-                                           <b>Status:</b> ${failed} of ${total} steps failed to start <br/><br/>
+                  this.flowErrorButton = `${failed} of ${total} steps failed to start <br/><br/>
                                            <b>Details:</b> <br/>`;
 
                   for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
@@ -235,7 +241,7 @@ export class FlowRowComponent implements OnInit {
 
                           const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
 
-                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table ">
                             <tbody>
                               <tr>
                                 <td><b>step id:</b></td>
@@ -254,7 +260,7 @@ export class FlowRowComponent implements OnInit {
                       }else if(status==='error'){
                           const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
 
-                          this.flowStatusButton = this.flowStatusButton + `<br/><table class="table ">
+                          this.flowErrorButton = this.flowStatusButton + `<br/><table class="table ">
                             <tbody>
                               <tr>
                                 <td><b>step id:</b></td>
@@ -271,10 +277,10 @@ export class FlowRowComponent implements OnInit {
                   }
 
           } else {
-              this.flowStatusButton = this.statusMessage.flow.message;
+              this.flowErrorButton = this.statusMessage.flow.message;
           }
       } catch (e) {
-           this.flowStatusButton = error;
+           this.flowErrorButton = error;
       }
 
   }
@@ -432,8 +438,7 @@ export class FlowRowComponent implements OnInit {
                 <b>Version:</b> ${this.flow.version}<br/><br/>
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
-                <b>Autostart:</b> ${this.flow.autoStart}<br/>
-                <b>Tracing:</b> ${this.flow.logLevel}<br/>
+                <b>Status:</b> ${this.flowStatusButton}<br/>
 
         `;
   }
@@ -652,6 +657,7 @@ export class FlowRowComponent implements OnInit {
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
+    this.flowError = `false`;
 
     if(this.flow.logLevel === LogLevelType.TRACE){
       this.enableTracing();
@@ -741,6 +747,7 @@ export class FlowRowComponent implements OnInit {
     this.flowStatus = 'Restarting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
+    this.flowAlerts = `false`;
 
     if(this.flow.logLevel === LogLevelType.OFF){
       this.disableTracing();
