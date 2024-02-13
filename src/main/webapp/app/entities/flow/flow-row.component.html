@@ -119,32 +119,34 @@
           class="btn btn-sm btn-block btn-arrow-right"
         >
           <span style="padding-left: 2em; text-transform: uppercase; float:left">{{ flow.name }}</span>
-          <i
-            style="padding-left: 1em"
-            aria-hidden="true"
-            (mouseenter)="getFlowDetails()"
-            data-container="body"
-            container="body"
-            placement="right"
-            triggers="mouseenter:mouseleave"
-            popoverTitle="Details"
-            popover-class="increase-popover-width"
-            [popover]="detailsTemplate"
-          ><fa-icon icon="info"></fa-icon></i>
-          <i
-            style="padding-left: 1em"
-            aria-hidden="true"
-            data-container="body"
-            container="body"
-            placement="right"
-            (mouseenter)="getFlowStatistic(flow)"
-            triggers="mouseenter:mouseleave"
-            popoverTitle="Stats"
-            popover-class="increase-popover-width"
-            [popover]="statsTemplate"
-          >
-            <fa-icon icon="chart-bar"></fa-icon>
-          </i>
+          <span style="padding-right: 2em; float:right">
+            <i
+              style="padding-left: 1em"
+              aria-hidden="true"
+              (mouseenter)="getFlowDetails()"
+              data-container="body"
+              container="body"
+              placement="right"
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Details"
+              popover-class="increase-popover-width"
+              [popover]="detailsTemplate"
+            ><fa-icon icon="info"></fa-icon></i>
+            <i
+              style="padding-left: 1em"
+              aria-hidden="true"
+              data-container="body"
+              container="body"
+              placement="right"
+              (mouseenter)="getFlowStatistic(flow)"
+              triggers="mouseenter:mouseleave"
+              popoverTitle="Stats"
+              popover-class="increase-popover-width"
+              [popover]="statsTemplate"
+            >
+              <fa-icon icon="chart-bar"></fa-icon>
+            </i>
+          </span>
         </button>
       </div>
 </td>
@@ -156,13 +158,13 @@
 <td id="flowErrorStepID" [hidden]="!flowRowErrorStepID"></td>
 
 <td class="text-right">
-  <div class="float-right" style="margin-right: 30px">
+  <div class="float-right;" style="margin-right: 30px">
     <h4 class="float-right">
       <ng-template #errorFlowButtonTemplate let-message="message">
         <div [innerHtml]="flowErrorButton"></div>
       </ng-template>
     </h4>
-    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; vertical-align: top">
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; margin-top: -10px; vertical-align: top">
       <span
         class="badge bg-danger text-dark"
         *ngIf="flowError === 'true'"
@@ -183,7 +185,7 @@
         <div [innerHtml]="flowAlertsButton"></div>
       </ng-template>
     </h4>
-    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; vertical-align: top">
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px;  margin-top: -10px; vertical-align: top">
       <span
         class="badge bg-warning text-dark"
         *ngIf="flowAlerts === 'true'"

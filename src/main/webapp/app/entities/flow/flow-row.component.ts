@@ -244,10 +244,6 @@ export class FlowRowComponent implements OnInit {
                           this.flowErrorButton = this.flowErrorButton + `<br/><table class="table ">
                             <tbody>
                               <tr>
-                                <td><b>step id:</b></td>
-                                <td>${id}</td>
-                              </tr>
-                              <tr>
                                 <td><b>uri:</b></td>
                                 <td>${uri}</td>
                               </tr>
@@ -260,12 +256,8 @@ export class FlowRowComponent implements OnInit {
                       }else if(status==='error'){
                           const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
 
-                          this.flowErrorButton = this.flowStatusButton + `<br/><table class="table ">
+                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table ">
                             <tbody>
-                              <tr>
-                                <td><b>step id:</b></td>
-                                <td>${id}</td>
-                              </tr>
                               <tr>
                                 <td><b>error:</b></td>
                                 <td>${errorMessage}</td>
