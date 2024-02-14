@@ -8,7 +8,7 @@
 <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${user.home}/.assimbly/logs/%d{yyyy-MM-dd}.assimbly.log</fileNamePattern>
+            <fileNamePattern>/data/.assimbly/logs/%d{yyyy-MM-dd}.assimbly.log</fileNamePattern>
             <maxHistory>30</maxHistory>
 		    <totalSizeCap>10GB</totalSizeCap>
         </rollingPolicy>

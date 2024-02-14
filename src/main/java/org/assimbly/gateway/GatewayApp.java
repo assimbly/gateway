@@ -129,8 +129,8 @@ public class GatewayApp {
             } else {
                 applicationBaseDirectory = userHomeDir + "/.assimbly";
             }
-        } else {
-            applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
+        } else if(applicationBaseDirectory.endsWith("/")){
+            applicationBaseDirectory = applicationBaseDirectory + ".assimbly";
         }
 
        log.info(
