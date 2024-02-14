@@ -235,7 +235,7 @@ application:
     name: default
     tracing: false
     debugging: false
-    base-directory: /app
+    base-directory: default
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true

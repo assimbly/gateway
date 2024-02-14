@@ -136,12 +136,16 @@ eclipse {
     }
 }
 
+// image = 'eclipse-temurin:21' (temurin on docker)
+// image = 'open-21-jdk-jammy' (semeru on dockerhub)
+// image = 'icr.io/appcafe/open-liberty:full-java21-openj9-ubi-minimal' (semeru minimal)
+// image = 'container-registry.oracle.com/graalvm/jdk:21' (graalvm from Oracle registry)
 // docker pull container-registry.oracle.com/graalvm/jdk:21
-// icr.io/appcafe/open-liberty full-java21-openj9-ubi-minimal
+// icr.io/appcafe/open-liberty/full-java21-openj9-ubi-minimal
 //build container image
 jib {
     from {
-        image = 'eclipse-temurin:21'
+        image = 'container-registry.oracle.com/graalvm/jdk:21'
     }
     to {
         image = 'assimbly/gateway-full'
@@ -290,7 +294,7 @@ configurations {
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.31.2")
+                    details.useVersion("2.32.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("6.0.1")
