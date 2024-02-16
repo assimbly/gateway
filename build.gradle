@@ -122,7 +122,6 @@ if (project.hasProperty("gae")) {
     appengineStage.dependsOn thinResolve
 }
 
-
 idea {
     module {
         excludeDirs += files("node_modules")
