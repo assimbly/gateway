@@ -34,7 +34,7 @@ public class Integration {
     }
     @PostConstruct
     public void init() throws Exception {
-        log.info("Start runtime");
+        log.debug("Start runtime");
         initIntegration();
     }
 

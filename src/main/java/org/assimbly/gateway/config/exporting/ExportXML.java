@@ -4,9 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.importing.ImportXMLUtil;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.*;
 import org.assimbly.util.IntegrationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,8 @@ import java.util.*;
 public class ExportXML {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
+
+    private final Logger log = LoggerFactory.getLogger(ExportXML.class);
 
     private final ApplicationProperties applicationProperties;
 
@@ -436,8 +441,12 @@ public class ExportXML {
                         routeConfigurations.appendChild(node);
                     }else{
                         routes.appendChild(node);
+                        System.out.println("append the node");
                     }
+                }else{
+                    log.error("Route content is not valid XML:\n\n" + routeContent);
                 }
+
             }
         }
 
