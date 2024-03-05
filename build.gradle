@@ -119,7 +119,6 @@ if (project.hasProperty("gae")) {
     appengineStage.dependsOn thinResolve
 }
 
-
 idea {
     module {
         excludeDirs += files("node_modules")
@@ -375,9 +374,7 @@ dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "commons-io:commons-io"
 
-
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-    //implementation "jakarta.transaction:jakarta.transaction-api"
+    implementation 'jakarta.persistence:jakarta.persistence-api'
     implementation "org.ehcache:ehcache"
     implementation "org.hibernate.orm:hibernate-core:${hibernate_version}"
     implementation "org.hibernate.orm:hibernate-jcache:${hibernate_version}"
