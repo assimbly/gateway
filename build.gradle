@@ -490,6 +490,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "hl7", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "multipart", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
