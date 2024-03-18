@@ -52,8 +52,8 @@ plugins {
     id "com.github.node-gradle.node"
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
-    id 'de.undercouch.download' version '5.5.0'
-    id "com.github.ben-manes.versions" version "0.50.0"
+    id 'de.undercouch.download' version '5.6.0'
+    id "com.github.ben-manes.versions" version "0.51.0"
     // id 'org.graalvm.buildtools.native' version '0.9.28'
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
@@ -150,7 +150,7 @@ jib {
         image = 'assimbly/gateway-full'
     }
     container {
-        ports = ['1000', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
+        ports = ['1000', '1616','1617', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
         format = 'OCI'
     }
     containerizingMode = 'exploded'
@@ -472,6 +472,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "multipart", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
