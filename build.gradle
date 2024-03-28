@@ -7,7 +7,13 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
+
+
         /*
+
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://repo.spring.io/snapshot" }
+
         maven{  name = "Aurea"
             url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
         }
@@ -286,17 +292,17 @@ configurations {
     all {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
-            force 'org.liquibase:liquibase-core:4.25.1'
-            force 'implementation "org.hibernate.orm:hibernate-core:6.4.2.Final'
-            force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.2.Final'
-            force 'implementation "org.hibernate.orm:hibernate-envers:6.4.2.Final'
+            force 'org.liquibase:liquibase-core:4.26.0'
+            force 'implementation "org.hibernate.orm:hibernate-core:6.4.4.Final'
+            force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.4.Final'
+            force 'implementation "org.hibernate.orm:hibernate-envers:6.4.4.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.32.0")
+                    details.useVersion("2.33.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.0.1")
+                    details.useVersion("6.1.0")
                 }
             }
         }
@@ -345,7 +351,7 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.1.0'
+    implementation 'tech.jhipster:jhipster-framework:8.2.0'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
@@ -627,7 +633,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "8.6"
+    gradleVersion = "8.7"
 }
 
 if (project.hasProperty("nodeInstall")) {
