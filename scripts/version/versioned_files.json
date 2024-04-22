@@ -1,7 +1,7 @@
 {
     "applicationName": "gateway",
-    "oldVersion": "4.0.5-SNAPSHOT",
-    "newVersion": "4.0.5-SNAPSHOT",
+    "oldVersion": "4.0.6",
+    "newVersion": "4.0.6",
     "resources": [
         {
             "path": "/package.json"
