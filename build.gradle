@@ -349,7 +349,7 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.2.0'
+    implementation 'tech.jhipster:jhipster-framework:8.3.0'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
@@ -439,8 +439,6 @@ dependencies {
 
     implementation 'org.yaml:snakeyaml'
 
-    //implementation 'org.crac:crac:1.4.0'
-
     implementation "com.warrenstrange:googleauth:1.5.0"
 
     implementation "org.mongodb.morphia:morphia:1.3.2"
@@ -484,12 +482,10 @@ dependencies {
         implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "throttling", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "xmltojson", version: "${version}", changing: true
