@@ -168,6 +168,7 @@ server:
     httpConfig:
       generateOrigin: true
 
+
 springdoc:
   show-actuator: true
   swagger-ui:
