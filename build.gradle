@@ -290,7 +290,7 @@ configurations {
     all {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
-            force 'org.liquibase:liquibase-core:4.26.0'
+            force 'org.liquibase:liquibase-core:4.27.0'
             force 'implementation "org.hibernate.orm:hibernate-core:6.4.4.Final'
             force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.4.Final'
             force 'implementation "org.hibernate.orm:hibernate-envers:6.4.4.Final'
@@ -483,6 +483,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
