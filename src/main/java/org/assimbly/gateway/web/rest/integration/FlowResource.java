@@ -129,7 +129,7 @@ public class FlowResource {
     @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long integrationid
+        @PathVariable(value = "integrationid") Long integrationid
     ) {
         log.debug("REST request to get a page of flows by integrationid");
         Page<FlowDTO> page = flowService.findAllByIntegrationId(pageable, integrationid);
@@ -145,7 +145,7 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
     @GetMapping("/flows/{id}")
-    public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
+    public ResponseEntity<FlowDTO> getFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Flow : {}", id);
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
 
@@ -159,7 +159,7 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/flows/{id}")
-    public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Flow : {}", id);
         flowService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

@@ -119,7 +119,7 @@ public class EnvironmentVariablesResource {
      * @return the ResponseEntity with status 200 (OK) and with body the environmentVariablesDTO, or with status 404 (Not Found)
      */
     @GetMapping("/environment-variables/{id}")
-    public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable Long id) {
+    public ResponseEntity<EnvironmentVariablesDTO> getEnvironmentVariables(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get EnvironmentVariables : {}", id);
         Optional<EnvironmentVariablesDTO> environmentVariablesDTO = environmentVariablesService.findOne(id);
         return ResponseUtil.wrapOrNotFound(environmentVariablesDTO);
@@ -132,7 +132,7 @@ public class EnvironmentVariablesResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/environment-variables/{id}")
-    public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEnvironmentVariables(@PathVariable("id") Long id) {
         log.debug("REST request to delete EnvironmentVariables : {}", id);
         environmentVariablesService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

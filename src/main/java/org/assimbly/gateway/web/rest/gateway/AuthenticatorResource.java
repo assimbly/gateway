@@ -43,7 +43,10 @@ public class AuthenticatorResource {
      * @return the ResponseEntity with the location of the QR code to register
      */
     @GetMapping("/authentication/register")
-    public ResponseEntity<String> registerTwoFactorAuthentication(@RequestHeader String Authorization, @RequestHeader String domainName) {
+    public ResponseEntity<String> registerTwoFactorAuthentication(
+        @RequestHeader(value = "Authorization") String Authorization,
+        @RequestHeader(value = "domainName") String domainName
+    ) {
         log.debug("REST request to register two-factor authentication");
         try {
 

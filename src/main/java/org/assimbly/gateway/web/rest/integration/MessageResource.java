@@ -116,7 +116,7 @@ public class MessageResource {
      * @return the ResponseEntity with status 200 (OK) and with body the messageDTO, or with status 404 (Not Found)
      */
     @GetMapping("/messages/{id}")
-    public ResponseEntity<MessageDTO> getMessage(@PathVariable Long id) {
+    public ResponseEntity<MessageDTO> getMessage(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Message : {}", id);
         Optional<MessageDTO> messageDTO = messageService.findOne(id);
         return ResponseUtil.wrapOrNotFound(messageDTO);
@@ -129,7 +129,7 @@ public class MessageResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/messages/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Message : {}", id);
         messageService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
@@ -142,7 +142,7 @@ public class MessageResource {
      * @return the Treemap (JSON Object)
      */
     @GetMapping("/messages/{id}/headers")
-    public TreeMap<String, Object> getHeaders(@PathVariable Long id) {
+    public TreeMap<String, Object> getHeaders(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Message : {}", id);
         String idAsString = Long.toString(id);
         TreeMap<String, Object> messageMap = getKeys(idAsString);

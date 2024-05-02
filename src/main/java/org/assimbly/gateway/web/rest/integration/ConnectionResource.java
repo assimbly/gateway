@@ -112,7 +112,7 @@ public class ConnectionResource {
      * @return the ResponseEntity with status 200 (OK) and with body the connectionDTO, or with status 404 (Not Found)
      */
     @GetMapping("/connections/{id}")
-    public ResponseEntity<ConnectionDTO> getConnection(@PathVariable Long id) {
+    public ResponseEntity<ConnectionDTO> getConnection(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Connection : {}", id);
         Optional<ConnectionDTO> connectionDTO = connectionService.findOne(id);
         return ResponseUtil.wrapOrNotFound(connectionDTO);
@@ -125,7 +125,7 @@ public class ConnectionResource {
      * @return the Treemap (JSON Object)
      */
     @GetMapping("/connections/{id}/keys")
-    public TreeMap<String, String> getConnectionKeys(@PathVariable Long id) {
+    public TreeMap<String, String> getConnectionKeys(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Header : {}", id);
         String idAsString = Long.toString(id);
         TreeMap<String, String> connectionMap = getKeys(idAsString);
@@ -139,7 +139,7 @@ public class ConnectionResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/connections/{id}")
-    public ResponseEntity<Void> deleteConnection(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteConnection(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Connection : {}", id);
         connectionService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
