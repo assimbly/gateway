@@ -144,7 +144,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
-    lazy-initialization: true
+    lazy-initialization: false
   mvc:
     favicon:
       enabled: true
