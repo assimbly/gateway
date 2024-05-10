@@ -24,12 +24,12 @@
               "path": "./webpack/webpack.custom.js"
             },
 			"allowedCommonJsDependencies": [
-				"codemirror", "buffer", "file-saver/FileSaver"
+				"sockjs-client", "codemirror"
 			],
             "outputPath": "build/resources/main/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": "src/main/webapp/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -87,15 +87,15 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "buildTarget": "gateway:build:development",
-            "port": 9060
+            "browserTarget": "gateway:build:development",
+            "port": 4200
           },
           "configurations": {
             "production": {
-              "buildTarget": "gateway:build:production"
+              "browserTarget": "gateway:build:production"
             },
             "development": {
-              "buildTarget": "gateway:build:development"
+              "browserTarget": "gateway:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -103,8 +103,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.conf.js",
-            "tsConfig": "tsconfig.spec.json"
+            "configPath": "jest.conf.js"
           }
         }
       }
