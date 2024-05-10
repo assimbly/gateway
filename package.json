@@ -146,7 +146,7 @@
     "rimraf": "5.0.5",
     "swagger-ui-dist": "5.13.0",
     "ts-jest": "29.1.2",
-    "typescript": "5.4.4",
+    "typescript": "5.4.5",
     "wait-on": "7.2.0",
     "webpack-bundle-analyzer": "4.10.1",
     "webpack-merge": "5.10.0",

@@ -20,6 +20,7 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "preserveSymlinks": true,
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
             },
