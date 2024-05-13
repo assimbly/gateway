@@ -90,7 +90,7 @@ public class HeaderResource {
      * @return the ResponseEntity with status 200 (OK) and with body the headerDTO, or with status 404 (Not Found)
      */
     @GetMapping("/header/{id}")
-    public ResponseEntity<HeaderDTO> getHeader(@PathVariable Long id) {
+    public ResponseEntity<HeaderDTO> getHeader(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Header : {}", id);
         Optional<HeaderDTO> headerDTO = headerService.findOne(id);
         return ResponseUtil.wrapOrNotFound(headerDTO);
@@ -103,7 +103,7 @@ public class HeaderResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/header/{id}")
-    public ResponseEntity<Void> deleteHeader(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteHeader(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Header : {}", id);
         headerService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

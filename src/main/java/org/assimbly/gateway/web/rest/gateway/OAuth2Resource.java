@@ -58,9 +58,9 @@ public class OAuth2Resource {
         produces = {MediaType.APPLICATION_JSON_VALUE}
     )
     public Map<String, String> tokenInfo(
-        @RequestParam("id") String id,
-        @RequestParam("tenant") String tenant,
-        @RequestParam("code") String code
+        @RequestParam(value = "id") String id,
+        @RequestParam(value = "tenant") String tenant,
+        @RequestParam(value = "code") String code
     ) {
         log.debug("REST request to register two-factor authentication");
 
