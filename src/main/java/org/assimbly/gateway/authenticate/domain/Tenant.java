@@ -1,19 +1,17 @@
 package org.assimbly.gateway.authenticate.domain;
 
+import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Property;
 
-@Entity("tenants")
 public class Tenant {
 
-    @Id
+    public static final String ID_FIELD = "_id";
+    public static final String NAME_FIELD = "name";
+    public static final String DB_NAME_FIELD = "db_name";
+    public static final String DISABLED_FIELD = "disabled";
+
     private ObjectId id;
-
     private String name;
-
-    @Property("db_name")
     private String dbName;
     private boolean disabled;
 
@@ -89,4 +87,26 @@ public class Tenant {
     }
 
     //</editor-fold>
+
+    public Document toDocument() {
+        Document document = new Document();
+        if (id != null) {
+            document.append(ID_FIELD, id);
+        }
+        document.append(NAME_FIELD, name)
+            .append(DB_NAME_FIELD, dbName)
+            .append(DISABLED_FIELD, disabled);
+        return document;
+    }
+
+    public static Tenant fromDocument(Document document) {
+        Tenant tenant = new Tenant();
+        if (document.containsKey(ID_FIELD)) {
+            tenant.setId(document.getObjectId(ID_FIELD));
+        }
+        tenant.setName(document.getString(NAME_FIELD));
+        tenant.setDbName(document.getString(DB_NAME_FIELD));
+        tenant.setDisabled(document.getBoolean(DISABLED_FIELD).booleanValue());
+        return tenant;
+    }
 }
