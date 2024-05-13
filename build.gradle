@@ -300,7 +300,7 @@ configurations {
                     details.useVersion("2.33.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.0")
+                    details.useVersion("6.1.2")
                 }
             }
         }
@@ -342,6 +342,8 @@ repositories {
 }
 
 dependencies {
+
+    implementation group: 'org.apache.activemq', name: 'activemq-openwire-legacy', version: '6.1.2'
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
