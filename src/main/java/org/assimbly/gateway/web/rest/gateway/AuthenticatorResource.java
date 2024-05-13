@@ -19,6 +19,8 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 
+import com.mongodb.client.MongoClient;
+
 /**
  * REST controller for managing authentication (two factor-authentication).
  */
@@ -33,9 +35,9 @@ public class AuthenticatorResource {
 
     private final Logger log = LoggerFactory.getLogger(AuthenticatorResource.class);
 
-    public AuthenticatorResource(){
-        authenticator.setCredentialRepository(new GoogleCredentialsRepository(database));
-        mongoDao = new MongoDao(database);
+    public AuthenticatorResource(MongoClient mongoClient, String databaseName){
+        authenticator.setCredentialRepository(new GoogleCredentialsRepository(mongoClient, databaseName));
+        mongoDao = new MongoDao(mongoClient.getDatabase(databaseName));
     }
 
     /**
@@ -43,7 +45,10 @@ public class AuthenticatorResource {
      * @return the ResponseEntity with the location of the QR code to register
      */
     @GetMapping("/authentication/register")
-    public ResponseEntity<String> registerTwoFactorAuthentication(@RequestHeader String Authorization, @RequestHeader String domainName) {
+    public ResponseEntity<String> registerTwoFactorAuthentication(
+        @RequestHeader(value = "Authorization") String Authorization,
+        @RequestHeader(value = "domainName") String domainName
+    ) {
         log.debug("REST request to register two-factor authentication");
         try {
 
