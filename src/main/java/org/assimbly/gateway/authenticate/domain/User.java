@@ -1,30 +1,26 @@
 package org.assimbly.gateway.authenticate.domain;
 
+import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.*;
-import org.assimbly.gateway.authenticate.util.EnumConverter;
 
-@Entity("users")
-@Converters(EnumConverter.class)
 public class User {
 
-    @Id
-    private ObjectId id;
+    public static final String ID_FIELD = "_id";
+    public static final String EMAIL_FIELD = "email";
+    public static final String ROLE_FIELD = "role";
+    public static final String STATUS_FIELD = "status";
+    public static final String PASSWORD_DIGEST_FIELD = "passwordDigest";
+    public static final String TENANT_ID_FIELD = "tenantId";
+    public static final String USES_TWO_FACTOR_FIELD = "usesTwoFactor";
+    public static final String SECRET_KEY_FIELD = "secretKey";
 
+    private ObjectId id;
     private String email;
     private Role role;
     private Status status;
-
-    @Property("password_digest")
     private String passwordDigest;
-
-    @Property("tenant_id")
     private ObjectId tenantId;
-
-    @Property("uses_two_factor")
     private Boolean usesTwoFactor;
-
-    @Property("secret_key")
     private String secretKey;
 
     public User() {
@@ -130,4 +126,34 @@ public class User {
         return result;
     }
     //</editor-fold>
+
+    public Document toDocument() {
+        Document document = new Document();
+        if (id != null) {
+            document.append(ID_FIELD, id);
+        }
+        document.append(EMAIL_FIELD, email)
+            .append(ROLE_FIELD, role.toString())
+            .append(STATUS_FIELD, status.toString()) // Converting Status enum to string
+            .append(PASSWORD_DIGEST_FIELD, passwordDigest)
+            .append(TENANT_ID_FIELD, tenantId)
+            .append(USES_TWO_FACTOR_FIELD, usesTwoFactor)
+            .append(SECRET_KEY_FIELD, secretKey);
+        return document;
+    }
+
+    public static User fromDocument(Document document) {
+        User user = new User();
+        if (document.containsKey(ID_FIELD)) {
+            user.setId(document.getObjectId(ID_FIELD));
+        }
+        user.setEmail(document.getString(EMAIL_FIELD));
+        user.setRole(Role.fromString(document.getString(ROLE_FIELD)));
+        user.setStatus(Status.fromString(document.getString(STATUS_FIELD)));
+        user.setPasswordDigest(document.getString(PASSWORD_DIGEST_FIELD));
+        user.setTenantId(document.getObjectId(TENANT_ID_FIELD));
+        user.setUsesTwoFactor(document.getBoolean(USES_TWO_FACTOR_FIELD));
+        user.setSecretKey(document.getString(SECRET_KEY_FIELD));
+        return user;
+    }
 }
