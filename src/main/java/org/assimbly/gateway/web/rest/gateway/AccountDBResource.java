@@ -32,8 +32,8 @@ public class AccountDBResource {
     private MongoDao mongoDao;
     private String database = ConfigHelper.get("baseDatabaseName");
 
-    public AccountDBResource(MongoClient mongoClient) {
-        this.mongoDao = new MongoDao(mongoClient.getDatabase(database));
+    public AccountDBResource() {
+        this.mongoDao = new MongoDao(database);
     }
 
     /**

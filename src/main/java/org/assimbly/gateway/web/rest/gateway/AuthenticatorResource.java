@@ -35,9 +35,9 @@ public class AuthenticatorResource {
 
     private final Logger log = LoggerFactory.getLogger(AuthenticatorResource.class);
 
-    public AuthenticatorResource(MongoClient mongoClient, String databaseName){
-        authenticator.setCredentialRepository(new GoogleCredentialsRepository(mongoClient, databaseName));
-        mongoDao = new MongoDao(mongoClient.getDatabase(databaseName));
+    public AuthenticatorResource(){
+        authenticator.setCredentialRepository(new GoogleCredentialsRepository(database));
+        mongoDao = new MongoDao(database);
     }
 
     /**
