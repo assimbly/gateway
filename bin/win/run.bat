@@ -52,15 +52,15 @@ for /f "tokens=1* delims==" %%a in ('type "%propertyFile%"') do (
 move /y "%tempFile%" "%propertyFile%"
 
 if [%1]==[] (
-    cls & ..\..\gradlew --settings-file ./../../settings.gradle -Papi-docs
+    cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx3g" -Papi-docs
 ) else (
     if [%2]==[] (
-        cls & ..\..\gradlew --settings-file ./../../settings.gradle -Papi-docs -P%1
+        cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx3g" -Papi-docs -P%1
     ) else (
         if [%3]==[] (
-            cls & ..\..\gradlew --settings-file ./../../settings.gradle -Papi-docs -P%1 -P%2
+            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx3g" -Papi-docs -P%1 -P%2
         ) else (
-            cls & ..\..\gradlew --settings-file ./../../settings.gradle -Papi-docs -P%1 -P%2 -P%3
+            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx3g" -Papi-docs -P%1 -P%2 -P%3
         )
     )
 )

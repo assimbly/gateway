@@ -471,7 +471,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
-        implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
+        //implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "mail", version: "${version}", changing: true

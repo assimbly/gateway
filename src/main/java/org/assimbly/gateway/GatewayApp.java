@@ -12,6 +12,7 @@ import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.web.rest.gateway.AccountDBResource;
 import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
