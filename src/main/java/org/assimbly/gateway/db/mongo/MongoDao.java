@@ -1,6 +1,5 @@
 package org.assimbly.gateway.db.mongo;
 
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.assimbly.gateway.authenticate.domain.Tenant;
@@ -9,7 +8,6 @@ import org.assimbly.gateway.exception.EnvironmentValueNotFoundException;
 import org.assimbly.gateway.variables.domain.EnvironmentValue;
 import org.assimbly.gateway.variables.domain.TenantVariable;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +26,13 @@ public class MongoDao {
 
     private static final String TENANT_VARIABLE_EXPRESSION = "@\\{(.*?)}";
 
-    private static MongoDatabase database;
+    private static String database;
 
     public MongoDao(){
     }
 
     public MongoDao(String databaseName) {
-        this.database = MongoClientProvider.getInstance().getDatabase(databaseName);
-    }
-
-    public static MongoCollection<Document> getCollection(String collectionName){
-        return database.getCollection(collectionName);
+        this.database = database;
     }
 
     /**
@@ -50,8 +44,10 @@ public class MongoDao {
      * @return a User object representing the user if found, otherwise null.
      */
     public User findUser(String email, String password) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
         Document query = new Document(User.EMAIL_FIELD, email).append(User.PASSWORD_DIGEST_FIELD, password);
-        Document userDocument = getCollection("users").find(query).first();
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
         if (userDocument != null) {
             return User.fromDocument(userDocument); // Convert Document to User object
         }
@@ -59,8 +55,10 @@ public class MongoDao {
     }
 
     public User findUser(String id) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
         Document query = new Document(User.ID_FIELD, id);
-        Document userDocument = getCollection("users").find(query).first();
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
         if (userDocument != null) {
             return User.fromDocument(userDocument); // Convert Document to User object
         }
@@ -68,8 +66,10 @@ public class MongoDao {
     }
 
     public User findUserByEmail(String email) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
         Document query = new Document(User.EMAIL_FIELD, email);
-        Document userDocument = getCollection("users").find(query).first();
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
         if (userDocument != null) {
             return User.fromDocument(userDocument); // Convert Document to User object
         }
@@ -77,8 +77,10 @@ public class MongoDao {
     }
 
     public Tenant findTenant(User user) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
         Document query = new Document(Tenant.ID_FIELD, user.getTenantId());
-        Document tenantDocument = getCollection("tenants").find(query).first();
+        Document tenantDocument = mongoDatabase.getCollection("tenants").find(query).first();
         if (tenantDocument != null) {
             return Tenant.fromDocument(tenantDocument);
         }
@@ -86,8 +88,10 @@ public class MongoDao {
     }
 
     public static TenantVariable findVariableByName(String variableName, String tenant) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
         Document query = new Document(TenantVariable.NAME_FIELD, variableName);
-        Document tenantVarsDocument = getCollection("tenant_variables").find(query).first();
+        Document tenantVarsDocument = mongoDatabase.getCollection("tenant_variables").find(query).first();
         if (tenantVarsDocument != null) {
             return TenantVariable.fromDocument(tenantVarsDocument);
         }
@@ -95,7 +99,9 @@ public class MongoDao {
     }
 
     public static void updateTenantVariable(TenantVariable tenantVariable, String tenant, boolean tenantVariableExist){
-        MongoCollection<Document> collection = getCollection("tenant_variables");
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
+        MongoCollection<Document> collection = mongoDatabase.getCollection("tenant_variables");
         if(tenantVariableExist) {
             collection.replaceOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), tenantVariable.toDocument());
         } else {
@@ -104,13 +110,17 @@ public class MongoDao {
     }
 
     public void updateAuthenticatorSettings(User user, String secretKey, Boolean usesTwoFactor) {
-        getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
+        mongoDatabase.getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
             new Document("$set", new Document("secret_key", secretKey)
                 .append("uses_two_factor", usesTwoFactor)));
     }
 
     public void removeAuthenticatorSettings(User user){
-        getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
+        mongoDatabase.getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
             new Document("$unset", new Document("secret_key", "")
                 .append("uses_two_factor", false)));
     }
