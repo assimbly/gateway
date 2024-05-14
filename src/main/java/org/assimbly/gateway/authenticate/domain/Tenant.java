@@ -106,7 +106,7 @@ public class Tenant {
         }
         tenant.setName(document.getString(NAME_FIELD));
         tenant.setDbName(document.getString(DB_NAME_FIELD));
-        tenant.setDisabled(document.getBoolean(DISABLED_FIELD).booleanValue());
+        tenant.setDisabled(document.getBoolean(DISABLED_FIELD));
         return tenant;
     }
 }

@@ -15,7 +15,7 @@ public class TenantVariable {
     public static final String CREATED_BY_FIELD = "createdBy";
     public static final String VALUES_FIELD = "values";
 
-    private String _id;
+    private ObjectId _id;
     private String name;
     private long createdAt;
     private String createdBy;
@@ -23,12 +23,12 @@ public class TenantVariable {
     private List<EnvironmentValue> values;
 
     public TenantVariable(){
-        this._id = new ObjectId().toString();
+        this._id = new ObjectId();
         this.values = new ArrayList<>();
     }
 
     public TenantVariable(String name){
-        this._id = new ObjectId().toString();
+        this._id = new ObjectId();
         this.name = name;
         this.values = new ArrayList<>();
     }
@@ -49,7 +49,7 @@ public class TenantVariable {
 
     public static TenantVariable fromDocument(Document document) {
         TenantVariable tenantVariable = new TenantVariable();
-        tenantVariable.set_id(document.getString(ID_FIELD));
+        tenantVariable.set_id(document.getObjectId(ID_FIELD));
         tenantVariable.setName(document.getString(NAME_FIELD));
         tenantVariable.setCreatedAt(document.getLong(CREATED_AT_FIELD));
         tenantVariable.setCreatedBy(document.getString(CREATED_BY_FIELD));
@@ -57,11 +57,11 @@ public class TenantVariable {
         List<Document> valuesList = (List<Document>) document.get(VALUES_FIELD);
         for (Document valueDoc : valuesList) {
             EnvironmentValue environmentValue = new EnvironmentValue();
-            environmentValue.set_id(valueDoc.getString(EnvironmentValue.ID_FIELD));
+            environmentValue.set_id(valueDoc.getObjectId(EnvironmentValue.ID_FIELD));
             environmentValue.setEnvironment(valueDoc.getString(EnvironmentValue.ENVIRONMENT_FIELD));
             environmentValue.setValue(valueDoc.getString(EnvironmentValue.VALUE_FIELD));
             environmentValue.setEncrypted(valueDoc.getBoolean(EnvironmentValue.ENCRYPTED_FIELD).booleanValue());
-            environmentValue.setLastUpdate(valueDoc.getLong(EnvironmentValue.LAST_UPDATE_FIELD).longValue());
+            environmentValue.setLastUpdate(valueDoc.getLong(EnvironmentValue.LAST_UPDATE_FIELD));
             environmentValue.setUpdatedBy(valueDoc.getString(EnvironmentValue.UPDATED_BY_FIELD));
             tenantVariable.put(environmentValue);
         }
@@ -92,11 +92,11 @@ public class TenantVariable {
         return document;
     }
 
-    public String get_id() {
+    public ObjectId get_id() {
         return _id;
     }
 
-    public void set_id(String _id) {
+    public void set_id(ObjectId _id) {
         this._id = _id;
     }
 
