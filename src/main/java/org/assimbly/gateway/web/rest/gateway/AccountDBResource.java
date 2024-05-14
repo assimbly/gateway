@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.mongodb.client.MongoClient;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -30,8 +32,8 @@ public class AccountDBResource {
     private MongoDao mongoDao;
     private String database = ConfigHelper.get("baseDatabaseName");
 
-    public AccountDBResource() {
-        this.mongoDao = new MongoDao(database);
+    public AccountDBResource(MongoClient mongoClient) {
+        this.mongoDao = new MongoDao(mongoClient.getDatabase(database));
     }
 
     /**

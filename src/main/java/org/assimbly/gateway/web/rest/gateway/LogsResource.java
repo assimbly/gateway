@@ -52,7 +52,11 @@ public class LogsResource {
         path = "/logs/{integrationid}/log/{lines}",
         produces = {MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getLog(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long integrationId, @PathVariable int lines) throws Exception {
+    public ResponseEntity<String> getLog(
+        @PathVariable(value = "integrationId") Long integrationId,
+        @PathVariable(value = "lines") int lines,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType
+    ) throws Exception {
 
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");

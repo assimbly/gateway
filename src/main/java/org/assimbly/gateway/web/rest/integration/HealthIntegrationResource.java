@@ -47,7 +47,7 @@ public class HealthIntegrationResource {
         path = "/flows",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
+    public ResponseEntity<String> getFlowStats(@Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType) throws Exception {
 
         plainResponse = true;
         long connectorId = 1;
@@ -67,7 +67,7 @@ public class HealthIntegrationResource {
         path = "/jvm",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType) throws Exception {
+    public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType) throws Exception {
 
         plainResponse = true;
         long connectorId = 1;

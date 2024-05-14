@@ -101,7 +101,7 @@ public class QueueResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the queueDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/queues/{id}")
-    public ResponseEntity<QueueDTO> getQueue(@PathVariable Long id) {
+    public ResponseEntity<QueueDTO> getQueue(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Queue : {}", id);
         Optional<QueueDTO> queueDTO = queueService.findOne(id);
         return ResponseUtil.wrapOrNotFound(queueDTO);
@@ -114,7 +114,7 @@ public class QueueResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/queues/{id}")
-    public ResponseEntity<Void> deleteQueue(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteQueue(@PathVariable("id") Long id) {
         log.debug("REST request to delete Queue : {}", id);
         queueService.delete(id);
         return ResponseEntity
