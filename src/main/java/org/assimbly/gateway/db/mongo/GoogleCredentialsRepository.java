@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.warrenstrange.googleauth.ICredentialRepository;
+import org.assimbly.gateway.authenticate.domain.User;
 import org.bson.Document;
 
 import java.util.List;
@@ -19,21 +20,13 @@ public class GoogleCredentialsRepository implements ICredentialRepository {
 
     @Override
     public String getSecretKey(String email) {
-        MongoCollection<Document> usersCollection = mongoDao.getCollection("users");
-        Document userDoc = usersCollection.find(Filters.eq("email", email)).first();
-        if (userDoc != null) {
-            return userDoc.getString("secret_key");
-        }
-        return null;
+        User user = mongoDao.findUserByEmail(email);
+        return user.getSecretKey();
     }
 
     @Override
     public void saveUserCredentials(String email, String secretKey, int validationCode, List<Integer> scratchCodes) {
-        MongoCollection<Document> usersCollection = mongoDao.getCollection("users");
-        usersCollection.updateOne(
-            Filters.eq("email", email),
-            new Document("$set", new Document("secret_key", secretKey))
-                .append("$set", new Document("uses_two_factor", true))
-        );
+        User user = mongoDao.findUserByEmail(email);
+        mongoDao.updateAuthenticatorSettings(user, secretKey, true);
     }
 }
