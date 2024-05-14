@@ -12,7 +12,7 @@ public class EnvironmentValue {
     public static final String LAST_UPDATE_FIELD = "last_update";
     public static final String UPDATED_BY_FIELD = "updatedBy";
 
-    private String _id;
+    private ObjectId _id;
 
     private String environment;
     private String value;
@@ -26,7 +26,7 @@ public class EnvironmentValue {
     public EnvironmentValue() {}
 
     public EnvironmentValue(String environment) {
-        this._id = String.valueOf(new ObjectId());
+        this._id = new ObjectId();
         this.environment = environment;
         this.encrypted = false;
         this.value = "Unassigned";
@@ -64,11 +64,11 @@ public class EnvironmentValue {
         this.nonce = nonce;
     }
 
-    public String get_id() {
+    public ObjectId get_id() {
         return _id;
     }
 
-    public void set_id(String _id) {
+    public void set_id(ObjectId _id) {
         this._id = _id;
     }
 
