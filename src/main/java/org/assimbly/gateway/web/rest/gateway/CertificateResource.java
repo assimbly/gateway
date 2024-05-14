@@ -161,14 +161,14 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK) and with body the certificateDTO, or with status 404 (Not Found)
      */
     @GetMapping("/certificates/{id}")
-    public ResponseEntity<CertificateDTO> getCertificate(@PathVariable Long id){
+    public ResponseEntity<CertificateDTO> getCertificate(@PathVariable(value = "id") Long id){
         log.debug("REST request to get Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
         return ResponseEntity.ok().body(certificateDTO.get());
     }
 
     @GetMapping("/certificates/details/{certificateName}")
-    public ResponseEntity<String> getCertificateDetails(@PathVariable String certificateName) throws Exception{
+    public ResponseEntity<String> getCertificateDetails(@PathVariable(value = "certificateName") String certificateName) throws Exception{
 
         log.debug("REST request to get certificate details for certificate: " + certificateName);
 
@@ -194,7 +194,7 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/certificates/{id}")
-    public ResponseEntity<Void> deleteCertificate(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> deleteCertificate(@PathVariable("id") Long id) throws Exception {
         log.debug("REST request to delete Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
         String certificateName = certificateDTO.get().getCertificateName();
@@ -231,7 +231,7 @@ public class CertificateResource {
     }
 
     @GetMapping("/certificates/isexpired/{withinNumberOfDays}")
-    public ResponseEntity<Boolean> isExpired(@PathVariable int withinNumberOfDays) throws Exception{
+    public ResponseEntity<Boolean> isExpired(@PathVariable(value = "withinNumberOfDays") int withinNumberOfDays) throws Exception{
 
         log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
 

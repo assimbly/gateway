@@ -136,7 +136,7 @@ public class StepResource {
      * @return the ResponseEntity with status 200 (OK) and with body the stepDTO, or with status 404 (Not Found)
      */
     @GetMapping("/steps/byflowid/{id}")
-    public List<StepDTO> getStepByFlowID(@PathVariable Long id) {
+    public List<StepDTO> getStepByFlowID(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Steps by flowId " + id);
         List<Step> steps = stepRepository.findByFlowId(id);
         return stepMapper.toDto(steps);
@@ -149,7 +149,7 @@ public class StepResource {
      * @return the ResponseEntity with status 200 (OK) and with body the stepDTO, or with status 404 (Not Found)
      */
     @GetMapping("/step/{id}")
-    public ResponseEntity<StepDTO> getStepID(@PathVariable Long id) {
+    public ResponseEntity<StepDTO> getStepID(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Step : {}", id);
         Optional<StepDTO> stepDTO = stepService.findOne(id);
         return ResponseUtil.wrapOrNotFound(stepDTO);
@@ -162,7 +162,7 @@ public class StepResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/steps/{id}")
-    public ResponseEntity<Void> deleteStep(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStep(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Step : {}", id);
         stepService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

@@ -101,7 +101,7 @@ public class RouteResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the routeDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/routes/{id}")
-    public ResponseEntity<RouteDTO> getRoute(@PathVariable Long id) {
+    public ResponseEntity<RouteDTO> getRoute(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Route : {}", id);
         Optional<RouteDTO> routeDTO = routeService.findOne(id);
         return ResponseUtil.wrapOrNotFound(routeDTO);
@@ -114,7 +114,7 @@ public class RouteResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/routes/{id}")
-    public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRoute(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Route : {}", id);
         routeService.delete(id);
         return ResponseEntity
