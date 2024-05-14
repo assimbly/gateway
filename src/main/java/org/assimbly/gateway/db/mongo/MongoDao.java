@@ -30,15 +30,14 @@ public class MongoDao {
 
     private static MongoDatabase database;
 
-    public MongoDao(MongoDatabase database){
-        this.database = database;
+    public MongoDao(){
     }
 
-    public MongoDao(MongoClient mongoClient, String databaseName) {
-        this.database = mongoClient.getDatabase(databaseName);
+    public MongoDao(String databaseName) {
+        this.database = MongoClientProvider.getInstance().getDatabase(databaseName);
     }
 
-    private static MongoCollection<Document> getCollection(String collectionName){
+    public static MongoCollection<Document> getCollection(String collectionName){
         return database.getCollection(collectionName);
     }
 
