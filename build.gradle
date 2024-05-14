@@ -343,8 +343,6 @@ repositories {
 
 dependencies {
 
-    implementation group: 'org.apache.activemq', name: 'activemq-openwire-legacy', version: '6.1.2'
-
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
     implementation "net.logstash.logback:logstash-logback-encoder:7.4"
@@ -474,6 +472,7 @@ dependencies {
         implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
+        implementation group:  "org.assimbly", name: "jetty", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
         implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
