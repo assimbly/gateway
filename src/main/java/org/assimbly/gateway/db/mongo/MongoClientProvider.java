@@ -5,6 +5,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Arrays;
  * This Client connection is set up once it is requested for the first time.
  */
 
+@Configuration
 public class MongoClientProvider implements Serializable {
 
     private static final MongoClientProvider INSTANCE = new MongoClientProvider();
@@ -35,6 +37,7 @@ public class MongoClientProvider implements Serializable {
      */
     MongoDatabase getDatabase(String name) {
         if (client == null) {
+            System.out.println("-------------mongo ---------------------");
             init();
         }
         return client.getDatabase(name);
@@ -49,4 +52,5 @@ public class MongoClientProvider implements Serializable {
                 builder.hosts(Arrays.asList(new ServerAddress("flux-mongo", 27017))))
             .build());
     }
+
 }
