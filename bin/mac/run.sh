@@ -7,18 +7,21 @@ property_file="../../gradle.properties"
 
 if [ -z "$1" ]; then
     sed -i .bak "s/type=.*/type=FULL/" $property_file
-    clear & ./../../gradlew --settings-file ./../../settings.gradle
+    clear & ./../../gradlew --settings-file ./../../settings.gradle -Dorg.gradle.jvmargs=-Xmx3g
 else
     if [ -z "$2" ]; then
-        sed -i .bak "s/type=.*/type=$1/" $property_file
-        clear & ./../../gradlew --settings-file ./../../settings.gradle -P$1
+        type="$1^^"
+        sed -i .bak "s/type=.*/type=$type/" $property_file
+        clear & ./../../gradlew --settings-file ./../../settings.gradle -Dorg.gradle.jvmargs=-Xmx3g -P$1
     else
         if [ -z "$3" ]; then
-            sed -i .bak "s/type=.*/type=$2/" $property_file
-            clear & ./../../gradlew --settings-file ./../../settings.gradle -P$1  -P$2
+            type="$2^^"
+            sed -i .bak "s/type=.*/type=$type/" $property_file
+            clear & ./../../gradlew --settings-file ./../../settings.gradle -Dorg.gradle.jvmargs=-Xmx3g -P$1 -P$2
         else
-            sed -i .bak "s/type=.*/type=$3/" $property_file
-            clear & ./../../gradlew --settings-file ./../../settings.gradle -P$1 -P$2 -P$3
+            type="$3^^"
+            sed -i .bak "s/type=.*/type=$type/" $property_file
+            clear & ./../../gradlew --settings-file ./../../settings.gradle -Dorg.gradle.jvmargs=-Xmx3g -P$1 -P$2 -P$3
         fi
     fi
 fi
