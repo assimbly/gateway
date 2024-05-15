@@ -11,6 +11,7 @@ services:
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/gateway
     ports:
       - 127.0.0.1:8080:8080
+      - 127.0.0.1:61616:61616
     healthcheck:
       test:
         - CMD
