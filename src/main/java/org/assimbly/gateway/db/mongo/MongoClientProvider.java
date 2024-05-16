@@ -37,7 +37,6 @@ public class MongoClientProvider implements Serializable {
      */
     MongoDatabase getDatabase(String name) {
         if (client == null) {
-            System.out.println("-------------mongo ---------------------");
             init();
         }
         return client.getDatabase(name);
