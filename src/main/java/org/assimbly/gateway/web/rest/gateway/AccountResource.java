@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api")
-public class UserAccountResource {
+public class AccountResource {
 
     private static class AccountResourceException extends RuntimeException {
 
@@ -32,7 +32,7 @@ public class UserAccountResource {
         }
     }
 
-    private final Logger log = LoggerFactory.getLogger(UserAccountResource.class);
+    private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 
     private final UserRepository userRepository;
 
@@ -40,7 +40,7 @@ public class UserAccountResource {
 
     private final MailService mailService;
 
-    public UserAccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
@@ -174,8 +174,8 @@ public class UserAccountResource {
     private static boolean isPasswordLengthInvalid(String password) {
         return (
             StringUtils.isEmpty(password) ||
-            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+                password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+                password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
 }
