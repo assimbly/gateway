@@ -2,6 +2,7 @@ package org.assimbly.gateway.authenticate.domain;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.bson.types.Symbol;
 
 public class User {
 
@@ -9,10 +10,10 @@ public class User {
     public static final String EMAIL_FIELD = "email";
     public static final String ROLE_FIELD = "role";
     public static final String STATUS_FIELD = "status";
-    public static final String PASSWORD_DIGEST_FIELD = "passwordDigest";
-    public static final String TENANT_ID_FIELD = "tenantId";
-    public static final String USES_TWO_FACTOR_FIELD = "usesTwoFactor";
-    public static final String SECRET_KEY_FIELD = "secretKey";
+    public static final String PASSWORD_DIGEST_FIELD = "password_digest";
+    public static final String TENANT_ID_FIELD = "tenant_id";
+    public static final String USES_TWO_FACTOR_FIELD = "uses_two_factor";
+    public static final String SECRET_KEY_FIELD = "secret_key";
 
     private ObjectId id;
     private String email;
@@ -148,8 +149,10 @@ public class User {
             user.setId(document.getObjectId(ID_FIELD));
         }
         user.setEmail(document.getString(EMAIL_FIELD));
-        user.setRole(Role.fromString(document.getString(ROLE_FIELD)));
-        user.setStatus(Status.fromString(document.getString(STATUS_FIELD)));
+        Symbol role = (Symbol) document.get(ROLE_FIELD);
+        user.setRole(Role.fromString(role.getSymbol()));
+        Symbol status = (Symbol) document.get(STATUS_FIELD);
+        user.setStatus(Status.fromString(status.getSymbol()));
         user.setPasswordDigest(document.getString(PASSWORD_DIGEST_FIELD));
         user.setTenantId(document.getObjectId(TENANT_ID_FIELD));
         user.setUsesTwoFactor(document.getBoolean(USES_TWO_FACTOR_FIELD));
