@@ -21,6 +21,8 @@ public class MongoDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDao.class);
 
+    private static final String TENANT_VARIABLES_COLLECTION_NAME = "tenant_variables";
+
     private static final String CREATED_BY_SYSTEM = "System";
     private static final String UPDATED_BY_SYSTEM = "System";
 
@@ -87,28 +89,6 @@ public class MongoDao {
         return null;
     }
 
-    public static TenantVariable findVariableByName(String variableName, String tenant) {
-        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
-
-        Document query = new Document(TenantVariable.NAME_FIELD, variableName);
-        Document tenantVarsDocument = mongoDatabase.getCollection("tenant_variables").find(query).first();
-        if (tenantVarsDocument != null) {
-            return TenantVariable.fromDocument(tenantVarsDocument);
-        }
-        return null;
-    }
-
-    public static void updateTenantVariable(TenantVariable tenantVariable, String tenant, boolean tenantVariableExist){
-        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
-
-        MongoCollection<Document> collection = mongoDatabase.getCollection("tenant_variables");
-        if(tenantVariableExist) {
-            collection.replaceOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), tenantVariable.toDocument());
-        } else {
-            collection.insertOne(tenantVariable.toDocument());
-        }
-    }
-
     public void updateAuthenticatorSettings(User user, String secretKey, Boolean usesTwoFactor) {
         MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
 
@@ -123,6 +103,27 @@ public class MongoDao {
         mongoDatabase.getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
             new Document("$unset", new Document("secret_key", "")
                 .append("uses_two_factor", false)));
+    }
+
+    public static TenantVariable findVariableByName(String variableName, String tenant) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
+        MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
+
+        Document document = collection.find(new Document(TenantVariable.NAME_FIELD, variableName)).first();
+        if (document != null) {
+            return TenantVariable.fromDocument(document);
+        }
+        return null;
+    }
+
+    public static void updateTenantVariable(TenantVariable tenantVariable, String tenant, boolean tenantVariableExist){
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
+        MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
+        if(tenantVariableExist) {
+            collection.replaceOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), tenantVariable.toDocument());
+        } else {
+            collection.insertOne(tenantVariable.toDocument());
+        }
     }
 
     static public String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
