@@ -31,7 +31,7 @@ public class MongoDao {
     public MongoDao(){
     }
 
-    public MongoDao(String databaseName) {
+    public MongoDao(String database) {
         this.database = database;
     }
 
