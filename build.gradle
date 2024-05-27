@@ -358,10 +358,10 @@ dependencies {
 
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
-    implementation "io.dropwizard.metrics:metrics-jvm"
-    implementation "io.dropwizard.metrics:metrics-servlet"
-    implementation "io.dropwizard.metrics:metrics-servlets"
-    implementation "io.dropwizard.metrics:metrics-annotation"
+    //implementation "io.dropwizard.metrics:metrics-jvm"
+    //implementation "io.dropwizard.metrics:metrics-servlet"
+    //implementation "io.dropwizard.metrics:metrics-servlets"
+    //implementation "io.dropwizard.metrics:metrics-annotation"
 
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "io.prometheus:simpleclient"
@@ -624,6 +624,30 @@ publishing {
 
 task cleanResources(type: Delete) {
     delete "build/resources"
+}
+
+/**
+ * Returns an int representing how mature [version] is.
+ * Higher numbers are more mature.
+ */
+static def maturityLevel(String version) {
+    /**
+     * Version qualifiers, in order from least to most mature.
+     * The most mature is to have no qualifier at all.
+     */
+    def qualifiers = ["preview", "alpha", "beta", "m", "cr", "rc"]
+    def qualifiersRegex = qualifiers.collect { /(?i).*[.\-]$it[.\-\d]*/ }
+
+    def index = qualifiersRegex.findIndexOf { version ==~ it }
+    return (index < 0) ? qualifiers.size : index
+}
+
+tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+        def candidateMaturity = maturityLevel(it.candidate.version)
+        def currentMaturity = maturityLevel(it.currentVersion)
+        candidateMaturity < currentMaturity
+    }
 }
 
 wrapper {
