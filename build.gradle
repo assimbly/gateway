@@ -96,11 +96,12 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
-    exclude group: 'org.eclipse.angus', module: 'angus-activation'
-//    exclude group: 'org.mongodb', module: 'mongodb-driver-legacy'
-//    exclude group: 'org.mongodb', module: 'mongodb-driver-core'
-//    exclude group: 'org.mongodb', module: 'mongodb-driver-sync'
-//    exclude group: 'org.mongodb', module: 'bson'
+    //exclude group: 'org.eclipse.angus', module: 'angus-activation'
+    resolutionStrategy {
+        force 'org.eclipse.angus:angus-mail:2.0.3'
+        force 'jakarta.mail:jakarta.mail-api:2.1.3'
+        force 'jakarta.activation:jakarta.activation-api:2.1.3'
+    }
 }
 
 if (project.hasProperty("headless")) {
@@ -353,8 +354,9 @@ dependencies {
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
-    implementation "com.sun.mail:jakarta.mail:2.0.1"
-    implementation "com.sun.activation:jakarta.activation:2.0.1"
+    implementation "org.eclipse.angus:angus-mail:2.0.3"
+    implementation "jakarta.mail:jakarta.mail-api:2.1.3"
+    implementation "jakarta.activation:jakarta.activation-api:2.1.3"
 
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
