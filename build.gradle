@@ -556,7 +556,6 @@ if (project.hasProperty("integration")){
         main {
             java {
 
-
                 exclude 'org/assimbly/gateway/web/rest/broker/**'
                 exclude 'org/assimbly/gateway/web/rest/gateway/**'
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
