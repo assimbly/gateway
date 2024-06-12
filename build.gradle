@@ -291,14 +291,14 @@ configurations {
     all {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
-            force 'org.liquibase:liquibase-core:4.27.0'
-            force 'implementation "org.hibernate.orm:hibernate-core:6.4.4.Final'
-            force 'implementation "org.hibernate.orm:hibernate-jcache:6.4.4.Final'
-            force 'implementation "org.hibernate.orm:hibernate-envers:6.4.4.Final'
+            force 'org.liquibase:liquibase-core:4.28.0'
+            force 'implementation "org.hibernate.orm:hibernate-core:6.5.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-jcache:6.5.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-envers:6.5.2.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.33.0")
+                    details.useVersion("2.34.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("6.1.2")
@@ -360,10 +360,6 @@ dependencies {
 
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
-    //implementation "io.dropwizard.metrics:metrics-jvm"
-    //implementation "io.dropwizard.metrics:metrics-servlet"
-    //implementation "io.dropwizard.metrics:metrics-servlets"
-    //implementation "io.dropwizard.metrics:metrics-annotation"
 
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "io.prometheus:simpleclient"
