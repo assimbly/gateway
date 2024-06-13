@@ -63,6 +63,7 @@ public class TenantVariable {
             environmentValue.setEnvironment(valueDoc.getString(EnvironmentValue.ENVIRONMENT_FIELD));
             environmentValue.setValue(valueDoc.getString(EnvironmentValue.VALUE_FIELD));
             environmentValue.setEncrypted(valueDoc.getBoolean(EnvironmentValue.ENCRYPTED_FIELD));
+            environmentValue.setNonce(valueDoc.getString(EnvironmentValue.NONCE_FIELD));
             if(valueDoc.getLong(EnvironmentValue.LAST_UPDATE_FIELD) != null) {
                 environmentValue.setLastUpdate(valueDoc.getLong(EnvironmentValue.LAST_UPDATE_FIELD));
             }
@@ -87,6 +88,7 @@ public class TenantVariable {
             valueDoc.append(EnvironmentValue.ENVIRONMENT_FIELD, environmentValue.getEnvironment());
             valueDoc.append(EnvironmentValue.VALUE_FIELD, environmentValue.getValue());
             valueDoc.append(EnvironmentValue.ENCRYPTED_FIELD, environmentValue.isEncrypted());
+            valueDoc.append(EnvironmentValue.NONCE_FIELD, environmentValue.getNonce());
             valueDoc.append(EnvironmentValue.LAST_UPDATE_FIELD, environmentValue.getLastUpdate());
             valueDoc.append(EnvironmentValue.UPDATED_BY_FIELD, environmentValue.getUpdatedBy());
             valuesList.add(valueDoc);
