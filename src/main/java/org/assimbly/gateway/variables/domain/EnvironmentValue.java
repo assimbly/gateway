@@ -9,6 +9,7 @@ public class EnvironmentValue {
     public static final String ENVIRONMENT_FIELD = "environment";
     public static final String VALUE_FIELD = "value";
     public static final String ENCRYPTED_FIELD = "encrypted";
+    public static final String NONCE_FIELD = "nonce";
     public static final String LAST_UPDATE_FIELD = "last_update";
     public static final String UPDATED_BY_FIELD = "updatedBy";
 
