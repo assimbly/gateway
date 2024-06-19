@@ -140,12 +140,15 @@ eclipse {
     }
 }
 
+// Example images
 // image = 'eclipse-temurin:21' (temurin on docker)
 // image = 'open-21-jdk-jammy' (semeru on dockerhub)
 // image = 'icr.io/appcafe/open-liberty:full-java21-openj9-ubi-minimal' (semeru minimal)
 // image = 'container-registry.oracle.com/graalvm/jdk:21' (graalvm from Oracle registry)
-// docker pull container-registry.oracle.com/graalvm/jdk:21
-// icr.io/appcafe/open-liberty/full-java21-openj9-ubi-minimal
+// image = 'icr.io/appcafe/open-liberty/full-java21-openj9-ubi-minimal'
+// image = 'container-registry.oracle.com/graalvm/jdk:21'
+// image = 'azul/zulu-openjdk:21-jdk-crac-latest' (support for crac)
+
 //build container image
 jib {
     from {
@@ -343,6 +346,8 @@ repositories {
 }
 
 dependencies {
+
+    implementation 'org.crac:crac:1.4.0'
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
