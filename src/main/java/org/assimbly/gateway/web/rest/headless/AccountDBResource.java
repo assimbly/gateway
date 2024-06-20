@@ -59,7 +59,7 @@ public class AccountDBResource {
 
             return ResponseEntity.ok().body(token);
         } catch (Exception e) {
-            log.debug("Error to authenticate", e);
+            log.error("Error to authenticate", e);
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body("Invalid authentication");
