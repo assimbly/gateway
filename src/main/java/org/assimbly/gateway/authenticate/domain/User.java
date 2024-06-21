@@ -3,6 +3,8 @@ package org.assimbly.gateway.authenticate.domain;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.bson.types.Symbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class User {
 
@@ -23,6 +25,8 @@ public class User {
     private ObjectId tenantId;
     private Boolean usesTwoFactor;
     private String secretKey;
+
+    protected static Logger log = LoggerFactory.getLogger(User.class);
 
     public User() {
         this.id = new ObjectId();
@@ -149,14 +153,31 @@ public class User {
             user.setId(document.getObjectId(ID_FIELD));
         }
         user.setEmail(document.getString(EMAIL_FIELD));
-        Symbol role = (Symbol) document.get(ROLE_FIELD);
-        user.setRole(Role.fromString(role.getSymbol()));
-        Symbol status = (Symbol) document.get(STATUS_FIELD);
-        user.setStatus(Status.fromString(status.getSymbol()));
+        user.setRole(getEnumFromDocument(document, ROLE_FIELD, Role.class));
+        user.setStatus(getEnumFromDocument(document, STATUS_FIELD, Status.class));
         user.setPasswordDigest(document.getString(PASSWORD_DIGEST_FIELD));
         user.setTenantId(document.getObjectId(TENANT_ID_FIELD));
         user.setUsesTwoFactor(document.getBoolean(USES_TWO_FACTOR_FIELD));
         user.setSecretKey(document.getString(SECRET_KEY_FIELD));
         return user;
     }
+
+    private static <T extends Enum<T>> T getEnumFromDocument(Document document, String fieldName, Class<T> enumClass) {
+        try {
+            Object fieldObj = document.get(fieldName);
+            if (fieldObj instanceof Symbol) {
+                String symbolValue = ((Symbol) fieldObj).getSymbol();
+                return Enum.valueOf(enumClass, symbolValue.toUpperCase());
+            } else if (fieldObj instanceof String) {
+                String stringValue = (String) fieldObj;
+                return Enum.valueOf(enumClass, stringValue.toUpperCase());
+            } else {
+                throw new IllegalArgumentException("Unsupported type for field: " + fieldName + ", class: " + fieldObj.getClass().getName());
+            }
+        } catch (ClassCastException e) {
+            log.error("Failed to get enum from document for field: {}, document: {}", fieldName, document.toJson(), e);
+            throw e;
+        }
+    }
+
 }
