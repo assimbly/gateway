@@ -51,6 +51,7 @@ plugins {
     id "idea"
     id "eclipse"
     id "org.springframework.boot"
+    id "org.springframework.boot.aot"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
     id "com.github.node-gradle.node"
@@ -347,7 +348,7 @@ repositories {
 
 dependencies {
 
-    implementation 'org.crac:crac:1.4.0'
+    implementation 'org.crac:crac:1.5.0'
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
@@ -355,7 +356,7 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.4.0'
+    implementation 'tech.jhipster:jhipster-framework:8.5.0'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
