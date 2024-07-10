@@ -330,7 +330,7 @@
                                   </i>
                                 </div>
                               </div>
-                              <div class="row" *ngFor="let option of stepsOptions[index]; index as idx" [formGroupName]="idx">
+                              <div class="row" style="padding-bottom: 10px;" *ngFor="let option of stepsOptions[index]; index as idx" [formGroupName]="idx">
                                 <div class="col-5">
                                   <ng-select [items]="componentOptions[index]" bindLabel="displayName"
                                              bindValue="name" [addTag]="addOptionTag" formControlName="key"
@@ -364,12 +364,19 @@
                                         (click)="addOption(stepsOptions[index], index)">
                                   <fa-icon icon="plus" style="color: white;"></fa-icon>
                                 </button>
-                                <button title="Remove option" type="button"
+                                <button *ngIf="idx == 0"
+                                        title="Remove option" type="button"
+                                        class="col-1 left-border-radius-0 btn btn-danger">
+                                  <fa-icon icon="times" style="color: white;"></fa-icon>
+                                </button>
+                                <button *ngIf="idx > 0"
+                                        title="Remove option" type="button"
                                         class="col-1 left-border-radius-0 btn btn-danger"
                                         (click)="removeOption(stepsOptions[index], option, index)">
                                   <fa-icon icon="times" style="color: white;"></fa-icon>
                                 </button>
                               </div>
+
                             </div>
 
                           </div>
