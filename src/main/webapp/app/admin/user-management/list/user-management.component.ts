@@ -15,6 +15,8 @@ import { UserManagementService } from '../service/user-management.service';
 import { User } from '../user-management.model';
 import UserManagementDeleteDialogComponent from '../delete/user-management-delete-dialog.component';
 
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
   standalone: true,
   selector: 'jhi-user-mgmt',
