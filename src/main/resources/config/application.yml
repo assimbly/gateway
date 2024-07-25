@@ -168,7 +168,7 @@ server:
       cookie:
         http-only: true
         max-age: 28800
-  max-http-header-size: 81920
+  max-http-request-header-size: 81920
   jetty:
     httpConfig:
       generateOrigin: true
