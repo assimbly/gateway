@@ -295,14 +295,14 @@ configurations {
     all {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
-            force 'org.liquibase:liquibase-core:4.28.0'
+            force 'org.liquibase:liquibase-core:4.29.1'
             force 'implementation "org.hibernate.orm:hibernate-core:6.5.2.Final'
             force 'implementation "org.hibernate.orm:hibernate-jcache:6.5.2.Final'
             force 'implementation "org.hibernate.orm:hibernate-envers:6.5.2.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.34.0")
+                    details.useVersion("2.36.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("6.1.2")
@@ -352,13 +352,13 @@ dependencies {
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
-    implementation "net.logstash.logback:logstash-logback-encoder:7.4"
+    implementation "net.logstash.logback:logstash-logback-encoder:8.0"
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
     implementation 'tech.jhipster:jhipster-framework:8.6.0'
 
-    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.1.0"
 
     implementation "org.eclipse.angus:angus-mail:2.0.3"
     implementation "jakarta.mail:jakarta.mail-api:2.1.3"
@@ -507,7 +507,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest-library"
-    runtimeOnly "com.h2database:h2:2.2.224"
+    runtimeOnly "com.h2database:h2:2.3.230"
     liquibaseRuntime "com.h2database:h2"
 
 }
@@ -648,8 +648,9 @@ tasks.named("dependencyUpdates").configure {
     }
 }
 
+//After upgrading execute Gradle wrapper task: ./gradlew wrapper
 wrapper {
-    gradleVersion = "8.8"
+    gradleVersion = "8.9"
 }
 
 if (project.hasProperty("nodeInstall")) {
