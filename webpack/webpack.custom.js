@@ -121,6 +121,7 @@ module.exports = async (config, options, targetOptions) => {
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
       SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
       __TYPE__: JSON.stringify(custom.__TYPE__),
+      __KEYSTORE_PWD__: JSON.stringify(custom.__KEYSTORE_PWD__),
     }),
     new MergeJsonWebpackPlugin({
       output: {
