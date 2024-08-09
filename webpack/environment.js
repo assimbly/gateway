@@ -3,5 +3,4 @@ module.exports = {
   SERVER_API_URL: '',
   __VERSION__: process.env.hasOwnProperty('APP_VERSION') ? process.env.APP_VERSION : 'DEV',
   __DEBUG_INFO_ENABLED__: false,
-  __KEYSTORE_PWD__: process.env.hasOwnProperty('KEYSTORE_PWD') ? process.env.KEYSTORE_PWD : 'supersecret',
 };
