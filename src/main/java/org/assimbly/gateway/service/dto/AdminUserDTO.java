@@ -3,7 +3,7 @@ package org.assimbly.gateway.service.dto;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;

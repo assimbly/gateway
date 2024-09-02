@@ -1,6 +1,4 @@
 /**
- * Specific errors used with Zalando's "problem-spring-web" library.
- *
- * More information on https://github.com/zalando/problem-spring-web
+ * Rest layer error handling.
  */
 package org.assimbly.gateway.web.rest.errors;

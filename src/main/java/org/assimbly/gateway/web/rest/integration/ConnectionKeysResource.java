@@ -113,7 +113,7 @@ public class ConnectionKeysResource {
      * @return the ResponseEntity with status 200 (OK) and with body the connectionKeysDTO, or with status 404 (Not Found)
      */
     @GetMapping("/connection-keys/{id}")
-    public ResponseEntity<ConnectionKeysDTO> getConnectionKeys(@PathVariable Long id) {
+    public ResponseEntity<ConnectionKeysDTO> getConnectionKeys(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get ConnectionKeys : {}", id);
         Optional<ConnectionKeysDTO> connectionKeysDTO = connectionKeysService.findOne(id);
         return ResponseUtil.wrapOrNotFound(connectionKeysDTO);
@@ -126,7 +126,7 @@ public class ConnectionKeysResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/connection-keys/{id}")
-    public ResponseEntity<Void> deleteConnectionKeys(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteConnectionKeys(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete ConnectionKeys : {}", id);
         connectionKeysService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();

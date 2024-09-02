@@ -1,13 +1,12 @@
 package org.assimbly.gateway.security;
 
+import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,7 +29,7 @@ public class DomainUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating {}", login);
 
@@ -52,11 +51,12 @@ public class DomainUserDetailsService implements UserDetailsService {
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
-        List<GrantedAuthority> grantedAuthorities = user
+        List<SimpleGrantedAuthority> grantedAuthorities = user
             .getAuthorities()
             .stream()
-            .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-            .collect(Collectors.toList());
+            .map(Authority::getName)
+            .map(SimpleGrantedAuthority::new)
+            .toList();
         return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), grantedAuthorities);
     }
 }

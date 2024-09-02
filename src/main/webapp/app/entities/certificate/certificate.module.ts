@@ -3,7 +3,8 @@ import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
 
 import { CertificateComponent } from './certificate.component';
 import { CertificateDetailComponent } from './certificate-detail.component';
@@ -22,18 +23,10 @@ import { CertificatePopupService } from './certificate-popup.service';
 const ENTITY_STATES = [...certificateRoute];
 
 @NgModule({
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, SortDirective, SortByDirective, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     CertificateComponent,
     CertificateDetailComponent,
-    CertificateUpdateComponent,
-    CertificateDeleteDialogComponent,
-    CertificateUploadDialogComponent,
-    CertificateUploadP12DialogComponent,
-    CertificateSelfSignDialogComponent,
-  ],
-  entryComponents: [
-    CertificateComponent,
     CertificateUpdateComponent,
     CertificateDeleteDialogComponent,
     CertificateUploadDialogComponent,

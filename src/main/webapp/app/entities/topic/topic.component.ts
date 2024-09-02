@@ -4,6 +4,10 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { SortDirective, SortByDirective } from 'app/shared/sort';
+import { ASC, DESC, SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
+import { SortService } from 'app/shared/sort/sort.service';
+
 import { AccountService } from 'app/core/auth/account.service';
 
 import { ITopic } from 'app/shared/model/topic.model';
@@ -20,6 +24,7 @@ import { startWith, switchMap } from 'rxjs/operators';
   templateUrl: './topic.component.html',
 })
 export class TopicComponent implements OnInit, OnDestroy {
+
   topics: ITopic[];
   addresses: IAddress[];
   brokers: IBroker[];
@@ -30,6 +35,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   page: number;
   predicate: string;
   ascending: boolean;
+
   timeInterval: Subscription;
   isBroker: boolean;
 
@@ -57,14 +63,14 @@ export class TopicComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
 	this.setSearchBox();
-	
+
     this.registerChangeInTopics();
     this.registerDeletedTopics();
 
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
-	
+
 
   }
 
@@ -80,7 +86,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.timeInterval.unsubscribe();
   }
 
-  
+
   reset(): void {
     this.page = 0;
     this.setSearchBox();
@@ -93,7 +99,7 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.getBrokerType();
   }
 
-   setSearchBox(){   
+   setSearchBox(){
     const searchText = localStorage.getItem('searchTopicText');
 	if(searchText){
 		this.searchTopicText = searchText;
@@ -101,7 +107,7 @@ export class TopicComponent implements OnInit, OnDestroy {
 		this.searchTopicText = '';
 	}
    }
-  
+
   trackId(index: number, item: IAddress): number {
     return item.id!;
   }

@@ -1,6 +1,6 @@
+const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const path = require('path');
 const { hashElement } = require('folder-hash');
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
@@ -8,10 +8,10 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const WebpackNotifierPlugin = require('webpack-notifier');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-
 const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
 const custom = require('./custom');
+
 
 module.exports = async (config, options, targetOptions) => {
   const languagesHash = await hashElement(path.resolve(__dirname, '../src/main/webapp/i18n'), {
@@ -19,16 +19,21 @@ module.exports = async (config, options, targetOptions) => {
     encoding: 'hex',
     files: { include: ['*.json'] },
   });
+
   // PLUGINS
   if (config.mode === 'development') {
     config.plugins.push(
       new ESLintPlugin({
-        extensions: ['js', 'ts'],
+        baseConfig: {
+          parserOptions: {
+            project: ['../tsconfig.app.json'],
+          },
+        },
       }),
       new WebpackNotifierPlugin({
-        title: 'Gateway',
+        title: 'Jhipster Sample Application',
         contentImage: path.join(__dirname, 'logo-jhipster.png'),
-      })
+      }),
     );
   }
 
@@ -46,7 +51,7 @@ module.exports = async (config, options, targetOptions) => {
           port: 9000,
           https: tls,
           proxy: {
-            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '4200' : '8080'}`,
+            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '9060' : '8080'}`,
             ws: true,
             proxyOptions: {
               changeOrigin: false, //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
@@ -68,8 +73,8 @@ module.exports = async (config, options, targetOptions) => {
         },
         {
           reload: targetOptions.target === 'build', // enabled for build --watch
-        }
-      )
+        },
+      ),
     );
   }
 
@@ -78,13 +83,25 @@ module.exports = async (config, options, targetOptions) => {
       new BundleAnalyzerPlugin({
         analyzerMode: 'static',
         openAnalyzer: false,
-        // Webpack statistics in target folder
-        reportFilename: '../stats.html',
-      })
+        // Webpack statistics in temporary folder
+        reportFilename: '../../stats.html',
+      }),
     );
   }
 
   const patterns = [
+    {
+      // https://github.com/swagger-api/swagger-ui/blob/v4.6.1/swagger-ui-dist-package/README.md
+      context: require('swagger-ui-dist').getAbsoluteFSPath(),
+      from: '*.{js,css,html,png}',
+      to: 'swagger-ui/',
+      globOptions: { ignore: ['**/index.html'] },
+    },
+    {
+      from: path.join(path.dirname(require.resolve('axios/package.json')), 'dist/axios.min.js'),
+      to: 'swagger-ui/',
+    },
+    { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
     // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array
   ];
 
@@ -104,6 +121,7 @@ module.exports = async (config, options, targetOptions) => {
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
       SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
       __TYPE__: JSON.stringify(custom.__TYPE__),
+      __KEYSTORE_PWD__: JSON.stringify(custom.__KEYSTORE_PWD__),
     }),
     new MergeJsonWebpackPlugin({
       output: {
@@ -112,11 +130,11 @@ module.exports = async (config, options, targetOptions) => {
           // jhipster-needle-i18n-language-webpack - JHipster will add/remove languages in this array
         ],
       },
-    })
+    }),
   );
 
   config = merge(
-    config
+    config,
     // jhipster-needle-add-webpack-config - JHipster will add custom config
   );
 

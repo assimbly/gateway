@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
@@ -22,13 +22,12 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest", "org.assimbly.integrationrestdt" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoMetricsAutoConfiguration.class, GroovyTemplateAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoMetricsAutoConfiguration.class, GroovyTemplateAutoConfiguration.class})
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
@@ -93,7 +92,6 @@ public class GatewayApp {
 
     private static void logApplicationStartup(Environment env) {
 
-
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
@@ -131,8 +129,8 @@ public class GatewayApp {
             } else {
                 applicationBaseDirectory = userHomeDir + "/.assimbly";
             }
-        } else {
-            applicationBaseDirectory = applicationBaseDirectory + "/.assimbly";
+        } else if(applicationBaseDirectory.endsWith("/")){
+            applicationBaseDirectory = applicationBaseDirectory + ".assimbly";
         }
 
        log.info(

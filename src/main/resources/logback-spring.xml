@@ -2,13 +2,16 @@
 <!DOCTYPE configuration>
 
 <configuration scan="true">
+
+    <property name="application.gateway.base-directory" value="${user.home}" />
+
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <include file="/data/.assimbly/config/logback-custom.xml" />
+    <include file="${application.gateway.base-directory}/.assimbly/config/logback-custom.xml" />
 
 <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${user.home}/.assimbly/logs/%d{yyyy-MM-dd}.assimbly.log</fileNamePattern>
+            <fileNamePattern>${application.gateway.base-directory}/.assimbly/logs/%d{yyyy-MM-dd}.assimbly.log</fileNamePattern>
             <maxHistory>30</maxHistory>
 		    <totalSizeCap>10GB</totalSizeCap>
         </rollingPolicy>
@@ -59,7 +62,7 @@
     <logger name="sun.rmi.transport" level="WARN"/>
 
     <!-- https://logback.qos.ch/manual/configuration.html#shutdownHook and https://jira.qos.ch/browse/LOGBACK-1090 -->
-    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+    <!--<shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>-->
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>

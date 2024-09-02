@@ -7,23 +7,20 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/error.constants';
 
 import { RegisterService } from './register.service';
-import { RegisterComponent } from './register.component';
+import RegisterComponent from './register.component';
 
 describe('RegisterComponent', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let comp: RegisterComponent;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-        declarations: [RegisterComponent],
-        providers: [FormBuilder],
-      })
-        .overrideTemplate(RegisterComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule, RegisterComponent],
+      providers: [FormBuilder],
     })
-  );
+      .overrideTemplate(RegisterComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(RegisterComponent);
@@ -64,7 +61,7 @@ describe('RegisterComponent', () => {
       expect(comp.errorUserExists).toBe(false);
       expect(comp.errorEmailExists).toBe(false);
       expect(comp.error).toBe(false);
-    })
+    }),
   ));
 
   it('should notify of user existence upon 400/login already in use', inject(
@@ -74,7 +71,7 @@ describe('RegisterComponent', () => {
         throwError({
           status: 400,
           error: { type: LOGIN_ALREADY_USED_TYPE },
-        })
+        }),
       );
       comp.registerForm.patchValue({
         password: 'password',
@@ -87,7 +84,7 @@ describe('RegisterComponent', () => {
       expect(comp.errorUserExists).toBe(true);
       expect(comp.errorEmailExists).toBe(false);
       expect(comp.error).toBe(false);
-    })
+    }),
   ));
 
   it('should notify of email existence upon 400/email address already in use', inject(
@@ -97,7 +94,7 @@ describe('RegisterComponent', () => {
         throwError({
           status: 400,
           error: { type: EMAIL_ALREADY_USED_TYPE },
-        })
+        }),
       );
       comp.registerForm.patchValue({
         password: 'password',
@@ -110,7 +107,7 @@ describe('RegisterComponent', () => {
       expect(comp.errorEmailExists).toBe(true);
       expect(comp.errorUserExists).toBe(false);
       expect(comp.error).toBe(false);
-    })
+    }),
   ));
 
   it('should notify of generic error', inject(
@@ -119,7 +116,7 @@ describe('RegisterComponent', () => {
       jest.spyOn(service, 'save').mockReturnValue(
         throwError({
           status: 503,
-        })
+        }),
       );
       comp.registerForm.patchValue({
         password: 'password',
@@ -132,6 +129,6 @@ describe('RegisterComponent', () => {
       expect(comp.errorUserExists).toBe(false);
       expect(comp.errorEmailExists).toBe(false);
       expect(comp.error).toBe(true);
-    })
+    }),
   ));
 });

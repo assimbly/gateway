@@ -16,8 +16,6 @@ import { FlowService } from './flow.service';
 import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 
-import { WebSocketsService } from 'app/shared/websockets/websockets.service';
-
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
@@ -59,8 +57,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected integrationService: IntegrationService,
-    protected router: Router,
-	private webSocketsService: WebSocketsService
+    protected router: Router
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -119,7 +116,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.getIntegrations();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
-	  this.webSocketsService.connect();
     });
     this.finished = true;
     this.registerChangeInFlows();
@@ -227,7 +223,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string, editorType: string): void {
-	  this.router.navigate(['../flow/editor', { mode: mode, editor: editorType }]);
+	  this.router.navigate(['../flow/editor'], {queryParams: { mode: mode, editor: editorType }});
   }
 
   private onSuccess(data, headers) {

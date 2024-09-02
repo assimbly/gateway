@@ -139,8 +139,8 @@ public class IntegrationResource {
     )
     public ResponseEntity<String> updateBackup(
         @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
-        @PathVariable Long integrationid,
-        @PathVariable String frequency,
+        @PathVariable("integrationid") Long integrationid,
+        @PathVariable("frequency") String frequency,
         @RequestBody String url
     ) throws Exception {
         if (!ran) {
@@ -200,7 +200,7 @@ public class IntegrationResource {
      * @return the ResponseEntity with status 200 (OK) and with body the integrationDTO, or with status 404 (Not Found)
      */
     @GetMapping("/integrations/{id}")
-    public ResponseEntity<IntegrationDTO> getIntegration(@PathVariable Long id) {
+    public ResponseEntity<IntegrationDTO> getIntegration(@PathVariable(value = "id") Long id) {
         log.error("Runs..");
         log.debug("Runs...");
         log.debug("REST request to get Integration : {}", id);
@@ -215,7 +215,7 @@ public class IntegrationResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/integrations/{id}")
-    public ResponseEntity<Void> deleteIntegration(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteIntegration(@PathVariable("id") Long id) {
         log.debug("REST request to delete Integration : {}", id);
 
         integrationRepository.deleteById(id);
@@ -235,8 +235,8 @@ public class IntegrationResource {
     )
     public ResponseEntity<String> getLog(
         @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
-        @PathVariable Long integrationid,
-        @PathVariable int lines
+        @PathVariable("integrationid") Long integrationid,
+        @PathVariable("lines") int lines
     ) throws Exception {
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");

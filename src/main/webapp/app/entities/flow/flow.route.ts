@@ -28,7 +28,7 @@ export class FlowResolve implements Resolve<IFlow> {
   }
 }
 
-export const flowRoute: Routes = [
+const flowRoute: Routes = [
   {
     path: 'flow',
     component: FlowComponent,
@@ -99,3 +99,5 @@ export const flowRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
+
+export default flowRoute;

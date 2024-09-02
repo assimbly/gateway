@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
-import { ConfigurationComponent } from './configuration.component';
+import ConfigurationComponent from './configuration.component';
 import { ConfigurationService } from './configuration.service';
 import { Bean, PropertySource } from './configuration.model';
 
@@ -11,17 +11,14 @@ describe('ConfigurationComponent', () => {
   let fixture: ComponentFixture<ConfigurationComponent>;
   let service: ConfigurationService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [ConfigurationComponent],
-        providers: [ConfigurationService],
-      })
-        .overrideTemplate(ConfigurationComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, ConfigurationComponent],
+      providers: [ConfigurationService],
     })
-  );
+      .overrideTemplate(ConfigurationComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfigurationComponent);

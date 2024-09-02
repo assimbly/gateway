@@ -5,7 +5,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
-import { PasswordResetFinishComponent } from './password-reset-finish.component';
+import PasswordResetFinishComponent from './password-reset-finish.component';
 import { PasswordResetFinishService } from './password-reset-finish.service';
 
 describe('PasswordResetFinishComponent', () => {
@@ -14,8 +14,7 @@ describe('PasswordResetFinishComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [PasswordResetFinishComponent],
+      imports: [HttpClientTestingModule, PasswordResetFinishComponent],
       providers: [
         FormBuilder,
         {
@@ -75,7 +74,7 @@ describe('PasswordResetFinishComponent', () => {
 
       expect(service.save).toHaveBeenCalledWith('XYZPDQ', 'password');
       expect(comp.success).toBe(true);
-    })
+    }),
   ));
 
   it('should notify of generic error', inject(
@@ -93,6 +92,6 @@ describe('PasswordResetFinishComponent', () => {
       expect(service.save).toHaveBeenCalledWith('XYZPDQ', 'password');
       expect(comp.success).toBe(false);
       expect(comp.error).toBe(true);
-    })
+    }),
   ));
 });

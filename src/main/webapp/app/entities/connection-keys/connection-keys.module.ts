@@ -1,7 +1,8 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Connections } from 'app/shared/camel/connections';
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+
 
 import { ConnectionKeysComponent } from './connection-keys.component';
 import { ConnectionKeysDetailComponent } from './connection-keys-detail.component';
@@ -22,7 +23,6 @@ const ENTITY_STATES = [...connectionKeysRoute];
     ConnectionKeysDeleteDialogComponent,
     ForbiddenConnectionKeysValidatorDirective,
   ],
-  entryComponents: [ConnectionKeysComponent, ConnectionKeysUpdateComponent, ConnectionKeysDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ConnectionKeysModule {}
