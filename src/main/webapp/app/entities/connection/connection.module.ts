@@ -2,7 +2,9 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
+
 import { ConnectionKeysModule } from '../../entities/connection-keys/connection-keys.module';
 
 import { Connections } from 'app/shared/camel/connections';
@@ -28,7 +30,7 @@ import { ConnectionPopupComponent } from 'app/entities/connection/connection-dia
 const ENTITY_STATES = [...connectionRoute, ...connectionPopupRoute];
 
 @NgModule({
-  imports: [SharedModule, ConnectionKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, SortDirective, SortByDirective, ConnectionKeysModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     ConnectionComponent,
     ConnectionAllComponent,
@@ -39,14 +41,6 @@ const ENTITY_STATES = [...connectionRoute, ...connectionPopupRoute];
     ConnectionPopupComponent,
     ForbiddenConnectionNamesValidatorDirective,
     ForbiddenConnectionKeysValidatorDirective,
-  ],
-  entryComponents: [
-    ConnectionComponent,
-    ConnectionAllComponent,
-    ConnectionUpdateComponent,
-    ConnectionDeleteDialogComponent,
-    ConnectionDialogComponent,
-    ConnectionPopupComponent,
   ],
   providers: [ConnectionService, ConnectionPopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

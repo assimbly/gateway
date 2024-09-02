@@ -1,7 +1,8 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
@@ -23,13 +24,6 @@ import { ForbiddenRouteNamesValidatorDirective } from 'app/entities/route/route-
     RouteDialogComponent,
     RoutePopupComponent,
     ForbiddenRouteNamesValidatorDirective,
-  ],
-  entryComponents: [
-    RouteComponent,
-    RouteDialogComponent,
-    RouteUpdateComponent,
-    RoutePopupComponent,
-    RouteDeleteDialogComponent,
   ],
   providers: [RouteService, RoutePopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

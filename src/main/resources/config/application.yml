@@ -14,19 +14,48 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+---
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+
 management:
+
   endpoints:
     web:
       base-path: /management
-      path-mapping:
-        hawtio: /hawtio/console
       exposure:
         include:
-          ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'startup', 'threaddump', 'hawtio', 'jolokia']
+          - configprops
+          - env
+          - health
+          - info
+          - jhimetrics
+          - jhiopenapigroups
+          - logfile
+          - loggers
+          - prometheus
+          - threaddump
+          - caches
+          - liquibase
+          - jolokia
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: "ALWAYS"
       roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
     jhimetrics:
       enabled: true
     jolokia:
@@ -37,10 +66,9 @@ management:
   health:
     mail:
       enabled: false # When using the MailService, configure an SMTP server and set this to true
-  metrics:
-    export:
-      # Prometheus is the default metrics backend
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
         step: 60
     enable:
@@ -54,12 +82,17 @@ management:
         all: true
       percentiles:
         all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    data:
+      repository:
+        autotime:
+          enabled: true
     tags:
       application: ${spring.application.name}
     web:
       server:
-        auto-time-requests: true
-
+        request:
+          autotime:
+            enabled: true
 spring:
   application:
     name: gateway
@@ -68,22 +101,44 @@ spring:
     # Otherwise, it will be filled in by gradle when building the WAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+        # Uncomment to activate TLS for the dev profile
+        #- tls
   data:
     jpa:
       repositories:
-        bootstrap-mode=lazy:
+        bootstrap-mode: deferred
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: H2
+    show-sql: false
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
+      hibernate.timezone.default_storage: NORMALIZE
+      hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      # modify batch size as necessary
+      hibernate.jdbc.batch_size: 25
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.query.fail_on_pagination_over_collection_fetch: true
+      hibernate.query.in_clause_parameter_padding: true
       hibernate:
+        globally_quoted_identifiers: true
         temp:
           use_jdbc_metadata_defaults: false
-    hibernate:
-      ddl-auto: none
-      naming: # org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        ddl-auto: none
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+          implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
   messages:
     basename: i18n/messages
   main:
@@ -95,10 +150,29 @@ spring:
       enabled: true
     pathmatch:
       matching-strategy: ant_path_matcher
+  threads:
+    virtual:
+      enabled: true
   thymeleaf:
     mode: HTML
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+    exclude:
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+server:
+  servlet:
+    session:
+      timeout: 28800
+      cookie:
+        http-only: true
+        max-age: 28800
+  max-http-request-header-size: 81920
+  jetty:
+    httpConfig:
+      generateOrigin: true
+
 
 springdoc:
   show-actuator: true
@@ -107,20 +181,9 @@ springdoc:
     tagsSorter: alpha
     tryItOutEnabled: true
     doc-expansion: none
-
-server:
-  servlet:
-    session:
-      timeout: 28800
-      cookie:
-        http-only: true
-        max-age: 28800
-  max-http-header-size: 81920
-  jetty:
-    httpConfig:
-      generateOrigin: true
-
-
+    disable-swagger-default-url: true
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
 
 # ===================================================================
 # JHipster specific properties
@@ -150,12 +213,12 @@ jhipster:
     management-include-pattern: /management/**
     title: Assimbly API
     description: Assimbly Gateway API documentation
-    version: 3.6.0
+    version: 4.1.0
     terms-of-service-url:
     contact-name:
     contact-url:
     contact-email:
-    license: unlicensed
+    license: Apache License
     license-url:
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ws:"
@@ -171,7 +234,7 @@ jhipster:
 
 application:
   info:
-    version: 4.0.6
+    version: 5.0.0
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
@@ -179,7 +242,7 @@ application:
     name: default
     tracing: false
     debugging: false
-    base-directory: /app
+    base-directory: default
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true

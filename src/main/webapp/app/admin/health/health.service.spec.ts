@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { HealthService } from './health.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { HealthService } from './health.service';
 
 describe('HealthService Service', () => {
   let service: HealthService;
@@ -24,7 +24,7 @@ describe('HealthService Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call management/health step with correct values', () => {
+    it('should call management/health endpoint with correct values', () => {
       // GIVEN
       let expectedResult;
       const checkHealth = {

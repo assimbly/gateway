@@ -5,23 +5,20 @@ import { of } from 'rxjs';
 import { ProfileInfo } from 'app/layouts/profiles/profile-info.model';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 
-import { PageRibbonComponent } from './page-ribbon.component';
+import PageRibbonComponent from './page-ribbon.component';
 
 describe('Page Ribbon Component', () => {
   let comp: PageRibbonComponent;
   let fixture: ComponentFixture<PageRibbonComponent>;
   let profileService: ProfileService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [PageRibbonComponent],
-      })
-        .overrideTemplate(PageRibbonComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, PageRibbonComponent],
     })
-  );
+      .overrideTemplate(PageRibbonComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PageRibbonComponent);

@@ -1,15 +1,36 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { LogViewerService } from './logviewer.service';
 
+import { RouterModule } from '@angular/router';
+import SharedModule from 'app/shared/shared.module';
+import { FormsModule } from '@angular/forms';
+
+import { SearchByNamePipe } from './logviewer.searchbyname.pipe';
+import { LogViewerLineValidationDirective } from './logviewer-line-validation.directive';
+
 @Component({
+  standalone: true,
     selector: 'jhi-logviewer',
-    templateUrl: './logviewer.component.html'
+    templateUrl: './logviewer.component.html',
+  imports: [
+    RouterModule,
+    FormsModule,
+    SharedModule,
+    SearchByNamePipe,
+    LogViewerLineValidationDirective,
+  ],
 })
-export class LogViewerComponent implements OnInit {
+
+
+
+export default class LogViewerComponent implements OnInit {
+
     @ViewChild('logArea', { static: false }) private logArea: ElementRef;
+
     public log: string;
     public logLines: string[];
     public lines: number;
+
     searchText = '';
 
     constructor(private logViewerService: LogViewerService) {}

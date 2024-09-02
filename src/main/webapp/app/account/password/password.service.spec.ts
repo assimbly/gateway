@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { PasswordService } from './password.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { PasswordService } from './password.service';
 
 describe('Password Service', () => {
   let service: PasswordService;
@@ -24,7 +24,7 @@ describe('Password Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call change-password step with correct values', () => {
+    it('should call change-password endpoint with correct values', () => {
       // GIVEN
       const password1 = 'password1';
       const password2 = 'password2';

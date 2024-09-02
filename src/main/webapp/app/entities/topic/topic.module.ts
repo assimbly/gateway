@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
 import { TopicComponent } from './topic.component';
 import { TopicDetailComponent } from './topic-detail.component';
 import { TopicUpdateComponent } from './topic-update.component';
@@ -15,7 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
 @NgModule({
-  imports: [SharedModule, RouterModule.forChild(topicRoute), ReactiveFormsModule, PopoverModule.forRoot()],
+  imports: [SharedModule, SortDirective, SortByDirective, RouterModule.forChild(topicRoute), ReactiveFormsModule, PopoverModule.forRoot()],
   declarations: [
     TopicComponent,
     TopicDetailComponent,
@@ -26,6 +27,5 @@ import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog
     TopicRowComponent,
     TopicClearDialogComponent,
   ],
-  entryComponents: [TopicDeleteDialogComponent, TopicClearDialogComponent],
 })
 export class TopicModule {}

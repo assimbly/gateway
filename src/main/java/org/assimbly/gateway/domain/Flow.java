@@ -6,7 +6,9 @@ import org.assimbly.gateway.domain.enumeration.LogLevelType;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -25,8 +27,11 @@ public class Flow implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "sequenceGenerator")
+    @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")})
+    @Column(name = "id")    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -73,12 +78,6 @@ public class Flow implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Step> steps = new HashSet<>();
-
-    /*
-    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(unique = true)
-    private Maintenance maintenance;
-    */
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {

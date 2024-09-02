@@ -67,10 +67,10 @@ export class TopicRowComponent implements OnInit, OnDestroy {
   }
 
   navigateToMessageSender(addressName: string) {
-    this.router.navigate(['../broker/sender/message-sender', { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/sender/message-sender'], {queryParams: { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }});
   }
 
   navigateToMessageBrowser(addressName: string) {
-    this.router.navigate(['../broker/browser/message-browser', { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }]);
+    this.router.navigate(['../broker/browser/message-browser'], {queryParams: { endpointName: addressName, endpointType: 'topic', brokerType: this.brokerType }});
   }
 }

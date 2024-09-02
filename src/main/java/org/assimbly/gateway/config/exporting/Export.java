@@ -18,8 +18,6 @@ public class Export {
 
 	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
 
-	private List<TreeMap<String, String>> propertiesList;
-	private TreeMap<String, String> properties;
 	private String xmlConfiguration;
 	private String configuration;
 
@@ -27,32 +25,9 @@ public class Export {
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
 	@Autowired
-	private ExportProperties exportProperties;
-
-	@Autowired
 	private ExportXML exportXML;
 
 	private String output;
-
-	// exports gateway to object (List of treemaps)
-	public List<TreeMap<String, String>> convertDBToConfiguration(Long integrationId) throws Exception {
-
-		propertiesList = new ArrayList<>();
-		propertiesList = exportProperties.getProperties(integrationId);
-
-		return propertiesList;
-	}
-
-	// exports flow to properties (treemap)
-	public TreeMap<String, String> convertDBToFlowConfiguration(Long id) throws Exception {
-
-		properties = new TreeMap<String, String>();
-
-		properties = exportProperties.getFlowProperties(id);
-
-		return properties;
-
-	}
 
 	// exports gateway to XML, JSON or YAML format
 	public String convertDBToConfiguration(Long integrationId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
@@ -71,7 +46,7 @@ public class Export {
 		if(isPlaceHolderReplacement) {
 			configuration = PlaceholdersReplacement(configuration);
 		}
-		
+
 		return configuration;
 	}
 
@@ -95,7 +70,7 @@ public class Export {
 
 		return configuration;
 	}
-	
+
 	// exports flow to XML, JSON or YAML
 	public String convertDBToFlowConfiguration(Long id, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
 
@@ -113,7 +88,7 @@ public class Export {
 		if(isPlaceHolderReplacement) {
 			configuration = PlaceholdersReplacement(configuration);
 		}
-		
+
 		return configuration;
 
 	}
@@ -121,15 +96,15 @@ public class Export {
 	private String PlaceholdersReplacement(String input) {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
-		
+
 		Map<String, String> values = environmentVariables.stream().collect(Collectors.toMap(EnvironmentVariables::getKey, EnvironmentVariables::getValue));
-		
+
 		if(values.containsValue("")) {
 			output = "Error: Environment variables contain empty values";
 		}else {
 			StringSubstitutor sub = new StringSubstitutor(values, "@{", "}");
 			output = sub.replace(input);
-		}	
+		}
 
 		return output;
 

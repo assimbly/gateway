@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { PasswordResetFinishService } from './password-reset-finish.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { PasswordResetFinishService } from './password-reset-finish.service';
 
 describe('PasswordResetFinish Service', () => {
   let service: PasswordResetFinishService;
@@ -24,7 +24,7 @@ describe('PasswordResetFinish Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call reset-password/finish step with correct values', () => {
+    it('should call reset-password/finish endpoint with correct values', () => {
       // GIVEN
       const key = 'abc';
       const newPassword = 'password';

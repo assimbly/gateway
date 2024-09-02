@@ -1,6 +1,6 @@
 # Assimbly
 
-**Assimbly** is an integration integration to create and run:
+**Assimbly** is an integration gateway to create and run:
 
 * Dataflows
 * Camel Routes

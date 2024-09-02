@@ -8,7 +8,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageSearchByMessageIdPipe } from './message.searchbymessageid.pipe';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
 
 import { BrokerComponent } from './broker.component';
 import { BrokerDetailComponent } from './broker-detail.component';
@@ -29,6 +30,8 @@ const ENTITY_STATES = [...brokerRoute];
 @NgModule({
   imports: [
     SharedModule,
+    SortDirective,
+    SortByDirective,
     RouterModule.forChild(ENTITY_STATES),
     NgbModule,
     NgSelectModule,
@@ -49,7 +52,6 @@ const ENTITY_STATES = [...brokerRoute];
     MessageSearchByMessageIdPipe,
     MessageSortByHeaderPipePipe,
   ],
-  entryComponents: [BrokerComponent, BrokerUpdateComponent, BrokerDeleteDialogComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], 
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class BrokerModule {}

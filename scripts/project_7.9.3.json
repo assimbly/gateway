@@ -1,0 +1,793 @@
+{
+  "applicationName": "gateway",
+  "applicationType": "monolithic",
+  "version": "3.7.0",
+  "jhipsterVersion": "7.7.0",
+  "tempDir": "/tmp",
+  "jhipsterDownloadPath": "https://codeload.github.com/jhipster/jhipster-sample-app/zip/refs/tags/",
+  "repositoryName": "gateway",
+  "javaPackageName": "org.assimbly.gateway",
+  "defaultPort": "8088",
+  "useJhipsterRegistry": "no",
+  "authentication": "jwt",
+  "databaseType": "sql",
+  "devDatabase": "h2",
+  "prodDatabase": "mysql",
+  "springCacheAbstraction": "ehcache",
+  "hibernateSecondLevelCache": "yes",
+  "buildTool": "gradle",
+  "openAPIGenerator": "yes",
+  "springWebsockets": "yes",
+  "elasticSearch": "no",
+  "apacheKafka": "no",
+  "frontendFramework": "angular",
+  "internationalizationSupport": "no",
+  "nativeLanguage": "en",
+  "additionalTestingFrameworks": {
+    "gatling": "no",
+    "cucumber": "no",
+    "protractor": "no"
+  },
+  "projectResources": {
+	"basePath": "/",
+	"resources": [
+	{
+      "type": "dir",
+      "path": "${activemq.data}",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "bin",
+      "action": "ignore"
+    },
+	{
+      "type": "dir",
+      "path": "build",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "data",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "FFDC",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "gradle",
+      "action": "ignore"
+    },
+	{
+      "type": "dir",
+      "path": "node_modules",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "scripts",
+      "action": "ignore"
+    },
+	{
+      "type": "dir",
+      "path": "src",
+      "action": "ignore"
+    },
+	{
+      "type": "dir",
+      "path": "src/main/docker",
+      "action": "replace"
+    },
+	{
+      "type": "dir",
+      "path": "src/main/resources",
+      "action": "ignore"
+    },
+	{
+      "type": "dir",
+      "path": "target",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "WebContent",
+      "action": "delete"
+    },
+	{
+      "type": "dir",
+      "path": "webpack",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/environment.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/custom.js",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "webpack/logo-jhipster.png",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/proxy.conf.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "webpack/webpack.custom.js",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": ".browserslistrc",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".editorconfig",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".eslintignore",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".eslintrc.json",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".gitattributes",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".gitignore",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".lintstagedrc.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".prettierignore",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".prettierrc",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": ".project",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": ".yo-rc.json",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "angular.json",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "build.gradle",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "checkstyle.xml",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "CONTRIBUTING.md",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "gradle.properties",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "gradlew",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "gradle.bat",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "jest.conf.js",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "LICENSE",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "package.json",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "package-lock.json",
+      "action": "delete"
+    },
+	{
+      "type": "file",
+      "path": "README",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "settings.gradle",
+      "action": "ignore"
+    },
+	{
+      "type": "file",
+      "path": "sonar-project.properties",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "tsconfig.app.json",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "tsconfig.e2e.json",
+      "action": "replace"
+    },
+	{
+      "type": "file",
+      "path": "tsconfig.json",
+      "action": "skip"
+    },
+	{
+      "type": "file",
+      "path": "tsconfig.spec.json",
+      "action": "replace"
+    }
+  ]
+  },
+  "backendResources": {
+	"basePath": "/src/main/java/org/assimbly/gateway",
+	  "resources": [
+		{
+		  "type": "dir",
+		  "path": "aop",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "config",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "config/ApplicationProperties.java",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "config/AsyncConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/CacheConfiguration.java",
+		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "config/Constants.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/DatabaseConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/DateTimeFormatConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/JacksonConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/LiquibaseConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/LocaleConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/LoggingAspectConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/LoggingConfiguration.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "config/SecurityConfiguration.java",
+		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "config/WebConfigurer.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "domain",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "domain/AbstractAuditingEntity.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "domain/Authority.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "domain/User.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "management",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "repository",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "security",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "service",
+		  "action": "ignore"
+		},{
+		  "type": "file",
+		  "path": "service/EmailAlreadyUsedException.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/InvalidPasswordException.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/MailService.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/UserService.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/UsernameAlreadyUsedException.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/dto/PasswordChangeDTO.java",
+		  "action": "replace"
+		},{
+		  "type": "file",
+		  "path": "service/dto/UserDTO.java",
+		  "action": "replace"
+		},{
+		  "type": "dir",
+		  "path": "web",
+		  "action": "ignore"
+		},{
+		  "type": "dir",
+		  "path": "web/rest/errors",
+		  "action": "replace"
+		},{
+		  "type": "dir",
+		  "path": "web/rest/vm",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "ApplicationWebXml.java",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "GatewayApp.java",
+		  "action": "ignore"
+		}
+	  ]
+  },
+  "testBackendResources": {
+  	"basePath": "/src/test/java/org/assimbly/gateway",
+	"resources": [
+		{
+		  "type": "dir",
+		  "path": "domain",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "repository",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "security",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "service",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "web",
+		  "action": "ignore"
+		}
+	  ]
+  },
+  "frontendResources": {
+  	"basePath": "/src/main/webapp",
+	  "resources": [
+		{
+		  "type": "dir",
+		  "path": "app/account",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/audits",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/configuration",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/docs",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/health",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/logs",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/metrics",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/admin/user-management",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/config",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/core",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/layouts/error",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/layouts/footer",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/layouts/main",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/layouts/navbar",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/layouts/navbar/active-menu.directive.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/layouts/navbar/navbar.route.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/layouts/profiles",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/login",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "app/shared/shared-module.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/shared/shared-libs.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/alert",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/auth",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/date",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/language",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/websockets",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "app/shared/window",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app.constants.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app.module.ts",
+		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "app/app-routing.module.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "content/css",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "content/images",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "content/scss",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/_bootstrap-variables.scss",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/global.scss",
+		  "action": "skip"
+		},
+		{
+		  "type": "file",
+		  "path": "content/scss/vendor.scss",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "i18n",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "swagger-ui",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "WEB-INF",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "404.html",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "bootstrap.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "declarations.d.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "assimbly.ico",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "favicon.ico",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "index.html",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "main.ts",
+		  "action": "ignore"
+		},
+		{
+		  "type": "file",
+		  "path": "manifest.webapp",
+		  "action": "ignore"
+		},{
+		  "type": "file",
+		  "path": "polyfills.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "robots.txt",
+		  "action": "replace"
+		}
+	  ]
+  },
+  "testFrontendResources": {
+  	"basePath": "/src/test/javascript",
+	"resources": [
+		{
+		  "type": "dir",
+		  "path": "spec/app/account",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "spec/app/admin",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "spec/app/core",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "spec/app/entities",
+		  "action": "ignore"
+		},
+		{
+		  "type": "dir",
+		  "path": "spec/app/shared",
+		  "action": "replace"
+		},
+		{
+		  "type": "dir",
+		  "path": "spec/helpers",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "jest.conf.js",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "jest.ts",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "path": "jest-global-mocks.ts",
+		  "action": "replace"
+		}
+	  ]
+  },
+  "specialResources": {
+  	"basePath": "/",
+	  "resources": [
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/AccountResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/AccountResource.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/AuditResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/AuditResource.java",
+		  "action": "replace"
+		},
+		{
+		  "type": "file",
+		  "sourcePath": "src/main/java/org/assimbly/gateway/web/rest/UserResource.java",
+		  "targetPath": "src/main/java/org/assimbly/gateway/web/rest/gateway/UserResource.java",
+		  "action": "replace"
+		}
+	  ]
+  }
+}

@@ -43,7 +43,12 @@ public class EnvironmentResource {
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> setGatewayConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType,@Parameter(hidden = true) @RequestHeader("Content-Type") String contentType, @PathVariable Long integrationid, @RequestBody String configuration) throws Exception {
+    public ResponseEntity<String> setGatewayConfiguration(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @RequestBody String configuration,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType,
+        @Parameter(hidden = true) @RequestHeader(value = "Content-Type") String contentType
+    ) throws Exception {
 
        	try {
        		log.info("Importing configuration into database");
@@ -68,7 +73,11 @@ public class EnvironmentResource {
         path = "/environment/{integrationid}",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getGatewayConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long integrationid ) throws Exception {
+    public ResponseEntity<String> getGatewayConfiguration(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType,
+        @RequestHeader(value = "PlaceholderReplacement") boolean isPlaceholderReplacement
+    ) throws Exception {
 
        	try {
 			configuration = confExport.convertDBToConfiguration(integrationid, mediaType,isPlaceholderReplacement);
@@ -98,7 +107,12 @@ public class EnvironmentResource {
         consumes = {MediaType.TEXT_PLAIN_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getConfigurationByFlowids(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long integrationid, @RequestBody String flowids) throws Exception {
+    public ResponseEntity<String> getConfigurationByFlowids(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @RequestBody String flowids,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType,
+        @RequestHeader(value = "PlaceholderReplacement") boolean isPlaceholderReplacement
+    ) throws Exception {
 
        	try {
 			configuration = confExport.convertDBToConfigurationByFlowIds(integrationid, mediaType, flowids, isPlaceholderReplacement);
@@ -128,7 +142,12 @@ public class EnvironmentResource {
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> setFlowConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @PathVariable Long integrationid, @PathVariable Long flowid, @RequestBody String configuration) throws Exception {
+    public ResponseEntity<String> setFlowConfiguration(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @PathVariable(value = "flowid") Long flowid,
+        @RequestBody String configuration,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType
+    ) throws Exception {
         try {
        		confImport.convertFlowConfigurationToDB(integrationid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(integrationid, mediaType, "setFlowConfiguration", "Flow configuration set");
@@ -150,7 +169,12 @@ public class EnvironmentResource {
         path = "/environment/{integrationid}/flow/{flowid}",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<String> getFlowConfiguration(@Parameter(hidden = true) @RequestHeader("Accept") String mediaType, @RequestHeader("PlaceholderReplacement") boolean isPlaceholderReplacement, @PathVariable Long integrationid, @PathVariable Long flowid) throws Exception {
+    public ResponseEntity<String> getFlowConfiguration(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @PathVariable(value = "flowid") Long flowid,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType,
+        @RequestHeader(value = "PlaceholderReplacement") boolean isPlaceholderReplacement
+    ) throws Exception {
        	try {
             configuration = confExport.convertDBToFlowConfiguration(flowid, mediaType, isPlaceholderReplacement);
 

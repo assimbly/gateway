@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
 
 import { LinkComponent } from './link.component';
 import { LinkDetailComponent } from './link-detail.component';
@@ -23,7 +23,6 @@ const ENTITY_STATES = [...linkRoute];
     LinkDeleteDialogComponent,
     ForbiddenLinkValidatorDirective,
   ],
-  entryComponents: [LinkComponent, LinkUpdateComponent, LinkDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LinkModule {}

@@ -2,17 +2,23 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import SharedModule from 'app/shared/shared.module';
 
 @Component({
+  standalone: true,
   selector: 'jhi-error',
   templateUrl: './error.component.html',
+  imports: [SharedModule],
 })
-export class ErrorComponent implements OnInit, OnDestroy {
+export default class ErrorComponent implements OnInit, OnDestroy {
   errorMessage?: string;
   errorKey?: string;
   langChangeSubscription?: Subscription;
 
-  constructor(private translateService: TranslateService, private route: ActivatedRoute) {}
+  constructor(
+    private translateService: TranslateService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.route.data.subscribe(routeData => {

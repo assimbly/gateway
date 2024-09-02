@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { Components } from 'app/shared/camel/component-type';
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
 
 import { IntegrationComponent } from './integration.component';
 import { IntegrationService } from './integration.service';
@@ -21,13 +21,6 @@ const ENTITY_STATES = [...integrationRoute];
   declarations: [
     IntegrationComponent,
     IntegrationDetailComponent,
-    IntegrationUpdateComponent,
-    IntegrationDeleteDialogComponent,
-    IntegrationImportDialogComponent,
-    IntegrationExportDialogComponent,
-  ],
-  entryComponents: [
-    IntegrationComponent,
     IntegrationUpdateComponent,
     IntegrationDeleteDialogComponent,
     IntegrationImportDialogComponent,

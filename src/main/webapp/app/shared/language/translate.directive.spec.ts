@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import { TranslateDirective } from './translate.directive';
+import TranslateDirective from './translate.directive';
 
 @Component({
   template: ` <div jhiTranslate="test"></div> `,
@@ -13,14 +13,12 @@ describe('TranslateDirective Tests', () => {
   let fixture: ComponentFixture<TestTranslateDirectiveComponent>;
   let translateService: TranslateService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot()],
-        declarations: [TranslateDirective, TestTranslateDirectiveComponent],
-      });
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot(), TranslateDirective],
+      declarations: [TestTranslateDirectiveComponent],
+    });
+  }));
 
   beforeEach(() => {
     translateService = TestBed.inject(TranslateService);

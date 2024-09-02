@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
 
 import { HeaderComponent } from './header.component';
 import { HeaderDetailComponent } from './header-detail.component';
@@ -23,7 +23,6 @@ const ENTITY_STATES = [...headerRoute];
     HeaderDeleteDialogComponent,
     ForbiddenHeaderValidatorDirective,
   ],
-  entryComponents: [HeaderComponent, HeaderUpdateComponent, HeaderDeleteDialogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class HeaderModule {}
