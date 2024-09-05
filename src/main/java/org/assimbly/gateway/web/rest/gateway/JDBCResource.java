@@ -19,10 +19,10 @@ import java.sql.SQLException;
 public class JDBCResource {
 
     /**
-     * GET  /validation/{integrationId}/jdbc : test jdbc
+     * GET  /validation/jdbc : test jdbc
      */
     @GetMapping(
-        path = "/validation/{integrationId}/jdbc",
+        path = "/validation/jdbc",
         produces = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ValidationErrorMessage validateJdbc(
