@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest.gateway;
+package org.assimbly.gateway.web.rest.headless;
 
 import org.assimbly.gateway.jdbc.adapter.DatabaseAdapter;
 import org.assimbly.gateway.jdbc.domain.ConnectionType;
