@@ -51,8 +51,6 @@ for /f "tokens=1* delims==" %%a in ('type "%propertyFile%"') do (
 
 move /y "%tempFile%" "%propertyFile%"
 
-set JAVA_HOME=D:\test\JDKS3\graalvm-jdk-21.0.3+7.1
-
 if [%1]==[] (
     cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx3g" -Papi-docs
 ) else (
