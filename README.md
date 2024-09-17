@@ -1,6 +1,6 @@
 # Assimbly
 
-**Assimbly** is an integration gateway to create and run:
+**Assimbly** is software to build and run:
 
 * Dataflows
 * Camel Routes
@@ -10,24 +10,22 @@
 
 Assimbly is powered by [Apache Camel](https://github.com/apache/camel) and [Apache ActiveMQ](https://activemq.apache.org/).
 
-![alt text](src/main/webapp/content/images/assimbly_screenshot.jpg?raw=true 'Flows page')
+## Design
 
-## Download
+The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 
-- [Jar files](https://github.com/orgs/assimbly/packages?repo_name=gateway)
-- [Docker images](https://hub.docker.com/u/assimbly)
+-   **Web-based**: Run from any browser.
+-   **Easy to use**: Easy to configure and manage integrations.
+-   **Separation of concerns**: Separate integrations from application and other middleware.
 
 ## Getting started
 
 Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
 
-## Design
+## Downloads
 
-The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
-
--   Web based: Run from any browser.
--   Ease of use: Configure and manage integrations with ease.
--   Separate-of-concerns: Separate integrations from application and other middleware.
+- [Jar files](https://github.com/assimbly/gateway/releases)
+- [Docker images](https://hub.docker.com/u/assimbly)
 
 # Documentation
 

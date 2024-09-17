@@ -172,7 +172,8 @@
         triggers="mouseenter"
         popoverTitle="Install error"
         [ngbPopover]="errorFlowButtonTemplate"
-        popover-class="increase-popover-width"
+        [popoverClass]="'increase-popover-width'"
+        [container]="'body'"
         [autoClose]="'outside'"
       >
 			<fa-icon style="color: white;" icon="exclamation-triangle"></fa-icon>
