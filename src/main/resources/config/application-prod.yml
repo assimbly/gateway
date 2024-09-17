@@ -45,7 +45,6 @@ spring:
     hikari:
       auto-commit: false
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     database: H2
     show-sql: false
     properties:
