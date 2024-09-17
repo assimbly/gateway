@@ -132,8 +132,6 @@ spring:
       hibernate.query.in_clause_parameter_padding: true
       hibernate:
         globally_quoted_identifiers: true
-        temp:
-          use_jdbc_metadata_defaults: false
         ddl-auto: none
         naming:
           physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
