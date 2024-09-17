@@ -150,26 +150,6 @@
                 <a
                   style="padding-left: 1em"
                   type="submit"
-                  routerLink="/queue"
-                  aria-hidden="true"
-                  placement="right"
-                  title="Queues"
-                >
-                  <fa-icon icon="envelope"></fa-icon>
-                </a>
-                <a
-                  style="padding-left: 1em"
-                  type="submit"
-                  routerLink="/topic"
-                  aria-hidden="true"
-                  placement="right"
-                  title="Topics"
-                >
-                  <fa-icon icon="envelope"></fa-icon>
-                </a>
-                <a
-                  style="padding-left: 1em"
-                  type="submit"
                   [routerLink]="['/broker', broker.id, 'edit']"
                   aria-hidden="true"
                   placement="right"
@@ -185,6 +165,28 @@
                   title="Delete broker">
 				  	<fa-icon icon="trash"></fa-icon>
 				  </a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
+                  routerLink="/queue"
+                  aria-hidden="true"
+                  placement="right"
+                  title="Queues"
+                >
+                  <fa-icon icon="envelope"></fa-icon>
+                  <span class="ml-2">Queues</span>
+                </a>
+                <a
+                  style="padding-left: 1em"
+                  type="submit"
+                  routerLink="/topic"
+                  aria-hidden="true"
+                  placement="right"
+                  title="Topics"
+                >
+                  <fa-icon icon="list"></fa-icon>
+                  <span class="ml-2">Topics</span>
+                </a>
               </div>
 			  </div>
             </div>
