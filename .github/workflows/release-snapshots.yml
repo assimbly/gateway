@@ -36,3 +36,88 @@ jobs:
     with:
       module: 'full'
       branch: 'develop'
+
+  call-integration-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+      branch: 'develop'
+
+  call-broker-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: 'develop'
+
+  call-headless-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: 'develop'
+
+  call-full-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'full'
+      branch: 'develop'
+      tag: 'develop'
+      type: 'full'
+
+  call-integration-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+      branch: 'develop'
+      tag: 'develop'
+      type: 'default'
+
+  call-broker-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: 'develop'
+      tag: 'develop'
+      type: 'default'
+
+  call-headless-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: 'develop'
+      tag: 'develop'
+      type: 'full'
+
+  call-headless-release-aws-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: 'develop'
+      tag: 'development'
+      type: 'full'
+
+  call-broker-release-aws-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: 'develop'
+      tag: 'development'
+      type: 'default'
+
