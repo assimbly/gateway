@@ -51,7 +51,6 @@ plugins {
     id "idea"
     id "eclipse"
     id "org.springframework.boot"
-    //id "org.springframework.boot.aot"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
     id "com.github.node-gradle.node"
@@ -59,6 +58,7 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.6.0'
     id "com.github.ben-manes.versions" version "0.51.0"
+    //id "org.springframework.boot.aot"
     //id 'org.graalvm.buildtools.native' version '0.10.3'
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }

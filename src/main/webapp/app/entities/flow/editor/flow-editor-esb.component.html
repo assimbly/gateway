@@ -640,6 +640,13 @@
 
       <br/>
       <br/>
+      <div
+        *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
+        <div *ngIf="editFlowForm['controls'].name.errors.required" class="invalid-field-message"
+             style="color: red;">Flowname is required.
+        </div>
+        <br/>
+      </div>
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-8 offset-4">
