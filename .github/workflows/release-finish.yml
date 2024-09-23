@@ -84,7 +84,7 @@ jobs:
     steps:
 
       - name: Delete older snapshots
-        uses: smartsquaregmbh/delete-old-packages@v0.7.0
+        uses: smartsquaregmbh/delete-old-packages@v0.8.1
         with:
           organization: assimbly
           type: maven
