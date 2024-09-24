@@ -2,28 +2,24 @@ name: Start Release
 
 on:
   workflow_dispatch:
-  issues:
-    types: [ opened, reopened, edited ]
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
 
-jobs:
-
-  release-new-version:
-
-    if: |
-      (contains(github.event.issue.labels.*.name, 'major') ||
-      contains(github.event.issue.labels.*.name, 'minor') ||
-      contains(github.event.issue.labels.*.name, 'patch')) &&
-      github.event.issue.milestone.title != ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-      repository-projects: write
-
-    steps:
-
-      - name: Start release
-        run: echo "Start release of gateway"
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
 
   call-gateway-update-version:
     needs: release-new-version
