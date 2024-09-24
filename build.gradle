@@ -347,7 +347,7 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.7.0'
+    implementation 'tech.jhipster:jhipster-framework:8.7.1'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.1.0"
 
