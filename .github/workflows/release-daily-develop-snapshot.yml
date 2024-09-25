@@ -28,6 +28,5 @@ jobs:
       - name: Call release
         uses: ./.github/workflows/release.yml
         with:
-          branch: 'develop'
           milestone: "${{ env.Milestone }}"
           tag: 'development'
