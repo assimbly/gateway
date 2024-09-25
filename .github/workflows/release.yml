@@ -40,6 +40,7 @@ jobs:
         run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
       - name: Print message if empty
         if: "${{ github.event.inputs.milestone == '' }}"
+        run: echo Milestone value is empty
 
   test-tag:
     runs-on: ubuntu-latest
