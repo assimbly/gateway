@@ -8,6 +8,8 @@ on:
 jobs:
   getversion:
     runs-on: ubuntu-latest
+    outputs:
+      milestone: ${{ steps.gradle-version.outputs.milestone }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
