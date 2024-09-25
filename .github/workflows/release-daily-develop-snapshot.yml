@@ -25,16 +25,11 @@ jobs:
           echo "Gradle version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
-  next-task:
+  echo-env-var:
     runs-on: ubuntu-latest
-    needs: extract-version
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Gradle Project Version
-        run: |
-          echo "Using Gradle project version: ${{env.version}}"
+      - name: Echo environment variable
+        run: echo ${{ env.version }}
 
   #call-release:
     #uses: ./.github/workflows/release.yml
