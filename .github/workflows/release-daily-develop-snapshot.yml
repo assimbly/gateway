@@ -21,15 +21,17 @@ jobs:
       - name: Get Gradle Project Version
         id: gradle-version
         run: |
-          VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
-          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$(./gradlew -q printVersion | cut -c 1-6)" >> $GITHUB_ENV
+          echo "Myversion=$VERSION"
 
   echo-env-var:
     runs-on: ubuntu-latest
     steps:
       - name: Echo environment variable
         run: echo ${{ env.version }}
+      - name: 2 Echo environment variable
+        run: echo $version
 
   #call-release:
     #uses: ./.github/workflows/release.yml
