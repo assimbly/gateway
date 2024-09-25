@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to operatie on'
+        description: 'Branch to operate on'
         default: 'develop'
         type: string    
       milestone:
@@ -19,7 +19,7 @@ on:
   workflow_call:
     inputs:
       branch:
-        description: 'Branch to operatie on'
+        description: 'Branch to operate on'
         default: 'develop'
         type: string        
       milestone:
@@ -54,15 +54,18 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Print variable if not empty
-        if: "${{ inputs.milestone != '' }}"
-        run: |
-          echo Creating release for milestone ${{ inputs.milestone }}
-      - name: Print message if empty
-        if: "${{ inputs.milestone == '' }}"
-        run: |
-          echo Milestone value is empty
-          exit 1
+      - name: Delete older snapshots
+        uses: smartsquaregmbh/delete-old-packages@v0.8.1
+        with:
+          organization: assimbly
+          type: maven
+          keep: 0
+          semver-pattern: "${{inputs.milestone}}"
+          names: |
+            org.assimbly.gateway.full
+            org.assimbly.gateway.headless
+            org.assimbly.gateway.integration
+            org.assimbly.gateway.broker
 
   call-full-release-jars:
     needs: delete_old_snapshots
