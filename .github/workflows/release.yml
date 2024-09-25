@@ -18,6 +18,10 @@ on:
 
   workflow_call:
     inputs:
+      branch:
+        description: 'Branch to operatie on'
+        default: 'develop'
+        type: string        
       milestone:
         description: 'Milestone to use as version'
         type: string
