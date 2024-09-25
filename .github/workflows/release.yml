@@ -9,7 +9,7 @@ on:
         required: true
       tag:
         description: 'Tag to use for this release'
-        default: 'develop'
+        default: 'development'
         type: string
 
   workflow_call:
@@ -20,7 +20,7 @@ on:
         required: true
       tag:
         description: 'Tag to use for this release'
-        default: 'develop'
+        default: 'development'
         type: string
 
 jobs:
