@@ -36,6 +36,7 @@ jobs:
 
 
   echo-env-var:
+    needs: extract-version
     runs-on: ubuntu-latest
     steps:
       - name: Echo environment variable
