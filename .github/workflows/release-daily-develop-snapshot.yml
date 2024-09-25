@@ -34,7 +34,7 @@ jobs:
 
       - name: Use Gradle Project Version
         run: |
-          echo "Using Gradle project version: ${{ env.version}}"
+          echo "Using Gradle project version: ${{env.version}}"
 
   #call-release:
     #uses: ./.github/workflows/release.yml
