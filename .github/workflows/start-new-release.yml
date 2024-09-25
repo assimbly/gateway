@@ -1,4 +1,4 @@
-name: Start Release
+name: Start New Release (update versions for all repositories)
 
 on:
   workflow_dispatch:
@@ -21,34 +21,31 @@ on:
         description: 'Milestone to use as version'
         type: string
 
+jobs:
   call-gateway-update-version:
-    needs: release-new-version
     uses: ./.github/workflows/update-version.yml
     secrets: inherit
     with:
-      branch: 'develop'
-      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+      branch: "${{ inputs.branch }}"
+      milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-base-release-version:
-    needs: release-new-version
     uses: assimbly/base/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: 'develop'
-      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+      branch: "${{ inputs.branch }}"
+      milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-runtime-release-version:
-    needs: release-new-version
     uses: assimbly/runtime/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: 'develop'
-      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+      branch: "${{ inputs.branch }}"
+      milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-custom-components-release-version:
-    needs: release-new-version
     uses: assimbly/custom-components/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: 'develop'
-      milestone: "${{github.event.issue.milestone.title}}-SNAPSHOT"
+      branch: "${{ inputs.branch }}"
+      milestone: "${{inputs.milestone}}-SNAPSHOT"

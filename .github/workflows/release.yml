@@ -1,9 +1,35 @@
-name: Release Snapshots
+name: Release
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '0 2 * * *'
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        default: 'develop'
+        type: string
+      tag:
+        description: 'Tag to use for this release'
+        default: 'develop'
+        type: string
+
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        default: 'develop'
+        type: string
+      tag:
+        description: 'Tag to use for this release'
+        default: 'develop'
+        type: string
 
 jobs:
   delete_old_snapshots:
@@ -22,7 +48,7 @@ jobs:
           organization: assimbly
           type: maven
           keep: 0
-          version-pattern: "^\\S+\\-SNAPSHOT$"
+          semver-pattern: "${{inputs.milestone}}"
           names: |
             org.assimbly.gateway.full
             org.assimbly.gateway.headless
@@ -35,7 +61,7 @@ jobs:
     secrets: inherit
     with:
       module: 'full'
-      branch: 'develop'
+      branch: "${{inputs.branch}}"
 
   call-integration-release-jars:
     needs: delete_old_snapshots
@@ -43,7 +69,7 @@ jobs:
     secrets: inherit
     with:
       module: 'integration'
-      branch: 'develop'
+      branch: "${{inputs.branch}}"
 
   call-broker-release-jars:
     needs: delete_old_snapshots
@@ -51,7 +77,7 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
+      branch: "${{inputs.branch}}"
 
   call-headless-release-jars:
     needs: delete_old_snapshots
@@ -59,7 +85,7 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
+      branch: "${{inputs.branch}}"
 
   call-full-release-dockerhub-image:
     needs: delete_old_snapshots
@@ -67,8 +93,8 @@ jobs:
     secrets: inherit
     with:
       module: 'full'
-      branch: 'develop'
-      tag: 'develop'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-integration-release-dockerhub-image:
@@ -77,8 +103,8 @@ jobs:
     secrets: inherit
     with:
       module: 'integration'
-      branch: 'develop'
-      tag: 'develop'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'default'
 
   call-broker-release-dockerhub-image:
@@ -87,8 +113,8 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
-      tag: 'develop'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'default'
 
   call-headless-release-dockerhub-image:
@@ -97,8 +123,8 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
-      tag: 'develop'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-headless-release-aws-image:
@@ -107,8 +133,8 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
-      tag: 'development'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-broker-release-aws-image:
@@ -117,7 +143,8 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
-      tag: 'development'
+      branch: "${{inputs.branch}}"
+      tag: "${{inputs.tag}}"
       type: 'default'
+
 

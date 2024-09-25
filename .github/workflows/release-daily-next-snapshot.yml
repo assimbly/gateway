@@ -1,0 +1,15 @@
+name: Release Daily Next Snapshot
+
+on:
+  workflow_dispatch:
+    #  schedule:
+    #    - cron: '0 3 * * *'
+
+jobs:
+  call-release:
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      branch: 'next'
+      milestone: 'next'
+      tag: 'next'
