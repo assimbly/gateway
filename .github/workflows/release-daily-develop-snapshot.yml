@@ -33,7 +33,7 @@ jobs:
       - name: Echo environment variable
         run: echo "${{ env.MyVERSION }}"
       - name: 2 Echo environment variable
-        run: echo "MyVersion= ${{ MyVERSION }}"
+        run: echo "MyVersion= ${{ env.MyVERSION }}"
 
   #call-release:
     #uses: ./.github/workflows/release.yml
