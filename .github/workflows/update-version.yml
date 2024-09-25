@@ -3,23 +3,17 @@ name: Update Version Number
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to use'
-        default: 'develop'
-        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
+        required: true
 
   workflow_call:
     inputs:
-      branch:
-        description: 'Branch to use'
-        default: 'develop'
-        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
+        required: true
 
 jobs:
   update_version:
@@ -28,8 +22,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        repository: assimbly/gateway
-        ref: ${{ inputs.branch }}
+        repository: ${{ github.repository }}
+        ref: ${{ github.ref_name }}
 
     - name: Update Gradle Version
       run: |
