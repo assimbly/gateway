@@ -28,8 +28,19 @@ on:
         type: string
 
 jobs:
-  delete_old_snapshots:
 
+  test-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print variable if not empty
+        if: "${{ github.event.inputs.milestone != '' }}"
+        run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
+      - name: Print message if empty
+        if: "${{ github.event.inputs.milestone == '' }}"
+        run: echo Milestone value is empty
+
+  delete_old_snapshots:
+    needs: test-milestone  
     runs-on: ubuntu-latest
 
     env:
