@@ -23,17 +23,17 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
-          echo "MyVERSION=$VERSION" >> $GITHUB_ENV
-          echo "Myversion=$Myversion"
-          echo "Myversion=${{ env.Myversion }}"
+          echo "MyVERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Myversion=$MyVERSION"
+          echo "Myversion=${{ env.MyVERSION }}"
 
   echo-env-var:
     runs-on: ubuntu-latest
     steps:
       - name: Echo environment variable
-        run: echo ${{ env.Myversion }}
+        run: echo ${{ env.MyVERSION }}
       - name: 2 Echo environment variable
-        run: echo $Myversion
+        run: echo $MyVERSION
 
   #call-release:
     #uses: ./.github/workflows/release.yml
