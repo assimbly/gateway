@@ -26,6 +26,7 @@ jobs:
           echo "milestone=$VERSION" >> $GITHUB_ENV
         
   call-release:
+     needs: extract-version 
      uses: ./.github/workflows/release.yml
      with:
        branch: 'develop'
