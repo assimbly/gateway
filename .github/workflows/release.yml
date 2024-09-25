@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Print variable if not empty
         if: "${{ inputs.tag != '' }}"
-        run: echo Creating release for milestone ${{ github.event.inputs.tag }}
+        run: echo Creating release for milestone ${{ inputs.tag }}         
       - name: Print message if empty
         if: "${{ inputs.tag == '' }}"        
         run: echo Tag value is empty
@@ -48,7 +48,22 @@ jobs:
     steps:
       - name: Print variable if not empty
         if: "${{ inputs.milestone != '' }}"
-        run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
+        run: |
+          echo Creating release for milestone ${{ inputs.milestone }}
+          exit 1
       - name: Print message if empty
         if: "${{ inputs.milestone == '' }}"
+        run: echo Milestone value is empty
+
+  test-branch:
+    needs: test-milestone
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print variable if not empty
+        if: "${{ inputs.branch != '' }}"
+        run: |
+          echo Creating release for milestone ${{ inputs.branch }}
+          exit 1
+      - name: Print message if empty
+        if: "${{ inputs.branch == '' }}"
         run: echo Milestone value is empty
