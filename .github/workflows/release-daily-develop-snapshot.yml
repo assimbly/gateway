@@ -22,7 +22,7 @@ jobs:
         id: gradle-version
         run: |
           echo "Gradle version: $VERSION"
-          echo "VERSION=$(./gradlew -q printVersion | cut -c 1-6)" >> $GITHUB_ENV
+          echo "VERSION=$(./gradlew -q printVersion)" >> $GITHUB_ENV
           echo "Myversion=$VERSION"
 
   echo-env-var:
