@@ -6,7 +6,7 @@ on:
     #    - cron: '0 2 * * *'
 
 jobs:
-  extract-version:
+  getversion:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -26,9 +26,12 @@ jobs:
           echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
         
   call-release:
-     needs: extract-version 
-     uses: ./.github/workflows/release.yml
-     with:
-       branch: 'develop'
-       milestone: "${{ needs.extract-version.outputs.milestone }}"
-       tag: 'development'
+     runs-on: ubuntu-latest
+     env:
+        milestone: ${{needs.job1.outputs.output1}}
+     needs: getversion 
+     steps:
+       - name: Get Gradle Project Version
+         id: gradle-version
+         run: |
+           echo "Milestone: $milestone"
