@@ -639,6 +639,16 @@ tasks.named("dependencyUpdates").configure {
     }
 }
 
+task printVersion {
+    // any code that goes here is part of configuring the task
+    // this code will always get run, even if the task is not executed
+    doLast { // add a task action
+        // any code that goes here is part of executing the task
+        // this code will only get run if and when the task gets executed
+        println project.version
+    }
+}
+
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
     gradleVersion = "8.10"
