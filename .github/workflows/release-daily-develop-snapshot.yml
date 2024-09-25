@@ -6,22 +6,28 @@ on:
     #    - cron: '0 2 * * *'
 
 jobs:
-
-  get-maven-version:
+  extract-version:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Extract Maven version from pom.xml
-        id: get_version
+      - name: Get Gradle Project Version
+        id: gradle-version
         run: |
-          version=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
-          echo "Maven Version: $version"
-          echo "maven_version=$version" >> $GITHUB_ENV
+          VERSION=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
+          echo "Gradle version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_ENV
 
-      - name: Use Maven version in subsequent step
-        run: echo "The extracted Maven version is ${{ env.maven_version }}"
+  next-task:
+    runs-on: ubuntu-latest
+    needs: extract-version
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Gradle Project Version
+        run: echo "Using Gradle project version: ${{ env.version }}"
 
   #call-release:
     #uses: ./.github/workflows/release.yml
