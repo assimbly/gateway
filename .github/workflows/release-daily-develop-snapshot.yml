@@ -21,7 +21,7 @@ jobs:
       - name: Get Gradle Project Version
         id: gradle-version
         run: |
-          VERSION=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
+          VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
