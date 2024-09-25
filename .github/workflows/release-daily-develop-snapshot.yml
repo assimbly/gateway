@@ -23,7 +23,7 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
-          echo "MyVERSION=$(VERSION)" >> $GITHUB_ENV
+          echo "MyVERSION=$VERSION" >> $GITHUB_ENV
           echo "Myversion=$Myversion"
           echo "Myversion=${{ env.Myversion }}"
 
