@@ -32,38 +32,130 @@ on:
 
 jobs:
 
-  test-tag:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print variable if not empty
-        if: "${{ inputs.tag != '' }}"
-        run: echo Creating release for milestone ${{ inputs.tag }}         
-      - name: Print message if empty
-        if: "${{ inputs.tag == '' }}"        
-        run: echo Tag value is empty
-
   test-milestone:
-    needs: test-tag
     runs-on: ubuntu-latest
     steps:
       - name: Print variable if not empty
         if: "${{ inputs.milestone != '' }}"
         run: |
           echo Creating release for milestone ${{ inputs.milestone }}
-          exit 1
       - name: Print message if empty
         if: "${{ inputs.milestone == '' }}"
-        run: echo Milestone value is empty
-
-  test-branch:
-    needs: test-milestone
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print variable if not empty
-        if: "${{ inputs.branch != '' }}"
         run: |
-          echo Creating release for milestone ${{ inputs.branch }}
+          echo Milestone value is empty
           exit 1
-      - name: Print message if empty
-        if: "${{ inputs.branch == '' }}"
-        run: echo Milestone value is empty
+
+  delete_old_snapshots:
+    needs: test-milestone  
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Delete older snapshots
+        uses: smartsquaregmbh/delete-old-packages@v0.8.1
+        with:
+          organization: assimbly
+          type: maven
+          keep: 0
+          semver-pattern: "${{inputs.milestone}}"
+          names: |
+            org.assimbly.gateway.full
+            org.assimbly.gateway.headless
+            org.assimbly.gateway.integration
+            org.assimbly.gateway.broker
+
+  call-full-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'full'
+      branch: ${{ inputs.branch }}
+
+  call-integration-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+      branch: ${{ inputs.branch }}
+
+  call-broker-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: ${{ inputs.branch }}
+
+  call-headless-release-jars:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-jars.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: ${{ inputs.branch }}
+
+  call-full-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'full'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'full'
+
+  call-integration-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'integration'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'default'
+
+  call-broker-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'default'
+
+  call-headless-release-dockerhub-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-dockerhub-images.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'full'
+
+  call-headless-release-aws-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'full'
+
+  call-broker-release-aws-image:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'default'
