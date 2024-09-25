@@ -28,14 +28,9 @@ jobs:
           echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
         
   call-release:
-     runs-on: ubuntu-latest
-     env:
-        milestone: ${{needs.getversion.outputs.milestone}}
-        message: 'blibli'
      needs: getversion 
-     steps:
-       - name: Get Gradle Project Version
-         id: gradle-version
-         run: |
-           echo "Milestone: $milestone"
-           echo "Message: $message"
+     uses: ./.github/workflows/release.yml
+     with:
+       branch: 'develop'
+       milestone: ${{needs.getversion.outputs.milestone}}
+       tag: 'development'
