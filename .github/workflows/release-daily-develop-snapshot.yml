@@ -28,10 +28,12 @@ jobs:
   call-release:
      runs-on: ubuntu-latest
      env:
-        milestone: ${{needs.job1.outputs.output1}}
+        milestone: ${{needs.getversion.outputs.milestone}}
+        message: 'blibli'
      needs: getversion 
      steps:
        - name: Get Gradle Project Version
          id: gradle-version
          run: |
            echo "Milestone: $milestone"
+           echo "Message: $message"
