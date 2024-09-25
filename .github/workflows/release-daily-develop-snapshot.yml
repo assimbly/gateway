@@ -27,7 +27,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Use Gradle Project Version
-        run: echo "Using Gradle project version: ${{ env.version }}"
+        run: |
+          echo "Using Gradle project version: ${{ env.version}}"
 
   #call-release:
     #uses: ./.github/workflows/release.yml
