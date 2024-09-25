@@ -25,9 +25,9 @@ jobs:
           echo "Gradle version: $VERSION"
           echo "Milestone=$VERSION" >> $GITHUB_ENV
         
-    call-release:
-        uses: ./.github/workflows/release.yml
-        with:
-          branch: 'develop'
-          milestone: "${{ env.Milestone }}"
-          tag: 'development'
+  call-release:
+     uses: ./.github/workflows/release.yml
+     with:
+       branch: 'develop'
+       milestone: "${{ env.Milestone }}"
+       tag: 'development'
