@@ -72,3 +72,11 @@ jobs:
     with:
       milestone: "${{inputs.milestone}}"
       tag: "${{inputs.milestone}}"
+
+  call-release-notes-drafter:
+    needs: call-gateway-release
+    uses: ./.github/workflows/release-drafter.yml
+    secrets: inherit
+    with:
+      branch: 'main'
+      milestone: "${{inputs.milestone}}"
