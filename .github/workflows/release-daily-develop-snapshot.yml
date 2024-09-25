@@ -1,0 +1,15 @@
+name: Release Daily Development Snapshot
+
+on:
+  workflow_dispatch:
+    #  schedule:
+    #    - cron: '0 2 * * *'
+
+jobs:
+  call-release:
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      branch: 'develop'
+      milestone: 'develop'
+      tag: 'development'
