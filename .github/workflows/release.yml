@@ -28,7 +28,6 @@ on:
         required: true
       tag:
         description: 'Tag to use for this release'
-        default: 'development'
         type: string
 
 jobs:
@@ -41,121 +40,13 @@ jobs:
         run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
       - name: Print message if empty
         if: "${{ github.event.inputs.milestone == '' }}"
-        run: echo Milestone value is empty
 
-  delete_old_snapshots:
-    needs: test-milestone  
+  test-tag:
     runs-on: ubuntu-latest
-
-    env:
-      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
-
-      - name: Delete older snapshots
-        uses: smartsquaregmbh/delete-old-packages@v0.8.1
-        with:
-          organization: assimbly
-          type: maven
-          keep: 0
-          semver-pattern: "${{inputs.milestone}}"
-          names: |
-            org.assimbly.gateway.full
-            org.assimbly.gateway.headless
-            org.assimbly.gateway.integration
-            org.assimbly.gateway.broker
-
-  call-full-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'full'
-      branch: ${{ inputs.branch }}
-
-  call-integration-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'integration'
-      branch: ${{ inputs.branch }}
-
-  call-broker-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'broker'
-      branch: ${{ inputs.branch }}
-
-  call-headless-release-jars:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-jars.yml
-    secrets: inherit
-    with:
-      module: 'headless'
-      branch: ${{ inputs.branch }}
-
-  call-full-release-dockerhub-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-dockerhub-images.yml
-    secrets: inherit
-    with:
-      module: 'full'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'full'
-
-  call-integration-release-dockerhub-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-dockerhub-images.yml
-    secrets: inherit
-    with:
-      module: 'integration'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'default'
-
-  call-broker-release-dockerhub-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-dockerhub-images.yml
-    secrets: inherit
-    with:
-      module: 'broker'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'default'
-
-  call-headless-release-dockerhub-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-dockerhub-images.yml
-    secrets: inherit
-    with:
-      module: 'headless'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'full'
-
-  call-headless-release-aws-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-aws-images.yml
-    secrets: inherit
-    with:
-      module: 'headless'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'full'
-
-  call-broker-release-aws-image:
-    needs: delete_old_snapshots
-    uses: ./.github/workflows/release-aws-images.yml
-    secrets: inherit
-    with:
-      module: 'broker'
-      branch: ${{ inputs.branch }}
-      tag: "${{inputs.tag}}"
-      type: 'default'
-
-
+      - name: Print variable if not empty
+        if: "${{ github.event.inputs.tag != '' }}"
+        run: echo Creating release for milestone ${{ github.event.inputs.tag }}
+      - name: Print message if empty
+        if: "${{ github.event.inputs.tag == '' }}"        
+        run: echo Milestone value is empty
