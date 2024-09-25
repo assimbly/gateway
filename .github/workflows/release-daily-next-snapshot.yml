@@ -6,8 +6,10 @@ on:
     #    - cron: '0 2 * * *'
 
 jobs:
-  extract-version:
+  getversion:
     runs-on: ubuntu-latest
+    outputs:
+      milestone: ${{ steps.gradle-version.outputs.milestone }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,11 +25,14 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
-          echo "Milestone=$VERSION" >> $GITHUB_ENV
-          
-      - name: Call release
-        uses: ./.github/workflows/release.yml
-        with:
-          branch: 'next'
-          milestone: "${{ env.Milestone }}"
-          tag: 'next'
+          echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
+
+        
+  call-release:
+    needs: getversion 
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      branch: 'next'
+      milestone: ${{needs.getversion.outputs.milestone}}
+      tag: 'next'
