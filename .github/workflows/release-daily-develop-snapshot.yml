@@ -23,12 +23,12 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
-          echo "milestone=$VERSION" >> $GITHUB_ENV
+          echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
         
   call-release:
      needs: extract-version 
      uses: ./.github/workflows/release.yml
      with:
        branch: 'develop'
-       milestone: "${{ env.milestone }}"
+       milestone: "${{ needs.extract-version.outputs.milestone }}"
        tag: 'development'
