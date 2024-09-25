@@ -32,22 +32,23 @@ on:
 
 jobs:
 
-  test-milestone:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print variable if not empty
-        if: "${{ github.event.inputs.milestone != '' }}"
-        run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
-      - name: Print message if empty
-        if: "${{ github.event.inputs.milestone == '' }}"
-        run: echo Milestone value is empty
-
   test-tag:
     runs-on: ubuntu-latest
     steps:
       - name: Print variable if not empty
-        if: "${{ github.event.inputs.tag != '' }}"
+        if: "${{ inputs.tag != '' }}"
         run: echo Creating release for milestone ${{ github.event.inputs.tag }}
       - name: Print message if empty
-        if: "${{ github.event.inputs.tag == '' }}"        
+        if: "${{ inputs.tag == '' }}"        
+        run: echo Tag value is empty
+
+  test-milestone:
+    needs: test-tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print variable if not empty
+        if: "${{ inputs.milestone != '' }}"
+        run: echo Creating release for milestone ${{ github.event.inputs.milestone }}
+      - name: Print message if empty
+        if: "${{ inputs.milestone == '' }}"
         run: echo Milestone value is empty
