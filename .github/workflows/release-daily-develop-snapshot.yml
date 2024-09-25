@@ -26,6 +26,7 @@ jobs:
           VERSION=$(./gradlew -q printVersion)
           echo "Gradle version: $VERSION"
           echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
+
         
   call-release:
     needs: getversion 
