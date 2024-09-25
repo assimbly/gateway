@@ -28,9 +28,9 @@ jobs:
           echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
         
   call-release:
-     needs: getversion 
-     uses: ./.github/workflows/release.yml
-     with:
-       branch: 'develop'
-       milestone: ${{needs.getversion.outputs.milestone}}
-       tag: 'development'
+    needs: getversion 
+    uses: ./.github/workflows/release.yml
+    with:
+      branch: 'develop'
+      milestone: ${{needs.getversion.outputs.milestone}}
+      tag: 'development'
