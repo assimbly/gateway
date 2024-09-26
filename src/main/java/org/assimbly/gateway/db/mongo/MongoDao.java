@@ -106,10 +106,18 @@ public class MongoDao {
     }
 
     public static TenantVariable findVariableByName(String variableName, String tenant) {
+        return findVariableByName(variableName, tenant, TenantVariable.TenantVarType.TenantVariable);
+    }
+
+    public static TenantVariable findVariableByName(String variableName, String tenant, TenantVariable.TenantVarType tenantVarType) {
         MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
         MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
 
-        Document document = collection.find(new Document(TenantVariable.NAME_FIELD, variableName)).first();
+        Document query = new Document()
+            .append(TenantVariable.NAME_FIELD, variableName)
+            .append(TenantVariable.TYPE_FIELD, tenantVarType.name());
+
+        Document document = collection.find(query).first();
         if (document != null) {
             return TenantVariable.fromDocument(document);
         }
@@ -127,10 +135,14 @@ public class MongoDao {
     }
 
     static public String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
+        return getTenantVariableValue(tenantVarName, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
+    }
 
-        TenantVariable tenantVar = MongoDao.findVariableByName(tenantVarName, tenant);
+    static public String getTenantVariableValue(String tenantVarName, String tenant, String environment, TenantVariable.TenantVarType tenantVarType) {
+
+        TenantVariable tenantVar = MongoDao.findVariableByName(tenantVarName, tenant, tenantVarType);
         if(tenantVar==null) {
-            LOG.info(String.format("tenantVar %s is NULL", tenantVarName));
+            LOG.info(String.format("tenantVar %s of type %s is NULL", tenantVarType.name(), tenantVarName));
             return null;
         }
 
@@ -166,11 +178,18 @@ public class MongoDao {
     static public void saveTenantVariable(
         String tenantVarName, String tenantVarValue, String tenant, String environment
     ) {
-        TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant);
+        saveTenantVariable(tenantVarName, tenantVarValue, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
+    }
+
+    static public void saveTenantVariable(
+        String tenantVarName, String tenantVarValue, String tenant, String environment, TenantVariable.TenantVarType tenantVarType
+    ) {
+        TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant, tenantVarType);
         boolean tenantVariableExist = !Objects.isNull(tenantVariable);
 
         if(Objects.isNull(tenantVariable)) {
             tenantVariable = new TenantVariable(tenantVarName);
+            tenantVariable.set_type(tenantVarType.name());
             tenantVariable.setCreatedAt(new Date().getTime());
             tenantVariable.setCreatedBy(CREATED_BY_SYSTEM);
         }
