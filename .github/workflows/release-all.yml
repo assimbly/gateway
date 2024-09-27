@@ -18,10 +18,10 @@ on:
 
 jobs:
   call-base-release:  
-    uses: assimbly/base/.github/workflows/release.yml@main
+    uses: assimbly/base/.github/workflows/release.yml@develop
     secrets: inherit
     with:
-      branch: 'main'
+      branch: 'develop'
       milestone: ${{ inputs.milestone }}
 
 
