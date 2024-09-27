@@ -2,7 +2,9 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { HeaderModule } from '../../entities/header/header.module';
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MessageComponent } from './message.component';
@@ -26,7 +28,7 @@ import { MessageService } from 'app/entities/message/message.service';
 const ENTITY_STATES = [...messageRoute, ...messagePopupRoute];
 
 @NgModule({
-  imports: [SharedModule, HeaderModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, SortDirective, SortByDirective, HeaderModule, NgSelectModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     MessageComponent,
     MessageDetailComponent,
@@ -37,14 +39,6 @@ const ENTITY_STATES = [...messageRoute, ...messagePopupRoute];
     MessagePopupComponent,
     ForbiddenMessageNamesValidatorDirective,
     ForbiddenHeaderValidatorDirective,
-  ],
-  entryComponents: [
-    MessageComponent,
-    MessageDialogComponent,
-    MessageUpdateComponent,
-    MessagePopupComponent,
-    MessageAllComponent,
-    MessageDeleteDialogComponent,
   ],
   providers: [MessageService, MessagePopupService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -1,5 +1,5 @@
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
 
 /* ==========================================================================
 Navbar
@@ -18,12 +18,6 @@ Navbar
 .navbar {
   padding: 0.2rem 1rem;
 
-  ul.navbar-nav {
-    .nav-item {
-      margin-left: 0.5em;
-    }
-  }
-
   a.nav-link {
     font-weight: 400;
   }
@@ -33,8 +27,10 @@ Navbar
 Logo styles
 ========================================================================== */
 .logo-img {
-  height: 100%;
-  background: url('../../../content/images/assimbly_transparant_white.png') no-repeat center center;
+  height: 45px;
+  width: 45px;
+  display: inline-block;
+  vertical-align: middle;
+  background: url('/content/images/logo-jhipster.png') no-repeat center center;
   background-size: contain;
-  width: 100%;
 }

@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { PasswordResetInitService } from './password-reset-init.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { PasswordResetInitService } from './password-reset-init.service';
 
 describe('PasswordResetInit Service', () => {
   let service: PasswordResetInitService;
@@ -24,7 +24,7 @@ describe('PasswordResetInit Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call reset-password/init step with correct values', () => {
+    it('should call reset-password/init endpoint with correct values', () => {
       // GIVEN
       const mail = 'test@test.com';
 

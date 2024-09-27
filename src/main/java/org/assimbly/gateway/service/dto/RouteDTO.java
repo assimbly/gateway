@@ -2,7 +2,7 @@ package org.assimbly.gateway.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Lob;
+import jakarta.persistence.Lob;
 
 /**
  * A DTO for the {@link org.assimbly.gateway.domain.Route} entity.

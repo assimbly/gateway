@@ -11,36 +11,42 @@
     <table id="healthCheck" class="table table-striped" aria-describedby="health-page-heading">
       <thead>
         <tr>
-          <th scope="col" jhiTranslate="health.table.service">Service Name</th>
+          <th scope="col" jhiTranslate="health.table.service">Service name</th>
           <th scope="col" class="text-center" jhiTranslate="health.table.status">Status</th>
           <th scope="col" class="text-center" jhiTranslate="health.details.details">Details</th>
         </tr>
       </thead>
-      <tbody *ngIf="health">
-        <tr *ngFor="let componentHealth of health.components | keyvalue">
-          <td>
-            {{ componentHealth.key }}
-          </td>
-          <td class="text-center">
-            <span
-              class="badge"
-              [ngClass]="getBadgeClass(componentHealth.value!.status)"
-              jhiTranslate="{{ 'health.status.' + componentHealth.value!.status }}"
-            >
-              {{ componentHealth.value!.status }}
-            </span>
-          </td>
-          <td class="text-center">
-            <a
-              class="hand"
-              (click)="showHealth({ key: componentHealth.key, value: componentHealth.value! })"
-              *ngIf="componentHealth.value!.details"
-            >
-              <fa-icon icon="eye"></fa-icon>
-            </a>
-          </td>
-        </tr>
-      </tbody>
+      @if (health) {
+        <tbody>
+          @for (componentHealth of health.components | keyvalue; track componentHealth.key) {
+            <tr>
+              <td>
+                {{ 'health.indicator.' + componentHealth.key | translate }}
+              </td>
+              <td class="text-center">
+                <span
+                  class="badge"
+                  [ngClass]="getBadgeClass(componentHealth.value!.status)"
+                  jhiTranslate="{{ 'health.status.' + componentHealth.value!.status }}"
+                >
+                  {{
+                    { UNKNOWN: 'UNKNOWN', UP: 'UP', OUT_OF_SERVICE: 'OUT_OF_SERVICE', DOWN: 'DOWN' }[
+                      componentHealth.value!.status || 'UNKNOWN'
+                    ]
+                  }}
+                </span>
+              </td>
+              <td class="text-center">
+                @if (componentHealth.value!.details) {
+                  <a class="hand" (click)="showHealth({ key: componentHealth.key, value: componentHealth.value! })">
+                    <fa-icon icon="eye"></fa-icon>
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      }
     </table>
   </div>
 </div>

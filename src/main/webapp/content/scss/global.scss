@@ -1,6 +1,6 @@
 @import 'bootstrap-variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
 
 /* ==============================================================
 Bootstrap tweaks
@@ -14,7 +14,7 @@ h4 {
   font-weight: 300;
 }
 
-/* Increase contrast of links to get 100% on Lighthouse Accessability Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
+/* Increase contrast of links to get 100% on Lighthouse Accessibility Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
 a {
   color: #533f03;
   font-weight: bold;
@@ -108,7 +108,6 @@ Generic styles
 
 .footer {
   border-top: 1px solid rgba(0, 0, 0, 0.125);
-  display: table-row;
 }
 
 .hand,
@@ -156,6 +155,14 @@ Custom alerts for notification
   .alerts .jhi-toast {
     width: 50%;
   }
+}
+
+/* ==========================================================================
+entity list page css
+========================================================================== */
+
+.table-entities thead th .d-flex > * {
+  margin: auto 0;
 }
 
 /* ==========================================================================
@@ -229,11 +236,12 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
     }
   }
 }
+/* jhipster-needle-scss-add-main JHipster will add new css style */
 
 /* ========================================================================== custom assimbly css ========================================================================== */
 
-@import '~@ng-select/ng-select/scss/default.theme';
-@import '~codemirror/lib/codemirror';
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import '~codemirror/lib/codemirror.css';
 
 #fromTab.active,
 #toTab.active,
@@ -297,11 +305,12 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   float: end;
 }
 
-.assimbly-integration-img img {
+.assimbly-integration-img {
   background-repeat: no-repeat;
   background-size: 100%;
   width: 60px;
   height: 50px;
+  background: url('/content/images/assimbly_transparant.png')
 }
 
 .activemq-link {
@@ -310,7 +319,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .activemq-broker-img {
-  background-image: url('../images/activemq.png');
+  background-image: url('/content/images/activemq.png');
   background-repeat: no-repeat;
   background-size: 100%;
   width: 60px;
@@ -325,8 +334,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 
 .camel-img {
-  background-image: url('../images/apache-camel.png');
-  background-repeat: no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  background: url('/content/images/apache-camel.png') no-repeat center center;
+  background-size: contain;
   background-size: 100%;
   width: 60px;
   height: 50px;
@@ -455,7 +466,8 @@ ng-dropdown-panel > div {
 
 .highlight {
   background-color: #0275d8 !important;
-  color: white;
+  color: green;
+  font-weight: bold
 }
 
 .btn-primary {
@@ -614,10 +626,8 @@ ng-dropdown-panel > div {
 }
 
 .increase-popover-width {
-  width: 1000px;
-  max-width: 1200px;
+  max-width: 40%;
 }
-
 
 .dropdown-toggle::after {
   display: none;

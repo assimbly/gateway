@@ -7,7 +7,7 @@
   <div class="row" *ngIf="isBroker && addresses?.length === 0">
     <div class="col-10"></div>
     <div class="col-2 text-right" >
-      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/queue/new']">
+      <button class="btn btn-primary" type="submit" [routerLink]="['/queue/new']">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Queue</span>
       </button>
     </div>
@@ -16,7 +16,7 @@
   <div class="row" *ngIf="isBroker && addresses?.length > 0">
     <div class="col-9"></div>
     <div class="col-3 text-right" *ngIf="isBroker && addresses?.length > 0">
-      <button class="btn btn-primary" type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'" [routerLink]="['/queue/new']">
+      <button class="btn btn-primary" type="submit" [routerLink]="['/queue/new']">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Queue</span>
       </button>
       <button class="btn btn-primary" type="submit" (click)="updateAllQueues()">
@@ -50,7 +50,7 @@
   <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending">
           <th scope="col" jhiSortBy="name"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>

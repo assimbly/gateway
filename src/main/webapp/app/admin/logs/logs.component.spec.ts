@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
-import { LogsComponent } from './logs.component';
+import LogsComponent from './logs.component';
 import { LogsService } from './logs.service';
 import { Log, LoggersResponse } from './log.model';
 
@@ -11,17 +11,14 @@ describe('LogsComponent', () => {
   let fixture: ComponentFixture<LogsComponent>;
   let service: LogsService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [LogsComponent],
-        providers: [LogsService],
-      })
-        .overrideTemplate(LogsComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, LogsComponent],
+      providers: [LogsService],
     })
-  );
+      .overrideTemplate(LogsComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LogsComponent);
@@ -46,7 +43,7 @@ describe('LogsComponent', () => {
               effectiveLevel: 'WARN',
             },
           },
-        } as unknown as LoggersResponse)
+        } as unknown as LoggersResponse),
       );
 
       // WHEN
@@ -70,7 +67,7 @@ describe('LogsComponent', () => {
               effectiveLevel: 'ERROR',
             },
           },
-        } as unknown as LoggersResponse)
+        } as unknown as LoggersResponse),
       );
 
       // WHEN

@@ -101,7 +101,7 @@ public class TopicResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the topicDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/topics/{id}")
-    public ResponseEntity<TopicDTO> getTopic(@PathVariable Long id) {
+    public ResponseEntity<TopicDTO> getTopic(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Topic : {}", id);
         Optional<TopicDTO> topicDTO = topicService.findOne(id);
         return ResponseUtil.wrapOrNotFound(topicDTO);
@@ -114,7 +114,7 @@ public class TopicResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/topics/{id}")
-    public ResponseEntity<Void> deleteTopic(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTopic(@PathVariable("id") Long id) {
         log.debug("REST request to delete Topic : {}", id);
         topicService.delete(id);
         return ResponseEntity

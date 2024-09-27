@@ -30,8 +30,8 @@ export class CertificateUploadP12DialogComponent implements OnInit, AfterContent
 
   ngOnInit() {
     this.importForm = new FormGroup({
-      password: new FormControl({ value: '' }),
-      certificateStore: new FormControl({ value: 'keystore' }),
+      password: new FormControl({ value: '', disabled: false }),
+      certificateStore: new FormControl({ value: 'keystore', disabled: false }),
     });
 
     this.importForm.patchValue({

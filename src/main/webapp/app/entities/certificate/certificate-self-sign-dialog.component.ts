@@ -29,8 +29,8 @@ export class CertificateSelfSignDialogComponent implements OnInit {
 
   ngOnInit() {
     this.importForm = new FormGroup({
-      cn: new FormControl({ value: '' }),
-      certificateStore: new FormControl({ value: 'keystore' }),
+      cn: new FormControl({ value: '', disabled: false }),
+      certificateStore: new FormControl({ value: 'keystore', disabled: false }),
     });
 
     this.importForm.patchValue({

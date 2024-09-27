@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * REST controller for managing the current user's account.
@@ -57,7 +57,7 @@ public class AccountDBResource {
             String token = (user!=null ? TokenUtil.buildToken(user) : request.getRemoteUser());
             return ResponseEntity.ok().body(token);
         } catch (Exception e) {
-            log.debug("Error to authenticate", e);
+            log.error("Error to authenticate", e);
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body("Invalid authentication");

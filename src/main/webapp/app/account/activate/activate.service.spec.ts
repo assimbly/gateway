@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { ActivateService } from './activate.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { ActivateService } from './activate.service';
 
 describe('ActivateService Service', () => {
   let service: ActivateService;
@@ -24,7 +24,7 @@ describe('ActivateService Service', () => {
   });
 
   describe('Service methods', () => {
-    it('should call api/activate step with correct values', () => {
+    it('should call api/activate endpoint with correct values', () => {
       // GIVEN
       let expectedResult;
       const key = 'key';

@@ -1,23 +1,34 @@
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { bootstrapApplication } from '@angular/platform-browser';
 
 import { DEBUG_INFO_ENABLED, TYPE } from './app/app.constants';
-import { AppModule } from './app/app.module';
+import { appConfig } from './app/app.config';
+import AppComponent from './app/app.component';
 
 // disable debug data on prod profile to improve performance
 if (!DEBUG_INFO_ENABLED) {
   enableProdMode();
 }
 
+// disable debug data on prod profile to improve performance
+if (!DEBUG_INFO_ENABLED) {
+  enableProdMode();
+}
+
+console.log('Application type: ' + TYPE);
+
 if(TYPE.toLowerCase() === 'headless'){
   //Don't bootstrap Angular in headless mode
-  console.log('type=' + TYPE)
+  console.log('Headless mode (No GUI)');
 }else{
-  console.log('2. type=' + TYPE)
-  platformBrowserDynamic()
-    .bootstrapModule(AppModule, { preserveWhitespaces: true })
+  bootstrapApplication(AppComponent, appConfig)
     // eslint-disable-next-line no-console
     .then(() => console.log('Application started'))
     .catch(err => console.error(err));
-
 }
+
+
+
+
+
+

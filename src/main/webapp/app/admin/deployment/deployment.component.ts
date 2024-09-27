@@ -33,8 +33,8 @@ export class DeploymentComponent implements OnInit {
     this.loadAllIntegrations();
   }
 
-  updateBackupFrequency(integrationId, frequency, url) {
-    this.integrationService.updateBackupFrequency(integrationId, frequency, url).subscribe(res => {
+  updateBackupFrequency(frequency, url) {
+    this.integrationService.updateBackupFrequency(frequency, url).subscribe(res => {
       console.log(res);
     });
   }

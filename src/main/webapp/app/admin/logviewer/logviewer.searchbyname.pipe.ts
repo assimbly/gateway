@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'SearchByName' })
+@Pipe({
+  standalone: true,
+  name: 'SearchByName',
+})
 export class SearchByNamePipe implements PipeTransform {
     logLines: string[] = [];
 

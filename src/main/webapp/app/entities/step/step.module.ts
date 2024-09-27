@@ -4,7 +4,8 @@ import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+
 import { Components } from '../../shared/camel/component-type';
 
 import { StepComponent } from './step.component';
@@ -26,7 +27,6 @@ const ENTITY_STATES = [...stepRoute];
     StepUpdateComponent,
     StepDeleteDialogComponent,
   ],
-  entryComponents: [StepComponent, StepUpdateComponent, StepDeleteDialogComponent],
   providers: [Components],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

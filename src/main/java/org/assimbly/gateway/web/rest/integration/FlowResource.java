@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 
-import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.repository.FlowRepository;
@@ -131,7 +129,7 @@ public class FlowResource {
     @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long integrationid
+        @PathVariable(value = "integrationid") Long integrationid
     ) {
         log.debug("REST request to get a page of flows by integrationid");
         Page<FlowDTO> page = flowService.findAllByIntegrationId(pageable, integrationid);
@@ -147,7 +145,7 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
     @GetMapping("/flows/{id}")
-    public ResponseEntity<FlowDTO> getFlow(@PathVariable Long id) {
+    public ResponseEntity<FlowDTO> getFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Flow : {}", id);
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
 
@@ -161,62 +159,10 @@ public class FlowResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/flows/{id}")
-    public ResponseEntity<Void> deleteFlow(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Flow : {}", id);
         flowService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-
-    @PostConstruct
-    public void init() throws Exception {
-        log.info("Start runtime");
-        initIntegration();
-    }
-
-
-    public CamelContext initIntegration() throws Exception {
-
-        ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
-        ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
-        boolean isDebuggging = gateway.getDebugging();
-        boolean deployOnStart = deployDirectory.getDeployOnStart();
-        boolean deployOnChange = deployDirectory.getDeployOnChange();
-
-        integrationRuntime.setIntegration(encryptionProperties.getProperties());
-
-        integrationRuntime.initIntegration();
-
-        integration = integrationRuntime.getIntegration();
-
-        integration.setDebugging(isDebuggging);
-        //integration.setTracing(isTracing, "default");
-        integration.setDeployDirectory(deployOnStart,deployOnChange);
-
-        return integration.getContext();
-    }
-
-    //start flows with autostart
-    /*
-    public void startFlows(){
-
-        List<Flow> flows = flowRepository.findAll();
-
-        try {
-            for (Flow flow : flows) {
-                if (flow.isAutoStart()) {
-                    String configuration;
-                    log.info("Autostart flow " + flow.getName() + " with id=" + flow.getId());
-                    configuration = confExport.convertDBToFlowConfiguration(flow.getId(), "xml/application", true);
-
-                    integration.setFlowConfiguration(flow.getId().toString(), "application/xml", configuration);
-                    integration.startFlow(flow.getId().toString());
-                }
-            }
-        } catch (Exception e) {
-            log.error("Autostart of flow failed (check configuration)");
-            e.printStackTrace();
-        }
-
-    }*/
 
 }

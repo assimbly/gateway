@@ -9,7 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
-import { SettingsComponent } from './settings.component';
+import SettingsComponent from './settings.component';
 
 describe('SettingsComponent', () => {
   let comp: SettingsComponent;
@@ -26,17 +26,14 @@ describe('SettingsComponent', () => {
     imageUrl: '',
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-        declarations: [SettingsComponent],
-        providers: [FormBuilder, AccountService],
-      })
-        .overrideTemplate(SettingsComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule, SettingsComponent],
+      providers: [FormBuilder, AccountService],
     })
-  );
+      .overrideTemplate(SettingsComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SettingsComponent);
@@ -64,7 +61,7 @@ describe('SettingsComponent', () => {
     expect(mockAccountService.identity).toHaveBeenCalled();
     expect(mockAccountService.save).toHaveBeenCalledWith(account);
     expect(mockAccountService.authenticate).toHaveBeenCalledWith(account);
-    expect(comp.settingsForm.value).toEqual(settingsFormValues);
+    expect(comp.settingsForm.value).toMatchObject(expect.objectContaining(settingsFormValues));
   });
 
   it('should notify of success upon successful save', () => {

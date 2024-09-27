@@ -27,7 +27,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import static org.assimbly.util.CertificatesUtil.convertPemToX509Certificate;
 
@@ -61,21 +61,13 @@ public class CertificateResource {
     public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws Exception {
         log.debug("REST request to save Certificate : {}", certificateDTO);
 
-        System.out.println("0");
-
         if (certificateDTO.getId() != null) {
             throw new BadRequestAlertException("A new certificate cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        System.out.println("1");
         try {
-            System.out.println("2");
 
             CertificateDTO saved = certificateService.save(certificateDTO);
-
-            System.out.println("3");
-
-            System.out.println("4" + saved.getCertificateName());
 
             return ResponseEntity.ok()
 	                .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, "Added certificateDTO"))
@@ -169,14 +161,14 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK) and with body the certificateDTO, or with status 404 (Not Found)
      */
     @GetMapping("/certificates/{id}")
-    public ResponseEntity<CertificateDTO> getCertificate(@PathVariable Long id){
+    public ResponseEntity<CertificateDTO> getCertificate(@PathVariable(value = "id") Long id){
         log.debug("REST request to get Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
         return ResponseEntity.ok().body(certificateDTO.get());
     }
 
     @GetMapping("/certificates/details/{certificateName}")
-    public ResponseEntity<String> getCertificateDetails(@PathVariable String certificateName) throws Exception{
+    public ResponseEntity<String> getCertificateDetails(@PathVariable(value = "certificateName") String certificateName) throws Exception{
 
         log.debug("REST request to get certificate details for certificate: " + certificateName);
 
@@ -202,7 +194,7 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/certificates/{id}")
-    public ResponseEntity<Void> deleteCertificate(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> deleteCertificate(@PathVariable("id") Long id) throws Exception {
         log.debug("REST request to delete Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
         String certificateName = certificateDTO.get().getCertificateName();
@@ -239,7 +231,7 @@ public class CertificateResource {
     }
 
     @GetMapping("/certificates/isexpired/{withinNumberOfDays}")
-    public ResponseEntity<Boolean> isExpired(@PathVariable int withinNumberOfDays) throws Exception{
+    public ResponseEntity<Boolean> isExpired(@PathVariable(value = "withinNumberOfDays") int withinNumberOfDays) throws Exception{
 
         log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
 
