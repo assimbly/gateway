@@ -1,4 +1,4 @@
-name: Finalize Release (update versions and releases for all repositories)
+name: Release for all repositories
 # Run this task when the snapshots are merged into main
 
 on:
@@ -17,64 +17,32 @@ on:
         required: true
 
 jobs:
-  call-base-update-version:
-    uses: assimbly/base/.github/workflows/update-version.yml@main
+  call-base-release:
+    uses: assimbly/base/.github/workflows/release.yml@main
     secrets: inherit
     with:
       branch: "main"
       milestone: "${{ inputs.milestone }}"
 
-  call-base-release:
-    uses: assimbly/base/.github/workflows/release.yml@main
-    needs: call-base-update-version
-    secrets: inherit
-    with:
-      branch: "main"    
-      milestone: "${{ inputs.milestone }}"
-
-  call-custom-components-update-version:
-    needs: call-base-release
-    uses: assimbly/custom-components/.github/workflows/update-version.yml@main
-    secrets: inherit
-    with:
-      branch: "main"    
-      milestone: "${{ inputs.milestone }}"
-
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
-    needs: call-custom-components-update-version
+    needs: call-base-release
     secrets: inherit
     with:
-      branch: "main"    
-      milestone: "${{ inputs.milestone }}"
-
-  call-runtime-update-version:
-    uses: assimbly/runtime/.github/workflows/update-version.yml@main
-    needs: call-custom-components-release
-    secrets: inherit
-    with:
-      branch: "main"    
+      branch: "main"
       milestone: "${{ inputs.milestone }}"
 
   call-runtime-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
-    needs: call-runtime-update-version
+    needs: call-custom-components-release
     secrets: inherit
     with:
-      branch: "main"    
-      milestone: "${{ inputs.milestone }}"
-
-  call-gateway-update-version:
-    uses: ./.github/workflows/update-version.yml
-    needs: call-runtime-release
-    secrets: inherit
-    with:
-      branch: "main"    
+      branch: "main"
       milestone: "${{ inputs.milestone }}"
 
   call-gateway-release:
     uses: ./.github/workflows/release.yml
-    needs: call-gateway-update-version
+    needs: call-runtime-release
     secrets: inherit
     with:
       branch: "main"
