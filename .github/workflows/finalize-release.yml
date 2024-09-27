@@ -21,6 +21,7 @@ jobs:
     uses: assimbly/base/.github/workflows/update-version.yml@main
     secrets: inherit
     with:
+      branch: "main"
       milestone: "${{ inputs.milestone }}"
 
   call-base-release:
@@ -28,6 +29,7 @@ jobs:
     needs: call-base-update-version
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-custom-components-update-version:
@@ -35,6 +37,7 @@ jobs:
     uses: assimbly/custom-components/.github/workflows/update-version.yml@main
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-custom-components-release:
@@ -42,6 +45,7 @@ jobs:
     needs: call-custom-components-update-version
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-runtime-update-version:
@@ -49,6 +53,7 @@ jobs:
     needs: call-custom-components-release
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-runtime-release:
@@ -56,6 +61,7 @@ jobs:
     needs: call-runtime-update-version
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-gateway-update-version:
@@ -63,13 +69,15 @@ jobs:
     needs: call-runtime-release
     secrets: inherit
     with:
+      branch: "main"    
       milestone: "${{ inputs.milestone }}"
 
   call-gateway-release:
-    uses: ./.github/workflows/release-version.yml
+    uses: ./.github/workflows/release.yml
     needs: call-gateway-update-version
     secrets: inherit
     with:
+      branch: "main"
       milestone: "${{inputs.milestone}}"
       tag: "${{inputs.milestone}}"
 
@@ -78,5 +86,5 @@ jobs:
     uses: ./.github/workflows/release-drafter.yml
     secrets: inherit
     with:
-      branch: 'main'
+      branch: "main"
       milestone: "${{inputs.milestone}}"
