@@ -59,6 +59,7 @@ jobs:
         with:
           organization: assimbly
           type: maven
+          token: ${{ secrets.MAVEN_TOKEN }}
           keep: 0
           semver-pattern: "${{inputs.milestone}}"
           names: |
