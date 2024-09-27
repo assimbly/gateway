@@ -73,7 +73,7 @@ jobs:
       milestone: "${{ inputs.milestone }}"
 
   call-gateway-release:
-    uses: ./.github/workflows/release-version.yml
+    uses: ./.github/workflows/release.yml
     needs: call-gateway-update-version
     secrets: inherit
     with:
