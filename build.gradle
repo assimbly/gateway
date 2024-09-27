@@ -651,7 +651,7 @@ task printVersion {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.10"
+    gradleVersion = "8.10.2"
 }
 
 if (project.hasProperty("nodeInstall")) {
