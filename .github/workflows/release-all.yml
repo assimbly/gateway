@@ -18,12 +18,11 @@ on:
 
 jobs:
   call-base-release:  
-    uses: assimbly/base/.github/workflows/release.yml@develop
+    uses: assimbly/base/.github/workflows/release.yml@main
     secrets: inherit
     with:
-      branch: 'develop'
+      branch: 'main'
       milestone: ${{ inputs.milestone }}
-
 
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
