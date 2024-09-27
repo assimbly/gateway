@@ -17,15 +17,17 @@ on:
         required: true
 
 jobs:
-  call-base-release:
-    uses: assimbly/base/.github/workflows/release.yml@main
+  call-base-release:  
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
-    secrets: inherit
-    with:
-      branch: 'main'
-      milestone: ${{ inputs.milestone }}
+    steps:
+      - name: Call the package deletion workflow
+        uses: owner/repository/.github/workflows/delete-packages.yml@main
+        with:
+          branch: 'main'
+          milestone: ${{ inputs.milestone }}
 
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
