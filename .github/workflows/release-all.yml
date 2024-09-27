@@ -19,6 +19,9 @@ on:
 jobs:
   call-base-release:
     uses: assimbly/base/.github/workflows/release.yml@main
+    permissions:
+      contents: write
+      packages: write
     secrets: inherit
     with:
       branch: 'main'
