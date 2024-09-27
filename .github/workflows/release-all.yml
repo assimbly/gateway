@@ -21,38 +21,38 @@ jobs:
     uses: assimbly/base/.github/workflows/release.yml@main
     secrets: inherit
     with:
-      branch: "main"
-      milestone: "${{ inputs.milestone }}"
+      branch: 'main'
+      milestone: ${{ inputs.milestone }}
 
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
     needs: call-base-release
     secrets: inherit
     with:
-      branch: "main"
-      milestone: "${{ inputs.milestone }}"
+      branch: 'main'
+      milestone: ${{ inputs.milestone }}
 
   call-runtime-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
     needs: call-custom-components-release
     secrets: inherit
     with:
-      branch: "main"
-      milestone: "${{ inputs.milestone }}"
+      branch: 'main'
+      milestone: ${{ inputs.milestone }}
 
   call-gateway-release:
     uses: ./.github/workflows/release.yml
     needs: call-runtime-release
     secrets: inherit
     with:
-      branch: "main"
-      milestone: "${{inputs.milestone}}"
-      tag: "${{inputs.milestone}}"
+      branch: 'main'
+      milestone: ${{ inputs.milestone }}
+      tag: ${{inputs.milestone}}
 
   call-release-notes-drafter:
     needs: call-gateway-release
     uses: ./.github/workflows/release-drafter.yml
     secrets: inherit
     with:
-      branch: "main"
-      milestone: "${{inputs.milestone}}"
+      branch: 'main'
+      milestone: ${{ inputs.milestone }}
