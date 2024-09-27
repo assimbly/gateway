@@ -3,6 +3,10 @@ name: Start New Release (update versions for all repositories)
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: 'Branch to use'
+        type: string
+        default: 'develop'    
       milestone:
         description: 'Milestone to use as version'
         type: string
@@ -10,6 +14,10 @@ on:
 
   workflow_call:
     inputs:
+      branch:
+        description: 'Branch to use'
+        type: string
+        default: 'develop'    
       milestone:
         description: 'Milestone to use as version'
         type: string
@@ -20,27 +28,27 @@ jobs:
     uses: ./.github/workflows/update-version.yml
     secrets: inherit
     with:
-      branch: ${{ github.ref_name }}
+      branch: ${{ inputs.branch }}
       milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-base-release-version:
     uses: assimbly/base/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: ${{ github.ref_name }}
+      branch: ${{ inputs.branch }}
       milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-custom-components-release-version:
     uses: assimbly/custom-components/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: ${{ github.ref_name }}
+      branch: ${{ inputs.branch }}
       milestone: "${{inputs.milestone}}-SNAPSHOT"
 
   call-runtime-release-version:
     uses: assimbly/runtime/.github/workflows/update-version.yml@develop
     secrets: inherit
     with:
-      branch: ${{ github.ref_name }}
+      branch: ${{ inputs.branch }}
       milestone: "${{inputs.milestone}}-SNAPSHOT"
 
