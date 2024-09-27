@@ -91,7 +91,7 @@ public class LinkResource {
      * @return the ResponseEntity with status 200 (OK) and with body the linkDTO, or with status 404 (Not Found)
      */
     @GetMapping("/link/{id}")
-    public ResponseEntity<LinkDTO> getLink(@PathVariable Long id) {
+    public ResponseEntity<LinkDTO> getLink(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Link : {}", id);
         Optional<LinkDTO> linkDTO = linkService.findOne(id);
         return ResponseUtil.wrapOrNotFound(linkDTO);
@@ -104,7 +104,7 @@ public class LinkResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/link/{id}")
-    public ResponseEntity<Void> deleteLink(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLink(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Link : {}", id);
         linkService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
@@ -118,7 +118,7 @@ public class LinkResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/link/bystepid/{stepid}")
-    public ResponseEntity<Void> deleteLinkByStepId(@PathVariable Long stepid) {
+    public ResponseEntity<Void> deleteLinkByStepId(@PathVariable(value = "id") Long stepid) {
         log.debug("REST request to delete Link by StepId : {}", stepid);
         linkService.deleteByStepId(stepid);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, stepid.toString())).build();

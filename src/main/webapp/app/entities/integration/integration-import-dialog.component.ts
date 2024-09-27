@@ -41,7 +41,7 @@ export class IntegrationImportDialogComponent implements AfterContentInit {
     }
 
     importConfiguration() {
-        this.integrationService.setIntegrationConfiguration(this.integrationId, this.xmlConfiguration).subscribe(
+        this.integrationService.setIntegrationConfiguration(this.xmlConfiguration).subscribe(
             data => {
                 this.importError = false;
                 this.activeModal.dismiss(true);

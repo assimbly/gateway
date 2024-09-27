@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
+  standalone: true,
   selector: 'jhi-footer',
   templateUrl: './footer.component.html',
 })
-export class FooterComponent {
-	year: number = new Date().getFullYear();
-}
+export default class FooterComponent {}

@@ -1,24 +1,9 @@
 <div>
   <div class="row">
-    <div class="col-10">
+    <div class="col-12">
       <h2>
         <span>Connections</span>
       </h2>
-    </div>
-    <div class="col-2">
-      <a
-        role="button"
-        class="btn btn-sm right-border-radius-0 assimbly-link assimbly-integration-img"
-        href="https://github.com/assimbly/integration/wiki/connections"
-        placement="right"
-        title="Assimbly Documentation"
-        target="_blank"
-      >
-        <picture>
-          <source srcset="../../../content/images/assimbly_transparant.webp" />
-          <img src="../../../content/images/assimbly_transparant.png" alt="assibmly-logo" />
-        </picture>
-      </a>
     </div>
   </div>
   <br />
@@ -35,7 +20,7 @@
   <div class="table-responsive">
     <table class="table table-striped">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
           <th jhiSortBy="name">
             <span>Name</span>
             <span class="fa fa-sort"></span>

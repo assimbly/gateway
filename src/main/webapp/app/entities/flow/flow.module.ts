@@ -2,19 +2,20 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ErrorHandler } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { SharedModule } from 'app/shared/shared.module';
+import SharedModule from 'app/shared/shared.module';
+import { SortDirective, SortByDirective } from 'app/shared/sort';
+
 import { StepModule } from '../../entities/step/step.module';
 import { ConnectionModule } from '../../entities/connection/connection.module';
 import { HeaderModule } from '../../entities/header/header.module';
 import { RouteModule } from '../../entities/route/route.module';
-import { MaintenanceModule } from '../../entities/maintenance/maintenance.module';
 import { CommonModule } from '@angular/common';
 
 import { FlowComponent } from './flow.component';
 import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowDeleteDialogComponent } from './flow-delete-dialog.component';
-import { flowRoute } from './flow.route';
+import flowRoute from './flow.route';
 import { FlowPopupService } from './flow-popup.service';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
@@ -35,11 +36,12 @@ const ENTITY_STATES = [...flowRoute];
 @NgModule({
   imports: [
     SharedModule,
+    SortDirective,
+    SortByDirective,
     StepModule,
     ConnectionModule,
     HeaderModule,
     RouteModule,
-    MaintenanceModule,
     RouterModule.forChild(ENTITY_STATES),
     NgbModule,
     NgSelectModule,
@@ -59,14 +61,6 @@ const ENTITY_STATES = [...flowRoute];
     FlowDetailComponent,
     FlowDeleteDialogComponent,
     FlowSearchByNamePipe,
-  ],
-  entryComponents: [
-    FlowComponent,
-    FlowUpdateComponent,
-    FlowEditorComponent,
-    FlowMessageSenderComponent,
-    FlowDeleteDialogComponent,
-    FlowDeleteDialogComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

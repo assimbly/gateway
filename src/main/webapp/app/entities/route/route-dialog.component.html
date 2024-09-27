@@ -10,9 +10,9 @@
             <label class="form-control-label" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name" formControlName="name"
                    required maxlength="255" [jhiExistingRouteNames]='routeNames'/>
-            <div *ngIf="editForm.value.name.invalid && (editForm.value.name.name.dirty || editForm.value.name.touched)" class="invalid-field-message">
-                <span *ngIf="editForm.value.name.errors.required" >Name is required.</span>
-                <span *ngIf="editForm.value.name.errors.existingRouteName">Name already exists.</span>
+            <div *ngIf="editForm.controls.name.invalid && (editForm.controls.name.dirty || editForm.controls.name.touched)" class="invalid-field-message">
+                <span *ngIf="editForm.controls.name.errors.required" >Name is required.</span>
+                <span *ngIf="editForm.controls.name.errors.existingRouteName">Name already exists.</span>
             </div>
         </div>
         <div class="form-group" *ngIf="!show">

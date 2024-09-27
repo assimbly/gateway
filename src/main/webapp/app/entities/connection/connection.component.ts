@@ -16,7 +16,6 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
-    entryComponents: [ConnectionKeysComponent]
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;

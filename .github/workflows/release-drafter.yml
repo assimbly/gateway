@@ -1,14 +1,15 @@
 name: Release Drafter
 
 on:
-  push:
-    branches:
-      - master
-
-  pull_request:
-    types: [opened, reopened, synchronize]
-    branches: 
-      - master
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'main'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
 
 permissions:
   contents: read
@@ -17,7 +18,7 @@ jobs:
   update_release_draft:
     permissions:
       contents: write
-      pull-requests: write 
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Draft a Release

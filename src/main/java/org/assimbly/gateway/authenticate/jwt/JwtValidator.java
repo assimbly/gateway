@@ -2,6 +2,7 @@ package org.assimbly.gateway.authenticate.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.slf4j.LoggerFactory;
@@ -55,10 +56,14 @@ public final class JwtValidator {
     public static Claims decode(String jwt) throws JwtException, UnsupportedEncodingException {
         String key = System.getenv("MONGO_SECRET_KEY");
 
-        return Jwts.parser()
-                .setSigningKey(key.getBytes("UTF-8"))
-                .parseClaimsJws(jwt)
-                .getBody();
+        JwtParser parser = Jwts.parser()
+            .setSigningKey(key.getBytes("UTF-8"))
+            .build();
+
+        return parser
+            .parseClaimsJws(jwt)
+            .getBody();
+
     }
 
 }

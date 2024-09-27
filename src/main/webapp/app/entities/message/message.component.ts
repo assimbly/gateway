@@ -15,7 +15,6 @@ import { HeaderService } from '../../entities/header/header.service';
 @Component({
     selector: 'jhi-message',
     templateUrl: './message.component.html',
-    entryComponents: [HeaderComponent]
 })
 export class MessageComponent implements OnInit, OnDestroy {
     messages: IMessage[];

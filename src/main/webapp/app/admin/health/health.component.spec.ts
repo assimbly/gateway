@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 
-import { HealthComponent } from './health.component';
+import HealthComponent from './health.component';
 import { HealthService } from './health.service';
 import { Health } from './health.model';
 
@@ -12,16 +12,13 @@ describe('HealthComponent', () => {
   let fixture: ComponentFixture<HealthComponent>;
   let service: HealthService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [HealthComponent],
-      })
-        .overrideTemplate(HealthComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, HealthComponent],
     })
-  );
+      .overrideTemplate(HealthComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HealthComponent);

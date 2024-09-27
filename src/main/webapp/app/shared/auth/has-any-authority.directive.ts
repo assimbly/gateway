@@ -16,14 +16,19 @@ import { AccountService } from 'app/core/auth/account.service';
  * ```
  */
 @Directive({
+  standalone: true,
   selector: '[jhiHasAnyAuthority]',
 })
-export class HasAnyAuthorityDirective implements OnDestroy {
+export default class HasAnyAuthorityDirective implements OnDestroy {
   private authorities!: string | string[];
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private accountService: AccountService, private templateRef: TemplateRef<any>, private viewContainerRef: ViewContainerRef) {}
+  constructor(
+    private accountService: AccountService,
+    private templateRef: TemplateRef<any>,
+    private viewContainerRef: ViewContainerRef,
+  ) {}
 
   @Input()
   set jhiHasAnyAuthority(value: string | string[]) {

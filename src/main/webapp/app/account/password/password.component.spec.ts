@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
 
-import { PasswordComponent } from './password.component';
+import PasswordComponent from './password.component';
 import { PasswordService } from './password.service';
 
 describe('PasswordComponent', () => {
@@ -16,17 +16,14 @@ describe('PasswordComponent', () => {
   let fixture: ComponentFixture<PasswordComponent>;
   let service: PasswordService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [PasswordComponent],
-        providers: [FormBuilder, AccountService],
-      })
-        .overrideTemplate(PasswordComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, PasswordComponent],
+      providers: [FormBuilder, AccountService],
     })
-  );
+      .overrideTemplate(PasswordComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PasswordComponent);

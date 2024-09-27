@@ -5,29 +5,27 @@ import { of } from 'rxjs';
 import { Authority } from 'app/config/authority.constants';
 import { User } from '../user-management.model';
 
-import { UserManagementDetailComponent } from './user-management-detail.component';
+import UserManagementDetailComponent from './user-management-detail.component';
 
 describe('User Management Detail Component', () => {
   let comp: UserManagementDetailComponent;
   let fixture: ComponentFixture<UserManagementDetailComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [UserManagementDetailComponent],
-        providers: [
-          {
-            provide: ActivatedRoute,
-            useValue: {
-              data: of({ user: new User(123, 'user', 'first', 'last', 'first@last.com', true, 'en', [Authority.USER], 'admin') }),
-            },
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [UserManagementDetailComponent],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            data: of({ user: new User(123, 'user', 'first', 'last', 'first@last.com', true, 'en', [Authority.USER], 'admin') }),
           },
-        ],
-      })
-        .overrideTemplate(UserManagementDetailComponent, '')
-        .compileComponents();
+        },
+      ],
     })
-  );
+      .overrideTemplate(UserManagementDetailComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UserManagementDetailComponent);
@@ -51,7 +49,7 @@ describe('User Management Detail Component', () => {
           langKey: 'en',
           authorities: [Authority.USER],
           createdBy: 'admin',
-        })
+        }),
       );
     });
   });

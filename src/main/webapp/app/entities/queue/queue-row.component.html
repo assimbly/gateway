@@ -18,7 +18,6 @@
 
         <button type="submit"
                 class="btn btn-danger btn-sm"
-                *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 (click)="delete(address)">
             <fa-icon icon="times"></fa-icon>
             <span class="d-none d-md-inline">Delete</span>
@@ -26,7 +25,6 @@
 
         <button type="submit"
                 class="btn btn-warning btn-sm"
-                *jhiHasAnyAuthority="'ROLE_ADMIN'"
                 (click)="clear(address)">
             <fa-icon icon="trash"></fa-icon>
             <span class="d-none d-md-inline">Clear</span>

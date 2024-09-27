@@ -18,14 +18,6 @@ export class IntegrationService {
 
     constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
-    stop(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.integrationUrl}/${id}/stop`, { observe: 'response', responseType: 'text' });
-    }
-
-    start(id: number): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.integrationUrl}/${id}/start`, { observe: 'response', responseType: 'text' });
-    }
-
     create(integration: IIntegration): Observable<EntityResponseType> {
         return this.http.post<IIntegration>(this.resourceUrl, integration, { observe: 'response' });
     }
@@ -47,29 +39,37 @@ export class IntegrationService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    setIntegrationConfiguration(integrationid, configuration): Observable<any> {
+    start(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.integrationUrl}/start`, { observe: 'response', responseType: 'text' });
+    }
+
+    stop(id: number): Observable<HttpResponse<any>> {
+        return this.http.get(`${this.integrationUrl}/stop`, { observe: 'response', responseType: 'text' });
+    }
+
+    setIntegrationConfiguration(configuration): Observable<any> {
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
         };
-        return this.http.post(`${this.environmentUrl}/${integrationid}`, configuration, options);
+        return this.http.post(`${this.environmentUrl}`, configuration, options);
     }
 
-    updateBackupFrequency(integrationid, frequency, url): Observable<any> {
+    updateBackupFrequency(frequency, url): Observable<any> {
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
         };
-        return this.http.post(`${this.resourceUrl}/${integrationid}/updatebackup/${frequency}`, url, options);
+        return this.http.post(`${this.resourceUrl}/$updatebackup/${frequency}`, url, options);
     }
 
-    addCollector(integrationid, collectorid, collection){
+    addCollector(collectorid, collection){
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/json', Accept: 'application/json' })
         };
-        return this.http.post(`${this.integrationUrl}/${integrationid}/collector/${collectorid}/add`, collection, options);
+        return this.http.post(`${this.integrationUrl}/collector/${collectorid}/add`, collection, options);
     }
 
-    removeCollector(integrationid, collectorid){
-          return this.http.delete(`${this.integrationUrl}/${integrationid}/collector/${collectorid}/remove`, { responseType: 'text' });
+    removeCollector(collectorid){
+          return this.http.delete(`${this.integrationUrl}/collector/${collectorid}/remove`, { responseType: 'text' });
     }
 
 }

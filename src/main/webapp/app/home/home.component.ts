@@ -1,46 +1,44 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
+import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import LoginComponent from 'app/login/login.component';
 
+
+import { EntityRoutingModule } from 'app/entities/entity-routing.module';
 import { TYPE } from 'app/app.constants';
 
 @Component({
+  standalone: true,
   selector: 'jhi-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrl: './home.component.scss',
+  imports: [SharedModule, LoginComponent, EntityRoutingModule, RouterModule],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export default class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
-  authSubscription?: Subscription;
+
+  private readonly destroy$ = new Subject<void>();
+
   type: string;
 
-  constructor(private accountService: AccountService, private router: Router) {
-    this.type = TYPE;
+  constructor(
+    private accountService: AccountService,
+    private router: Router,
+  ) {
+      this.type = TYPE;
   }
 
   ngOnInit(): void {
-
-      if (!this.isAuthenticated()) {
-	  	  	console.log('login');
-        this.login();
-      }
-
-    	console.log('type' + this.type);
-
-    this.authSubscription = this.accountService.getAuthenticationState().subscribe(account => {
-      this.account = account;
-
-
-    });
-
-
-  }
-
-  isAuthenticated(): boolean {
-    return this.accountService.isAuthenticated();
+    console.log('And the type =' + this.type);
+    this.accountService
+      .getAuthenticationState()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(account => (this.account = account));
   }
 
   login(): void {
@@ -48,8 +46,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

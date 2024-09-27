@@ -2,6 +2,30 @@
 Main page styles
 ========================================================================== */
 
+.hipster {
+  display: inline-block;
+  width: 347px;
+  height: 497px;
+  background: url('../../content/images/assimbly.png') no-repeat center top;
+  background-size: contain;
+}
+
+/* wait autoprefixer update to allow simple generation of high pixel density media query */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+  only screen and (-moz-min-device-pixel-ratio: 2),
+  only screen and (-o-min-device-pixel-ratio: 2/1),
+  only screen and (min-resolution: 192dpi),
+  only screen and (min-resolution: 2dppx) {
+  .hipster {
+    background: url('../../content/images/assimbly.png') no-repeat center top;
+    background-size: contain;
+  }
+}
+
+/* ==========================================================================
+Custom page styles
+========================================================================== */
+
 .foreground {
   display: inline-block;
   position: relative;
@@ -71,23 +95,4 @@ p {
   font-family: 'Raleway', sans-serif;
   font-size: 18px;
   font-weight: 500;
-}
-
-.hipster {
-  display: inline-block;
-  width: 347px;
-  height: 497px;
-  background: url('../../content/images/assimbly.png') no-repeat center top;
-  background-size: contain;
-}
-/* wait autoprefixer update to allow simple generation of high pixel density media query */
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-  only screen and (-moz-min-device-pixel-ratio: 2),
-  only screen and (-o-min-device-pixel-ratio: 2 / 1),
-  only screen and (min-resolution: 192dpi),
-  only screen and (min-resolution: 2dppx) {
-  .hipster {
-    background: url('../../content/images/assimbly.png') no-repeat center top;
-    background-size: contain;
-  }
 }

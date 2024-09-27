@@ -1,14 +1,13 @@
 package org.assimbly.gateway.db.mongo;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.assimbly.gateway.authenticate.domain.Tenant;
+import org.assimbly.gateway.authenticate.domain.User;
 import org.assimbly.gateway.exception.EnvironmentValueNotFoundException;
 import org.assimbly.gateway.variables.domain.EnvironmentValue;
 import org.assimbly.gateway.variables.domain.TenantVariable;
-import org.bson.types.ObjectId;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.UpdateOperations;
-import org.assimbly.gateway.authenticate.domain.Tenant;
-import org.assimbly.gateway.authenticate.domain.User;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +21,7 @@ public class MongoDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDao.class);
 
-    private static final String ID_FIELD = "_id";
-    private static final String NAME_FIELD = "name";
-    private static final String EMAIL_FIELD = "email";
-    private static final String PW_FIELD = "password_digest";
+    private static final String TENANT_VARIABLES_COLLECTION_NAME = "tenant_variables";
 
     private static final String CREATED_BY_SYSTEM = "System";
     private static final String UPDATED_BY_SYSTEM = "System";
@@ -37,7 +33,7 @@ public class MongoDao {
     public MongoDao(){
     }
 
-    public MongoDao(String database){
+    public MongoDao(String database) {
         this.database = database;
     }
 
@@ -49,42 +45,85 @@ public class MongoDao {
      * @param password of the user to find.
      * @return a User object representing the user if found, otherwise null.
      */
-    static public User findUser(String email, String password) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
+    public User findUser(String email, String password) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
 
-        return datastore.createQuery(User.class)
-                .field(EMAIL_FIELD).equal(email)
-                .field(PW_FIELD).equal(password)
-            .get(new FindOptions());
+        Document query = new Document(User.EMAIL_FIELD, email).append(User.PASSWORD_DIGEST_FIELD, password);
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
+        if (userDocument != null) {
+            return User.fromDocument(userDocument); // Convert Document to User object
+        }
+        return null;
     }
 
-    static public User findUser(String id) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
+    public User findUser(String id) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
 
-        return datastore.createQuery(User.class)
-                .field(ID_FIELD).equal(new ObjectId(id))
-                .get();
+        Document query = new Document(User.ID_FIELD, id);
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
+        if (userDocument != null) {
+            return User.fromDocument(userDocument); // Convert Document to User object
+        }
+        return null;
     }
 
-    static public User findUserByEmail(String email) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
+    public User findUserByEmail(String email) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
 
-        return datastore.createQuery(User.class)
-                .field(EMAIL_FIELD).equal(email)
-                .get();
+        Document query = new Document(User.EMAIL_FIELD, email);
+        Document userDocument = mongoDatabase.getCollection("users").find(query).first();
+        if (userDocument != null) {
+            return User.fromDocument(userDocument); // Convert Document to User object
+        }
+        return null;
     }
 
-    static public Tenant findTenant(User user) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
+    public Tenant findTenant(User user) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
 
-        return datastore.createQuery(Tenant.class)
-                .field(ID_FIELD).equal(user.getTenantId())
-                .get();
+        Document query = new Document(Tenant.ID_FIELD, user.getTenantId());
+        Document tenantDocument = mongoDatabase.getCollection("tenants").find(query).first();
+        if (tenantDocument != null) {
+            return Tenant.fromDocument(tenantDocument);
+        }
+        return null;
     }
 
-    static public TenantVariable findVariableByName(String variableName, String tenant) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
-        return datastore.find(TenantVariable.class).field(NAME_FIELD).equal(variableName).get();
+    public void updateAuthenticatorSettings(User user, String secretKey, Boolean usesTwoFactor) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
+        mongoDatabase.getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
+            new Document("$set", new Document("secret_key", secretKey)
+                .append("uses_two_factor", usesTwoFactor)));
+    }
+
+    public void removeAuthenticatorSettings(User user){
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(database);
+
+        mongoDatabase.getCollection("users").updateOne(new Document(User.ID_FIELD, user.getId()),
+            new Document("$unset", new Document("secret_key", "")
+                .append("uses_two_factor", false)));
+    }
+
+    public static TenantVariable findVariableByName(String variableName, String tenant) {
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
+        MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
+
+        Document document = collection.find(new Document(TenantVariable.NAME_FIELD, variableName)).first();
+        if (document != null) {
+            return TenantVariable.fromDocument(document);
+        }
+        return null;
+    }
+
+    public static void updateTenantVariable(TenantVariable tenantVariable, String tenant, boolean tenantVariableExist){
+        MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
+        MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
+        if(tenantVariableExist) {
+            collection.replaceOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), tenantVariable.toDocument());
+        } else {
+            collection.insertOne(tenantVariable.toDocument());
+        }
     }
 
     static public String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
@@ -128,6 +167,7 @@ public class MongoDao {
         String tenantVarName, String tenantVarValue, String tenant, String environment
     ) {
         TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant);
+        boolean tenantVariableExist = !Objects.isNull(tenantVariable);
 
         if(Objects.isNull(tenantVariable)) {
             tenantVariable = new TenantVariable(tenantVarName);
@@ -142,35 +182,10 @@ public class MongoDao {
 
         variable.setEncrypted(false);
         variable.setValue(tenantVarValue);
-        variable.setUpdatedAt(new Date().getTime());
+        variable.setLastUpdate(new Date().getTime());
         variable.setUpdatedBy(UPDATED_BY_SYSTEM);
 
-        updateTenantVariable(tenantVariable, tenant);
-    }
-
-    static public void updateAuthenticatorSettings(User user, String secretKey, Boolean usesTwoFactor) {
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
-
-        UpdateOperations<User> operations = datastore.createUpdateOperations(User.class)
-                .set("secret_key", secretKey)
-                .set("uses_two_factor", usesTwoFactor);
-
-        datastore.update(user, operations);
-    }
-
-    static public void updateTenantVariable(TenantVariable tenantVariable, String tenant){
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(tenant);
-        datastore.save(tenantVariable);
-    }
-
-    static public void removeAuthenticatorSettings(User user){
-        Datastore datastore = MongoClientProvider.getInstance().getDatastore(database);
-
-        UpdateOperations<User> operations = datastore.createUpdateOperations(User.class)
-                .unset("secret_key")
-                .set("uses_two_factor", false);
-
-        datastore.update(user, operations);
+        updateTenantVariable(tenantVariable, tenant, tenantVariableExist);
     }
 
 }
