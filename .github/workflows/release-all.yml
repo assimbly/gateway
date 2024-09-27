@@ -24,6 +24,7 @@ jobs:
       branch: 'main'
       milestone: ${{ inputs.milestone }}
 
+
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@main
     needs: call-base-release
