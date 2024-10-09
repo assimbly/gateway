@@ -2,6 +2,7 @@ package org.assimbly.gateway.db.mongo;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.authenticate.domain.Tenant;
 import org.assimbly.gateway.authenticate.domain.User;
 import org.assimbly.gateway.exception.EnvironmentValueNotFoundException;
@@ -187,15 +188,7 @@ public class MongoDao {
         TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant, tenantVarType);
         boolean tenantVariableExist = !Objects.isNull(tenantVariable);
 
-        if(Objects.isNull(tenantVariable)) {
-            tenantVariable = new TenantVariable(tenantVarName);
-            tenantVariable.set_type(tenantVarType.name());
-            tenantVariable.setCreatedAt(new Date().getTime());
-            tenantVariable.setCreatedBy(CREATED_BY_SYSTEM);
-        }
-
-        if(!tenantVariable.find(environment).isPresent())
-            tenantVariable.put(new EnvironmentValue(environment));
+        tenantVariable = initTenantVariable(tenantVariable, tenantVarType, tenantVarName, environment, tenantVariableExist);
 
         EnvironmentValue variable = tenantVariable.find(environment).get();
 
@@ -205,6 +198,24 @@ public class MongoDao {
         variable.setUpdatedBy(UPDATED_BY_SYSTEM);
 
         updateTenantVariable(tenantVariable, tenant, tenantVariableExist);
+    }
+
+    private static TenantVariable initTenantVariable(TenantVariable tenantVariable, TenantVariable.TenantVarType tenantVarType, String tenantVarName, String environment, boolean tenantVariableExist) {
+        if(!tenantVariableExist) {
+            tenantVariable = new TenantVariable(tenantVarName);
+            tenantVariable.set_type(tenantVarType.name());
+        }
+        if(StringUtils.isEmpty(tenantVariable.getCreatedBy())) {
+            tenantVariable.setCreatedBy(CREATED_BY_SYSTEM);
+        }
+        if(tenantVariable.getCreatedAt() == 0) {
+            tenantVariable.setCreatedAt(new Date().getTime());
+        }
+        if(!tenantVariable.find(environment).isPresent()) {
+            tenantVariable.put(new EnvironmentValue(environment));
+        }
+
+        return tenantVariable;
     }
 
 }
