@@ -70,9 +70,17 @@ public class TenantVariable {
             tenantVariable.set_type(document.getString(TYPE_FIELD));
         }
         tenantVariable.setName(document.getString(NAME_FIELD));
-        if(document.getLong(CREATED_AT_FIELD) != null) {
-            tenantVariable.setCreatedAt(document.getLong(CREATED_AT_FIELD));
+
+        Object createdAtField = document.get(CREATED_AT_FIELD);
+        if (createdAtField != null) {
+            if (createdAtField instanceof Long) {
+                tenantVariable.setCreatedAt((Long) createdAtField);
+            } else if (createdAtField instanceof Integer) {
+                // Convert Integer to Long
+                tenantVariable.setCreatedAt(((Integer) createdAtField).longValue());
+            }
         }
+
         tenantVariable.setCreatedBy(document.getString(CREATED_BY_FIELD));
 
         List<Document> valuesList = (List<Document>) document.get(VALUES_FIELD);
