@@ -36,4 +36,10 @@ file_env 'SPRING_LIQUIBASE_USER'
 file_env 'SPRING_LIQUIBASE_PASSWORD'
 file_env 'JHIPSTER_REGISTRY_PASSWORD'
 
-exec java ${JAVA_OPTS} -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -cp /app/resources/:/app/classes/:/app/libs/* "org.assimbly.gateway.GatewayApp"  "$@" --application.gateway.base-directory=/data/ --server.port=8088
+#exec java ${JAVA_OPTS} -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -XX:+ShowCodeDetailsInExceptionMessages -verbose:class -cp /app/resources/:/app/classes/:/app/libs/jakarta*:/app/libs/* "org.assimbly.gateway.GatewayApp"  "$@" --application.gateway.base-directory=/data/ --server.port=8088
+#exec java ${JAVA_OPTS} -cp /app/resources/:/app/classes/:/app/libs/* "org.assimbly.gateway.GatewayApp"  "$@" --application.gateway.base-directory=/data/ --server.port=8088
+#ls -la "/app/"
+#ls -la "/"
+#tail -f /dev/null
+#exec java ${JAVA_OPTS} -cp /app/gateway-5.0.1-SNAPSHOT-plain.jar "org.assimbly.gateway.GatewayApp" --application.gateway.base-directory=/data/ --server.port=8088
+exec java ${JAVA_OPTS} -cp "$(cat /app/jib-classpath-file)" "$@" --application.gateway.base-directory=/data/ --server.port=8088
