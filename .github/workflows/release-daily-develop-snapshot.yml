@@ -2,8 +2,9 @@ name: Release Daily Development Snapshot
 
 on:
   workflow_dispatch:
-    #  schedule:
-    #    - cron: '0 2 * * *'
+
+  schedule:
+    - cron: '0 3 * * *'
 
 jobs:
   getversion:
