@@ -45,6 +45,7 @@ management:
           - caches
           - liquibase
           - jolokia
+          - hawtio
   endpoint:
     health:
       show-details: "ALWAYS"

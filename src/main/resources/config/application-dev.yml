@@ -64,6 +64,8 @@ spring:
     jasypt:
       algorithm: PBEWithHMACSHA512AndAES_256
       password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
+  jmx:
+    enabled: true
 
 server:
   port: 8088

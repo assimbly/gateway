@@ -430,6 +430,8 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-sync:4.7.2"
     implementation "org.mongodb:mongodb-driver-core:4.7.2"
 
+    implementation 'io.hawt:hawtio-springboot:4.2.0'
+    
     implementation group: "org.assimbly", name: "database-drivers", version: "${version}", changing: true
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
