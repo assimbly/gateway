@@ -33,7 +33,7 @@ jobs:
       milestone: ${{ inputs.milestone }}
 
   call-runtime-release:
-    uses: assimbly/custom-components/.github/workflows/release.yml@main
+    uses: assimbly/runtime/.github/workflows/release.yml@main
     needs: call-custom-components-release
     secrets: inherit
     with:
