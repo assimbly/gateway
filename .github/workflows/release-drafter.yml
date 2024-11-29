@@ -1,6 +1,15 @@
 name: Release Drafter
 
 on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        default: 'main'
+        type: string
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
   workflow_call:
     inputs:
       branch:
