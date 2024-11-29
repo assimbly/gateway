@@ -232,7 +232,7 @@ jhipster:
 
 application:
   info:
-    version: 5.0.1
+    version: 5.0.2-SNAPSHOT
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
