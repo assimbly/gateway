@@ -45,6 +45,7 @@ management:
           - caches
           - liquibase
           - jolokia
+          - hawtio
   endpoint:
     health:
       show-details: "ALWAYS"
@@ -231,7 +232,7 @@ jhipster:
 
 application:
   info:
-    version: 5.0.0
+    version: 5.0.1
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest

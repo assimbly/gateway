@@ -5,6 +5,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
@@ -17,6 +18,8 @@ import java.util.Arrays;
 
 @Configuration
 public class MongoClientProvider implements Serializable {
+
+    private final String MONGO_CONTAINER_NAME = "MONGO_CONTAINER_NAME";
 
     private static final MongoClientProvider INSTANCE = new MongoClientProvider();
 
@@ -48,8 +51,16 @@ public class MongoClientProvider implements Serializable {
     private void init() {
         client = MongoClients.create(MongoClientSettings.builder()
             .applyToClusterSettings(builder ->
-                builder.hosts(Arrays.asList(new ServerAddress("flux-mongo", 27017))))
+                builder.hosts(Arrays.asList(new ServerAddress(getMongoContainerName(), 27017))))
             .build());
+    }
+
+    private String getMongoContainerName() {
+        String mongoContainer = System.getenv(MONGO_CONTAINER_NAME);
+        if (StringUtils.isNotEmpty(mongoContainer)) {
+            return mongoContainer;
+        }
+        return "flux-mongo"; // by default
     }
 
 }
