@@ -7,11 +7,6 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
-        /*
-
-        maven { url "https://repo.spring.io/milestone" }
-        maven { url "https://repo.spring.io/snapshot" }
-
         maven{  name = "Aurea"
             url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
         }
@@ -36,7 +31,7 @@ buildscript {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
         }
-         */
+
     }
 
 }
@@ -51,7 +46,6 @@ plugins {
     id "idea"
     id "eclipse"
     id "org.springframework.boot"
-    //id "org.springframework.boot.aot"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
     id "com.github.node-gradle.node"
@@ -59,7 +53,8 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.6.0'
     id "com.github.ben-manes.versions" version "0.51.0"
-    // id 'org.graalvm.buildtools.native' version '0.10.2'
+    //id "org.springframework.boot.aot"
+    //id 'org.graalvm.buildtools.native' version '0.10.3'
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
@@ -74,7 +69,7 @@ tasks.withType(JavaExec) {
 }
 
 group = "org.assimbly.gateway"
-version = '5.0.0'
+version = '5.0.2-SNAPSHOT'
 description = "A message gateway"
 
 apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
@@ -97,12 +92,6 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
-    //exclude group: 'org.eclipse.angus', module: 'angus-activation'
-    resolutionStrategy {
-        force 'org.eclipse.angus:angus-mail:2.0.3'
-        force 'jakarta.mail:jakarta.mail-api:2.1.3'
-        force 'jakarta.activation:jakarta.activation-api:2.1.3'
-    }
 }
 
 if (project.hasProperty("headless")) {
@@ -159,7 +148,8 @@ jib {
         image = 'assimbly/gateway-full'
     }
     container {
-        ports = ['1000', '1616','1617', '2000-2003/udp', '8088', '8443', '61616','61617','9000','9001']
+        mainClass = 'org.assimbly.gateway.GatewayApp'
+        ports = ['1000','1616','1617','2000-2003/udp','8088','8443','9000','9001','27017','61616','61617']
         format = 'OCI'
     }
     containerizingMode = 'exploded'
@@ -170,7 +160,7 @@ jib {
                 from = file('src/main/jib')
             }
             path {
-                // copies the contents of 'src/main/another/dir' into '/extras' on the container
+                // copies the contents of 'src/main/data' into '/data' on the container
                 from = file('src/main/data')
                 into = '/data'
             }
@@ -295,17 +285,16 @@ configurations {
     all {
         resolutionStrategy {
             // force to use latest liquibase instead of default by Spring dependencies
-            force 'org.liquibase:liquibase-core:4.29.1'
-            force 'implementation "org.hibernate.orm:hibernate-core:6.5.2.Final'
-            force 'implementation "org.hibernate.orm:hibernate-jcache:6.5.2.Final'
-            force 'implementation "org.hibernate.orm:hibernate-envers:6.5.2.Final'
+            force 'implementation "org.hibernate.orm:hibernate-core:6.6.0.Final'
+            force 'implementation "org.hibernate.orm:hibernate-jcache:6.6.0.Final'
+            force 'implementation "org.hibernate.orm:hibernate-envers:6.6.0.Final'
 
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.36.0")
+                    details.useVersion("2.37.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.2")
+                    details.useVersion("6.1.3")
                 }
             }
         }
@@ -316,7 +305,6 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    /*
     maven{  name = "Aurea"
         url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
@@ -342,13 +330,11 @@ repositories {
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
     }
 
-     */
-
 }
 
 dependencies {
 
-    implementation 'org.crac:crac:1.5.0'
+    //implementation 'org.crac:crac:1.5.0'
 
     implementation group: "org.assimbly", name: "common-base", version: "${version}"
 
@@ -356,13 +342,9 @@ dependencies {
 
     implementation "com.mattbertolini:liquibase-slf4j:5.0.0"
 
-    implementation 'tech.jhipster:jhipster-framework:8.6.0'
+    implementation 'tech.jhipster:jhipster-framework:8.7.1'
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.1.0"
-
-    implementation "org.eclipse.angus:angus-mail:2.0.3"
-    implementation "jakarta.mail:jakarta.mail-api:2.1.3"
-    implementation "jakarta.activation:jakarta.activation-api:2.1.3"
 
     implementation "io.dropwizard.metrics:metrics-core"
     implementation "io.dropwizard.metrics:metrics-json"
@@ -448,6 +430,8 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-sync:4.7.2"
     implementation "org.mongodb:mongodb-driver-core:4.7.2"
 
+    implementation 'io.hawt:hawtio-springboot:4.2.0'
+    
     implementation group: "org.assimbly", name: "database-drivers", version: "${version}", changing: true
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
@@ -648,9 +632,19 @@ tasks.named("dependencyUpdates").configure {
     }
 }
 
+task printVersion {
+    // any code that goes here is part of configuring the task
+    // this code will always get run, even if the task is not executed
+    doLast { // add a task action
+        // any code that goes here is part of executing the task
+        // this code will only get run if and when the task gets executed
+        println project.version
+    }
+}
+
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.10"
+    gradleVersion = "8.10.2"
 }
 
 if (project.hasProperty("nodeInstall")) {
@@ -661,6 +655,30 @@ if (project.hasProperty("nodeInstall")) {
         download = true
     }
 }
+
+/*
+graalvmNative {
+    binaries {
+        main {
+            // Pass the native-image option here
+            buildArgs.add('--initialize-at-run-time=io.netty.internal.tcnative.CertificateCompressionAlgo')
+            buildArgs.add('--initialize-at-run-time=io.netty.channel.kqueue.KQueueEventLoop')
+            buildArgs.add('--initialize-at-run-time=org.slf4j.impl.StaticLoggerBinder')
+            buildArgs.add('--initialize-at-run-time=org.slf4j.LoggerFactory')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.classic.Logger')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.spi.AppenderAttachableImpl')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.status.StatusBase')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.classic.Level')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.status.InfoStatus')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.classic.PatternLayout')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.CoreConstants')
+            buildArgs.add('--initialize-at-run-time=io.netty.handler.ssl.BouncyCastleAlpnSslUtils')
+            buildArgs.add('-H:+UnlockExperimentalVMOptions')
+        }
+    }
+}
+*/
+
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources

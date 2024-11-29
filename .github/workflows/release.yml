@@ -1,13 +1,52 @@
-name: Release Snapshots
+name: Release
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '0 2 * * *'
+    inputs:
+      branch:
+        description: 'Branch to operate on'
+        default: 'develop'
+        type: string    
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
+        required: true
+      tag:
+        description: 'Tag to use for this release'
+        default: 'development'
+        type: string
+
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to operate on'
+        default: 'develop'
+        type: string        
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
+        required: true
+      tag:
+        description: 'Tag to use for this release'
+        type: string
 
 jobs:
-  delete_old_snapshots:
 
+  test-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print variable if not empty
+        if: "${{ inputs.milestone != '' }}"
+        run: |
+          echo Creating release for milestone ${{ inputs.milestone }}
+      - name: Print message if empty
+        if: "${{ inputs.milestone == '' }}"
+        run: |
+          echo Milestone value is empty
+          exit 1
+
+  delete_old_snapshots:
+    needs: test-milestone  
     runs-on: ubuntu-latest
 
     env:
@@ -15,14 +54,14 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-
       - name: Delete older snapshots
-        uses: smartsquaregmbh/delete-old-packages@v0.7.0
+        uses: smartsquaregmbh/delete-old-packages@v0.8.1
         with:
           organization: assimbly
           type: maven
+          token: ${{ secrets.MAVEN_TOKEN }}
           keep: 0
-          version-pattern: "^\\S+\\-SNAPSHOT$"
+          semver-pattern: "${{inputs.milestone}}"
           names: |
             org.assimbly.gateway.full
             org.assimbly.gateway.headless
@@ -35,7 +74,7 @@ jobs:
     secrets: inherit
     with:
       module: 'full'
-      branch: 'develop'
+      branch: ${{ inputs.branch }}
 
   call-integration-release-jars:
     needs: delete_old_snapshots
@@ -43,7 +82,7 @@ jobs:
     secrets: inherit
     with:
       module: 'integration'
-      branch: 'develop'
+      branch: ${{ inputs.branch }}
 
   call-broker-release-jars:
     needs: delete_old_snapshots
@@ -51,7 +90,7 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
+      branch: ${{ inputs.branch }}
 
   call-headless-release-jars:
     needs: delete_old_snapshots
@@ -59,7 +98,7 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
+      branch: ${{ inputs.branch }}
 
   call-full-release-dockerhub-image:
     needs: delete_old_snapshots
@@ -67,8 +106,8 @@ jobs:
     secrets: inherit
     with:
       module: 'full'
-      branch: 'develop'
-      tag: 'develop'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-integration-release-dockerhub-image:
@@ -77,8 +116,8 @@ jobs:
     secrets: inherit
     with:
       module: 'integration'
-      branch: 'develop'
-      tag: 'develop'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'default'
 
   call-broker-release-dockerhub-image:
@@ -87,8 +126,8 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
-      tag: 'develop'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'default'
 
   call-headless-release-dockerhub-image:
@@ -97,8 +136,8 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
-      tag: 'develop'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-headless-release-aws-image:
@@ -107,8 +146,8 @@ jobs:
     secrets: inherit
     with:
       module: 'headless'
-      branch: 'develop'
-      tag: 'development'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'full'
 
   call-broker-release-aws-image:
@@ -117,6 +156,6 @@ jobs:
     secrets: inherit
     with:
       module: 'broker'
-      branch: 'develop'
-      tag: 'development'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
       type: 'default'

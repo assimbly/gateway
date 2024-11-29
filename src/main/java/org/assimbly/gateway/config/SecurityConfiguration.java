@@ -3,6 +3,8 @@ package org.assimbly.gateway.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
+import io.hawt.springboot.EndpointPathResolver;
+import io.hawt.springboot.HawtioEndpoint;
 import org.assimbly.gateway.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
@@ -103,7 +106,9 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/management/jhiopenapigroups")).permitAll()
                     .requestMatchers(mvc.pattern("/management/**")).authenticated()
                     .requestMatchers(mvc.pattern("/management/jolokia")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll());
+                    .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/hawtio")).permitAll()
+                    .requestMatchers(mvc.pattern("/management/hawtio/**")).permitAll());
         }
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -120,6 +125,24 @@ public class SecurityConfiguration {
     @Bean
     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
         return new MvcRequestMatcher.Builder(introspector);
+    }
+
+    @Bean
+    public HawtioEndpoint hawtioEndpoint(final EndpointPathResolver endpointPathResolver) {
+        // return a modified HawtioEndpoint that does not check for / and /app for static resources
+        // because we might serve our own files from those locations
+        // remove when this is fixed https://github.com/hawtio/hawtio/issues/2559
+        return new HawtioEndpoint(endpointPathResolver) {
+            @Override
+            public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+                registry.addResourceHandler(endpointPathResolver.resolveUrlMapping("hawtio", "/plugins/**"))
+                    .addResourceLocations("classpath:/hawtio-static/app/");
+                registry.addResourceHandler(endpointPathResolver.resolveUrlMapping("hawtio", "/**"))
+                    .addResourceLocations("classpath:/hawtio-static/", "classpath:/hawtio-static/app/");
+                registry.addResourceHandler(endpointPathResolver.resolveUrlMapping("hawtio", "/img/**"))
+                    .addResourceLocations("classpath:/hawtio-static/img/");
+            }
+        };
     }
 
 }

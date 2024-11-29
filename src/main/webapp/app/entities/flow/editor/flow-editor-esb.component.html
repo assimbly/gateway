@@ -340,7 +340,7 @@
                                              [(ngModel)]="selectedOptions[index][idx]">
                                     <ng-template ng-option-tmp let-item="item">
                                       <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip"
-                                           [openDelay]="500" placement="bottom" container="body">{{item.displayName}}
+                                           placement="bottom" container="body">{{item.displayName}}
                                       </div>
                                       <ng-template #optionTooltip>
                                         <div>
@@ -640,6 +640,13 @@
 
       <br/>
       <br/>
+      <div
+        *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
+        <div *ngIf="editFlowForm['controls'].name.errors.required" class="invalid-field-message"
+             style="color: red;">Flowname is required.
+        </div>
+        <br/>
+      </div>
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-8 offset-4">

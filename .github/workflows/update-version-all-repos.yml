@@ -1,0 +1,54 @@
+name: Update Version for all repositories
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        type: string
+        default: 'develop'
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
+        required: true
+
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to use'
+        type: string
+        default: 'develop'
+      milestone:
+        description: 'Milestone to use as version'
+        type: string
+        required: true
+
+jobs:
+  call-gateway-update-version:
+    uses: ./.github/workflows/update-version.yml
+    secrets: inherit
+    with:
+      branch: ${{ inputs.branch }}
+      milestone: "${{inputs.milestone}}"
+
+  call-base-release-version:
+    uses: assimbly/base/.github/workflows/update-version.yml@develop
+    secrets: inherit
+    with:
+      branch: ${{ inputs.branch }}
+      milestone: "${{inputs.milestone}}"
+
+  call-custom-components-release-version:
+    uses: assimbly/custom-components/.github/workflows/update-version.yml@develop
+    secrets: inherit
+    with:
+      branch: ${{ inputs.branch }}
+      milestone: "${{inputs.milestone}}"
+
+  call-runtime-release-version:
+    uses: assimbly/runtime/.github/workflows/update-version.yml@develop
+    secrets: inherit
+    with:
+      branch: ${{ inputs.branch }}
+      milestone: "${{inputs.milestone}}"
+

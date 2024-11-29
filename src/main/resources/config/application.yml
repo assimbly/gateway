@@ -45,6 +45,7 @@ management:
           - caches
           - liquibase
           - jolokia
+          - hawtio
   endpoint:
     health:
       show-details: "ALWAYS"
@@ -112,14 +113,13 @@ spring:
       repositories:
         bootstrap-mode: deferred
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     database: H2
     show-sql: false
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
       hibernate.timezone.default_storage: NORMALIZE
-      hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
+      # hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
       hibernate.cache.use_second_level_cache: true
@@ -133,8 +133,6 @@ spring:
       hibernate.query.in_clause_parameter_padding: true
       hibernate:
         globally_quoted_identifiers: true
-        temp:
-          use_jdbc_metadata_defaults: false
         ddl-auto: none
         naming:
           physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
@@ -234,7 +232,7 @@ jhipster:
 
 application:
   info:
-    version: 5.0.0
+    version: 5.0.2-SNAPSHOT
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
