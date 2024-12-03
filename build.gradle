@@ -297,6 +297,7 @@ dependencies {
     implementation "javax.cache:cache-api"
     implementation "net.logstash.logback:logstash-logback-encoder:8.0"
     implementation "org.apache.commons:commons-lang3"
+    implementation 'org.eclipse.angus:jakarta.mail'
     implementation "org.ehcache:ehcache"
     implementation "org.hibernate.orm:hibernate-core:${hibernate_version}"
     implementation "org.hibernate.orm:hibernate-envers:${hibernate_version}"
