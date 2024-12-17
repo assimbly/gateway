@@ -61,6 +61,8 @@ management:
       enabled: true
     jolokia:
       sensitive: false
+      detectors:
+        activemq: false
   info:
     git:
       mode: full

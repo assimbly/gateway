@@ -646,6 +646,7 @@ export class FlowRowComponent implements OnInit {
   }
 
   start() {
+
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;

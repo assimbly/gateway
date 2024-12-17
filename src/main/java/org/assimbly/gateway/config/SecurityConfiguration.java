@@ -59,11 +59,7 @@ public class SecurityConfiguration {
                     .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
                     .frameOptions(FrameOptionsConfig::sameOrigin)
                     .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(permissions ->
-                        permissions.policy(
-                            "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
-                        )
-                    )
+                    .permissionsPolicyHeader(Customizer.withDefaults())
             );
 
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {

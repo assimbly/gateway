@@ -68,7 +68,9 @@ public class TenantVariable {
         values.add(environmentValue);
     }
 
+    @SuppressWarnings("unchecked")
     public static TenantVariable fromDocument(Document document) {
+
         TenantVariable tenantVariable = new TenantVariable();
         tenantVariable.set_id(document.getObjectId(ID_FIELD));
         if(document.getString(TYPE_FIELD) != null) {
