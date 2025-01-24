@@ -47,14 +47,14 @@ public class LiquibaseConfiguration {
             dataSourceProperties
         );
         liquibase.setChangeLog("classpath:config/liquibase/master.xml");
-        liquibase.setContexts(liquibaseProperties.getContexts());
+        liquibase.setContexts(String.valueOf(liquibaseProperties.getContexts()));
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setLiquibaseSchema(liquibaseProperties.getLiquibaseSchema());
         liquibase.setLiquibaseTablespace(liquibaseProperties.getLiquibaseTablespace());
         liquibase.setDatabaseChangeLogLockTable(liquibaseProperties.getDatabaseChangeLogLockTable());
         liquibase.setDatabaseChangeLogTable(liquibaseProperties.getDatabaseChangeLogTable());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-        liquibase.setLabelFilter(liquibaseProperties.getLabelFilter());
+        liquibase.setLabelFilter(String.valueOf(liquibaseProperties.getLabelFilter()));
         liquibase.setChangeLogParameters(liquibaseProperties.getParameters());
         liquibase.setRollbackFile(liquibaseProperties.getRollbackFile());
         liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());

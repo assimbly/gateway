@@ -61,6 +61,8 @@ management:
       enabled: true
     jolokia:
       sensitive: false
+      detectors:
+        activemq: false
   info:
     git:
       mode: full
@@ -232,7 +234,7 @@ jhipster:
 
 application:
   info:
-    version: 5.0.1
+    version: 5.0.2
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
