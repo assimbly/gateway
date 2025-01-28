@@ -3,6 +3,7 @@ package org.assimbly.gateway.camel;
 import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.CustomObjectMapperConfig;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
@@ -57,7 +58,11 @@ public class Integration {
         integration.setDebugging(isDebuggging);
         integration.setDeployDirectory(deployOnStart,deployOnChange);
 
-        return integration.getContext();
+        CamelContext camelContext = integration.getContext();
+
+        CustomObjectMapperConfig.addCustomObjectMapper(camelContext);
+
+        return camelContext;
     }
 
 }
