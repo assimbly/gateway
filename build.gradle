@@ -310,7 +310,6 @@ dependencies {
     implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
