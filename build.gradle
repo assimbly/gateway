@@ -4,6 +4,25 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
+        maven{ name = "Assimbly Base"
+            url = uri("https://maven.pkg.github.com/assimbly/base")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+        maven{ name = "Assimbly Runtime"
+            url = uri("https://maven.pkg.github.com/assimbly/runtime")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+        maven{  name = "Assimbly Custom Components"
+            url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+            credentials {
+                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        }
+
     }
 }
 
@@ -22,12 +41,11 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.6.0'
-    id "com.github.ben-manes.versions" version "0.51.0"
-    //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
+    id "com.github.ben-manes.versions" version "0.52.0"
 }
 
 group = "org.assimbly.gateway"
-version = '5.0.2-SNAPSHOT'
+version = '5.0.3'
 description = "A message gateway"
 
 java {
@@ -48,7 +66,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
-//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
 
 configurations.all {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
@@ -239,6 +256,25 @@ repositories {
         url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
 
+    maven{ name = "Assimbly Base"
+        url = uri("https://maven.pkg.github.com/assimbly/base")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+    maven{ name = "Assimbly Runtime"
+        url = uri("https://maven.pkg.github.com/assimbly/runtime")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+    maven{  name = "Assimbly Custom Components"
+        url = uri("https://maven.pkg.github.com/assimbly/custom-components")
+        credentials {
+            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+    }
+
 }
 
 dependencies {
@@ -274,7 +310,6 @@ dependencies {
     implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
@@ -317,9 +352,9 @@ dependencies {
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
-    implementation 'io.hawt:hawtio-springboot:4.2.0'
+    implementation 'io.hawt:hawtio-springboot:4.3.0'
     implementation 'jakarta.persistence:jakarta.persistence-api'
-    implementation 'tech.jhipster:jhipster-framework:8.7.2'
+    implementation 'tech.jhipster:jhipster-framework:8.9.0'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
@@ -456,7 +491,7 @@ task printVersion {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.11.1"
+    gradleVersion = "8.12.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
