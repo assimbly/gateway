@@ -76,6 +76,16 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
+    resolutionStrategy {
+        force 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+        force 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-hppc:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+        force 'com.fasterxml.jackson.module:jackson-module-afterburner:2.18.2'
+        force 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.18.2'
+    }
 }
 
 idea {
@@ -317,14 +327,14 @@ dependencies {
     implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
 
-    implementation "com.fasterxml.jackson.core:jackson-annotations"
-    implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.18.2"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.18.2"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2"
+    implementation "com.fasterxml.jackson.module:jackson-module-afterburner:2.18.2"
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.18.2"
     implementation "com.mattbertolini:liquibase-slf4j:5.1.0"
     implementation "com.mysql:mysql-connector-j"
     implementation "com.warrenstrange:googleauth:1.5.0"
