@@ -16,6 +16,7 @@ import dayjs from 'dayjs/esm';
 
 
 @Component({
+    standalone: false,
     selector: 'jhi-broker-message-sender',
     templateUrl: './broker-message-sender.component.html'
 })

@@ -18,7 +18,8 @@
       "ping": "Application",
       "db": "Database",
       "jms": "ActiveMQ",
-      "rabbit": "Rabbit"
+      "rabbit": "Rabbit",
+      "ssl": "SSL"
     },
     "table": {
       "service": "Service name",

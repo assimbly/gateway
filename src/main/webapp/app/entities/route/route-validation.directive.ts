@@ -2,8 +2,9 @@ import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
-    selector: '[jhiExistingRouteNames]',
-    providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenRouteNamesValidatorDirective, multi: true }]
+  standalone: false,
+  selector: '[jhiExistingRouteNames]',
+  providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenRouteNamesValidatorDirective, multi: true }]
 })
 export class ForbiddenRouteNamesValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename

@@ -22,6 +22,7 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver/FileSaver';
 
 @Component({
+  standalone: false,
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
 })
@@ -68,7 +69,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }
-  
+
   reset() {
     this.page = 0;
     this.securities = [];
@@ -103,7 +104,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	
+
   trackId(index: number, item: ICertificate) {
     return item.id;
   }

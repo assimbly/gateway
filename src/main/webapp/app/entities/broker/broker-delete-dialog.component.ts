@@ -8,6 +8,7 @@ import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-broker-delete-dialog',
     templateUrl: './broker-delete-dialog.component.html'
 })

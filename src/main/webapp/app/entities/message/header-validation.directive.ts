@@ -2,6 +2,7 @@ import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
+    standalone: false,
     selector: '[jhiExistingHeader]',
     providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenHeaderValidatorDirective, multi: true }]
 })

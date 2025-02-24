@@ -31,6 +31,7 @@ import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
 
 @Component({
+  standalone: false,
   selector: 'jhi-flow-editor-esb',
   templateUrl: './flow-editor-esb.component.html',
   encapsulation: ViewEncapsulation.None,

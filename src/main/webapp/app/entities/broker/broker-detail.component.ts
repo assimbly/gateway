@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-broker-detail',
     templateUrl: './broker-detail.component.html'
 })

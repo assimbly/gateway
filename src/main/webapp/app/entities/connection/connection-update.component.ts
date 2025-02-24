@@ -14,6 +14,7 @@ import { RequiredConnectionKey } from '../connection-keys/connection-keys.compon
 import { Connections } from '../../shared/camel/connections';
 
 @Component({
+  standalone: false,
   selector: 'jhi-connection-update',
   templateUrl: './connection-update.component.html',
 })

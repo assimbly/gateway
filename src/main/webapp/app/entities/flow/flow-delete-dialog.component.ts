@@ -7,6 +7,7 @@ import { IFlow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-flow-delete-dialog',
     templateUrl: './flow-delete-dialog.component.html'
 })
@@ -20,7 +21,7 @@ export class FlowDeleteDialogComponent {
         public activeModal: NgbActiveModal,
         protected router: Router
     ) {}
-	
+
     clear() {
         this.activeModal.dismiss('cancel');
     }

@@ -17,6 +17,7 @@ import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/int
 import { IntegrationService } from 'app/entities/integration/integration.service';
 
 @Component({
+  standalone: false,
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
 })

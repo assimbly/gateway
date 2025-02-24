@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-environment-variables-detail',
     templateUrl: './environment-variables-detail.component.html'
 })

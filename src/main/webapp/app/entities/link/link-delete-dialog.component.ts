@@ -8,6 +8,7 @@ import { ILink } from 'app/shared/model/link.model';
 import { LinkService } from './link.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-link-delete-dialog',
     templateUrl: './link-delete-dialog.component.html'
 })

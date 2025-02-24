@@ -8,6 +8,7 @@ import { IMessage } from 'app/shared/model/message.model';
 import { MessageService } from './message.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-message-delete-dialog',
     templateUrl: './message-delete-dialog.component.html'
 })

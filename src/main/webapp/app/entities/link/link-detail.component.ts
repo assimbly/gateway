@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ILink } from 'app/shared/model/link.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-link-detail',
     templateUrl: './link-detail.component.html'
 })

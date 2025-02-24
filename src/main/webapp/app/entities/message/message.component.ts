@@ -13,6 +13,7 @@ import { HeaderComponent } from '../../entities/header/header.component';
 import { HeaderService } from '../../entities/header/header.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-message',
     templateUrl: './message.component.html',
 })

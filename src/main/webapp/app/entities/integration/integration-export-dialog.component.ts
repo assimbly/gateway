@@ -8,6 +8,7 @@ import { IntegrationPopupService } from 'app/entities/integration/integration-po
 import { DeploymentService } from 'app/admin/deployment/deployment.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-integration-export-dialog',
     templateUrl: './integration-export-dialog.component.html'
 })

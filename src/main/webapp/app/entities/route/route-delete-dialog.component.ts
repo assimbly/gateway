@@ -7,7 +7,8 @@ import { IRoute } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 
 @Component({
-    templateUrl: './route-delete-dialog.component.html'
+  standalone: false,
+  templateUrl: './route-delete-dialog.component.html'
 })
 export class RouteDeleteDialogComponent {
     route?: IRoute;
@@ -20,7 +21,7 @@ export class RouteDeleteDialogComponent {
 
     confirmDelete(id: number): void {
         this.routeService.delete(id).subscribe(() => {
-			this.eventManager.broadcast(new EventWithContent('routeListModification', 'Deleted'));			
+			this.eventManager.broadcast(new EventWithContent('routeListModification', 'Deleted'));
             this.activeModal.close();
         });
     }

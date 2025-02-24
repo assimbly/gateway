@@ -15,6 +15,7 @@ import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
+  standalone: false,
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
 })
@@ -74,7 +75,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit() {    
+  ngAfterViewInit() {
     this.getBrokerType();
     this.poll();
   }
@@ -85,9 +86,9 @@ export class QueueComponent implements OnInit, OnDestroy {
     }
     this.timeInterval.unsubscribe();
   }
-  
-   setSearchBox(){  
-   
+
+   setSearchBox(){
+
     const searchText = localStorage.getItem('searchQueueText');
 	if(searchText){
 		this.searchQueueText = searchText;
@@ -96,7 +97,7 @@ export class QueueComponent implements OnInit, OnDestroy {
 	}
 
    }
-  
+
 
   trackId(index: number, item: IAddress): number {
     return item.id!;

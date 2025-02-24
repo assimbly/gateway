@@ -9,6 +9,7 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
+    standalone: false,
     templateUrl: './queue-clear-dialog.component.html'
 })
 export class QueueClearDialogComponent {
@@ -42,7 +43,7 @@ export class QueueClearDialogComponent {
             // this.disableClear = true;
         } else {
             this.queueService.clearQueue(name, this.brokerType).subscribe(() => {
-				this.eventManager.broadcast(new EventWithContent('queueListModification', 'cleared'));			
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'cleared'));
                 this.address.numberOfMessages = 0;
                 this.router.navigate(['/queue']);
                 this.activeModal.dismiss(true);

@@ -11,6 +11,7 @@ import { Address, IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-queue-update',
     templateUrl: './queue-update.component.html'
 })

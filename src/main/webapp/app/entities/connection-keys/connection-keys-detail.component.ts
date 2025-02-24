@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-connection-keys-detail',
     templateUrl: './connection-keys-detail.component.html'
 })

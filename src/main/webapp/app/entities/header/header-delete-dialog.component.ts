@@ -8,6 +8,7 @@ import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-header-delete-dialog',
     templateUrl: './header-delete-dialog.component.html'
 })

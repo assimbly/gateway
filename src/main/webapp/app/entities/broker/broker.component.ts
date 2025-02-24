@@ -19,6 +19,7 @@ enum Status {
     activeError = 'activeError'
 }
 @Component({
+    standalone: false,
     selector: 'jhi-broker',
     templateUrl: './broker.component.html'
 })
@@ -201,7 +202,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <b>Total Messages:</b> ${totalMessages}<br/>`;
         }
     }
-	
+
 	delete(broker: IBroker): void {
 		const modalRef = this.modalService.open(BrokerDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
 		modalRef.componentInstance.broker = broker;

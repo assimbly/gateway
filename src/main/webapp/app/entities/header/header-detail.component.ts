@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IHeader } from 'app/shared/model/header.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-header-detail',
     templateUrl: './header-detail.component.html'
 })

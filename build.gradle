@@ -24,6 +24,10 @@ buildscript {
         }
 
     }
+
+    dependencies {
+        classpath "org.liquibase:liquibase-core:${liquibase_version}" // Add this
+    }
 }
 
 plugins {

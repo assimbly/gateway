@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IQueue } from 'app/shared/model/queue.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-queue-detail',
     templateUrl: './queue-detail.component.html'
 })

@@ -14,6 +14,7 @@ import { Connections } from '../../shared/camel/connections';
 import { Observable } from 'rxjs';
 
 @Component({
+    standalone: false,
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
 })

@@ -10,8 +10,9 @@ import { RouteService } from './route.service';
 import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 
 @Component({
-    selector: 'jhi-route',
-    templateUrl: './route.component.html'
+  standalone: false,
+  selector: 'jhi-route',
+  templateUrl: './route.component.html'
 })
 export class RouteComponent implements OnInit, OnDestroy {
     routes?: IRoute[];

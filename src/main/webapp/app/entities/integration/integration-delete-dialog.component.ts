@@ -8,6 +8,7 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationService } from './integration.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-integration-delete-dialog',
     templateUrl: './integration-delete-dialog.component.html'
 })

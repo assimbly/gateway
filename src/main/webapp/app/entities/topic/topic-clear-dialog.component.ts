@@ -9,6 +9,7 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
+    standalone: false,
     templateUrl: './topic-clear-dialog.component.html'
 })
 export class TopicClearDialogComponent {

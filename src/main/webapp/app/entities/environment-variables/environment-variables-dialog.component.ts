@@ -16,6 +16,7 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-environment-variables-dialog',
     templateUrl: './environment-variables-dialog.component.html'
 })

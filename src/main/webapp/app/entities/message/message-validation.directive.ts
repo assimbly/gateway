@@ -2,6 +2,7 @@ import { Directive, Input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
+    standalone: false,
     selector: '[jhiExistingMessageNames]',
     providers: [{ provide: NG_VALIDATORS, useExisting: ForbiddenMessageNamesValidatorDirective, multi: true }]
 })

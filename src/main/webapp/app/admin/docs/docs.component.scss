@@ -1,5 +1,4 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
+@use 'bootstrap/scss/bootstrap' as *;
 
 iframe {
   background: white;

@@ -11,6 +11,7 @@ import { RouteService } from './route.service';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-route-update',
     templateUrl: './route-update.component.html'
 })

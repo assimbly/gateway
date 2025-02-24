@@ -8,6 +8,7 @@ import { IEnvironmentVariables } from 'app/shared/model/environment-variables.mo
 import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-environment-variables-delete-dialog',
     templateUrl: './environment-variables-delete-dialog.component.html'
 })

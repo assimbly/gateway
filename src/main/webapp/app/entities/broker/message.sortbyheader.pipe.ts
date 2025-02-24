@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { Header } from 'app/shared/model/header.model';
 
-@Pipe({ name: 'MessageSortByHeaderPipe' })
+@Pipe({ standalone: false, name: 'MessageSortByHeaderPipe' })
 export class MessageSortByHeaderPipePipe implements PipeTransform {
     transform(headers: KeyValue<string, any>[], ascending: boolean, predicate: string) {
         let sortedHeaders: Header[] = [];

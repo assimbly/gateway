@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { combineLatest } from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
@@ -10,12 +10,10 @@ import { MetricsCacheComponent } from './blocks/metrics-cache/metrics-cache.comp
 import { MetricsDatasourceComponent } from './blocks/metrics-datasource/metrics-datasource.component';
 import { MetricsEndpointsRequestsComponent } from './blocks/metrics-endpoints-requests/metrics-endpoints-requests.component';
 import { MetricsGarbageCollectorComponent } from './blocks/metrics-garbagecollector/metrics-garbagecollector.component';
-import { MetricsModalThreadsComponent } from './blocks/metrics-modal-threads/metrics-modal-threads.component';
 import { MetricsRequestComponent } from './blocks/metrics-request/metrics-request.component';
 import { MetricsSystemComponent } from './blocks/metrics-system/metrics-system.component';
 
 @Component({
-  standalone: true,
   selector: 'jhi-metrics',
   templateUrl: './metrics.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,40 +25,33 @@ import { MetricsSystemComponent } from './blocks/metrics-system/metrics-system.c
     MetricsDatasourceComponent,
     MetricsEndpointsRequestsComponent,
     MetricsGarbageCollectorComponent,
-    MetricsModalThreadsComponent,
     MetricsRequestComponent,
     MetricsSystemComponent,
   ],
 })
 export default class MetricsComponent implements OnInit {
-  metrics?: Metrics;
-  threads?: Thread[];
-  updatingMetrics = true;
+  metrics = signal<Metrics | undefined>(undefined);
+  threads = signal<Thread[] | undefined>(undefined);
+  updatingMetrics = signal(true);
 
-  constructor(
-    private metricsService: MetricsService,
-    private changeDetector: ChangeDetectorRef,
-  ) {}
+  private readonly metricsService = inject(MetricsService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.refresh();
   }
 
   refresh(): void {
-    this.updatingMetrics = true;
+    this.updatingMetrics.set(true);
     combineLatest([this.metricsService.getMetrics(), this.metricsService.threadDump()]).subscribe(([metrics, threadDump]) => {
-      this.metrics = metrics;
-      this.threads = threadDump.threads;
-      this.updatingMetrics = false;
+      this.metrics.set(metrics);
+      this.threads.set(threadDump.threads);
+      this.updatingMetrics.set(false);
       this.changeDetector.markForCheck();
     });
   }
 
-  metricsKeyExists(key: keyof Metrics): boolean {
-    return Boolean(this.metrics?.[key]);
-  }
-
   metricsKeyExistsAndObjectNotEmpty(key: keyof Metrics): boolean {
-    return Boolean(this.metrics?.[key] && JSON.stringify(this.metrics[key]) !== '{}');
+    return Boolean(this.metrics()?.[key] && JSON.stringify(this.metrics()?.[key]) !== '{}');
   }
 }

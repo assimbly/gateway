@@ -1,6 +1,6 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import MetricsComponent from './metrics.component';
@@ -15,7 +15,8 @@ describe('MetricsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, MetricsComponent],
+      imports: [MetricsComponent],
+      providers: [provideHttpClient()],
     })
       .overrideTemplate(MetricsComponent, '')
       .compileComponents();
@@ -54,63 +55,17 @@ describe('MetricsComponent', () => {
 
       // THEN
       expect(service.getMetrics).toHaveBeenCalled();
-      expect(comp.metrics).toEqual(metrics);
-      expect(comp.threads).toEqual(threadDump.threads);
-      expect(comp.updatingMetrics).toBeFalsy();
+      expect(comp.metrics()).toEqual(metrics);
+      expect(comp.threads()).toEqual(threadDump.threads);
+      expect(comp.updatingMetrics()).toBeFalsy();
       expect(changeDetector.constructor.prototype.markForCheck).toHaveBeenCalled();
-    });
-  });
-
-  describe('metricsKeyExists', () => {
-    it('should check that metrics key exists', () => {
-      // GIVEN
-      comp.metrics = {
-        garbageCollector: {
-          'PS Scavenge': {
-            collectionCount: 0,
-            collectionTime: 0,
-          },
-          'PS MarkSweep': {
-            collectionCount: 0,
-            collectionTime: 0,
-          },
-        },
-      } as unknown as Metrics;
-
-      // WHEN
-      const garbageCollectorKeyExists = comp.metricsKeyExists('garbageCollector');
-
-      // THEN
-      expect(garbageCollectorKeyExists).toBeTruthy();
-    });
-
-    it('should check that metrics key does not exist', () => {
-      // GIVEN
-      comp.metrics = {
-        garbageCollector: {
-          'PS Scavenge': {
-            collectionCount: 0,
-            collectionTime: 0,
-          },
-          'PS MarkSweep': {
-            collectionCount: 0,
-            collectionTime: 0,
-          },
-        },
-      } as unknown as Metrics;
-
-      // WHEN
-      const databasesCollectorKeyExists = comp.metricsKeyExists('databases');
-
-      // THEN
-      expect(databasesCollectorKeyExists).toBeFalsy();
     });
   });
 
   describe('metricsKeyExistsAndObjectNotEmpty', () => {
     it('should check that metrics key exists and is not empty', () => {
       // GIVEN
-      comp.metrics = {
+      comp.metrics.set({
         garbageCollector: {
           'PS Scavenge': {
             collectionCount: 0,
@@ -121,7 +76,7 @@ describe('MetricsComponent', () => {
             collectionTime: 0,
           },
         },
-      } as unknown as Metrics;
+      } as unknown as Metrics);
 
       // WHEN
       const garbageCollectorKeyExistsAndNotEmpty = comp.metricsKeyExistsAndObjectNotEmpty('garbageCollector');
@@ -132,9 +87,9 @@ describe('MetricsComponent', () => {
 
     it('should check that metrics key is empty', () => {
       // GIVEN
-      comp.metrics = {
+      comp.metrics.set({
         garbageCollector: {},
-      } as Metrics;
+      } as Metrics);
 
       // WHEN
       const garbageCollectorKeyEmpty = comp.metricsKeyExistsAndObjectNotEmpty('garbageCollector');

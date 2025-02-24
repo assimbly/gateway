@@ -13,6 +13,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { LinkService } from './link.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-link',
     templateUrl: './link.component.html'
 })

@@ -12,6 +12,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 
 @Component({
+    standalone: false,
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html'
 })

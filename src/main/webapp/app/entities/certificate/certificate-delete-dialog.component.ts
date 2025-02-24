@@ -8,6 +8,7 @@ import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-certificate-delete-dialog',
     templateUrl: './certificate-delete-dialog.component.html'
 })

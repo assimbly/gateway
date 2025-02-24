@@ -10,6 +10,7 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
 @Component({
+  standalone: false,
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
 })

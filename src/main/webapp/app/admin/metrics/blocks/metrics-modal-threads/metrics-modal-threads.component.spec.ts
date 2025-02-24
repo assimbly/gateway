@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ThreadState } from '../../metrics.model';
@@ -12,8 +12,8 @@ describe('MetricsModalThreadsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, MetricsModalThreadsComponent],
-      providers: [NgbActiveModal],
+      imports: [MetricsModalThreadsComponent],
+      providers: [provideHttpClient(), NgbActiveModal],
     })
       .overrideTemplate(MetricsModalThreadsComponent, '')
       .compileComponents();
@@ -181,28 +181,30 @@ describe('MetricsModalThreadsComponent', () => {
   });
 
   describe('getThreads', () => {
+    // GIVEN
+    const thread1 = {
+      threadName: '',
+      threadId: 1,
+      blockedTime: 1,
+      blockedCount: 1,
+      waitedTime: 1,
+      waitedCount: 1,
+      lockName: 'lock1',
+      lockOwnerId: 1,
+      lockOwnerName: 'lock1',
+      daemon: true,
+      inNative: true,
+      suspended: true,
+      threadState: ThreadState.Blocked,
+      priority: 1,
+      stackTrace: [],
+      lockedMonitors: [],
+      lockedSynchronizers: [],
+      lockInfo: null,
+    };
+
     it('should return blocked threads', () => {
       // GIVEN
-      const thread1 = {
-        threadName: '',
-        threadId: 1,
-        blockedTime: 1,
-        blockedCount: 1,
-        waitedTime: 1,
-        waitedCount: 1,
-        lockName: 'lock1',
-        lockOwnerId: 1,
-        lockOwnerName: 'lock1',
-        daemon: true,
-        inNative: true,
-        suspended: true,
-        threadState: ThreadState.Blocked,
-        priority: 1,
-        stackTrace: [],
-        lockedMonitors: [],
-        lockedSynchronizers: [],
-        lockInfo: null,
-      };
       const thread2 = {
         threadName: '',
         threadId: 2,
@@ -247,26 +249,6 @@ describe('MetricsModalThreadsComponent', () => {
 
     it('should return all threads if there is no filter', () => {
       // GIVEN
-      const thread1 = {
-        threadName: '',
-        threadId: 1,
-        blockedTime: 1,
-        blockedCount: 1,
-        waitedTime: 1,
-        waitedCount: 1,
-        lockName: 'lock1',
-        lockOwnerId: 1,
-        lockOwnerName: 'lock1',
-        daemon: true,
-        inNative: true,
-        suspended: true,
-        threadState: ThreadState.Blocked,
-        priority: 1,
-        stackTrace: [],
-        lockedMonitors: [],
-        lockedSynchronizers: [],
-        lockInfo: null,
-      };
       const thread2 = {
         threadName: '',
         threadId: 2,

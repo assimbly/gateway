@@ -28,7 +28,7 @@ public class AccountResource {
     private static class AccountResourceException extends RuntimeException {
 
         private AccountResourceException(String message) {
-            super(message);
+            super(message, null, true, false);
         }
     }
 

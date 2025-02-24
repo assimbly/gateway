@@ -13,8 +13,9 @@ import { IMessage } from 'app/shared/model/message.model';
 import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
-    selector: 'jhi-step-update',
-    templateUrl: './step-update.component.html'
+  standalone: false,
+  selector: 'jhi-step-update',
+  templateUrl: './step-update.component.html'
 })
 export class StepUpdateComponent implements OnInit {
     step: IStep;

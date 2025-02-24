@@ -35,6 +35,7 @@ import { ConnectionPopupService } from 'app/entities/connection/connection-popup
 import dayjs from 'dayjs/esm';
 
 @Component({
+    standalone: false,
     selector: 'jhi-flow-message-sender',
     templateUrl: './flow-message-sender.component.html',
     encapsulation: ViewEncapsulation.None

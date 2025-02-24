@@ -21,7 +21,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
   standalone: true,
   selector: 'jhi-user-mgmt',
   templateUrl: './user-management.component.html',
-  imports: [RouterModule, SharedModule, SortDirective, SortByDirective, UserManagementDeleteDialogComponent, ItemCountComponent],
+  imports: [RouterModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
 })
 export default class UserManagementComponent implements OnInit {
   currentAccount: Account | null = null;

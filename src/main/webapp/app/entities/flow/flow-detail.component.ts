@@ -15,6 +15,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { Subscription } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'jhi-flow-detail',
   templateUrl: './flow-detail.component.html',
 })

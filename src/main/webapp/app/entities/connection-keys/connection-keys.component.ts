@@ -14,6 +14,7 @@ import { ConnectionKeysService } from './connection-keys.service';
 import { Connections } from '../../shared/camel/connections';
 
 @Component({
+    standalone: false,
     selector: 'jhi-connection-keys',
     templateUrl: './connection-keys.component.html'
 })

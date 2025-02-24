@@ -9,6 +9,7 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-flow-update',
     templateUrl: './flow-update.component.html'
 })

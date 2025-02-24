@@ -7,6 +7,7 @@ import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from './connection.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-connection-delete-dialog',
     templateUrl: './connection-delete-dialog.component.html'
 })

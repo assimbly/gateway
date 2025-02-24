@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import HealthModalComponent from './health-modal.component';
@@ -11,8 +11,8 @@ describe('HealthModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, HealthModalComponent],
-      providers: [NgbActiveModal],
+      imports: [HealthModalComponent],
+      providers: [provideHttpClient(), NgbActiveModal],
     })
       .overrideTemplate(HealthModalComponent, '')
       .compileComponents();
@@ -47,7 +47,7 @@ describe('HealthModalComponent', () => {
       expect(result).toEqual('jhipster');
     });
 
-    it('should return storage space in an human readable unit (GB)', () => {
+    it('should return storage space in a human readable unit (GB)', () => {
       // GIVEN
       comp.health = {
         key: 'diskSpace',
@@ -63,7 +63,7 @@ describe('HealthModalComponent', () => {
       expect(result).toEqual('1.00 GB');
     });
 
-    it('should return storage space in an human readable unit (MB)', () => {
+    it('should return storage space in a human readable unit (MB)', () => {
       // GIVEN
       comp.health = {
         key: 'diskSpace',

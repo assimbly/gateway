@@ -9,7 +9,8 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-    templateUrl: './queue-delete-dialog.component.html'
+  standalone: false,
+  templateUrl: './queue-delete-dialog.component.html'
 })
 export class QueueDeleteDialogComponent {
     queue?: IQueue;
@@ -45,7 +46,7 @@ export class QueueDeleteDialogComponent {
             this.disableDelete = true;
         } else {
             this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
-				this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));			
+				this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));
                  this.activeModal.dismiss(true);
             });
         }

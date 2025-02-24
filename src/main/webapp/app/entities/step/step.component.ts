@@ -8,8 +8,9 @@ import { AccountService } from 'app/core/auth/account.service';
 import { StepService } from './step.service';
 
 @Component({
-    selector: 'jhi-step',
-    templateUrl: './step.component.html'
+  standalone: false,
+  selector: 'jhi-step',
+  templateUrl: './step.component.html'
 })
 export class StepComponent implements OnInit, OnDestroy {
     steps: IStep[];

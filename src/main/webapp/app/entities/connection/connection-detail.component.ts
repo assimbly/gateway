@@ -10,6 +10,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { ConnectionService } from 'app/entities/connection/connection.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-connection-detail',
     templateUrl: './connection-detail.component.html'
 })

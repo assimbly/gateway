@@ -10,6 +10,7 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
 @Component({
+  standalone: false,
   selector: 'jhi-certificate-self-sign-dialog',
   templateUrl: './certificate-self-sign-dialog.component.html',
 })

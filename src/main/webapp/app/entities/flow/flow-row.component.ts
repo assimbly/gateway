@@ -24,6 +24,7 @@ enum Status {
   inactiveError = 'inactiveError',
 }
 @Component({
+  standalone: false,
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
 })

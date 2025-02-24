@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { IAddress } from 'app/shared/model/address.model';
 
-@Pipe({ name: 'TopicSearchByName' })
+@Pipe({ standalone: false, name: 'TopicSearchByName' })
 export class TopicSearchByNamePipe implements PipeTransform {
     transform(addresses: IAddress[], searchText: string, ascending: boolean, predicate: string) {
         const asc: number = ascending ? 1 : -1;

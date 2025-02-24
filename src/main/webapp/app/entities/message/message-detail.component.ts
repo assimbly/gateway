@@ -7,6 +7,7 @@ import { IHeader, Header } from 'app/shared/model/header.model';
 import { Subscription } from 'rxjs';
 
 @Component({
+    standalone: false,
     selector: 'jhi-message-detail',
     templateUrl: './message-detail.component.html'
 })

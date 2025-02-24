@@ -8,6 +8,7 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationPopupService } from 'app/entities/integration/integration-popup.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-integration-import-dialog',
     templateUrl: './integration-import-dialog.component.html'
 })

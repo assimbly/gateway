@@ -5,6 +5,7 @@ import { CertificateService } from './certificate.service';
 import { ICertificate } from 'app/shared/model/certificate.model';
 
 @Component({
+    standalone: false,
     selector: 'jhi-certificate-detail',
     templateUrl: './certificate-detail.component.html'
 })

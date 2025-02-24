@@ -4,8 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { IStep } from 'app/shared/model/step.model';
 
 @Component({
-    selector: 'jhi-step-detail',
-    templateUrl: './step-detail.component.html'
+  standalone: false,
+  selector: 'jhi-step-detail',
+  templateUrl: './step-detail.component.html'
 })
 export class StepDetailComponent implements OnInit {
     step: IStep;

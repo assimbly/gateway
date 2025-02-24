@@ -13,6 +13,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { HeaderService } from './header.service';
 
 @Component({
+    standalone: false,
     selector: 'jhi-header',
     templateUrl: './header.component.html'
 })

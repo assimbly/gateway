@@ -11,8 +11,9 @@ import { TopicService } from './topic.service';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-    selector: 'jhi-topic-update',
-    templateUrl: './topic-update.component.html'
+  standalone: false,
+  selector: 'jhi-topic-update',
+  templateUrl: './topic-update.component.html'
 })
 export class TopicUpdateComponent implements OnInit {
     isSaving = false;

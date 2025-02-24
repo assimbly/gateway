@@ -11,6 +11,7 @@ import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broke
 import 'codemirror/addon/edit/closetag';
 
 @Component({
+    standalone: false,
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html'
 })

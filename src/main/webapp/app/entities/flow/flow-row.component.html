@@ -177,6 +177,7 @@
         [autoClose]="'outside'"
       >
 			<fa-icon style="color: white;" icon="exclamation-triangle"></fa-icon>
+        <span>Error</span>
       </span>
     </h5>
   </div>
@@ -199,8 +200,7 @@
         [autoClose]="'outside'"
       >
 			<fa-icon icon="exclamation-triangle"></fa-icon>
-        <span *ngIf="numberOfAlerts > 1">{{ numberOfAlerts }} Alerts</span>
-        <span *ngIf="numberOfAlerts == 1">1 Alert</span>
+        <span *ngIf="numberOfAlerts > 0">Alert ({{ numberOfAlerts }})</span>
       </span>
     </h5>
   </div>
