@@ -45,6 +45,8 @@ public class Import {
 	// imports flow configuration (specific flow)
 	public String convertFlowConfigurationToDB(Long integrationId, Long id, String mediaType, String flowConfiguration)	throws Exception {
 
+        configuration = flowConfiguration;
+
 		if(!configuration.endsWith("</dil>")){
 			configuration = new Transform("transform-to-dil.xsl").transformToDil(configuration, Long.toString(id));
 		}

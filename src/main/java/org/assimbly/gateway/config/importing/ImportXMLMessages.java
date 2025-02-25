@@ -34,12 +34,16 @@ public class ImportXMLMessages {
 
     private Set<Header> headers;
 
-	public String setMessagesFromXML(Document doc) throws Exception {
-
-        log.info("Importing messages");
+	public void setMessagesFromXML(Document doc) throws Exception {
 
         // create messages
 		List<String> messageIds = ImportXMLUtil.getList(doc, "/dil/core/messages/message/id/text()");
+
+        if(messageIds==null || messageIds.size() == 0){
+            return;
+        }
+
+        log.info("Importing messages");
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
@@ -54,7 +58,7 @@ public class ImportXMLMessages {
 			updateMessageIdsFromXml(doc, entry);
         }
 
-        NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options/message_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/block[type='message']/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < messagesIdNodes.getLength(); i++) {
             String updateId =  messagesIdNodes.item(i).getTextContent();
@@ -70,8 +74,6 @@ public class ImportXMLMessages {
 
         log.info("Importing messages finished");
 
-        return "ok";
-
 	}
 
 	public void setMessageFromXML(Document doc, String messageId) throws Exception {
@@ -80,8 +82,6 @@ public class ImportXMLMessages {
 		XPath xPath = xpathFactory.newXPath();
 
 		String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageId + "]/name", doc);
-
-        log.info("Start importing message: " + messageName);
 
 		try {
 			Long.parseLong(messageId, 10);
@@ -193,13 +193,13 @@ public class ImportXMLMessages {
 
         log.debug("Update Message ID: " + messageId + ". New Message ID: " + generatedmessageId);
 
-		//update message_id to generated message_id
+		//update message id to the generated id
 		if(!messageId.equals(generatedmessageId)) {
 
 			NodeList messageNodes = (NodeList) xPath.compile("/dil/core/messages/message[id=" + messageId + "]/id/text()").evaluate(doc, XPathConstants.NODESET);
             messageNodes.item(0).setTextContent("id" + generatedmessageId);
 
-			NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options[message_id=" + messageId + "]/message_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList messagesIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/block[id=" + messageId + "]/id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < messagesIdNodes.getLength(); i++) {
 				messagesIdNodes.item(i).setTextContent("id" + generatedmessageId);

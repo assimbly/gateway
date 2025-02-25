@@ -32,14 +32,20 @@ public class ImportXMLConnections {
 
 	private Set<ConnectionKeys> connectionKeys;
 
-	public String setConnectionsFromXML(Document doc) throws Exception {
+	public void setConnectionsFromXML(Document doc) throws Exception {
+
+        List<String> connectionIds = ImportXMLUtil.getList(doc, "dil/core/connections/connection/id/text()");
+
+        if(connectionIds==null || connectionIds.size() == 0){
+            return;
+        }
 
         log.info("Importing connections");
 
-        List<String> connectionIds = ImportXMLUtil.getList(doc, "dil/core/connections/connection/id/text()");
-		XPath xPath = XPathFactory.newInstance().newXPath();
-
+        XPath xPath = XPathFactory.newInstance().newXPath();
         connectionsIdMap = new HashMap<String, String>();
+
+
 
 		for (String connectionId : connectionIds) {
 			setConnectionFromXml(doc, connectionId);
@@ -49,7 +55,7 @@ public class ImportXMLConnections {
 			updateConnectionIdsFromXml(doc, entry);
         }
 
-        NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options/connection_id").evaluate(doc, XPathConstants.NODESET);
+        NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/block[type='connection']/id").evaluate(doc, XPathConstants.NODESET);
 
         for (int i = 0; i < connectionsIdNodes.getLength(); i++) {
             String updateId =  connectionsIdNodes.item(i).getTextContent();
@@ -65,7 +71,6 @@ public class ImportXMLConnections {
 
         log.info("Importing connections finished");
 
-        return "ok";
 	}
 
 	public void setConnectionFromXml(Document doc, String connectionId) throws Exception {
@@ -183,10 +188,10 @@ public class ImportXMLConnections {
 
         log.debug("Update Connection ID: " + connectionId + ". New Connection ID: " + generatedConnectionId);
 
-		//update connection_id to generated connection_id
+		//update connection id to the generated id
 		if(!connectionId.equals(generatedConnectionId)) {
 
-			NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/*/options[connection_id='" + connectionId + "']/connection_id").evaluate(doc, XPathConstants.NODESET);
+			NodeList connectionsIdNodes = (NodeList) xPath.compile("/dil/integrations/integration/flows/flow/*/*/*/block[id='" + connectionId + "']/id").evaluate(doc, XPathConstants.NODESET);
 
 			for (int i = 0; i < connectionsIdNodes.getLength(); i++) {
 				connectionsIdNodes.item(i).setTextContent("id" + generatedConnectionId);

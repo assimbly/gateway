@@ -56,15 +56,13 @@ public class ImportXMLFlows {
     private Set<Step> steps;
 	private Step step;
 
-	public String setFlowsFromXML(Document doc, Long integrationId) throws Exception {
+	public void setFlowsFromXML(Document doc, Long integrationId) throws Exception {
 
         log.info("Importing flows");
 
 		List<String> flowIds = ImportXMLUtil.getList(doc, "/dil/integrations/integration/flows/flow/id/text()");
 
 		for (String flowId : flowIds) {
-
-            log.info("Importing flow: " + flowId);
 
             Long id;
 			try{
@@ -76,34 +74,30 @@ public class ImportXMLFlows {
 
 			setFlowFromXML(doc, integrationId, flowId, id);
 
-            log.info("Importing flow finished: " + flowId);
-
 		}
 
         log.info("Importing flows finished");
 
-        String result = "ok";
-
-		return result;
-
 	}
 
-	public String setFlowFromXML(Document doc, Long integrationId, String id, Long databaseId) throws Exception {
+	public void setFlowFromXML(Document doc, Long integrationId, String flowIid, Long databaseId) throws Exception {
+
+        log.info("Importing flow: {}", flowIid);
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String flowId = xPath.evaluate("//flows/flow[id='" + id + "']/id", doc);
-		String flowName = xPath.evaluate("//flows/flow[id='" + id + "']/name", doc);
-		String flowType = xPath.evaluate("//flows/flow[id='" + id + "']/type", doc);
-        String flowVersion = xPath.evaluate("//flows/flow[id='" + id + "']/version", doc);
-        String flowNotes = xPath.evaluate("//flows/flow[id='" + id + "']/notes", doc);
+		String flowId = xPath.evaluate("//flows/flow[id='" + flowIid + "']/id", doc);
+		String flowName = xPath.evaluate("//flows/flow[id='" + flowIid + "']/name", doc);
+		String flowType = xPath.evaluate("//flows/flow[id='" + flowIid + "']/type", doc);
+        String flowVersion = xPath.evaluate("//flows/flow[id='" + flowIid + "']/version", doc);
+        String flowNotes = xPath.evaluate("//flows/flow[id='" + flowIid + "']/notes", doc);
 
         //options
-		String flowAutostart = xPath.evaluate("//flows/flow[id='" + id + "']/options/autostart", doc);
-        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + id + "']/options/parallelProcessing", doc);
-		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + id + "']/options/maximumRedeliveries", doc);
-		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + id + "']/options/redeliveryDelay", doc);
-		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + id + "']/options/logLevel", doc);
-        String flowLastModified = xPath.evaluate("//flows/flow[id='" + id + "']/options/lastModified", doc);
+		String flowAutostart = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/autostart", doc);
+        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/parallelProcessing", doc);
+		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/maximumRedeliveries", doc);
+		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/redeliveryDelay", doc);
+		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/logLevel", doc);
+        String flowLastModified = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/lastModified", doc);
 
 		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
@@ -112,7 +106,7 @@ public class ImportXMLFlows {
 
             if (!flowOptional.isPresent()) {
 				flow = new Flow();
-				flow.setId(databaseId);
+				//flow.setId(databaseId);
 
                 steps = getStepsFromXML(flowId, doc, flow, true);
 
@@ -122,7 +116,8 @@ public class ImportXMLFlows {
 			}
 
             if (!integrationOptional.isPresent()) {
-				return "unknown integration";
+                log.warn("Integration not found: {}", integrationId);
+				return;
 			} else {
 				integration = integrationOptional.get();
 				flow.setIntegration(integration);
@@ -182,11 +177,12 @@ public class ImportXMLFlows {
 
             flowRepository.save(flow);
 
-			return "flow imported";
+            log.info("Importing flow finished: " + flowId);
 
-		} else {
-			return "unknown flow id";
-		}
+        } else {
+            log.warn("Flow not found: {}", flowId);
+        }
+
 	}
 
 	private Set<Step> getStepsFromXML(String id, Document doc, Flow flow, boolean newFlow)
@@ -236,10 +232,10 @@ public class ImportXMLFlows {
         String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
 		String options = "";
-		String connectionId = xPath.evaluate(stepXPath + "*/*/options/connection_id", doc);
-		String messageId = xPath.evaluate(stepXPath + "*/*/options/message_id", doc);
-        String responseIdAsString = xPath.evaluate(stepXPath + "*/*/options/response_id", doc);
-        String routeIdAsString = xPath.evaluate(stepXPath + "*/*/options/route_id", doc);
+		String connectionId = xPath.evaluate(stepXPath + "blocks/block[type='connection']/id", doc);
+		String messageId = xPath.evaluate(stepXPath + "blocks/block[type='message']/id", doc);
+        String responseIdAsString = xPath.evaluate(stepXPath + "blocks/blockk[type='response']/id", doc);
+        String routeIdAsString = xPath.evaluate(stepXPath + "blocks/block[type='route']/id", doc);
 
         // get type
 		StepType stepType = StepType.valueOf(type.toUpperCase());

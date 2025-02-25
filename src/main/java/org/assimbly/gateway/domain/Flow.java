@@ -31,7 +31,8 @@ public class Flow implements Serializable {
     @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
         @Parameter(name = "initial_value", value = "1"),
         @Parameter(name = "increment_size", value = "1")})
-    @Column(name = "id")    private Long id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name")
     private String name;

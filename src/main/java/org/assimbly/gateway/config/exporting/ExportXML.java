@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.config.importing.ImportXMLUtil;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.*;
 import org.assimbly.util.IntegrationUtil;
@@ -325,7 +324,6 @@ public class ExportXML {
         String confStepType = stepDB.getStepType().getStep();
 
         Element block = setElement("block", null, blocks);
-        Element options = setElement("options", null, block);
 
             if (confRouteId != null) {
 
@@ -337,9 +335,11 @@ public class ExportXML {
                     String routeContent = route.getContent();
 
                     if(routeContent.startsWith("<routeConfiguration")) {
-                        Element routeId = setElement("routeconfiguration_id", stepId, options);
+                        setElement("id", stepId, block);
+                        setElement("type", "routeconfiguration", block);
                     }else{
-                        Element routeId = setElement("route_id", stepId, options);
+                        setElement("id", stepId, block);
+                        setElement("type", "route", block);
                     }
                 }
 
@@ -347,14 +347,16 @@ public class ExportXML {
 
             if (confConnection != null) {
                 String confConnectionId = confConnection.getId().toString();
-                Element connectionId =  setElement("connection_id", confConnectionId, options);
+                setElement("id", confConnectionId, block);
+                setElement("type", "connection", block);
 
                 setConnection(confConnectionId, confStepType, confConnection);
             }
 
             if (confMessage != null) {
                 String confMessageId = confMessage.getId().toString();
-                Element messageId =  setElement("message_id", confMessageId, options);
+                setElement("id", confMessageId, block);
+                setElement("type", "message", block);
 
                 setMessage(confMessageId, confStepType, confMessage, stepDB);
             }
@@ -364,7 +366,8 @@ public class ExportXML {
             }
 
             if (confResponseId != null) {
-                Element responseId =  setElement("response_id", Integer.toString(confResponseId), options);
+                setElement("id", Integer.toString(confResponseId), block);
+                setElement("response", "response", block);
             }
 
             if(confRouteId == null && confConnection == null && confMessage == null && confResponseId == null) {
@@ -460,11 +463,11 @@ public class ExportXML {
 
 			Element connection =  setElement("connection", null, connections);
 
-			Element id =  setElement("id", connectionDB.getId().toString(), connection);
+			setElement("id", connectionDB.getId().toString(), connection);
 
-			Element name =  setElement("name", connectionDB.getName(), connection);
+			setElement("name", connectionDB.getName(), connection);
 
-			Element connectionType =  setElement("type", connectionDB.getType(), connection);
+			setElement("type", connectionDB.getType(), connection);
 
 			Element keys =  setElement("keys", null, connection);
 
@@ -475,7 +478,7 @@ public class ExportXML {
 				String parameterName = connectionKey.getKey();
 				String parameterValue = connectionKey.getValue();
 
-				Element connectionParameter =  setElement(parameterName, parameterValue, keys);
+				setElement(parameterName, parameterValue, keys);
 
 			}
 
@@ -562,9 +565,9 @@ public class ExportXML {
 				Element environmentVariableNode = doc.createElement("environmentVariable");
 				environmentVariablesList.appendChild(environmentVariableNode);
 
-				Element environmentKeyNode =  setElement("key", environmentVariable.getKey(), environmentVariableNode);
-				Element environmentValueNode =  setElement("value", environmentVariable.getValue(), environmentVariableNode);
-				Element environmentEncryptedNode =  setElement("encrypted", environmentVariable.isEncrypted().toString(), environmentVariableNode);
+				setElement("key", environmentVariable.getKey(), environmentVariableNode);
+				setElement("value", environmentVariable.getValue(), environmentVariableNode);
+				setElement("encrypted", environmentVariable.isEncrypted().toString(), environmentVariableNode);
 
             }
 		}
