@@ -43,12 +43,12 @@ public class Import {
 	}
 
 	// imports flow configuration (specific flow)
-	public String convertFlowConfigurationToDB(Long integrationId, Long id, String mediaType, String flowConfiguration)	throws Exception {
+	public String convertFlowConfigurationToDB(Long integrationId, Long flowId, String mediaType, String flowConfiguration)	throws Exception {
 
         configuration = flowConfiguration;
 
 		if(!configuration.endsWith("</dil>")){
-			configuration = new Transform("transform-to-dil.xsl").transformToDil(configuration, Long.toString(id));
+			configuration = new Transform("transform-to-dil.xsl").transformToDil(configuration, Long.toString(flowId));
 		}
 
 		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
@@ -61,7 +61,7 @@ public class Import {
 
 		importXMLConnections.setConnectionsFromXML(doc);
 
-		importXMLFlows.setFlowFromXML(doc, integrationId, id.toString(), id);
+		importXMLFlows.setFlowFromXML(doc, integrationId, Long.toString(flowId));
 
 		return "ok";
 

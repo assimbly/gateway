@@ -72,7 +72,7 @@ public class ImportXMLFlows {
 				id = uniqueKey.getLeastSignificantBits();
             }
 
-			setFlowFromXML(doc, integrationId, flowId, id);
+			setFlowFromXML(doc, integrationId, flowId);
 
 		}
 
@@ -80,24 +80,23 @@ public class ImportXMLFlows {
 
 	}
 
-	public void setFlowFromXML(Document doc, Long integrationId, String flowIid, Long databaseId) throws Exception {
+	public void setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
 
-        log.info("Importing flow: {}", flowIid);
+        log.info("Importing flow: {}", flowId);
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
-		String flowId = xPath.evaluate("//flows/flow[id='" + flowIid + "']/id", doc);
-		String flowName = xPath.evaluate("//flows/flow[id='" + flowIid + "']/name", doc);
-		String flowType = xPath.evaluate("//flows/flow[id='" + flowIid + "']/type", doc);
-        String flowVersion = xPath.evaluate("//flows/flow[id='" + flowIid + "']/version", doc);
-        String flowNotes = xPath.evaluate("//flows/flow[id='" + flowIid + "']/notes", doc);
+		String flowName = xPath.evaluate("//flows/flow[id='" + flowId + "']/name", doc);
+		String flowType = xPath.evaluate("//flows/flow[id='" + flowId + "']/type", doc);
+        String flowVersion = xPath.evaluate("//flows/flow[id='" + flowId + "']/version", doc);
+        String flowNotes = xPath.evaluate("//flows/flow[id='" + flowId + "']/notes", doc);
 
         //options
-		String flowAutostart = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/autostart", doc);
-        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/parallelProcessing", doc);
-		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/maximumRedeliveries", doc);
-		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/redeliveryDelay", doc);
-		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/logLevel", doc);
-        String flowLastModified = xPath.evaluate("//flows/flow[id='" + flowIid + "']/options/lastModified", doc);
+		String flowAutostart = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/autostart", doc);
+        String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/parallelProcessing", doc);
+		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/maximumRedeliveries", doc);
+		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/redeliveryDelay", doc);
+		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/logLevel", doc);
+        String flowLastModified = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/lastModified", doc);
 
 		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
