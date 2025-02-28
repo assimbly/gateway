@@ -1,10 +1,5 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.ConnectionKeysService;
 import org.assimbly.gateway.service.dto.ConnectionKeysDTO;
@@ -17,6 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * REST controller for managing ConnectionKeys.

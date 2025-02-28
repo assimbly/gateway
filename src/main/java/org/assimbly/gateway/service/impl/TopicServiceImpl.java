@@ -1,13 +1,12 @@
 package org.assimbly.gateway.service.impl;
 
-import org.assimbly.gateway.service.TopicService;
 import org.assimbly.gateway.domain.Topic;
 import org.assimbly.gateway.repository.TopicRepository;
+import org.assimbly.gateway.service.TopicService;
 import org.assimbly.gateway.service.dto.TopicDTO;
 import org.assimbly.gateway.service.mapper.TopicMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

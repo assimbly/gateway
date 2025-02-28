@@ -1,7 +1,7 @@
 package org.assimbly.gateway.config.importing;
 
-import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.repository.*;
+import org.assimbly.gateway.domain.Route;
+import org.assimbly.gateway.repository.RouteRepository;
 import org.assimbly.util.TransformUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,10 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,15 +29,9 @@ public class ImportXMLRoutes {
     @Autowired
     private RouteRepository routeRepository;
 
-	private Route route;
 	private Map<String, String> routesIdMap;
 
-	public String xmlConfiguration;
-	public String configuration;
-
     private String baseXpath;
-
-	private long routeIdLong;
 
 
 	public void setRoutesFromXML(Document doc, String type) throws Exception {
@@ -48,7 +45,7 @@ public class ImportXMLRoutes {
         // create routes
 		List<String> routeIds = ImportXMLUtil.getList(doc, baseXpath + "/@id");
 
-        if(routeIds==null || routeIds.size() == 0){
+        if(routeIds.isEmpty()){
             return;
         }
 
@@ -57,7 +54,7 @@ public class ImportXMLRoutes {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-        routesIdMap = new HashMap<String, String>();
+        routesIdMap = new HashMap<>();
 
 		for (String routeId : routeIds) {
 			setRouteFromXML(doc, routeId);
@@ -100,8 +97,9 @@ public class ImportXMLRoutes {
         String routeContent = TransformUtil.nodeToString(node);
 
 
+        Route route;
         try {
-			routeIdLong = Long.parseLong(routeId, 10);
+            long routeIdLong = Long.parseLong(routeId, 10);
 			Optional<Route> routeOptional = routeRepository.findById(routeIdLong);
 
 			if (!routeOptional.isPresent()) {
@@ -134,7 +132,6 @@ public class ImportXMLRoutes {
 
 			routesIdMap.put(routeId, generatedRouteId);
 
-			route = null;
 		}
 
         log.info("Finish importing route: " + routeName);

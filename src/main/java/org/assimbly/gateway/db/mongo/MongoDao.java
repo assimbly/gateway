@@ -135,11 +135,11 @@ public class MongoDao {
         }
     }
 
-    static public String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
+    public static String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
         return getTenantVariableValue(tenantVarName, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
     }
 
-    static public String getTenantVariableValue(String tenantVarName, String tenant, String environment, TenantVariable.TenantVarType tenantVarType) {
+    public static String getTenantVariableValue(String tenantVarName, String tenant, String environment, TenantVariable.TenantVarType tenantVarType) {
 
         TenantVariable tenantVar = MongoDao.findVariableByName(tenantVarName, tenant, tenantVarType);
         if(tenantVar==null) {
@@ -176,13 +176,13 @@ public class MongoDao {
         return output.toString();
     }
 
-    static public void saveTenantVariable(
+    public static void saveTenantVariable(
         String tenantVarName, String tenantVarValue, String tenant, String environment
     ) {
         saveTenantVariable(tenantVarName, tenantVarValue, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
     }
 
-    static public void saveTenantVariable(
+    public static void saveTenantVariable(
         String tenantVarName, String tenantVarValue, String tenant, String environment, TenantVariable.TenantVarType tenantVarType
     ) {
         TenantVariable tenantVariable = findVariableByName(tenantVarName, tenant, tenantVarType);

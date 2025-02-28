@@ -1,6 +1,8 @@
 package org.assimbly.gateway.service.util;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import java.security.SecureRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Utility class for generating random Strings.
@@ -18,7 +20,14 @@ public final class RandomUtil {
      * @return the generated password
      */
     public static String generatePassword() {
-        return RandomStringUtils.randomAlphanumeric(DEF_COUNT);
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+
+        return IntStream.range(0, DEF_COUNT)
+            .map(i -> random.nextInt(CHARACTERS.length()))
+            .mapToObj(CHARACTERS::charAt)
+            .map(String::valueOf)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -27,7 +36,12 @@ public final class RandomUtil {
      * @return the generated activation key
      */
     public static String generateActivationKey() {
-        return RandomStringUtils.randomNumeric(DEF_COUNT);
+        SecureRandom random = new SecureRandom();
+
+        return IntStream.range(0, DEF_COUNT)
+            .map(i -> random.nextInt(10)) // Generates a number between 0-9
+            .mapToObj(String::valueOf)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -36,7 +50,12 @@ public final class RandomUtil {
      * @return the generated reset key
      */
     public static String generateResetKey() {
-        return RandomStringUtils.randomNumeric(DEF_COUNT);
+        SecureRandom random = new SecureRandom();
+
+        return IntStream.range(0, DEF_COUNT)
+            .map(i -> random.nextInt(10)) // Generates a number between 0-9
+            .mapToObj(String::valueOf)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -46,7 +65,14 @@ public final class RandomUtil {
      * @return the generated series data
      */
     public static String generateSeriesData() {
-        return RandomStringUtils.randomAlphanumeric(DEF_COUNT);
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+
+        return IntStream.range(0, DEF_COUNT)
+            .map(i -> random.nextInt(CHARACTERS.length()))
+            .mapToObj(CHARACTERS::charAt)
+            .map(String::valueOf)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -55,6 +81,13 @@ public final class RandomUtil {
      * @return the generated token data
      */
     public static String generateTokenData() {
-        return RandomStringUtils.randomAlphanumeric(DEF_COUNT);
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+
+        return IntStream.range(0, DEF_COUNT)
+            .map(i -> random.nextInt(CHARACTERS.length()))
+            .mapToObj(CHARACTERS::charAt)
+            .map(String::valueOf)
+            .collect(Collectors.joining());
     }
 }

@@ -1,7 +1,6 @@
 package org.assimbly.gateway.repository;
 
 import org.assimbly.gateway.domain.Authority;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

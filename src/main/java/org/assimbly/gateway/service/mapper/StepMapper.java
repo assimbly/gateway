@@ -1,9 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.service.dto.StepDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity Step and its DTO StepDTO.

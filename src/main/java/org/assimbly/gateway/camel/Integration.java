@@ -25,8 +25,6 @@ public class Integration {
     EncryptionProperties encryptionProperties;
     private final ApplicationProperties applicationProperties;
 
-    private org.assimbly.integration.Integration integration;
-
     private final IntegrationRuntime integrationRuntime;
 
     public Integration(ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
@@ -53,12 +51,12 @@ public class Integration {
 
         integrationRuntime.initIntegration();
 
-        integration = integrationRuntime.getIntegration();
+        org.assimbly.integration.Integration runtime = integrationRuntime.getIntegration();
 
-        integration.setDebugging(isDebuggging);
-        integration.setDeployDirectory(deployOnStart,deployOnChange);
+        runtime.setDebugging(isDebuggging);
+        runtime.setDeployDirectory(deployOnStart,deployOnChange);
 
-        CamelContext camelContext = integration.getContext();
+        CamelContext camelContext = runtime.getContext();
 
         CustomObjectMapperConfig.addCustomObjectMapper(camelContext);
 

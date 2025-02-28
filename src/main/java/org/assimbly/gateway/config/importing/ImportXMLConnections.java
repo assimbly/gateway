@@ -1,7 +1,8 @@
 package org.assimbly.gateway.config.importing;
 
-import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.repository.*;
+import org.assimbly.gateway.domain.Connection;
+import org.assimbly.gateway.domain.ConnectionKeys;
+import org.assimbly.gateway.repository.ConnectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,29 +24,20 @@ public class ImportXMLConnections {
 
 	@Autowired
 	private ConnectionRepository connectionRepository;
-	private Connection connection;
     private Map<String, String> connectionsIdMap;
-
-	public String xmlConfiguration;
-
-    public String configuration;
-
-	private Set<ConnectionKeys> connectionKeys;
 
 	public void setConnectionsFromXML(Document doc) throws Exception {
 
         List<String> connectionIds = ImportXMLUtil.getList(doc, "dil/core/connections/connection/id/text()");
 
-        if(connectionIds==null || connectionIds.size() == 0){
+        if(connectionIds.isEmpty()){
             return;
         }
 
         log.info("Importing connections");
 
         XPath xPath = XPathFactory.newInstance().newXPath();
-        connectionsIdMap = new HashMap<String, String>();
-
-
+        connectionsIdMap = new HashMap<>();
 
 		for (String connectionId : connectionIds) {
 			setConnectionFromXml(doc, connectionId);
@@ -83,7 +75,9 @@ public class ImportXMLConnections {
 
 		log.info("Start importing connection: " + connectionName);
 
-		try {
+        Set<ConnectionKeys> connectionKeys;
+        Connection connection;
+        try {
 			Optional<Connection> connectionOptional = connectionRepository.findByName(connectionName);
 
 			if(!connectionOptional.isPresent()) {
@@ -91,7 +85,7 @@ public class ImportXMLConnections {
                 log.debug("Create new connection: " + connectionName);
 
                 connection = new Connection();
-				connectionKeys = new HashSet<ConnectionKeys>();
+				connectionKeys = new HashSet<>();
 				connection.setId(null);
 				connection.setName(connectionName);
 				connection.setType(connectionType);
@@ -110,7 +104,7 @@ public class ImportXMLConnections {
 			}
 		} catch (NumberFormatException nfe) {
 			connection = new Connection();
-			connectionKeys = new HashSet<ConnectionKeys>();
+			connectionKeys = new HashSet<>();
 			if (connectionName != null) {
 				connection.setName(connectionName);
 			} else {
@@ -170,11 +164,9 @@ public class ImportXMLConnections {
 
 			connectionsIdMap.put(connectionId, generatedConnectionId);
 
-			connection = null;
-			connectionKeys = null;
 		}
 
-        log.info("Finish importing connection: " + connectionName);
+        log.info("Finish importing connection: {}", connectionName);
 
     }
 

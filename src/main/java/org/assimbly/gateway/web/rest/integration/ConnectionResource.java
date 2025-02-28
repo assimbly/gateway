@@ -1,11 +1,5 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
 import org.assimbly.gateway.domain.Connection;
 import org.assimbly.gateway.domain.ConnectionKeys;
 import org.assimbly.gateway.repository.ConnectionRepository;
@@ -24,6 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * REST controller for managing Connection.

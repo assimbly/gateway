@@ -1,9 +1,11 @@
 package org.assimbly.gateway.config;
 
-import java.util.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class to load a Spring profile to be used as default

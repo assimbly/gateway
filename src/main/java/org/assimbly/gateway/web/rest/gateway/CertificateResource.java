@@ -1,19 +1,14 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.service.CertificateService;
+import org.assimbly.gateway.service.dto.CertificateDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.gateway.service.dto.CertificateDTO;
-
-import org.assimbly.util.CertificatesUtil;
-import org.assimbly.util.rest.ResponseUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -26,8 +21,6 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.annotation.PostConstruct;
 
 import static org.assimbly.util.CertificatesUtil.convertPemToX509Certificate;
 
@@ -74,7 +67,6 @@ public class CertificateResource {
 	                .body(saved);
 
         } catch (Exception e) {
-            log.error("Add certificateDTO failed: ", e.getMessage());
             throw new BadRequestAlertException("Adding certificateDTO failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
 
@@ -126,7 +118,7 @@ public class CertificateResource {
 
         List<Certificate> certificates = certificateService.findAll();
 
-        if(certificates.size()==0) {
+        if(certificates.isEmpty()) {
             return ResponseEntity.ok().body("no certificates found");
         }
 
@@ -207,7 +199,6 @@ public class CertificateResource {
 	        certificateService.delete(id);
 	        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
         }catch (Exception e) {
-            log.debug("Remove url to Whitelist failed: ", e.getMessage());
             throw new BadRequestAlertException("Remove url to whitelist failed. (See error log) ", ENTITY_NAME, e.getMessage());
    		}
     }
@@ -219,7 +210,7 @@ public class CertificateResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @PostMapping("/certificates/remove")
-    public ResponseEntity<Void> removeByUrl(@RequestBody String url) throws Exception {
+    public ResponseEntity<Void> removeByUrl(@RequestBody String url) {
         log.debug("REST request to remove certificates in truststore for url ", url);
         List<Certificate> certificates = certificateService.findAllByUrl(url);
 
@@ -231,17 +222,17 @@ public class CertificateResource {
     }
 
     @GetMapping("/certificates/isexpired/{withinNumberOfDays}")
-    public ResponseEntity<Boolean> isExpired(@PathVariable(value = "withinNumberOfDays") int withinNumberOfDays) throws Exception{
+    public ResponseEntity<Boolean> isExpired(@PathVariable(value = "withinNumberOfDays") int withinNumberOfDays) {
 
         log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
 
-        Boolean isExpired;
+        boolean isExpired;
         Instant dateNow = Instant.now();
-        Instant dateOfExpiry = Instant.now().plusSeconds(withinNumberOfDays * 86400);
+        Instant dateOfExpiry = Instant.now().plusSeconds(withinNumberOfDays * 86400L);
 
         List<Certificate> listExpired = certificateService.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
 
-        isExpired = listExpired.size() > 0;
+        isExpired = !listExpired.isEmpty();
 
         return ResponseEntity.ok().body(isExpired);
 
@@ -258,7 +249,6 @@ public class CertificateResource {
             String certificateUrl = certificate.getUrl();
             String certificateFile  = certificate.getCertificateFile();
 
-            CertificatesUtil util = new CertificatesUtil();
             X509Certificate real = convertPemToX509Certificate(certificate.getCertificateFile());
 
             Instant certificateExpiry = real.getNotAfter().toInstant();
@@ -281,31 +271,5 @@ public class CertificateResource {
         return certificatesObject.toString();
 
     }
-
-    //old: used for sync database with keystores
-    // This methode Should be moved to "web.rest/integration"
-    /*
-    @PostConstruct
-    private void init() throws Exception {
-
-    	log.debug("REST request to sync all certificates with truststore");
-        Integration integration = integrationResource.getIntegration();
-        List<Certificate> certificates = certificateService.findAll();
-
-        if(certificates.size()>0) {
-        	for (Certificate certificate : certificates) {
-
-            	String certificateName = certificate.getCertificateName();
-            	String certificateFile = certificate.getCertificateFile();
-            	String certificateStore = certificate.getCertificateStore();
-
-            	if(!certificateName.startsWith("P12")){
-                    X509Certificate real = convertPemToX509Certificate(certificateFile);
-                    integration.importCertificateInKeystore(certificateStore,"supersecret",certificateName,real);
-                }
-            }
-        }
-
-    }*/
 
 }

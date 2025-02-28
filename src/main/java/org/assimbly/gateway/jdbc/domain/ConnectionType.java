@@ -2,6 +2,8 @@ package org.assimbly.gateway.jdbc.domain;
 
 import org.assimbly.gateway.jdbc.adapter.DatabaseAdapter;
 
+import java.lang.reflect.InvocationTargetException;
+
 public enum ConnectionType {
     DB2("DB2Adapter"),
     INFORMIX("InformixAdapter"),
@@ -17,7 +19,11 @@ public enum ConnectionType {
         this.adapterName = adapterName;
     }
 
-    public DatabaseAdapter getAdapter() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return (DatabaseAdapter) Class.forName("org.assimbly.gateway.jdbc.adapter." + adapterName).newInstance();
+    public DatabaseAdapter getAdapter()
+        throws ClassNotFoundException, NoSuchMethodException, InstantiationException,
+        IllegalAccessException, InvocationTargetException {
+        return (DatabaseAdapter) Class.forName("org.assimbly.gateway.jdbc.adapter." + adapterName)
+            .getDeclaredConstructor()
+            .newInstance();
     }
 }

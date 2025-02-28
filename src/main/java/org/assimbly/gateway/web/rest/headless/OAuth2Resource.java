@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,24 +31,24 @@ public class OAuth2Resource {
 
     private static final Logger log = LoggerFactory.getLogger(OAuth2Resource.class);
 
-    public static String OAUTH2_PREFIX = "oauth2_";
-    public static String OAUTH2_URI_TOKEN_SUFFIX = "_uri_token";
-    public static String OAUTH2_SCOPE_SUFFIX = "_scope";
-    public static String OAUTH2_CLIENT_ID_SUFFIX = "_client_id";
-    public static String OAUTH2_CLIENT_SECRET_SUFFIX = "_client_secret";
-    public static String OAUTH2_EXPIRE_DATE_SUFFIX = "_expire_date";
-    public static String OAUTH2_ACCESS_TOKEN_SUFFIX = "_access_token";
-    public static String OAUTH2_REFRESH_TOKEN_SUFFIX = "_refresh_token";
-    public static String OAUTH2_REFRESH_FLAG_SUFFIX = "_refresh_flag";
-    public static String OAUTH2_REDIRECT_URI_SUFFIX = "_redirect_uri";
-    public static String OAUTH2_CREDENTIALS_TYPE_URI_SUFFIX = "_credentials_type";
-    public static String OAUTH2_TOKEN_TENANT_VAR_SUFFIX = "_token_global_var";
+    public static final String OAUTH2_PREFIX = "oauth2_";
+    public static final String OAUTH2_URI_TOKEN_SUFFIX = "_uri_token";
+    public static final String OAUTH2_SCOPE_SUFFIX = "_scope";
+    public static final String OAUTH2_CLIENT_ID_SUFFIX = "_client_id";
+    public static final String OAUTH2_CLIENT_SECRET_SUFFIX = "_client_secret";
+    public static final String OAUTH2_EXPIRE_DATE_SUFFIX = "_expire_date";
+    public static final String OAUTH2_ACCESS_TOKEN_SUFFIX = "_access_token";
+    public static final String OAUTH2_REFRESH_TOKEN_SUFFIX = "_refresh_token";
+    public static final String OAUTH2_REFRESH_FLAG_SUFFIX = "_refresh_flag";
+    public static final String OAUTH2_REDIRECT_URI_SUFFIX = "_redirect_uri";
+    public static final String OAUTH2_CREDENTIALS_TYPE_URI_SUFFIX = "_credentials_type";
+    public static final String OAUTH2_TOKEN_TENANT_VAR_SUFFIX = "_token_global_var";
 
-    private static String SERVICE_PARAM_EXPIRES_IN = "expires_in";
-    private static String SERVICE_PARAM_ACCESS_TOKEN = "access_token";
-    private static String SERVICE_PARAM_REFRESH_TOKEN = "refresh_token";
-    private static String SERVICE_PARAM_ERROR = "error";
-    private static String SERVICE_PARAM_ERROR_DESCRIPTION = "error_description";
+    private static final String SERVICE_PARAM_EXPIRES_IN = "expires_in";
+    private static final String SERVICE_PARAM_ACCESS_TOKEN = "access_token";
+    private static final String SERVICE_PARAM_REFRESH_TOKEN = "refresh_token";
+    private static final String SERVICE_PARAM_ERROR = "error";
+    private static final String SERVICE_PARAM_ERROR_DESCRIPTION = "error_description";
 
     private static final String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
     private static final String GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
@@ -64,7 +66,7 @@ public class OAuth2Resource {
         @RequestParam(value = "id") String id,
         @RequestParam(value = "tenant") String tenant,
         @RequestParam(value = "code") String code
-    ) {
+    ) throws IOException {
         log.debug("REST request to register two-factor authentication");
 
         Map<String, String> tokenInfoMap = new HashMap<>();
@@ -132,26 +134,27 @@ public class OAuth2Resource {
     }
 
     // call service
-    private static void callService(Map<String, String> tokenInfoMap, String uriToken, String urlParameters) {
+    private static void callService(Map<String, String> tokenInfoMap, String uriToken, String urlParameters) throws IOException {
 
-        HttpURLConnection con = null;
 
-        try {
-            URL url = null;
-            InputStream stream = null;
-            String tokenInfoResp = null;
+        URL url = null;
+        InputStream stream = null;
+        String tokenInfoResp = null;
 
-            // prepare connection
-            url = new URL(uriToken);
-            con = (HttpURLConnection) url.openConnection();
-            con.setDoOutput(true);
-            con.setInstanceFollowRedirects(false);
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            con.setUseCaches(false);
+        // prepare connection
+        URI uri = URI.create(uriToken);
+        url = uri.toURL();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setDoOutput(true);
+        con.setInstanceFollowRedirects(false);
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        con.setUseCaches(false);
+
+        try(OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());) {
 
             // get token info from uri_token service
-            OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+
             wr.write(urlParameters);
             wr.flush();
 
@@ -162,13 +165,13 @@ public class OAuth2Resource {
                 stream = con.getErrorStream();
             }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             tokenInfoResp = reader.lines().collect(Collectors.joining(System.lineSeparator()));
 
             if (tokenInfoResp != null) {
                 JSONObject tokenInfoJson = new JSONObject(tokenInfoResp);
                 if (!tokenInfoJson.isNull(SERVICE_PARAM_ERROR)) {
-                    log.info("tokenInfoResp > "+tokenInfoResp);
+                    log.info("tokenInfoResp > {}", tokenInfoResp);
                     String error = (
                         tokenInfoJson.has(SERVICE_PARAM_ERROR) ? tokenInfoJson.getString(SERVICE_PARAM_ERROR) : ""
                     );
@@ -194,11 +197,7 @@ public class OAuth2Resource {
             }
 
         } catch (IOException e) {
-            log.error("Error calling the service, with the following parameters: "+urlParameters, e);
-        } finally {
-            if (con != null) {
-                con.disconnect();
-            }
+            log.error("Error calling the service, with the following parameters: {}", urlParameters, e);
         }
     }
 

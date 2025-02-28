@@ -1,10 +1,9 @@
 package org.assimbly.gateway.security;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
-
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

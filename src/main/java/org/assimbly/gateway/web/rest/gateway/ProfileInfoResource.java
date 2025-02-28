@@ -3,8 +3,9 @@ package org.assimbly.gateway.web.rest.gateway;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.*;
-import tech.jhipster.config.JHipsterProperties;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Resource to return information about the currently running Spring profiles.
@@ -15,13 +16,10 @@ public class ProfileInfoResource {
 
     private final Environment env;
 
-    private final JHipsterProperties jHipsterProperties;
-
     private final ApplicationProperties.Documentation documentation;
 
-    public ProfileInfoResource(Environment env, JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties) {
+    public ProfileInfoResource(Environment env, ApplicationProperties applicationProperties) {
         this.env = env;
-        this.jHipsterProperties = jHipsterProperties;
         this.documentation = applicationProperties.getDocumentation();
     }
 
@@ -33,8 +31,7 @@ public class ProfileInfoResource {
 
     @GetMapping("/documentation/url")
     public String getUrl() {
-        String propertyUrl = documentation.getCamelUrl();
-        return propertyUrl;
+        return documentation.getCamelUrl();
     }
 
     class ProfileInfoVM {

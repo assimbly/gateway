@@ -1,7 +1,6 @@
 package org.assimbly.gateway.config.audit;
 
 import org.assimbly.gateway.domain.PersistentAuditEvent;
-
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;

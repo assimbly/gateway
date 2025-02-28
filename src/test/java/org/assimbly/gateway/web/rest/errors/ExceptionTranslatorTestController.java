@@ -1,15 +1,12 @@
 package org.assimbly.gateway.web.rest.errors;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class ExceptionTranslatorTestController {

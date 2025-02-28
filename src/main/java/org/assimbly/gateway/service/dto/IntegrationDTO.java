@@ -1,10 +1,11 @@
 package org.assimbly.gateway.service.dto;
 
-import java.io.Serializable;
-import java.util.Objects;
-import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.domain.enumeration.ConnectorType;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
+import org.assimbly.gateway.domain.enumeration.GatewayType;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A DTO for the Integration entity.

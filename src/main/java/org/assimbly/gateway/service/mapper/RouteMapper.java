@@ -1,10 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Route;
 import org.assimbly.gateway.service.dto.RouteDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity {@link Route} and its DTO {@link RouteDTO}.

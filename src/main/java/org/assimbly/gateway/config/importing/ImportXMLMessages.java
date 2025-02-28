@@ -1,7 +1,8 @@
 package org.assimbly.gateway.config.importing;
 
-import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.repository.*;
+import org.assimbly.gateway.domain.Header;
+import org.assimbly.gateway.domain.Message;
+import org.assimbly.gateway.repository.MessageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,14 @@ public class ImportXMLMessages {
 	@Autowired
 	private MessageRepository messageRepository;
 
-	public String xmlConfiguration;
-	public String configuration;
-
-    private Message message;
     private Map<String, String> messagesIdMap;
-
-    private Set<Header> headers;
 
 	public void setMessagesFromXML(Document doc) throws Exception {
 
         // create messages
 		List<String> messageIds = ImportXMLUtil.getList(doc, "/dil/core/messages/message/id/text()");
 
-        if(messageIds==null || messageIds.size() == 0){
+        if(messageIds.isEmpty()){
             return;
         }
 
@@ -48,7 +43,7 @@ public class ImportXMLMessages {
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xPath = xpathFactory.newXPath();
 
-        messagesIdMap = new HashMap<String, String>();
+        messagesIdMap = new HashMap<>();
 
         for (String messageId : messageIds) {
 			setMessageFromXML(doc, messageId);
@@ -83,14 +78,16 @@ public class ImportXMLMessages {
 
 		String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageId + "]/name", doc);
 
-		try {
+        Message message;
+        Set<Header> headers;
+        try {
 			Long.parseLong(messageId, 10);
 			Optional<Message> messageOptional = messageRepository.findByName(messageName);
 
 			if (!messageOptional.isPresent()) {
                 log.debug("Create new message: " + messageName);
                 message = new Message();
-				headers = new HashSet<Header>();
+				headers = new HashSet<>();
 				message.setId(null);
 				if (messageName == null || messageName.isEmpty()) {
 					message.setName(messageId);
@@ -104,7 +101,7 @@ public class ImportXMLMessages {
 			}
 		} catch (NumberFormatException nfe) {
 			message = new Message();
-			headers = new HashSet<Header>();
+			headers = new HashSet<>();
 			if (messageName == null || messageName.isEmpty()) {
 				message.setName(messageId);
 			} else {
@@ -175,11 +172,9 @@ public class ImportXMLMessages {
 
 			messagesIdMap.put(messageId, generatedmessageId);
 
-			message = null;
-			headers = null;
 		}
 
-        log.info("Finished importing message: " + messageName);
+        log.info("Finished importing message: {}", messageName);
 
     }
 

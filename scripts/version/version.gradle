@@ -1,5 +1,4 @@
 import groovy.transform.Field
-import groovy.io.FileType
 
 def json = file('scripts/version/versioned_files.json')
 def projectFile = new groovy.json.JsonSlurper().parseText(json.text)

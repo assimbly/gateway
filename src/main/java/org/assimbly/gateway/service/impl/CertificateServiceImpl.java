@@ -1,13 +1,12 @@
 package org.assimbly.gateway.service.impl;
 
-import org.assimbly.gateway.service.CertificateService;
 import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.repository.CertificateRepository;
+import org.assimbly.gateway.service.CertificateService;
 import org.assimbly.gateway.service.dto.CertificateDTO;
 import org.assimbly.gateway.service.mapper.CertificateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,7 @@ public class CertificateServiceImpl implements CertificateService {
         log.debug("Request to delete Certificate : {}", id);
         certificateRepository.deleteById(id);
     }
-    
+
     public List<Certificate> findAll() {
 		return certificateRepository.findAll();
 	}
@@ -101,9 +100,9 @@ public class CertificateServiceImpl implements CertificateService {
     public List<Certificate> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry) {
 		return certificateRepository.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
 	}
-    
+
     public Optional<Certificate> findByCertificateName(String certificateName) {
 		return certificateRepository.findByCertificateName(certificateName);
 	}
-    
+
 }

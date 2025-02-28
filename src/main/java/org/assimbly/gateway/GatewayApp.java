@@ -1,11 +1,5 @@
 package org.assimbly.gateway;
 
-import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
@@ -26,6 +20,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
 
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+
 // @SpringBootApplication
 @SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, MongoMetricsAutoConfiguration.class, GroovyTemplateAutoConfiguration.class})
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
@@ -33,9 +34,7 @@ public class GatewayApp {
 
     protected static Logger log = LoggerFactory.getLogger(GatewayApp.class);
 
-    private static final String userHomeDir = System.getProperty("user.home");
-
-    private static long vmStartTime;
+    private static final String USER_HOME = System.getProperty("user.home");
 
     private final Environment env;
 
@@ -81,7 +80,6 @@ public class GatewayApp {
 
         if (startApplication) {
             SpringApplication app = new SpringApplication(GatewayApp.class);
-            //app.setApplicationStartup(new BufferingApplicationStartup(2048));
 
             DefaultProfileUtil.addDefaultProfile(app);
             Environment env = app.run(args).getEnvironment();
@@ -112,7 +110,7 @@ public class GatewayApp {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
 
-        vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
+        long vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
 
         long startupTime = ((System.currentTimeMillis() - vmStartTime) / 1000);
 
@@ -123,11 +121,11 @@ public class GatewayApp {
         String javaVersion = Runtime.version().toString();
         String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
 
-        if (applicationBaseDirectory.equals("default")) {
+        if (applicationBaseDirectory == null || applicationBaseDirectory.equals("default")) {
             if (isWindows()) {
-                applicationBaseDirectory = userHomeDir + "\\.assimbly";
+                applicationBaseDirectory = USER_HOME + "\\.assimbly";
             } else {
-                applicationBaseDirectory = userHomeDir + "/.assimbly";
+                applicationBaseDirectory = USER_HOME + "/.assimbly";
             }
         } else if(applicationBaseDirectory.endsWith("/")){
             applicationBaseDirectory = applicationBaseDirectory + ".assimbly";
@@ -162,7 +160,7 @@ public class GatewayApp {
     }
 
     public static boolean isWindows() {
-        String OS = System.getProperty("os.name");
-        return OS.startsWith("Windows");
+        String operatingSystem = System.getProperty("os.name");
+        return operatingSystem.startsWith("Windows");
     }
 }

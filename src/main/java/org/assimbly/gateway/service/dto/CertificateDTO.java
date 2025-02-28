@@ -1,9 +1,10 @@
 package org.assimbly.gateway.service.dto;
 
-import java.time.Instant;
-import java.io.Serializable;
-import java.util.Objects;
 import jakarta.persistence.Lob;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
  * A DTO for the Certificate entity.

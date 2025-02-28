@@ -118,7 +118,7 @@ public class LinkResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/link/bystepid/{stepid}")
-    public ResponseEntity<Void> deleteLinkByStepId(@PathVariable(value = "id") Long stepid) {
+    public ResponseEntity<Void> deleteLinkByStepId(@PathVariable(value = "stepid") Long stepid) {
         log.debug("REST request to delete Link by StepId : {}", stepid);
         linkService.deleteByStepId(stepid);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, stepid.toString())).build();

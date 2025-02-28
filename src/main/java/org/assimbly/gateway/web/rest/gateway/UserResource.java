@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
@@ -10,12 +12,6 @@ import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.errors.EmailAlreadyUsedException;
 import org.assimbly.gateway.web.rest.errors.LoginAlreadyUsedException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +27,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing users.

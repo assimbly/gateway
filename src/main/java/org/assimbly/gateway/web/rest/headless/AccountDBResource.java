@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -50,9 +52,8 @@ public class AccountDBResource {
             String[] values = TokenUtil.decodeHeader(request.getHeader("Authorization"));
             User user = null;
 
-            switch (dbType) {
-                case MONGO:
-                    user = authenticateOnMongo(values[0], values[1]);
+            if (Objects.requireNonNull(dbType) == DataBase.MONGO) {
+                user = authenticateOnMongo(values[0], values[1]);
             }
 
             String token = (user!=null ? TokenUtil.buildToken(user) : request.getRemoteUser());

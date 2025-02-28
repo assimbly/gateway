@@ -1,6 +1,7 @@
 package org.assimbly.gateway.service.dto;
 
 import org.assimbly.gateway.domain.User;
+
 import java.io.Serializable;
 
 /**

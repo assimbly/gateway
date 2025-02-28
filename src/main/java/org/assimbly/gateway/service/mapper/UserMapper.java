@@ -1,7 +1,5 @@
 package org.assimbly.gateway.service.mapper;
 
-import java.util.*;
-import java.util.stream.Collectors;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.service.dto.AdminUserDTO;
@@ -10,6 +8,9 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**

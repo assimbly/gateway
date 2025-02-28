@@ -1,11 +1,11 @@
 package org.assimbly.gateway.service.dto;
 
+import org.assimbly.gateway.domain.Link;
+import org.assimbly.gateway.domain.enumeration.StepType;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
-
-import org.assimbly.gateway.domain.Link;
-import org.assimbly.gateway.domain.enumeration.StepType;
 
 /**
  * A DTO for the Step entity.

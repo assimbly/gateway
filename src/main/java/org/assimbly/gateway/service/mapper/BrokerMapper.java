@@ -1,9 +1,8 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Broker;
 import org.assimbly.gateway.service.dto.BrokerDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity Broker and its DTO BrokerDTO.

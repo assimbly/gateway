@@ -1,8 +1,8 @@
 package org.assimbly.gateway.service.impl;
 
 import org.assimbly.gateway.domain.Connection;
-import org.assimbly.gateway.service.ConnectionService;
 import org.assimbly.gateway.repository.ConnectionRepository;
+import org.assimbly.gateway.service.ConnectionService;
 import org.assimbly.gateway.service.dto.ConnectionDTO;
 import org.assimbly.gateway.service.mapper.ConnectionMapper;
 import org.slf4j.Logger;

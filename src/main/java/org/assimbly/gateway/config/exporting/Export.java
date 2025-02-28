@@ -1,11 +1,5 @@
 package org.assimbly.gateway.config.exporting;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.EnvironmentVariables;
@@ -13,10 +7,14 @@ import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 public class Export {
 
-	public static int PRETTY_PRINT_INDENT_FACTOR = 4;
+	public static final int PRETTY_PRINT_INDENT_FACTOR = 4;
 
 	private String xmlConfiguration;
 	private String configuration;
@@ -26,8 +24,6 @@ public class Export {
 
 	@Autowired
 	private ExportXML exportXML;
-
-	private String output;
 
 	// exports gateway to XML, JSON or YAML format
 	public String convertDBToConfiguration(Long integrationId, String mediaType, boolean isPlaceHolderReplacement) throws Exception {
@@ -44,7 +40,7 @@ public class Export {
 
 		// replace environment variables
 		if(isPlaceHolderReplacement) {
-			configuration = PlaceholdersReplacement(configuration);
+			configuration = placeholdersReplacement(configuration);
 		}
 
 		return configuration;
@@ -65,7 +61,7 @@ public class Export {
 
 		// replace environment variables
 		if(isPlaceHolderReplacement) {
-			configuration = PlaceholdersReplacement(configuration);
+			configuration = placeholdersReplacement(configuration);
 		}
 
 		return configuration;
@@ -86,20 +82,21 @@ public class Export {
 
 		// replace environment variables
 		if(isPlaceHolderReplacement) {
-			configuration = PlaceholdersReplacement(configuration);
+			configuration = placeholdersReplacement(configuration);
 		}
 
 		return configuration;
 
 	}
 
-	private String PlaceholdersReplacement(String input) {
+	private String placeholdersReplacement(String input) {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
 
 		Map<String, String> values = environmentVariables.stream().collect(Collectors.toMap(EnvironmentVariables::getKey, EnvironmentVariables::getValue));
 
-		if(values.containsValue("")) {
+        String output;
+        if(values.containsValue("")) {
 			output = "Error: Environment variables contain empty values";
 		}else {
 			StringSubstitutor sub = new StringSubstitutor(values, "@{", "}");

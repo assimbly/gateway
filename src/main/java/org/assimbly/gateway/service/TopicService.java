@@ -1,7 +1,6 @@
 package org.assimbly.gateway.service;
 
 import org.assimbly.gateway.service.dto.TopicDTO;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

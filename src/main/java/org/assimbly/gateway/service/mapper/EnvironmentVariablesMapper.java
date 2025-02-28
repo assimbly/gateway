@@ -1,9 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.service.dto.EnvironmentVariablesDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity EnvironmentVariables and its DTO EnvironmentVariablesDTO.

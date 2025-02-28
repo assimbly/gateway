@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MysqlAdapter implements DatabaseAdapter {
 
@@ -58,7 +57,6 @@ public class MysqlAdapter implements DatabaseAdapter {
     }
 
     private List<NameValuePair> putParameters(NameValuePair ... pairs) {
-        return Arrays.stream(pairs)
-                .collect(Collectors.toList());
+        return Arrays.stream(pairs).toList();
     }
 }

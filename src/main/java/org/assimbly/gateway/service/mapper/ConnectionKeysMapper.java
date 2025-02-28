@@ -1,9 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.ConnectionKeys;
 import org.assimbly.gateway.service.dto.ConnectionKeysDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity ConnectionKeys and its DTO ConnectionKeysDTO.

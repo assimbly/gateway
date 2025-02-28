@@ -1,9 +1,5 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
 import org.assimbly.gateway.service.RouteService;
 import org.assimbly.gateway.service.dto.RouteDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -14,6 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Route}.

@@ -1,14 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-
 import io.swagger.v3.oas.annotations.Parameter;
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.scheduling.ExportConfigJob;
 import org.assimbly.gateway.repository.IntegrationRepository;
 import org.assimbly.gateway.service.IntegrationService;
@@ -26,6 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 /**
  * REST controller for managing Integration.
@@ -45,17 +45,13 @@ public class IntegrationResource {
 
     private final IntegrationService integrationService;
 
-    private final ApplicationProperties applicationProperties;
-
     private Scheduler scheduler;
 
     private boolean ran = false;
 
-    public IntegrationResource(IntegrationService integrationService, IntegrationRepository integrationRepository, ApplicationProperties applicationProperties)
-        throws SchedulerException {
+    public IntegrationResource(IntegrationService integrationService, IntegrationRepository integrationRepository) {
         this.integrationService = integrationService;
         this.integrationRepository = integrationRepository;
-        this.applicationProperties = applicationProperties;
     }
 
     /**
@@ -240,8 +236,8 @@ public class IntegrationResource {
     ) throws Exception {
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
-            String log = LogUtil.tail(file, lines);
-            return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(integrationid, mediaType, "getLog", log, true);
+            String springLog = LogUtil.tail(file, lines);
+            return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(integrationid, mediaType, "getLog", springLog, true);
         } catch (Exception e) {
             return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(integrationid, mediaType, "getLog", e.getMessage());
         }

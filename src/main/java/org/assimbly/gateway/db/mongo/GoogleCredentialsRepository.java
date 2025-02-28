@@ -1,12 +1,7 @@
 package org.assimbly.gateway.db.mongo;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.warrenstrange.googleauth.ICredentialRepository;
 import org.assimbly.gateway.authenticate.domain.User;
-import org.bson.Document;
 
 import java.util.List;
 

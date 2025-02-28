@@ -1,9 +1,5 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -13,6 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing Header.

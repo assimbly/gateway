@@ -1,9 +1,5 @@
 package org.assimbly.gateway.web.rest.broker;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
 import org.assimbly.gateway.service.TopicService;
 import org.assimbly.gateway.service.dto.TopicDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -19,6 +15,11 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Topic}.
  */
@@ -30,7 +31,7 @@ public class TopicResource {
 
     private static final String ENTITY_NAME = "topic";
 
-    private static final String applicationName = "assimbly";
+    private static final String APPLICATION_NAME = "assimbly";
 
     private final TopicService topicService;
 
@@ -54,7 +55,7 @@ public class TopicResource {
         TopicDTO result = topicService.save(topicDTO);
         return ResponseEntity
             .created(new URI("/api/topics/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(APPLICATION_NAME, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -76,7 +77,7 @@ public class TopicResource {
         TopicDTO result = topicService.save(topicDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, topicDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(APPLICATION_NAME, false, ENTITY_NAME, topicDTO.getId().toString()))
             .body(result);
     }
 
@@ -119,7 +120,7 @@ public class TopicResource {
         topicService.delete(id);
         return ResponseEntity
             .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+            .headers(HeaderUtil.createEntityDeletionAlert(APPLICATION_NAME, false, ENTITY_NAME, id.toString()))
             .build();
     }
 }

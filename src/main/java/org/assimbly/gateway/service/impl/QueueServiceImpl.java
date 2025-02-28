@@ -1,13 +1,12 @@
 package org.assimbly.gateway.service.impl;
 
-import org.assimbly.gateway.service.QueueService;
 import org.assimbly.gateway.domain.Queue;
 import org.assimbly.gateway.repository.QueueRepository;
+import org.assimbly.gateway.service.QueueService;
 import org.assimbly.gateway.service.dto.QueueDTO;
 import org.assimbly.gateway.service.mapper.QueueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.service.dto.HeaderDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity Header and its DTO HeaderDTO.

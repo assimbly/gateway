@@ -1,11 +1,8 @@
 package org.assimbly.gateway.domain;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -21,10 +18,8 @@ public class ConnectionKeys implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(generator = "sequenceGenerator")
-    @GenericGenerator(strategy = "enhanced-sequence", name = "sequenceGenerator", parameters = {
-        @Parameter(name = "initial_value", value = "1"),
-        @Parameter(name = "increment_size", value = "1")})
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "your_sequence_name", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

@@ -5,9 +5,11 @@ import org.assimbly.gateway.jdbc.domain.ConnectionType;
 import org.assimbly.gateway.jdbc.domain.JDBCConnection;
 import org.assimbly.util.error.ValidationErrorMessage;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 

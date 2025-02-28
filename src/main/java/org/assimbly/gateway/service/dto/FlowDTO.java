@@ -1,13 +1,12 @@
 package org.assimbly.gateway.service.dto;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-import java.time.Instant;
-import java.util.Set;
-
 import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the Flow entity.

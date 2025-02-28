@@ -19,7 +19,7 @@ import java.util.Arrays;
 @Configuration
 public class MongoClientProvider implements Serializable {
 
-    private final String MONGO_CONTAINER_NAME = "MONGO_CONTAINER_NAME";
+    private static final String MONGO_CONTAINER_NAME = "MONGO_CONTAINER_NAME";
 
     private static final MongoClientProvider INSTANCE = new MongoClientProvider();
 

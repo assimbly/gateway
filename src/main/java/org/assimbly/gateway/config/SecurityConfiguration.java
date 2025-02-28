@@ -1,8 +1,5 @@
 package org.assimbly.gateway.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import io.hawt.springboot.EndpointPathResolver;
 import io.hawt.springboot.HawtioEndpoint;
 import org.assimbly.gateway.web.filter.SpaWebFilter;
@@ -28,6 +25,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 
 @Configuration

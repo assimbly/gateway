@@ -2,24 +2,21 @@ package org.assimbly.gateway.web.rest.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.assimbly.gateway.authenticate.domain.TwoFactorRequest;
 import org.assimbly.gateway.authenticate.domain.User;
 import org.assimbly.gateway.authenticate.jwt.JwtValidator;
+import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.assimbly.gateway.db.mongo.GoogleCredentialsRepository;
 import org.assimbly.gateway.db.mongo.MongoDao;
-import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
-
-import com.mongodb.client.MongoClient;
 
 /**
  * REST controller for managing authentication (two factor-authentication).

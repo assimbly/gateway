@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;

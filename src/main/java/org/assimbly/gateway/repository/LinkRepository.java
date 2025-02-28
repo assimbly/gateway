@@ -1,7 +1,6 @@
 package org.assimbly.gateway.repository;
 
 import org.assimbly.gateway.domain.Link;
-import org.assimbly.gateway.domain.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

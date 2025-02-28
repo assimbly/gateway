@@ -1,7 +1,5 @@
 package org.assimbly.gateway.config.importing;
 
-import java.util.*;
-
 import org.assimbly.gateway.domain.Integration;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
@@ -11,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -41,12 +39,6 @@ public class ImportXMLGateways {
     @Autowired
     private ImportXMLEnvironmentVariables importXMLEnvironmentVariables;
 
-	public String xmlConfiguration;
-	public String configuration;
-
-    private Optional<Integration> integrationOptional;
-    private Integration integration;
-
 	public void setGatewayFromXML(Document doc, Long integrationIdLong) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -69,8 +61,9 @@ public class ImportXMLGateways {
 
 			log.info("Importing integration: " + name);
 
-			integrationOptional = integrationRepository.findById(integrationIdLong);
+            Optional<Integration> integrationOptional = integrationRepository.findById(integrationIdLong);
 
+            Integration integration;
 			if (!integrationOptional.isPresent()) {
 				integration = new Integration();
 			}else {
@@ -97,7 +90,7 @@ public class ImportXMLGateways {
 			integration.setDefaultErrorComponentType(defaultErrorComponentType);
 
             // create environment variables
-            importXMLEnvironmentVariables.setEnvironmentVariablesFromXML(doc, integrationIdLong, integration);
+            importXMLEnvironmentVariables.setEnvironmentVariablesFromXML(doc, integration);
 
             integrationRepository.save(integration);
 

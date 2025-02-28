@@ -1,9 +1,8 @@
 package org.assimbly.gateway.service.mapper;
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.service.dto.CertificateDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity Certificate and its DTO CertificateDTO.

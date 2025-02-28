@@ -2,8 +2,8 @@ package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
+import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,19 +42,7 @@ public class ImportXMLFlows {
     @Autowired
     private LinkRepository linkRepository;
 
-    public String xmlConfiguration;
-    public String configuration;
-
-    public String uri;
-
-    private Integration integration;
-    private Optional<Integration> integrationOptional;
-
-    private Optional<Flow> flowOptional;
-    private Flow flow;
-
     private Set<Step> steps;
-	private Step step;
 
 	public void setFlowsFromXML(Document doc, Long integrationId) throws Exception {
 
@@ -63,17 +51,7 @@ public class ImportXMLFlows {
 		List<String> flowIds = ImportXMLUtil.getList(doc, "/dil/integrations/integration/flows/flow/id/text()");
 
 		for (String flowId : flowIds) {
-
-            Long id;
-			try{
-				id = Long.parseLong(flowId, 10);
-			}catch (Exception e){
-				UUID uniqueKey = UUID.randomUUID();
-				id = uniqueKey.getLeastSignificantBits();
-            }
-
 			setFlowFromXML(doc, integrationId, flowId);
-
 		}
 
         log.info("Importing flows finished");
@@ -100,12 +78,12 @@ public class ImportXMLFlows {
 
 		if (!flowId.isEmpty() && !flowName.isEmpty()) {
 
-            flowOptional = flowRepository.findByName(flowName);
-			integrationOptional = integrationRepository.findById(integrationId);
+            Optional<Flow> flowOptional = flowRepository.findByName(flowName);
+            Optional<Integration> integrationOptional = integrationRepository.findById(integrationId);
 
+            Flow flow;
             if (!flowOptional.isPresent()) {
 				flow = new Flow();
-				//flow.setId(databaseId);
 
                 steps = getStepsFromXML(flowId, doc, flow, true);
 
@@ -118,7 +96,7 @@ public class ImportXMLFlows {
                 log.warn("Integration not found: {}", integrationId);
 				return;
 			} else {
-				integration = integrationOptional.get();
+                Integration integration = integrationOptional.get();
 				flow.setIntegration(integration);
 			}
 
@@ -189,14 +167,14 @@ public class ImportXMLFlows {
 
 		if (newFlow) {
 
-            steps = new HashSet<Step>();
+            steps = new HashSet<>();
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			int numberOfSteps = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/steps/step)", doc));
 			numberOfSteps = numberOfSteps + 1;
 
 			for (int i = 1; i < numberOfSteps; i++) {
 				String index = Integer.toString(i);
-				step = getStepFromXML(id, doc, flow, null, index);
+                Step step = getStepFromXML(id, doc, flow, null, index);
 				steps.add(step);
 			}
 		} else {
@@ -359,7 +337,7 @@ public class ImportXMLFlows {
     public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
 
         steps = flow.getSteps();
-        Map<String,String> linkidMap = new HashMap<String,String>();
+        Map<String,String> linkidMap = new HashMap<>();
 
 
         //fill the map

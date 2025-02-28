@@ -1,9 +1,5 @@
 package org.assimbly.gateway.web.rest.broker;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
 import jakarta.annotation.PostConstruct;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.BrokerService;
@@ -16,6 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing Broker.

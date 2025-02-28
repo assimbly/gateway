@@ -1,34 +1,30 @@
 package org.assimbly.gateway.config.importing;
 
-import org.assimbly.gateway.domain.*;
-import org.assimbly.gateway.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.assimbly.gateway.domain.EnvironmentVariables;
+import org.assimbly.gateway.domain.Integration;
+import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
 public class ImportXMLEnvironmentVariables {
 
-    private final Logger log = LoggerFactory.getLogger(ImportXMLEnvironmentVariables.class);
-
 	@Autowired
 	private EnvironmentVariablesRepository environmentVariablesRepository;
 
-	public String xmlConfiguration;
-	public String configuration;
-
-
-	public void setEnvironmentVariablesFromXML(Document doc, Long integrationId, Integration integration) throws Exception {
+	public void setEnvironmentVariablesFromXML(Document doc, Integration integration) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
 

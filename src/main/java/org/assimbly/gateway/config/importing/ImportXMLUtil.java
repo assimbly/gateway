@@ -2,8 +2,6 @@ package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -11,15 +9,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ImportXMLUtil {
 
-    private static String xmlConfiguration;
-    private final Logger log = LoggerFactory.getLogger(ImportXMLUtil.class);
-
     public static Document getDocument(String mediaType, String configuration) throws Exception {
 
+        String xmlConfiguration;
         if (mediaType.contains("json")) {
             xmlConfiguration = DocConverter.convertJsonToXml(configuration);
         } else if (mediaType.contains("yaml") || mediaType.contains("text")) {
@@ -28,9 +27,8 @@ public class ImportXMLUtil {
             xmlConfiguration = configuration;
         }
 
-        Document document = DocConverter.convertStringToDoc(xmlConfiguration);
+        return DocConverter.convertStringToDoc(xmlConfiguration);
 
-        return document;
     }
 
     public static Map<String, String> getMap(Document doc, String input) throws Exception {
@@ -41,7 +39,7 @@ public class ImportXMLUtil {
 		XPathExpression expr = xpath.compile(input);
 
 		// Create list of Ids
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			map.put(nodes.item(i).getNodeName(), nodes.item(i).getTextContent());

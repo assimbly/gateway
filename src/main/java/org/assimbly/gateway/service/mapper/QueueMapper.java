@@ -1,10 +1,9 @@
 package org.assimbly.gateway.service.mapper;
 
 
-import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.Queue;
 import org.assimbly.gateway.service.dto.QueueDTO;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity {@link Queue} and its DTO {@link QueueDTO}.

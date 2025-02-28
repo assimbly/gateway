@@ -1,14 +1,8 @@
 package org.assimbly.gateway.web.rest.headless;
 
-import static org.assimbly.gateway.security.SecurityUtils.AUTHORITIES_KEY;
-import static org.assimbly.gateway.security.SecurityUtils.JWT_ALGORITHM;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.stream.Collectors;
 import org.assimbly.gateway.web.rest.vm.LoginVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +20,13 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
+
+import static org.assimbly.gateway.security.SecurityUtils.AUTHORITIES_KEY;
+import static org.assimbly.gateway.security.SecurityUtils.JWT_ALGORITHM;
 
 /**
  * Controller to authenticate users.
