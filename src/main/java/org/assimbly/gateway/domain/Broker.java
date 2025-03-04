@@ -19,7 +19,7 @@ public class Broker implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "your_sequence_name", allocationSize = 1)
+    @SequenceGenerator(name = "brokerSequenceGenerator", sequenceName = "broker_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

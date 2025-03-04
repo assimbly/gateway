@@ -20,7 +20,7 @@ public class EnvironmentVariables implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "your_sequence_name", allocationSize = 1)
+    @SequenceGenerator(name = "environmentVariablesSequenceGenerator", sequenceName = "environment_variables_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

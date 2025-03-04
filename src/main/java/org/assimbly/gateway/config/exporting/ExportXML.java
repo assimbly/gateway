@@ -29,8 +29,6 @@ import java.util.*;
 @Transactional
 public class ExportXML {
 
-	public static final int PRETTY_PRINT_INDENT_FACTOR = 4;
-
     private final Logger log = LoggerFactory.getLogger(ExportXML.class);
 
     private final ApplicationProperties applicationProperties;
@@ -208,7 +206,6 @@ public class ExportXML {
 	public void setFlows(Flow flowDB) throws Exception {
 
 		flow = setElement("flow", null, flows);
-        String flowId = flowDB.getId().toString();
 
 		//general
 		setElement("id", flowDB.getId().toString(), flow);
@@ -238,7 +235,7 @@ public class ExportXML {
         setDependencies(stepsDB);
 
 		// set steps
-		setSteps(flowId, stepsDB);
+		setSteps(stepsDB);
 
 	}
 
@@ -259,25 +256,25 @@ public class ExportXML {
         }
     }
 
-    public void setSteps(String flowId, Set<Step> stepsDB) throws Exception {
+    public void setSteps(Set<Step> stepsDB) throws Exception {
 
         Element steps = setElement("steps", null, flow);
 
 		for (Step stepDB : stepsDB) {
             if(stepDB.getStepType().getStep().equalsIgnoreCase("error")){
-                setStep(flowId, steps, stepDB);
+                setStep(steps, stepDB);
             }
         }
 
         for (Step stepDB : stepsDB) {
             if(!stepDB.getStepType().getStep().equalsIgnoreCase("error")){
-                setStep(flowId, steps, stepDB);
+                setStep(steps, stepDB);
             }
         }
 
 	}
 
-    public void setStep(String flowId, Element steps, Step stepDB) throws Exception {
+    public void setStep(Element steps, Step stepDB) throws Exception {
 
         String confId = Long.toString(stepDB.getId());
         String confUri = stepDB.getUri();
@@ -292,7 +289,7 @@ public class ExportXML {
         setElement("id", confId, step);
         setElement("type", confStepType, step);
 
-        confUri = createUri(confUri, confComponentType, confOptions, confConnection, confMessage);
+        confUri = createUri(confUri, confComponentType, confConnection, confMessage);
         setElement("uri", confUri, step);
 
         if (confOptions != null && !confOptions.isEmpty()) {
@@ -312,7 +309,6 @@ public class ExportXML {
 
         setLinks(stepDB, step);
 
-
     }
 
     public void setBlocks(String confId, Step stepDB, Element step) throws Exception {
@@ -325,7 +321,7 @@ public class ExportXML {
         Message confMessage = stepDB.getMessage();
         Integer confResponseId = stepDB.getResponseId();
 
-        Element block = setElement("block", null, blocks);
+        Element block;
 
             if (confRouteId != null) {
 
@@ -333,6 +329,7 @@ public class ExportXML {
 
                 if(routeOptional.isPresent()) {
 
+                    block = setElement("block", null, blocks);
                     Route route = routeOptional.get();
                     String routeContent = route.getContent();
 
@@ -345,9 +342,12 @@ public class ExportXML {
                     }
                 }
 
+                setRoute(confRouteId, confId);
+
             }
 
             if (confConnection != null) {
+                block = setElement("block", null, blocks);
                 String confConnectionId = confConnection.getId().toString();
                 setElement("id", confConnectionId, block);
                 setElement("type", "connection", block);
@@ -356,6 +356,7 @@ public class ExportXML {
             }
 
             if (confMessage != null) {
+                block = setElement("block", null, blocks);
                 String confMessageId = confMessage.getId().toString();
                 setElement("id", confMessageId, block);
                 setElement("type", "message", block);
@@ -363,11 +364,8 @@ public class ExportXML {
                 setMessage(confMessageId, confMessage, stepDB);
             }
 
-            if (confRouteId != null) {
-                setRoute(confRouteId, confId);
-            }
-
             if (confResponseId != null) {
+                block = setElement("block", null, blocks);
                 setElement("id", Integer.toString(confResponseId), block);
                 setElement("response", "response", block);
             }
@@ -408,7 +406,7 @@ public class ExportXML {
         messagesList = new ArrayList<>();
         routesList = new  ArrayList<>();
 
-        setEnvironmentVariables(integrationId);
+        setEnvironmentVariables();
 
     }
 
@@ -556,7 +554,7 @@ public class ExportXML {
 
     }
 
-	public void setEnvironmentVariables(String integrationId) throws Exception {
+	public void setEnvironmentVariables() throws Exception {
 
 		List<EnvironmentVariables> environmentVariables = environmentVariablesRepository.findAll();
 
@@ -576,20 +574,13 @@ public class ExportXML {
 
 	}
 
-	public String createUri(String confUri, String confComponentType, String confOptions, Connection confConnection, Message confMessage) {
+	public String createUri(String confUri, String confComponentType, Connection confConnection, Message confMessage) {
 
         String componentType = confComponentType.toLowerCase();
 
         componentType = setDefaultComponentType(componentType);
 
-        if (componentType.startsWith("sql")) {
-			String confConnectionId = confConnection.getId().toString();
-			if (confOptions.isEmpty()) {
-				confOptions = "dataSource=" + confConnectionId;
-			} else if (!confOptions.contains("dataSource")) {
-				confOptions = "&dataSource=" + confConnectionId;
-			}
-		}else if (componentType.startsWith("setheaders") || componentType.startsWith("setmessage")) {
+        if (componentType.startsWith("setheaders") || componentType.startsWith("setmessage")) {
             if(confUri==null || !confUri.startsWith("message")) {
                 confUri = "message:" + confMessage.getId().toString();
             }
