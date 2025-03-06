@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -59,7 +60,8 @@ public class JDBCResource {
             DatabaseAdapter adapter = connectionType.getAdapter();
 
             connection = jdbcConnection.connect(adapter);
-        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
             return new ValidationErrorMessage(e.getMessage());
         } finally {
             close(connection);
