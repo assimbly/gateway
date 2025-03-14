@@ -245,7 +245,7 @@ configurations {
                     details.useVersion("2.39.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.5")
+                    details.useVersion("6.1.6")
                 }
             }
         }
@@ -369,7 +369,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.assertj:assertj-core:3.27.3"
     testImplementation "junit:junit"
-    testImplementation "org.mockito:mockito-core:5.15.2"
+    testImplementation "org.mockito:mockito-core:5.16.0"
     testImplementation "com.mattbertolini:liquibase-slf4j"
 
     runtimeOnly "com.h2database:h2:2.3.232"
