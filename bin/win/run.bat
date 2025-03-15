@@ -51,16 +51,17 @@ for /f "tokens=1* delims==" %%a in ('type "%propertyFile%"') do (
 
 move /y "%tempFile%" "%propertyFile%"
 
+
 if [%1]==[] (
-    cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" -Papi-docs
+    cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs
 ) else (
     if [%2]==[] (
-        cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" -Papi-docs -P%1
+        cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1
     ) else (
         if [%3]==[] (
-            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" -Papi-docs -P%1 -P%2
+            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1 -P%2
         ) else (
-            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" -Papi-docs -P%1 -P%2 -P%3
+            cls & ..\..\gradlew --settings-file ./../../settings.gradle "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1 -P%2 -P%3
         )
     )
 )
