@@ -494,8 +494,9 @@ tasks.all {
 }
 
 task printVersion {
-    doLast { // add a task action
-        println project.version
+    def versionValue = project.version // Capture at configuration time
+    doLast {
+        println versionValue
     }
 }
 
