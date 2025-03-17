@@ -24,10 +24,6 @@ buildscript {
         }
 
     }
-
-    dependencies {
-        classpath "org.liquibase:liquibase-core:${liquibase_version}" // Add this
-    }
 }
 
 plugins {
@@ -49,7 +45,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '5.1.0'
+version = '5.0.4-SNAPSHOT'
 description = "A message gateway"
 
 java {
@@ -80,6 +76,16 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
+    resolutionStrategy {
+        force 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+        force 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-hppc:2.18.2'
+        force 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+        force 'com.fasterxml.jackson.module:jackson-module-afterburner:2.18.2'
+        force 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.18.2'
+    }
 }
 
 idea {
@@ -242,10 +248,10 @@ configurations {
         resolutionStrategy {
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.39.0")
+                    details.useVersion("2.38.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.6")
+                    details.useVersion("6.1.4")
                 }
             }
         }
@@ -321,17 +327,17 @@ dependencies {
     implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
 
-    implementation "com.fasterxml.jackson.core:jackson-annotations"
-    implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.18.2"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.18.2"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc:2.18.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2"
+    implementation "com.fasterxml.jackson.module:jackson-module-afterburner:2.18.2"
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.18.2"
     implementation "com.mattbertolini:liquibase-slf4j:5.1.0"
-    implementation "com.mysql:mysql-connector-j:9.2.0"
-    implementation "com.warrenstrange:googleauth"
+    implementation "com.mysql:mysql-connector-j"
+    implementation "com.warrenstrange:googleauth:1.5.0"
     implementation "commons-io:commons-io"
     implementation "javax.cache:cache-api"
     implementation "net.logstash.logback:logstash-logback-encoder:8.0"
@@ -341,13 +347,13 @@ dependencies {
     implementation "org.hibernate.orm:hibernate-core:${hibernate_version}"
     implementation "org.hibernate.orm:hibernate-envers:${hibernate_version}"
     implementation "org.hibernate.orm:hibernate-jcache:${hibernate_version}"
-    implementation "org.hibernate.validator:hibernate-validator:${hibernate_validator_version}"
+    implementation "org.hibernate.validator:hibernate-validator:8.0.1.Final"
     implementation "org.liquibase:liquibase-core:${liquibase_version}"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
-    implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
-    implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
-    implementation "org.quartz-scheduler:quartz:${quartz_version}"
+    implementation "org.mongodb:mongodb-driver-core:4.7.2"
+    implementation "org.mongodb:mongodb-driver-sync:4.7.2"
+    implementation "org.quartz-scheduler:quartz"
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
@@ -367,9 +373,9 @@ dependencies {
     }
 
     testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "org.assertj:assertj-core:3.27.3"
+    testImplementation "org.assertj:assertj-core"
     testImplementation "junit:junit"
-    testImplementation "org.mockito:mockito-core:5.16.0"
+    testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
 
     runtimeOnly "com.h2database:h2:2.3.232"
@@ -377,7 +383,7 @@ dependencies {
     liquibaseRuntime "org.liquibase:liquibase-core:${liquibase_version}"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
     liquibaseRuntime "com.h2database:h2"
-    liquibaseRuntime "com.mysql:mysql-connector-j:9.2.0"
+    liquibaseRuntime "com.mysql:mysql-connector-j"
 
 }
 
@@ -488,21 +494,14 @@ tasks.all {
 }
 
 task printVersion {
-    def versionValue = project.version // Capture at configuration time
-    doLast {
-        println versionValue
-    }
-}
-
-dependencyUpdates {
-    rejectVersionIf {
-        it.candidate.version.matches(/(?i).*[.-](alpha|beta|rc|cr|m)[.\d-]*/)
+    doLast { // add a task action
+        println project.version
     }
 }
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.13"
+    gradleVersion = "8.12.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
