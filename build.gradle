@@ -242,7 +242,7 @@ configurations {
         resolutionStrategy {
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.39.0")
+                    details.useVersion("2.40.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
                     details.useVersion("6.1.6")
@@ -369,7 +369,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.assertj:assertj-core:3.27.3"
     testImplementation "junit:junit"
-    testImplementation "org.mockito:mockito-core:5.16.0"
+    testImplementation "org.mockito:mockito-core:5.16.1"
     testImplementation "com.mattbertolini:liquibase-slf4j"
 
     runtimeOnly "com.h2database:h2:2.3.232"
