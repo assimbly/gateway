@@ -322,6 +322,7 @@ dependencies {
     implementation group:  "org.assimbly", name: "sandbox", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
+    implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
