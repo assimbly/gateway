@@ -6,10 +6,6 @@
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" [hidden]="!connection.id">
-            <label for="id">ID</label>
-            <input type="text" class="form-control" id="id" name="id" [(ngModel)]="connection.id" readonly />
-        </div>
         <div class="form-group">
             <label class="form-control-label" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name" required maxlength="255" [jhiExistingConnectionNames]='connectionNames'
@@ -19,9 +15,13 @@
                 <span *ngIf="name.errors.existingConnectionName">Name already exists.</span>
             </div>
         </div>
+      <div class="form-group" [hidden]="!connection.id">
+        <label for="id">ID</label>
+        <input type="text" class="form-control" id="id" name="id" [(ngModel)]="connection.id" readonly />
+      </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control form-select" id="type" name="field_type" [(ngModel)]="connection.type"  (change)="changeType(false)" #type="ngModel">
+            <select class="form-control form-select" id="type" name="field_type" [(ngModel)]="connection.type"  (change)="changeType(false)" #type="ngModel" disabled>
                 <option [ngValue]="type" *ngFor="let type of connections.connectionsList">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
@@ -79,6 +79,9 @@
                                         </ng-container>
                                        	<ng-container *ngIf="connectionKey.key == 'jmsprovider'">
                                    	     <option [value]="l" *ngFor="let l of jmsProvidersList">{{l}}</option>
+                                        </ng-container>
+                                        <ng-container *ngIf="connectionKey.key == 'pooled'">
+                                          <option [value]="l" *ngFor="let l of pooledList">{{l}}</option>
                                         </ng-container>
                                     </select>
                                     <div *ngIf="listValue.invalid && (listValue.dirty || listValue.touched)" class="invalid-field-message">

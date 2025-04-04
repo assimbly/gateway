@@ -21,9 +21,17 @@ export class Connections {
     'AMQPS',
     'IBMMQ',
     'JDBC',
-    'MQ',
+    'JMS',
+    'RabbitMQ',
+    'SJMS',
+    'SJMS2',
     'SonicMQ',
   ];
+
+  pooledList: string[] = [
+      'true',
+      'false',
+    ];
 
   keysList = [
     {
@@ -64,28 +72,33 @@ export class Connections {
           placeholder: 'Example tcp://localhost:61616',
           isRequired: true,
         },
-        /* ,
-            {
-                connectionKeyName: 'username',
-                valueType: 'text',
-                placeholder: 'user',
-                isRequired: false
-            },
-            {
-                connectionKeyName: 'password',
-                valueType: 'password',
-                placeholder: '',
-                isRequired: false
-            }*/
+        {
+          connectionKeyName: 'username',
+          valueType: 'text',
+          placeholder: 'user',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'password',
+          valueType: 'password',
+          placeholder: '',
+          isRequired: true,
+        },
+        {
+           connectionKeyName: 'pooled',
+           valueType: 'list',
+           placeholder: '',
+           isRequired: true,
+        },
       ],
     },
     {
       name: 'AmazonMQ',
-      connectionKeys: [
+	    connectionKeys: [
         {
           connectionKeyName: 'url',
           valueType: 'text',
-          placeholder: 'Example ssl://servername:61617',
+          placeholder: 'ssl://localhost:61617',
           isRequired: true,
         },
         {
@@ -99,6 +112,12 @@ export class Connections {
           valueType: 'password',
           placeholder: '',
           isRequired: true,
+        },
+        {
+           connectionKeyName: 'pooled',
+           valueType: 'list',
+           placeholder: '',
+           isRequired: true,
         },
       ],
     },
@@ -172,7 +191,7 @@ export class Connections {
       ],
     },
     {
-      name: 'MQ',
+      name: 'JMS',
       connectionKeys: [
         {
           connectionKeyName: 'url',
@@ -198,6 +217,111 @@ export class Connections {
           placeholder: '',
           isRequired: true,
         },
+        {
+           connectionKeyName: 'pooled',
+           valueType: 'list',
+           placeholder: '',
+           isRequired: true,
+        },
+      ],
+    },
+    {
+      name: 'RabbitMQ',
+      connectionKeys: [
+        {
+          connectionKeyName: 'host',
+          valueType: 'text',
+          placeholder: 'Example localhost',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'port',
+          valueType: 'text',
+          placeholder: 'Example 5672',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'username',
+          valueType: 'text',
+          placeholder: 'Example: guest',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'password',
+          valueType: 'password',
+          placeholder: 'Example: guest',
+          isRequired: true,
+        },
+      ],
+    },
+    {
+      name: 'SJMS',
+      connectionKeys: [
+        {
+          connectionKeyName: 'url',
+          valueType: 'text',
+          placeholder: 'tcp://localhost:61616',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'username',
+          valueType: 'text',
+          placeholder: 'user',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'password',
+          valueType: 'password',
+          placeholder: '',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'jmsprovider',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
+        },
+         {
+           connectionKeyName: 'pooled',
+           valueType: 'list',
+           placeholder: '',
+           isRequired: true,
+         },
+      ],
+    },
+    {
+      name: 'SJMS2',
+      connectionKeys: [
+        {
+          connectionKeyName: 'url',
+          valueType: 'text',
+          placeholder: 'tcp://localhost:61616',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'username',
+          valueType: 'text',
+          placeholder: 'user',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'password',
+          valueType: 'password',
+          placeholder: '',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'jmsprovider',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
+        },
+         {
+           connectionKeyName: 'pooled',
+           valueType: 'list',
+           placeholder: '',
+           isRequired: true,
+         },
       ],
     },
     {
@@ -240,8 +364,14 @@ export class Connections {
       return 'SonicMQ';
     } else if (componentType === 'sql') {
       return 'JDBC';
+    } else if (componentType === 'jms') {
+      return 'JMS';
     } else if (componentType === 'sjms') {
-      return 'MQ';
+      return 'SJMS';
+    } else if (componentType === 'sjms2') {
+      return 'SJMS2';
+    }else if (componentType === 'spring-rabbitmq') {
+      return 'RabbitMQ';
     } else {
       return '';
     }
@@ -262,7 +392,13 @@ export class Connections {
       return true;
     } else if (componentType === 'sql') {
       return true;
+    } else if (componentType === 'jms') {
+       return true;
     } else if (componentType === 'sjms') {
+      return true;
+    } else if (componentType === 'sjms2') {
+      return true;
+    } else if (componentType === 'spring-rabbitmq') {
       return true;
     } else {
       return false;

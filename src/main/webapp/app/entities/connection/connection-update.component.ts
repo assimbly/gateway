@@ -27,6 +27,7 @@ export class ConnectionUpdateComponent implements OnInit {
 
   public driversList: Array<string> = this.connections.driversList;
   jmsProvidersList: Array<string> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+  pooledList: Array<String> = ['true', 'false'];
 
   public disableType: boolean;
 
@@ -66,6 +67,7 @@ export class ConnectionUpdateComponent implements OnInit {
     } else {
       this.loadConnectionKeys(false);
     }
+
   }
 
   changeType(cloneHeader: boolean) {

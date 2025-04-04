@@ -30,6 +30,7 @@ export class ConnectionDialogComponent implements OnInit {
     public connectionKeysKeys: Array<string> = [];
     public driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+    pooledList: Array<String> = ['true', 'false'];
 
     public disableType: boolean;
     public connectionType: string;
@@ -81,7 +82,6 @@ export class ConnectionDialogComponent implements OnInit {
             });
         }
 
-        console.log('3. this.connection.type' + this.connection.type);
         this.requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
 
         const requiredConnectionKeys = new Array<ConnectionKeys>();

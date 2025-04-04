@@ -37,6 +37,7 @@ import { FlowService } from "../flow.service";
   encapsulation: ViewEncapsulation.None,
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
+
 	flow: IFlow;
 	routes: Route[];
 	messages: IMessage[];
@@ -48,12 +49,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	steps: IStep[] = new Array<Step>();
 	step: IStep;
 
-  //Future possibilities
+    //Future possibilities
 	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "SCRIPT", "API", MESSAGE", "CONNECTION", "ERROR"];
 
 	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
-  public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
-  public componentsWithConnection: Array<any> = ['amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq'];
+    public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq','spring-rabbitmq'];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -88,60 +89,60 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	reverse: any;
 
 	routeCreated: boolean;
-  connectionCreated: boolean;
-  messageCreated: boolean;
-  errorStep: boolean = true;
+    connectionCreated: boolean;
+    messageCreated: boolean;
+    errorStep: boolean = true;
 
 	namePopoverMessage: string;
 	logLevelPopoverMessage: string;
 	errorHandlerPopoverMessage: string;
 	notesPopoverMessage: string;
 
-  componentPopoverMessage: string;
-  optionsPopoverMessage: string;
-  messagePopoverMessage: string;
-  routePopoverMessage: string;
-  connectionPopoverMessage: string;
-  popoverMessage: string;
+    componentPopoverMessage: string;
+	optionsPopoverMessage: string;
+	messagePopoverMessage: string;
+	routePopoverMessage: string;
+	connectionPopoverMessage: string;
+	popoverMessage: string;
 
-  selectedComponentType: string;
-  selectedOptions: Array<Array<any>> = [[]];
-  componentOptions: Array<any> = [];
-  customOptions: Array<any> = [];
+	selectedComponentType: string;
+	selectedOptions: Array<Array<any>> = [[]];
+	componentOptions: Array<any> = [];
+	customOptions: Array<any> = [];
 
-  componentTypeAssimblyLinks: Array<string> = new Array<string>();
-  componentTypeCamelLinks: Array<string> = new Array<string>();
-  uriPlaceholders: Array<string> = new Array<string>();
-  uriPopoverMessages: Array<string> = new Array<string>();
+	componentTypeAssimblyLinks: Array<string> = new Array<string>();
+	componentTypeCamelLinks: Array<string> = new Array<string>();
+	uriPlaceholders: Array<string> = new Array<string>();
+	uriPopoverMessages: Array<string> = new Array<string>();
 
 	sourceComponentsNames: Array<any> = [];
-  actionComponentsNames: Array<any> = [];
+    actionComponentsNames: Array<any> = [];
 	sinkComponentsNames: Array<any> = [];
 
 	editFlowForm: FormGroup;
 	invalidUriMessage: string;
 	notUniqueUriMessage: string;
 
-  filterConnection: Array<Array<Connection>> = [[]];
-  connectionType: Array<string> = [];
-  selectedConnection: Connection = new Connection();
+    filterConnection: Array<Array<Connection>> = [[]];
+    connectionType: Array<string> = [];
+    selectedConnection: Connection = new Connection();
 
-  enableConnection: Array<boolean> = [];
-  enableMessage: Array<boolean> = [];
+    enableConnection: Array<boolean> = [];
+    enableMessage: Array<boolean> = [];
 
 	numberOfSteps = 0;
 
 	modalRef: NgbModalRef | null;
 	modalRefPromise: Promise<NgbModalRef> | null;
 
-  testConnectionForm: FormGroup;
-  testConnectionMessage: string;
-  connectionHost: any;
-  connectionPort: any;
-  connectionTimeout: any;
-  hostnamePopoverMessage: string;
-  portPopoverMessage: string;
-  timeoutPopoverMessage: string;
+    testConnectionForm: FormGroup;
+    testConnectionMessage: string;
+    connectionHost: any;
+    connectionPort: any;
+    connectionTimeout: any;
+    hostnamePopoverMessage: string;
+    portPopoverMessage: string;
+    timeoutPopoverMessage: string;
 
 	private subscription: Subscription;
 	private eventSubscriber: Subscription;
@@ -156,7 +157,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private linkService: LinkService,
 		private messageService: MessageService,
 		private routeService: RouteService,
-    private connectionService: ConnectionService,
+        private connectionService: ConnectionService,
 		private alertService: AlertService,
 		private route: ActivatedRoute,
 		private router: Router,
@@ -362,7 +363,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         const formgroup = this.initializeStepData(step);
 
-        this.stepsOptions[0] = [new Option()];
+        //this.stepsOptions[0] = [new Option()];
         (<FormArray>this.editFlowForm.controls.stepsData).insert(index, formgroup);
 
         this.setTypeLinks(step, index);
@@ -513,6 +514,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         if(this.componentsWithConnection.includes(componentType)){
           this.enableConnection[stepFormIndex] = true;
+          this.filterConnections(componentType, stepFormIndex);
         }else{
           this.enableConnection[stepFormIndex] = false;
         }
@@ -880,9 +882,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           let options: Array<string> = [];
 
           if(step.options.includes('&')){
-            options = step.options.match(/[^&]+(?:&&[^&]+)*/g);
+            // note this splits the options with a regex, because some options have & in them.
+            // implement options (key-values) into a separate table to avoid this.
+             const regex = /&(?=[^=&]+=)/;
+             options = step.options.split(regex);
           }else{
-            options = step.options.split('&');
+            options.push(step.options);
           }
 
           options.forEach((option, optionIndex) => {
@@ -935,12 +940,117 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
       });
 
-
-
     }
 
     this.selectedOptions.splice(index, 0, optionArray);
   }
+
+//chatgpt
+splitOptions0(query: string): string[] {
+    const result: string[] = [];
+    let current = "";
+    let insideValue = false;
+
+    for (let i = 0; i < query.length; i++) {
+        if (query[i] === '&' && !insideValue) {
+            result.push(current);
+            current = "";
+        } else {
+            current += query[i];
+            if (query[i] === '=' && (i === 0 || query[i - 1] !== '&')) {
+                insideValue = true;
+            } else if (query[i] === '&') {
+                insideValue = false;
+            }
+        }
+    }
+    if (current) result.push(current);
+
+    return result;
+}
+
+//chatgpt
+splitOptions1(str) {
+    const regex = /([^=&]+)=([^&]*)/g;
+    const result = [];
+    let match;
+
+    while ((match = regex.exec(str)) !== null) {
+        const key = match[1];
+        const value = match[2];
+
+        // If the key already exists, append the value with '&'
+        result[key] = result[key] ? result[key] + "&" + value : value;
+    }
+
+    return result;
+}
+
+//claude
+splitOptions2(queryStr) {
+  const result = [];
+  // Regex to match potential parameter starts
+  const regex = /([^&=]+)=|^=/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(queryStr)) !== null) {
+    // If this isn't the first parameter, add the previous one to the result
+    if (lastIndex > 0) {
+      result.push(queryStr.substring(lastIndex, match.index));
+    }
+    lastIndex = match.index;
+  }
+
+  // Add the last parameter
+  if (lastIndex < queryStr.length) {
+    result.push(queryStr.substring(lastIndex));
+  }
+
+  return result;
+}
+
+//gemini
+splitOptions3(optionsString: string): string[] {
+  // Handle empty or null input string gracefully
+  if (!optionsString) {
+    return [];
+  }
+
+  const regex = /&(?=[^=&]+=)/;
+
+  return optionsString.split(regex);
+}
+
+//deepseek
+splitOptions4(options: string): string[] {
+    const segments = options.split('&');
+    const result: string[] = [];
+    let currentSegment: string | null = null;
+
+    for (const segment of segments) {
+        const equalsIndex = segment.indexOf('=');
+        if (equalsIndex > 0) { // Check if the segment has a non-empty key
+            if (currentSegment !== null) {
+                result.push(currentSegment);
+            }
+            currentSegment = segment;
+        } else {
+            if (currentSegment === null) {
+                currentSegment = segment;
+            } else {
+                currentSegment += '&' + segment;
+            }
+        }
+    }
+
+    if (currentSegment !== null) {
+        result.push(currentSegment);
+    }
+
+    return result;
+}
+
 
   setOptions(): void {
     this.steps.forEach((step, i) => {
@@ -1037,10 +1147,20 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   // this filters connections not of the correct type
-  filterConnections(step: any, formConnection: FormControl): void {
+  filterConnections(componentType: string, index: number): void {
 
-    //this.connectionType[this.steps.indexOf(step)] = this.connectionsList.getConnectionType(step.componentType);
-    this.filterConnection[this.steps.indexOf(step)] = this.connections;
+    const filteredConnections: Connection[] = [];
+    for (const connection of this.connections) {
+      if(connection.type.toLowerCase() === componentType.toLowerCase()) {
+        filteredConnections.push(connection);
+      }else if(connection.type.toLowerCase() === 'rabbitmq' && componentType.toLowerCase() === 'spring-rabbitmq') {
+        filteredConnections.push(connection);
+      }else if(connection.type.toLowerCase() === 'jdbc' && componentType.toLowerCase() === 'sql') {
+        filteredConnections.push(connection);
+      }
+    }
+
+    this.filterConnection[index] = filteredConnections;
 
   }
 

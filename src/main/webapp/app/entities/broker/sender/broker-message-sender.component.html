@@ -4,33 +4,26 @@
 </div>
 
 <div class="row">
-  <div class="col-8">
-    <h4 style="margin-left: 0.3em">
-      <b
-        ><i>{{ subtitle }}</i></b
-      >
-    </h4>
+  <div class="col-9-5">
+    <h5 style="margin-left: 0.6em">
+      <i>{{ subtitle }}</i>
+    </h5>
   </div>
-  <div class="col-3-5 text-right">
-    <div ngbDropdown class="d-inline-block">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
-      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <button ngbDropdownItem (click)="send(false)">Send</button>
-        <button ngbDropdownItem (click)="send(true)">Send and Return</button>
-      </div>
-    </div>
+  <div class="col-2-5 text-right">
+    <button class="btn btn-primary" (click)="send(true)">
+      <fa-icon icon="envelope"></fa-icon><span class="d-none d-md-inline"> Send</span>
+    </button>
 
     <div ngbDropdown class="d-inline-block">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px">Upload</button>
+      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="upload"></fa-icon></button>
       <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <label ngbDropdownItem class="btn btn-default">File<input type="file" hidden (change)="openFile($event)" /></label>
+        <label ngbDropdownItem class="btn btn-default">Upload File<input type="file" hidden (change)="openFile($event)" /></label>
         <label ngbDropdownItem class="btn btn-default"
-          >Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)="openDirectory($event)"
+        >Upload Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)="openDirectory($event)"
         /></label>
       </div>
     </div>
   </div>
-  <div class="col-0-5"></div>
 </div>
 
 <br />
@@ -60,10 +53,11 @@
 						name="codemirror"
 						[(ngModel)]="requestBody"
 						[options]="{
-							lineNumbers: false,
+							lineNumbers: true,
 							theme: 'default',
 							mode: requestEditorMode
 						  }"
+            [autoFocus]= "true"
 						(drop)="drop($event)"
 						(dragover)="allowDrop($event)"
 						style="width: 760px;">

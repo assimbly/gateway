@@ -31,6 +31,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
     private requiredType: RequiredConnectionKey;
     driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+    pooledList: Array<String> = ['true', 'false'];
 
     constructor(
         protected connectionKeysService: ConnectionKeysService,
@@ -52,6 +53,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
+
         this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });

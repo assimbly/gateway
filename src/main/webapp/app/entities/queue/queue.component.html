@@ -14,13 +14,13 @@
   </div>
 
   <div class="row" *ngIf="isBroker && addresses?.length > 0">
-    <div class="col-9"></div>
-    <div class="col-3 text-right" *ngIf="isBroker && addresses?.length > 0">
+    <div class="col-9-5"></div>
+    <div class="col-2-5 text-right" *ngIf="isBroker && addresses?.length > 0">
       <button class="btn btn-primary" type="submit" [routerLink]="['/queue/new']">
-        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Queue</span>
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Create Queue</span>
       </button>
       <button class="btn btn-primary" type="submit" (click)="updateAllQueues()">
-        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline">Refresh</span>
+        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline"> Refresh</span>
       </button>
     </div>
   </div>
