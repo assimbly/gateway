@@ -1309,6 +1309,12 @@ splitOptions4(options: string): string[] {
         this.connections = res.body;
         this.connectionCreated = this.connections.length > 0;
         step.connectionId = id;
+        const addedConnectionType = step.componentType;
+        this.steps.forEach((step, index) => {
+          if(step.componentType === addedConnectionType){
+            this.filterConnections(addedConnectionType, index);
+          }
+        });
         formConnection.patchValue(id);
       },
       res => this.onError(res.body)
