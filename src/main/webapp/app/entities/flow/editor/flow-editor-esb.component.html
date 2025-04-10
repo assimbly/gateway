@@ -541,9 +541,15 @@
                               <label class="form-control-label float-start" for="field_connection" style="float: left; margin-left: 6px;">Connection</label>
                             </div>
                             <div class="col-10">
-                              <ng-select [items]="filterConnection[index]" bindLabel="name" bindValue="id"
+                              <ng-select  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value==='ROUTE'"
+                                         [items]="connections" bindLabel="name" bindValue="id"
+
                                          formControlName="connection" id="field_connection"
                                          dropdownPosition="top"></ng-select>
+                              <ng-select  *ngIf="editFlowForm['controls'].stepsData['controls'][index]['controls'].stepType.value!=='ROUTE'"
+                                          [items]="filterConnection[index]" bindLabel="name" bindValue="id"
+                                          formControlName="connection" id="field_connection"
+                                          dropdownPosition="top"></ng-select>
                             </div>
                             <button type="button"
                                     *ngIf="connectionCreated && editFlowForm['controls'].stepsData['controls'][index]['controls'].connection.value"
