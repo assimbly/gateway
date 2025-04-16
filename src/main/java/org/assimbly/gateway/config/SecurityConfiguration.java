@@ -123,13 +123,13 @@ public class SecurityConfiguration {
         return new MvcRequestMatcher.Builder(introspector);
     }
 
+    /* This worked until hawtio 4.3.0
     @Bean
     public HawtioEndpoint hawtioEndpoint(final EndpointPathResolver endpointPathResolver) {
         // return a modified HawtioEndpoint that does not check for / and /app for static resources
         // because we might serve our own files from those locations
         // remove when this is fixed https://github.com/hawtio/hawtio/issues/2559
         return new HawtioEndpoint(endpointPathResolver) {
-            @Override
             public void addResourceHandlers(final ResourceHandlerRegistry registry) {
                 registry.addResourceHandler(endpointPathResolver.resolveUrlMapping("hawtio", "/plugins/**"))
                     .addResourceLocations("classpath:/hawtio-static/app/");
@@ -140,5 +140,7 @@ public class SecurityConfiguration {
             }
         };
     }
+
+     */
 
 }

@@ -330,13 +330,13 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
     implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
-    implementation "com.mattbertolini:liquibase-slf4j"
+    implementation "com.mattbertolini:liquibase-slf4j:${liquibase_slf4j_version}"
     implementation "com.mysql:mysql-connector-j"
     implementation "com.warrenstrange:googleauth"
     implementation "commons-io:commons-io"
     implementation 'jakarta.persistence:jakarta.persistence-api'
     implementation "javax.cache:cache-api"
-    implementation "net.logstash.logback:logstash-logback-encoder"
+    implementation "net.logstash.logback:logstash-logback-encoder:${logback_encoder_version}"
     implementation "org.apache.commons:commons-lang3"
     implementation 'org.eclipse.angus:jakarta.mail'
     implementation "org.ehcache:ehcache"
