@@ -18,7 +18,7 @@ import { Injectable } from '@angular/core';
 })
 export class Components {
 
-    public mqTypes = ['jms','sjms','sjms2','amazonmq','activemq'];
+    public mqTypes = ['jms','amazonmq','activemq'];
     public restTypes = ["get","post", "put", "delete", "patch", "head", "trace", "connect", "options"]
 
     types = [

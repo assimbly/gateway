@@ -41,6 +41,7 @@ import dayjs from 'dayjs/esm';
     encapsulation: ViewEncapsulation.None
 })
 export class FlowMessageSenderComponent implements OnInit, OnDestroy {
+
     flows: IFlow[];
     connections: Connection[];
     messages: IMessage[];
@@ -86,7 +87,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     integrations: Integration[];
 
-    embeddedBroker = false;
+    enableConnection = false;
     createRoute: number;
     newId: number;
     predicate: any;
@@ -113,6 +114,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     consumerComponentsNames: Array<any> = [];
     producerComponentsNames: Array<any> = [];
 
+    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq','spring-rabbitmq'];
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
     componentTypeCamelLinks: Array<string> = new Array<string>();
     uriPlaceholders: Array<string> = new Array<string>();
@@ -121,15 +123,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     typesLinks: Array<TypeLinks>;
     messageSenderForm: FormGroup;
     invalidUriMessage: string;
-
-    testConnectionForm: FormGroup;
-    testConnectionMessage: string;
-    connectionHost: any;
-    connectionPort: any;
-    connectionTimeout: any;
-    hostnamePopoverMessage: string;
-    portPopoverMessage: string;
-    timeoutPopoverMessage: string;
 
     filterConnection: Array<Array<Connection>> = [[]];
     connectionType: Array<string> = [];
@@ -195,9 +188,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             this.messageCreated = this.messages.length > 0;
 
             this.initializeForm();
-
-            this.messageSenderForm.controls.exchangepattern.setValue('FireAndForget');
-            this.messageSenderForm.controls.templatefilter.setValue('ALL');
 
             this.requestStep = new Step();
             this.requestStep.stepType = StepType.TO;
@@ -282,6 +272,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             });
         });
 
+        this.enableConnection = this.componentsWithConnection.includes(componentType);
+
         this.enableFields(stepForm);
 
         this.setURIlist();
@@ -299,9 +291,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.connectionPopoverMessage = `If available then a connection can be selected. For example a connection that sets up a database connection.<br/><br/>
                                      Use the button on the right to create or edit connections.`;
         this.popoverMessage = `Destination`;
-        this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
-        this.portPopoverMessage = `Number of the port. Range between 1 and 65536`;
-        this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
+
     }
 
     enableFields(stepForm) {
@@ -342,10 +332,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             id: new FormControl(''),
             name: new FormControl(''),
             templatefilter: new FormControl('from'),
-            exchangepattern: new FormControl('FireAndForget'),
-            numberoftimes: new FormControl('1'),
             stepsData: new FormArray([]),
-			responsebody: new FormControl('')
+			      responsebody: new FormControl('')
         });
     }
 
@@ -356,6 +344,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             uri: new FormControl(step.uri),
             options: new FormArray([this.initializeOption()]),
             message: new FormControl(step.messageId),
+            exchangepattern: new FormControl('FireAndForget'),
+            numberoftimes: new FormControl('1'),
             connection: new FormControl(step.connectionId, Validators.required),
             requestbody: new FormControl('')
         });
@@ -369,27 +359,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    initializeTestConnectionForm() {
-        this.testConnectionForm = new FormGroup({
-            connectionHost: new FormControl(null, Validators.required),
-            connectionPort: new FormControl(80),
-            connectionTimeout: new FormControl(10)
-        });
-    }
-
     updateForm() {
-        this.updateTemplateData();
         const stepsData = this.messageSenderForm.controls.stepsData as FormArray;
         this.steps.forEach((step, i) => {
             this.updateStepData(step, stepsData.controls[i] as FormControl);
-        });
-    }
-
-    updateTemplateData() {
-        this.messageSenderForm.patchValue({
-            name: '',
-            exchangePattern: '',
-            numberoftimes: ''
         });
     }
 
@@ -399,6 +372,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             stepType: step.stepType,
             componentType: step.componentType,
             uri: step.uri,
+            exchangePattern: step.exchangePattern,
+            numberoftimes: step.numberoftimes,
             connection: step.connectionId,
             message: step.messageId
         });
@@ -515,28 +490,11 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.modalRef = this.modalService.open(templateRef);
     }
 
-    openTestConnectionModal(templateRef: TemplateRef<any>) {
-        this.initializeTestConnectionForm();
-        this.testConnectionMessage = '';
-        this.modalRef = this.modalService.open(templateRef);
-    }
-
     cancelModal(): void {
         if (this.modalRef) {
             this.modalRef.dismiss();
             this.modalRef = null;
         }
-    }
-
-    testConnection() {
-        this.testConnectionMessage = '<i class="fa fa-refresh fa-spin fa-fw"></i><span class="sr-only"></span>Testing...';
-        this.connectionHost = <FormGroup>this.testConnectionForm.controls.connectionHost.value;
-        this.connectionPort = <FormGroup>this.testConnectionForm.controls.connectionPort.value;
-        this.connectionTimeout = <FormGroup>this.testConnectionForm.controls.connectionTimeout.value;
-
-        this.flowService.testConnection(1, this.connectionHost, this.connectionPort, this.connectionTimeout).subscribe(result => {
-            this.testConnectionMessage = result.body;
-        });
     }
 
     previousState() {
@@ -750,19 +708,19 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     setRequest() {
+
         const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
 
-        this.requestExchangePattern = this.messageSenderForm.controls.exchangepattern.value;
-        this.requestNumberOfTimes =
-        this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        this.requestComponentType = stepForm.controls.componentType.value;
-        this.requestOptions = '?';
-        this.requestUri = this.requestStep.uri;
         this.requestStepId = this.requestStep.id == null ? '0' : this.requestStep.id.toString();
-        this.requestHeaderId = stepForm.controls.message.value == null ? '' : stepForm.controls.message.value.toString();
+        this.requestComponentType = stepForm.controls.componentType.value;
+        this.requestUri = this.requestStep.uri;
+        this.requestExchangePattern = stepForm.controls.exchangepattern.value.toString();
+        this.requestNumberOfTimes = stepForm.controls.numberoftimes.value == null ? 1 : stepForm.controls.numberoftimes.value.toString();
         this.requestConnectionId = stepForm.controls.connection.value == null ? '' : stepForm.controls.connection.value.toString();
+        this.requestHeaderId = stepForm.controls.message.value == null ? '' : stepForm.controls.message.value.toString();
         this.requestBody = stepForm.controls.requestbody.value == null ? '0' : stepForm.controls.requestbody.value.toString();
 
+        this.requestOptions = '?';
         this.setStepOptions(this.stepsOptions[0], this.requestStep, this.selectOptions(0));
 
         if (this.requestOptions.length < 2) {
@@ -770,13 +728,16 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         } else {
             this.requestUri = [this.requestComponentType.toLowerCase(), '://', this.requestUri, this.requestOptions].join('');
         }
+
     }
 
     handleSendResponse(body: string, showResponse: boolean) {
+
         this.alertService.addAlert({
           type: 'success',
           message: 'Send successfully',
         });
+
         setTimeout(() => {
             this.isSending = false;
         }, 1000);
@@ -787,6 +748,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         } else {
             this.responseBody = body;
         }
+
     }
 
     handleSendError(body: any) {
