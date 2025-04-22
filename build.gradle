@@ -350,6 +350,7 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
     implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
     implementation "org.quartz-scheduler:quartz:${quartz_version}"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
@@ -358,7 +359,7 @@ dependencies {
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
-    implementation "io.hawt:hawtio-springboot:${hawtio_version}"
+    //implementation "io.hawt:hawtio-springboot:${hawtio_version}"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
