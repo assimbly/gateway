@@ -10,8 +10,10 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.web.rest.mail.EmailRequest;
 import org.assimbly.gateway.web.rest.mail.ServiceAccount;
+import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,9 @@ public class EmailResource {
 
     private static final Logger log = LoggerFactory.getLogger(EmailResource.class);
 
+    @Autowired
+    private IntegrationRuntime integrationRuntime;
+
     /**
      * GET  /info : requests oauth2 access token info
      * @return Map token information
@@ -45,7 +50,7 @@ public class EmailResource {
     ) {
 
         try {
-            CamelContext context = new DefaultCamelContext();
+            CamelContext context = integrationRuntime.getIntegration().getContext();
             String accessToken = "";
 
             StringBuffer uriStrBuf = new StringBuffer();
@@ -80,11 +85,7 @@ public class EmailResource {
                 }
             });
 
-            context.start();
-
             context.createProducerTemplate().requestBody("direct:start", emailRequest.getBody());
-
-            context.stop();
 
             return Response.status(Response.Status.OK).entity("OK").build();
 
