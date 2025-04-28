@@ -5,15 +5,14 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.ws.rs.core.Response;
 import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.web.rest.mail.EmailRequest;
 import org.assimbly.gateway.web.rest.mail.ServiceAccount;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +33,11 @@ public class EmailResource {
 
     private static final Logger log = LoggerFactory.getLogger(EmailResource.class);
 
-    @Autowired
-    private IntegrationRuntime integrationRuntime;
+    private final IntegrationRuntime integrationRuntime;
+
+    public EmailResource(IntegrationRuntime integrationRuntime) {
+        this.integrationRuntime = integrationRuntime;
+    }
 
     /**
      * GET  /info : requests oauth2 access token info
@@ -50,28 +52,29 @@ public class EmailResource {
     ) {
 
         try {
+
             CamelContext context = integrationRuntime.getIntegration().getContext();
             String accessToken = "";
 
-            StringBuffer uriStrBuf = new StringBuffer();
-            uriStrBuf.append(String.format("%s://%s:%d?", emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()));
-            uriStrBuf.append(String.format("authenticationType=RAW(%s)", emailRequest.getTypeAuth()));
-            uriStrBuf.append("&mail.smtp.starttls.enable=true");
-            uriStrBuf.append(String.format("&subject=RAW(%s)", emailRequest.getSubject()));
-            uriStrBuf.append(String.format("&to=RAW(%s)", emailRequest.getTo()));
-            uriStrBuf.append(String.format("&username=RAW(%s)", emailRequest.getUsername()));
-            uriStrBuf.append(String.format("&contentType=RAW(%s)", emailRequest.getContentType()));
+            StringBuilder uriStrBuild = new StringBuilder();
+            uriStrBuild.append(String.format("%s://%s:%d?", emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()));
+            uriStrBuild.append(String.format("authenticationType=RAW(%s)", emailRequest.getTypeAuth()));
+            uriStrBuild.append("&mail.smtp.starttls.enable=true");
+            uriStrBuild.append(String.format("&subject=RAW(%s)", emailRequest.getSubject()));
+            uriStrBuild.append(String.format("&to=RAW(%s)", emailRequest.getTo()));
+            uriStrBuild.append(String.format("&username=RAW(%s)", emailRequest.getUsername()));
+            uriStrBuild.append(String.format("&contentType=RAW(%s)", emailRequest.getContentType()));
 
             if(StringUtils.isNoneEmpty(emailRequest.getTypeAuth()) && emailRequest.getTypeAuth().equals("basic")) {
                 // basic
-                uriStrBuf.append(String.format("&password=RAW(%s)", emailRequest.getPassword()));
+                uriStrBuild.append(String.format("&password=RAW(%s)", emailRequest.getPassword()));
             } else {
                 // oauth
                 accessToken = getAccessToken(emailRequest);
                 if(accessToken == null) {
                     throw new Exception("AccessToken is empty!");
                 }
-                uriStrBuf.append(String.format("&accessToken=RAW(%s)", accessToken));
+                uriStrBuild.append(String.format("&accessToken=RAW(%s)", accessToken));
             }
 
             final String bearerToken = accessToken;
@@ -81,11 +84,13 @@ public class EmailResource {
                     from("direct:start")
                         .setHeader("user", constant(emailRequest.getUsername()))
                         .setHeader("Authorization", constant("Bearer "+ bearerToken))
-                        .to(uriStrBuf.toString());
+                        .to(uriStrBuild.toString());
                 }
             });
 
-            context.createProducerTemplate().requestBody("direct:start", emailRequest.getBody());
+            try (ProducerTemplate template = context.createProducerTemplate()) {
+                template.sendBody("direct:start", emailRequest.getBody());
+            }
 
             return Response.status(Response.Status.OK).entity("OK").build();
 
@@ -99,9 +104,6 @@ public class EmailResource {
     private String getAccessToken(EmailRequest emailRequest) {
         try {
             InputStream serviceAccountStream = convertServiceAccountToInputStream(emailRequest.getServiceAccount());
-            if (serviceAccountStream == null) {
-                throw new IOException("Service account file not found");
-            }
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream)
                 .createScoped(Collections.singleton(emailRequest.getScopes()))
@@ -114,7 +116,7 @@ public class EmailResource {
             return token.getTokenValue();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred: ", e);
         }
         return null;
     }
