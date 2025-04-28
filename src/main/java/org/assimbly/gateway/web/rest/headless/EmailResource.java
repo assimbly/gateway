@@ -78,10 +78,19 @@ public class EmailResource {
             }
 
             final String bearerToken = accessToken;
+            final String routeId = "dynamic-send-email-route";
+
+            // stop and remove the route if it already exists
+            if (context.getRoute(routeId) != null) {
+                context.getRouteController().stopRoute(routeId);
+                context.removeRoute(routeId);
+            }
+
             context.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
                     from("direct:start")
+                        .routeId(routeId)
                         .setHeader("user", constant(emailRequest.getUsername()))
                         .setHeader("Authorization", constant("Bearer "+ bearerToken))
                         .to(uriStrBuild.toString());
@@ -91,6 +100,10 @@ public class EmailResource {
             try (ProducerTemplate template = context.createProducerTemplate()) {
                 template.sendBody("direct:start", emailRequest.getBody());
             }
+
+            // clean up the route after sending
+            context.getRouteController().stopRoute(routeId);
+            context.removeRoute(routeId);
 
             return Response.status(Response.Status.OK).entity("OK").build();
 
