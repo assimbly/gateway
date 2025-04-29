@@ -4,6 +4,7 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
+        /*
         maven{ name = "Assimbly Base"
             url = uri("https://maven.pkg.github.com/assimbly/base")
             credentials {
@@ -21,7 +22,7 @@ buildscript {
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-        }
+        }*/
 
     }
 }
@@ -113,6 +114,16 @@ eclipse {
 jib {
     from {
         image = 'container-registry.oracle.com/graalvm/jdk:21'
+        platforms {
+            platform {
+                architecture = 'amd64'
+                os = 'linux'
+            }
+            platform {
+                architecture = 'aarch64'
+                os = 'linux'
+            }
+        }
     }
     to {
         image = 'assimbly/gateway-full'
@@ -266,6 +277,8 @@ repositories {
         url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
 
+
+    /*
     maven{ name = "Assimbly Base"
         url = uri("https://maven.pkg.github.com/assimbly/base")
         credentials {
@@ -283,7 +296,7 @@ repositories {
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-    }
+    }*/
 
 }
 
@@ -468,6 +481,7 @@ publishing {
             from components.java
         }
     }
+    /*
     repositories {
         maven {
             name = "GitHubPackages"
@@ -478,6 +492,8 @@ publishing {
             }
         }
     }
+
+     */
 }
 
 tasks.named('bootJar') {
