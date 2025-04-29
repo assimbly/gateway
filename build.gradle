@@ -108,21 +108,11 @@ eclipse {
 // image = 'eclipse-temurin:21' (temurin on docker)
 // image = 'open-21-jdk-jammy' (semeru on dockerhub)
 // image = 'azul/zulu-openjdk:21-jdk-crac-latest' (support for crac)
-
+//image = 'container-registry.oracle.com/graalvm/jdk:21'
 //build container image
 jib {
     from {
-        image = 'container-registry.oracle.com/graalvm/jdk:21'
-        platforms {
-            platform {
-                architecture = 'amd64'
-                os = 'linux'
-            }
-            platform {
-                architecture = 'aarch64'
-                os = 'linux'
-            }
-        }
+        image = 'eclipse-temurin:21.0.7_6-jdk-alpine-3.21'
     }
     to {
         image = 'assimbly/gateway-full'
