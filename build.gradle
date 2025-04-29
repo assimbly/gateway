@@ -4,7 +4,6 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
-        /*
         maven{ name = "Assimbly Base"
             url = uri("https://maven.pkg.github.com/assimbly/base")
             credentials {
@@ -22,7 +21,7 @@ buildscript {
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-        }*/
+        }
 
     }
 }
@@ -277,8 +276,6 @@ repositories {
         url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
     }
 
-
-    /*
     maven{ name = "Assimbly Base"
         url = uri("https://maven.pkg.github.com/assimbly/base")
         credentials {
@@ -296,7 +293,7 @@ repositories {
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-    }*/
+    }
 
 }
 
