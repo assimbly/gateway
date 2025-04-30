@@ -112,7 +112,7 @@ eclipse {
 //build container image
 jib {
     from {
-        image = 'eclipse-temurin:21.0.7_6-jdk-alpine-3.21'
+        image = 'eclipse-temurin:21.0.7_6-jdk-jammy'
     }
     to {
         image = 'assimbly/gateway-full'
