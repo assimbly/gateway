@@ -119,7 +119,7 @@ jib {
                 os = 'linux'
             }
             platform {
-                architecture = 'arm64/v8'
+                architecture = 'arm64'
                 os = 'linux'
             }
         }
