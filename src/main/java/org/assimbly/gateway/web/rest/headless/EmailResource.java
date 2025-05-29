@@ -92,6 +92,7 @@ public class EmailResource {
                     from("direct:start")
                         .routeId(routeId)
                         .setHeader("user", constant(emailRequest.getUsername()))
+                        .setHeader("From", constant(emailRequest.getFrom()))
                         .setHeader("Authorization", constant("Bearer "+ bearerToken))
                         .to(uriStrBuild.toString());
                 }
