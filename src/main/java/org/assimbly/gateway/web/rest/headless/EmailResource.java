@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.Collections;
 
 /**
- * REST controller for managing oauth2 (Open Authorization v2).
+ * REST controller to interact with Google Mail service using oauth2 (m2m)
  */
 @RestController
 @RequestMapping("/api/email")
@@ -40,8 +40,8 @@ public class EmailResource {
     }
 
     /**
-     * GET  /info : requests oauth2 access token info
-     * @return Map token information
+     * POST  /send : send email
+     * @return response status
      */
     @PostMapping(
         path = "/send",
@@ -92,6 +92,7 @@ public class EmailResource {
                     from("direct:start")
                         .routeId(routeId)
                         .setHeader("user", constant(emailRequest.getUsername()))
+                        .setHeader("From", constant(emailRequest.getFrom()))
                         .setHeader("Authorization", constant("Bearer "+ bearerToken))
                         .to(uriStrBuild.toString());
                 }
