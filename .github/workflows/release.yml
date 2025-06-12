@@ -6,7 +6,7 @@ on:
       branch:
         description: 'Branch to operate on'
         default: 'develop'
-        type: string    
+        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
@@ -21,7 +21,7 @@ on:
       branch:
         description: 'Branch to operate on'
         default: 'develop'
-        type: string        
+        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
@@ -46,7 +46,7 @@ jobs:
           exit 1
 
   delete_old_snapshots:
-    needs: test-milestone  
+    needs: test-milestone
     runs-on: ubuntu-latest
 
     env:
@@ -159,3 +159,13 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'default'
+
+  call-broker-release-aws-image-arm:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images-arm.yml
+    secrets: inherit
+    with:
+      module: 'headless'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'full'
