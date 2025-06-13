@@ -107,6 +107,14 @@ jobs:
           echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
           cat $MAVEN_PATH/conf/settings.xml
 
+      - name: Install Chromium for ARM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium
+
+      - name: Set Puppeteer to skip Chromium download
+        run: echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
