@@ -160,7 +160,7 @@ jobs:
       tag: "${{inputs.tag}}"
       type: 'default'
 
-  call-broker-release-aws-image-arm:
+  call-headless-release-aws-image-arm:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-aws-images-arm.yml
     secrets: inherit
@@ -169,3 +169,13 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'full'
+
+  call-broker-release-aws-image-arm:
+    needs: delete_old_snapshots
+    uses: ./.github/workflows/release-aws-images-arm.yml
+    secrets: inherit
+    with:
+      module: 'broker'
+      branch: ${{ inputs.branch }}
+      tag: "${{inputs.tag}}"
+      type: 'default'

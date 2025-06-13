@@ -1,4 +1,4 @@
-name: Release Docker Images on AWS ECR (elastic container registry)
+name: Release Docker ARM Images on AWS ECR (elastic container registry)
 
 on:
   workflow_dispatch:
@@ -106,6 +106,14 @@ jobs:
           echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
           echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
           cat $MAVEN_PATH/conf/settings.xml
+
+      - name: Install Chromium for ARM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium
+
+      - name: Set Puppeteer to skip Chromium download
+        run: echo "PUPPETEER_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
