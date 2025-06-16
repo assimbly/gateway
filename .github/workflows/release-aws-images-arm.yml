@@ -128,4 +128,4 @@ jobs:
 
       - name: Push gateway image to Amazon ECR
         run: |
-          clear & ./gradlew clean bootJar jib -Djib.from.platforms="linux/aarch64" -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway-${{ inputs.module }}-arm:${{ inputs.tag }} --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }}
+          clear & ./gradlew clean bootJar jib -Djib.from.image="eclipse-temurin:21-jdk-noble" -Djib.from.platforms="linux/arm64/v8" -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway-${{ inputs.module }}-arm:${{ inputs.tag }} --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }}
