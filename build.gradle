@@ -245,7 +245,7 @@ configurations {
                     details.useVersion("2.41.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.6")
+                    details.useVersion("6.1.7")
                 }
             }
         }
