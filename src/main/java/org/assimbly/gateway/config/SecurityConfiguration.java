@@ -100,8 +100,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/management/**")).authenticated()
                     .requestMatchers(mvc.pattern("/management/jolokia")).permitAll()
                     .requestMatchers(mvc.pattern("/management/jolokia/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/hawtio")).permitAll()
-                    .requestMatchers(mvc.pattern("/management/hawtio/**")).permitAll());
+                    .requestMatchers(mvc.pattern("/management/hawtio")).permitAll());
         }
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

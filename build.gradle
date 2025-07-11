@@ -363,6 +363,8 @@ dependencies {
     //implementation "io.hawt:hawtio-springboot:${hawtio_version}"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
+    implementation 'org.apache.camel.springboot:camel-cli-connector-starter:4.13.0'
+
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {

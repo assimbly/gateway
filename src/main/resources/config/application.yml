@@ -26,7 +26,6 @@ springdoc:
 ---
 
 management:
-
   endpoints:
     web:
       base-path: /management
