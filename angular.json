@@ -33,6 +33,9 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src", "node_modules"]
+            },
             "assets": [
               "src/main/webapp/content",
               "src/main/webapp/favicon.ico",

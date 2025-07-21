@@ -6,7 +6,7 @@
     <property name="application.gateway.base-directory" value="${user.home}" />
 
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <include file="${application.gateway.base-directory}/.assimbly/config/logback-custom.xml" />
+    <include optional="true" file="${application.gateway.base-directory}/.assimbly/config/logback-custom.xml" />
 
 <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">

@@ -361,7 +361,6 @@ dependencies {
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
-    //implementation "io.hawt:hawtio-springboot:${hawtio_version}"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
     implementation 'org.apache.camel.springboot:camel-cli-connector-starter:4.13.0'
@@ -450,6 +449,27 @@ if (project.hasProperty("integration")){
     }
 }
 
+
+tasks.named('bootJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('cleanResources', Delete) {
+    delete "build/resources"
+}
+
+tasks.configureEach {
+    if (name == 'explodeCodeSourceMain') {
+        dependsOn tasks.named('compileJava')
+    }
+}
+
+tasks.register('printVersion') {
+    doLast { // add a task action
+        println project.version
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -479,26 +499,6 @@ publishing {
     }
 }
 
-tasks.named('bootJar') {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-task cleanResources(type: Delete) {
-    delete "build/resources"
-}
-
-tasks.all {
-    if (name == 'explodeCodeSourceMain') {
-        dependsOn tasks.named('compileJava')
-    }
-}
-
-task printVersion {
-    doLast { // add a task action
-        println project.version
-    }
-}
-
 dependencyUpdates {
     rejectVersionIf {
         it.candidate.version.matches(/(?i).*[.-](alpha|beta|rc|cr|m)[.\d-]*/)
@@ -507,7 +507,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.14.2"
+    gradleVersion = "8.14.3"
 }
 
 if (project.hasProperty("nodeInstall")) {

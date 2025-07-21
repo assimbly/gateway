@@ -1,5 +1,4 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
+@use 'bootstrap/scss/bootstrap' as bs;
 
 /* ==========================================================================
 Navbar
@@ -7,7 +6,7 @@ Navbar
 
 .navbar-version {
   font-size: 0.65em;
-  color: $navbar-dark-color;
+  color: bs.$navbar-dark-color;
 }
 
 .profile-image {
