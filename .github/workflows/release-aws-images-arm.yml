@@ -21,6 +21,9 @@ on:
         default: 'default'
         type: string
 
+permissions:
+  contents: write # Needed for pushing any changes (if your workflow does this)
+
 jobs:
   publish_docker_images:
     runs-on: ubuntu-24.04-arm
