@@ -9,8 +9,8 @@ import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
-//import org.springframework.boot.actuate.autoconfigure.metrics.mongo.MongoMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
@@ -81,8 +81,12 @@ public class GatewayApp {
         if (startApplication) {
             SpringApplication app = new SpringApplication(GatewayApp.class);
 
+            app.setBannerMode(Banner.Mode.OFF);
+            app.setLogStartupInfo(false);
+
             DefaultProfileUtil.addDefaultProfile(app);
-            Environment env = app.run(args).getEnvironment();
+            Environment env = app
+                .run(args).getEnvironment();
 
             logApplicationStartup(env);
         }
@@ -132,20 +136,29 @@ public class GatewayApp {
         }
 
        log.info(
-            "\n----------------------------------------------------------\n\t" +
-            "{} is running! \n\n\t" +
-            "Application Version: \t{}\n\t" +
-            "Application BaseDir: \t{}\n\t" +
-            "Application Startup: \t{} Seconds\n\t" +
-            "Local URL: \t\t{}://localhost:{}{}\n\t" +
-            "External URL: \t\t{}://{}:{}{}\n\t" +
-            "Java Version: \t\t{}\n\t" +
-            "Java WorkingDir: \t{}\n\t" +
-            "Profile(s): \t\t{}\n----------------------------------------------------------",
+            """
+
+
+            {} is running!
+
+            ----------------------------------------------------------
+            Version:         {}
+            BaseDir:         {}
+            Profile(s):      {}
+            Java Version:    {}
+            Java WorkingDir: {}
+            Local URL:       {}://localhost:{}{}
+            External URL:    {}://{}:{}{}
+            Startup time:    {} seconds
+            ----------------------------------------------------------
+
+            """,
             applicationName,
             applicationVersion,
             applicationBaseDirectory,
-            applicationStartupTime,
+            env.getActiveProfiles(),
+            javaVersion,
+            javaWorkingDirectory,
             protocol,
             serverPort,
             contextPath,
@@ -153,10 +166,8 @@ public class GatewayApp {
             hostAddress,
             serverPort,
             contextPath,
-            javaVersion,
-            javaWorkingDirectory,
-            env.getActiveProfiles()
-        );
+            applicationStartupTime
+           );
     }
 
     public static boolean isWindows() {
