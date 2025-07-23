@@ -384,6 +384,8 @@ dependencies {
 
     runtimeOnly "com.h2database:h2:2.3.232"
 
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 }
 
 //Build different jar based on type of application
