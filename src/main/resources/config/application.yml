@@ -114,19 +114,16 @@ spring:
       repositories:
         bootstrap-mode: deferred
   jpa:
-    database: H2
     show-sql: false
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
       hibernate.timezone.default_storage: NORMALIZE
-      # hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
-      # modify batch size as necessary
       hibernate.jdbc.batch_size: 25
       hibernate.order_inserts: true
       hibernate.order_updates: true
@@ -143,7 +140,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
-    lazy-initialization: false
+    lazy-initialization: true
   mvc:
     favicon:
       enabled: true
@@ -154,6 +151,8 @@ spring:
       enabled: true
   thymeleaf:
     mode: HTML
+  quartz:
+    auto-startup: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration

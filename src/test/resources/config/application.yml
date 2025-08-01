@@ -28,8 +28,6 @@ spring:
         hikari:
             auto-commit: false
     jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-        database: H2
         open-in-view: false
         show-sql: false
         hibernate:

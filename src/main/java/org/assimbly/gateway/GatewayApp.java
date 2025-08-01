@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, GroovyTemplateAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, GroovyTemplateAutoConfiguration.class, QuartzAutoConfiguration.class})
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
@@ -101,8 +102,12 @@ public class GatewayApp {
 
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
-        EncryptionUtil.key = env.getProperty("encryption.jasypt.password");
-        EncryptionUtil.algorithm = env.getProperty("encryption.jasypt.algorithm");
+        String encryptionPassword = env.getProperty("encryption.jasypt.password");
+        String encryptionAlgorithm = env.getProperty("encryption.jasypt.algorithm");
+
+        if(encryptionPassword!=null && encryptionAlgorithm != null){
+           new EncryptionUtil(encryptionPassword, encryptionAlgorithm);
+        }
 
         if (StringUtils.isBlank(contextPath)) {
             contextPath = "/";

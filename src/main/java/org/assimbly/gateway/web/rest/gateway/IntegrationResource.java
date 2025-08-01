@@ -1,16 +1,12 @@
 package org.assimbly.gateway.web.rest.gateway;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import org.assimbly.gateway.config.scheduling.ExportConfigJob;
 import org.assimbly.gateway.repository.IntegrationRepository;
 import org.assimbly.gateway.service.IntegrationService;
 import org.assimbly.gateway.service.dto.IntegrationDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.LogUtil;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +21,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 /**
  * REST controller for managing Integration.
@@ -44,10 +39,6 @@ public class IntegrationResource {
     private final IntegrationRepository integrationRepository;
 
     private final IntegrationService integrationService;
-
-    private Scheduler scheduler;
-
-    private boolean ran = false;
 
     public IntegrationResource(IntegrationService integrationService, IntegrationRepository integrationRepository) {
         this.integrationService = integrationService;
@@ -93,89 +84,6 @@ public class IntegrationResource {
         IntegrationDTO result = integrationService.save(integrationDTO);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, integrationDTO.getId().toString())).body(result);
-    }
-
-    private boolean isCreated(String groupName) throws SchedulerException {
-        for (String name : scheduler.getJobGroupNames()) {
-            if (name.equals(groupName)) return true;
-        }
-        return false;
-    }
-
-    private JobKey getJobKey(String name) throws SchedulerException {
-        for (String groupName : scheduler.getJobGroupNames()) {
-            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                if (name.equals(jobKey.getName())) {
-                    return jobKey;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void scheduleJob(Trigger trigger, int integrationid, String url) throws SchedulerException {
-        if (isCreated("" + integrationid)) scheduler.deleteJob(getJobKey("" + integrationid));
-        scheduler.getContext().put("integrationid", integrationid);
-        scheduler.getContext().put("database", confExport);
-        scheduler.getContext().put("url", url);
-        scheduler.scheduleJob(JobBuilder.newJob(ExportConfigJob.class).withIdentity("" + integrationid, "" + integrationid).build(), trigger);
-    }
-
-    /**
-     * POST  /updatebackup : updates the backup frequency
-     *
-     * @param integrationid
-     * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the stopping integration failed
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @PostMapping(
-        path = "/integrations/{integrationid}/updatebackup/{frequency}",
-        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
-        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
-    )
-    public ResponseEntity<String> updateBackup(
-        @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
-        @PathVariable("integrationid") Long integrationid,
-        @PathVariable("frequency") String frequency,
-        @RequestBody String url
-    ) throws Exception {
-        if (!ran) {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-            ran = true;
-        }
-        switch (frequency) {
-            case "Daily":
-                scheduleJob(
-                    TriggerBuilder.newTrigger().withIdentity("" + integrationid).withSchedule(cronSchedule("0 0 10 ? * MON-FRI *")).build(),
-                    Math.toIntExact(integrationid),
-                    url
-                );
-                break;
-            case "Weekly":
-                scheduleJob(
-                    TriggerBuilder.newTrigger().withIdentity("" + integrationid).withSchedule(cronSchedule("0 0 10 ? * MON *")).build(),
-                    Math.toIntExact(integrationid),
-                    url
-                );
-                break;
-            case "Monthly":
-                scheduleJob(
-                    TriggerBuilder.newTrigger().withIdentity("" + integrationid).withSchedule(cronSchedule("0 0 10 1 1/1 ? *")).build(),
-                    Math.toIntExact(integrationid),
-                    url
-                );
-                break;
-            default:
-                if (isCreated("" + integrationid)) scheduler.deleteJob(getJobKey("" + integrationid));
-                break;
-        }
-        return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(
-            integrationid,
-            mediaType,
-            "/integrations/{integrationid}/updatebackup/{frequency}",
-            "Backup frequency updated"
-        );
     }
 
     /**

@@ -43,18 +43,11 @@ public class Integration {
         ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
         ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
 
-        boolean isDebuggging = gateway.getDebugging();
-        boolean deployOnStart = deployDirectory.getDeployOnStart();
-        boolean deployOnChange = deployDirectory.getDeployOnChange();
-
         integrationRuntime.setIntegration(encryptionProperties.getProperties());
 
         integrationRuntime.initIntegration();
 
         org.assimbly.integration.Integration runtime = integrationRuntime.getIntegration();
-
-        runtime.setDebugging(isDebuggging);
-        runtime.setDeployDirectory(deployOnStart,deployOnChange);
 
         CamelContext camelContext = runtime.getContext();
 

@@ -218,7 +218,7 @@ liquibase {
             username "gateway"
             password ""
             changeLogFile project.ext.diffChangelogFile
-            referenceUrl "hibernate:spring:org.assimbly.gateway.domain?dialect=org.hibernate.dialect.H2Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+            referenceUrl "hibernate:spring:org.assimbly.gateway.domain?hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
             defaultSchemaName ""
             logLevel "debug"
             classpath layout.buildDirectory.dir("/classes/java/main")
@@ -350,7 +350,6 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
     implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
-    implementation "org.quartz-scheduler:quartz:${quartz_version}"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -363,7 +362,7 @@ dependencies {
     implementation "org.springframework:spring-context-support"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
-    implementation 'org.apache.camel.springboot:camel-cli-connector-starter:4.13.0'
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
