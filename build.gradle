@@ -257,10 +257,6 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    maven{  name = "Aurea"
-        url "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
-    }
-
     maven{ name = "Assimbly Base"
         url = uri("https://maven.pkg.github.com/assimbly/base")
         credentials {

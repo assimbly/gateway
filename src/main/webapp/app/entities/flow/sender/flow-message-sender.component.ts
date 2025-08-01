@@ -114,7 +114,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     consumerComponentsNames: Array<any> = [];
     producerComponentsNames: Array<any> = [];
 
-    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq','spring-rabbitmq'];
+    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
     componentTypeAssimblyLinks: Array<string> = new Array<string>();
     componentTypeCamelLinks: Array<string> = new Array<string>();
     uriPlaceholders: Array<string> = new Array<string>();

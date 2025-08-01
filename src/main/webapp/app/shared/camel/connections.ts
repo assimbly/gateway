@@ -25,7 +25,6 @@ export class Connections {
     'RabbitMQ',
     'SJMS',
     'SJMS2',
-    'SonicMQ',
   ];
 
   pooledList: string[] = [
@@ -323,30 +322,7 @@ export class Connections {
            isRequired: true,
          },
       ],
-    },
-    {
-      name: 'SonicMQ',
-      connectionKeys: [
-        {
-          connectionKeyName: 'url',
-          valueType: 'text',
-          placeholder: 'Example tcp://localhost:2506',
-          isRequired: true,
-        },
-        {
-          connectionKeyName: 'username',
-          valueType: 'text',
-          placeholder: 'Example Administrator',
-          isRequired: true,
-        },
-        {
-          connectionKeyName: 'password',
-          valueType: 'password',
-          placeholder: '',
-          isRequired: true,
-        },
-      ],
-    },
+    }
   ];
 
   getConnectionType(componentType: any) {

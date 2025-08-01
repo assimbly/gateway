@@ -9889,33 +9889,6 @@ export class Components {
                 "full": true
               },
               {
-                "scheme": "",
-                "producerOnly": false,
-                "deprecated": false,
-                "groupId": "org.apache.camel",
-                "description": "Send and receive messages to/from SonicMQ",
-                "source": true,
-                "title": "SONICMQ",
-                "router": false,
-                "action": true,
-                "artifactId": "camel-jms",
-                "api": false,
-                "consumerOnly": false,
-                "kind": "component",
-                "sink": true,
-                "label": "mq,jms",
-                "supportLevel": "Stable",
-                "version": "3.14.0",
-                "javaType": "",
-                "async": false,
-                "firstVersion": "2.19.0",
-                "lenientProperties": true,
-                "name": "sonicmq",
-                "syntax": "destinationType:destinationName",
-                "extendsScheme": "",
-                "full": false
-              },
-              {
                 "scheme": "split",
                 "kind": "model",
                 "sink": false,
@@ -10312,10 +10285,8 @@ export class Components {
            camelComponentType = 'coap';
         } else if (componentType === 'smmps') {
           camelComponentType = 'smmp';
-       } else if (componentType === 'solr-cloud' || componentType === 'solrs') {
+        } else if (componentType === 'solr-cloud' || componentType === 'solrs') {
            camelComponentType = 'coap';
-        } else if (componentType === 'sonicmq') {
-           camelComponentType = 'sjms';
         } else if (componentType === 'wastebin') {
            camelComponentType = 'mock';
         } else {

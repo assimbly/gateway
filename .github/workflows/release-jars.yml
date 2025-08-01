@@ -74,11 +74,6 @@ jobs:
                   "snapshots": {
                     "enabled": "true"
                   }
-                },
-                {
-                    "id": "aurea",
-                    "name": "Aurea Sonic Repository",
-                    "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
                 }
             ]
 

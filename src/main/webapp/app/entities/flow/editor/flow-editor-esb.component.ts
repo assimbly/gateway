@@ -54,7 +54,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
     public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
-    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','sonicmq','spring-rabbitmq'];
+    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
 
 	public logLevelListType = [
 		LogLevelType.OFF,

@@ -4,7 +4,7 @@
         {
             "fieldName": "type",
             "fieldType": "EndpointType",
-            "fieldValues": "ACTIVEMQ,FILE,HTTP4,KAFKA,SFTP,SJMS,SMTP,SONICMQ,SQL,STREAM,VM,WASTEBIN"
+            "fieldValues": "ACTIVEMQ,FILE,HTTP4,KAFKA,SFTP,SJMS,SMTP,SQL,STREAM,VM,WASTEBIN"
         },
         {
             "fieldName": "uri",
