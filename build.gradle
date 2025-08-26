@@ -81,6 +81,10 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        exclude group: 'io.netty', module: 'netty-transport-native-epoll'
+        exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
+    }
 }
 
 idea {
@@ -290,13 +294,11 @@ dependencies {
     }
 
     implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "amazon", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edifactdotweb", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edifactstandards", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
