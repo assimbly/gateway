@@ -364,7 +364,7 @@ dependencies {
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
-    implementation 'io.hawt:hawtio-springboot:4.3.0'
+    implementation 'io.hawt:hawtio-springboot:4.5.0'
     implementation 'jakarta.persistence:jakarta.persistence-api'
     implementation 'tech.jhipster:jhipster-framework:8.9.0'
 
