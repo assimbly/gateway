@@ -298,7 +298,6 @@ dependencies {
     implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edifactdotweb", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
