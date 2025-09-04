@@ -102,6 +102,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/activate").permitAll()
                         .requestMatchers("/api/account/reset-password/init").permitAll()
                         .requestMatchers("/api/account/reset-password/finish").permitAll()
+                        .requestMatchers("/api/db/authenticate").permitAll()
                         .requestMatchers("/api/**").authenticated() // Changed from permitAll() based on your commented out .authenticated()
 
                         // Actuator endpoints
