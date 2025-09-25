@@ -4,7 +4,7 @@ if [%1]==[] goto usage
 echo:
 @echo update version to %1
 echo:
-cls & ..\..\gradlew -q version -PnewVersion=%1 --settings-file ./../../settings.gradle
+cls & ..\..\gradlew -q version -PnewVersion=%1 --project-dir ./../../
 :usage
 echo:
 @echo updateversion ^<versionnumber^>

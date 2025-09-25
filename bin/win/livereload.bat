@@ -1,2 +1,2 @@
 
-cls & ..\..\gradlew --settings-file ./../../settings.gradle classes --continuous
+cls & ..\..\gradlew --project-dir ./../../ classes --continuous

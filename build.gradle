@@ -154,7 +154,7 @@ if (project.hasProperty("headless")) {
 defaultTasks "bootRun"
 
 springBoot {
-    mainClassName = "org.assimbly.gateway.GatewayApp"
+    mainClass = "org.assimbly.gateway.GatewayApp"
 }
 
 test {
@@ -505,7 +505,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "8.14.3"
+    gradleVersion = "9.1.0"
 }
 
 if (project.hasProperty("nodeInstall")) {

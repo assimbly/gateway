@@ -13,4 +13,4 @@ fi
 echo ""
 echo "update version to $1"
 echo ""
-../../gradlew -q version -PnewVersion="$1" --settings-file ./../../settings.gradle
+../../gradlew -q version -PnewVersion="$1" --project-dir ./../../
