@@ -376,7 +376,7 @@ dependencies {
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
-    runtimeOnly "com.h2database:h2:2.3.232"
+    runtimeOnly "com.h2database:h2:2.4.240"
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
