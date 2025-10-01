@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      repo:
+        description: 'repository name'
+        default: 'backend'
+        type: string
       module:
         description: 'Kind of module to build'
         default: 'full'
