@@ -105,8 +105,6 @@ public class IntegrationResource {
      */
     @GetMapping("/integrations/{id}")
     public ResponseEntity<IntegrationDTO> getIntegration(@PathVariable(value = "id") Long id) {
-        log.error("Runs..");
-        log.debug("Runs...");
         log.debug("REST request to get Integration : {}", id);
         Optional<IntegrationDTO> integrationDTO = integrationService.findOne(id);
         return ResponseUtil.wrapOrNotFound(integrationDTO);

@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest.broker;
 
+import org.springframework.context.annotation.Lazy;
 import jakarta.annotation.PostConstruct;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.BrokerService;
@@ -21,6 +22,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Broker.
  */
+@Lazy(false)
 @RestController
 @RequestMapping("/api")
 public class BrokerResource {
@@ -136,14 +138,15 @@ public class BrokerResource {
 
         for (BrokerDTO broker : brokers) {
 
-            if (broker.isAutoStart()) {
+            if (Boolean.TRUE.equals(broker.isAutoStart())) {
 
                 String brokerType = broker.getType();
                 String brokerConfigurationType = broker.getConfigurationType();
 
-                log.debug("Autostart broker: " + brokerType);
+                log.info("Autostart broker: {}", brokerType);
 
                 managedBroker.start(brokerType, brokerConfigurationType);
+
             }
         }
     }
