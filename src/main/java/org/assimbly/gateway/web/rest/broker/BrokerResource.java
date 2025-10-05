@@ -124,11 +124,14 @@ public class BrokerResource {
      */
     @GetMapping("/brokers/{id}/type")
     public String getBrokerType(@PathVariable(value = "brokerType") Long id) {
-        log.debug("REST request to get status of Broker : {}", id);
+        log.debug("REST request to get type of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
-        String brokerType = brokerDTO.get().getType();
 
-        return brokerType;
+        if(brokerDTO.isEmpty()){
+            return "unknown";
+        }
+
+        return brokerDTO.get().getType();
     }
 
     @PostConstruct
