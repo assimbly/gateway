@@ -357,6 +357,9 @@ dependencies {
     implementation "org.springframework:spring-context-support"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
+    // need to set this to force latest version
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
