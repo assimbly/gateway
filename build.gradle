@@ -368,6 +368,9 @@ dependencies {
     implementation 'jakarta.persistence:jakarta.persistence-api'
     implementation 'tech.jhipster:jhipster-framework:8.9.0'
 
+    //force version 12.9 (same as mapforce)
+    implementation 'net.sf.saxon:Saxon-HE:12.9'
+
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
