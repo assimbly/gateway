@@ -1,7 +1,7 @@
 {
     "applicationName": "gateway",
-    "oldVersion": "5.0.8-SNAPSHOT",
-    "newVersion": "5.0.8-SNAPSHOT",
+    "oldVersion": "5.0.8",
+    "newVersion": "5.0.8",
     "resources": [
         {
             "path": "/package.json"
