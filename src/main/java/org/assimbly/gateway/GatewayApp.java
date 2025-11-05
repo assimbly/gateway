@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import jakarta.annotation.PostConstruct;
+import net.sf.saxon.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
@@ -91,6 +92,11 @@ public class GatewayApp {
     }
 
     private static void logApplicationStartup(Environment env) {
+
+        //temporary print the Saxon version used
+        System.out.println("Saxon product version: " + Version.getProductVersion());
+        System.out.println("Saxon product name: " + Version.getProductName());
+        System.out.println("Saxon full version: " + Version.getProductTitle());
 
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
