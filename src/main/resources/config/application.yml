@@ -234,7 +234,7 @@ jhipster:
 
 application:
   info:
-    version: 5.0.9-SNAPSHOT
+    version: 5.0.8
   documentation:
     url: https://github.com/assimbly/gateway/wiki
     camel-url: https://camel.apache.org/components/latest
