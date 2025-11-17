@@ -346,7 +346,7 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
     implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation "org.springframework.boot:spring-boot-starter-aop"
+
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
@@ -357,8 +357,22 @@ dependencies {
     implementation "org.springframework:spring-context-support"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
+    //remove aop starter (replaced by aspectj in Spring Boot 4)
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    // implementation "org.springframework.boot:spring-boot-starter-aspectj"
+
+    //following dependencies are need when moving to Spring Boot 4
+    //implementation "org.springframework.boot:spring-boot-starter-jackson"
+    //implementation "org.springframework.boot:spring-boot-starter-liquibase"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.retry:spring-retry:2.0.12'
+    implementation 'org.slf4j:jcl-over-slf4j:2.0.17'
+
     // need to set this to force latest version
-    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'org.apache.commons:commons-lang3:3.20.0'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"

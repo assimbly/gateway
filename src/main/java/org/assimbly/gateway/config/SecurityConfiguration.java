@@ -59,13 +59,21 @@ public class SecurityConfiguration {
 
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
 
-
             //permit all for easier testing
             http.authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz
-                    // Permit all requests for common static resources locations
-                    .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                    .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/webjars/**",
+                        "/favicon.ico",
+                        "/static/**",
+                        "/public/**",
+                        "/resources/**"
+                    ).permitAll()
+
 
                     // Specific static file extensions (already covered by atCommonLocations in most cases, but good to be explicit if you have custom paths)
                     .requestMatchers(
@@ -82,9 +90,17 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz ->
                     authz
                         // Permit all requests for common static resources locations
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers(
+                            "/css/**",
+                            "/js/**",
+                            "/images/**",
+                            "/webjars/**",
+                            "/favicon.ico",
+                            "/static/**",
+                            "/public/**",
+                            "/resources/**"
+                        ).permitAll()
 
-                        // Specific static file extensions (already covered by atCommonLocations in most cases, but good to be explicit if you have custom paths)
                         .requestMatchers(
                             "/*.js", "/*.txt", "/*.json", "/*.map", "/*.css", "/*.ico", "/*.png", "/*.svg", "/*.webapp"
                         ).permitAll()
