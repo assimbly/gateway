@@ -10,11 +10,11 @@ on:
         type: string
       branch:
         description: 'Branch to use'
-        default: 'develop'
+        default: 'next'
         type: string
       tag:
         description: 'Tag to use'
-        default: 'develop'
+        default: 'next'
         type: string
       type:
         description: 'Type: default or full (includes custom components)'
