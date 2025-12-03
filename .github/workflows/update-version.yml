@@ -6,18 +6,18 @@ on:
       branch:
         description: 'Branch to use'
         type: string
-        default: 'develop'    
+        default: 'develop'
       milestone:
         description: 'Milestone to use as version'
         type: string
         required: true
 
-  workflow_call: 
+  workflow_call:
     inputs:
       branch:
         description: 'Branch to use'
         type: string
-        default: 'develop'    
+        default: 'develop'
       milestone:
         description: 'Milestone to use as version'
         type: string
@@ -42,7 +42,7 @@ jobs:
     - name: Update Gradle Version
       run: |
         echo "Updating to version: ${{inputs.milestone}}"
-        ./gradlew -q version -PnewVersion=${{inputs.milestone}} --settings-file ./settings.gradle
+        ./gradlew --settings-file ./settings.gradle -q -PnewVersion=${{inputs.milestone}} version
 
     - name: Diff check
       run: git diff
