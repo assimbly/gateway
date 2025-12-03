@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         description: 'Branch to operate on'
-        default: 'develop'
+        default: 'next'
         type: string
       milestone:
         description: 'Milestone to use as version'
@@ -13,14 +13,14 @@ on:
         required: true
       tag:
         description: 'Tag to use for this release'
-        default: 'development'
+        default: 'next'
         type: string
 
   workflow_call:
     inputs:
       branch:
         description: 'Branch to operate on'
-        default: 'develop'
+        default: 'next'
         type: string
       milestone:
         description: 'Milestone to use as version'
