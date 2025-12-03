@@ -145,6 +145,7 @@ jobs:
     uses: ./.github/workflows/release-aws-images.yml
     secrets: inherit
     with:
+      repo: 'backend'
       module: 'headless'
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
@@ -155,6 +156,7 @@ jobs:
     uses: ./.github/workflows/release-aws-images.yml
     secrets: inherit
     with:
+      repo: 'broker'
       module: 'broker'
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
@@ -165,6 +167,7 @@ jobs:
     uses: ./.github/workflows/release-aws-images-arm.yml
     secrets: inherit
     with:
+      repo: 'backend'
       module: 'headless'
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
@@ -175,6 +178,7 @@ jobs:
     uses: ./.github/workflows/release-aws-images-arm.yml
     secrets: inherit
     with:
+      repo: 'broker'
       module: 'broker'
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"

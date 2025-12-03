@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      repo:
+        description: 'repository name'
+        default: 'backend'
+        type: string
       module:
         description: 'Kind of module to build'
         default: 'full'
@@ -26,6 +30,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     env:
+      REPO_NAME: ${{ inputs.repo }}
       BUILD_TAG: ${{ inputs.module }}
       VERSION_TAG: ${{ inputs.branch }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -123,4 +128,4 @@ jobs:
 
       - name: Push gateway image to Amazon ECR
         run: |
-          clear & ./gradlew -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/gateway-${{ inputs.module }}-arm:${{ inputs.tag }} -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }} clean bootJar jib
+          clear & ./gradlew -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/${{ inputs.repo }}-arm:${{ inputs.tag }} -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }} clean bootJar jib
