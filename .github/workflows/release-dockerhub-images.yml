@@ -112,7 +112,7 @@ jobs:
           VERSION_TAG: ${{ inputs.tag }}
 
         run: |
-          ./gradlew clean --settings-file ./settings.gradle -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull bootJar jibDockerBuild
+          ./gradlew clean -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull bootJar jibDockerBuild
 
       - name: Push the docker image
         env:
@@ -122,4 +122,4 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
         run: |
-          clear & ./gradlew --settings-file ./settings.gradle -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs -P${{ inputs.module }} -Pprod -Pfull clean bootJar jib
+          clear & ./gradlew -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs -P${{ inputs.module }} -Pprod -Pfull clean bootJar jib
