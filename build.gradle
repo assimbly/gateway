@@ -518,7 +518,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.1.0"
+    gradleVersion = "9.2.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
