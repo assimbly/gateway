@@ -239,6 +239,7 @@ application:
     name: default
     tracing: false
     debugging: false
+    cache: true
     base-directory: default
   deploy-directory:
     deploy-on-start: true

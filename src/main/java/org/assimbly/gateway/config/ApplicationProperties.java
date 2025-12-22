@@ -15,7 +15,7 @@ public class ApplicationProperties {
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
     public final DeployDirectory deployDirectory = new DeployDirectory();
-    //   public final Encryption encryption = new Encryption();
+    //public final Encryption encryption = new Encryption();
 
 
     public Info getInfo() {
@@ -78,6 +78,7 @@ public class ApplicationProperties {
     	private String baseDirectory;
     	private boolean tracing;
     	private boolean debugging;
+        private boolean cache;
 
         public String getName() {
             return name;
@@ -99,10 +100,9 @@ public class ApplicationProperties {
             return tracing;
         }
 
-        public void setName(boolean tracing) {
+        public void setTracing(boolean tracing) {
             this.tracing = tracing;
         }
-
 
         public boolean getDebugging() {
             return debugging;
@@ -110,6 +110,14 @@ public class ApplicationProperties {
 
         public void setDebugging(boolean debugging) {
             this.debugging = debugging;
+        }
+
+        public boolean getCache() {
+            return cache;
+        }
+
+        public void setCache(boolean cache) {
+            this.cache = cache;
         }
 
     }

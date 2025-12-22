@@ -70,7 +70,7 @@ spring:
       password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
   jmx:
     enabled: true
-    
+
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
 # keytool -genkey -alias gateway -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
@@ -150,4 +150,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  gateway:
+    cache: true
+
