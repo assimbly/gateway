@@ -301,7 +301,6 @@ dependencies {
 
     implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "amazon", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "camel-as2-component", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
