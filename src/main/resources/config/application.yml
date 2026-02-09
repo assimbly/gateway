@@ -181,6 +181,9 @@ springdoc:
     disable-swagger-default-url: true
     config-url: /v3/api-docs/swagger-config
     url: /v3/api-docs
+  api-docs:
+    resolve-schema-properties: true
+  default-flat-param-object: false
 
 # ===================================================================
 # JHipster specific properties
