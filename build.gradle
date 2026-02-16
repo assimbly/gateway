@@ -4,12 +4,6 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
 
-        maven{ name = "Assimbly Base"
-            url = uri("https://maven.pkg.github.com/assimbly/base")
-            credentials {
-                username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-        }
         maven{ name = "Assimbly Runtime"
             url = uri("https://maven.pkg.github.com/assimbly/runtime")
             credentials {
