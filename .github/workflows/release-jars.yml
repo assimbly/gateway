@@ -53,14 +53,6 @@ jobs:
                 },
                 {
                   "id": "github",
-                  "name": "Assimbly Base Repository",
-                  "url": "https://maven.pkg.github.com/assimbly/base",
-                  "snapshots": {
-                    "enabled": "true"
-                  }
-                },
-                {
-                  "id": "github",
                   "name": "Assimbly Runtime Repository",
                   "url": "https://maven.pkg.github.com/assimbly/runtime",
                   "snapshots": {
@@ -74,11 +66,6 @@ jobs:
                   "snapshots": {
                     "enabled": "true"
                   }
-                },
-                {
-                    "id": "aurea",
-                    "name": "Aurea Sonic Repository",
-                    "url": "https://int-factory.aurea.com/nexus/content/repositories/sonic-releases/"
                 }
             ]
 
@@ -104,4 +91,4 @@ jobs:
         env:
           VERSION_TAG: '-SNAPSHOT'
         run: |
-          ./gradlew clean publish --settings-file ./settings.gradle -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
+          ./gradlew clean publish -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
