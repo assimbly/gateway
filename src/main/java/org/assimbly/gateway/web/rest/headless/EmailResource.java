@@ -77,7 +77,6 @@ public class EmailResource {
                 uriStrBuild.append(String.format("&accessToken=RAW(%s)", accessToken));
             }
 
-            final String bearerToken = accessToken;
             final String routeId = "dynamic-send-email-route";
 
             // stop and remove the route if it already exists
@@ -93,7 +92,6 @@ public class EmailResource {
                         .routeId(routeId)
                         .setHeader("user", constant(emailRequest.getUsername()))
                         .setHeader("From", constant(emailRequest.getFrom()))
-                        .setHeader("Authorization", constant("Bearer "+ bearerToken))
                         .to(uriStrBuild.toString());
                 }
             });

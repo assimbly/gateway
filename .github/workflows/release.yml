@@ -54,6 +54,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
+    
       - name: Delete older snapshots
         uses: smartsquaregmbh/delete-old-packages@v0.8.1
         with:

@@ -10,7 +10,7 @@ on:
         type: string
       branch:
         description: 'Branch to use'
-        default: 'develop'
+        default: 'next'
         type: string
 
 jobs:
