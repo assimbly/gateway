@@ -52,7 +52,7 @@ public class AuthenticatorResource {
             String userEmail = JwtValidator.decode(Authorization).get("name", String.class);
             User user = mongoDao.findUserByEmail(userEmail);
 
-            String issuer = String.format("Dovetail - %s", CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, domainName));
+            String issuer = String.format("Fluxygen - %s", CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, domainName));
             GoogleAuthenticatorKey key = authenticator.createCredentials(user.getEmail());
 
             String qrLocation = GoogleAuthenticatorQRGenerator.getOtpAuthURL(issuer, user.getEmail(), key);
