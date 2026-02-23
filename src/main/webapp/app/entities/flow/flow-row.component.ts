@@ -487,7 +487,7 @@ export class FlowRowComponent implements OnInit {
  */
   setFlowStatistic(res, uri, stepType) {
 
-    if (res.step.status != 'started') {
+    if (res.step.status != 'Started') {
       this.flowStatistic = `There are no stats yet.`;
     } else {
 

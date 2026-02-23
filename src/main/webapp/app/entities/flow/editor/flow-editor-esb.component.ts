@@ -588,7 +588,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         step.componentType = 'groovy';
         stepForm.controls.componentType.patchValue(step.componentType);
     }else if(stepType === 'ACTION'){
-             step.componentType = 'print';
+             step.componentType = 'log';
              stepForm.controls.componentType.patchValue(step.componentType);
     }else{
        // if(integration.get)
@@ -767,7 +767,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
     if(this.activeEditor === 'flow'){
       newStep.stepType = StepType.ACTION;
-      newStep.componentType = 'print';
+      newStep.componentType = 'log';
     }else if(this.activeEditor === 'script'){
       newStep.stepType = StepType.SCRIPT;
       newStep.componentType = '';
