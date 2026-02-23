@@ -49,12 +49,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	steps: IStep[] = new Array<Step>();
 	step: IStep;
 
-    //Future possibilities
-	//public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTER", "ROUTE", "SCRIPT", "API", MESSAGE", "CONNECTION", "ERROR"];
-
-	public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
-    public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
-    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
+  public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
+  public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+  public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
 
 	public logLevelListType = [
 		LogLevelType.OFF,
@@ -89,16 +86,16 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	reverse: any;
 
 	routeCreated: boolean;
-    connectionCreated: boolean;
-    messageCreated: boolean;
-    errorStep: boolean = true;
+  connectionCreated: boolean;
+  messageCreated: boolean;
+  errorStep: boolean = true;
 
 	namePopoverMessage: string;
 	logLevelPopoverMessage: string;
 	errorHandlerPopoverMessage: string;
 	notesPopoverMessage: string;
 
-    componentPopoverMessage: string;
+  componentPopoverMessage: string;
 	optionsPopoverMessage: string;
 	messagePopoverMessage: string;
 	routePopoverMessage: string;
@@ -157,7 +154,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private linkService: LinkService,
 		private messageService: MessageService,
 		private routeService: RouteService,
-        private connectionService: ConnectionService,
+    private connectionService: ConnectionService,
 		private alertService: AlertService,
 		private route: ActivatedRoute,
 		private router: Router,
@@ -335,21 +332,23 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         this.steps = [];
         let startStep = this.flow.steps.find(step => step.stepType === 'SOURCE');
-
         let index = 0;
 
         if(startStep){
-          this.loadStep(startStep, index);
+          this.loadStep(startStep, index, true);
         }else{
-            startStep = this.flow.steps.find(step => step.stepType === 'ROUTE');
-            if(startStep){
-                this.loadStep(startStep, 0);
-            }
+
+          const sortedSteps = [...this.flow.steps].sort((a, b) => a.id - b.id);
+
+          sortedSteps.forEach((step, index) => {
+            this.loadStep(step, index, false);
+          });
+
         }
       }
   }
 
-  loadStep(loadStep: any, index: number){
+  loadStep(loadStep: any, index: number, recursive: boolean){
 
         this.numberOfSteps = this.numberOfSteps + 1;
 
@@ -387,26 +386,31 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.enableMessage[index] = false;
         }
 
-        const linkName = this.flow.id + '-' + step.id
+        //call recursively if flow
+        if(recursive){
 
-        this.flow.steps.forEach((nextStep) => {
-              if(nextStep.id!==step.id){
-                const found = nextStep.links.find(link => {
-                  return (link.name === linkName);
-                });
-                if(found){
-                  index = index + 1;
-                  //recursively call itself when nextStep is found
-                  this.loadStep(nextStep, index);
-                }
-            }
-        });
+          const linkName = this.flow.id + '-' + step.id
 
-        if(this.errorStep){
-            this.errorStep = false;
-            let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
-            this.loadStep(errorStep, index + 1);
-        }
+          this.flow.steps.forEach((nextStep) => {
+                if(nextStep.id!==step.id){
+                  const found = nextStep.links.find(link => {
+                    return (link.name === linkName);
+                  });
+                  if(found){
+                    index = index + 1;
+                    //recursively call itself when nextStep is found
+                    this.loadStep(nextStep, index, true);
+                  }
+              }
+          });
+
+          if(this.errorStep){
+              this.errorStep = false;
+              let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
+              this.loadStep(errorStep, index + 1, false);
+          }
+
+       }
 
   }
 
@@ -439,8 +443,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.active = index.toString();
 
   }
-
-
 
   setTypeLinks(step: any, stepFormIndex?, e?: Event): void {
 
