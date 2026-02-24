@@ -146,10 +146,12 @@ public class MessageResource {
      */
     @GetMapping("/messages/{id}/headers")
     public TreeMap<String, Object> getHeaders(@PathVariable(value = "id") Long id) {
+
         log.debug("REST request to get Message : {}", id);
         String idAsString = Long.toString(id);
-        TreeMap<String, Object> messageMap = getKeys(idAsString);
-        return messageMap;
+
+        return getKeys(idAsString);
+
     }
 
     private TreeMap<String, Object> getKeys(String messageId) {

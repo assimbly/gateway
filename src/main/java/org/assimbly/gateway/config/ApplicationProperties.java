@@ -15,8 +15,6 @@ public class ApplicationProperties {
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
     public final DeployDirectory deployDirectory = new DeployDirectory();
-    //public final Encryption encryption = new Encryption();
-
 
     public Info getInfo() {
         return info;

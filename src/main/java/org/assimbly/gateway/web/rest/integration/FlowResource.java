@@ -8,7 +8,6 @@ import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.integration.Integration;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,16 +54,8 @@ public class FlowResource {
     @Value("${server.port}")
     private int serverPort;
 
-    private final ApplicationProperties applicationProperties;
-
-    private Integration integration;
-
-    private final IntegrationRuntime integrationRuntime;
-
     public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
         this.flowService = flowService;
-        this.applicationProperties = applicationProperties;
-        this.integrationRuntime = integrationRuntime;
     }
 
     /**

@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,6 +13,8 @@ import java.util.Date;
 import java.util.Random;
 
 public final class JwtBuilder {
+
+    private static final Random random = new Random();
 
     private JwtBuilder() {
         //Static class cannot be instantiated.
@@ -36,7 +39,7 @@ public final class JwtBuilder {
                 .claim("scope", scope)
                 .signWith(
                         SignatureAlgorithm.HS256,
-                        key.getBytes("UTF-8")
+                        key.getBytes(StandardCharsets.UTF_8)
                 )
                 .compact();
     }
@@ -61,7 +64,7 @@ public final class JwtBuilder {
      * @return the created String.
      */
     private static String createRandomString() {
-        Random random = new Random();
+
         String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
         char[] s = new char[10];

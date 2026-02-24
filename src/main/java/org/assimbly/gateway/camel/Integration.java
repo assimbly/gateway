@@ -23,12 +23,10 @@ public class Integration {
 
     @Autowired
     EncryptionProperties encryptionProperties;
-    private final ApplicationProperties applicationProperties;
 
     private final IntegrationRuntime integrationRuntime;
 
     public Integration(ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
-        this.applicationProperties = applicationProperties;
         this.integrationRuntime = integrationRuntime;
     }
     @PostConstruct
@@ -39,9 +37,6 @@ public class Integration {
 
 
     public CamelContext initIntegration() throws Exception {
-
-        ApplicationProperties.Gateway gateway = applicationProperties.getGateway();
-        ApplicationProperties.DeployDirectory deployDirectory = applicationProperties.getDeployDirectory();
 
         integrationRuntime.setIntegration(encryptionProperties.getProperties());
 

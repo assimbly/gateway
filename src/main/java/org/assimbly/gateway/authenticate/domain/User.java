@@ -176,7 +176,7 @@ public class User {
             }
         } catch (ClassCastException e) {
             log.error("Failed to get enum from document for field: {}, document: {}", fieldName, document.toJson(), e);
-            throw e;
+            throw new ClassCastException();
         }
     }
 

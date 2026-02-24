@@ -51,9 +51,8 @@ public final class BodyUtil {
         responseBody.put("path", path);
         responseBody.put("message", message);
 
-        String responseBodyXml = "<response>"+ System.lineSeparator() + XML.toString(responseBody) + System.lineSeparator() + "</response>";
+        return "<response>"+ System.lineSeparator() + XML.toString(responseBody) + System.lineSeparator() + "</response>";
 
-        return responseBodyXml;
 	}
 
     public static String createFailureXMLResponse(Long id, String path, String message) throws Exception {
@@ -66,16 +65,15 @@ public final class BodyUtil {
         responseBody.put("path", path);
         responseBody.put("message", message);
 
-        String responseBodyXml = "<response>" + System.lineSeparator() + XML.toString(responseBody) + System.lineSeparator() + "</response>";
+        return "<response>" + System.lineSeparator() + XML.toString(responseBody) + System.lineSeparator() + "</response>";
 
-        return responseBodyXml;
 	}
 
-    public static String createSuccessTEXTResponse(String message) throws Exception {
+    public static String createSuccessTEXTResponse(String message) {
         return message;
 	}
 
-    public static String createFailureTEXTResponse(String message) throws Exception {
+    public static String createFailureTEXTResponse(String message) {
         return message;
 	}
 

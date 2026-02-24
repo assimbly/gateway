@@ -123,7 +123,7 @@ public class BrokerResource {
      * @return the brokerType (artemis or classic) with status 200 (OK) or with status 404 (Not Found)
      */
     @GetMapping("/brokers/{id}/type")
-    public String getBrokerType(@PathVariable(value = "brokerType") Long id) {
+    public String getBrokerType(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get type of Broker : {}", id);
         Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
 

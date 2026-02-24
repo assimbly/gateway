@@ -127,10 +127,12 @@ public class ConnectionResource {
      */
     @GetMapping("/connections/{id}/keys")
     public TreeMap<String, String> getConnectionKeys(@PathVariable(value = "id") Long id) {
+
         log.debug("REST request to get Header : {}", id);
         String idAsString = Long.toString(id);
-        TreeMap<String, String> connectionMap = getKeys(idAsString);
-        return connectionMap;
+
+        return getKeys(idAsString);
+
     }
 
     /**

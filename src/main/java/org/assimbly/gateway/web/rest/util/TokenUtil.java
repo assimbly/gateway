@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest.util;
 
-//import io.undertow.util.BadRequestException;
 import org.assimbly.gateway.authenticate.jwt.JwtBuilder;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.util.helper.Base64Helper;
@@ -11,7 +10,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TokenUtil {
 
-    static public String[] decodeHeader(String base64) throws BadRequestAlertException {
+    public static String[] decodeHeader(String base64) throws BadRequestAlertException {
+
         String[] values;
 
         try {
@@ -31,7 +31,7 @@ public class TokenUtil {
         return values;
     }
 
-    static public String buildToken(org.assimbly.gateway.authenticate.domain.User user) throws UnsupportedEncodingException {
+    public static String buildToken(org.assimbly.gateway.authenticate.domain.User user) throws UnsupportedEncodingException {
         return JwtBuilder.build(user.getEmail(), "role");
     }
 

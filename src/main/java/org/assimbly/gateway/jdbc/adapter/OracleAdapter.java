@@ -16,8 +16,6 @@ public class OracleAdapter implements DatabaseAdapter {
         String url = String.format("jdbc:oracle:thin:@%s:%s/%s",
                 connection.getHost(), connection.getPort(), connection.getDatabase());
 
-        //TODO: Figure out how SSL is configured in Oracle JDBC Connection String
-
         DriverManager.setLoginTimeout(5);
         DriverManager.registerDriver(driver);
 

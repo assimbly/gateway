@@ -176,11 +176,12 @@ public class StepResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/steps")
-    public ResponseEntity<Void> deleteSteps(@RequestBody List<StepDTO> stepsDTO) throws URISyntaxException {
+    public ResponseEntity<Void> deleteSteps(@RequestBody List<StepDTO> stepsDTO) {
+
         log.debug("REST request to delete List<Step> : {}", stepsDTO);
         List<Step> steps = stepMapper.toEntity(stepsDTO);
 
-        ArrayList<String> arrayOfIds = new ArrayList<String>();
+        ArrayList<String> arrayOfIds = new ArrayList<>();
         for (Step step : steps) {
             arrayOfIds.add(step.getId().toString());
         }

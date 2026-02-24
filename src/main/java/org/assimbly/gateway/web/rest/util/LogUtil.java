@@ -6,10 +6,9 @@ import java.io.IOException;
 public class LogUtil {
 
 	public static String tail(File file, int lines) {
-	    java.io.RandomAccessFile fileHandler = null;
-	    try {
-	        fileHandler = 
-	            new java.io.RandomAccessFile( file, "r" );
+
+	    try(java.io.RandomAccessFile fileHandler = new java.io.RandomAccessFile( file, "r" );) {
+
 	        long fileLength = fileHandler.length() - 1;
 	        StringBuilder sb = new StringBuilder();
 	        int line = 0;
@@ -22,32 +21,20 @@ public class LogUtil {
 	                if (filePointer < fileLength) {
 	                    line = line + 1;
 	                }
-	            } else if( readByte == 0xD ) {
-	                if (filePointer < fileLength-1) {
+	            } else if( readByte == 0xD && filePointer < fileLength-1) {
 	                    line = line + 1;
 	                }
-	            }
-	            if (line >= lines) {
+
+                if (line >= lines) {
 	                break;
 	            }
 	            sb.append( ( char ) readByte );
 	        }
 
-	        String lastLine = sb.reverse().toString();
-	        return lastLine;
-	    } catch( java.io.FileNotFoundException e ) {
-	        e.printStackTrace();
-	        return null;
-	    } catch( java.io.IOException e ) {
-	        e.printStackTrace();
+	        return sb.reverse().toString();
+
+	    } catch( IOException e ) {
 	        return null;
 	    }
-	    finally {
-	        if (fileHandler != null )
-	            try {
-	                fileHandler.close();
-	            } catch (IOException e) {
-	            }
-	    }
-	}	
+	}
 }

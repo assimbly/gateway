@@ -29,7 +29,7 @@ public class MongoDao {
 
     private static final String TENANT_VARIABLE_EXPRESSION = "@\\{(.*?)}";
 
-    private static String database;
+    private String database;
 
     public MongoDao(){
     }
@@ -190,7 +190,11 @@ public class MongoDao {
 
         tenantVariable = initTenantVariable(tenantVariable, tenantVarType, tenantVarName, environment, tenantVariableExist);
 
-        EnvironmentValue variable = tenantVariable.find(environment).get();
+        Optional<EnvironmentValue> tenantVariableOptional = tenantVariable.find(environment);
+
+        if(tenantVariableOptional.isPresent()){
+
+        EnvironmentValue variable = tenantVariableOptional.get();
 
         variable.setEncrypted(false);
         variable.setValue(tenantVarValue);
@@ -198,6 +202,9 @@ public class MongoDao {
         variable.setUpdatedBy(UPDATED_BY_SYSTEM);
 
         updateTenantVariable(tenantVariable, tenant, tenantVariableExist);
+
+        }
+
     }
 
     private static TenantVariable initTenantVariable(TenantVariable tenantVariable, TenantVariable.TenantVarType tenantVarType, String tenantVarName, String environment, boolean tenantVariableExist) {

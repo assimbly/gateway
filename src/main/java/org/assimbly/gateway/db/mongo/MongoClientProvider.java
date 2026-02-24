@@ -48,14 +48,14 @@ public class MongoClientProvider implements Serializable {
     /**
      * Initialize the MongoClient.
      */
-    private void init() {
+    private static void init() {
         client = MongoClients.create(MongoClientSettings.builder()
             .applyToClusterSettings(builder ->
                 builder.hosts(Arrays.asList(new ServerAddress(getMongoContainerName(), 27017))))
             .build());
     }
 
-    private String getMongoContainerName() {
+    private static String getMongoContainerName() {
         String mongoContainer = System.getenv(MONGO_CONTAINER_NAME);
         if (StringUtils.isNotEmpty(mongoContainer)) {
             return mongoContainer;

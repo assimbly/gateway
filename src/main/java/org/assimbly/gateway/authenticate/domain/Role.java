@@ -5,7 +5,7 @@ public enum Role {
     ADMIN("admin"),
     USER("user");
 
-    private String value;
+    private final String value;
 
     Role(String value) {
         this.value = value;

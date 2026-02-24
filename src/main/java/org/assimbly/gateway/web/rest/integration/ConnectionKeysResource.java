@@ -134,13 +134,14 @@ public class ConnectionKeysResource {
     }
 
     private String encryptValue(String value) {
+
         Properties properties = encryptionProperties.getProperties();
         String password = properties.getProperty("password");
         String algorithm = properties.getProperty("algorithm");
 
         EncryptionUtil encryptionUtil = new EncryptionUtil(password, algorithm);
-        String encryptedValue = encryptionUtil.encrypt(value);
 
-        return encryptedValue;
+        return encryptionUtil.encrypt(value);
+
     }
 }

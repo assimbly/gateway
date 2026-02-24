@@ -85,8 +85,9 @@ public class AuthenticatorResource {
             TwoFactorRequest twoFactorRequest = null;
             if(body!=null){
                 twoFactorRequest = new ObjectMapper().readValue(body, TwoFactorRequest.class);
+                return authenticator.authorizeUser(twoFactorRequest.getEmail(), twoFactorRequest.getToken());
             }
-            return authenticator.authorizeUser(twoFactorRequest.getEmail(), twoFactorRequest.getToken());
+            return false;
         } catch (Exception e) {
             log.error("Error to validate token", e);
             return false;

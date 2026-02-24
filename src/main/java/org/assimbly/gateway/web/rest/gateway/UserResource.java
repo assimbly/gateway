@@ -1,4 +1,4 @@
-package org.assimbly.gateway.web.rest;
+package org.assimbly.gateway.web.rest.gateway;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;

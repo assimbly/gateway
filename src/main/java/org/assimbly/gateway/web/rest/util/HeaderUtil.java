@@ -30,7 +30,7 @@ public final class HeaderUtil {
     public static HttpHeaders createEntityUpdateAlert(String entityName, String param) {
         return createAlert("A " + entityName + " is updated with identifier " + param, param);
     }
-    
+
     public static HttpHeaders createEntityDeletionAlert(String entityName, String param) {
         return createAlert("A " + entityName + " is deleted with identifier " + param, param);
     }
@@ -38,7 +38,7 @@ public final class HeaderUtil {
     public static HttpHeaders createStartAlert(String param) {
         return createAlert("Started flow " + param, param);
     }
-    
+
     public static HttpHeaders createRestartAlert(String param) {
         return createAlert("Restarted " + param, param);
     }
@@ -55,15 +55,7 @@ public final class HeaderUtil {
 		return createAlert("Route " + param + " resumes", param);
 	}
 
-	public static HttpHeaders flowFailureAlert(String flowName, String errorKey, String defaultMessage) {
-        log.error("Entity processing failed, {}", defaultMessage);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-gatewayApp-error", defaultMessage);
-        headers.add("X-gatewayApp-params", flowName);
-        return headers;
-    }
-    
-    public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
+    public static HttpHeaders createFailureAlert(String entityName, String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-" + APPLICATION_NAME + "-error", defaultMessage);

@@ -1,7 +1,6 @@
 package org.assimbly.gateway.config;
 
 import org.assimbly.gateway.web.filter.SpaWebFilter;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -118,7 +117,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/activate").permitAll()
                         .requestMatchers("/api/account/reset-password/init").permitAll()
                         .requestMatchers("/api/account/reset-password/finish").permitAll()
-                        .requestMatchers("/api/**").permitAll() // TODO - changed back to permitAll. to be changed on the future, to make it more secure
+                        .requestMatchers("/api/**").permitAll()
 
                         // Actuator endpoints
                         .requestMatchers("/health/**").permitAll()
