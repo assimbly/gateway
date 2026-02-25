@@ -75,9 +75,10 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
-    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    if (System.getProperty("os.name").toLowerCase().contains("windows")||System.getProperty("os.name").equals("Mac OS X")) {
         exclude group: 'io.netty', module: 'netty-transport-native-epoll'
         exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
+
     }
 }
 
