@@ -438,14 +438,10 @@ export class FlowRowComponent implements OnInit {
 
   getFlowStatistic(flow: IFlow) {
 
-    console.log('get flow stats');
-
     this.flowStatistic = ``;
     this.statsTableRows = [];
 
     for (const step of flow.steps) {
-
-       console.log('get flow stats step=' + step.stepType);
 
       if (step.stepType === StepType.SOURCE) {
         this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {

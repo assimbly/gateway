@@ -47,6 +47,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	allsteps: IStep[] = new Array<Step>();
   stepsOptions: Array<Array<Option>> = [[]];
 	steps: IStep[] = new Array<Step>();
+	stepsToDelete: IStep[] = new Array<Step>();
 	step: IStep;
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
@@ -331,28 +332,22 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       if(this.flow.steps.length > 0){
 
         this.steps = [];
+
         let startStep = this.flow.steps.find(step => step.stepType === 'SOURCE');
-        let index = 0;
 
-        if(startStep){
-          this.loadStep(startStep, index, true);
-        }else{
-
-          const sortedSteps = [...this.flow.steps].sort((a, b) => a.id - b.id);
-
-          sortedSteps.forEach((step, index) => {
-            this.loadStep(step, index, false);
-          });
-
+        if(!startStep){
+          startStep = this.flow.steps.reduce((min, step) => step.id < min.id ? step : min, this.flow.steps[0]);
         }
+
+        this.loadStep(startStep, 0);
+
       }
+
   }
 
-  loadStep(loadStep: any, index: number, recursive: boolean){
+  loadStep(step: any, index: number){
 
         this.numberOfSteps = this.numberOfSteps + 1;
-
-        const step = this.allsteps.find(step => step.id === loadStep.id);
 
         if (typeof this.stepsOptions[index] === 'undefined') {
           this.stepsOptions.push([]);
@@ -362,7 +357,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         const formgroup = this.initializeStepData(step);
 
-        //this.stepsOptions[0] = [new Option()];
         (<FormArray>this.editFlowForm.controls.stepsData).insert(index, formgroup);
 
         this.setTypeLinks(step, index);
@@ -386,32 +380,30 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.enableMessage[index] = false;
         }
 
-        //call recursively if flow
-        if(recursive){
+        const nextStep = this.findNextStep(step);
+        if (nextStep) {
+          index = index + 1;
+          //recursively call itself when nextStep is found
+          this.loadStep(nextStep, index);
+        }
 
-          const linkName = this.flow.id + '-' + step.id
-
-          this.flow.steps.forEach((nextStep) => {
-                if(nextStep.id!==step.id){
-                  const found = nextStep.links.find(link => {
-                    return (link.name === linkName);
-                  });
-                  if(found){
-                    index = index + 1;
-                    //recursively call itself when nextStep is found
-                    this.loadStep(nextStep, index, true);
-                  }
-              }
-          });
-
-          if(this.errorStep){
-              this.errorStep = false;
-              let errorStep = this.flow.steps.find(step => step.stepType === 'ERROR');
-              this.loadStep(errorStep, index + 1, false);
-          }
-
+       // Add error step as last step
+       if(this.errorStep){
+           this.errorStep = false;
+           const lastStep = this.flow.steps.find(step => step.stepType === 'ERROR');
+           this.loadStep(lastStep, index + 1);
        }
 
+  }
+
+  findNextStep(current: any): any | undefined {
+    const outLinkName = current.links
+      .filter((l: any) => l.bound === 'out')
+      .map((l: any) => l.name);
+
+    return this.flow.steps.find(s =>
+      s.links.some((l: any) => l.bound === 'in' && outLinkName.includes(l.name))
+    );
   }
 
   createNewStep(stepType: StepType, defaultComponentType: string, index: number){
@@ -488,7 +480,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if(step.stepType === 'SOURCE' || step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTER'){
 
         const type = this.components.types.find(component => component.name === componentType);
-        const camelType = this.components.types.find(component => component.name === camelComponentType);
 
         this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
         this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
@@ -797,6 +788,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	removeStep(step, index): void {
 
+    this.stepsToDelete.push(step);
+
 		if (index === 0) {
   			return;
  		}
@@ -826,6 +819,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.stepsOptions.splice(i, 1);
 		this.editFlowForm.removeControl(index);
 		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
+
+
+
 	}
 
 	addConnection(step, index): void {
@@ -1037,13 +1033,12 @@ splitOptions4(options: string): string[] {
                 result.push(currentSegment);
             }
             currentSegment = segment;
+        } else if (currentSegment === null) {
+          currentSegment = segment;
         } else {
-            if (currentSegment === null) {
-                currentSegment = segment;
-            } else {
-                currentSegment += '&' + segment;
-            }
+          currentSegment += '&' + segment;
         }
+
     }
 
     if (currentSegment !== null) {
@@ -1188,7 +1183,7 @@ splitOptions4(options: string): string[] {
           }
         );
     },(reason)=>{
-       console.log('createHeader error: ', reason);
+       //console.log('createHeader error: ', reason);
     });
 
   }
@@ -1293,12 +1288,12 @@ splitOptions4(options: string): string[] {
               result => {
                 this.setConnection(step, result.id, formConnection);
               },
-              reason => {
-                this.setConnection(step, reason.id, formConnection);
+              error => {
+                this.setConnection(step, error.id, formConnection);
               }
           );
 
-       }, (reason)=>{
+       }, (error)=>{
           console.log('Set connection failed');
        }
     )
@@ -1371,6 +1366,11 @@ splitOptions4(options: string): string[] {
 
           this.flow = flow.body;
 
+          //delete removed steps
+          this.stepsToDelete.forEach((step) => {
+            this.stepService.delete(step.id).subscribe((results) => {});
+          });
+
           //update steps
           const updateSteps = this.stepService.updateMultiple(
             this.steps,
@@ -1402,17 +1402,6 @@ splitOptions4(options: string): string[] {
                           }
                         },
                       );
-
-                    /*
-                    if (steps.length > 0) {
-                      steps.forEach(
-                        (step) => {
-                          this.stepService.delete(step.id).subscribe();
-                        },
-                      );
-                    }
-                    */
-
                   },
                 );
 
@@ -1480,8 +1469,10 @@ splitOptions4(options: string): string[] {
               if(step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE'){
                   const linkName = this.flow.id + '-' + step.id;
                   const outLink = this.setLink(linkName, step.id, 'out');
-                  this.linkService.create(outLink).subscribe((results) => {
-                  },
+
+                  this.linkService.create(outLink).subscribe((result) => {
+                      //console.log(result);
+                    },
                   );
               }
 
@@ -1489,7 +1480,8 @@ splitOptions4(options: string): string[] {
                   const linkName = this.flow.id + '-' + previousStepId;
                   const inLink = this.setLink(linkName, step.id, 'in');
                   if(previousStepId!=0){
-                    this.linkService.create(inLink).subscribe((results) => {
+                    this.linkService.create(inLink).subscribe((result) => {
+                        //console.log(result);
                       },
                     );
                   }
@@ -1508,14 +1500,24 @@ splitOptions4(options: string): string[] {
   }
 
   deleteLinks(){
-        this.steps.forEach(async (step) => {
-            const contents = await this.linkService.deleteByStepId(step.id).subscribe((result) => {
+
+      this.stepsToDelete.forEach((step) => {
+             this.linkService.deleteByStepId(step.id).subscribe((result) => {
+               //console.log('X deleteByStepId',result);
             });
           },
         );
+
+
+      //delete original links
+      this.steps.forEach((step) => {
+           console.log('deleteLinks stepId=',step.id);
+           this.linkService.deleteByStepId(step.id).subscribe((result) => {
+             //console.log('deleteByStepId',result);
+          });
+        },
+      );
   }
-
-
 
 	setDataFromForm(): void {
 		const flowControls = this.editFlowForm.controls;
@@ -1548,6 +1550,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	setLink(name: string, stepId: number, bound: string): ILink {
+
 	    const link = new Link();
       link.name = name;
       link.bound = bound;
