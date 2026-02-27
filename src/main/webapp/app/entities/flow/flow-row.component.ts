@@ -218,29 +218,28 @@ export class FlowRowComponent implements OnInit {
     }
   }
 
-  setErrorMessage(action: string, error: string){
+  setErrorMessage(action: string, errorReport: any){
 
       this.flowError = true;
 
       try {
 
-          if (this.statusMessage.flow.stepsLoaded) {
+          if (errorReport.flow.installed) {
 
-                  const total = this.statusMessage.flow.stepsLoaded.total;
-                  const failed = this.statusMessage.flow.stepsLoaded.failed;
+                  const total = errorReport.flow.installed.total;
+                  const failed = errorReport.flow.installed.failed;
 
                   this.flowErrorButton = `${failed} of ${total} steps failed to start <br/><br/>
                                            <b>Details:</b> <br/>`;
 
-                  for (let i = 0; i < this.statusMessage.flow.steps.length; i++) {
+                  for (let i = 0; i < errorReport.flow.steps.length; i++) {
 
-                      const id = this.statusMessage.flow.steps[i].id;
-                      const uri = this.statusMessage.flow.steps[i].uri;
-                      const status = this.statusMessage.flow.steps[i].status;
+                      const uri = errorReport.flow.steps[i].uri;
+                      const status = errorReport.flow.steps[i].status;
 
                       if(status==='error' && uri){
 
-                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+                          const errorMessage = errorReport.flow.steps[i].message;
 
                           this.flowErrorButton = this.flowErrorButton + `<br/><table class="table" style="width: 100%">
                             <tbody>
@@ -255,7 +254,8 @@ export class FlowRowComponent implements OnInit {
                             </tbody>
                           </table>`;
                       }else if(status==='error'){
-                          const errorMessage = this.statusMessage.flow.steps[i].errorMessage;
+
+                          const errorMessage = errorReport.flow.steps[i].message;
 
                           this.flowErrorButton = this.flowErrorButton + `<br/><table class="table">
                             <tbody>
@@ -270,10 +270,10 @@ export class FlowRowComponent implements OnInit {
                   }
 
           } else {
-              this.flowErrorButton = this.statusMessage.flow.message;
+              this.flowErrorButton = errorReport.flow.message;
           }
       } catch (e) {
-           this.flowErrorButton = error;
+           this.flowErrorButton = errorReport;
       }
 
   }
@@ -399,26 +399,6 @@ export class FlowRowComponent implements OnInit {
   exportFlow(){
     this.flowService.exportFlowConfiguration(this.flow);
   }
-
-  getFlowLastError(id: number, action: string, errMessage: string) {
-
-    if (errMessage) {
-      if (errMessage.startsWith('Full authentication is required to access this resource', 0)) {
-        this.router.navigate(['/login']);
-      } else {
-        this.setErrorMessage(action, errMessage);
-        this.statusFlow = Status.inactiveError;
-      }
-    } else {
-      this.flowService.getFlowLastError(id).subscribe(response => {
-        this.lastError = response === '0' ? '' : response.body;
-        this.setErrorMessage(action, errMessage);
-        this.statusFlow = Status.inactiveError;
-      });
-    }
-
-  }
-
 
   getFlowDetails() {
     const createdFormatted = dayjs(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
@@ -663,20 +643,19 @@ export class FlowRowComponent implements OnInit {
               this.disableActionBtns = false;
             },
             err => {
-     			    this.setFlowStatus(err.error);
-              this.getFlowLastError(this.flow.id, 'Start', err.error);
-              this.isFlowStatusOK = false;
+              this.statusMessage = JSON.parse(err.error);
+     			    this.setFlowStatus('error');
               this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+              this.isFlowStatusOK = false;
               this.disableActionBtns = false;
             }
           );
         });
       },
       err => {
-        this.getFlowLastError(this.flow.id, 'Start', err.error);
-        this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
         this.flowConfigurationNotObtained(this.flow.id);
+        this.isFlowStatusOK = false;
         this.disableActionBtns = false;
       }
     );
@@ -694,7 +673,6 @@ export class FlowRowComponent implements OnInit {
       },
       err => {
 		    this.setFlowStatus('error');
-        this.getFlowLastError(this.flow.id, 'Start', err.error);
         this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
         this.disableActionBtns = false;
@@ -718,7 +696,6 @@ export class FlowRowComponent implements OnInit {
             },
             err => {
      			    this.setFlowStatus('error');
-              this.getFlowLastError(this.flow.id, 'Start', err.error);
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
               this.disableActionBtns = false;
@@ -754,7 +731,6 @@ export class FlowRowComponent implements OnInit {
             },
             err => {
      			    this.setFlowStatus('error');
-              this.getFlowLastError(this.flow.id, 'Start', err.error);
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
               this.disableActionBtns = false;
@@ -784,7 +760,6 @@ export class FlowRowComponent implements OnInit {
       },
       err => {
 		    this.setFlowStatus('error');
-        this.getFlowLastError(this.flow.id, 'Start', err.error);
         this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
         this.disableActionBtns = false;
@@ -821,9 +796,7 @@ export class FlowRowComponent implements OnInit {
   disableTracing(){
 
    this.integrationService.removeCollector(this.flow.id).subscribe(
-        response => {
-          //console.log('2. Removed' + response);
-        },
+        response => {},
         err => {
           console.log('Failed to remove tracing: ' + JSON.stringify(err));
         }
