@@ -222,6 +222,7 @@ public class ExportXML {
         setElement("lastModified", flowDB.getLastModified().toString(), options);
         setElement("autostart", flowDB.isAutoStart().toString(), options);
         setElement("logLevel", flowDB.getLogLevel().toString(), options);
+        setElement("failureProcessor", "true", options);
 
         flowNameAsString = flowDB.getName();
         flowTypeAsString = flowDB.getType();

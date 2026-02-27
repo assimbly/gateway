@@ -167,7 +167,7 @@
     <h5 class="float-end" style="padding-left: 10px; margin-left: 10px; margin-top: -10px; vertical-align: top">
       <span
         class="badge bg-danger text-dark"
-        *ngIf="flowError === 'true'"
+        *ngIf="flowError"
         placement="left"
         triggers="mouseenter"
         popoverTitle="Install error"
@@ -181,26 +181,27 @@
       </span>
     </h5>
   </div>
-  <div class="float-right" style="margin-right: 30px">
+  <div class="float-right" style="margin-right: 30px;">
     <h4 class="float-right">
       <ng-template #alertsFlowButtonTemplate let-message="message">
         <div [innerHtml]="flowAlertsButton"></div>
       </ng-template>
     </h4>
-    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px;  margin-top: -10px; vertical-align: top">
+    <h5 class="float-end" style="padding-left: 10px; margin-left: 10px;  margin-top: -10px; vertical-align;">
       <span
         class="badge bg-warning text-dark"
-        *ngIf="flowAlerts === 'true'"
+        *ngIf="numberOfAlerts > 0"
         (mouseenter)="(p != p)"
         placement="left"
         on-mouseover="getFlowAlerts(flow.id)"
         triggers="mouseenter"
         popoverTitle="Last alerts"
+        popoverClass="alert-popover"
         [ngbPopover]="alertsFlowButtonTemplate"
         [autoClose]="'outside'"
       >
 			<fa-icon icon="exclamation-triangle"></fa-icon>
-        <span *ngIf="numberOfAlerts > 0">Alert ({{ numberOfAlerts }})</span>
+        <span>Alert ({{ numberOfAlerts }})</span>
       </span>
     </h5>
   </div>

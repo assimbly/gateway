@@ -58,7 +58,7 @@ export class FlowRowComponent implements OnInit {
   public flowStartTime: any;
   public clickButton = false;
 
-  public flowError: string;
+  public flowError = false;
   public flowErrorButton: string;
 
   public flowAlerts: string;
@@ -220,7 +220,7 @@ export class FlowRowComponent implements OnInit {
 
   setErrorMessage(action: string, error: string){
 
-      this.flowError = `true`;
+      this.flowError = true;
 
       try {
 
@@ -647,7 +647,7 @@ export class FlowRowComponent implements OnInit {
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
-    this.flowError = `false`;
+    this.flowError = false;
 
     if(this.flow.logLevel === LogLevelType.TRACE){
       this.enableTracing();

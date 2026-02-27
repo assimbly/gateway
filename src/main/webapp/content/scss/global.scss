@@ -376,6 +376,8 @@ ng-dropdown-panel > div {
 
 /* comment the popover as it interferes with ngb popover */
 
+
+
 /*
 .popover {
   min-width: 200px;
@@ -394,6 +396,16 @@ ng-dropdown-panel > div {
     white-space:pre-wrap;
 }
 */
+
+.alert-popover {
+  min-width: 200px;
+  max-width: 60%;
+}
+
+.alert-popover .popover-body {
+  white-space: pre-wrap;
+}
+
 
 @media (min-width: 768px) {
   .flow-btns .btn {
