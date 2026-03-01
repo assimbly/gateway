@@ -45,6 +45,7 @@ management:
           - liquibase
           - jolokia
           - hawtio
+          - metrics
   endpoint:
     health:
       show-details: "ALWAYS"
@@ -247,6 +248,13 @@ application:
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true
+
 hawtio:
   authenticationEnabled: false
   offline: true
+
+camel:
+  management:
+    enabled: true
+    port: 9876
+    # port: ${server.port:8088}

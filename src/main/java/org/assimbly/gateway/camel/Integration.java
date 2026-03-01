@@ -2,7 +2,6 @@ package org.assimbly.gateway.camel;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
-import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CustomObjectMapperConfig;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.integrationrest.IntegrationRuntime;
@@ -26,7 +25,7 @@ public class Integration {
 
     private final IntegrationRuntime integrationRuntime;
 
-    public Integration(ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
+    public Integration(IntegrationRuntime integrationRuntime) {
         this.integrationRuntime = integrationRuntime;
     }
     @PostConstruct
@@ -36,7 +35,7 @@ public class Integration {
     }
 
 
-    public CamelContext initIntegration() throws Exception {
+    public void initIntegration() throws Exception {
 
         integrationRuntime.setIntegration(encryptionProperties.getProperties());
 
@@ -48,7 +47,6 @@ public class Integration {
 
         CustomObjectMapperConfig.addCustomObjectMapper(camelContext);
 
-        return camelContext;
     }
 
 }

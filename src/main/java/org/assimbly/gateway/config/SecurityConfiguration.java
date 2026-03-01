@@ -131,6 +131,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/management/jolokia").permitAll()
                         .requestMatchers("/management/jolokia/**").permitAll()
                         .requestMatchers("/management/hawtio").permitAll()
+                        .requestMatchers("/management/metrics").permitAll()
                         .requestMatchers("/management/**").authenticated() // Secure other management endpoints
 
                         // Any other request not explicitly matched above requires authentication
