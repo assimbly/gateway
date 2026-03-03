@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -20,6 +21,7 @@ import java.util.Objects;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Authority implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NotNull

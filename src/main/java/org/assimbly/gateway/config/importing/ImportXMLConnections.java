@@ -80,7 +80,7 @@ public class ImportXMLConnections {
         try {
 			Optional<Connection> connectionOptional = connectionRepository.findByName(connectionName);
 
-			if(!connectionOptional.isPresent()) {
+			if(connectionOptional.isEmpty()) {
 
                 log.debug("Create new connection: " + connectionName);
 

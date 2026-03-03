@@ -1,10 +1,12 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -18,11 +20,12 @@ import java.util.Set;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Connection implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "connectionSequenceGenerator", sequenceName = "certificate_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "sequence_generator")
     @Column(name = "id")
     private Long id;
 
@@ -33,7 +36,7 @@ public class Connection implements Serializable {
     private String type;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "connection", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private Set<ConnectionKeys> connectionKeys = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

@@ -12,11 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
@@ -24,12 +20,12 @@ import tech.jhipster.config.JHipsterConstants;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" }, exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, GroovyTemplateAutoConfiguration.class, QuartzAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
@@ -128,7 +124,7 @@ public class GatewayApp {
         String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
         String applicationStartupTime = Long.toString(startupTime);
         String javaVersion = Runtime.version().toString();
-        String javaWorkingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+        String javaWorkingDirectory = Path.of(".").toAbsolutePath().normalize().toString();
 
         if (applicationBaseDirectory == null || applicationBaseDirectory.equals("default")) {
             if (isWindows()) {

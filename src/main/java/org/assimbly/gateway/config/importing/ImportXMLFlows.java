@@ -82,7 +82,7 @@ public class ImportXMLFlows {
             Optional<Integration> integrationOptional = integrationRepository.findById(integrationId);
 
             Flow flow;
-            if (!flowOptional.isPresent()) {
+            if (flowOptional.isEmpty()) {
 				flow = new Flow();
 
                 steps = getStepsFromXML(flowId, doc, flow, true);
@@ -92,7 +92,7 @@ public class ImportXMLFlows {
 				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
-            if (!integrationOptional.isPresent()) {
+            if (integrationOptional.isEmpty()) {
                 log.warn("Integration not found: {}", integrationId);
 				return;
 			} else {

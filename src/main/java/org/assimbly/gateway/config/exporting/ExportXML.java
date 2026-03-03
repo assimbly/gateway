@@ -124,6 +124,11 @@ public class ExportXML {
         if (flowOptional.isPresent()) {
 
             Flow flow = flowOptional.get();
+
+            if (flow.getIntegration() == null) {
+                throw new IllegalStateException("Flow " + flow.getId() + " has no integration assigned");
+            }
+
             setGeneralProperties(flow.getIntegration().getId());
 
             // check if steps are configured

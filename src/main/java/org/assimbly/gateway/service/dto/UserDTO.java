@@ -2,6 +2,7 @@ package org.assimbly.gateway.service.dto;
 
 import org.assimbly.gateway.domain.User;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -9,6 +10,7 @@ import java.io.Serializable;
  */
 public class UserDTO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;

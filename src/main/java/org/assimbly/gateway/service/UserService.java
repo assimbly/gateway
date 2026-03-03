@@ -170,8 +170,7 @@ public class UserService {
                 .getAuthorities()
                 .stream()
                 .map(authorityRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
             user.setAuthorities(authorities);
         }
@@ -209,8 +208,7 @@ public class UserService {
                     .getAuthorities()
                     .stream()
                     .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .flatMap(Optional::stream)
                     .forEach(managedAuthorities::add);
                 userRepository.save(user);
                 this.clearUserCaches(user);

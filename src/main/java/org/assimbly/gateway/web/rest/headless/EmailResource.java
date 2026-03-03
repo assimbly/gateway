@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.headless;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.ws.rs.core.Response;
@@ -57,24 +57,24 @@ public class EmailResource {
             String accessToken = "";
 
             StringBuilder uriStrBuild = new StringBuilder();
-            uriStrBuild.append(String.format("%s://%s:%d?", emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()));
-            uriStrBuild.append(String.format("authenticationType=RAW(%s)", emailRequest.getTypeAuth()));
+            uriStrBuild.append("%s://%s:%d?".formatted(emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()));
+            uriStrBuild.append("authenticationType=RAW(%s)".formatted(emailRequest.getTypeAuth()));
             uriStrBuild.append("&mail.smtp.starttls.enable=true");
-            uriStrBuild.append(String.format("&subject=RAW(%s)", emailRequest.getSubject()));
-            uriStrBuild.append(String.format("&to=RAW(%s)", emailRequest.getTo()));
-            uriStrBuild.append(String.format("&username=RAW(%s)", emailRequest.getUsername()));
-            uriStrBuild.append(String.format("&contentType=RAW(%s)", emailRequest.getContentType()));
+            uriStrBuild.append("&subject=RAW(%s)".formatted(emailRequest.getSubject()));
+            uriStrBuild.append("&to=RAW(%s)".formatted(emailRequest.getTo()));
+            uriStrBuild.append("&username=RAW(%s)".formatted(emailRequest.getUsername()));
+            uriStrBuild.append("&contentType=RAW(%s)".formatted(emailRequest.getContentType()));
 
             if(StringUtils.isNoneEmpty(emailRequest.getTypeAuth()) && emailRequest.getTypeAuth().equals("basic")) {
                 // basic
-                uriStrBuild.append(String.format("&password=RAW(%s)", emailRequest.getPassword()));
+                uriStrBuild.append("&password=RAW(%s)".formatted(emailRequest.getPassword()));
             } else {
                 // oauth
                 accessToken = getAccessToken(emailRequest);
                 if(accessToken == null) {
                     throw new Exception("AccessToken is empty!");
                 }
-                uriStrBuild.append(String.format("&accessToken=RAW(%s)", accessToken));
+                uriStrBuild.append("&accessToken=RAW(%s)".formatted(accessToken));
             }
 
             final String routeId = "dynamic-send-email-route";

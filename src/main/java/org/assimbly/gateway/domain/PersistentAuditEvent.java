@@ -3,6 +3,7 @@ package org.assimbly.gateway.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @Table(name = "jhi_persistent_audit_event")
 public class PersistentAuditEvent implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

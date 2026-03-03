@@ -2,9 +2,9 @@ package org.assimbly.gateway.jdbc.adapter;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.URLEncodedUtils;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.assimbly.gateway.jdbc.domain.JDBCConnection;
 
 import java.nio.charset.StandardCharsets;
@@ -33,7 +33,7 @@ public class SqlServerAdapter implements DatabaseAdapter {
 
         String query = URLEncodedUtils.format(parameters, StandardCharsets.UTF_8);
         String instance = StringUtils.isNotEmpty(connection.getInstance()) ? "\\"+connection.getInstance() : "";
-        String url = String.format("jdbc:sqlserver://%s%s:%s;DatabaseName=%s;%s",
+        String url = "jdbc:sqlserver://%s%s:%s;DatabaseName=%s;%s".formatted(
             connection.getHost(), instance, connection.getPort(), connection.getDatabase(), query);
 
         DriverManager.setLoginTimeout(5);

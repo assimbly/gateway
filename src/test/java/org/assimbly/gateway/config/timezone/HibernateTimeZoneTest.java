@@ -3,26 +3,22 @@ package org.assimbly.gateway.config.timezone;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.repository.timezone.DateTimeWrapper;
 import org.assimbly.gateway.repository.timezone.DateTimeWrapperRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for the UTC Hibernate configuration.
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = GatewayApp.class)
 public class HibernateTimeZoneTest {
 
@@ -36,7 +32,7 @@ public class HibernateTimeZoneTest {
     private DateTimeFormatter timeFormatter;
     private DateTimeFormatter dateFormatter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         dateTimeWrapper = new DateTimeWrapper();
         dateTimeWrapper.setInstant(Instant.parse("2014-11-12T05:50:00.0Z"));
@@ -162,7 +158,7 @@ public class HibernateTimeZoneTest {
     }
 
     private String generateSqlRequest(String fieldName, long id) {
-        return format("SELECT %s FROM jhi_date_time_wrapper where id=%d", fieldName, id);
+        return "SELECT %s FROM jhi_date_time_wrapper where id=%d".formatted(fieldName, id);
     }
 
     private void assertThatDateStoredValueIsEqualToInsertDateValueOnGMTTimeZone(SqlRowSet sqlRowSet, String expectedValue) {

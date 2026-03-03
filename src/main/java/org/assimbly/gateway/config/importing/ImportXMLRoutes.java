@@ -102,7 +102,7 @@ public class ImportXMLRoutes {
             long routeIdLong = Long.parseLong(routeId, 10);
 			Optional<Route> routeOptional = routeRepository.findById(routeIdLong);
 
-			if (!routeOptional.isPresent()) {
+			if (routeOptional.isEmpty()) {
                 log.debug("Create new route: " + routeName);
 
                 route = new Route();

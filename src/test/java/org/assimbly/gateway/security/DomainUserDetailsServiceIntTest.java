@@ -4,27 +4,25 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test class for DomainUserDetailsService.
  *
  * @see DomainUserDetailsService
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = GatewayApp.class)
 @Transactional
 public class DomainUserDetailsServiceIntTest {
@@ -46,7 +44,7 @@ public class DomainUserDetailsServiceIntTest {
     private User userTwo;
     private User userThree;
 
-    @Before
+    @BeforeEach
     public void init() {
         userOne = new User();
         userOne.setLogin(USER_ONE_LOGIN);
@@ -103,10 +101,11 @@ public class DomainUserDetailsServiceIntTest {
         assertThat(userDetails.getUsername()).isEqualTo(USER_TWO_LOGIN);
     }
 
-    @Test(expected = UsernameNotFoundException.class)
+    @Test
     @Transactional
     public void assertThatUserCanNotBeFoundByEmailIgnoreCase() {
-    domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH));
+        assertThrows(UsernameNotFoundException.class, () ->
+            domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH)));
     }
 
     @Test
@@ -117,10 +116,11 @@ public class DomainUserDetailsServiceIntTest {
         assertThat(userDetails.getUsername()).isEqualTo(USER_ONE_LOGIN);
     }
 
-    @Test(expected = UserNotActivatedException.class)
+    @Test
     @Transactional
     public void assertThatUserNotActivatedExceptionIsThrownForNotActivatedUsers() {
-        domainUserDetailsService.loadUserByUsername(USER_THREE_LOGIN);
+        assertThrows(UserNotActivatedException.class, () ->
+            domainUserDetailsService.loadUserByUsername(USER_THREE_LOGIN));
     }
 
 }

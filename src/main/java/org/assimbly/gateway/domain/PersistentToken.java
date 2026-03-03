@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PersistentToken implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final int MAX_USER_AGENT_LEN = 255;

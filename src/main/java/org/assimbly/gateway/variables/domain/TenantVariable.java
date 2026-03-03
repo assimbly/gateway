@@ -83,11 +83,11 @@ public class TenantVariable {
 
         Object createdAtField = document.get(CREATED_AT_FIELD);
         if (createdAtField != null) {
-            if (createdAtField instanceof Long) {
-                tenantVariable.setCreatedAt((Long) createdAtField);
-            } else if (createdAtField instanceof Integer) {
+            if (createdAtField instanceof Long long1) {
+                tenantVariable.setCreatedAt(long1);
+            } else if (createdAtField instanceof Integer integer) {
                 // Convert Integer to Long
-                tenantVariable.setCreatedAt(((Integer) createdAtField).longValue());
+                tenantVariable.setCreatedAt(integer.longValue());
             }
         }
 

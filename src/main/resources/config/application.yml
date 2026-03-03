@@ -131,7 +131,7 @@ spring:
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
       hibernate:
-        globally_quoted_identifiers: true
+        globally_quoted_identifiers: false
         ddl-auto: none
         naming:
           physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
@@ -143,8 +143,8 @@ spring:
     allow-circular-references: true
     lazy-initialization: true
   mvc:
-    favicon:
-      enabled: true
+    # This property is deprecated and will be removed in future Spring Boot versions
+      # enabled: true
     pathmatch:
       matching-strategy: ant_path_matcher
   threads:

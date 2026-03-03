@@ -34,8 +34,8 @@ public class AccountResource {
      */
     @GetMapping("/account")
     public UserVM getAccount(Principal principal) {
-        if (principal instanceof AbstractAuthenticationToken) {
-            return getUserFromAuthentication((AbstractAuthenticationToken) principal);
+        if (principal instanceof AbstractAuthenticationToken token) {
+            return getUserFromAuthentication(token);
         } else {
             throw new AccountResourceException("User could not be found");
         }

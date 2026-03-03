@@ -84,7 +84,7 @@ public class ImportXMLMessages {
 			Long.parseLong(messageId, 10);
 			Optional<Message> messageOptional = messageRepository.findByName(messageName);
 
-			if (!messageOptional.isPresent()) {
+			if (messageOptional.isEmpty()) {
                 log.debug("Create new message: " + messageName);
                 message = new Message();
 				headers = new HashSet<>();

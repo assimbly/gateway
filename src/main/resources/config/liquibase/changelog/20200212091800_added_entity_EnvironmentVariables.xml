@@ -17,7 +17,7 @@
             <column name="jhi_key" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="value" type="clob">
+            <column name="jhi_value" type="clob">
                 <constraints nullable="true" />
             </column>
             <column name="encrypted" type="boolean">

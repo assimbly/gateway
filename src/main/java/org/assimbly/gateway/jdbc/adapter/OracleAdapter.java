@@ -13,8 +13,8 @@ public class OracleAdapter implements DatabaseAdapter {
     public Connection connect(JDBCConnection connection) throws SQLException {
         OracleDriver driver = new OracleDriver();
 
-        String url = String.format("jdbc:oracle:thin:@%s:%s/%s",
-                connection.getHost(), connection.getPort(), connection.getDatabase());
+        String url = "jdbc:oracle:thin:@%s:%s/%s".formatted(
+            connection.getHost(), connection.getPort(), connection.getDatabase());
 
         DriverManager.setLoginTimeout(5);
         DriverManager.registerDriver(driver);

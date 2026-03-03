@@ -165,11 +165,10 @@ public class User {
     private static <T extends Enum<T>> T getEnumFromDocument(Document document, String fieldName, Class<T> enumClass) {
         try {
             Object fieldObj = document.get(fieldName);
-            if (fieldObj instanceof Symbol) {
-                String symbolValue = ((Symbol) fieldObj).getSymbol();
+            if (fieldObj instanceof Symbol symbol) {
+                String symbolValue = symbol.getSymbol();
                 return Enum.valueOf(enumClass, symbolValue.toUpperCase());
-            } else if (fieldObj instanceof String) {
-                String stringValue = (String) fieldObj;
+            } else if (fieldObj instanceof String stringValue) {
                 return Enum.valueOf(enumClass, stringValue.toUpperCase());
             } else {
                 throw new IllegalArgumentException("Unsupported type for field: " + fieldName + ", class: " + fieldObj.getClass().getName());

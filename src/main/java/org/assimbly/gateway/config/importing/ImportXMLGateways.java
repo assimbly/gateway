@@ -64,7 +64,7 @@ public class ImportXMLGateways {
             Optional<Integration> integrationOptional = integrationRepository.findById(integrationIdLong);
 
             Integration integration;
-			if (!integrationOptional.isPresent()) {
+			if (integrationOptional.isEmpty()) {
 				integration = new Integration();
 			}else {
 				integration = integrationOptional.get();
