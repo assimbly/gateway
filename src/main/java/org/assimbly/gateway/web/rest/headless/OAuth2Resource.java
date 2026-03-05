@@ -151,7 +151,7 @@ public class OAuth2Resource {
         con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         con.setUseCaches(false);
 
-        try(OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());) {
+        try(OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream())) {
 
             // get token info from uri_token service
 

@@ -50,7 +50,7 @@ description = "A message gateway"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -107,7 +107,7 @@ eclipse {
 //build container image
 jib {
     from {
-        image = 'container-registry.oracle.com/graalvm/jdk:21'
+        image = 'container-registry.oracle.com/graalvm/jdk:25'
     }
     to {
         image = 'assimbly/gateway-full'
@@ -389,6 +389,8 @@ dependencies {
     testImplementation "org.assertj:assertj-core:${assertj_version}"
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
+    testImplementation "org.hamcrest:hamcrest:3.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:5.22.0"
 
     liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase:4.0.3"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
@@ -535,7 +537,7 @@ if (project.hasProperty("nodeInstall")) {
 }
 
 rewrite {
-    activeRecipe("org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0")
+    activeRecipe("org.openrewrite.java.migrate.UpgradeToJava25")
     setExportDatatables(true)
 }
 

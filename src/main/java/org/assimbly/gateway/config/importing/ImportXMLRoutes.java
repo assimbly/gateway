@@ -115,7 +115,7 @@ public class ImportXMLRoutes {
                 log.debug("Update route: " + routeName);
                 route = routeOptional.get();
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			route = new Route();
 			route.setName(routeId);
 			route.setType("xml");

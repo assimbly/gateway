@@ -451,7 +451,7 @@ public class ExportXML {
                         routeConfigurations.appendChild(node);
                     }else{
                         routes.appendChild(node);
-                        System.out.println("append the node");
+                        IO.println("append the node");
                     }
                 }else{
                     log.error("Route content is not valid XML:\n\n" + routeContent);

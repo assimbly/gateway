@@ -1,13 +1,11 @@
 {
-  "resources": {
-    "includes": [
+  "resources": [
       {
         "condition": {
           "typeReachable": "org.eclipse.jetty.client.HttpClient"
         },
-        "pattern": "\\Qorg/eclipse/jetty/version/build.properties\\E"
+        "glob": "\\\\Qorg/eclipse/jetty/version/build.properties\\\\E"
       }
-    ]
-  },
+    ],
   "bundles": []
 }

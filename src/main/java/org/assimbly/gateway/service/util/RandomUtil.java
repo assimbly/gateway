@@ -24,7 +24,7 @@ public final class RandomUtil {
         SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(i -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> random.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());
@@ -39,7 +39,7 @@ public final class RandomUtil {
         SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(i -> random.nextInt(10)) // Generates a number between 0-9
+            .map(_ -> random.nextInt(10)) // Generates a number between 0-9
             .mapToObj(String::valueOf)
             .collect(Collectors.joining());
     }
@@ -53,7 +53,7 @@ public final class RandomUtil {
         SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(i -> random.nextInt(10)) // Generates a number between 0-9
+            .map(_ -> random.nextInt(10)) // Generates a number between 0-9
             .mapToObj(String::valueOf)
             .collect(Collectors.joining());
     }
@@ -69,7 +69,7 @@ public final class RandomUtil {
         SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(i -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> random.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());
@@ -85,7 +85,7 @@ public final class RandomUtil {
         SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(i -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> random.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());

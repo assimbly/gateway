@@ -8,6 +8,7 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +29,10 @@ public final class TestUtil {
             MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
-
     private static ObjectMapper createObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
-        return mapper;
+        return JsonMapper.builder()
+            //.changeDefaultPropertyInclusion(incl -> incl.withValue(JsonInclude.Include.NON_EMPTY))
+            .build();
     }
 
     /**
@@ -82,7 +82,7 @@ public final class TestUtil {
                     return false;
                 }
                 return true;
-            } catch (DateTimeParseException e) {
+            } catch (DateTimeParseException _) {
                 mismatchDescription.appendText("was ").appendValue(item)
                     .appendText(", which could not be parsed as a ZonedDateTime");
                 return false;

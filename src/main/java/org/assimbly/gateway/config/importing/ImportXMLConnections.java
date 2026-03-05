@@ -102,7 +102,7 @@ public class ImportXMLConnections {
                 connectionKeys = connection.getConnectionKeys();
 
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			connection = new Connection();
 			connectionKeys = new HashSet<>();
 			if (connectionName != null) {

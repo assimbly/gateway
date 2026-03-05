@@ -136,7 +136,7 @@ public class ImportXMLFlows {
                     flow.lastModified(lastModified);
                     flow.created(Instant.now());
                 }
-                catch (Exception e)
+                catch (Exception _)
                 {
                     flow.lastModified(Instant.now());
                     flow.created(Instant.now());
@@ -263,7 +263,7 @@ public class ImportXMLFlows {
             }else {
                 connection = null;
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			connection = null;
 		}
 
@@ -281,7 +281,7 @@ public class ImportXMLFlows {
 				message = null;
 			}
 
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			message = null;
 		}
 

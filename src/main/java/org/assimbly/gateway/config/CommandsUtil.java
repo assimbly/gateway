@@ -51,7 +51,7 @@ public final class CommandsUtil {
 
         try {
             cmd = parser.parse(options, arguments, true);
-        } catch (ParseException e) {
+        } catch (ParseException _) {
             //
         }
 

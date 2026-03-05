@@ -1,26 +1,24 @@
 {
-    "resources": {
-        "includes": [
+    "resources": [
             {
-                "pattern": "\\QMETA-INF/services/org.apache.activemq.artemis.spi.core.remoting.ssl.OpenSSLContextFactory\\E",
+                "glob": "\\\\QMETA-INF/services/org.apache.activemq.artemis.spi.core.remoting.ssl.OpenSSLContextFactory\\\\E",
                 "condition": {
                     "typeReachable": "org.apache.activemq.artemis.spi.core.remoting.ssl.OpenSSLContextFactoryProvider"
                 }
             },
             {
-                "pattern": "\\QMETA-INF/services/org.apache.activemq.artemis.spi.core.remoting.ssl.SSLContextFactory\\E",
+                "glob": "\\\\QMETA-INF/services/org.apache.activemq.artemis.spi.core.remoting.ssl.SSLContextFactory\\\\E",
                 "condition": {
                     "typeReachable": "org.apache.activemq.artemis.spi.core.remoting.ssl.SSLContextFactoryProvider"
                 }
             },
             {
-                "pattern": "\\Qactivemq-version.properties\\E",
+                "glob": "\\\\Qactivemq-version.properties\\\\E",
                 "condition": {
                     "typeReachable": "org.apache.activemq.artemis.utils.VersionLoader"
                 }
             }
-        ]
-    },
+        ],
     "bundles": [
         
     ]

@@ -99,7 +99,7 @@ public class ImportXMLMessages {
 				message = messageOptional.get();
 				headers = message.getHeaders();
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			message = new Message();
 			headers = new HashSet<>();
 			if (messageName == null || messageName.isEmpty()) {

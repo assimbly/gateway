@@ -39,7 +39,7 @@ public class CacheConfiguration {
 
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
-        return cm -> {
+        return _ -> {
             // jhipster-needle-ehcache-add-entry
         };
     }

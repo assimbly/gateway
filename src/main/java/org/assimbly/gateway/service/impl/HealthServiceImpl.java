@@ -49,7 +49,7 @@ public class HealthServiceImpl implements HealthService {
             if (unixOS.isInstance(operatingSystemMXBean))
                 return unixOS.getMethod(methodName).invoke(operatingSystemMXBean);
 
-        } catch (Exception e) {
+        } catch (Exception _) {
             log.error("Can't invoke {}", methodName);
         }
 

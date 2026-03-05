@@ -108,7 +108,7 @@ public class AuthenticatorResource {
             mongoDao.removeAuthenticatorSettings(user);
 
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
+        } catch (Exception _) {
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body("The session token is invalid.");

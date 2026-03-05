@@ -75,7 +75,7 @@ public class ImportXMLGateways {
             }else {
                 try {
                     GatewayType.valueOf(type);
-                }catch (Exception e){
+                }catch (Exception _){
                     type = "FULL";
                 }
             }

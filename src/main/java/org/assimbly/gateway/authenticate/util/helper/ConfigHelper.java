@@ -48,7 +48,7 @@ public final class ConfigHelper {
 
         try (FileInputStream fis = new FileInputStream("/opt/karaf/etc/" + FILE_NAME)) {
             props.load(fis);
-        } catch (IOException e) {
+        } catch (IOException _) {
             props.load(resourceStream);
         }
 
