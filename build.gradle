@@ -45,7 +45,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '5.1.0'
+version = '6.0.0'
 description = "A message gateway"
 
 java {
@@ -280,7 +280,7 @@ repositories {
 
 dependencies {
 
-    rewrite("org.openrewrite.recipe:rewrite-spring:6.25.0")
+    rewrite("org.openrewrite.recipe:rewrite-spring:6.26.0")
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
@@ -385,6 +385,10 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
+    // Add these to silence the hibernate metamodel warnings
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.transaction:jakarta.transaction-api'
+
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.assertj:assertj-core:${assertj_version}"
     testImplementation "org.mockito:mockito-core"
@@ -398,8 +402,6 @@ dependencies {
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
     runtimeOnly "com.h2database:h2:2.4.240"
-
-    runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
@@ -526,20 +528,20 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.3.1"
+    gradleVersion = "9.4.0"
 }
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "20.15.1"
-        npmVersion = "9.5.1"
-        yarnVersion = "1.22.19"
+        version = "20.20.0"
+        npmVersion = "11.11.0"
+        yarnVersion = "1.22.22"
         download = true
     }
 }
 
 rewrite {
-    activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE11")
+    //activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE11")
     setExportDatatables(true)
 }
 
