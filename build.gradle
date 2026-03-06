@@ -54,7 +54,7 @@ java {
     }
 }
 
-tasks.withType(JavaExec) {
+tasks.withType(JavaExec).configureEach {
     systemProperty "ASSIMBLY_ENV", System.getProperty("ASSIMBLY_ENV")
 }
 
@@ -67,7 +67,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 
-configurations.all {
+configurations.configureEach {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
     exclude group: "org.slf4j", module: "slf4j-nop"
@@ -163,7 +163,7 @@ test {
     reports.html.required = false
 }
 
-task integrationTest(type: Test) {
+tasks.register('integrationTest', Test) {
     useJUnitPlatform()
     description = "Execute integration tests."
     group = "verification"
@@ -179,12 +179,12 @@ task integrationTest(type: Test) {
 }
 
 check.dependsOn integrationTest
-task testReport(type: TestReport) {
+tasks.register('testReport', TestReport) {
     destinationDirectory = layout.buildDirectory.dir("reports/tests").get().asFile
     getTestResults()
 }
 
-task integrationTestReport(type: TestReport) {
+tasks.register('integrationTestReport', TestReport) {
     destinationDirectory = layout.buildDirectory.dir("reports/tests").get().asFile
     getTestResults()
 }
@@ -193,7 +193,7 @@ if (!project.hasProperty("runList")) {
     project.ext.runList = "main"
 }
 
-task getDeps(type: Copy) {
+tasks.register('getDeps', Copy) {
     from sourceSets.main.runtimeClasspath
     into 'runtime/'
 }
@@ -202,7 +202,7 @@ project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/"
 
 liquibase {
     activities {
-        main {
+        main({
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
             username "gateway"
@@ -211,7 +211,7 @@ liquibase {
             defaultSchemaName ""
             logLevel "debug"
             classpath "src/main/resources/"
-        }
+        })
         diffLog {
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
@@ -239,7 +239,7 @@ configurations {
     liquibaseRuntime.extendsFrom(sourceSets.main.compileClasspath)
 
     compile { transitive = false }
-    all {
+    configureEach {
         resolutionStrategy {
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
@@ -399,6 +399,8 @@ dependencies {
 
     runtimeOnly "com.h2database:h2:2.4.240"
 
+    runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 }
@@ -537,7 +539,7 @@ if (project.hasProperty("nodeInstall")) {
 }
 
 rewrite {
-    activeRecipe("org.openrewrite.java.migrate.UpgradeToJava25")
+    activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE11")
     setExportDatatables(true)
 }
 
