@@ -40,4 +40,4 @@ file_env 'JHIPSTER_REGISTRY_PASSWORD'
 exec java ${JAVA_OPTS} -Djdk.tls.useExtendedMasterSecret=false -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -cp /app/resources/:/app/classes/:/app/libs/* "org.assimbly.gateway.GatewayApp"  "$@" --application.gateway.base-directory=/data/ --server.port=8088
 
 # packaged
-#exec java ${JAVA_OPTS} -Djdk.tls.useExtendedMasterSecret=false -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -cp @/app/jib-classpath-file @/app/jib-main-class-file "$@" --application.gateway.base-directory=/data/ --server.port=8088
+#exec java ${JAVA_OPTS} -Djdk.tls.useExtendedMasterSecret=false -XX:+UseCompactObjectHeaders -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -cp @/app/jib-classpath-file @/app/jib-main-class-file "$@" --application.gateway.base-directory=/data/ --server.port=8088
