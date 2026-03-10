@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.errors;
 
+import java.util.*;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +31,6 @@ import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCau
 import tech.jhipster.web.util.HeaderUtil;
 
 import java.net.URI;
-import java.util.*;
 
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 

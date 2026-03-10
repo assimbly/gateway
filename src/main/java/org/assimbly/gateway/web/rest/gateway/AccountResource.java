@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class AccountResource {
 
-    private static class AccountResourceException extends RuntimeException {
+    private static final class AccountResourceException extends RuntimeException {
 
         private AccountResourceException(String message) {
             super(message, null, true, false);

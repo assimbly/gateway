@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Persist AuditEvent managed by the Spring Boot actuator.
@@ -41,7 +41,7 @@ public class PersistentAuditEvent implements Serializable {
     @MapKeyColumn(name = "name")
     @Column(name = "value")
     @CollectionTable(name = "jhi_persistent_audit_evt_data", joinColumns=@JoinColumn(name="event_id"))
-    private Map<String, String> data = new HashMap<>();
+    private Map<String, String> data = new ConcurrentHashMap<>();
 
     public Long getId() {
         return id;

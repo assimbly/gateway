@@ -10,9 +10,9 @@ import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.ansi.AnsiStyle;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Log filter to prevent attackers from forging log entries by submitting input containing CRLF characters.
@@ -33,7 +33,7 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
     private static final Map<String, AnsiElement> ELEMENTS;
 
     static {
-        Map<String, AnsiElement> ansiElements = new HashMap<>();
+        Map<String, AnsiElement> ansiElements = new ConcurrentHashMap<>();
         ansiElements.put("faint", AnsiStyle.FAINT);
         ansiElements.put("red", AnsiColor.RED);
         ansiElements.put("green", AnsiColor.GREEN);

@@ -1,13 +1,13 @@
 package org.assimbly.gateway.service.response;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BackendResponse {
 
-    private Map<String, Object> jvm = new HashMap<>();
-    private Map<String, Long> memory = new HashMap<>();
-    private Map<String, Integer> threads = new HashMap<>();
+    private Map<String, Object> jvm = new ConcurrentHashMap<>();
+    private Map<String, Long> memory = new ConcurrentHashMap<>();
+    private Map<String, Integer> threads = new ConcurrentHashMap<>();
 
     public Map<String, Long> getMemory() {
         return memory;

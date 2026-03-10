@@ -3,6 +3,8 @@ package org.assimbly.gateway.authenticate.util.helper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,14 +44,14 @@ public final class ConfigHelper {
     private static Properties loadFile(String fileName) throws IOException {
         ClassLoader loader = ConfigHelper.class.getClassLoader();
 
-        InputStream resourceStream = loader.getResourceAsStream(fileName);
-
         Properties props = new Properties();
 
-        try (FileInputStream fis = new FileInputStream("/opt/karaf/etc/" + FILE_NAME)) {
+        try (InputStream fis = Files.newInputStream(Paths.get("/opt/karaf/etc/" + FILE_NAME))) {
             props.load(fis);
         } catch (IOException _) {
-            props.load(resourceStream);
+            try(InputStream resourceStream = loader.getResourceAsStream(fileName)) {
+                props.load(resourceStream);
+            }
         }
 
         return props;

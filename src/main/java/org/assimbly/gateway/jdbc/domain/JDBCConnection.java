@@ -5,17 +5,17 @@ import org.assimbly.gateway.jdbc.adapter.DatabaseAdapter;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class JDBCConnection {
+public final class JDBCConnection {
 
-    private String username;
-    private String password;
-    private String host;
-    private String instance;
-    private int port;
-    private String database;
-    private boolean isSecure;
-    private String enabledTLSProtocols;
-    private boolean escapeChars;
+    private final String username;
+    private final String password;
+    private final String host;
+    private final String instance;
+    private final int port;
+    private final String database;
+    private final boolean isSecure;
+    private final String enabledTLSProtocols;
+    private final boolean escapeChars;
 
     private JDBCConnection(Builder builder) {
         this.username = builder.username;

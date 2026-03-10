@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import tech.jhipster.config.JHipsterProperties;
 import tools.jackson.core.JacksonException;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static tech.jhipster.config.logging.LoggingUtils.*;
 
@@ -27,7 +27,7 @@ public class LoggingConfiguration {
     ) throws JacksonException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new ConcurrentHashMap<>();
         map.put("app_name", appName);
         map.put("app_port", serverPort);
         String customFields = mapper.writeValueAsString(map);

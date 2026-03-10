@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import java.io.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.tenant.TenantVariableManager;
 import org.assimbly.util.exception.OAuth2TokenException;
@@ -12,14 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +70,7 @@ public class OAuth2Resource {
     ) throws IOException {
         log.debug("REST request to register two-factor authentication");
 
-        Map<String, String> tokenInfoMap = new HashMap<>();
+        Map<String, String> tokenInfoMap = new ConcurrentHashMap<>();
 
         tenant = tenant.toLowerCase();
         String environment = System.getenv("ASSIMBLY_ENV");
@@ -101,7 +102,7 @@ public class OAuth2Resource {
 
         // prepare data to send
         String urlParameters  = "client_id="+(customCredentialsType ? clientId : GOOGLE_CLIENT_ID)+
-            (scope!=null && !scope.trim().equals("") ? "&scope="+scope : "")+
+            (scope!=null && !scope.trim().isEmpty() ? "&scope="+scope : "")+
             "&redirect_uri="+redirectUri+
             "&grant_type=authorization_code"+
             "&client_secret="+(customCredentialsType ? clientSecret : GOOGLE_CLIENT_SECRET)+
@@ -136,7 +137,7 @@ public class OAuth2Resource {
     // call service
     private static void callService(Map<String, String> tokenInfoMap, String uriToken, String urlParameters) throws IOException {
 
-        HttpURLConnection con = null;
+        HttpURLConnection con;
         // prepare connection
         URI uri = URI.create(uriToken);
         URL url = uri.toURL();
@@ -149,9 +150,8 @@ public class OAuth2Resource {
 
         try(OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream())) {
 
-            InputStream stream = null;
-            String tokenInfoResp = null;
-
+            InputStream stream;
+            String tokenInfoResp;
 
             // get token info from uri_token service
 
@@ -170,7 +170,7 @@ public class OAuth2Resource {
 
             JSONObject tokenInfoJson = new JSONObject(tokenInfoResp);
             if (!tokenInfoJson.isNull(SERVICE_PARAM_ERROR)) {
-                log.info("tokenInfoResp > "+tokenInfoResp);
+                log.info("tokenInfoResp > {}", tokenInfoResp);
                 String error = (
                     tokenInfoJson.has(SERVICE_PARAM_ERROR) ? tokenInfoJson.getString(SERVICE_PARAM_ERROR) : ""
                 );

@@ -13,9 +13,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -30,7 +30,7 @@ public class ImportXMLEnvironmentVariables {
 
 		Set<EnvironmentVariables> environmentVariablesList = integration.getEnvironmentVariables();
 
-		Map<String, EnvironmentVariables> map = new HashMap<>();
+		Map<String, EnvironmentVariables> map = new ConcurrentHashMap<>();
 		for (EnvironmentVariables s : environmentVariablesList) {
 			map.put(s.getKey(), s);
 		}
@@ -48,22 +48,18 @@ public class ImportXMLEnvironmentVariables {
 
             boolean encryptedBoolean = encrypted.equalsIgnoreCase("true");
 
+            EnvironmentVariables environmentVariable;
             if (!map.containsKey(key)) {
-				EnvironmentVariables environmentVariable = new EnvironmentVariables();
-				environmentVariable.setKey(key);
-				environmentVariable.setValue(value);
-                environmentVariable.setEncrypted(encryptedBoolean);
-				environmentVariable.setIntegration(integration);
-				environmentVariablesList.add(environmentVariable);
-			} else {
-				EnvironmentVariables environmentVariable = map.get(key);
-				environmentVariable.setKey(key);
-				environmentVariable.setValue(value);
-                environmentVariable.setEncrypted(encryptedBoolean);
-				environmentVariable.setIntegration(integration);
-				environmentVariablesList.add(environmentVariable);
-			}
-		}
+                environmentVariable = new EnvironmentVariables();
+            } else {
+                environmentVariable = map.get(key);
+            }
+            environmentVariable.setKey(key);
+            environmentVariable.setValue(value);
+            environmentVariable.setEncrypted(encryptedBoolean);
+            environmentVariable.setIntegration(integration);
+            environmentVariablesList.add(environmentVariable);
+        }
 
 		environmentVariablesRepository.saveAll(environmentVariablesList);
 

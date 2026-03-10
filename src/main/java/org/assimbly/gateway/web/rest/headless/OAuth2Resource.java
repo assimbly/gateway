@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.headless;
 
+import java.io.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.tenant.TenantVariableManager;
 import org.assimbly.util.exception.OAuth2TokenException;
@@ -12,14 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +70,7 @@ public class OAuth2Resource {
     ) throws IOException {
         log.debug("REST request to register two-factor authentication");
 
-        Map<String, String> tokenInfoMap = new HashMap<>();
+        Map<String, String> tokenInfoMap = new ConcurrentHashMap<>();
 
         tenant = tenant.toLowerCase();
         String environment = System.getenv("ASSIMBLY_ENV");
@@ -101,7 +102,7 @@ public class OAuth2Resource {
 
         // prepare data to send
         String urlParameters  = "client_id="+(customCredentialsType ? clientId : GOOGLE_CLIENT_ID)+
-            (scope!=null && !scope.trim().equals("") ? "&scope="+scope : "")+
+            (scope!=null && !scope.trim().isEmpty() ? "&scope="+scope : "")+
             "&redirect_uri="+redirectUri+
             "&grant_type=authorization_code"+
             "&client_secret="+(customCredentialsType ? clientSecret : GOOGLE_CLIENT_SECRET)+
@@ -137,9 +138,9 @@ public class OAuth2Resource {
     private static void callService(Map<String, String> tokenInfoMap, String uriToken, String urlParameters) throws IOException {
 
 
-        URL url = null;
-        InputStream stream = null;
-        String tokenInfoResp = null;
+        URL url;
+        InputStream stream;
+        String tokenInfoResp;
 
         // prepare connection
         URI uri = URI.create(uriToken);
@@ -168,32 +169,30 @@ public class OAuth2Resource {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             tokenInfoResp = reader.lines().collect(Collectors.joining(System.lineSeparator()));
 
-            if (tokenInfoResp != null) {
-                JSONObject tokenInfoJson = new JSONObject(tokenInfoResp);
-                if (!tokenInfoJson.isNull(SERVICE_PARAM_ERROR)) {
-                    log.info("tokenInfoResp > {}", tokenInfoResp);
-                    String error = (
-                        tokenInfoJson.has(SERVICE_PARAM_ERROR) ? tokenInfoJson.getString(SERVICE_PARAM_ERROR) : ""
-                    );
-                    String errorDescription = (
-                        tokenInfoJson.has(SERVICE_PARAM_ERROR_DESCRIPTION) ?
-                            tokenInfoJson.getString(SERVICE_PARAM_ERROR_DESCRIPTION) : ""
-                    );
-                    throw new OAuth2TokenException(error + " - " + errorDescription);
-                } else {
-                    // expire_date
-                    Calendar nowCal = Calendar.getInstance();
-                    int expiresIn = tokenInfoJson.getInt(SERVICE_PARAM_EXPIRES_IN);
-                    nowCal.add(Calendar.SECOND, expiresIn);
-                    // access_token
-                    String accessToken = tokenInfoJson.getString(SERVICE_PARAM_ACCESS_TOKEN);
-                    // refresh_token
-                    String refreshToken = tokenInfoJson.optString(SERVICE_PARAM_REFRESH_TOKEN);
-                    // add token info into hashmap
-                    tokenInfoMap.put(SERVICE_PARAM_EXPIRES_IN, String.valueOf(nowCal.getTimeInMillis()));
-                    tokenInfoMap.put(SERVICE_PARAM_ACCESS_TOKEN, accessToken);
-                    tokenInfoMap.put(SERVICE_PARAM_REFRESH_TOKEN, refreshToken);
-                }
+            JSONObject tokenInfoJson = new JSONObject(tokenInfoResp);
+            if (!tokenInfoJson.isNull(SERVICE_PARAM_ERROR)) {
+                log.info("tokenInfoResp > {}", tokenInfoResp);
+                String error = (
+                    tokenInfoJson.has(SERVICE_PARAM_ERROR) ? tokenInfoJson.getString(SERVICE_PARAM_ERROR) : ""
+                );
+                String errorDescription = (
+                    tokenInfoJson.has(SERVICE_PARAM_ERROR_DESCRIPTION) ?
+                        tokenInfoJson.getString(SERVICE_PARAM_ERROR_DESCRIPTION) : ""
+                );
+                throw new OAuth2TokenException(error + " - " + errorDescription);
+            } else {
+                // expire_date
+                Calendar nowCal = Calendar.getInstance();
+                int expiresIn = tokenInfoJson.getInt(SERVICE_PARAM_EXPIRES_IN);
+                nowCal.add(Calendar.SECOND, expiresIn);
+                // access_token
+                String accessToken = tokenInfoJson.getString(SERVICE_PARAM_ACCESS_TOKEN);
+                // refresh_token
+                String refreshToken = tokenInfoJson.optString(SERVICE_PARAM_REFRESH_TOKEN);
+                // add token info into hashmap
+                tokenInfoMap.put(SERVICE_PARAM_EXPIRES_IN, String.valueOf(nowCal.getTimeInMillis()));
+                tokenInfoMap.put(SERVICE_PARAM_ACCESS_TOKEN, accessToken);
+                tokenInfoMap.put(SERVICE_PARAM_REFRESH_TOKEN, refreshToken);
             }
 
         } catch (IOException e) {

@@ -56,14 +56,14 @@ public class EmailResource {
             CamelContext context = integrationRuntime.getIntegration().getContext();
             String accessToken = "";
 
-            StringBuilder uriStrBuild = new StringBuilder();
-            uriStrBuild.append("%s://%s:%d?".formatted(emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()));
-            uriStrBuild.append("authenticationType=RAW(%s)".formatted(emailRequest.getTypeAuth()));
-            uriStrBuild.append("&mail.smtp.starttls.enable=true");
-            uriStrBuild.append("&subject=RAW(%s)".formatted(emailRequest.getSubject()));
-            uriStrBuild.append("&to=RAW(%s)".formatted(emailRequest.getTo()));
-            uriStrBuild.append("&username=RAW(%s)".formatted(emailRequest.getUsername()));
-            uriStrBuild.append("&contentType=RAW(%s)".formatted(emailRequest.getContentType()));
+            StringBuilder uriStrBuild = new StringBuilder(32)
+            .append("%s://%s:%d?".formatted(emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()))
+            .append("authenticationType=RAW(%s)".formatted(emailRequest.getTypeAuth()))
+            .append("&mail.smtp.starttls.enable=true")
+            .append("&subject=RAW(%s)".formatted(emailRequest.getSubject()))
+            .append("&to=RAW(%s)".formatted(emailRequest.getTo()))
+            .append("&username=RAW(%s)".formatted(emailRequest.getUsername()))
+            .append("&contentType=RAW(%s)".formatted(emailRequest.getContentType()));
 
             if(StringUtils.isNoneEmpty(emailRequest.getTypeAuth()) && emailRequest.getTypeAuth().equals("basic")) {
                 // basic
