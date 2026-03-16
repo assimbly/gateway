@@ -243,10 +243,10 @@ configurations {
         resolutionStrategy {
             eachDependency { DependencyResolveDetails details ->
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.41.0")
+                    details.useVersion("2.52.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.7")
+                    details.useVersion("6.2.1")
                 }
             }
         }
@@ -280,7 +280,7 @@ repositories {
 
 dependencies {
 
-    rewrite("org.openrewrite.recipe:rewrite-spring:6.26.0")
+    rewrite("org.openrewrite.recipe:rewrite-spring:6.27.0")
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
@@ -394,7 +394,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest:3.0"
-    testImplementation "org.mockito:mockito-junit-jupiter:5.22.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
 
     liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase:4.0.3"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
