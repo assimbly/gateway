@@ -239,18 +239,7 @@ configurations {
     liquibaseRuntime.extendsFrom(sourceSets.main.compileClasspath)
 
     compile { transitive = false }
-    configureEach {
-        resolutionStrategy {
-            eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.52.0")
-                }
-                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.2.1")
-                }
-            }
-        }
-    }
+
 }
 
 repositories {
@@ -362,18 +351,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation 'org.springframework.retry:spring-retry:2.0.12'
 
-
-    // Ensure you have the JDBC starter as well for DataSourceProperties
-    implementation "org.springframework.boot:spring-boot-starter-jdbc:4.0.3"
-
     implementation 'org.slf4j:jcl-over-slf4j:2.0.17'
-
-
-
-    // need to set this to force latest version
-    implementation 'org.apache.commons:commons-lang3:3.20.0'
 
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'

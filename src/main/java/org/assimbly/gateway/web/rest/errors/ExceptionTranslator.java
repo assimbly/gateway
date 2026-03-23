@@ -3,8 +3,14 @@ package org.assimbly.gateway.web.rest.errors;
 import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.nio.file.AccessDeniedException;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.ConcurrencyFailureException;
@@ -14,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.ErrorResponseException;
@@ -30,13 +35,11 @@ import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
 import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 
-import java.net.URI;
-
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
- * The error response follows RFC7807 - Problem Details for HTTP APIs (https://tools.ietf.org/html/rfc7807).
+ * The error response follows RFC7807 - Problem Details for HTTP APIs (<a href="https://tools.ietf.org/html/rfc7807">...</a>).
  */
 @ControllerAdvice
 public class ExceptionTranslator extends ResponseEntityExceptionHandler {
@@ -46,7 +49,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private static final String PATH_KEY = "path";
     private static final boolean CASUAL_CHAIN_ENABLED = false;
 
-    @Value("${jhipster.clientApp.name}")
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionTranslator.class);
+
+    @Value("${jhipster.clientApp.name:jhipsterSampleApplication}")
     private String applicationName;
 
     private final Environment env;
@@ -56,11 +61,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
+    public @Nullable ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
+        LOG.debug("Converting Exception to Problem Details:", ex);
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
-        return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
+        return handleExceptionInternal((Exception) ex, pdCause, Objects.requireNonNull(buildHeaders(ex)), HttpStatusCode.valueOf(pdCause.getStatus()), request);
     }
 
+    @SuppressWarnings("java:S2638")
     @Nullable
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
@@ -70,31 +77,31 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         HttpStatusCode statusCode,
         WebRequest request
     ) {
-        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, (NativeWebRequest) request) : body;
+        body = body == null ? wrapAndCustomizeProblem(ex, (NativeWebRequest) request) : body;
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 
-    protected ProblemDetailWithCause wrapAndCustomizeProblem(Throwable ex, NativeWebRequest request) {
+    protected @Nullable ProblemDetailWithCause wrapAndCustomizeProblem(Throwable ex, NativeWebRequest request) {
         return customizeProblem(getProblemDetailWithCause(ex), ex, request);
     }
 
     private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
-        if (
-            ex instanceof org.assimbly.gateway.service.UsernameAlreadyUsedException
-        ) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
-        if (
-            ex instanceof org.assimbly.gateway.service.EmailAlreadyUsedException
-        ) return (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
-        if (
-            ex instanceof org.assimbly.gateway.service.InvalidPasswordException
-        ) return (ProblemDetailWithCause) new InvalidPasswordException().getBody();
+        return switch (ex) {
+            case org.assimbly.gateway.service.UsernameAlreadyUsedException _ ->
+                (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
+            case org.assimbly.gateway.service.EmailAlreadyUsedException _ ->
+                (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
+            case org.assimbly.gateway.service.InvalidPasswordException _ ->
+                (ProblemDetailWithCause) new InvalidPasswordException().getBody();
+            case
+                ErrorResponseException exp when exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause ->
+                problemDetailWithCause;
+            default -> ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
+        };
 
-        if (
-            ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
-        ) return problemDetailWithCause;
-        return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
     }
 
+    @Nullable
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, NativeWebRequest request) {
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
@@ -122,7 +129,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
-            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
+                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
         ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
@@ -130,7 +137,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return problem;
     }
 
-    private String extractTitle(Throwable err, int statusCode) {
+    private @Nullable String extractTitle(Throwable err, int statusCode) {
         return getCustomizedTitle(err) != null ? getCustomizedTitle(err) : extractTitleForResponseStatus(err, statusCode);
     }
 
@@ -143,14 +150,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                 new FieldErrorVM(
                     f.getObjectName().replaceFirst("DTO$", ""),
                     f.getField(),
-                    StringUtils.isNotBlank(f.getDefaultMessage()) ? f.getDefaultMessage() : f.getCode()
+                    StringUtils.isNotBlank(f.getDefaultMessage()) ? f.getDefaultMessage() : Objects.requireNonNull(f.getCode())
                 )
             )
             .toList();
     }
 
     private String extractTitleForResponseStatus(Throwable err, int statusCode) {
-        ResponseStatus specialStatus = extractResponseStatus(err);
+        var specialStatus = extractResponseStatus(err);
         return specialStatus == null ? HttpStatus.valueOf(statusCode).getReasonPhrase() : specialStatus.reason();
     }
 
@@ -163,18 +170,16 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         // Let the ErrorResponse take this responsibility
         if (throwable instanceof ErrorResponse err) return HttpStatus.valueOf(err.getBody().getStatus());
 
-        return Optional
-            .ofNullable(getMappedStatus(throwable))
-            .orElse(
-                Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value).orElse(HttpStatus.INTERNAL_SERVER_ERROR)
-            );
+        return Optional.ofNullable(getMappedStatus(throwable)).orElse(
+            Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value).orElse(HttpStatus.INTERNAL_SERVER_ERROR)
+        );
     }
 
-    private ResponseStatus extractResponseStatus(final Throwable throwable) {
-        return Optional.ofNullable(resolveResponseStatus(throwable)).orElse(null);
+    private @Nullable ResponseStatus extractResponseStatus(final Throwable throwable) {
+        return resolveResponseStatus(throwable);
     }
 
-    private ResponseStatus resolveResponseStatus(final Throwable type) {
+    private @Nullable ResponseStatus resolveResponseStatus(final Throwable type) {
         final ResponseStatus candidate = findMergedAnnotation(type.getClass(), ResponseStatus.class);
         return candidate == null && type.getCause() != null ? resolveResponseStatus(type.getCause()) : candidate;
     }
@@ -184,7 +189,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return ErrorConstants.DEFAULT_TYPE;
     }
 
-    private String getMappedMessageKey(Throwable err) {
+    private @Nullable String getMappedMessageKey(Throwable err) {
         if (err instanceof MethodArgumentNotValidException) {
             return ErrorConstants.ERR_VALIDATION;
         } else if (err instanceof ConcurrencyFailureException || err.getCause() instanceof ConcurrencyFailureException) {
@@ -193,7 +198,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return null;
     }
 
-    private String getCustomizedTitle(Throwable err) {
+    private @Nullable String getCustomizedTitle(Throwable err) {
         if (err instanceof MethodArgumentNotValidException) return "Method argument not valid";
         return null;
     }
@@ -208,36 +213,37 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         return err.getCause() != null ? err.getCause().getMessage() : err.getMessage();
     }
 
-    private HttpStatus getMappedStatus(Throwable err) {
+    private @Nullable HttpStatus getMappedStatus(Throwable err) {
         // Where we disagree with Spring defaults
-        if (err instanceof AccessDeniedException) return HttpStatus.FORBIDDEN;
-        if (err instanceof ConcurrencyFailureException) return HttpStatus.CONFLICT;
-        if (err instanceof BadCredentialsException) return HttpStatus.UNAUTHORIZED;
-        return null;
+        return switch (err) {
+            case AccessDeniedException _ -> HttpStatus.FORBIDDEN;
+            case ConcurrencyFailureException _ -> HttpStatus.CONFLICT;
+            case BadCredentialsException _ -> HttpStatus.UNAUTHORIZED;
+            default -> null;
+        };
     }
 
     private URI getPathValue(NativeWebRequest request) {
-        if (request == null) return URI.create("about:blank");
         return URI.create(extractURI(request));
     }
 
-    private HttpHeaders buildHeaders(Throwable err) {
+    private @Nullable HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException
             ? HeaderUtil.createFailureAlert(
-                applicationName,
-                true,
-                badRequestAlertException.getEntityName(),
-                badRequestAlertException.getErrorKey(),
-                badRequestAlertException.getMessage()
-            )
+            applicationName,
+            true,
+            badRequestAlertException.getEntityName(),
+            badRequestAlertException.getErrorKey(),
+            badRequestAlertException.getMessage()
+        )
             : null;
     }
 
     public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, NativeWebRequest request) {
-        if (throwable != null && isCasualChainEnabled()) {
+        if (isCasualChainEnabled()) {
             return Optional.of(customizeProblem(getProblemDetailWithCause(throwable), throwable, request));
         }
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
     private boolean isCasualChainEnabled() {
@@ -247,7 +253,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private boolean containsPackageName(String message) {
         // This list is for sure not complete
-        return StringUtils.containsAny(
+        return Strings.CS.containsAny(
             message,
             "org.",
             "java.",
@@ -257,7 +263,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             "com.",
             "io.",
             "de.",
-            "org.assimbly.gateway"
+            "io.github.jhipster.sample"
         );
     }
 }
