@@ -33,7 +33,7 @@ plugins {
     id "idea"
     id "eclipse"
     id "org.springframework.boot"
-    // id "org.springframework.boot.aot"
+    id "org.springframework.boot.aot"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
     id "com.github.node-gradle.node"
@@ -41,7 +41,7 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
     id "com.github.ben-manes.versions" version "0.53.0"
-    id("org.openrewrite.rewrite") version("latest.release")
+    //id("org.openrewrite.rewrite") version("latest.release")
 }
 
 group = "org.assimbly.gateway"
@@ -269,7 +269,7 @@ repositories {
 
 dependencies {
 
-    rewrite("org.openrewrite.recipe:rewrite-spring:6.27.0")
+    //rewrite("org.openrewrite.recipe:rewrite-spring:6.28.1")
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
@@ -279,31 +279,6 @@ dependencies {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }
-
-    implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "tools.jackson.core:jackson-databind"
@@ -344,7 +319,6 @@ dependencies {
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-
 
     implementation "org.springframework.boot:spring-boot-starter-jackson"
     implementation "org.springframework.boot:spring-boot-starter-cache"
@@ -509,7 +483,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.4.0"
+    gradleVersion = "9.4.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
@@ -521,10 +495,12 @@ if (project.hasProperty("nodeInstall")) {
     }
 }
 
+/*
 rewrite {
     //activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE11")
     setExportDatatables(true)
 }
+ */
 
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo
