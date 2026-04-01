@@ -76,10 +76,9 @@ configurations.configureEach {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
-    if (System.getProperty("os.name").toLowerCase().contains("windows")||System.getProperty("os.name").equals("Mac OS X")) {
+    if (System.getProperty("os.name").toLowerCase().contains("windows")|| System.getProperty("os.name") == "Mac OS X") {
         exclude group: 'io.netty', module: 'netty-transport-native-epoll'
         exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
-
     }
 }
 
@@ -202,7 +201,7 @@ project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/"
 
 liquibase {
     activities {
-        main({
+        register("main"){
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
             username "gateway"
@@ -211,8 +210,8 @@ liquibase {
             defaultSchemaName ""
             logLevel "debug"
             classpath "src/main/resources/"
-        })
-        diffLog {
+        }
+        register("diffLog") {
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
             username "gateway"
@@ -446,19 +445,16 @@ tasks.register('printVersion') {
     }
 }
 
+def projectArtifactId = project.hasProperty("integration") ? 'integration' :
+    project.hasProperty("broker")      ? 'broker'      :
+        project.hasProperty("headless")    ? 'headless'    : 'full'
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-
-            if (project.hasProperty("integration")) {
-                artifactId = 'integration'
-            }else if (project.hasProperty("broker")) {
-                artifactId = 'broker'
-            }else if (project.hasProperty("headless")) {
-                artifactId = 'headless'
-            }else{
-                artifactId = 'full'
-            }
+        // 2. Use 'create' instead of the magic method name to help the IDE
+        create('mavenJava', MavenPublication) {
+            // 3. Set the property explicitly
+            artifactId = projectArtifactId
 
             from components.java
         }

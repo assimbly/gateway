@@ -1,21 +1,13 @@
 package org.assimbly.gateway.config.memory;
 
-import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.ExpiryPolicyBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.jsr107.Eh107Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.cache.autoconfigure.JCacheManagerCustomizer;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.config.cache.PrefixedKeyGenerator;
-
-import java.time.Duration;
 
 @Configuration
 @EnableCaching
@@ -23,35 +15,9 @@ public class CacheConfiguration {
 
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
-    private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
 
-    public CacheConfiguration(JHipsterProperties jHipsterProperties) {
-        JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
-
-        jcacheConfiguration =
-            Eh107Configuration.fromEhcacheCacheConfiguration(
-                CacheConfigurationBuilder
-                    .newCacheConfigurationBuilder(Object.class, Object.class, ResourcePoolsBuilder.heap(ehcache.getMaxEntries()))
-                    .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
-                    .build()
-            );
-    }
-
-    @Bean
-    public JCacheManagerCustomizer cacheManagerCustomizer() {
-        return _ -> {
-            // jhipster-needle-ehcache-add-entry
-        };
-    }
-
-    private void createCache(javax.cache.CacheManager cm, String cacheName) {
-        javax.cache.Cache<Object, Object> cache = cm.getCache(cacheName);
-        if (cache != null) {
-            cache.clear();
-        } else {
-            cm.createCache(cacheName, jcacheConfiguration);
-        }
-    }
+    // jcacheConfiguration field and constructor are removed entirely
+    // since no caches are created here
 
     @Autowired(required = false)
     public void setGitProperties(GitProperties gitProperties) {
@@ -67,4 +33,5 @@ public class CacheConfiguration {
     public KeyGenerator keyGenerator() {
         return new PrefixedKeyGenerator(this.gitProperties, this.buildProperties);
     }
+
 }
