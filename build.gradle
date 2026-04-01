@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.liquibase:liquibase-core:${liquibase_version}" // Add this
+        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.0.3") // Add this
     }
 }
 
@@ -41,19 +41,20 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
     id "com.github.ben-manes.versions" version "0.53.0"
+    //id("org.openrewrite.rewrite") version("latest.release")
 }
 
 group = "org.assimbly.gateway"
-version = '5.1.0'
+version = '6.0.0'
 description = "A message gateway"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
-tasks.withType(JavaExec) {
+tasks.withType(JavaExec).configureEach {
     systemProperty "ASSIMBLY_ENV", System.getProperty("ASSIMBLY_ENV")
 }
 
@@ -66,7 +67,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 
-configurations.all {
+configurations.configureEach {
     exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     exclude group: 'org.jboss.slf4j', module: 'slf4j-jboss-logmanager'
     exclude group: "org.slf4j", module: "slf4j-nop"
@@ -75,10 +76,9 @@ configurations.all {
     exclude group: "org.apache.logging.log4j", module: 'log4j-slf4j-impl'
     exclude group: 'commons-logging', module: 'commons-logging'
     exclude group: 'xerces', module: 'xercesImpl'
-    if (System.getProperty("os.name").toLowerCase().contains("windows")||System.getProperty("os.name").equals("Mac OS X")) {
+    if (System.getProperty("os.name").toLowerCase().contains("windows")|| System.getProperty("os.name") == "Mac OS X") {
         exclude group: 'io.netty', module: 'netty-transport-native-epoll'
         exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
-
     }
 }
 
@@ -106,7 +106,7 @@ eclipse {
 //build container image
 jib {
     from {
-        image = 'container-registry.oracle.com/graalvm/jdk:21'
+        image = 'container-registry.oracle.com/graalvm/jdk:25'
     }
     to {
         image = 'assimbly/gateway-full'
@@ -162,7 +162,7 @@ test {
     reports.html.required = false
 }
 
-task integrationTest(type: Test) {
+tasks.register('integrationTest', Test) {
     useJUnitPlatform()
     description = "Execute integration tests."
     group = "verification"
@@ -178,12 +178,12 @@ task integrationTest(type: Test) {
 }
 
 check.dependsOn integrationTest
-task testReport(type: TestReport) {
+tasks.register('testReport', TestReport) {
     destinationDirectory = layout.buildDirectory.dir("reports/tests").get().asFile
     getTestResults()
 }
 
-task integrationTestReport(type: TestReport) {
+tasks.register('integrationTestReport', TestReport) {
     destinationDirectory = layout.buildDirectory.dir("reports/tests").get().asFile
     getTestResults()
 }
@@ -192,7 +192,7 @@ if (!project.hasProperty("runList")) {
     project.ext.runList = "main"
 }
 
-task getDeps(type: Copy) {
+tasks.register('getDeps', Copy) {
     from sourceSets.main.runtimeClasspath
     into 'runtime/'
 }
@@ -201,7 +201,7 @@ project.ext.diffChangelogFile = "src/main/resources/config/liquibase/changelog/"
 
 liquibase {
     activities {
-        main {
+        register("main"){
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
             username "gateway"
@@ -211,7 +211,7 @@ liquibase {
             logLevel "debug"
             classpath "src/main/resources/"
         }
-        diffLog {
+        register("diffLog") {
             driver "org.h2.Driver"
             url "jdbc:h2:file:./target/h2db/db/gateway"
             username "gateway"
@@ -238,18 +238,7 @@ configurations {
     liquibaseRuntime.extendsFrom(sourceSets.main.compileClasspath)
 
     compile { transitive = false }
-    all {
-        resolutionStrategy {
-            eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('artemis') ) {
-                    details.useVersion("2.41.0")
-                }
-                if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.1.7")
-                }
-            }
-        }
-    }
+
 }
 
 repositories {
@@ -279,6 +268,8 @@ repositories {
 
 dependencies {
 
+    //rewrite("org.openrewrite.recipe:rewrite-spring:6.28.1")
+
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
@@ -288,39 +279,14 @@ dependencies {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
     }
 
-    implementation group:  "org.assimbly", name: "aggregate", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "csvtoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "docconverter", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edi", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "edifact", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "encoder", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "enrich", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "exceltoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "flv", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "formtoxml", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "googledrive", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "jsontoxmllegacy", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "pdf", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "pdftotext", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "replace", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "simplereplace", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "smb", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "soap", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "tenantvariables", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltocsv", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltoexcel", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "xmltojsonlegacy", version: "${version}", changing: true
-
     implementation "com.fasterxml.jackson.core:jackson-annotations"
-    implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation "com.fasterxml.jackson.module:jackson-module-afterburner"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
+    implementation "tools.jackson.core:jackson-databind"
+    implementation "tools.jackson.dataformat:jackson-dataformat-xml"
+    implementation "tools.jackson.datatype:jackson-datatype-hibernate7"
+    implementation "tools.jackson.datatype:jackson-datatype-hppc"
+    implementation "tools.jackson.core:jackson-databind"
+    implementation "tools.jackson.module:jackson-module-afterburner"
+    implementation "tools.jackson.module:jackson-module-jakarta-xmlbind-annotations"
     implementation "com.mattbertolini:liquibase-slf4j:${liquibase_slf4j_version}"
     implementation "com.mysql:mysql-connector-j"
     implementation "com.warrenstrange:googleauth"
@@ -335,56 +301,56 @@ dependencies {
     implementation "org.hibernate.orm:hibernate-envers:${hibernate_version}"
     implementation "org.hibernate.orm:hibernate-jcache:${hibernate_version}"
     implementation "org.hibernate.validator:hibernate-validator:${hibernate_validator_version}"
-    implementation "org.liquibase:liquibase-core:${liquibase_version}"
+    implementation "org.springframework.boot:spring-boot-starter-liquibase"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
     implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-webmvc"
+    implementation "org.springframework.boot:spring-boot-starter-aspectj"
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework:spring-context-support"
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
 
-    //remove aop starter (replaced by aspectj in Spring Boot 4)
-    implementation "org.springframework.boot:spring-boot-starter-aop"
-    // implementation "org.springframework.boot:spring-boot-starter-aspectj"
-
-    //following dependencies are need when moving to Spring Boot 4
-    //implementation "org.springframework.boot:spring-boot-starter-jackson"
-    //implementation "org.springframework.boot:spring-boot-starter-liquibase"
+    implementation "org.springframework.boot:spring-boot-starter-jackson"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation 'org.springframework.retry:spring-retry:2.0.12'
-    implementation 'org.slf4j:jcl-over-slf4j:2.0.17'
 
-    // need to set this to force latest version
-    implementation 'org.apache.commons:commons-lang3:3.20.0'
+    implementation 'org.slf4j:jcl-over-slf4j:2.0.17'
 
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    annotationProcessor "org.hibernate:hibernate-jpamodelgen:${hibernate_version}"
+    annotationProcessor "org.hibernate.orm:hibernate-processor:${hibernate_version}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
+    // Add these to silence the hibernate metamodel warnings
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.transaction:jakarta.transaction-api'
+
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.assertj:assertj-core:${assertj_version}"
-    testImplementation "junit:junit"
     testImplementation "org.mockito:mockito-core"
     testImplementation "com.mattbertolini:liquibase-slf4j"
+    testImplementation "org.hamcrest:hamcrest:3.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
 
-    liquibaseRuntime "org.liquibase:liquibase-core:${liquibase_version}"
+    liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase:4.0.3"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
@@ -479,19 +445,16 @@ tasks.register('printVersion') {
     }
 }
 
+def projectArtifactId = project.hasProperty("integration") ? 'integration' :
+    project.hasProperty("broker")      ? 'broker'      :
+        project.hasProperty("headless")    ? 'headless'    : 'full'
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-
-            if (project.hasProperty("integration")) {
-                artifactId = 'integration'
-            }else if (project.hasProperty("broker")) {
-                artifactId = 'broker'
-            }else if (project.hasProperty("headless")) {
-                artifactId = 'headless'
-            }else{
-                artifactId = 'full'
-            }
+        // 2. Use 'create' instead of the magic method name to help the IDE
+        create('mavenJava', MavenPublication) {
+            // 3. Set the property explicitly
+            artifactId = projectArtifactId
 
             from components.java
         }
@@ -516,17 +479,24 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.3.1"
+    gradleVersion = "9.4.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "20.15.1"
-        npmVersion = "9.5.1"
-        yarnVersion = "1.22.19"
+        version = "20.20.0"
+        npmVersion = "11.11.0"
+        yarnVersion = "1.22.22"
         download = true
     }
 }
+
+/*
+rewrite {
+    //activeRecipe("org.openrewrite.java.migrate.jakarta.JakartaEE11")
+    setExportDatatables(true)
+}
+ */
 
 compileJava.dependsOn processResources
 processResources.dependsOn cleanResources,bootBuildInfo

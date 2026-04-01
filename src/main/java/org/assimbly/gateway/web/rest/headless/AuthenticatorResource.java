@@ -1,6 +1,6 @@
 package org.assimbly.gateway.web.rest.headless;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -52,7 +52,7 @@ public class AuthenticatorResource {
             String userEmail = JwtValidator.decode(Authorization).get("name", String.class);
             User user = mongoDao.findUserByEmail(userEmail);
 
-            String issuer = String.format("Fluxygen - %s", CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, domainName));
+            String issuer = "Fluxygen - %s".formatted(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, domainName));
             GoogleAuthenticatorKey key = authenticator.createCredentials(user.getEmail());
 
             String qrLocation = GoogleAuthenticatorQRGenerator.getOtpAuthURL(issuer, user.getEmail(), key);
@@ -108,7 +108,7 @@ public class AuthenticatorResource {
             mongoDao.removeAuthenticatorSettings(user);
 
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
+        } catch (Exception _) {
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body("The session token is invalid.");

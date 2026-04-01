@@ -10,9 +10,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ImportXMLUtil {
 
@@ -39,7 +39,7 @@ public class ImportXMLUtil {
 		XPathExpression expr = xpath.compile(input);
 
 		// Create list of Ids
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new ConcurrentHashMap<>();
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			map.put(nodes.item(i).getNodeName(), nodes.item(i).getTextContent());

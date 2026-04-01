@@ -1,6 +1,8 @@
 package org.assimbly.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -26,11 +29,12 @@ import java.util.Set;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "userSequenceGenerator", sequenceName = "user_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "sequence_generator")
     private Long id;
 
     @NotNull
@@ -60,7 +64,7 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    private boolean activated = false;
+    private boolean activated;
 
     @Size(min = 2, max = 10)
     @Column(name = "lang_key", length = 10)
@@ -81,14 +85,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private String resetKey;
 
     @Column(name = "reset_date")
-    private Instant resetDate = null;
+    private Instant resetDate;
 
-    @JsonIgnore
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     @ManyToMany
     @JoinTable(
         name = "jhi_user_authority",
-        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
-        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @BatchSize(size = 20)

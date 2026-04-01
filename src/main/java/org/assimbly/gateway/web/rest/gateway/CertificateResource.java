@@ -137,7 +137,7 @@ public class CertificateResource {
     @PostMapping("/certificates/byurl")
     public ResponseEntity<String> getCertificatesByUrl(@RequestBody String url) throws Exception {
 
-        log.debug("REST request to get all certificates by url ", url);
+        log.debug("REST request to get all certificates by url {}", url);
 
         List<Certificate> certificates = certificateService.findAllByUrl(url);
 
@@ -211,7 +211,7 @@ public class CertificateResource {
      */
     @PostMapping("/certificates/remove")
     public ResponseEntity<Void> removeByUrl(@RequestBody String url) {
-        log.debug("REST request to remove certificates in truststore for url ", url);
+        log.debug("REST request to remove certificates in truststore for url {}", url);
         List<Certificate> certificates = certificateService.findAllByUrl(url);
 
         for (Certificate certificate : certificates) {

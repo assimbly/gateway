@@ -157,13 +157,9 @@ public class FlowDTO implements Serializable {
         this.lastModified = lastModified;
     }
 
-    public Long getintegrationId() {
-        return integrationId;
-    }
+    public Long getIntegrationId() { return integrationId;  }
 
-    public void setintegrationId(Long integrationId) {
-        this.integrationId = integrationId;
-    }
+    public void setIntegrationId(Long integrationId) { this.integrationId = integrationId; }
 
     public Set<Step> getSteps() {
         return steps;
@@ -207,7 +203,7 @@ public class FlowDTO implements Serializable {
             ", parallelProcessing='" + isParallelProcessing() + "'" +
             ", logLevel='" + getLogLevel() + "'" +
             ", instances=" + getInstances() +
-            ", integration=" + getintegrationId() +
+            ", integration=" + getIntegrationId() +
             ", steps=" + getSteps() +
             "}";
     }

@@ -37,7 +37,7 @@ public class AdminUserDTO {
     @Size(max = 256)
     private String imageUrl;
 
-    private boolean activated = false;
+    private boolean activated;
 
     @Size(min = 2, max = 10)
     private String langKey;

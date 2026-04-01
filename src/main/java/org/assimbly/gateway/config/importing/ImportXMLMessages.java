@@ -1,5 +1,7 @@
 package org.assimbly.gateway.config.importing;
 
+import java.util.*;
+
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.Message;
 import org.assimbly.gateway.repository.MessageRepository;
@@ -16,7 +18,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -84,7 +86,7 @@ public class ImportXMLMessages {
 			Long.parseLong(messageId, 10);
 			Optional<Message> messageOptional = messageRepository.findByName(messageName);
 
-			if (!messageOptional.isPresent()) {
+			if (messageOptional.isEmpty()) {
                 log.debug("Create new message: " + messageName);
                 message = new Message();
 				headers = new HashSet<>();
@@ -99,7 +101,7 @@ public class ImportXMLMessages {
 				message = messageOptional.get();
 				headers = message.getHeaders();
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			message = new Message();
 			headers = new HashSet<>();
 			if (messageName == null || messageName.isEmpty()) {
@@ -111,7 +113,7 @@ public class ImportXMLMessages {
 
         log.debug("Get Header: " + messageName);
 
-        Map<String, Header> map = new HashMap<>();
+        Map<String, Header> map = new ConcurrentHashMap<>();
 		for (Header s : headers) {
 			map.put(s.getKey(), s);
 		}

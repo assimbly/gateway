@@ -33,8 +33,8 @@ spring:
         hibernate:
             ddl-auto: none
             naming:
-                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+                implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
         properties:
             hibernate.id.new_generator_mappings: true
             hibernate.connection.provider_disables_autocommit: true
@@ -49,9 +49,8 @@ spring:
         host: localhost
     messages:
         basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
+    # This property is deprecated and will be removed in future Spring Boot versions
+            # enabled: false
     thymeleaf:
         mode: HTML
 

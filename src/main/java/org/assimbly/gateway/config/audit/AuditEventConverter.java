@@ -1,11 +1,13 @@
 package org.assimbly.gateway.config.audit;
 
+import java.util.*;
+
 import org.assimbly.gateway.domain.PersistentAuditEvent;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class AuditEventConverter {
@@ -48,7 +50,7 @@ public class AuditEventConverter {
      * @return a map of {@link String}, {@link Object}.
      */
     public Map<String, Object> convertDataToObjects(Map<String, String> data) {
-        Map<String, Object> results = new HashMap<>();
+        Map<String, Object> results = new ConcurrentHashMap<>();
 
         if (data != null) {
             for (Map.Entry<String, String> entry : data.entrySet()) {
@@ -66,7 +68,7 @@ public class AuditEventConverter {
      * @return a map of {@link String}, {@link String}.
      */
     public Map<String, String> convertDataToStrings(Map<String, Object> data) {
-        Map<String, String> results = new HashMap<>();
+        Map<String, String> results = new ConcurrentHashMap<>();
 
         if (data != null) {
             for (Map.Entry<String, Object> entry : data.entrySet()) {

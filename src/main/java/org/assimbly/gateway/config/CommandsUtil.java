@@ -15,7 +15,7 @@ public final class CommandsUtil {
 
     private static final Logger log = LoggerFactory.getLogger(CommandsUtil.class);
 
-    private final static String userHomeDir = System.getProperty("user.home");
+    private final static String USER_HOME_DIR = System.getProperty("user.home");
 
     private CommandsUtil() {
     }
@@ -51,7 +51,7 @@ public final class CommandsUtil {
 
         try {
             cmd = parser.parse(options, arguments, true);
-        } catch (ParseException e) {
+        } catch (ParseException _) {
             //
         }
 
@@ -62,11 +62,7 @@ public final class CommandsUtil {
         String restoreDirectoryParam = cmd.getOptionValue("restore");
 
         if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
-            if(isWindows()) {
-                baseDirectoryParam = userHomeDir;
-            }else {
-                baseDirectoryParam = userHomeDir;
-            }
+            baseDirectoryParam = USER_HOME_DIR;
         }
 
         System.setProperty("user.home",baseDirectoryParam);
@@ -163,41 +159,41 @@ public final class CommandsUtil {
     private static String[] getArguments(String[] args) {
 
         String[] arguments = null;
-        String argumentList = null;
+        StringBuilder argumentList = null;
 
         for(String arg: args) {
             if(arg.startsWith("-d=")|| arg.startsWith("--application.gateway.base-directory=")) {
                 if(argumentList==null) {
-                    argumentList= arg;
+                    argumentList = new StringBuilder(arg);
                 }else {
-                    argumentList= argumentList + ","  +  arg;
+                    argumentList.append(',').append(arg);
                 }
             }else if(arg.startsWith("-c=")|| arg.startsWith("--clean=")) {
                 if(argumentList==null) {
-                    argumentList= arg;
+                    argumentList = new StringBuilder(arg);
                 }else {
-                    argumentList= argumentList + ","  +  arg;
+                    argumentList.append(',').append(arg);
                 }
             }else if(arg.startsWith("-b=")|| arg.startsWith("--backup=")) {
                 if(argumentList==null) {
-                    argumentList= arg;
+                    argumentList = new StringBuilder(arg);
                 }else {
-                    argumentList= argumentList + ","  +  arg;
+                    argumentList.append(',').append(arg);
                 }
             }else if(arg.startsWith("-r=")|| arg.startsWith("--restore=")) {
                 if(argumentList==null) {
-                    argumentList= arg;
+                    argumentList = new StringBuilder(arg);
                 }else {
-                    argumentList= argumentList + ","  +  arg;
+                    argumentList.append(',').append(arg);
                 }
             }
         }
 
         if(argumentList!=null) {
-            if(argumentList.contains(",")) {
-                arguments = argumentList.split(",");
+            if(argumentList.toString().contains(",")) {
+                arguments = argumentList.toString().split(",");
             }else {
-                arguments =  new String [] {argumentList};
+                arguments =  new String [] {argumentList.toString()};
             }
         }
 

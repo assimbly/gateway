@@ -1,5 +1,7 @@
 package org.assimbly.gateway.config.importing;
 
+import java.util.*;
+
 import org.assimbly.gateway.domain.Connection;
 import org.assimbly.gateway.domain.ConnectionKeys;
 import org.assimbly.gateway.repository.ConnectionRepository;
@@ -14,7 +16,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.util.*;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -80,7 +83,7 @@ public class ImportXMLConnections {
         try {
 			Optional<Connection> connectionOptional = connectionRepository.findByName(connectionName);
 
-			if(!connectionOptional.isPresent()) {
+			if(connectionOptional.isEmpty()) {
 
                 log.debug("Create new connection: " + connectionName);
 
@@ -102,7 +105,7 @@ public class ImportXMLConnections {
                 connectionKeys = connection.getConnectionKeys();
 
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			connection = new Connection();
 			connectionKeys = new HashSet<>();
 			if (connectionName != null) {
@@ -117,7 +120,7 @@ public class ImportXMLConnections {
         log.debug("Get Connection Keys: " + connectionName);
 
         Map<String, String> connectionMap = ImportXMLUtil.getMap(doc,"/dil/core/connections/connection[id='" + connectionId + "']/keys/*");
-		Map<String, ConnectionKeys> map = new HashMap<>();
+		Map<String, ConnectionKeys> map = new ConcurrentHashMap<>();
 		for (ConnectionKeys s : connectionKeys) {
 			map.put(s.getKey(), s);
 		}

@@ -124,6 +124,11 @@ public class ExportXML {
         if (flowOptional.isPresent()) {
 
             Flow flow = flowOptional.get();
+
+            if (flow.getIntegration() == null) {
+                throw new IllegalStateException("Flow " + flow.getId() + " has no integration assigned");
+            }
+
             setGeneralProperties(flow.getIntegration().getId());
 
             // check if steps are configured
@@ -446,7 +451,7 @@ public class ExportXML {
                         routeConfigurations.appendChild(node);
                     }else{
                         routes.appendChild(node);
-                        System.out.println("append the node");
+                        IO.println("append the node");
                     }
                 }else{
                     log.error("Route content is not valid XML:\n\n" + routeContent);

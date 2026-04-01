@@ -1,6 +1,5 @@
 package org.assimbly.gateway.web.rest.integration;
 
-import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowService;
@@ -8,7 +7,6 @@ import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
-import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,7 @@ public class FlowResource {
     @Value("${server.port}")
     private int serverPort;
 
-    public FlowResource(FlowService flowService, ApplicationProperties applicationProperties, IntegrationRuntime integrationRuntime) {
+    public FlowResource(FlowService flowService) {
         this.flowService = flowService;
     }
 

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -16,18 +17,19 @@ import java.util.Objects;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class EnvironmentVariables implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "environmentVariablesSequenceGenerator", sequenceName = "environment_variables_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "sequence_generator")
     @Column(name = "id")
     private Long id;
 
     @Column(name = "jhi_key")
     private String key;
 
-    @Column(name = "`value`")
+    @Column(name = "jhi_value")
     private String value;
 
     @Column(name = "encrypted")

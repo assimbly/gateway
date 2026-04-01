@@ -3,7 +3,7 @@ package org.assimbly.gateway.security;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Authenticate a user from the database.
@@ -26,16 +27,19 @@ public class DomainUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+
     public DomainUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(final String login) {
+    public @NonNull UserDetails loadUserByUsername(final @NonNull String login) {
         log.debug("Authenticating {}", login);
 
-        if (new EmailValidator().isValid(login, null)) {
+        // Replace the internal Hibernate EmailValidator with a pattern check
+        if (EMAIL_PATTERN.matcher(login).matches()) {
             return userRepository
                 .findOneWithAuthoritiesByEmailIgnoreCase(login)
                 .map(user -> createSpringSecurityUser(login, user))

@@ -1,4 +1,4 @@
-{
+/*~~(Some patterns could not be automatically converted to glob format)~~>*/{
   "bundles": [
     {
       "name": "liquibase/i18n/liquibase-core",
@@ -7,20 +7,18 @@
       ]
     }
   ],
-  "resources": {
-    "includes": [
+  "resources": [
       {
         "condition": {
           "typeReachable": "liquibase.util.LiquibaseUtil"
         },
-        "pattern": "\\Qliquibase.build.properties\\E"
+        "glob": "\\\\Qliquibase.build.properties\\\\E"
       },
-      {
+      /*~~(Pattern contains anchors that cannot be converted to glob: ^www.liquibase.org/xml/ns/dbchangelog/dbchangelog-.*)~~>*/{
         "condition": {
           "typeReachable": "liquibase.parser.core.xml.LiquibaseEntityResolver"
         },
         "pattern": "^www.liquibase.org/xml/ns/dbchangelog/dbchangelog-.*"
       }
     ]
-  }
 }

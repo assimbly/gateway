@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -82,7 +83,7 @@ public class ImportXMLFlows {
             Optional<Integration> integrationOptional = integrationRepository.findById(integrationId);
 
             Flow flow;
-            if (!flowOptional.isPresent()) {
+            if (flowOptional.isEmpty()) {
 				flow = new Flow();
 
                 steps = getStepsFromXML(flowId, doc, flow, true);
@@ -92,7 +93,7 @@ public class ImportXMLFlows {
 				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
 			}
 
-            if (!integrationOptional.isPresent()) {
+            if (integrationOptional.isEmpty()) {
                 log.warn("Integration not found: {}", integrationId);
 				return;
 			} else {
@@ -136,7 +137,7 @@ public class ImportXMLFlows {
                     flow.lastModified(lastModified);
                     flow.created(Instant.now());
                 }
-                catch (Exception e)
+                catch (Exception _)
                 {
                     flow.lastModified(Instant.now());
                     flow.created(Instant.now());
@@ -208,7 +209,7 @@ public class ImportXMLFlows {
         String name = xPath.evaluate(stepXPath + "name", doc);
         String type = xPath.evaluate(stepXPath + "type", doc);
 		String uri = xPath.evaluate(stepXPath + "uri", doc);
-		String options = "";
+		StringBuilder options = new StringBuilder();
 		String connectionId = xPath.evaluate(stepXPath + "blocks/block[type='connection']/id", doc);
 		String messageId = xPath.evaluate(stepXPath + "blocks/block[type='message']/id", doc);
         String responseIdAsString = xPath.evaluate(stepXPath + "blocks/blockk[type='response']/id", doc);
@@ -240,10 +241,10 @@ public class ImportXMLFlows {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			if (options != null && !options.isEmpty()) {
-				options = options + "&" + key + "=" + value;
+			if (!options.isEmpty()) {
+				options.append('&').append(key).append('=').append(value);
             } else {
-				options = key + "=" + value;
+				options = new StringBuilder(key).append('=').append(value);
 			}
 
 		}
@@ -263,7 +264,7 @@ public class ImportXMLFlows {
             }else {
                 connection = null;
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			connection = null;
 		}
 
@@ -281,7 +282,7 @@ public class ImportXMLFlows {
 				message = null;
 			}
 
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException _) {
 			message = null;
 		}
 
@@ -307,7 +308,7 @@ public class ImportXMLFlows {
         step.responseId(responseId);
         step.setUri(uri);
 		step.setFlow(flow);
-		step.setOptions(options);
+		step.setOptions(options.toString());
 
 
 
@@ -337,7 +338,7 @@ public class ImportXMLFlows {
     public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
 
         steps = flow.getSteps();
-        Map<String,String> linkidMap = new HashMap<>();
+        Map<String,String> linkidMap = new ConcurrentHashMap<>();
 
 
         //fill the map

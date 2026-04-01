@@ -1,10 +1,12 @@
 package org.assimbly.gateway.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -18,11 +20,12 @@ import java.util.Set;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Message implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "messageSequenceGenerator", sequenceName = "message_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "sequence_generator")
     @Column(name = "id")
     private Long id;
 
@@ -36,7 +39,7 @@ public class Message implements Serializable {
     private String language;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "message", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private Set<Header> headers = new HashSet<>();
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,8 +17,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class AccountResource {
 
-    private static class AccountResourceException extends RuntimeException {
+    private static final class AccountResourceException extends RuntimeException {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         private AccountResourceException(String message) {
@@ -34,8 +36,8 @@ public class AccountResource {
      */
     @GetMapping("/account")
     public UserVM getAccount(Principal principal) {
-        if (principal instanceof AbstractAuthenticationToken) {
-            return getUserFromAuthentication((AbstractAuthenticationToken) principal);
+        if (principal instanceof AbstractAuthenticationToken token) {
+            return getUserFromAuthentication(token);
         } else {
             throw new AccountResourceException("User could not be found");
         }

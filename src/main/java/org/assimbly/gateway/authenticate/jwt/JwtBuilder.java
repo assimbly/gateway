@@ -14,7 +14,7 @@ import java.util.Random;
 
 public final class JwtBuilder {
 
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     private JwtBuilder() {
         //Static class cannot be instantiated.
@@ -69,7 +69,7 @@ public final class JwtBuilder {
 
         char[] s = new char[10];
         for (int i = 0; i < 10; i++) {
-            s[i] = characters.charAt(random.nextInt(characters.length()));
+            s[i] = characters.charAt(RANDOM.nextInt(characters.length()));
         }
         return new String(s);
     }

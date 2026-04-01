@@ -1,30 +1,28 @@
 {
-  "resources": {
-    "includes": [
+  "resources": [
       {
         "condition": {
           "typeReachable": "io.undertow.Version"
         },
-        "pattern": "\\Qio/undertow/version.properties\\E"
+        "glob": "\\\\Qio/undertow/version.properties\\\\E"
       },
       {
         "condition": {
           "typeReachable": "io.undertow.Undertow"
         },
-        "pattern": "\\Qorg/jboss/threads/Version.properties\\E"
+        "glob": "\\\\Qorg/jboss/threads/Version.properties\\\\E"
       },
       {
         "condition": {
           "typeReachable": "io.undertow.Undertow"
         },
-        "pattern": "\\Qorg/xnio/Version.properties\\E"
+        "glob": "\\\\Qorg/xnio/Version.properties\\\\E"
       },
       {
         "condition": {
           "typeReachable": "io.undertow.Undertow"
         },
-        "pattern": "\\Qorg/xnio/nio/Version.properties\\E"
+        "glob": "\\\\Qorg/xnio/nio/Version.properties\\\\E"
       }
     ]
-  }
 }
