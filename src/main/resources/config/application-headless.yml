@@ -31,6 +31,8 @@ management:
         enabled: false
 
 spring:
+  liquibase:
+    enabled: false
   security:
     user:
       name: admin
