@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.tenant.TenantVariableManager;
-import org.assimbly.util.exception.OAuth2TokenException;
+import org.assimbly.oauth2token.exception.OAuth2TokenException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
