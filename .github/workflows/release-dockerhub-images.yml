@@ -104,7 +104,7 @@ jobs:
           VERSION_TAG: ${{ inputs.tag }}
 
         run: |
-          ./gradlew clean bootJar jibDockerBuild -Djib.from.image="eclipse-temurin:21-jdk-noble" -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull
+          ./gradlew clean bootJar jibDockerBuild -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull
 
       - name: Push the docker image
         env:
