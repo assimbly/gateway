@@ -12,6 +12,10 @@ on:
         description: 'Branch to use'
         default: 'develop'
         type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string            
 
 jobs:
   release_jars:
@@ -31,10 +35,10 @@ jobs:
           ref: "${{ inputs.branch }}"
 
 
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: "${{ inputs.jdk }}"
           distribution: 'temurin'
 
       - name: Setup Gradle
