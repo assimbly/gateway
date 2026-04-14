@@ -20,6 +20,10 @@ on:
         description: 'Type: default or full (includes custom components)'
         default: 'default'
         type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string          
 
 jobs:
   publish_docker_images:
@@ -39,7 +43,7 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: "${{ inputs.jdk }}"
           distribution: 'temurin'
 
       - name: Setup Gradle
