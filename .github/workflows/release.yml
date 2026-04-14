@@ -15,6 +15,10 @@ on:
         description: 'Tag to use for this release'
         default: 'development'
         type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string        
 
   workflow_call:
     inputs:
@@ -29,7 +33,11 @@ on:
       tag:
         description: 'Tag to use for this release'
         type: string
-
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string
+        
 jobs:
 
   test-milestone:
@@ -76,7 +84,8 @@ jobs:
     with:
       module: 'full'
       branch: ${{ inputs.branch }}
-
+      jdk: "${{inputs.jdk}}"
+      
   call-integration-release-jars:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
@@ -84,7 +93,8 @@ jobs:
     with:
       module: 'integration'
       branch: ${{ inputs.branch }}
-
+      jdk: "${{inputs.jdk}}"
+      
   call-broker-release-jars:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
@@ -92,7 +102,8 @@ jobs:
     with:
       module: 'broker'
       branch: ${{ inputs.branch }}
-
+      jdk: "${{inputs.jdk}}"
+      
   call-headless-release-jars:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-jars.yml
@@ -100,7 +111,8 @@ jobs:
     with:
       module: 'headless'
       branch: ${{ inputs.branch }}
-
+      jdk: "${{inputs.jdk}}"
+      
   call-full-release-dockerhub-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-dockerhub-images.yml
@@ -110,7 +122,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'full'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-integration-release-dockerhub-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-dockerhub-images.yml
@@ -120,7 +133,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'default'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-broker-release-dockerhub-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-dockerhub-images.yml
@@ -130,7 +144,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'default'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-headless-release-dockerhub-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-dockerhub-images.yml
@@ -140,7 +155,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'full'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-headless-release-aws-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-aws-images.yml
@@ -151,7 +167,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'full'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-broker-release-aws-image:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-aws-images.yml
@@ -162,7 +179,8 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'default'
-
+      jdk: "${{inputs.jdk}}"
+      
   call-headless-release-aws-image-arm:
     needs: delete_old_snapshots
     uses: ./.github/workflows/release-aws-images-arm.yml
@@ -173,6 +191,7 @@ jobs:
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
       type: 'full'
+      jdk: "${{inputs.jdk}}"
 
   call-broker-release-aws-image-arm:
     needs: delete_old_snapshots
@@ -183,4 +202,6 @@ jobs:
       module: 'broker'
       branch: ${{ inputs.branch }}
       tag: "${{inputs.tag}}"
-      type: 'default'
+      type: 'default'      
+      jdk: "${{inputs.jdk}}"
+
