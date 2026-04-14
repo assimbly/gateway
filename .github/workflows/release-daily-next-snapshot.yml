@@ -39,3 +39,4 @@ jobs:
       branch: 'next'
       milestone: ${{needs.getversion.outputs.milestone}}
       tag: 'next'
+      jdk: '25'
