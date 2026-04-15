@@ -335,7 +335,7 @@ dependencies {
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'
 
-    implementation 'com.warrenstrange:googleauth:1.5.0'
+    implementation 'com.warrenstrange:googleauth'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.hibernate.orm:hibernate-processor:${hibernate_version}"
