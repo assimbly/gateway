@@ -24,6 +24,10 @@ on:
         description: 'Type: default or full (includes custom components)'
         default: 'default'
         type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string    
 
 jobs:
   publish_docker_images:
@@ -43,10 +47,10 @@ jobs:
         with:
           ref: "${{ inputs.branch }}"
 
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: "${{ inputs.jdk }}"
           distribution: 'temurin'
 
       - name: Setup Gradle
@@ -133,4 +137,4 @@ jobs:
 
       - name: Push gateway image to Amazon ECR
         run: |
-          clear & ./gradlew clean bootJar jib -Djib.from.image="eclipse-temurin:21-jdk-noble" -Djib.from.platforms="linux/arm64" -Djib.container.user=root -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/${{ inputs.repo }}-arm:${{ inputs.tag }} -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }}
+          clear & ./gradlew clean bootJar jib -Djib.from.image="eclipse-temurin:${{ inputs.jdk }}" -Djib.from.platforms="linux/arm64" -Djib.container.user=root -Djib.to.image=902987087860.dkr.ecr.eu-west-1.amazonaws.com/${{ inputs.repo }}-arm:${{ inputs.tag }} -Papi-docs -P${{ inputs.module }} -Pprod -P${{ inputs.type }}

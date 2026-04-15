@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -36,4 +36,5 @@ jobs:
     with:
       branch: 'develop'
       milestone: ${{needs.getversion.outputs.milestone}}
-      tag: 'development'
+      tag: 'development'      
+      jdk: '21'

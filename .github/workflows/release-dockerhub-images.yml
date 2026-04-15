@@ -20,6 +20,10 @@ on:
         description: 'Type: default or full (includes custom components)'
         default: 'default'
         type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string          
 
 jobs:
   publish_docker_images:
@@ -36,10 +40,10 @@ jobs:
         with:
           ref: "${{ inputs.branch }}"
 
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: "${{ inputs.jdk }}"
           distribution: 'temurin'
 
       - name: Setup Gradle
@@ -104,7 +108,7 @@ jobs:
           VERSION_TAG: ${{ inputs.tag }}
 
         run: |
-          ./gradlew clean bootJar jibDockerBuild -Djib.from.image="eclipse-temurin:21-jdk-noble" -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull
+          ./gradlew clean bootJar jibDockerBuild -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs  -P${{ inputs.module }} -Pprod -Pfull
 
       - name: Push the docker image
         env:
@@ -114,4 +118,4 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
         run: |
-          clear & ./gradlew clean bootJar jib -Djib.from.image="eclipse-temurin:21-jdk-noble" -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
+          clear & ./gradlew clean bootJar jib -Djib.container.user=root -Djib.to.image=assimbly/gateway-$BUILD_TYPE:$VERSION_TAG -Papi-docs -P${{ inputs.module }} -Pprod -Pfull
