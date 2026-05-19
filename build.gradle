@@ -315,14 +315,12 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-jackson"
 
     implementation "org.springframework.boot:spring-boot-starter-liquibase"
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server"
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.boot:spring-boot-starter-webmvc"
@@ -330,7 +328,8 @@ dependencies {
     implementation "org.springframework:spring-context-support"
 
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-    implementation 'org.slf4j:jcl-over-slf4j:2.0.17'
+    implementation "org.thymeleaf:thymeleaf-spring6"
+    implementation 'org.slf4j:jcl-over-slf4j:2.0.18'
 
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'
@@ -484,7 +483,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.4.1"
+    gradleVersion = "9.5.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
@@ -493,6 +492,37 @@ if (project.hasProperty("nodeInstall")) {
         npmVersion = "11.11.0"
         yarnVersion = "1.22.22"
         download = true
+    }
+}
+
+jar {
+    exclude("META-INF/native-image/**")
+}
+
+graalvmNative {
+    binaries {
+        main {
+
+            buildArgs.addAll([
+                // Initialize the entire logging stack at build-time
+                '--initialize-at-build-time=org.slf4j',
+                '--initialize-at-build-time=ch.qos.logback',
+                '--initialize-at-build-time=org.apache.log4j', // Reachable via bridge
+                '--initialize-at-build-time=org.jboss.logging', // Reachable via Hibernate/Netty
+
+                // Keep your existing Netty settings
+                '--initialize-at-build-time=io.netty.util.ResourceLeakDetectorFactory',
+                '--initialize-at-run-time=io.netty.channel.kqueue',
+                '--initialize-at-run-time=io.netty.channel.epoll',
+                '--initialize-at-run-time=io.netty.channel.unix'
+            ])
+
+            // This is a shorthand for many common library initializations
+            buildArgs.add('-H:+InstallExitHandlers')
+
+            // Your specific overrides
+            buildArgs.add('--initialize-at-build-time=org.slf4j,ch.qos.logback,org.jboss.logging')
+        }
     }
 }
 

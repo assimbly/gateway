@@ -53,15 +53,15 @@ move /y "%tempFile%" "%propertyFile%"
 
 
 if [%1]==[] (
-    cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs
+    cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true"
 ) else (
     if [%2]==[] (
-        cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1
+        cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1
     ) else (
         if [%3]==[] (
-            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1 -P%2
+            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1 -P%2
         ) else (
-            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -Papi-docs -P%1 -P%2 -P%3
+            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1 -P%2 -P%3
         )
     )
 )

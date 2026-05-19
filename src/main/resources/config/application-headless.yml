@@ -57,13 +57,19 @@ spring:
     username:
     password:
   messages:
-    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+    cache-duration: PT1H # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: true
   encryption:
     jasypt:
       algorithm: PBEWithHMACSHA512AndAES_256
       password: Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:

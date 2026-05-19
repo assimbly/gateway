@@ -28,12 +28,12 @@ public class Integration {
     public Integration(IntegrationRuntime integrationRuntime) {
         this.integrationRuntime = integrationRuntime;
     }
+
     @PostConstruct
     public void init() throws Exception {
         log.debug("Start runtime");
         initIntegration();
     }
-
 
     public void initIntegration() throws Exception {
 

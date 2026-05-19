@@ -31,20 +31,8 @@ management:
       base-path: /management
       exposure:
         include:
-          - configprops
-          - env
           - health
           - info
-          - jhimetrics
-          - jhiopenapigroups
-          - logfile
-          - loggers
-          - prometheus
-          - threaddump
-          - caches
-          - liquibase
-          - jolokia
-          - hawtio
           - metrics
   endpoint:
     health:
@@ -81,10 +69,11 @@ management:
       process: true
       system: true
     distribution:
-      percentiles-histogram:
-        all: true
-      percentiles:
-        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+       percentiles-histogram:
+         http.server.requests: true
+       percentiles:
+         http.server.requests: 0.5, 0.95, 0.99
+
     data:
       repository:
         autotime:
@@ -125,13 +114,13 @@ spring:
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
-      hibernate.jdbc.batch_size: 25
+      hibernate.jdbc.batch_size: 50
       hibernate.order_inserts: true
       hibernate.order_updates: true
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
       hibernate:
-        globally_quoted_identifiers: false
+        globally_quoted_identifiers: true
         ddl-auto: none
         naming:
           physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
@@ -152,12 +141,9 @@ spring:
       enabled: true
   thymeleaf:
     mode: HTML
-  quartz:
-    auto-startup: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
-      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
       - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
 server:
