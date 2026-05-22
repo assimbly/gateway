@@ -321,6 +321,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-security-oauth2-resource-server"
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.security:spring-security-web"
     implementation "org.springframework.boot:spring-boot-starter-webmvc"
@@ -328,7 +329,6 @@ dependencies {
     implementation "org.springframework:spring-context-support"
 
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-    implementation "org.thymeleaf:thymeleaf-spring6"
     implementation 'org.slf4j:jcl-over-slf4j:2.0.18'
 
     //force version 12.9 (same as mapforce)
