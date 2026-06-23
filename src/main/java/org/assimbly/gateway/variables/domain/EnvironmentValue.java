@@ -9,7 +9,6 @@ public class EnvironmentValue {
     public static final String ENVIRONMENT_FIELD = "environment";
     public static final String VALUE_FIELD = "value";
     public static final String ENCRYPTED_FIELD = "encrypted";
-    public static final String NONCE_FIELD = "nonce";
     public static final String LAST_UPDATE_FIELD = "last_update";
     public static final String UPDATED_BY_FIELD = "updatedBy";
 
@@ -18,7 +17,6 @@ public class EnvironmentValue {
     private String environment;
     private String value;
 
-    private String nonce;
     private boolean encrypted;
 
     private long lastUpdate;
@@ -55,14 +53,6 @@ public class EnvironmentValue {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
-    }
-
-    public String getNonce() {
-        return nonce;
-    }
-
-    public void setNonce(String nonce) {
-        this.nonce = nonce;
     }
 
     public ObjectId get_id() {
