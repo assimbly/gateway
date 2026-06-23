@@ -98,13 +98,19 @@ public class TenantVariableManager {
     }
 
     private static String decrypt(String encryptedValue) {
-        String value = encryptionUtil.decrypt(encryptedValue);
-        return value;
+        if(!encryptedValue.isEmpty()) {
+            return encryptionUtil.decrypt(encryptedValue);
+        } else {
+            return "";
+        }
     }
 
     private static String encrypt(String value) {
-        String encryptedValue = encryptionUtil.encrypt(value);
-        return encryptedValue;
+        if(!value.isEmpty()) {
+            return encryptionUtil.encrypt(value);
+        } else {
+            return "";
+        }
     }
 
 }
