@@ -45,7 +45,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '5.0.10'
+version = '5.0.11'
 description = "A message gateway"
 
 java {
@@ -252,7 +252,7 @@ configurations {
                     details.useVersion("2.44.0")
                 }
                 if (details.requested.group == 'org.apache.activemq' && details.requested.name.startsWith('activemq') && !details.requested.name.startsWith('activemq-artemis') && !details.requested.name.startsWith('activemq-branding')) {
-                    details.useVersion("6.2.2")
+                    details.useVersion("6.2.6")
                 }
             }
         }
