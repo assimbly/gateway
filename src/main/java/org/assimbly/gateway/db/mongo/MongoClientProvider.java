@@ -60,7 +60,7 @@ public class MongoClientProvider implements Serializable {
         if (StringUtils.isNotEmpty(mongoContainer)) {
             return mongoContainer;
         }
-        return "flux-mongo"; // by default
+        return "mongo"; // by default
     }
 
 }
