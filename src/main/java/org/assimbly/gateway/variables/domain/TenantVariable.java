@@ -12,10 +12,12 @@ public class TenantVariable {
     public static final String ID_FIELD = "_id";
     public static final String TYPE_FIELD = "_type";
     public static final String NAME_FIELD = "name";
+    public static final String PROTECTED_VALUE_FIELD = "protectedValue";
     public static final String STATIC_TENANT_VARIABLE_GROUP_ID_FIELD = "static_tenant_variable_group_id";
     public static final String CREATED_AT_FIELD = "createdAt";
     public static final String CREATED_BY_FIELD = "createdBy";
     public static final String VALUES_FIELD = "values";
+    public static final String TAG_IDS_FIELD = "tag_ids";
 
     public enum TenantVarType {
         TenantVariable,
@@ -24,6 +26,7 @@ public class TenantVariable {
 
     private ObjectId _id;
     private String _type;
+    private boolean protectedValue;
     private String name;
     private ObjectId staticTenantVariableGroupId;
     private long createdAt;
@@ -31,24 +34,31 @@ public class TenantVariable {
 
     private List<EnvironmentValue> values;
 
+    private List<ObjectId> tagIds;
+
     public TenantVariable(){
         this._id = new ObjectId();
         this._type = TenantVarType.TenantVariable.name();
+        this.protectedValue = false;
         this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
+        this.tagIds = new ArrayList<>();
     }
 
     public TenantVariable(String name){
         this._id = new ObjectId();
         this._type = TenantVarType.TenantVariable.name();
+        this.protectedValue = false;
         this.name = name;
         this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
+        this.tagIds = new ArrayList<>();
     }
 
     public TenantVariable(String name, TenantVarType tenantVarType){
         this._id = new ObjectId();
         this._type = tenantVarType.name();
+        this.protectedValue = false;
         this.name = name;
         this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
@@ -78,6 +88,9 @@ public class TenantVariable {
         if(document.getString(TYPE_FIELD) != null) {
             tenantVariable.set_type(document.getString(TYPE_FIELD));
         }
+        if(document.get(PROTECTED_VALUE_FIELD) != null) {
+            tenantVariable.setProtectedValue(document.getBoolean(PROTECTED_VALUE_FIELD));
+        }
         tenantVariable.setName(document.getString(NAME_FIELD));
         tenantVariable.setStaticTenantVariableGroupId(document.getObjectId(STATIC_TENANT_VARIABLE_GROUP_ID_FIELD));
 
@@ -100,7 +113,6 @@ public class TenantVariable {
             environmentValue.setEnvironment(valueDoc.getString(EnvironmentValue.ENVIRONMENT_FIELD));
             environmentValue.setValue(valueDoc.getString(EnvironmentValue.VALUE_FIELD));
             environmentValue.setEncrypted(valueDoc.getBoolean(EnvironmentValue.ENCRYPTED_FIELD));
-            environmentValue.setNonce(valueDoc.getString(EnvironmentValue.NONCE_FIELD));
             Object lastUpdateObj = valueDoc.get(EnvironmentValue.LAST_UPDATE_FIELD);
             if (lastUpdateObj != null) {
                 environmentValue.setLastUpdate(((Number) lastUpdateObj).longValue());
@@ -109,6 +121,8 @@ public class TenantVariable {
             tenantVariable.put(environmentValue);
         }
 
+        tenantVariable.setTagIds(document.getList(TAG_IDS_FIELD, ObjectId.class));
+
         return tenantVariable;
     }
 
@@ -116,6 +130,7 @@ public class TenantVariable {
         Document document = new Document();
         document.append(ID_FIELD, this.get_id());
         document.append(TYPE_FIELD, this.get_type());
+        document.append(PROTECTED_VALUE_FIELD, this.isProtectedValue());
         document.append(NAME_FIELD, this.getName());
         document.append(STATIC_TENANT_VARIABLE_GROUP_ID_FIELD, this.getStaticTenantVariableGroupId());
         document.append(CREATED_AT_FIELD, this.getCreatedAt());
@@ -128,12 +143,13 @@ public class TenantVariable {
             valueDoc.append(EnvironmentValue.ENVIRONMENT_FIELD, environmentValue.getEnvironment());
             valueDoc.append(EnvironmentValue.VALUE_FIELD, environmentValue.getValue());
             valueDoc.append(EnvironmentValue.ENCRYPTED_FIELD, environmentValue.isEncrypted());
-            valueDoc.append(EnvironmentValue.NONCE_FIELD, environmentValue.getNonce());
             valueDoc.append(EnvironmentValue.LAST_UPDATE_FIELD, environmentValue.getLastUpdate());
             valueDoc.append(EnvironmentValue.UPDATED_BY_FIELD, environmentValue.getUpdatedBy());
             valuesList.add(valueDoc);
         }
         document.append(VALUES_FIELD, valuesList);
+
+        document.append(TAG_IDS_FIELD, this.getTagIds());
 
         return document;
     }
@@ -181,4 +197,20 @@ public class TenantVariable {
     }
 
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public List<ObjectId> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<ObjectId> tagIds) {
+        this.tagIds = tagIds;
+    }
+
+    public boolean isProtectedValue() {
+        return protectedValue;
+    }
+
+    public void setProtectedValue(boolean protectedValue) {
+        this.protectedValue = protectedValue;
+    }
 }
