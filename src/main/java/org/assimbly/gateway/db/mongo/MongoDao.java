@@ -107,7 +107,7 @@ public class MongoDao {
     }
 
     public static TenantVariable findVariableByName(String variableName, String tenant) {
-        return findVariableByName(variableName, tenant, TenantVariable.TenantVarType.TenantVariable);
+        return findVariableByName(variableName, tenant, TenantVariable.TenantVarType.TENANT_VARIABLE);
     }
 
     public static TenantVariable findVariableByName(String variableName, String tenant, TenantVariable.TenantVarType tenantVarType) {
@@ -116,7 +116,7 @@ public class MongoDao {
 
         Document query = new Document()
             .append(TenantVariable.NAME_FIELD, variableName)
-            .append(TenantVariable.TYPE_FIELD, tenantVarType.name());
+            .append(TenantVariable.TYPE_FIELD, tenantVarType.getType());
 
         Document document = collection.find(query).first();
         if (document != null) {
@@ -136,14 +136,14 @@ public class MongoDao {
     }
 
     public static String getTenantVariableValue(String tenantVarName, String tenant, String environment) {
-        return getTenantVariableValue(tenantVarName, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
+        return getTenantVariableValue(tenantVarName, tenant, environment, TenantVariable.TenantVarType.TENANT_VARIABLE);
     }
 
     public static String getTenantVariableValue(String tenantVarName, String tenant, String environment, TenantVariable.TenantVarType tenantVarType) {
 
         TenantVariable tenantVar = MongoDao.findVariableByName(tenantVarName, tenant, tenantVarType);
         if(tenantVar==null) {
-            LOG.info("tenantVar %s of type %s is NULL".formatted(tenantVarType.name(), tenantVarName));
+            LOG.info("tenantVar %s of type %s is NULL".formatted(tenantVarName, tenantVarType.getType()));
             return null;
         }
 
@@ -179,7 +179,7 @@ public class MongoDao {
     public static void saveTenantVariable(
         String tenantVarName, String tenantVarValue, String tenant, String environment
     ) {
-        saveTenantVariable(tenantVarName, tenantVarValue, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
+        saveTenantVariable(tenantVarName, tenantVarValue, tenant, environment, TenantVariable.TenantVarType.TENANT_VARIABLE);
     }
 
     public static void saveTenantVariable(
@@ -210,7 +210,7 @@ public class MongoDao {
     private static TenantVariable initTenantVariable(TenantVariable tenantVariable, TenantVariable.TenantVarType tenantVarType, String tenantVarName, String environment, boolean tenantVariableExist) {
         if(!tenantVariableExist) {
             tenantVariable = new TenantVariable(tenantVarName);
-            tenantVariable.set_type(tenantVarType.name());
+            tenantVariable.set_type(tenantVarType.getType());
         }
         if(StringUtils.isEmpty(tenantVariable.getCreatedBy())) {
             tenantVariable.setCreatedBy(CREATED_BY_SYSTEM);

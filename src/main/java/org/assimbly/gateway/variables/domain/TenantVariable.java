@@ -20,8 +20,18 @@ public class TenantVariable {
     public static final String TAG_IDS_FIELD = "tag_ids";
 
     public enum TenantVarType {
-        TenantVariable,
-        StaticTenantVariable
+        TENANT_VARIABLE("TenantVariable"),
+        STATIC_TENANT_VARIABLE("StaticTenantVariable");
+
+        private final String type;
+
+        TenantVarType(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
     }
 
     private ObjectId _id;
@@ -38,7 +48,7 @@ public class TenantVariable {
 
     public TenantVariable(){
         this._id = new ObjectId();
-        this._type = TenantVarType.TenantVariable.name();
+        this._type = TenantVarType.TENANT_VARIABLE.getType();
         this.protectedValue = false;
         this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
@@ -47,21 +57,12 @@ public class TenantVariable {
 
     public TenantVariable(String name){
         this._id = new ObjectId();
-        this._type = TenantVarType.TenantVariable.name();
+        this._type = TenantVarType.TENANT_VARIABLE.getType();
         this.protectedValue = false;
         this.name = name;
         this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
         this.tagIds = new ArrayList<>();
-    }
-
-    public TenantVariable(String name, TenantVarType tenantVarType){
-        this._id = new ObjectId();
-        this._type = tenantVarType.name();
-        this.protectedValue = false;
-        this.name = name;
-        this.staticTenantVariableGroupId = new ObjectId();
-        this.values = new ArrayList<>();
     }
 
     public List<EnvironmentValue> getValues() {

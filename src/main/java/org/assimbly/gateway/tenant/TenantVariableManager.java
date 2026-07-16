@@ -10,37 +10,37 @@ import java.util.Date;
 
 public class TenantVariableManager {
 
-    private static final String STATIC_TENANT_VARIABLE_SUFFIX = "_" + TenantVariable.TenantVarType.StaticTenantVariable.name();
+    private static final String STATIC_TENANT_VARIABLE_SUFFIX = "_" + TenantVariable.TenantVarType.STATIC_TENANT_VARIABLE.getType();
 
     private static final String ALGORITHM = "PBEWithHMACSHA512AndAES_256";
     private static final String ASSIMBLY_ENCRYPTION_SECRET = System.getenv("ASSIMBLY_ENCRYPTION_SECRET");
     private static final EncryptionUtil encryptionUtil = new EncryptionUtil(ASSIMBLY_ENCRYPTION_SECRET, ALGORITHM);
 
     public static String getTenantVariableValue(String tokenName, String tenant, String environment) {
-        return getDecryptedValue(tokenName, tenant, environment, TenantVariable.TenantVarType.TenantVariable);
+        return getDecryptedValue(tokenName, tenant, environment, TenantVariable.TenantVarType.TENANT_VARIABLE);
     }
 
     public static String discoverAndGetTenantVariableValue(String tokenName, String tenant, String environment) {
-        TenantVariable.TenantVarType tenantVarType = TenantVariable.TenantVarType.TenantVariable;
+        TenantVariable.TenantVarType tenantVarType = TenantVariable.TenantVarType.TENANT_VARIABLE;
 
         if(isStaticTenantVariable(tokenName)) {
             tokenName = getStaticTenantVariableName(tokenName);
-            tenantVarType = TenantVariable.TenantVarType.StaticTenantVariable;
+            tenantVarType = TenantVariable.TenantVarType.STATIC_TENANT_VARIABLE;
         }
 
         return getDecryptedValue(tokenName, tenant, environment, tenantVarType);
     }
 
     public static void saveTenantVariable(String tokenName, String accessToken, String tenant, String environment) {
-        saveValue(tokenName, accessToken, tenant, environment, TenantVariable.TenantVarType.TenantVariable, true);
+        saveValue(tokenName, accessToken, tenant, environment, TenantVariable.TenantVarType.TENANT_VARIABLE, true);
     }
 
     public static void discoverAndSaveTenantVariable(String tokenName, String accessToken, String tenant, String environment) {
-        TenantVariable.TenantVarType tenantVarType = TenantVariable.TenantVarType.TenantVariable;
+        TenantVariable.TenantVarType tenantVarType = TenantVariable.TenantVarType.TENANT_VARIABLE;
 
         if(TenantVariableManager.isStaticTenantVariable(tokenName)) {
             tokenName = getStaticTenantVariableName(tokenName);
-            tenantVarType = TenantVariable.TenantVarType.StaticTenantVariable;
+            tenantVarType = TenantVariable.TenantVarType.STATIC_TENANT_VARIABLE;
         }
 
         saveValue(tokenName, accessToken, tenant, environment, tenantVarType, true);
@@ -64,7 +64,7 @@ public class TenantVariableManager {
 
         if (!tenantVariableExists) {
             tenantVariable = new TenantVariable(tokenName);
-            tenantVariable.set_type(tenantVarType.name());
+            tenantVariable.set_type(tenantVarType.getType());
         }
 
         if (!tenantVariable.find(environment).isPresent()) {
