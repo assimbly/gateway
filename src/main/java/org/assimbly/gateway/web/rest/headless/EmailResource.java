@@ -1,13 +1,14 @@
 package org.assimbly.gateway.web.rest.headless;
 
-import tools.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.ws.rs.core.Response;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.builder.TemplatedRouteBuilder;
+import org.apache.camel.component.mail.MailAuthenticator;
 import org.apache.commons.lang3.StringUtils;
+import org.assimbly.dil.blocks.beans.OAuth2MailAuthenticator;
 import org.assimbly.gateway.web.rest.mail.EmailRequest;
 import org.assimbly.gateway.web.rest.mail.ServiceAccount;
 import org.assimbly.integrationrest.IntegrationRuntime;
@@ -18,11 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.UUID;
 
 /**
  * REST controller for managing oauth2 (Open Authorization v2).
@@ -52,63 +55,72 @@ public class EmailResource {
     ) {
 
         try {
+            final String routeId = "dynamic-send-email-route";
+            final String triggerUri = "direct:" + routeId + "-trigger";
+            boolean isBasicAuth = StringUtils.isNoneEmpty(emailRequest.getTypeAuth())
+                && emailRequest.getTypeAuth().equalsIgnoreCase("basic");
 
             CamelContext context = integrationRuntime.getIntegration().getContext();
-            String accessToken = "";
+            String beanId = null;
 
-            StringBuilder uriStrBuild = new StringBuilder(32)
-            .append("%s://%s:%d?".formatted(emailRequest.getProtocol(), emailRequest.getHost(), emailRequest.getPort()))
-            .append("authenticationType=RAW(%s)".formatted(emailRequest.getTypeAuth()))
-            .append("&mail.smtp.starttls.enable=true")
-            .append("&subject=RAW(%s)".formatted(emailRequest.getSubject()))
-            .append("&to=RAW(%s)".formatted(emailRequest.getTo()))
-            .append("&username=RAW(%s)".formatted(emailRequest.getUsername()))
-            .append("&contentType=RAW(%s)".formatted(emailRequest.getContentType()));
+            TemplatedRouteBuilder trb = TemplatedRouteBuilder.builder(context, "smtp-action")
+                .routeId(routeId)
+                .parameter("stepId", "adhoc")
+                .parameter("in", triggerUri)
+                .parameter("scheme", emailRequest.getProtocol())
+                .parameter("path", "%s:%d".formatted(emailRequest.getHost(), emailRequest.getPort()))
+                .parameter("subject", emailRequest.getSubject())
+                .parameter("to", emailRequest.getTo())
+                .parameter("from", emailRequest.getFrom())
+                .parameter("username", emailRequest.getUsername())
+                .parameter("contentType", emailRequest.getContentType());
 
-            if(StringUtils.isNoneEmpty(emailRequest.getTypeAuth()) && emailRequest.getTypeAuth().equals("basic")) {
-                // basic
-                uriStrBuild.append("&password=RAW(%s)".formatted(emailRequest.getPassword()));
+            if (isBasicAuth) {
+                trb.parameter("password", emailRequest.getPassword());
             } else {
-                // oauth
-                accessToken = getAccessToken(emailRequest);
-                if(accessToken == null) {
+                String accessToken = getAccessToken(emailRequest);
+                if (accessToken == null) {
                     throw new Exception("AccessToken is empty!");
                 }
-                uriStrBuild.append("&accessToken=RAW(%s)".formatted(accessToken));
+
+                beanId = "mailAuth-" + UUID.randomUUID();
+                MailAuthenticator authenticator =
+                    new OAuth2MailAuthenticator(emailRequest.getUsername(), accessToken, "", false);
+                context.getRegistry().bind(beanId, authenticator);
+
+                trb.parameter("authMechanisms", "XOAUTH2")
+                    .parameter("authEnabled", "true")
+                    .parameter("authenticator", "#" + beanId);
             }
 
-            final String routeId = "dynamic-send-email-route";
-
-            // stop and remove the route if it already exists
+            // stop/remove any previous instance of this ad-hoc route
             if (context.getRoute(routeId) != null) {
                 context.getRouteController().stopRoute(routeId);
                 context.removeRoute(routeId);
             }
 
-            context.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from("direct:start")
-                        .routeId(routeId)
-                        .setHeader("user", constant(emailRequest.getUsername()))
-                        .setHeader("From", constant(emailRequest.getFrom()))
-                        .to(uriStrBuild.toString());
-                }
-            });
+            trb.add(); // instantiates the route template into a real route
 
             try (ProducerTemplate template = context.createProducerTemplate()) {
-                template.sendBody("direct:start", emailRequest.getBody());
+                template.sendBody(triggerUri, emailRequest.getBody());
             }
 
-            // clean up the route after sending
             context.getRouteController().stopRoute(routeId);
             context.removeRoute(routeId);
+
+            if (beanId != null) {
+                try {
+                    context.getRegistry().unbind(beanId);
+                } catch (Exception e) {
+                    log.warn("Could not unbind temporary mail authenticator bean: {}", beanId, e);
+                }
+            }
 
             return Response.status(Response.Status.OK).entity("OK").build();
 
         } catch (Exception e) {
             log.error("Error to send email", e);
-            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to send email - "+e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to send email - " + e.getMessage()).build();
         }
     }
 
