@@ -433,6 +433,10 @@ tasks.named('bootJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+tasks.named("bootRun") {
+    environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv("ASSIMBLY_ENCRYPTION_SECRET") ?: "Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!"
+}
+
 tasks.register('cleanResources', Delete) {
     delete "build/resources"
 }
