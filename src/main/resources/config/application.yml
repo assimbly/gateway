@@ -125,6 +125,9 @@ spring:
         naming:
           physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
           implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        javax:
+          cache:
+            missing_cache_strategy: create
   messages:
     basename: i18n/messages
   main:
