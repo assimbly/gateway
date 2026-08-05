@@ -68,6 +68,9 @@
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
     <logger name="org.quartz" level="WARN"/>
 
+    <!-- Silence compact notation WARN messages from YAML DSL -->
+    <logger name="org.apache.camel.dsl.yaml.common.YamlDeserializerBase" level="ERROR" />
+
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
 
     <!-- Prevent logback from outputting its own status -->

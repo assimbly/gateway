@@ -41,7 +41,7 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
     id "com.github.ben-manes.versions" version "0.54.0"
-    id 'org.graalvm.buildtools.native' version '1.1.3'
+    id 'org.graalvm.buildtools.native' version '1.1.6'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -81,7 +81,14 @@ configurations.configureEach {
         exclude group: 'io.netty', module: 'netty-transport-native-epoll'
         exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
     }
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group.startsWith("org.graalvm")) {
+            details.useVersion "25.2.4"
+        }
+    }
 }
+
+
 
 idea {
     module {
@@ -507,6 +514,14 @@ graalvmNative {
     binaries {
         main {
 
+            imageName.set("assimbly")
+
+            // Give native-image process enough heap to prevent swapping
+            // Fix Out-Of-Memory/Watchdog Abort
+            buildArgs.add("-J-Xmx16g")
+            buildArgs.add("-Ob")
+            buildArgs.add("-H:DeadlockWatchdogInterval=30")
+
             buildArgs.addAll([
                 // Initialize the entire logging stack at build-time
                 '--initialize-at-build-time=org.slf4j',
@@ -521,8 +536,18 @@ graalvmNative {
                 '--initialize-at-run-time=io.netty.channel.unix'
             ])
 
+            //unlock experimental options
+            buildArgs.add("-H:+UnlockExperimentalVMOptions")
+
             // This is a shorthand for many common library initializations
             buildArgs.add('-H:+InstallExitHandlers')
+
+            // Temporary workaround for duplicate XML classes on classpath
+            buildArgs.add("-H:+AllowDeprecatedBuilderClassesOnImageClasspath")
+
+            //Add crema support
+            buildArgs.add("-H:+RuntimeClassLoading")
+           // buildArgs.add("-H:+GraalJITCompileAtRuntime")
 
             // Your specific overrides
             buildArgs.add('--initialize-at-build-time=org.slf4j,ch.qos.logback,org.jboss.logging')
