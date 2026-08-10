@@ -54,7 +54,7 @@ echo location of your Java installation. 1>&2
 "%COMSPEC%" /c exit 1
 
 :findJavaFromJavaHome
-set JAVA_HOME=D:\java\graalvm-25.2.4+7.1
+set JAVA_HOME=%JAVA_HOME:"=%
 set JAVA_EXE=%JAVA_HOME%/bin/java.exe
 
 if exist "%JAVA_EXE%" goto execute
