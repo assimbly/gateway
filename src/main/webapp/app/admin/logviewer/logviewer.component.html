@@ -2,17 +2,17 @@
 <hr>
 
 <div class="form-group" contenteditable="true">
-	<code contenteditable="true" *ngFor="let logLine of (logLines | SearchByName: searchText)">
-		<div>
-			  <span *ngIf="logLine.includes(' ERROR ') else logLineWarning" style="color: red">{{logLine}}</span>
-		</div>
-		<ng-template #logLineWarning>
-			<span *ngIf="logLine.includes(' WARN ') else logLineDefault" style="color: orange">{{logLine}}</span>
-		</ng-template>
-		<ng-template #logLineDefault>
-			<span style="color: green">{{logLine}}</span>
-		</ng-template>
-	</code>
+  @for (logLine of (logLines | SearchByName: searchText); track $index) {
+  <code contenteditable="true">
+    @if (logLine.includes(' ERROR ')) {
+    <span style="color: red">{{ logLine }}</span>
+    } @else if (logLine.includes(' WARN ')) {
+    <span style="color: orange">{{ logLine }}</span>
+    } @else {
+    <span>{{ logLine }}</span>
+    }
+  </code>
+  }
 </div>
 
 <form name="logsForm" #logsForm="ngForm">

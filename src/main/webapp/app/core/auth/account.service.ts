@@ -1,48 +1,47 @@
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { Service, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, ReplaySubject, of } from 'rxjs';
-import { shareReplay, tap, catchError } from 'rxjs/operators';
+import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 
-import { StateStorageService } from 'app/core/auth/state-storage.service';
-import { Account } from 'app/core/auth/account.model';
-import { ApplicationConfigService } from '../config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
-@Injectable({ providedIn: 'root' })
+import { Account } from './account.model';
+import { StateStorageService } from './state-storage.service';
+
+@Service()
 export class AccountService {
-  private userIdentity: Account | null = null;
-  private authenticationState = new ReplaySubject<Account | null>(1);
+  private readonly userIdentity = signal<Account | null>(null);
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  readonly account = this.userIdentity.asReadonly();
   private accountCache$?: Observable<Account> | null;
 
-  constructor(
-    private translateService: TranslateService,
-    private http: HttpClient,
-    private stateStorageService: StateStorageService,
-    private router: Router,
-    private applicationConfigService: ApplicationConfigService,
-  ) {}
+  private readonly translateService = inject(TranslateService);
+  private readonly http = inject(HttpClient);
+  private readonly stateStorageService = inject(StateStorageService);
+  private readonly router = inject(Router);
 
   save(account: Account): Observable<{}> {
-    return this.http.post(this.applicationConfigService.getEndpointFor('api/account'), account);
+    return this.http.post(`${serverApiUrl}api/account`, account);
   }
 
   authenticate(identity: Account | null): void {
-    this.userIdentity = identity;
-    this.authenticationState.next(this.userIdentity);
+    this.userIdentity.set(identity);
     if (!identity) {
       this.accountCache$ = null;
     }
   }
 
   hasAnyAuthority(authorities: string[] | string): boolean {
-    if (!this.userIdentity) {
+    const userIdentity = this.userIdentity();
+    if (!userIdentity) {
       return false;
     }
     if (!Array.isArray(authorities)) {
       authorities = [authorities];
     }
-    return this.userIdentity.authorities.some((authority: string) => authorities.includes(authority));
+    return userIdentity.authorities.some((authority: string) => authorities.includes(authority));
   }
 
   identity(force?: boolean): Observable<Account | null> {
@@ -53,8 +52,8 @@ export class AccountService {
 
           // After retrieve the account info, the language will be changed to
           // the user's preferred language configured in the account setting
-          // unless user have choosed other language in the current session
-          if (!this.stateStorageService.getLocale()) {
+          // unless user have chosen another language in the current session
+          if (account.langKey && !this.stateStorageService.getLocale()) {
             this.translateService.use(account.langKey);
           }
 
@@ -67,15 +66,11 @@ export class AccountService {
   }
 
   isAuthenticated(): boolean {
-    return this.userIdentity !== null;
-  }
-
-  getAuthenticationState(): Observable<Account | null> {
-    return this.authenticationState.asObservable();
+    return this.userIdentity() !== null;
   }
 
   private fetch(): Observable<Account> {
-    return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account'));
+    return this.http.get<Account>(`${serverApiUrl}api/account`);
   }
 
   private navigateToStoredUrl(): void {

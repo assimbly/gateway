@@ -1,1 +1,1 @@
-export { default as ItemCountComponent } from './item-count.component';
+export { default as ItemCount } from './item-count';

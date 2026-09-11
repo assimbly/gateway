@@ -1,18 +1,16 @@
-jest.mock('app/core/auth/state-storage.service');
-
-import { Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
-import { Account } from 'app/core/auth/account.model';
-import { Authority } from 'app/config/authority.constants';
-import { StateStorageService } from 'app/core/auth/state-storage.service';
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 
+import { serverApiUrl } from 'app/config';
+import { Authority } from 'app/shared/jhipster/constants';
+
+import { Account } from './account.model';
 import { AccountService } from './account.service';
+import { StateStorageService } from './state-storage.service';
 
 function accountWithAuthorities(authorities: string[]): Account {
   return {
@@ -27,9 +25,10 @@ function accountWithAuthorities(authorities: string[]): Account {
   };
 }
 
+const mockFn = (value: string | null): Mock => vi.fn(() => value);
+
 describe('Account Service', () => {
   let service: AccountService;
-  let applicationConfigService: ApplicationConfigService;
   let httpMock: HttpTestingController;
   let mockStorageService: StateStorageService;
   let mockRouter: Router;
@@ -37,19 +36,27 @@ describe('Account Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot()],
-      providers: [StateStorageService],
+      providers: [
+        provideTranslateService(),
+        provideHttpClientTesting(),
+        {
+          provide: StateStorageService,
+          useValue: {
+            clearUrl: vi.fn(),
+            getUrl: vi.fn(),
+          },
+        },
+      ],
     });
 
     service = TestBed.inject(AccountService);
-    applicationConfigService = TestBed.inject(ApplicationConfigService);
     httpMock = TestBed.inject(HttpTestingController);
     mockStorageService = TestBed.inject(StateStorageService);
     mockRouter = TestBed.inject(Router);
-    jest.spyOn(mockRouter, 'navigateByUrl').mockImplementation(() => Promise.resolve(true));
+    vi.spyOn(mockRouter, 'navigateByUrl');
 
     mockTranslateService = TestBed.inject(TranslateService);
-    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of(''));
+    vi.spyOn(mockTranslateService, 'use');
   });
 
   afterEach(() => {
@@ -63,7 +70,7 @@ describe('Account Service', () => {
 
       // WHEN
       service.save(account).subscribe();
-      const testRequest = httpMock.expectOne({ method: 'POST', url: applicationConfigService.getEndpointFor('api/account') });
+      const testRequest = httpMock.expectOne({ method: 'POST', url: `${serverApiUrl}api/account` });
       testRequest.flush({});
 
       // THEN
@@ -71,43 +78,25 @@ describe('Account Service', () => {
     });
   });
 
-  describe('authenticate', () => {
-    it('authenticationState should emit null if input is null', () => {
-      // GIVEN
-      let userIdentity: Account | null = accountWithAuthorities([]);
-      service.getAuthenticationState().subscribe(account => (userIdentity = account));
-
-      // WHEN
-      service.authenticate(null);
-
-      // THEN
-      expect(userIdentity).toBeNull();
-      expect(service.isAuthenticated()).toBe(false);
-    });
-
-    it('authenticationState should emit the same account as was in input parameter', () => {
-      // GIVEN
-      const expectedResult = accountWithAuthorities([]);
-      let userIdentity: Account | null = null;
-      service.getAuthenticationState().subscribe(account => (userIdentity = account));
-
-      // WHEN
-      service.authenticate(expectedResult);
-
-      // THEN
-      expect(userIdentity).toEqual(expectedResult);
-      expect(service.isAuthenticated()).toBe(true);
-    });
-  });
-
   describe('identity', () => {
+    it('should set account after successful identity request', () => {
+      const account = { ...accountWithAuthorities([]) };
+      // When I call
+      service.identity().subscribe();
+      // And return account
+      httpMock.expectOne({ method: 'GET' }).flush(account);
+      // Then account signal has account value
+      expect(service.account()).toBe(account);
+    });
+
     it('should call /account only once if last call have not returned', () => {
       // When I call
       service.identity().subscribe();
       // Once more
       service.identity().subscribe();
       // Then there is only request
-      httpMock.expectOne({ method: 'GET' });
+      const requests = httpMock.match({ method: 'GET' });
+      expect(requests).toHaveLength(1);
     });
 
     it('should call /account only once if not logged out after first authentication and should call /account again if user has logged out', () => {
@@ -127,13 +116,14 @@ describe('Account Service', () => {
       service.identity().subscribe();
 
       // Then there is a new request
-      httpMock.expectOne({ method: 'GET' });
+      const requests = httpMock.match({ method: 'GET' });
+      expect(requests).toHaveLength(1);
     });
 
     describe('should change the language on authentication if necessary', () => {
       it('should change language if user has not changed language manually', () => {
         // GIVEN
-        mockStorageService.getLocale = jest.fn(() => null);
+        mockStorageService.getLocale = mockFn(null);
 
         // WHEN
         service.identity().subscribe();
@@ -145,7 +135,7 @@ describe('Account Service', () => {
 
       it('should not change language if user has changed language manually', () => {
         // GIVEN
-        mockStorageService.getLocale = jest.fn(() => 'sessionLang');
+        mockStorageService.getLocale = mockFn('sessionLang');
 
         // WHEN
         service.identity().subscribe();
@@ -159,7 +149,7 @@ describe('Account Service', () => {
     describe('navigateToStoredUrl', () => {
       it('should navigate to the previous stored url post successful authentication', () => {
         // GIVEN
-        mockStorageService.getUrl = jest.fn(() => 'admin/users?page=0');
+        mockStorageService.getUrl = mockFn('admin/users?page=0');
 
         // WHEN
         service.identity().subscribe();
@@ -174,7 +164,7 @@ describe('Account Service', () => {
       it('should not navigate to the previous stored url when authentication fails', () => {
         // WHEN
         service.identity().subscribe();
-        httpMock.expectOne({ method: 'GET' }).error(new ErrorEvent(''));
+        httpMock.expectOne({ method: 'GET' }).error(new ProgressEvent(''));
 
         // THEN
         expect(mockStorageService.getUrl).not.toHaveBeenCalled();
@@ -184,7 +174,7 @@ describe('Account Service', () => {
 
       it('should not navigate to the previous stored url when no such url exists post successful authentication', () => {
         // GIVEN
-        mockStorageService.getUrl = jest.fn(() => null);
+        mockStorageService.getUrl = mockFn(null);
 
         // WHEN
         service.identity().subscribe();
@@ -205,7 +195,7 @@ describe('Account Service', () => {
         expect(hasAuthority).toBe(false);
       });
 
-      it('should return false if user is logged and has not authority', () => {
+      it('should return false if user is logged and has no authority', () => {
         service.authenticate(accountWithAuthorities([Authority.USER]));
 
         const hasAuthority = service.hasAnyAuthority(Authority.ADMIN);
@@ -228,7 +218,7 @@ describe('Account Service', () => {
         expect(hasAuthority).toBeFalsy();
       });
 
-      it('should return false if user is logged and has not authority', () => {
+      it('should return false if user is logged and has no authority', () => {
         service.authenticate(accountWithAuthorities([Authority.USER]));
 
         const hasAuthority = service.hasAnyAuthority([Authority.ADMIN]);

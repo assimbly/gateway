@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { LogViewerService } from './logviewer.service';
 
 import { RouterModule } from '@angular/router';
-import SharedModule from 'app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 
 import { SearchByNamePipe } from './logviewer.searchbyname.pipe';
@@ -15,7 +14,6 @@ import { LogViewerLineValidationDirective } from './logviewer-line-validation.di
   imports: [
     RouterModule,
     FormsModule,
-    SharedModule,
     SearchByNamePipe,
     LogViewerLineValidationDirective,
   ],

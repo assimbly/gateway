@@ -1,2 +1,2 @@
-export { default as FilterComponent } from './filter.component';
+export { default as Filter } from './filter';
 export * from './filter.model';
