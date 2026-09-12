@@ -37,7 +37,7 @@ const ENTITY_STATES = [...brokerRoute];
     NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
-    PopoverModule.forRoot(),
+    PopoverModule,
     CommonModule,
   ],
   exports: [BrokerComponent],

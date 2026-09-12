@@ -17,7 +17,6 @@ import { ConnectionPopupService } from 'app/entities/connection/connection-popup
 import { Connections } from '../../shared/camel/connections';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-dialog',
     templateUrl: './connection-dialog.component.html'
 })
@@ -229,7 +228,6 @@ export class ConnectionDialogComponent implements OnInit {
 }
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-popup',
     template: ''
 })

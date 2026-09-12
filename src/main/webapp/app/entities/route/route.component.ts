@@ -10,7 +10,6 @@ import { RouteService } from './route.service';
 import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 
 @Component({
-  standalone: false,
   selector: 'jhi-route',
   templateUrl: './route.component.html'
 })

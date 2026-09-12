@@ -17,7 +17,7 @@ import { IntegrationPopupService } from './integration-popup.service';
 const ENTITY_STATES = [...integrationRoute];
 
 @NgModule({
-  imports: [SharedModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, PopoverModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     IntegrationComponent,
     IntegrationDetailComponent,

@@ -1,27 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { FlowEditorEsbComponent } from './flow-editor-esb.component';
+
 @Component({
-  standalone: false,
   selector: 'jhi-flow-editor',
-  templateUrl: './flow-editor.component.html'
+  templateUrl: './flow-editor.component.html',
+  imports: [FlowEditorEsbComponent],
 })
 export class FlowEditorComponent implements OnInit {
 
   editor: string = 'esb';
 
   constructor(
-	private route: ActivatedRoute,
+    private route: ActivatedRoute,
     private router: Router,
   ) {}
 
-    ngOnInit() {
+  ngOnInit() {
 
-		this.route.params.subscribe(params => {
-		    this.editor = 'esb';
-		});
+    this.route.params.subscribe(params => {
+      this.editor = 'esb';
+    });
 
-	}
+  }
 
 }
 

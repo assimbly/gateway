@@ -12,7 +12,6 @@ import { IntegrationService } from './integration.service';
 import { FlowService } from '../flow/flow.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-integration',
     templateUrl: './integration.component.html'
 })

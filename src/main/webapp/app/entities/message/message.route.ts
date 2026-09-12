@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Message } from 'app/shared/model/message.model';
@@ -37,7 +37,7 @@ export const messageRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'message',
@@ -46,7 +46,7 @@ export const messageRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'message/:id/view',
@@ -58,7 +58,7 @@ export const messageRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'message/new',
@@ -70,7 +70,7 @@ export const messageRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'message/:id/edit',
@@ -82,7 +82,7 @@ export const messageRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];
 
@@ -94,7 +94,7 @@ export const messagePopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   },
   {
@@ -104,7 +104,7 @@ export const messagePopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   }
 ];

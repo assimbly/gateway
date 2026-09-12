@@ -11,7 +11,6 @@ import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dial
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
 @Component({
-  standalone: false,
   selector: '[jhi-queue-row]',
   templateUrl: './queue-row.component.html',
 })

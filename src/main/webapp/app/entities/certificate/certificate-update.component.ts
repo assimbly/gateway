@@ -15,7 +15,6 @@ import { CertificateService } from './certificate.service';
 // import { faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate-update',
   templateUrl: './certificate-update.component.html',
 })

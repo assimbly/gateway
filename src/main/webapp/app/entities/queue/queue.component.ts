@@ -15,7 +15,6 @@ import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-  standalone: false,
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
 })

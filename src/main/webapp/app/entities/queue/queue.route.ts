@@ -4,7 +4,7 @@ import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { IQueue, Queue } from 'app/shared/model/queue.model';
 import { QueueService } from './queue.service';
 import { QueueComponent } from './queue.component';
@@ -41,7 +41,7 @@ export const queueRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'queue/:id/view',
@@ -53,7 +53,7 @@ export const queueRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'queue/new',
@@ -65,7 +65,7 @@ export const queueRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'queue/:id/edit',
@@ -77,6 +77,6 @@ export const queueRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];

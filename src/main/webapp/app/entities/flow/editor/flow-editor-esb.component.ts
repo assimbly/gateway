@@ -1,7 +1,11 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from "@angular/core";
-import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { CommonModule } from "@angular/common";
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { NgbModal, NgbModalRef, NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgSelectModule } from "@ng-select/ng-select";
+import { PopoverModule } from "ngx-bootstrap/popover";
 import { AlertService } from "app/core/util/alert.service";
 import { EventManager, EventWithContent } from "app/core/util/event-manager.service";
 import { MessageDialogComponent } from 'app/entities/message/message-dialog.component';
@@ -31,10 +35,10 @@ import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
 
 @Component({
-  standalone: false,
   selector: 'jhi-flow-editor-esb',
   templateUrl: './flow-editor-esb.component.html',
   encapsulation: ViewEncapsulation.None,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 

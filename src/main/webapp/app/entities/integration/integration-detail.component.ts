@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IIntegration } from 'app/shared/model/integration.model';
 
 @Component({
-    standalone: false,
     selector: 'jhi-integration-detail',
     templateUrl: './integration-detail.component.html'
 })

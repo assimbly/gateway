@@ -1,12 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
 import { AlertService } from 'app/core/util/alert.service';
-
-import { Router } from '@angular/router';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -15,11 +22,24 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
+import { FlowRowComponent } from './flow-row.component';
+import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
 @Component({
-  standalone: false,
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgbDropdownModule,
+    FontAwesomeModule,
+    InfiniteScrollModule,
+    SortDirective,
+    SortByDirective,
+    FlowRowComponent,
+    FlowSearchByNamePipe,
+  ],
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
@@ -31,9 +51,8 @@ export class FlowComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: any;
-  predicate: any;
+  sortState: SortState = { predicate: 'name', order: 'asc' };
   queryCount: any;
-  reverse: any;
   totalItems = -1;
   integrationExists: boolean;
   multipleIntegrations = false;
@@ -66,8 +85,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.links = {
       last: 0,
     };
-    this.predicate = 'name';
-    this.reverse = true;
   }
 
   loadFlows() {
@@ -198,9 +215,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.reset());
   }
 
-  sort() {
-    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
+  sort(): string[] {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'name') {
       result.push('name');
     }
     return result;

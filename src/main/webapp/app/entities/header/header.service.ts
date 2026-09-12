@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { IHeader } from 'app/shared/model/header.model';
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IHeader[]>;
 
 @Injectable({ providedIn: 'root' })
 export class HeaderService {
-    public resourceUrl = this.applicationConfigService.getEndpointFor('api/header');
+    public resourceUrl = `${serverApiUrl}api/header`;
 
-    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+    constructor(protected http: HttpClient) {}
 
     create(header: IHeader): Observable<EntityResponseType> {
         return this.http.post<IHeader>(this.resourceUrl, header, { observe: 'response' });

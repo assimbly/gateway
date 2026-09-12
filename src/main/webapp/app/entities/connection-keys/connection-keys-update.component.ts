@@ -9,7 +9,6 @@ import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from 'app/entities/connection/connection.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-keys-update',
     templateUrl: './connection-keys-update.component.html'
 })

@@ -8,7 +8,6 @@ import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 import { ConnectionKeysService } from './connection-keys.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-keys-delete-dialog',
     templateUrl: './connection-keys-delete-dialog.component.html'
 })

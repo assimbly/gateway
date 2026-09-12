@@ -22,7 +22,6 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver/FileSaver';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
 })

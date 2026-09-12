@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { ILink } from 'app/shared/model/link.model';
@@ -13,9 +13,9 @@ type EntityArrayResponseType = HttpResponse<ILink[]>;
 @Injectable({ providedIn: 'root' })
 export class LinkService {
 
-    public resourceUrl = this.applicationConfigService.getEndpointFor('api/link');
+    public resourceUrl = `${serverApiUrl}api/link`;
 
-    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+    constructor(protected http: HttpClient) {}
 
     create(link: ILink): Observable<EntityResponseType> {
         return this.http.post<ILink>(this.resourceUrl, link, { observe: 'response' });

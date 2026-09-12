@@ -7,7 +7,6 @@ import { IRoute } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 
 @Component({
-  standalone: false,
   templateUrl: './route-delete-dialog.component.html'
 })
 export class RouteDeleteDialogComponent {

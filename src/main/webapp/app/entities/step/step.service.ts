@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { IStep, Step } from 'app/shared/model/step.model';
@@ -13,11 +13,11 @@ type EntityArrayResponseType = HttpResponse<IStep[]>;
 
 @Injectable({ providedIn: 'root' })
 export class StepService {
-    private resourceUrlStep = this.applicationConfigService.getEndpointFor('api/step');
-    private resourceUrlSteps = this.applicationConfigService.getEndpointFor('api/steps');
-    public resourceUrl = this.applicationConfigService.getEndpointFor('api/steps');
+    private resourceUrlStep = `${serverApiUrl}api/step`;
+    private resourceUrlSteps = `${serverApiUrl}api/steps`;
+    public resourceUrl = `${serverApiUrl}api/steps`;
 
-    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+    constructor(protected http: HttpClient) {}
 
     create(step: IStep): Observable<HttpResponse<IStep>> {
         const copy = this.convert(step);

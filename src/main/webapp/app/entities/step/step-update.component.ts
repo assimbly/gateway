@@ -13,7 +13,6 @@ import { IMessage } from 'app/shared/model/message.model';
 import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-step-update',
   templateUrl: './step-update.component.html'
 })

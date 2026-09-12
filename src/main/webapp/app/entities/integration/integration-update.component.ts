@@ -9,7 +9,6 @@ import { Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
 
 @Component({
-    standalone: false,
     selector: 'jhi-integration-update',
     templateUrl: './integration-update.component.html'
 })

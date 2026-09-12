@@ -10,7 +10,6 @@ import { Subscription } from 'rxjs';
 import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-connection-all',
   templateUrl: './connection-all.component.html',
 })

@@ -8,7 +8,6 @@ import { IStep } from 'app/shared/model/step.model';
 import { StepService } from './step.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-step-delete-dialog',
   templateUrl: './step-delete-dialog.component.html'
 })

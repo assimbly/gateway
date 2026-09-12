@@ -8,7 +8,6 @@ import { AccountService } from 'app/core/auth/account.service';
 import { StepService } from './step.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-step',
   templateUrl: './step.component.html'
 })

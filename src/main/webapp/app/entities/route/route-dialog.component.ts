@@ -15,7 +15,6 @@ import { RoutePopupService } from 'app/entities/route/route-popup.service';
 import 'codemirror/addon/edit/closetag';
 
 @Component({
-    standalone: false,
     selector: 'jhi-route-dialog',
     templateUrl: './route-dialog.component.html'
 })
@@ -144,7 +143,6 @@ export class RouteDialogComponent implements OnInit {
 }
 
 @Component({
-    standalone: false,
     selector: 'jhi-route-popup',
     template: ''
 })

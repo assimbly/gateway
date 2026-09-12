@@ -1,11 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { NgbModal, NgbModalRef, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
 import { Step, StepType } from 'app/shared/model/step.model';
 import { StepService } from '../step/step.service';
-import { IntegrationService } from "../integration/integration.service";
+import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { Collectors } from 'app/shared/collect/collectors';
@@ -15,18 +21,17 @@ import dayjs from 'dayjs/esm';
 
 import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } from 'rxjs';
 
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
 enum Status {
   active = 'active',
   paused = 'paused',
   inactive = 'inactive',
   inactiveError = 'inactiveError',
 }
+
 @Component({
-  standalone: false,
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, PopoverModule, NgbPopoverModule],
 })
 export class FlowRowComponent implements OnInit {
   sslUrl: any;
@@ -589,8 +594,8 @@ export class FlowRowComponent implements OnInit {
   }
 
   registerTriggeredAction() {
-    this.eventManager.subscribe('trigerAction', response => {
-      switch (response) {
+    this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
+      switch (response.content as string) {
         case 'start':
           if (this.statusFlow === Status.inactive) {
             this.start();

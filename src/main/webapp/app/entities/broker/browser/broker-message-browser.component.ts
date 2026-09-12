@@ -20,7 +20,6 @@ import { ViewChild } from '@angular/core'
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 
 @Component({
-  standalone: false,
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
 })

@@ -5,7 +5,6 @@ import { DataUtils } from 'app/core/util/data-util.service';
 import { IRoute } from 'app/shared/model/route.model';
 
 @Component({
-    standalone: false,
     selector: 'jhi-route-detail',
     templateUrl: './route-detail.component.html'
 })

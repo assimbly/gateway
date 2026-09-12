@@ -20,7 +20,6 @@ import { IBroker } from 'app/shared/model/broker.model';
 import { startWith, switchMap } from 'rxjs/operators';
 
 @Component({
-  standalone: false,
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
 })

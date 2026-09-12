@@ -16,7 +16,6 @@ import { filter } from 'rxjs/operators';
 import { MessagePopupService } from 'app/entities/message/message-popup.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-message-dialog',
   templateUrl: './message-dialog.component.html',
 })
@@ -167,7 +166,6 @@ export class MessageDialogComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: 'jhi-message-popup',
   template: '',
 })

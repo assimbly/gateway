@@ -34,9 +34,9 @@
     >
       <table class="table table-striped table-sm" style="word-wrap: break-word; table-layout: fixed; width: 100%; z-index: 5;">
         <thead class="transparant">
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
+        <tr jhiSort [(sortState)]="sortState">
           <th [style.display]="'none'"><span>ID</span></th>
-          <th jhiSortBy="name" class="border-bottom-none"><span></span> <span class="fa fa-sort"></span></th>
+          <th jhiSortBy="name" class="border-bottom-none"><span></span> <fa-icon></fa-icon></th>
           <th [style.display]="'none'"><span>Integration</span></th>
           <th [style.display]="'none'"><span>Error</span></th>
           <th class="border-bottom-none"></th>

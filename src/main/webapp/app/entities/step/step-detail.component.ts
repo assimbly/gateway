@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IStep } from 'app/shared/model/step.model';
 
 @Component({
-  standalone: false,
   selector: 'jhi-step-detail',
   templateUrl: './step-detail.component.html'
 })

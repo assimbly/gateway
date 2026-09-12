@@ -9,7 +9,6 @@ import { IStep } from 'app/shared/model/step.model';
 import { StepService } from 'app/entities/step/step.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-link-update',
     templateUrl: './link-update.component.html'
 })

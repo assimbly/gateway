@@ -19,7 +19,6 @@ enum Status {
     activeError = 'activeError'
 }
 @Component({
-    standalone: false,
     selector: 'jhi-broker',
     templateUrl: './broker.component.html'
 })

@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ITopic } from 'app/shared/model/topic.model';
 
 @Component({
-  standalone: false,
   selector: 'jhi-topic-detail',
   templateUrl: './topic-detail.component.html'
 })

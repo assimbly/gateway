@@ -11,7 +11,6 @@ import { TopicService } from './topic.service';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-  standalone: false,
   selector: 'jhi-topic-update',
   templateUrl: './topic-update.component.html'
 })

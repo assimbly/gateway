@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
@@ -36,7 +36,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/message-sender',
@@ -45,7 +45,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/editor',
@@ -54,7 +54,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/editor/:id',
@@ -63,7 +63,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/editor/:id/:clone',
@@ -72,7 +72,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/new',
@@ -84,7 +84,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'flow/:id/edit',
@@ -96,7 +96,7 @@ const flowRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];
 

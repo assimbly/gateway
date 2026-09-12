@@ -12,7 +12,6 @@ import { HeaderService } from '../header/header.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  standalone: false,
   selector: 'jhi-message-update',
   templateUrl: './message-update.component.html',
 })

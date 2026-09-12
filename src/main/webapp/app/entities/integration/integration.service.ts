@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { IIntegration } from 'app/shared/model/integration.model';
@@ -12,11 +12,11 @@ type EntityArrayResponseType = HttpResponse<IIntegration[]>;
 
 @Injectable({ providedIn: 'root' })
 export class IntegrationService {
-    public resourceUrl = this.applicationConfigService.getEndpointFor('api/integrations');
-    public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
-    public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
+    public resourceUrl = `${serverApiUrl}api/integrations`;
+    public environmentUrl = `${serverApiUrl}api/environment`;
+    public integrationUrl = `${serverApiUrl}api/integration`;
 
-    constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+    constructor(protected http: HttpClient) {}
 
     create(integration: IIntegration): Observable<EntityResponseType> {
         return this.http.post<IIntegration>(this.resourceUrl, integration, { observe: 'response' });

@@ -10,7 +10,6 @@ import { IMessage } from 'app/shared/model/message.model';
 import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
-  standalone: false,
   selector: 'jhi-message-all',
   templateUrl: './message-all.component.html',
 })

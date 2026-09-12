@@ -11,7 +11,6 @@ import { AccountService } from 'app/core/auth/account.service';
 import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-environment-variables',
     templateUrl: './environment-variables.component.html'
 })

@@ -9,7 +9,6 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-  standalone: false,
   templateUrl: './queue-delete-dialog.component.html'
 })
 export class QueueDeleteDialogComponent {

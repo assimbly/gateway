@@ -11,7 +11,6 @@ import { TopicDeleteDialogComponent } from 'app/entities/topic/topic-delete-dial
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
 @Component({
-  standalone: false,
   selector: '[jhi-topic-row]',
   templateUrl: './topic-row.component.html',
 })

@@ -6,7 +6,7 @@ import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
 import { KEYSTORE_PWD } from 'app/app.constants';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { ICertificate } from 'app/shared/model/certificate.model';
@@ -17,9 +17,9 @@ type EntityArrayResponseType = HttpResponse<ICertificate[]>;
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
 
-  public resourceUrl = this.applicationConfigService.getEndpointFor('api/certificates');
+  public resourceUrl = `${serverApiUrl}api/certificates`;
 
-  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient) {}
 
   create(certificate: ICertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(certificate);
