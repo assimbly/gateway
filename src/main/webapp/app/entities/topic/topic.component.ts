@@ -1,10 +1,15 @@
 import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
-import { SortDirective, SortByDirective } from 'app/shared/sort';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 import { ASC, DESC, SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
 import { SortService } from 'app/shared/sort/sort.service';
 
@@ -18,10 +23,23 @@ import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { startWith, switchMap } from 'rxjs/operators';
+import { TopicRowComponent } from './topic-row.component';
+import { TopicSearchByNamePipe } from './topic.searchbyname.pipe';
 
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    FontAwesomeModule,
+    InfiniteScrollModule,
+    SortDirective,
+    SortByDirective,
+    TopicRowComponent,
+    TopicSearchByNamePipe,
+  ],
 })
 export class TopicComponent implements OnInit, OnDestroy {
 
@@ -33,8 +51,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: number;
-  predicate: string;
-  ascending: boolean;
+  sortState: SortState = { predicate: 'name', order: 'desc' };
 
   timeInterval: Subscription;
   isBroker: boolean;
@@ -56,8 +73,6 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.links = {
       last: 0,
     };
-    this.predicate = 'name';
-    this.ascending = false;
   }
 
   ngOnInit(): void {
@@ -134,8 +149,9 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'name') {
       result.push('name');
     }
     return result;

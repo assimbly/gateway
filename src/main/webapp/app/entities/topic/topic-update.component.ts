@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 
 import { Address, IAddress } from 'app/shared/model/address.model';
 import { TopicService } from './topic.service';
@@ -12,7 +15,8 @@ import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
   selector: 'jhi-topic-update',
-  templateUrl: './topic-update.component.html'
+  templateUrl: './topic-update.component.html',
+  imports: [ReactiveFormsModule, FontAwesomeModule, AlertError],
 })
 export class TopicUpdateComponent implements OnInit {
     isSaving = false;

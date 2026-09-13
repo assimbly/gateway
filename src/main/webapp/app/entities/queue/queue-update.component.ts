@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 
 import { QueueService } from './queue.service';
 import { Address, IAddress } from 'app/shared/model/address.model';
@@ -12,7 +15,8 @@ import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
     selector: 'jhi-queue-update',
-    templateUrl: './queue-update.component.html'
+    templateUrl: './queue-update.component.html',
+    imports: [ReactiveFormsModule, FontAwesomeModule, AlertError],
 })
 export class QueueUpdateComponent implements OnInit {
     isSaving = false;

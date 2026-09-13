@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Router } from '@angular/router';
 
@@ -9,7 +12,8 @@ import { IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
 
 @Component({
-    templateUrl: './queue-clear-dialog.component.html'
+    templateUrl: './queue-clear-dialog.component.html',
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class QueueClearDialogComponent {
     queue?: IQueue;

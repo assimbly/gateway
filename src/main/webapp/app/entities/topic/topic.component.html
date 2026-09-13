@@ -52,7 +52,7 @@
   <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
-      <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="sort()">
+      <tr jhiSort [(sortState)]="sortState" (sortChange)="sort()">
           <th scope="col" jhiSortBy="name"><span>Address</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="numberOfConsumers"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
@@ -72,7 +72,7 @@
       >
         <tr
           jhi-topic-row
-          *ngFor="let address of addresses | TopicSearchByName: searchTopicText:ascending:predicate; trackBy: trackId"
+          *ngFor="let address of addresses | TopicSearchByName: searchTopicText:(sortState.order === 'asc'):sortState.predicate; trackBy: trackId"
           [address]="address"
           [brokerType]="brokerType"
           ng-init="$last && finished()"

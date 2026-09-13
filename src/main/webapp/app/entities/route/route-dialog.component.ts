@@ -1,10 +1,16 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { ForbiddenRouteNamesValidatorDirective } from './route-validation.directive';
 
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
@@ -16,7 +22,8 @@ import 'codemirror/addon/edit/closetag';
 
 @Component({
     selector: 'jhi-route-dialog',
-    templateUrl: './route-dialog.component.html'
+    templateUrl: './route-dialog.component.html',
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective],
 })
 export class RouteDialogComponent implements OnInit {
     route: IRoute;

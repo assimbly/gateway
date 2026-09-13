@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FormBuilder, Validators } from '@angular/forms';
@@ -6,13 +8,16 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { FileLoadError, DataUtils } from 'app/core/util/data-util.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
     selector: 'jhi-route-update',
-    templateUrl: './route-update.component.html'
+    templateUrl: './route-update.component.html',
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule],
 })
 export class RouteUpdateComponent implements OnInit {
     isSaving = false;

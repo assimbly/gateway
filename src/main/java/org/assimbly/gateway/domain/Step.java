@@ -34,11 +34,11 @@ public class Step implements Serializable {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "stepType")
+    @Column(name = "step_type")
     private StepType stepType;
 
 
-    @Column(name = "componentType")
+    @Column(name = "component_type")
     private String componentType;
 
     @Column(name = "uri")
@@ -47,10 +47,10 @@ public class Step implements Serializable {
     @Column(name = "options")
     private String options;
 
-    @Column(name = "responseId")
+    @Column(name = "response_id")
     private Integer responseId;
 
-    @Column(name = "routeId")
+    @Column(name = "route_id")
     private Integer routeId;
 
     @ManyToOne
@@ -58,11 +58,11 @@ public class Step implements Serializable {
     private Flow flow;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "connectionId")
+    @JoinColumn(name = "connection_id")
     private Connection connection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "messageId")
+    @JoinColumn(name = "message_id")
     private Message message;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "step", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})

@@ -1,8 +1,14 @@
 import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 
 import { AccountService } from 'app/core/auth/account.service';
 
@@ -13,10 +19,23 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
+import { QueueRowComponent } from './queue-row.component';
+import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
 
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    FontAwesomeModule,
+    InfiniteScrollModule,
+    SortDirective,
+    SortByDirective,
+    QueueRowComponent,
+    QueueSearchByNamePipe,
+  ],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[];
@@ -27,8 +46,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: number;
-  predicate: string;
-  ascending: boolean;
+  sortState: SortState = { predicate: 'name', order: 'desc' };
   timeInterval: Subscription;
   isBroker: boolean;
 
@@ -49,8 +67,6 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.links = {
       last: 0,
     };
-    this.predicate = 'name';
-    this.ascending = false;
   }
 
   reset(): void {
@@ -124,8 +140,9 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'name') {
       result.push('name');
     }
     return result;

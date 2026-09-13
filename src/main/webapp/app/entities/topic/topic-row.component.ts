@@ -1,4 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { TopicService } from './topic.service';
@@ -13,6 +16,7 @@ import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog
 @Component({
   selector: '[jhi-topic-row]',
   templateUrl: './topic-row.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule],
 })
 export class TopicRowComponent implements OnInit, OnDestroy {
   mySubscription: Subscription;
